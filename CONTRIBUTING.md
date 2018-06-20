@@ -31,10 +31,10 @@ This project just started! Please wait for the first few versions to be released
 - try to only contribute working code, no dead code, no "soon to be used" code and no "will fix is soon" code
 - for C# code, follow the usual C# / .Net coding style rules from Microsoft and Unity
 - only strictly typed variables
-- camlelCase: parameter, 
+- camelCase: parameter, 
 - PascalCase: Method, Class, EEnum, NameSpace, Property, IInterface
-- prefixes: E for enums, I for interfaces
+- prefixes: E for enums, I for interfaces, m_ for members
 - no acronyms, except for the above mentioned prefixes
-- only use public where necessary, use static where possible, avoid protected
+- only use public where necessary, use static/readonly where possible, avoid protected
 - no huge methods, try to reduce complexity, write readable code -> see [Clean Code Cheat Sheet](https://www.bbv.ch/images/bbv/pdf/downloads/V2_Clean_Code_V3.pdf)
 - when copying others peoples/projects code, check licenses
