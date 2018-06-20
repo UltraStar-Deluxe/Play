@@ -1,0 +1,39 @@
+# see https://github.com/SebastianJay/unity-ci-test for how to set up unity builds using travis-ci
+
+# do not install anything extra onto the image
+language: generic
+
+# use a Mac OSX image
+os: osx
+
+# only run builds on pushes to the master branch
+branches:
+  only:
+  - master
+
+# send email notifications when the build changes from succeeding to broken
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+# decrypt the encrypted SSH key file so it can be used for scp auth in post_build.sh
+before_install:
+- openssl aes-256-cbc -k "$KEYFILE_PASS" -in "${UPLOAD_KEYPATH}.enc" -out "${UPLOAD_KEYPATH}" -d
+
+# run the script to download and install Unity editor
+install:
+- sudo -E sh ./tools/travis/install.sh
+
+# run the script for unit tests and builds
+script:
+- sudo -E sh ./tools/travis/build.sh
+
+# run the script to upload the builds as tarballs
+after_success:
+- sudo -E sh ./tools/travis/post_build.sh
+
+# environment variables used in bash scripts
+env:
+  global:
+  - UNITYCI_PROJECT_NAME="UltraStar Play"
