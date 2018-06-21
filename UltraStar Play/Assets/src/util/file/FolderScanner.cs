@@ -40,7 +40,9 @@ public class FolderScanner
             if (recursive)
             {
                 foreach (DirectoryInfo innerDirInfo in dirInfo.GetDirectories())
+                {
                     result.AddRange(GetFiles(innerDirInfo.FullName, true));
+                }
             }
         }
         catch (Exception ex)

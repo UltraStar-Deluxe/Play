@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class SettingsManager
 {
-    private static readonly GameSetting s_setting;
-
-    static SettingsManager()
-    {
-        s_setting = new GameSetting();
-    }
+    private static GameSetting s_setting = new GameSetting();
 
     public static System.Object GetSetting(ESetting key)
     {
@@ -28,6 +23,14 @@ public class SettingsManager
         lock (s_setting)
         {
             s_setting.SetSetting(key, value);
+        }
+    }
+
+    public static void Reload()
+    {
+        lock (s_setting)
+        {
+            s_setting = new GameSetting();
         }
     }
 }

@@ -15,8 +15,8 @@ public class SAboutController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-		
-	}
+        // todo
+    }
 
     public void GoToMainView()
     {

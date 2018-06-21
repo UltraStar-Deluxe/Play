@@ -13,7 +13,8 @@ public class MySaveData
     float health;
 }
 
-public class NewButtonClickTestScript : MonoBehaviour {
+public class NewButtonClickTestScript : MonoBehaviour
+{
 
     //private MySaveData saveData;
 
@@ -25,8 +26,6 @@ public class NewButtonClickTestScript : MonoBehaviour {
             //ser.Serialize(file, saveData);
         }
     }
-
-    //public void LoadTheGame
 
     public override bool Equals(object other)
     {
@@ -44,14 +43,16 @@ public class NewButtonClickTestScript : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    void Start ()
+    {
+        // todo
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+        // todo
+    }
 
     public void NewButtonClickTest()
     {
