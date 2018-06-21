@@ -43,4 +43,12 @@ public class PlayersManager
             return s_players.AsReadOnly();
         }
     }
+
+    public static void ClearPlayers()
+    {
+        lock (s_players)
+        {
+            s_players.Clear();
+        }
+    }
 }

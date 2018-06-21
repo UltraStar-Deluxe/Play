@@ -156,6 +156,7 @@ public class MicrophoneListener : MonoBehaviour
                 //wait until microphone position is found (?)
                 while (!(Microphone.GetPosition(null) > 0))
                 {
+                    // todo
                 }
 
                 src.Play(); // Play the audio source
