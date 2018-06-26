@@ -31,3 +31,19 @@ see [CONTRIBUTING.md](https://github.com/UltraStar-Deluxe/Play/blob/master/CONTR
 - see documentation sources mentioned above
 - [Issue Tracker](https://github.com/UltraStar-Deluxe/Play/issues)
 - "the code is documentation enough" << sorry, this project just started, there will be more places for support later on
+
+### 7. Repository Folder Structure
+The current folder structure is just a first draft, and you are encouraged to improve it, if you have extensive knowledge of / experience in open source unity games.
+
+| Where | What |
+|---|---|
+| / | Main repo folder. Try to not add any new files here, but instead place them in a fitting subfolder |
+| /tools/ | any build scripts, templates, helper stuff for devs, code checking stuff, lint templates |
+| /UltraStar Play/ | Unity project |
+| /UltraStar Play/Assets/Editor/ | unit tests or integration tests go here |
+| /UltraStar Play/Assets/Materials/theme/ | theme content: image files, animations, click sounds, background music |
+| /UltraStar Play/Assets/src/ | actual code of this project |
+| ./src/audio/ | any audio input / output / pitch detection / microphone related code goes here |
+| ./src/model/ | code related to the data model, static classes for songs-manager, players-manager, settings-manager |
+| ./src/util/ |  rather generic utility code that is not specific to this karaoke game |
+| ./src/view/ | all the screens/views and any code that is specific for these screens, currently also contains all the "in-game logic" |
