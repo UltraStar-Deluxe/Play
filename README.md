@@ -2,7 +2,8 @@
 
 [![Travis Build Status](https://travis-ci.org/UltraStar-Deluxe/Play.svg?branch=master)](https://travis-ci.org/UltraStar-Deluxe/Play)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5eeefc3773e8405aac7332ce0e57ec86)](https://www.codacy.com/app/UltraStar-Deluxe/Play?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UltraStar-Deluxe/Play&amp;utm_campaign=Badge_Grade)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/UltraStar-Deluxe/Play/blob/master/LICENSE) [![Join the chat at https://gitter.im/UltraStar-Deluxe/Play](https://badges.gitter.im/UltraStar-Deluxe/Play.svg)](https://gitter.im/UltraStar-Deluxe/Play?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/UltraStar-Deluxe/Play/blob/master/LICENSE) 
+[![Join the chat at https://gitter.im/UltraStar-Deluxe/Play](https://badges.gitter.im/UltraStar-Deluxe/Play.svg)](https://gitter.im/UltraStar-Deluxe/Play?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### 1. About
 UltraStar Play is a free and open source karaoke singing game for Windows, Linux, Android, Xbox, PlayStation and other modern platforms. The game plays the audio file, displays singing lyrics, notes and optionally a background video or picture, while the singers sing the songs and thus try to hit the notes to get points depending on how close they get to the perfect pitches.
