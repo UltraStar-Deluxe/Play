@@ -3,7 +3,7 @@ First off, thank you for considering contributing to UltraStar Play. It's people
 Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
 We are a free/libre open source project and we love to receive contributions from our community — you! There are many ways to contribute, from writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into the game itself.
-Please, don't use the issue tracker for support questions. Check whether the #usdx IRC channel on Freenode can help with your issue. If your problem is not strictly UltraStar Play specific, there are also a couple of forums out there regarding karaoke games.
+Please, don't use the issue tracker for support questions. Check whether the [UltraStar Play chat on Gitter](https://gitter.im/UltraStar-Deluxe/Play) can help with your issue. If your problem is not strictly UltraStar Play specific, there are also a couple of forums out there regarding karaoke games.
 
 ## Open Development
 All work on UltraStar Play happens directly on GitHub. Both core team members and external contributors send pull requests which go through the same review process.
