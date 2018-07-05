@@ -21,7 +21,12 @@ public class FolderScanner
         }
     }
 
-    public List<string> GetFiles(string folder, bool recursive = true)
+    public List<string> GetFiles(string folder) 
+    {
+        return GetFiles(folder, true);
+    }
+
+    public List<string> GetFiles(string folder, bool recursive)
     {
         var result = new List<string>();
         var dirInfo = new DirectoryInfo(folder);
@@ -47,7 +52,6 @@ public class FolderScanner
         }
         catch (Exception ex)
         {
-            // TODO basisbit 06.12.2017: only do logging instead of failing
             throw new UnityException("Scanning of a folder failed.", ex);
         }
 
