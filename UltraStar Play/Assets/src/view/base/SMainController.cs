@@ -4,18 +4,6 @@ using UnityEngine;
 
 public class SMainController : MonoBehaviour
 {
-	// Use this for initialization
-	void Start ()
-    {
-        // todo
-    }
-
-    // Update is called once per frame
-    void Update ()
-    {
-        // todo
-    }
-
     public void OnGUI()
     {
         Debug.Log("omg they want me to draw stuff. I am not prepared. What shal I do? *runs away*");

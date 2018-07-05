@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
-public class PlayersManager
+public static class PlayersManager
 {
     private static readonly List<Player> s_players = new List<Player>();
-
-    static PlayersManager()
-    {
-        // nothing to do for now.
-    }
 
     public static void AddPlayer(Player player)
     {
