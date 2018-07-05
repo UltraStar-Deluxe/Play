@@ -12,15 +12,15 @@ public class MicrophoneListener : MonoBehaviour
     public bool startMicOnStartup = true;
 
     //allows start and stop of listener at run time within the unity editor
-    public bool stopMicrophoneListener = false;
-    public bool startMicrophoneListener = false;
+    public bool stopMicrophoneListener;
+    public bool startMicrophoneListener;
 
-    private bool microphoneListenerOn = false;
+    private bool microphoneListenerOn;
 
     //public to allow temporary listening over the speakers if you want of the mic output
     //but internally it toggles the output sound to the speakers of the audiosource depending
     //on if the microphone listener is on or off
-    public bool disableOutputSound = false; 
+    public bool disableOutputSound; 
  
     //an audio source also attached to the same object as this script is
     AudioSource src;
@@ -35,13 +35,7 @@ public class MicrophoneListener : MonoBehaviour
     //and rename it to "Volume"
     public AudioMixer masterMixer;
 
-
-    float timeSinceRestart = 0;
-
-
-
-
-
+    float timeSinceRestart;
 
     void Start()
     {
@@ -55,7 +49,6 @@ public class MicrophoneListener : MonoBehaviour
 
     void Update()
     {
-
         //can use these variables that appear in the inspector, or can call the public functions directly from other scripts
         if (stopMicrophoneListener)
         {
@@ -74,12 +67,11 @@ public class MicrophoneListener : MonoBehaviour
 
         //can choose to unmute sound from inspector if desired
         DisableSound(!disableOutputSound);
-
-
     }
 
-
-    //stops everything and returns audioclip to null
+    /// <summary>
+    /// Stops everything and returns audioclip to null;
+    /// </summary>
     public void StopMicrophoneListener()
     {
         //stop the microphone listener
@@ -105,11 +97,12 @@ public class MicrophoneListener : MonoBehaviour
     }
 
 
-    //controls whether the volume is on or off, use "off" for mic input (dont want to hear your own voice input!) 
-    //and "on" for music input
+    /// <summary>
+    /// Controls whether the volume is on or off, use "off" for mic input (dont want to hear your own voice input!)
+    /// and "on" for music input.
+    /// </summary>
     public void DisableSound(bool SoundOn)
     {
-
         float volume = 0;
 
         if (SoundOn)
@@ -127,9 +120,9 @@ public class MicrophoneListener : MonoBehaviour
         }
     }
 
-
-
-    // restart microphone removes the clip from the audiosource
+    /// <summary>
+    /// Restart microphone removes the clip from the audiosource.
+    /// </summary>
     public void RestartMicrophoneListener()
     {
 
@@ -142,7 +135,9 @@ public class MicrophoneListener : MonoBehaviour
 
     }
 
-    //puts the mic into the audiosource
+    /// <summary>
+    /// Puts the mic into the audiosource.
+    /// </summary>
     void MicrophoneIntoAudioSource(bool MicrophoneListenerOn)
     {
 
@@ -152,13 +147,6 @@ public class MicrophoneListener : MonoBehaviour
             if (Time.time - timeSinceRestart > 0.5f && !Microphone.IsRecording(null))
             {
                 src.clip = Microphone.Start(null, true, 10, 44100);
-
-                //wait until microphone position is found (?)
-                while (!(Microphone.GetPosition(null) > 0))
-                {
-                    // todo
-                }
-
                 src.Play(); // Play the audio source
             }
         }

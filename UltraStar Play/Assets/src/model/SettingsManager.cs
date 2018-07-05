@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SettingsManager
+public static class SettingsManager
 {
     private static GameSetting s_setting = new GameSetting();
 
@@ -14,15 +14,15 @@ public class SettingsManager
         }
     }
 
-    public static void SetSetting(ESetting key, System.Object value)
+    public static void SetSetting(ESetting key, System.Object settingValue)
     {
-        if(value == null)
+        if(settingValue == null)
         {
             throw new UnityException("Can not set setting because value is null!");
         }
         lock (s_setting)
         {
-            s_setting.SetSetting(key, value);
+            s_setting.SetSetting(key, settingValue);
         }
     }
 

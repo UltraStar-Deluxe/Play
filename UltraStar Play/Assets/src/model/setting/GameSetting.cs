@@ -8,7 +8,7 @@ public class GameSetting
 
     public GameSetting()
     {
-        InitSettingDefaults(m_settings);
+        m_settings = InitSettingDefaults(m_settings);
     }
 
     private static Dictionary<ESetting, System.Object> InitSettingDefaults(Dictionary<ESetting, System.Object> settings)

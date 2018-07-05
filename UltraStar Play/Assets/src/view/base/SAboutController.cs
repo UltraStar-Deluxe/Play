@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,21 +7,16 @@ using UnityEngine.SceneManagement;
 
 public class SAboutController : MonoBehaviour
 {
-	// Use this for initialization
+    /// <summary>
+    /// Use this for initialization.
+    /// </summary>
 	void Start ()
     {
-        System.Console.WriteLine("beeeeeep");
+        Debug.Log("beeeeeep");
     }
 	
-	// Update is called once per frame
-	void Update ()
+	public void GoToMainView()
     {
-        // todo
-    }
-
-    public void GoToMainView()
-    {
-        //Application.c
         SceneManager.LoadScene("src/view/base/SMainView");
     }
 }

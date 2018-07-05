@@ -7,7 +7,7 @@ using System;
 
 public class SLoadingController : MonoBehaviour
 {
-    public Text m_labelStatus;
+    public Text m_labelStatus = new Text();
 
     void Start ()
     {
@@ -15,7 +15,6 @@ public class SLoadingController : MonoBehaviour
         {
             Debug.Log("Name: " + device);
         }
-        // SongsManager.ScanSongFiles();
     }
 
 	void Update ()
@@ -29,7 +28,6 @@ public class SLoadingController : MonoBehaviour
                 + Environment.NewLine
                 + SongsManager.GetSongs().Count
                 + Environment.NewLine;
-                //+ (SongsManager.getSongs().Count >= 0 ? SongsManager.getSongs()[0].getSentences(0).Count.ToString() : "empty");
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
