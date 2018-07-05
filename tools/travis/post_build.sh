@@ -4,7 +4,7 @@
 osxname="${UNITYCI_PROJECT_NAME}_osx.tar.gz"
 
 # set file permissions so builds can run out of the box
-for infile in `find $(pwd)/Build | grep -E '\.exe$|\.dll$'`; do
+for infile in $(find $(pwd)/Build | grep -E '\.exe$|\.dll$'); do
 	chmod 755 $infile
 done
 

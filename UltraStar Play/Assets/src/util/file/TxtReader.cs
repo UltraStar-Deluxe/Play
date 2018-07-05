@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-public class TxtReader
+public static class TxtReader
 {
     public static Encoding GuessFileEncoding(string srcFile)
     {
@@ -32,7 +32,11 @@ public class TxtReader
         return enc;
     }
 
-    public static StreamReader GetFileStreamReader(string path, Encoding enc = null)
+    public static StreamReader GetFileStreamReader(string path)
+    {
+        return GetFileStreamReader(path, null);
+    }
+    public static StreamReader GetFileStreamReader(string path, Encoding enc)
     {
         if (path == null || !File.Exists(path))
         {
@@ -82,7 +86,10 @@ public class TxtReader
                 case '\u000C':
                 case '\u000D':
                 case '\u0085':
-                    if (skip) continue;
+                    if (skip)
+                    {
+                        continue;
+                    }
                     src[index++] = ch;
                     skip = true;
                     continue;

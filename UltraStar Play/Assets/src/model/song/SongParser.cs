@@ -9,11 +9,6 @@ using UnityEngine;
 
 class SongParser
 {
-    public SongParser()
-    {
-        // nothing to do so far.
-    }
-
     public static bool ParseSongFile(string path, Encoding enc = null)
     {
         Note lastNote = null; //Holds last parsed note. Get's reset on player change
@@ -45,7 +40,7 @@ class SongParser
                     if (line == "" || line[0].Equals(" ")
                         || (finishedHeaders && line[0].Equals('#')))
                     {
-                        Debug.Log(String.Format("Invalid linestart found in {0} :: \"{1}\". Aborting.", path, line.ToString()));
+                        Debug.Log(String.Format("Invalid linestart found in {0} :: \"{1}\". Aborting.", path, line);
                         return false;
                     }
                     if (!finishedHeaders && line[0].Equals('#'))
@@ -57,9 +52,9 @@ class SongParser
                             HandleParsingError("invalid file...", EParsingErrorSeverity.Critical);
                             continue;
                         }
-                        string value = line.Substring(pos + 1).Trim();
+                        string tag = line.Substring(pos + 1).Trim();
 
-                        if (value == "")
+                        if (tag.Equals(string.Empty))
                         {
                             // invalid tag.
                             HandleParsingError("Invalid empty tag found", EParsingErrorSeverity.Minor);
@@ -68,11 +63,11 @@ class SongParser
 
                         if (identifier.Equals("ENCODING"))
                         {
-                            if (value.Equals("UTF8"))
+                            if (tag.Equals("UTF8"))
                             {
-                                value = "UTF-8";
+                                tag = "UTF-8";
                             }
-                            Encoding newEncoding = Encoding.GetEncoding(value);
+                            Encoding newEncoding = Encoding.GetEncoding(tag);
                             if (!newEncoding.Equals(reader.CurrentEncoding))
                             {
                                 reader.Dispose();
@@ -80,7 +75,7 @@ class SongParser
                             }
                         }
 
-                        identifier = ParseHeaderField(headers, directory, identifier, value);
+                        identifier = ParseHeaderField(headers, directory, identifier, tag);
                     }
                     else
                     {
@@ -141,8 +136,6 @@ class SongParser
         int startBeat, length;
         switch (tag)
         {
-            case '#':
-                break; ;
             case 'E':
                 endFound = true;
                 break;
@@ -186,15 +179,19 @@ class SongParser
                 ENoteType noteType;
 
                 if (tag.Equals('*'))
+                {
                     noteType = ENoteType.Golden;
+                }
                 else if (tag.Equals('F'))
+                {
                     noteType = ENoteType.Freestyle;
+                }
                 else
+                {
                     noteType = ENoteType.Normal;
+                }
 
                 lastNote = new Note(pitch, startBeat, length, text, noteType);
-                // TODO basisbit 20.06.2018: add note to end of current sentence.    
-                // playersSentences[player].Last().
                 break;
             case '-':
                 string[] lineBreakData = line.Split(splitChars);
@@ -217,14 +214,6 @@ class SongParser
                 {
                     HandleParsingError("Ignored line break because position is < 1", EParsingErrorSeverity.Minor);
                 }
-                else
-                {
-                    // TODO basisbit 20.06.2018: add new sentence to sentences collection of current player
-                    // check if overlapping or duplicate sentences (startBeat & beginning of new sentence smaller than end beat 
-                    //{
-                    //   HandleParsingErrorg(("Ignored line break for player " + (curPlayer + 1) + " (Overlapping or duplicate)", EParsingErrorSeverity.Minor);
-                    //}
-                }
                 break;
             default:
                 HandleParsingError("Unexpected or missing character (" + tag + ")", EParsingErrorSeverity.Critical);
@@ -232,7 +221,7 @@ class SongParser
         }
     }
 
-    private static string ParseHeaderField(Dictionary<ESongHeader, object> headers, string directory, string identifier, string value)
+    private static string ParseHeaderField(Dictionary<ESongHeader, object> headers, string directory, string identifier, string fieldValue)
     {
         switch (identifier)
         {
@@ -240,29 +229,29 @@ class SongParser
                 // handled outside the switch. Nothing to do here
                 break;
             case "TITLE":
-                headers[ESongHeader.Title] = value.Trim();
+                headers[ESongHeader.Title] = fieldValue.Trim();
                 break;
             case "ARTIST":
-                headers[ESongHeader.Artist] = value.Trim();
+                headers[ESongHeader.Artist] = fieldValue.Trim();
                 break;
             case "CREATOR":
             case "AUTHOR":
             case "AUTOR":
-                headers[ESongHeader.Creator] = value.Trim();
+                headers[ESongHeader.Creator] = fieldValue.Trim();
                 break;
             case "MP3":
-                if (File.Exists(Path.Combine(directory, value.Trim())))
+                if (File.Exists(Path.Combine(directory, fieldValue.Trim())))
                 {
-                    headers[ESongHeader.Mp3] = value.Trim();
+                    headers[ESongHeader.Mp3] = fieldValue.Trim();
                 }
                 else
                 {
-                    HandleParsingError("Can't find audio file: " + Path.Combine(directory, value), EParsingErrorSeverity.Critical);
-                };
+                    HandleParsingError("Can't find audio file: " + Path.Combine(directory, fieldValue), EParsingErrorSeverity.Critical);
+                }
                 break;
             case "BPM":
                 float result;
-                if (TryParse(value, out result))
+                if (TryParse(fieldValue, out result))
                 {
                     headers[ESongHeader.Bpm] = result;
                 }
@@ -272,9 +261,9 @@ class SongParser
                 }
                 break;
             case "EDITION":
-                if (value.Length > 1)
+                if (fieldValue.Length > 1)
                 {
-                    headers[ESongHeader.Edition] = value.Trim();
+                    headers[ESongHeader.Edition] = fieldValue.Trim();
                 }
                 else
                 {
@@ -282,9 +271,9 @@ class SongParser
                 }
                 break;
             case "GENRE":
-                if (value.Length > 1)
+                if (fieldValue.Length > 1)
                 {
-                    headers[ESongHeader.Genre] = value.Trim();
+                    headers[ESongHeader.Genre] = fieldValue.Trim();
                 }
                 else
                 {
@@ -292,13 +281,13 @@ class SongParser
                 }
                 break;
             case "ALBUM":
-                headers[ESongHeader.Edition] = value.Trim();
+                headers[ESongHeader.Edition] = fieldValue.Trim();
                 break;
             case "YEAR":
                 int num;
-                if (value.Length == 4 && int.TryParse(value, out num) && num > 0)
+                if (fieldValue.Length == 4 && int.TryParse(fieldValue, out num) && num > 0)
                 {
-                    headers[ESongHeader.Year] = (int)num;
+                    headers[ESongHeader.Year] = num;
                 }
                 else
                 {
@@ -306,9 +295,9 @@ class SongParser
                 }
                 break;
             case "LANGUAGE":
-                if (value.Length > 1)
+                if (fieldValue.Length > 1)
                 {
-                    headers[ESongHeader.Language] = value.Trim();
+                    headers[ESongHeader.Language] = fieldValue.Trim();
                 }
                 else
                 {
@@ -317,7 +306,7 @@ class SongParser
                 break;
             case "GAP":
                 float resultGap;
-                if (TryParse(value, out resultGap))
+                if (TryParse(fieldValue, out resultGap))
                 {
                     headers[ESongHeader.Gap] = resultGap / 1000f;
                 }
@@ -327,38 +316,38 @@ class SongParser
                 }
                 break;
             case "COVER":
-                if (File.Exists(Path.Combine(directory, value)))
+                if (File.Exists(Path.Combine(directory, fieldValue)))
                 {
-                    headers[ESongHeader.Cover] = value;
+                    headers[ESongHeader.Cover] = fieldValue;
                 }
                 else
                 {
-                    HandleParsingError("Can't find cover file: " + Path.Combine(directory, value), EParsingErrorSeverity.Minor);
+                    HandleParsingError("Can't find cover file: " + Path.Combine(directory, fieldValue), EParsingErrorSeverity.Minor);
                 }
                 break;
             case "BACKGROUND":
-                if (File.Exists(Path.Combine(directory, value)))
+                if (File.Exists(Path.Combine(directory, fieldValue)))
                 {
-                    headers[ESongHeader.Background] = value;
+                    headers[ESongHeader.Background] = fieldValue;
                 }
                 else
                 {
-                    HandleParsingError("Can't find background file: " + Path.Combine(directory, value), EParsingErrorSeverity.Minor);
+                    HandleParsingError("Can't find background file: " + Path.Combine(directory, fieldValue), EParsingErrorSeverity.Minor);
                 }
                 break;
             case "VIDEO":
-                if (File.Exists(Path.Combine(directory, value)))
+                if (File.Exists(Path.Combine(directory, fieldValue)))
                 {
-                    headers[ESongHeader.Video] = value;
+                    headers[ESongHeader.Video] = fieldValue;
                 }
                 else
                 {
-                    HandleParsingError("Can't find video file: " + Path.Combine(directory, value), EParsingErrorSeverity.Minor);
+                    HandleParsingError("Can't find video file: " + Path.Combine(directory, fieldValue), EParsingErrorSeverity.Minor);
                 }
                 break;
             case "VIDEOGAP":
                 float resultVideoGap;
-                if (TryParse(value, out resultVideoGap))
+                if (TryParse(fieldValue, out resultVideoGap))
                 {
                     headers[ESongHeader.Videogap] = resultVideoGap;
                 }
@@ -369,7 +358,7 @@ class SongParser
                 break;
             case "START":
                 float resultStart;
-                if (TryParse(value, out resultStart))
+                if (TryParse(fieldValue, out resultStart))
                 {
                     headers[ESongHeader.Start] = resultStart;
                 }
@@ -380,7 +369,7 @@ class SongParser
                 break;
             case "END":
                 float resultFinish;
-                if (TryParse(value, out resultFinish))
+                if (TryParse(fieldValue, out resultFinish))
                 {
                     headers[ESongHeader.End] = resultFinish / 1000f;
                 }
@@ -395,19 +384,11 @@ class SongParser
                 {
                     identifier = identifier.Substring(10);
                     if (!identifier.StartsWith("P"))
-                        identifier = "P" + identifier;
-                }
-                if (identifier.StartsWith("P"))
-                {
-                    int lplayer;
-                    if (int.TryParse(identifier.Substring(1).Trim(), out lplayer))
                     {
-                        //playersSentences.Add(new List<Sentence>());
-                        //foreach (int curPlayer in player.GetSetBits())
-                        //    TODO store value / voice names in the Song object for the current player
+                        identifier = "P" + identifier;
                     }
                 }
-                else
+                if (!identifier.StartsWith("P"))
                 {
                     HandleParsingError("Unknown tag: #" + identifier, EParsingErrorSeverity.Minor);
                 }
@@ -418,24 +399,27 @@ class SongParser
         return identifier;
     }
 
-    private static bool TryParse<T>(string value, out T result, bool ignoreCase = false)
+    private static bool TryParse<T>(string input, out T result, bool ignoreCase = false)
             where T : struct
     {
         result = default(T);
         try
         {
-            result = (T)Enum.Parse(typeof(T), value, ignoreCase);
+            result = (T)Enum.Parse(typeof(T), input, ignoreCase);
             return true;
         }
-        catch { }
+        catch (Exception e) 
+        {
+            Debug.Log(e);
+        }
 
         return false;
     }
 
-    private static bool TryParse(string value, out float result)
+    private static bool TryParse(string input, out float result)
     {
-        value = value.Replace(',', '.');
-        return Single.TryParse(value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, NumberFormatInfo.InvariantInfo, out result);
+        string inputAsWeWant = input.Replace(',', '.');
+        return Single.TryParse(inputAsWeWant, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, NumberFormatInfo.InvariantInfo, out result);
     }
 
     private static void HandleParsingError(string errorMessage, EParsingErrorSeverity errorSeverity)
@@ -443,10 +427,11 @@ class SongParser
         switch (errorSeverity)
         {
             case EParsingErrorSeverity.Critical:
-                throw new Exception("Critical parsing error in file TODO.\nInner error message: " + errorMessage);
-            case EParsingErrorSeverity.Minor:
+                throw new SongParserException("Critical parsing error in file.\nInner error message: " + errorMessage);
+            default:
                 Debug.Log(errorMessage);
                 break;
+
         }
     }
 
@@ -454,5 +439,18 @@ class SongParser
     {
         Minor,
         Critical
+    }
+}
+
+public class SongParserException : Exception 
+{
+    public SongParserException(string message)
+        : base(message) 
+    {
+    }
+
+    public SongParserException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

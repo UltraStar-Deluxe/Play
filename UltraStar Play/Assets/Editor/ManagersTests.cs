@@ -46,7 +46,7 @@ public class ManagersTests
     public void TestSettingsManagerGetSetting()
     {
         SettingsManager.Reload();
-        bool isFullscreen = (bool) SettingsManager.GetSetting(ESetting.FullScreen);
+        Assert.IsTrue((bool) SettingsManager.GetSetting(ESetting.FullScreen));
     }
 
     [Test]
