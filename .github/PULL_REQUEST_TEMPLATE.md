@@ -29,6 +29,7 @@ HOW TO WRITE A GOOD PULL REQUEST?
 ### More
 
 - [ ] Added/updated documentation
+- [ ] Updated [`Changelog.md`](https://github.com/UltraStar-Deluxe/Play/blob/master/CHANGELOG.md)
 
 ### Additional Notes
 
