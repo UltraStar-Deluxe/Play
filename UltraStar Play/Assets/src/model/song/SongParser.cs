@@ -40,7 +40,7 @@ class SongParser
                     if (line == "" || line[0].Equals(" ")
                         || (finishedHeaders && line[0].Equals('#')))
                     {
-                        Debug.Log(String.Format("Invalid linestart found in {0} :: \"{1}\". Aborting.", path, line);
+                        Debug.Log(String.Format("Invalid linestart found in {0} :: \"{1}\". Aborting.", path, line));
                         return false;
                     }
                     if (!finishedHeaders && line[0].Equals('#'))
