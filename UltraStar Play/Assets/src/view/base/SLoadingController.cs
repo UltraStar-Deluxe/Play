@@ -7,7 +7,7 @@ using System;
 
 public class SLoadingController : MonoBehaviour
 {
-    public Text m_labelStatus = new Text();
+    public Text m_labelStatus;
 
     void Start ()
     {
