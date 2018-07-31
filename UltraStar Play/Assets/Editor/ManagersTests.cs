@@ -10,9 +10,7 @@ public class ManagersTests
     public void TestPlayersManagerCreation()
     {
         PlayersManager.ClearPlayers();
-        //~ PlayersManager playersManager;
-        //~ Assert.IsNotNull(playersManager);
-        Assert.IsNotNull(null);
+        Assert.IsTrue(PlayersManager.GetPlayers().Count == 0);
     }
 
     [Test]
