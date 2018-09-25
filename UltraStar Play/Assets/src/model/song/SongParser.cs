@@ -11,21 +11,16 @@ class SongParser
 {
     public static bool ParseSongFile(string path, Encoding enc = null)
     {
-        Note lastNote = null; //Holds last parsed note. Get's reset on player change
         bool endFound = false; // True if end tag was found
 
-        int player = 1;
+        SongBuilder songBuilder = new SongBuilder(path);
 
         char[] trimChars = { ' ', ':' };
         char[] splitChars = { ' ' };
 
+        string[] voiceIdentifiers = { "P", "DUETSINGERP" };
+
         Dictionary<ESongHeader, System.Object> headers = new Dictionary<ESongHeader, System.Object>();
-        List<List<Sentence>> voicesSentences = new List<List<Sentence>>
-        {
-            new List<Sentence>(),
-            new List<Sentence>(),
-            new List<Sentence>()
-        };
 
         try
         {
@@ -76,14 +71,28 @@ class SongParser
                         }
 
                         identifier = ParseHeaderField(headers, directory, identifier, tag);
+                        foreach (string voiceIdentifier in voiceIdentifiers)
+                        {
+                            if (identifier.StartsWith(voiceIdentifier))
+                            {
+                                if (identifier.Length <= voiceIdentifier.Length)
+                                {
+                                    HandleParsingError("Player identifiers cannot be empty", EParsingErrorSeverity.Critical);
+                                }
+                                songBuilder.AddVoice(identifier, tag.Trim());
+                                break;
+                            }
+                        }
                     }
                     else
                     {
                         if (!finishedHeaders)
                         {
                             finishedHeaders = true;
+                            songBuilder.SetSongHeaders(headers);
+                            songBuilder.FixVoices();
                         }
-                        ParseLyricsTxtLine(ref lastNote, ref endFound, ref player, trimChars, splitChars, ref line);
+                        ParseLyricsTxtLine(ref endFound, trimChars, splitChars, ref line, ref songBuilder);
                     }
                 }
 
@@ -92,16 +101,15 @@ class SongParser
                     HandleParsingError("Lyrics/Notes missing", EParsingErrorSeverity.Critical);
                 }
 
-                CheckMinimalRequiredHeaders(headers);
+                CheckMinimalRequiredHeaders(songBuilder.GetSongHeaders());
             }
         }
         catch (Exception e)
         {
-            Debug.Log("Error reading song file" + e.Message);
+            Debug.Log("Error reading song file" + e.Message+"\n"+e.StackTrace);
             return false;
         }
-        Song song = new Song(headers, voicesSentences, path);
-        SongsManager.AddSongs(song);
+        SongsManager.AddSongs(songBuilder.AsSong());
         return true;
     }
 
@@ -128,25 +136,21 @@ class SongParser
         }
     }
 
-    private static void ParseLyricsTxtLine(ref Note lastNote, ref bool endFound, ref int player, char[] trimChars, char[] splitChars, ref string line)
+    private static void ParseLyricsTxtLine(ref bool endFound, char[] trimChars, char[] splitChars, ref string line, ref SongBuilder songBuilder)
     {
         char tag = line[0];
         line = (line.Length >= 2 && line[1] == ' ') ? line.Substring(2) : line.Substring(1);
+        uint startBeat;
 
-        int startBeat, length;
         switch (tag)
         {
             case 'E':
                 endFound = true;
+                songBuilder.SaveCurrentSentence();
                 break;
             case 'P':
-                line = line.Trim(trimChars);
-
-                if (!int.TryParse(line, out player))
-                {
-                    HandleParsingError("Wrong or missing number after \"P\"", EParsingErrorSeverity.Critical);
-                }
-                lastNote = null;
+                songBuilder.SaveCurrentSentence();
+                songBuilder.SetCurrentVoice("P"+line.Trim(trimChars));
                 break;
             case ':':
             case '*':
@@ -162,8 +166,9 @@ class SongParser
                     HandleParsingError("Invalid note found", EParsingErrorSeverity.Critical);
                 }
                 int pitch;
-                if (!int.TryParse(noteData[0], out startBeat)
-                    || !int.TryParse(noteData[1], out length)
+                uint length;
+                if (!uint.TryParse(noteData[0], out startBeat)
+                    || !uint.TryParse(noteData[1], out length)
                     || !int.TryParse(noteData[2], out pitch))
                 {
                     HandleParsingError("Invalid note found (non-numeric values)", EParsingErrorSeverity.Critical);
@@ -191,7 +196,7 @@ class SongParser
                     noteType = ENoteType.Normal;
                 }
 
-                lastNote = new Note(pitch, startBeat, length, text, noteType);
+                songBuilder.AddNote(new Note(pitch, startBeat, length, text, noteType));
                 break;
             case '-':
                 string[] lineBreakData = line.Split(splitChars);
@@ -199,16 +204,18 @@ class SongParser
                 {
                     HandleParsingError("Invalid line break found (No beat)", EParsingErrorSeverity.Critical);
                 }
-                if (!int.TryParse(lineBreakData[0], out startBeat))
+                if (!uint.TryParse(lineBreakData[0], out startBeat))
                 {
                     HandleParsingError("Invalid line break found (Non-numeric value)", EParsingErrorSeverity.Critical);
                 }
 
-                if (lastNote != null && startBeat <= lastNote.m_startBeat + lastNote.m_length - 1)
-                {
-                    HandleParsingError("Line break is before previous note end. Adjusted.", EParsingErrorSeverity.Minor);
-                    startBeat = lastNote.m_startBeat + lastNote.m_length;
-                }
+                // commented out because it just doesn't do anything functional anyway
+                //~ if (lastNote != null && startBeat <= lastNote.m_startBeat + lastNote.m_length - 1)
+                //~ {
+                    //~ HandleParsingError("Line break is before previous note end. Adjusted.", EParsingErrorSeverity.Minor);
+                    //~ startBeat = lastNote.m_startBeat + lastNote.m_length;
+                //~ }
+                songBuilder.SaveCurrentSentence();
 
                 if (startBeat < 1)
                 {
@@ -378,17 +385,17 @@ class SongParser
                     HandleParsingError("Invalid end", EParsingErrorSeverity.Critical);
                 }
                 break;
+            case "UPDATED":
+            case "COMMENT":
+                // have no in-game use, thus ignore to prevent unknown tag errors
+                break;
             
             default:
-                if (identifier.StartsWith("DUETSINGER"))
+                if (identifier.StartsWith("DUETSINGERP") || identifier.StartsWith("P"))
                 {
-                    identifier = identifier.Substring(10);
-                    if (!identifier.StartsWith("P"))
-                    {
-                        identifier = "P" + identifier;
-                    }
+                    // do nothing, we need to distinguish between the two later on
                 }
-                if (!identifier.StartsWith("P"))
+                else
                 {
                     HandleParsingError("Unknown tag: #" + identifier, EParsingErrorSeverity.Minor);
                 }
