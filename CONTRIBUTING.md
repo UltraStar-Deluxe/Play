@@ -33,7 +33,7 @@ This project just started! Please wait for the first few versions to be released
 - only strictly typed variables
 - camelCase: parameter, 
 - PascalCase: Method, Class, EEnum, NameSpace, Property, IInterface
-- prefixes: E for enums, I for interfaces, m_ for members, S for scenes
+- prefixes: E for enums, I for interfaces, m_ for members, s_ for static members, S for scenes
 - no acronyms, except for the above mentioned prefixes
 - only use public where necessary, use static/readonly where possible, avoid protected
 - no huge methods, try to reduce complexity, write readable code -> see [Clean Code Cheat Sheet](https://www.bbv.ch/images/bbv/pdf/downloads/V2_Clean_Code_V3.pdf)
