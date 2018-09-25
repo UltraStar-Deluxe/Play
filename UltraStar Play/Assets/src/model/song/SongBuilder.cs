@@ -13,11 +13,6 @@ public class SongBuilder
             m_notes.Add(note);
         }
 
-        public List<Note> GetNotes()
-        {
-            return m_notes;
-        }
-
         public Sentence AsSentence()
         {
             return new Sentence(m_notes, GetStartBeat(), GetEndBeat());
