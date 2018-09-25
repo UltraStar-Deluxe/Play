@@ -24,8 +24,23 @@ public class Note
         return m_length;
     }
 
+    public int GetPitch()
+    {
+        return m_pitch;
+    }
+
     public uint GetStartBeat()
     {
         return m_startBeat;
+    }
+
+    public string GetText()
+    {
+        return m_text;
+    }
+
+    public ENoteType GetType()
+    {
+        return m_type;
     }
 }
