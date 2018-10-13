@@ -18,8 +18,6 @@ class SongParser
         char[] trimChars = { ' ', ':' };
         char[] splitChars = { ' ' };
 
-        string[] voiceIdentifiers = { "P", "DUETSINGERP" };
-
         Dictionary<ESongHeader, System.Object> headers = new Dictionary<ESongHeader, System.Object>();
 
         try
@@ -71,18 +69,7 @@ class SongParser
                         }
 
                         identifier = ParseHeaderField(headers, directory, identifier, tag);
-                        foreach (string voiceIdentifier in voiceIdentifiers)
-                        {
-                            if (identifier.StartsWith(voiceIdentifier))
-                            {
-                                if (identifier.Length <= voiceIdentifier.Length)
-                                {
-                                    HandleParsingError("Player identifiers cannot be empty", EParsingErrorSeverity.Critical);
-                                }
-                                songBuilder.AddVoice(identifier, tag.Trim());
-                                break;
-                            }
-                        }
+                        AddVoice(identifier, tag.Trim(), ref songBuilder);
                     }
                     else
                     {
@@ -111,6 +98,23 @@ class SongParser
         }
         SongsManager.AddSongs(songBuilder.AsSong());
         return true;
+    }
+    
+    private static void AddVoice(string identifier, string name, ref SongBuilder songBuilder)
+    {
+        string[] voiceIdentifiers = { "P", "DUETSINGERP" };
+        foreach (string voiceIdentifier in voiceIdentifiers)
+        {
+            if (identifier.StartsWith(voiceIdentifier))
+            {
+                if (identifier.Length == voiceIdentifier.Length)
+                {
+                    HandleParsingError("Player identifiers cannot be empty", EParsingErrorSeverity.Critical);
+                }
+                songBuilder.AddVoice(identifier, name);
+                break;
+            }
+        }
     }
 
     private static void CheckMinimalRequiredHeaders(Dictionary<ESongHeader, object> headers)
@@ -232,8 +236,9 @@ class SongParser
     {
         switch (identifier)
         {
-            case "ENCODING":
-                // handled outside the switch. Nothing to do here
+            case "ENCODING": // handled outside the switch. Nothing to do here
+            case "UPDATED": // no in-game use, ignore to prevent unknown tag errors
+            case "COMMENT": // no in-game use, ignore to prevent unknown tag errors
                 break;
             case "TITLE":
                 headers[ESongHeader.Title] = fieldValue.Trim();
@@ -385,11 +390,6 @@ class SongParser
                     HandleParsingError("Invalid end", EParsingErrorSeverity.Critical);
                 }
                 break;
-            case "UPDATED":
-            case "COMMENT":
-                // have no in-game use, thus ignore to prevent unknown tag errors
-                break;
-            
             default:
                 if (identifier.StartsWith("DUETSINGERP") || identifier.StartsWith("P"))
                 {
