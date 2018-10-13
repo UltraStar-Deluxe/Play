@@ -6,7 +6,7 @@ public class SongBuilder
     // mutable versions of some objects
     private class MutableSentence
     {
-        private List<Note> m_notes = new List<Note>();
+        private readonly List<Note> m_notes = new List<Note>();
 
         public void AddNote(Note note)
         {
@@ -33,7 +33,7 @@ public class SongBuilder
     private class MutableVoice
     {
         private readonly string m_name;
-        private List<Sentence> m_sentences = new List<Sentence>();
+        private readonly List<Sentence> m_sentences = new List<Sentence>();
 
         public MutableVoice(string name)
         {
@@ -137,7 +137,7 @@ public class SongBuilder
 
     private MutableVoice m_currentVoice;
     private MutableSentence m_currentSentence;
-    private MutableSong m_song;
+    private readonly MutableSong m_song;
 
     public SongBuilder(string path)
     {
@@ -150,11 +150,18 @@ public class SongBuilder
         {
             return;
         }
-        if (m_currentVoice == null && m_song.GetNumberOfVoices() == 0)
+        if (m_currentVoice == null)
         {
-            // some default voice if it was never set, aka most solo songs
-            m_song.AddVoice("_", "_");
-            m_currentVoice = m_song.GetVoice("_");
+            if (m_song.GetNumberOfVoices() == 0)
+            {
+                // some default voice if it was never set, aka most solo songs
+                m_song.AddVoice("_", "_");
+                m_currentVoice = m_song.GetVoice("_");
+            }
+            else
+            {
+                throw new UnityException("One or more voices were named, you need to define who is singing right now");
+            }
         }
         m_currentVoice.AddSentence(m_currentSentence.AsSentence());
         m_currentSentence = null;

@@ -33,14 +33,14 @@ public class Song
         m_folderPath = new FileInfo(path).Directory.FullName;
     }
 
-    //~ public ReadOnlyCollection<Sentence> GetSentences(int voiceNr)
-    //~ {
-        //~ if(voiceNr > (m_voices.Count -1))
-        //~ {
-            //~ throw new UnityException("Invalid voiceNumber. Can not get sentences for that player!");
-        //~ }
-        //~ return m_voices[voiceNr].AsReadOnly();
-    //~ }
+    public ReadOnlyCollection<Sentence> GetSentences(int voiceNr)
+    {
+        if(voiceNr > (m_voices.Count -1))
+        {
+            throw new UnityException("Invalid voiceNumber. Can not get sentences for that player!");
+        }
+        return m_voices[voiceNr].getSentences().AsReadOnly();
+    }
 
     public string GetStringHeaderOrNull(ESongHeader key)
     {
