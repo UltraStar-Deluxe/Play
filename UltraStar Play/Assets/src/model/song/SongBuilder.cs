@@ -190,7 +190,6 @@ public class SongBuilder
         m_currentSentence.AddNote(note);
     }
 
-    // todo: this can probably maybe get split out into setting individual headers, but for now It'll Be OK
     public void SetSongHeaders(Dictionary<ESongHeader, System.Object> headers)
     {
         m_song.SetHeaders(headers);
