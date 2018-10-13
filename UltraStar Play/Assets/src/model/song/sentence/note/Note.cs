@@ -39,7 +39,7 @@ public class Note
         return m_text;
     }
 
-    public ENoteType GetType()
+    public new ENoteType GetType()
     {
         return m_type;
     }
