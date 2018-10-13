@@ -59,14 +59,13 @@ public class SongBuilder
     {
         private readonly string m_path;
         private Dictionary<ESongHeader, System.Object> m_headers = new Dictionary<ESongHeader, System.Object>();
-        private Dictionary<string, MutableVoice> m_voices = new Dictionary<string, MutableVoice>(); // P# -> MutableVoice
+        private readonly Dictionary<string, MutableVoice> m_voices = new Dictionary<string, MutableVoice>(); // P# -> MutableVoice
 
         public MutableSong(string path)
         {
             m_path = path;
         }
 
-        // todo: this can probably maybe get split out into setting individual headers, but for now It'll Be OK
         public void SetHeaders(Dictionary<ESongHeader, System.Object> headers)
         {
             m_headers = headers;

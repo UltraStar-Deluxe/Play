@@ -213,12 +213,6 @@ class SongParser
                     HandleParsingError("Invalid line break found (Non-numeric value)", EParsingErrorSeverity.Critical);
                 }
 
-                // commented out because it just doesn't do anything functional anyway
-                //~ if (lastNote != null && startBeat <= lastNote.m_startBeat + lastNote.m_length - 1)
-                //~ {
-                    //~ HandleParsingError("Line break is before previous note end. Adjusted.", EParsingErrorSeverity.Minor);
-                    //~ startBeat = lastNote.m_startBeat + lastNote.m_length;
-                //~ }
                 songBuilder.SaveCurrentSentence();
 
                 if (startBeat < 1)
