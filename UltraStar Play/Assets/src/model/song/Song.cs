@@ -8,10 +8,10 @@ public class Song
 {
     private readonly string m_path;
     private readonly string m_folderPath;
-    private readonly List<List<Sentence>> m_voicesSentences;
+    private readonly List<Voice> m_voices;
     private readonly Dictionary<ESongHeader, System.Object> m_headers;
 
-    public Song(Dictionary<ESongHeader, System.Object> headers, List<List<Sentence>> voicesSentences, string path)
+    public Song(Dictionary<ESongHeader, System.Object> headers, List<Voice> voices, string path)
     {
         if(headers == null || headers.Count == 0)
         {
@@ -19,11 +19,11 @@ public class Song
         }
         m_headers = headers;
 
-        if (voicesSentences == null || voicesSentences.Count == 0 || voicesSentences[0] == null)// || playerSentences[0].Count == 0)
+        if (voices == null || voices.Count == 0 || voices[0] == null)// || playerSentences[0].Count == 0)
         {
-            throw new UnityException("playerSentences is null or empty! Can not initialize Song.");
+            throw new UnityException("voices is null or empty! Can not initialize Song.");
         }
-        m_voicesSentences = voicesSentences;
+        m_voices = voices;
 
         if(path == null || path.Length < 6 || !File.Exists(path))
         {
@@ -35,11 +35,11 @@ public class Song
 
     public ReadOnlyCollection<Sentence> GetSentences(int voiceNr)
     {
-        if(voiceNr > (m_voicesSentences.Count -1))
+        if(voiceNr > (m_voices.Count -1))
         {
             throw new UnityException("Invalid voiceNumber. Can not get sentences for that player!");
         }
-        return m_voicesSentences[voiceNr].AsReadOnly();
+        return m_voices[voiceNr].getSentences().AsReadOnly();
     }
 
     public string GetStringHeaderOrNull(ESongHeader key)
@@ -74,6 +74,6 @@ public class Song
     }
     public bool IsDuet()
     {
-        return (m_voicesSentences.Count == 2 || m_voicesSentences.Count == 3);
+        return (m_voices.Count == 2 || m_voices.Count == 3);
     }
 }

@@ -15,9 +15,10 @@ public class SLoadingController : MonoBehaviour
         {
             Debug.Log("Name: " + device);
         }
+        SongsManager.ScanSongFiles();
     }
 
-	void Update ()
+    void Update ()
     {
         if(m_labelStatus != null)
         {
