@@ -159,6 +159,8 @@ class SongParser
             case ':':
             case '*':
             case 'F':
+            case 'R':
+            case 'G':
                 string[] noteData = line.Split(splitChars, 4);
                 if (noteData.Length < 4)
                 {
@@ -185,21 +187,7 @@ class SongParser
                     break;
                 }
 
-                ENoteType noteType;
-
-                if (tag.Equals('*'))
-                {
-                    noteType = ENoteType.Golden;
-                }
-                else if (tag.Equals('F'))
-                {
-                    noteType = ENoteType.Freestyle;
-                }
-                else
-                {
-                    noteType = ENoteType.Normal;
-                }
-
+                ENoteType noteType = GetNoteType(tag);
                 songBuilder.AddNote(new Note(pitch, startBeat, length, text, noteType));
                 break;
             case '-':
@@ -224,6 +212,32 @@ class SongParser
                 HandleParsingError("Unexpected or missing character (" + tag + ")", EParsingErrorSeverity.Critical);
                 break;
         }
+    }
+
+    private static ENoteType GetNoteType(char c)
+    {
+        ENoteType res;
+        switch (c)
+        {
+            case ':':
+                res = ENoteType.Normal;
+                break;
+            case '*':
+                res = ENoteType.Golden;
+                break;
+            case 'F':
+                res = ENoteType.Freestyle;
+                break;
+            case 'R':
+                res = ENoteType.Rap;
+                break;
+            case 'G':
+                res = ENoteType.RapGolden;
+                break;
+            default:
+                throw new SongParserException("Cannot convert '"+c.ToString()+"' to a ENoteType");
+        }
+        return res;
     }
 
     private static string ParseHeaderField(Dictionary<ESongHeader, object> headers, string directory, string identifier, string fieldValue)
