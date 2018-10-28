@@ -20,12 +20,12 @@ public class Voice
         m_sentences = sentences;
     }
 
-    public string getName()
+    public string GetName()
     {
         return m_name;
     }
 
-    public List<Sentence> getSentences()
+    public List<Sentence> GetSentences()
     {
         return m_sentences;
     }
