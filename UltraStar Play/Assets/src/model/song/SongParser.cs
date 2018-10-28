@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-class SongParser
+static class SongParser
 {
     public static bool ParseSongFile(string path, Encoding enc = null)
     {
@@ -47,16 +47,16 @@ class SongParser
                         }
                         string tag = line.Substring(pos + 1).Trim();
 
-                        if (tag.Equals(string.Empty))
+                        if (tag.Length == 0)
                         {
                             // invalid tag.
                             HandleParsingError("Invalid empty tag found", EParsingErrorSeverity.Minor);
                             continue;
                         }
 
-                        if (identifier.Equals("ENCODING"))
+                        if (identifier.Equals("ENCODING", StringComparison.Ordinal))
                         {
-                            if (tag.Equals("UTF8"))
+                            if (tag.Equals("UTF8", StringComparison.Ordinal))
                             {
                                 tag = "UTF-8";
                             }
@@ -105,7 +105,7 @@ class SongParser
         string[] voiceIdentifiers = { "P", "DUETSINGERP" };
         foreach (string voiceIdentifier in voiceIdentifiers)
         {
-            if (identifier.StartsWith(voiceIdentifier))
+            if (identifier.StartsWith(voiceIdentifier, StringComparison.Ordinal))
             {
                 if (identifier.Length == voiceIdentifier.Length)
                 {
@@ -399,7 +399,8 @@ class SongParser
                 }
                 break;
             default:
-                if (identifier.StartsWith("DUETSINGERP") || identifier.StartsWith("P"))
+                if (identifier.StartsWith("DUETSINGERP", StringComparison.Ordinal)
+                    || identifier.StartsWith("P", StringComparison.Ordinal))
                 {
                     // do nothing, we need to distinguish between the two later on
                 }
@@ -457,8 +458,13 @@ class SongParser
     }
 }
 
+[Serializable]
 public class SongParserException : Exception 
 {
+    public SongParserException()
+    {
+    }
+
     public SongParserException(string message)
         : base(message) 
     {
