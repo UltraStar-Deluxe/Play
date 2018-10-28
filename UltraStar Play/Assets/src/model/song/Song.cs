@@ -39,7 +39,7 @@ public class Song
         {
             throw new UnityException("Invalid voiceNumber. Can not get sentences for that player!");
         }
-        return m_voices[voiceNr].getSentences().AsReadOnly();
+        return m_voices[voiceNr].GetSentences().AsReadOnly();
     }
 
     public string GetStringHeaderOrNull(ESongHeader key)

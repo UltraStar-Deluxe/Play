@@ -4,15 +4,10 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using UnityEngine;
 
-public class SongsManager
+public static class SongsManager
 {
     private static readonly List<Song> s_songs = new List<Song>();
-    private static string s_songScanStatus = "";
-
-    SongsManager()
-    {
-        s_songScanStatus = "Waiting for song files scan to start.";
-    }
+    private static string s_songScanStatus = "Waiting for song files scan to start.";
 
     public static void AddSongs(Song song)
     {
@@ -92,7 +87,7 @@ public class SongsManager
         }
     }
 
-    public static string SetSongScanStatus()
+    public static string GetSongScanStatus()
     {
         lock(s_songScanStatus)
         {

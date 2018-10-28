@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -89,7 +90,7 @@ public class SongBuilder
             List<string> voicesToRename = new List<string>();
             foreach (string identifier in m_voices.Keys)
             {
-                if (identifier.StartsWith("DUETSINGERP"))
+                if (identifier.StartsWith("DUETSINGERP", StringComparison.Ordinal))
                 {
                     if (m_voices.ContainsKey(identifier.Substring(10)))
                     {

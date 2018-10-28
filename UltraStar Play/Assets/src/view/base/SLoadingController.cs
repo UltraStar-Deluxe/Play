@@ -25,7 +25,7 @@ public class SLoadingController : MonoBehaviour
             m_labelStatus.text =
                 System.DateTime.Now.ToLongTimeString()
                 + Environment.NewLine
-                + SongsManager.SetSongScanStatus()
+                + SongsManager.GetSongScanStatus()
                 + Environment.NewLine
                 + SongsManager.GetSongs().Count
                 + Environment.NewLine;

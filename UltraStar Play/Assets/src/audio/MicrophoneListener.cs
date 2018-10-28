@@ -15,7 +15,7 @@ public class MicrophoneListener : MonoBehaviour
     public bool stopMicrophoneListener;
     public bool startMicrophoneListener;
 
-    private bool microphoneListenerOn;
+    private bool m_microphoneListenerOn;
 
     //public to allow temporary listening over the speakers if you want of the mic output
     //but internally it toggles the output sound to the speakers of the audiosource depending
@@ -63,7 +63,7 @@ public class MicrophoneListener : MonoBehaviour
         startMicrophoneListener = false;
 
         //must run in update otherwise it doesnt seem to work
-        MicrophoneIntoAudioSource(microphoneListenerOn);
+        MicrophoneIntoAudioSource(m_microphoneListenerOn);
 
         //can choose to unmute sound from inspector if desired
         DisableSound(!disableOutputSound);
@@ -75,7 +75,7 @@ public class MicrophoneListener : MonoBehaviour
     public void StopMicrophoneListener()
     {
         //stop the microphone listener
-        microphoneListenerOn = false;
+        m_microphoneListenerOn = false;
         //reenable the master sound in mixer
         disableOutputSound = false;
         //remove mic from audiosource clip
@@ -89,7 +89,7 @@ public class MicrophoneListener : MonoBehaviour
     public void StartMicrophoneListener()
     {
         //start the microphone listener
-        microphoneListenerOn = true;
+        m_microphoneListenerOn = true;
         //disable sound output (dont want to hear mic input on the output!)
         disableOutputSound = true;
         //reset the audiosource
@@ -101,11 +101,11 @@ public class MicrophoneListener : MonoBehaviour
     /// Controls whether the volume is on or off, use "off" for mic input (dont want to hear your own voice input!)
     /// and "on" for music input.
     /// </summary>
-    public void DisableSound(bool SoundOn)
+    public void DisableSound(bool soundOn)
     {
         float volume = 0;
 
-        if (SoundOn)
+        if (soundOn)
         {
             volume = 0.0f;
         }
@@ -138,10 +138,10 @@ public class MicrophoneListener : MonoBehaviour
     /// <summary>
     /// Puts the mic into the audiosource.
     /// </summary>
-    void MicrophoneIntoAudioSource(bool MicrophoneListenerOn)
+    void MicrophoneIntoAudioSource(bool microphoneListenerOn)
     {
 
-        if (MicrophoneListenerOn)
+        if (microphoneListenerOn)
         {
             //pause a little before setting clip to avoid lag and bugginess
             if (Time.time - timeSinceRestart > 0.5f && !Microphone.IsRecording(null))
