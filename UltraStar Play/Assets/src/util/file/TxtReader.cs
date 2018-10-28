@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,7 +11,7 @@ public static class TxtReader
     {
         Encoding enc = Encoding.Default; //Ansi CodePage
         byte[] buffer = new byte[5];
-        FileStream file = new FileStream(srcFile, FileMode.Open);
+        FileStream file = new FileStream(srcFile, FileMode.Open, FileAccess.Read);
         file.Read(buffer, 0, 5);
         file.Close();
         if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
@@ -50,6 +51,10 @@ public static class TxtReader
     // see https://stackoverflow.com/a/37592018
     public static string NormalizeWhiteSpaceForLoop(string input)
     {
+        if (input == null)
+        {
+            throw new ArgumentNullException(input);
+        }
         int len = input.Length,
             index = 0,
             i = 0;
