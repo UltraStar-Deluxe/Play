@@ -1,57 +1,37 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
-# NOTE the command args below make the assumption that your Unity project folder is
-#  a subdirectory of the repo root directory, e.g. for this repo "Play" 
-#  the project folder is "UltraStar Play". If this is not true then adjust the 
-#  -projectPath argument to point to the right location.
+set -e
+set -x
 
-## Run the editor unit tests
-echo "Running editor unit tests for ${UNITYCI_PROJECT_NAME}"
-/Applications/Unity/Unity.app/Contents/MacOS/Unity \
-	-batchmode \
-	-nographics \
-	-silent-crashes \
-	-logFile $(pwd)/unity.log \
-	-projectPath "$(pwd)/${UNITYCI_PROJECT_NAME}" \
-	-runEditorTests \
-	-editorTestsResultFile $(pwd)/test.xml \
-	-quit
+echo "Building for $BUILD_TARGET"
 
-rc0=$?
-echo "Unit test logs"
-cat $(pwd)/test.xml
-# exit if tests failed
-if [ $rc0 -ne 0 ]; then { echo "Failed unit tests"; } fi
-# exit $rc0; } fi
+export BUILD_PATH=./Builds/$BUILD_TARGET/
+mkdir -p $BUILD_PATH
 
-## Make the builds
-# Recall from install.sh that a separate module was needed for Windows build support
-#echo "Attempting build of ${UNITYCI_PROJECT_NAME} for Windows"
-#/Applications/Unity/Unity.app/Contents/MacOS/Unity \
-#	-batchmode \
-#	-nographics \
-#	-silent-crashes \
-#	-logFile $(pwd)/unity.log \
-#	-projectPath "$(pwd)/${UNITYCI_PROJECT_NAME}" \
-#	-buildWindowsPlayer "$(pwd)/Build/windows/${UNITYCI_PROJECT_NAME}.exe" \
-#	-quit
+xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
+  /opt/Unity/Editor/Unity \
+    -projectPath $(pwd) \
+    -quit \
+    -batchmode \
+    -buildTarget $BUILD_TARGET \
+    -customBuildTarget $BUILD_TARGET \
+    -customBuildName $BUILD_NAME \
+    -customBuildPath $BUILD_PATH \
+    -customBuildOptions AcceptExternalModificationsToPlayer \
+    -executeMethod BuildCommand.PerformBuild \
+    -logFile
 
-#rc1=$?
-#echo "Build logs (Windows)"
-#cat $(pwd)/unity.log
+UNITY_EXIT_CODE=$?
 
-echo "Attempting build of ${UNITYCI_PROJECT_NAME} for OSX"
-/Applications/Unity/Unity.app/Contents/MacOS/Unity \
-	-batchmode \
-	-nographics \
-	-silent-crashes \
-	-logFile $(pwd)/unity.log \
-	-projectPath "$(pwd)/${UNITYCI_PROJECT_NAME}" \
-	-buildOSXUniversalPlayer "$(pwd)/Build/osx/${UNITYCI_PROJECT_NAME}.app" \
-	-quit
+if [ $UNITY_EXIT_CODE -eq 0 ]; then
+  echo "Run succeeded, no failures occurred";
+elif [ $UNITY_EXIT_CODE -eq 2 ]; then
+  echo "Run succeeded, some tests failed";
+elif [ $UNITY_EXIT_CODE -eq 3 ]; then
+  echo "Run failure (other failure)";
+else
+  echo "Unexpected exit code $UNITY_EXIT_CODE";
+fi
 
-rc2=$?
-echo "Build logs (OSX)"
-cat $(pwd)/unity.log
-
-exit $((rc1|rc2))
+ls -la $BUILD_PATH
+[ -n "$(ls -A $BUILD_PATH)" ] # fail job if build folder is empty
