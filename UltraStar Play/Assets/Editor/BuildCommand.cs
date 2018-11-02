@@ -1,6 +1,8 @@
 ﻿using UnityEditor;
 using System.Linq;
 using System;
+using System.Globalization;
+using UnityEngine;
 
 static class BuildCommand
 {
@@ -31,7 +33,7 @@ static class BuildCommand
 		string buildTargetName = GetArgument ("customBuildTarget");
 		Console.WriteLine (":: Received customBuildTarget " + buildTargetName);
 
-		if (buildTargetName.ToLower () == "android")
+		if (buildTargetName.ToLower (CultureInfo.InvariantCulture) == "android")
         {
 			EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Internal;
 		}
@@ -45,7 +47,7 @@ static class BuildCommand
 		Console.WriteLine (":: Received customBuildPath " + buildPath);
 		if (buildPath == "")
         {
-			throw new Exception ("customBuildPath argument is missing");
+			throw new UnityException ("customBuildPath argument is missing");
 		}
 		return buildPath;
 	}
@@ -56,23 +58,24 @@ static class BuildCommand
 		Console.WriteLine (":: Received customBuildName " + buildName);
 		if (buildName == "")
         {
-			throw new Exception ("customBuildName argument is missing");
+			throw new UnityException ("customBuildName argument is missing");
 		}
 		return buildName;
 	}
 
 	static string GetFixedBuildPath (BuildTarget buildTarget, string buildPath, string buildName)
     {
+        string resultName = null;
 		if (buildTarget.ToString().ToLower().Contains("windows"))
         {
-			buildName = buildName + ".exe";
+            resultName = buildName + ".exe";
 		}
         else if (buildTarget.ToString().ToLower().Contains("webgl"))
         {
-			// webgl produces a folder with index.html inside, there is no executable name for this buildTarget
-			buildName = "";
+            // webgl produces a folder with index.html inside, there is no executable name for this buildTarget
+            resultName = "";
 		}
-		return buildPath + buildName;
+		return buildPath + resultName;
 	}
 
 	static BuildOptions GetBuildOptions ()
