@@ -34,4 +34,4 @@ else
 fi
 
 ls -la "UltraStar Play/$BUILD_PATH"
-[ -n "$(ls -A $BUILD_PATH)" ] # fail job if build folder is empty
+[ -n "$(ls -A "UltraStar Play/$BUILD_PATH)" ] # fail job if build folder is empty
