@@ -1,25 +1,15 @@
 #!/usr/bin/env bash
 
-set -e
 set -x
-
-echo "Building for $BUILD_TARGET"
-
-export BUILD_PATH=./Builds/$BUILD_TARGET/
-mkdir -p $BUILD_PATH
 
 xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
   /opt/Unity/Editor/Unity \
     -projectPath "$(pwd)/UltraStar Play" \
-    -quit \
-    -batchmode \
-    -buildTarget $BUILD_TARGET \
-    -customBuildTarget $BUILD_TARGET \
-    -customBuildName $BUILD_NAME \
-    -customBuildPath $BUILD_PATH \
-    -customBuildOptions AcceptExternalModificationsToPlayer \
-    -executeMethod BuildCommand.PerformBuild \
-    -logFile
+    -runTests \
+    -testPlatform $TEST_PLATFORM \
+    -testResults $(pwd)/$TEST_PLATFORM-results.xml \
+    -logFile \
+    -batchmode
 
 UNITY_EXIT_CODE=$?
 
@@ -33,4 +23,5 @@ else
   echo "Unexpected exit code $UNITY_EXIT_CODE";
 fi
 
-ls -la "UltraStar Play/$BUILD_PATH"
+cat $(pwd)/$TEST_PLATFORM-results.xml | grep test-run | grep Passed
+exit $UNITY_TEST_EXIT_CODE
