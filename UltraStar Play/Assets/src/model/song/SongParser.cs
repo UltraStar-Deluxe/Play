@@ -96,7 +96,17 @@ static class SongParser
             Debug.Log("Error reading song file" + e.Message+"\n"+e.StackTrace);
             return false;
         }
-        SongsManager.AddSongs(songBuilder.AsSong());
+
+        try
+        {
+            SongsManager.AddSongs(songBuilder.AsSong());
+        }
+        catch (SongBuilderException e)
+        {
+            Debug.Log("Error reading song file '"+path+"'\n  Error message: "+e.Message);
+            return false;
+        }
+
         return true;
     }
     
@@ -144,7 +154,7 @@ static class SongParser
     {
         char tag = line[0];
         line = (line.Length >= 2 && line[1] == ' ') ? line.Substring(2) : line.Substring(1);
-        uint startBeat;
+        uint beat;
 
         switch (tag)
         {
@@ -173,7 +183,7 @@ static class SongParser
                 }
                 int pitch;
                 uint length;
-                if (!uint.TryParse(noteData[0], out startBeat)
+                if (!uint.TryParse(noteData[0], out beat)
                     || !uint.TryParse(noteData[1], out length)
                     || !int.TryParse(noteData[2], out pitch))
                 {
@@ -188,7 +198,7 @@ static class SongParser
                 }
 
                 ENoteType noteType = GetNoteType(tag);
-                songBuilder.AddNote(new Note(pitch, startBeat, length, text, noteType));
+                songBuilder.AddNote(new Note(pitch, beat, length, text, noteType));
                 break;
             case '-':
                 string[] lineBreakData = line.Split(splitChars);
@@ -196,16 +206,19 @@ static class SongParser
                 {
                     HandleParsingError("Invalid line break found (No beat)", EParsingErrorSeverity.Critical);
                 }
-                if (!uint.TryParse(lineBreakData[0], out startBeat))
+                if (!uint.TryParse(lineBreakData[0], out beat))
                 {
                     HandleParsingError("Invalid line break found (Non-numeric value)", EParsingErrorSeverity.Critical);
                 }
 
-                songBuilder.SaveCurrentSentence();
-
-                if (startBeat < 1)
+                if (beat < 1)
                 {
                     HandleParsingError("Ignored line break because position is < 1", EParsingErrorSeverity.Minor);
+                }
+                else
+                {
+                    songBuilder.SetLinebreakBeat(beat);
+                    songBuilder.SaveCurrentSentence();
                 }
                 break;
             default:

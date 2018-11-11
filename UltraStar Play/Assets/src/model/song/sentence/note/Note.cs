@@ -12,6 +12,10 @@ public class Note
 
     public Note(int pitch, uint startBeat, uint length, string text, ENoteType type)
     {
+        if (length < 1)
+        {
+            throw new UnityException("Illegal note length "+length+" at note starting at beat "+startBeat);
+        }
         m_pitch = pitch;
         m_startBeat = startBeat;
         m_length = length;
