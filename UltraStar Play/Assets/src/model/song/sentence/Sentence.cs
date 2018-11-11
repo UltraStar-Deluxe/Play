@@ -5,18 +5,16 @@ using UnityEngine;
 public class Sentence
 {
     private readonly List<Note> m_notes;
-    private readonly uint m_startBeat;
-    private readonly uint m_endBeat;
+    private readonly uint m_linebreakBeat;
 
-    public Sentence(List<Note> notes, uint startBeat, uint endBeat)
+    public Sentence(List<Note> notes, uint linebreakBeat)
     {
         if (notes == null || notes.Count < 1)
         {
             throw new UnityException("notes is null or empty!");
         }
         m_notes = notes;
-        m_startBeat = startBeat;
-        m_endBeat = endBeat;
+        m_linebreakBeat = linebreakBeat;
     }
 
     public List<Note> GetNotes()
@@ -26,11 +24,17 @@ public class Sentence
 
     public uint GetStartBeat()
     {
-        return m_startBeat;
+        return m_notes[0].GetStartBeat();
     }
 
     public uint GetEndBeat()
     {
-        return m_endBeat;
+        Note lastNote = m_notes[m_notes.Count-1];
+        return lastNote.GetStartBeat() + lastNote.GetLength();
+    }
+
+    public uint GetLinebreakBeat()
+    {
+        return m_linebreakBeat;
     }
 }
