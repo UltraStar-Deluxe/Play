@@ -15,7 +15,7 @@ public class SLoadingController : MonoBehaviour
         {
             Debug.Log("Name: " + device);
         }
-        SongsManager.ScanSongFiles();
+        SongMetaManager.ScanFiles();
     }
 
     void Update ()
@@ -25,9 +25,9 @@ public class SLoadingController : MonoBehaviour
             m_labelStatus.text =
                 System.DateTime.Now.ToLongTimeString()
                 + Environment.NewLine
-                + SongsManager.GetSongScanStatus()
+                + SongMetaManager.GetScanStatus()
                 + Environment.NewLine
-                + SongsManager.GetSongs().Count
+                + SongMetaManager.GetSongMetas().Count
                 + Environment.NewLine;
         }
 
@@ -40,7 +40,7 @@ public class SLoadingController : MonoBehaviour
 
     void OnGui()
     {
-        GUI.Box(new Rect(0, 0, Screen.width / 2, Screen.height / 2), "Song files scan finished");
+        GUI.Box(new Rect(0, 0, (int)(Screen.width / 2), (int)(Screen.height / 2)), "Song files scan finished");
         Debug.Log("Just did draw a Rect!");
     }
 }
