@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.IO;
 
 public class SongMeta
 {
@@ -57,10 +58,6 @@ public class SongMeta
         if (voiceNames == null) throw new ArgumentNullException("voiceNames");
         if (encoding == null) throw new ArgumentNullException("encoding");
 
-        // todo: check that some (trimmed) strings are not empty
-
-        // todo: check that some files actually exist, are files, and are readable
-
         Directory = directory;
         Filename = filename;
 
@@ -77,5 +74,10 @@ public class SongMeta
         Gap = 0;
         Relative = false;
         Start = 0;
+    }
+
+    public Dictionary<string, Voice> GetVoices()
+    {
+        return VoicesBuilder.ParseFile(Directory + Path.PathSeparator + Filename, Encoding, VoiceNames.Keys);
     }
 }

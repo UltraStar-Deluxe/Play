@@ -4,47 +4,22 @@ using UnityEngine;
 
 public class Note
 {
-    private readonly int m_pitch;
-    private readonly uint m_startBeat;
-    private readonly uint m_length;
-    private readonly string m_text;
-    private readonly ENoteType m_type;
+    public ENoteType Type {get;}
+    public uint StartBeat {get;}
+    public uint Length {get;}
+    public int Pitch {get;}
+    public string Text {get;}
 
-    public Note(int pitch, uint startBeat, uint length, string text, ENoteType type)
+    public Note(ENoteType type, uint startBeat, uint length, int pitch, string text)
     {
         if (length < 1)
         {
             throw new UnityException("Illegal note length "+length+" at note starting at beat "+startBeat);
         }
-        m_pitch = pitch;
-        m_startBeat = startBeat;
-        m_length = length;
-        m_text = text;
-        m_type = type;
-    }
-
-    public uint GetLength()
-    {
-        return m_length;
-    }
-
-    public int GetPitch()
-    {
-        return m_pitch;
-    }
-
-    public uint GetStartBeat()
-    {
-        return m_startBeat;
-    }
-
-    public string GetText()
-    {
-        return m_text;
-    }
-
-    public new ENoteType GetType()
-    {
-        return m_type;
+        Type = type;
+        StartBeat = startBeat;
+        Length = length;
+        Pitch = pitch;
+        Text = text;
     }
 }
