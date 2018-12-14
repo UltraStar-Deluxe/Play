@@ -7,7 +7,10 @@ using UnityEngine;
 public static class SongMetaManager
 {
     private static readonly List<SongMeta> s_songMetas = new List<SongMeta>();
-    private static string s_scanStatus = "Waiting for song files scan to start.";
+    private static object s_scanLock = new object();
+    private static int s_songsFound;
+    private static int s_songsSuccess;
+    private static int s_songsFailed;
 
     public static void Add(SongMeta songMeta)
     {
@@ -49,47 +52,54 @@ public static class SongMetaManager
 
     private static void ScanFilesAsThread()
     {
-        SetScanStatus("Initializing scan of song information files...");
-        FolderScanner scannerTxt = new FolderScanner("*.txt");
-        List<string> txtFiles = new List<string>();
-        SetScanStatus("Scanning for matching file names in songs folder...");
-        txtFiles = scannerTxt.GetFiles((string)SettingsManager.GetSetting(ESetting.SongDir));
-        SetScanStatus(String.Format("Discovered a total of {0} possible song data files...", txtFiles.Count));
-        int counter = 0;
-        txtFiles.ForEach(delegate (string path)
+        lock (s_scanLock)
         {
-            counter += 1;
-            SetScanStatus(String.Format("Scanning file {0} of {1} possible song data files...", counter, txtFiles.Count));
-            try
+            s_songsFound = 0;
+            s_songsSuccess = 0;
+            s_songsFailed = 0;
+            FolderScanner scannerTxt = new FolderScanner("*.txt");
+            List<string> txtFiles = new List<string>();
+            txtFiles = scannerTxt.GetFiles((string)SettingsManager.GetSetting(ESetting.SongDir));
+            s_songsFound = txtFiles.Count;
+            txtFiles.ForEach(delegate (string path)
             {
-                Add(SongMetaBuilder.ParseFile(path));
-            }
-            catch (SongMetaBuilderException e)
-            {
-                Debug.Log("nope::"+path+"\n"+e.Message);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.Log("nope::" + path);
-            }
-            SetScanStatus("Song files scan finished.");
-        });
-    }
-
-    private static void SetScanStatus(string text)
-    {
-        lock(s_scanStatus)
-        {
-            s_scanStatus = text;
+                try
+                {
+                    Add(SongMetaBuilder.ParseFile(path));
+                    Interlocked.Increment(ref s_songsSuccess);
+                }
+                catch (SongMetaBuilderException e)
+                {
+                    Debug.Log("nope::"+path+"\n"+e.Message);
+                    Interlocked.Increment(ref s_songsFailed);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.Log("nope::" + path);
+                    Interlocked.Increment(ref s_songsFailed);
+                }
+            });
         }
     }
 
-    public static string GetScanStatus()
+    public static int GetNumberOfSongsFound()
     {
-        lock(s_scanStatus)
-        {
-            return s_scanStatus;
-        }
+        return s_songsFound;
+    }
+
+    public static int GetNumberOfSongsScanned()
+    {
+        return s_songsSuccess + s_songsFailed;
+    }
+
+    public static int GetNumberOfSongsSuccess()
+    {
+        return s_songsSuccess;
+    }
+
+    public static int GetNumberOfSongsFailed()
+    {
+        return s_songsFailed;
     }
 }
