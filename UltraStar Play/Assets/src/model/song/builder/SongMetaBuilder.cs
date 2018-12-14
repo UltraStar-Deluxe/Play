@@ -24,7 +24,7 @@ static class SongMetaBuilder
             Dictionary<string, string> voiceNames = new Dictionary<string, string>();
             Dictionary<string, string> otherFields = new Dictionary<string, string>();
 
-            while (!finishedHeaders || !reader.EndOfStream)
+            while (!finishedHeaders && !reader.EndOfStream)
             {
                 string line = reader.ReadLine();
                 if (!line.StartsWith("#", StringComparison.Ordinal))
@@ -160,14 +160,12 @@ static class SongMetaBuilder
 
     private static float ConvertToFloat(string s)
     {
-        try
+        float res;
+        if (!float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out res))
         {
-            return float.Parse(s, CultureInfo.InvariantCulture.NumberFormat);
+            throw new SongMetaBuilderException("Could not convert "+s+" to a float.");
         }
-        catch (FormatException e)
-        {
-            throw new SongMetaBuilderException("Could not convert "+s+" to a float. Reason: "+e.Message);
-        }
+        return res;
     }
 
     private static uint ConvertToUInt32(string s)
