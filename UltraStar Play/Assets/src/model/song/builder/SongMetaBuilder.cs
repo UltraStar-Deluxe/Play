@@ -116,12 +116,6 @@ static class SongMetaBuilder
                         case "background":
                             res.Background = item.Value;
                             break;
-                        case "comment":
-                            res.Comment = item.Value;
-                            break;
-                        case "creator":
-                            res.Edition = item.Value;
-                            break;
                         case "edition":
                             res.Edition = item.Value;
                             break;
@@ -137,14 +131,8 @@ static class SongMetaBuilder
                         case "language":
                             res.Language = item.Value;
                             break;
-                        case "source":
-                            res.Source = item.Value;
-                            break;
                         case "start":
                             res.Start = ConvertToFloat(item.Value);
-                            break;
-                        case "updated":
-                            res.Updated = item.Value;
                             break;
                         case "video":
                             res.Video = item.Value;
@@ -155,30 +143,9 @@ static class SongMetaBuilder
                         case "year":
                             res.Year = ConvertToUInt32(item.Value);
                             break;
-                        // todo: these fields are not really implemented, and should be moved above here once they are
-                        case "calcmedley":
-                            res.CalcMedley = ConvertToUInt32(item.Value);
-                            break;
-                        case "medleyendbeat":
-                            res.MedleyEndBeat = ConvertToUInt32(item.Value);
-                            break;
-                        case "medleystartbeat":
-                            res.MedleyStartBeat = ConvertToUInt32(item.Value);
-                            break;
-                        case "notesgap":
-                            res.NotesGap = ConvertToUInt32(item.Value);
-                            break;
-                        case "previewstart":
-                            res.PreviewStart = ConvertToUInt32(item.Value);
-                            break;
-                        case "relative":
-                            res.Relative = Convert.ToBoolean(item.Value);
-                            break;
-                        case "resolution":
-                            res.Resolution = item.Value;
-                            break;
+                        // unknown or unimplemented fields just get ignored completely
                         default:
-                            throw new SongMetaBuilderException("Unrecognized tag '"+item.Key+"' in file "+path);
+                            continue;
                     }
                 }
                 return res;

@@ -21,28 +21,16 @@ public class SongMeta
 
     // optional fields
     public string Background {get; set;}
-    public string Comment {get; set;}
-    public string Creator {get; set;}
     public string Edition {get; set;}
     public float End {get; set;}
     public float Gap {get; set;}
     public string Genre {get; set;}
     public string Language {get; set;}
-    public string Source {get; set;}
+    public bool Relative {get; set;}// = false; // setting default values here does not work in C# 4.0
     public float Start {get; set;}// = 0; // setting default values here does not work in C# 4.0
-    public string Updated {get; set;}
     public string Video {get; set;}
     public float VideoGap {get; set;}
     public uint Year {get; set;}
-
-    // todo: not implemented -- what are these and how are they used
-    public uint CalcMedley {get; set;}
-    public uint MedleyEndBeat {get; set;}
-    public uint MedleyStartBeat {get; set;}
-    public uint NotesGap {get; set;}
-    public uint PreviewStart {get; set;}
-    public bool Relative {get; set;}// = false; // setting default values here does not work in C# 4.0
-    public string Resolution {get; set;}
 
     public SongMeta(
         // required helper fields
