@@ -22,12 +22,16 @@ public class SLoadingController : MonoBehaviour
     {
         if(m_labelStatus != null)
         {
+            int found = SongMetaManager.GetNumberOfSongsFound();
+            int success = SongMetaManager.GetNumberOfSongsSuccess();
+            int failed = SongMetaManager.GetNumberOfSongsFailed();
+
             m_labelStatus.text =
                 System.DateTime.Now.ToLongTimeString()
                 + Environment.NewLine
-                + SongMetaManager.GetScanStatus()
+                + "Scanned "+(success+failed)+" out of "+found+" possible songs,"
                 + Environment.NewLine
-                + SongMetaManager.GetSongMetas().Count
+                + "of which "+success+" successful and "+failed+" failed."
                 + Environment.NewLine;
         }
 
@@ -40,7 +44,7 @@ public class SLoadingController : MonoBehaviour
 
     void OnGui()
     {
-        GUI.Box(new Rect(0, 0, (int)(Screen.width / 2), (int)(Screen.height / 2)), "Song files scan finished");
+        GUI.Box(new Rect(0, 0, (int)(Screen.width / 2), (int)(Screen.height / 2)), "A rectangle with some text");
         Debug.Log("Just did draw a Rect!");
     }
 }
