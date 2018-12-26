@@ -242,7 +242,7 @@ public class MutableVoice
     }
     
     // this needs to be switched over to IReadOnlyList
-    private List<Sentence> GetSentences()
+    public List<Sentence> GetSentences()
     {
         return m_sentences;
     }
@@ -261,7 +261,7 @@ public class MutableVoice
 public class MutableSentence
 {
     private readonly List<Note> m_notes = new List<Note>();
-    private uint m_linebreakBeat = 0;
+    private uint m_linebreakBeat;
 
     public void Add(Note note)
     {
@@ -273,7 +273,7 @@ public class MutableSentence
         {
             throw new VoicesBuilderException("Adding more notes after the linebreak has already been set is not allowed");
         }
-        else if (GetEndBeat() > note.StartBeat)
+        else if (GetUntilBeat() > note.StartBeat)
         {
             throw new VoicesBuilderException("New note overlaps with existing sentence");
         }
@@ -282,14 +282,14 @@ public class MutableSentence
         }
     }
 
-    private uint GetEndBeat()
+    private uint GetUntilBeat()
     {
         if (m_notes.Count == 0)
         {
             return 0;
         }
         Note lastNote = m_notes[m_notes.Count-1];
-        return lastNote.StartBeat + lastNote.Length - 1;
+        return lastNote.StartBeat + lastNote.Length;
     }
 
     // this needs to be switched over to IReadOnlyList
@@ -300,6 +300,10 @@ public class MutableSentence
 
     public void SetLinebreakBeat(uint beat)
     {
+        if (beat < GetUntilBeat())
+        {
+            throw new VoicesBuilderException("Linebreak conflicts with existing sentence");
+        }
         m_linebreakBeat = beat;
     }
 

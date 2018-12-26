@@ -123,7 +123,7 @@ static class SongMetaBuilder
                             res.End = ConvertToFloat(item.Value);
                             break;
                         case "gap":
-                            res.End = ConvertToFloat(item.Value);
+                            res.Gap = ConvertToFloat(item.Value);
                             break;
                         case "genre":
                             res.Genre = item.Value;
