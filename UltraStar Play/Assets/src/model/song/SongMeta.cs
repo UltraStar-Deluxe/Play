@@ -49,14 +49,30 @@ public class SongMeta
     )
     {
         // C# 4.0 does not support the 'nameof' keyword, hence the strings
-        if (directory == null) throw new ArgumentNullException("directory");
-        if (filename == null) throw new ArgumentNullException("filename");
-        if (artist == null) throw new ArgumentNullException("artist");
-        if (cover == null) throw new ArgumentNullException("cover");
-        if (mp3 == null) throw new ArgumentNullException("mp3");
-        if (title == null) throw new ArgumentNullException("title");
-        if (voiceNames == null) throw new ArgumentNullException("voiceNames");
-        if (encoding == null) throw new ArgumentNullException("encoding");
+        if (directory == null) {
+            throw new ArgumentNullException("directory");
+        }
+        if (filename == null) {
+            throw new ArgumentNullException("filename");
+        }
+        if (artist == null) {
+            throw new ArgumentNullException("artist");
+        }
+        if (cover == null) {
+            throw new ArgumentNullException("cover");
+        }
+        if (mp3 == null) {
+            throw new ArgumentNullException("mp3");
+        }
+        if (title == null) {
+            throw new ArgumentNullException("title");
+        }
+        if (voiceNames == null) {
+            throw new ArgumentNullException("voiceNames");
+        }
+        if (encoding == null) {
+            throw new ArgumentNullException("encoding");
+        }
 
         Directory = directory;
         Filename = filename;
@@ -64,7 +80,7 @@ public class SongMeta
         Artist = artist;
         Bpm = bpm;
         Cover = cover;
-        Mp3 = Mp3;
+        Mp3 = mp3;
         Title = title;
 
         VoiceNames = voiceNames;
