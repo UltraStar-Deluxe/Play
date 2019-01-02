@@ -1,57 +1,43 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: File a bug report
 
 ---
 
+Issue type: Bug report
 <!--
-DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS.
-
-The issue tracker is for reporting bugs and feature requests only.
-For end-user related support questions, please refer to one of the following:
-
-- Gitter: https://gitter.im/UltraStar-Deluxe/Play
-
+PLEASE DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS.
+The issue tracker is for reporting bugs, feature requests and development discussions only.
+For support questions, please use our chat at https://gitter.im/UltraStar-Deluxe/Play
 -->
 
-### Do you want to request a *feature* or report a *bug*?
+### Actual behaviour
 
-Bug
+Tell us what happens
 
-### What did you do?
+### Expected behaviour
 
-<!--
+Tell us what should actually happen
 
-HOW TO WRITE A GOOD BUG REPORT?
+### Steps to reproduce
 
-- Respect the issue template as much as possible.
-- The title should be short and descriptive.
-- Explain the conditions which led you to report this issue: the context.
-- The context should lead to something, an idea or a problem that you’re facing.
-- Remain clear and concise.
-- Format your messages to help the reader focus on what matters and understand the structure of your message, use Markdown syntax https://help.github.com/articles/github-flavored-markdown
+Please supply step-by-step instructions so that anyone with the same environment can reproduce the issue. Whenever you offer a description, imagine
+yourself in the shoes of someone who has never encountered this problem before and would like to know exactly how to observe it under a given set of conditions.
+Here is an example:
 
--->
-
-### What did you expect to see?
+1. Open the ultrastarplay.exe
+2. Click on button X, then on the menu that appears, click Y
+3. Wait for 3 seconds, and note the appearance of an unexpected message
 
 
-### What did you see instead?
+### Details
 
+Provide some additional information:
 
-### Output of `ultrastarplay.exe --version`: (_What version of UltraStar Play are you using?_)
+- UltraStar Play version:
+- Operating System + version:
 
-```
-(paste your output here)
-```
-
-### What is your environment & configuration (arguments, platform, ...)?
-
-<!--
-Add more configuration information here.
--->
-
-### If applicable, please paste the log output in DEBUG level (`--logLevel=DEBUG` switch)
+### If applicable, please paste the log output
 
 ```
 (paste your output here)
