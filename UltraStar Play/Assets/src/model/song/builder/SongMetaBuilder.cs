@@ -17,18 +17,23 @@ static class SongMetaBuilder
             Dictionary<string, string> requiredFields = new Dictionary<string, string>(){
                 {"artist", null},
                 {"bpm", null},
-                {"cover", null},
                 {"mp3", null},
                 {"title", null}
             };
             Dictionary<string, string> voiceNames = new Dictionary<string, string>();
             Dictionary<string, string> otherFields = new Dictionary<string, string>();
 
+            uint lineNumber = 0;
             while (!finishedHeaders && !reader.EndOfStream)
             {
+                ++lineNumber;
                 string line = reader.ReadLine();
                 if (!line.StartsWith("#", StringComparison.Ordinal))
                 {
+                    if (lineNumber == 1)
+                    {
+                        throw new SongMetaBuilderException(path+" does not look like a song file; ignoring");
+                    }
                     finishedHeaders = true;
                     break;
                 }
@@ -58,7 +63,7 @@ static class SongMetaBuilder
                 {
                     requiredFields[tag] = val;
                 }
-                else if (tag.StartsWith("p", StringComparison.Ordinal))
+                else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
                 {
                     if (!voiceNames.ContainsKey(tag.ToUpper()))
                     {
@@ -66,7 +71,7 @@ static class SongMetaBuilder
                     }
                     // silently ignore already set voiceNames
                 }
-                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal))
+                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal) && tag.Length > 11)
                 {
                     string shorttag = tag.Substring(10).ToUpper();
                     if (!voiceNames.ContainsKey(shorttag))
@@ -103,7 +108,6 @@ static class SongMetaBuilder
                     filename,
                     requiredFields["artist"],
                     ConvertToFloat(requiredFields["bpm"]),
-                    requiredFields["cover"],
                     requiredFields["mp3"],
                     requiredFields["title"],
                     voiceNames,
@@ -115,6 +119,9 @@ static class SongMetaBuilder
                     {
                         case "background":
                             res.Background = item.Value;
+                            break;
+                        case "cover":
+                            res.Cover = item.Value;
                             break;
                         case "edition":
                             res.Edition = item.Value;

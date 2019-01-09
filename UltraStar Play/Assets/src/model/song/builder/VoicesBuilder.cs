@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 static class VoicesBuilder
 {
@@ -16,7 +17,14 @@ static class VoicesBuilder
         MutableVoice currentVoice = null;
         MutableSentence currentSentence = null;
         bool endFound = false;
-        
+
+        // if this is a solo song (without a named voice) then just add one with identifier "" (empty string)
+        if (res.Count == 0)
+        {
+            res.Add("", new MutableVoice());
+            currentVoice = res[""];
+        }
+
         using (StreamReader reader = TxtReader.GetFileStreamReader(path, enc))
         {
             uint lineNumber = 0;
@@ -82,7 +90,7 @@ static class VoicesBuilder
                     case 'G':
                         if (currentVoice == null)
                         {
-                            ThrowLineError(lineNumber, "Linebreak encountered but no voice is active");
+                            ThrowLineError(lineNumber, "Note encountered but no voice is active");
                         }
                         else if (currentSentence == null)
                         {
@@ -103,7 +111,7 @@ static class VoicesBuilder
                 }
             }
         }
-        
+
         Dictionary<string, Voice> actualRes = new Dictionary<string, Voice>();
         foreach (var item in res)
         {
@@ -111,12 +119,12 @@ static class VoicesBuilder
         }
         return actualRes;
     }
-    
+
     private static uint ParseLinebreak(string line)
     {
         return ConvertToUInt32(line);
     }
-    
+
     private static Note ParseNote(string line)
     {
         char[] splitChars = {' '};
@@ -133,7 +141,7 @@ static class VoicesBuilder
             data[4]
         );
     }
-    
+
     private static ENoteType GetNoteType(string s)
     {
         ENoteType res;
@@ -159,7 +167,7 @@ static class VoicesBuilder
         }
         return res;
     }
-    
+
     private static void ThrowLineError(uint lineNumber, string message)
     {
         throw new VoicesBuilderException("Error at line "+lineNumber+": "+message);
@@ -240,13 +248,13 @@ public class MutableVoice
              m_sentences.Add(sentence);
         }
     }
-    
+
     // this needs to be switched over to IReadOnlyList
     public List<Sentence> GetSentences()
     {
         return m_sentences;
     }
-    
+
     public static explicit operator Voice(MutableVoice mv)
     {
         if (mv == null)
@@ -311,7 +319,7 @@ public class MutableSentence
     {
         return m_linebreakBeat;
     }
-    
+
     public static explicit operator Sentence(MutableSentence ms)
     {
         if (ms == null)
