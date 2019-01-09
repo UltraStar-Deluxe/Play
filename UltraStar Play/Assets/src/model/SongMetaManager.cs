@@ -58,8 +58,7 @@ public static class SongMetaManager
             s_songsSuccess = 0;
             s_songsFailed = 0;
             FolderScanner scannerTxt = new FolderScanner("*.txt");
-            List<string> txtFiles = new List<string>();
-            txtFiles = scannerTxt.GetFiles((string)SettingsManager.GetSetting(ESetting.SongDir));
+            List<string> txtFiles = scannerTxt.GetFiles((string)SettingsManager.GetSetting(ESetting.SongDir));
             s_songsFound = txtFiles.Count;
             txtFiles.ForEach(delegate (string path)
             {
