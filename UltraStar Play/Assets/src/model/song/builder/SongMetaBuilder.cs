@@ -14,7 +14,7 @@ static class SongMetaBuilder
             string directory = new FileInfo(path).Directory.FullName;
             string filename = new FileInfo(path).Name;
 
-            Dictionary<string, string> requiredFields = new Dictionary<string, string>(){
+            Dictionary<string, string> requiredFields = new Dictionary<string, string>{
                 {"artist", null},
                 {"bpm", null},
                 {"mp3", null},
@@ -43,7 +43,7 @@ static class SongMetaBuilder
                 {
                     throw new SongMetaBuilderException("Invalid line formatting on line "+line+" of file "+path);
                 }
-                string tag = parts[0].ToLower();
+                string tag = parts[0].ToLowerInvariant();
                 string val = parts[1];
 
                 if (tag.Equals("encoding", StringComparison.Ordinal))
@@ -65,15 +65,15 @@ static class SongMetaBuilder
                 }
                 else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
                 {
-                    if (!voiceNames.ContainsKey(tag.ToUpper()))
+                    if (!voiceNames.ContainsKey(tag.ToUpperInvariant()))
                     {
-                        voiceNames.Add(tag.ToUpper(), val);
+                        voiceNames.Add(tag.ToUpperInvariant(), val);
                     }
                     // silently ignore already set voiceNames
                 }
                 else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal) && tag.Length > 11)
                 {
-                    string shorttag = tag.Substring(10).ToUpper();
+                    string shorttag = tag.Substring(10).ToUpperInvariant();
                     if (!voiceNames.ContainsKey(shorttag))
                     {
                         voiceNames.Add(shorttag, val);
