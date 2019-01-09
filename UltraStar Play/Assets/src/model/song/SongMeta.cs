@@ -12,7 +12,6 @@ public class SongMeta
     // required fields
     public string Artist {get;}
     public float Bpm {get;}
-    public string Cover {get;}
     public string Mp3 {get;}
     public string Title {get;}
 
@@ -22,6 +21,7 @@ public class SongMeta
 
     // optional fields
     public string Background {get; set;}
+    public string Cover {get; set;}
     public string Edition {get; set;}
     public float End {get; set;}
     public float Gap {get; set;}
@@ -40,7 +40,6 @@ public class SongMeta
         // required fields
         string artist,
         float bpm,
-        string cover,
         string mp3,
         string title,
         // required special fields
@@ -57,9 +56,6 @@ public class SongMeta
         }
         if (artist == null) {
             throw new ArgumentNullException("artist");
-        }
-        if (cover == null) {
-            throw new ArgumentNullException("cover");
         }
         if (mp3 == null) {
             throw new ArgumentNullException("mp3");
@@ -79,7 +75,6 @@ public class SongMeta
 
         Artist = artist;
         Bpm = bpm;
-        Cover = cover;
         Mp3 = mp3;
         Title = title;
 
@@ -94,6 +89,6 @@ public class SongMeta
 
     public Dictionary<string, Voice> GetVoices()
     {
-        return VoicesBuilder.ParseFile(Directory + Path.PathSeparator + Filename, Encoding, VoiceNames.Keys);
+        return VoicesBuilder.ParseFile(Directory + Path.DirectorySeparatorChar + Filename, Encoding, VoiceNames.Keys);
     }
 }
