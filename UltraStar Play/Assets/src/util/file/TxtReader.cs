@@ -53,7 +53,7 @@ public static class TxtReader
     {
         if (input == null)
         {
-            throw new ArgumentNullException(input);
+            throw new ArgumentNullException("input");
         }
         int len = input.Length,
             index = 0,
