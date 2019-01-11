@@ -4,33 +4,28 @@ using UnityEngine;
 
 public class Sentence
 {
-    private readonly List<Note> m_notes;
-    private readonly uint m_startBeat;
-    private readonly uint m_endBeat;
+    // this needs to be switched over to IReadOnlyList
+    public List<Note> Notes {get;}
+    public uint LinebreakBeat {get;}
 
-    public Sentence(List<Note> notes, uint startBeat, uint endBeat)
+    public Sentence(List<Note> notes, uint linebreakBeat)
     {
         if (notes == null || notes.Count < 1)
         {
             throw new UnityException("notes is null or empty!");
         }
-        m_notes = notes;
-        m_startBeat = startBeat;
-        m_endBeat = endBeat;
-    }
-
-    public List<Note> GetNotes()
-    {
-        return m_notes;
+        Notes = notes;
+        LinebreakBeat = linebreakBeat;
     }
 
     public uint GetStartBeat()
     {
-        return m_startBeat;
+        return Notes[0].StartBeat;
     }
 
     public uint GetEndBeat()
     {
-        return m_endBeat;
+        Note lastNote = Notes[Notes.Count-1];
+        return lastNote.StartBeat + lastNote.Length;
     }
 }
