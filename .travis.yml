@@ -1,11 +1,14 @@
-# see https://github.com/SebastianJay/unity-ci-test for how to set up unity builds using travis-ci
-
-# do not install anything extra onto the image
-language: generic
-
-# use a Mac OSX image
-os: osx
-
+sudo: required
+language: bash
+env:
+  global:
+  - IMAGE_NAME=gableroux/unity3d:2018.2.6f1
+  - BUILD_NAME="UltraStar Play"
+  - UNITYCI_PROJECT_NAME="UltraStar Play"
+  
+services:
+- docker
+  
 # only run builds on pushes to the master branch
 branches:
   only:
@@ -18,26 +21,49 @@ notifications:
     on_failure: change
 
 before_install:
-  - chmod +x ./tools/travis/install.sh
+  - chmod +x ./tools/travis/docker_test.sh
+  - chmod +x ./tools/travis/docker_build.sh
   - chmod +x ./tools/travis/build.sh
-  - chmod +x ./tools/travis/post_build.sh
-# decrypt the encrypted SSH key file so it can be used for scp auth in post_build.sh
-# before_install:
-# - openssl aes-256-cbc -k "$KEYFILE_PASS" -in "${UPLOAD_KEYPATH}.enc" -out "${UPLOAD_KEYPATH}" -d
+  - chmod +x ./tools/travis/before_script.sh
+  - chmod +x ./tools/travis/test.sh
+  - export UNITY_LICENSE_CONTENT=`cat tools/travis/activat.ion`
+  - rm tools/travis/activat.ion
+  - docker pull $IMAGE_NAME
 
-# run the script to download and install Unity editor
-install:
-- sudo -E sh ./tools/travis/install.sh
-
-# run the script for unit tests and builds
-script:
-- sudo -E sh ./tools/travis/build.sh
-
-# run the script to upload the builds as tarballs
-after_success:
-- sudo -E sh ./tools/travis/post_build.sh
-
-# environment variables used in bash scripts
-env:
-  global:
-  - UNITYCI_PROJECT_NAME="UltraStar Play"
+jobs:
+  include:
+  - stage: test
+    script: "./tools/travis/docker_test.sh"
+    env: TEST_PLATFORM=editmode
+    addons:
+      artifacts:
+        target_paths:
+        - "$(pwd)/$TEST_PLATFORM-results.xml"
+  - stage: test
+    script: "./tools/travis/docker_test.sh"
+    env: TEST_PLATFORM=playmode
+    addons:
+      artifacts:
+        target_paths:
+        - "$(pwd)/$TEST_PLATFORM-results.xml"
+#  - stage: build
+#    env: BUILD_TARGET=StandaloneLinux64
+#    script: "./tools/travis/docker_build.sh"
+#    addons:
+#      artifacts:
+#        target_paths:
+#        - "./Builds/"
+#  - stage: build
+#    env: BUILD_TARGET=StandaloneOSX
+#    script: "./tools/travis/docker_build.sh"
+#    addons:
+#      artifacts:
+#        target_paths:
+#        - "./Builds/"
+  - stage: build
+    env: BUILD_TARGET=StandaloneWindows64
+    script: "./tools/travis/docker_build.sh"
+#    addons:
+#      artifacts:
+#        target_paths:
+#        - "./Builds/"

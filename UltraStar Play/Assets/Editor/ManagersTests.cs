@@ -10,7 +10,7 @@ public class ManagersTests
     public void TestPlayersManagerCreation()
     {
         PlayersManager.ClearPlayers();
-        Assert.IsTrue(PlayersManager.GetPlayers().Count == 0);
+        Assert.AreEqual(0, PlayersManager.GetPlayers().Count);
     }
 
     [Test]

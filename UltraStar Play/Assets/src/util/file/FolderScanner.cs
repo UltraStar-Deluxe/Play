@@ -32,7 +32,7 @@ public class FolderScanner
         var dirInfo = new DirectoryInfo(folder);
         if (folder == null || !System.IO.Directory.Exists(folder))
         {
-            throw new UnityException("Can not scan for songs. Specified folder does not exist or can not be read!");
+            throw new UnityException("Can not scan for songs. Folder '"+folder+"' does not exist or can not be read!");
         }
 
         try
