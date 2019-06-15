@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 static class SongMetaBuilder
 {
@@ -63,7 +64,7 @@ static class SongMetaBuilder
                 {
                     requiredFields[tag] = val;
                 }
-                else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
+                else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1 && Regex.IsMatch(tag, @"^p\d+$"))
                 {
                     if (!voiceNames.ContainsKey(tag.ToUpperInvariant()))
                     {
@@ -71,7 +72,7 @@ static class SongMetaBuilder
                     }
                     // silently ignore already set voiceNames
                 }
-                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal) && tag.Length > 11)
+                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal) && tag.Length > 11 && Regex.IsMatch(tag, @"^duetsingerp\d+$"))
                 {
                     string shorttag = tag.Substring(10).ToUpperInvariant();
                     if (!voiceNames.ContainsKey(shorttag))

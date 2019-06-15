@@ -122,7 +122,9 @@ static class VoicesBuilder
 
     private static uint ParseLinebreak(string line)
     {
-        return ConvertToUInt32(line);
+        // workaround for linebreaks with multiple beats (where no lyrics are on screen for a while)
+        // for now, just use the first value and ignore everything else
+        return ConvertToUInt32(line.Split(' ')[0]);
     }
 
     private static Note ParseNote(string line)
@@ -180,6 +182,10 @@ static class VoicesBuilder
             return Convert.ToUInt32(s, 10);
         }
         catch (FormatException e)
+        {
+            throw new VoicesBuilderException("Could not convert "+s+" to an uint. Reason: "+e.Message);
+        }
+        catch (OverflowException e)
         {
             throw new VoicesBuilderException("Could not convert "+s+" to an uint. Reason: "+e.Message);
         }
