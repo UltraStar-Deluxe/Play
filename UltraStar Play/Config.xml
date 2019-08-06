@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Game>
+	<SongDir>./Songs</SongDir>
+    <SongDir>F:\Dev\UltraStar Songs Dev</SongDir>
+  </Game>
+</root>

@@ -63,7 +63,7 @@ public enum ESetting
     SingTimebarMode,
 
     // Directories
-    SongDir,
+    SongDirs,
 
     // Jukebox
     JukeboxShowLyrics,
