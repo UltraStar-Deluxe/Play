@@ -46,11 +46,15 @@ public static class SongMetaManager
 
     public static void ScanFiles()
     {
-        Thread thread = new Thread(new ThreadStart(ScanFilesAsThread));
-        thread.Start();
+        Debug.Log("Scanning for UltraStar Songs");
+        ScanFilesSynchronously();
+
+        // TODO: Load songs asynchronously and emit event to update UI when done
+        // Thread thread = new Thread(new ThreadStart(ScanFilesSynchronously));
+        // thread.Start();
     }
 
-    private static void ScanFilesAsThread()
+    private static void ScanFilesSynchronously()
     {
         lock (s_scanLock)
         {
@@ -58,8 +62,17 @@ public static class SongMetaManager
             s_songsSuccess = 0;
             s_songsFailed = 0;
             FolderScanner scannerTxt = new FolderScanner("*.txt");
-            List<string> txtFiles = scannerTxt.GetFiles((string)SettingsManager.GetSetting(ESetting.SongDir));
+            
+            // Find all txt files in the song directories
+            List<string> txtFiles = new List<string>();
+            List<string> songDirs = SettingsManager.GetSetting(ESetting.SongDirs) as List<string>;
+            foreach(var songDir in songDirs) {
+                List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
+                txtFiles.AddRange(txtFilesInSongDir);
+            }
             s_songsFound = txtFiles.Count;
+            Debug.Log($"Found {s_songsFound} songs in {songDirs.Count} configured song directories");
+
             txtFiles.ForEach(delegate (string path)
             {
                 try

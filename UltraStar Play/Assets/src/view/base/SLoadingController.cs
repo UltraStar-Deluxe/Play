@@ -13,8 +13,9 @@ public class SLoadingController : MonoBehaviour
     {
         foreach (string device in Microphone.devices)
         {
-            Debug.Log("Name: " + device);
+            Debug.Log("Microphone device name: " + device);
         }
+        // Load all songs
         SongMetaManager.ScanFiles();
     }
 

@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 public class GameSetting
@@ -14,6 +17,14 @@ public class GameSetting
     private static Dictionary<ESetting, System.Object> InitSettingDefaults(Dictionary<ESetting, System.Object> settings)
     {
         settings.Clear();
+
+        // Load Config.xml
+        var xconfig = XElement.Load("./Config.xml");
+        var xgame = xconfig.Element("Game");
+
+        // Load song directories
+        List<string> songDirs = new List<string>();
+        songDirs = xgame.Elements("SongDir").Select(xsongDir => xsongDir.Value).ToList();
 
         settings.Add(ESetting.ActualLineColor, Color.white);
         settings.Add(ESetting.ActualLineOColor, Color.yellow);
@@ -50,7 +61,7 @@ public class GameSetting
         settings.Add(ESetting.SingScores, true);
         settings.Add(ESetting.SingTimebarMode, ESingTimebarMode.Remaining);
         settings.Add(ESetting.Skin, "Summer");
-        settings.Add(ESetting.SongDir, @"C:\Program Files (x86)\MyLittleKaraoke_test2\songs");
+        settings.Add(ESetting.SongDirs, songDirs);
         settings.Add(ESetting.SongMenu, ESongMenu.Roulette);
         settings.Add(ESetting.Sorting, ESorting.Artist);
         settings.Add(ESetting.Tabs, false);
