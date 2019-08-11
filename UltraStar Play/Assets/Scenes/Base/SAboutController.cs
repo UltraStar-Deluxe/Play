@@ -7,9 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class SAboutController : MonoBehaviour
 {
-    /// <summary>
-    /// Use this for initialization.
-    /// </summary>
 	void Start ()
     {
         Debug.Log("beeeeeep");

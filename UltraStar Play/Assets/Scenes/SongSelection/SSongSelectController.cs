@@ -7,7 +7,7 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-public class SongSelectionManager : MonoBehaviour
+public class SSongSelectController : MonoBehaviour
 {
     public RectTransform songListContent;
     public RectTransform songButtonPrefab;
