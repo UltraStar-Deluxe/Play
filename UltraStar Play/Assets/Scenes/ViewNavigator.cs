@@ -8,7 +8,7 @@ public class ViewNavigator : MonoBehaviour
     public void QuitGame()
     {
         // TODO ask for confirmation if required
-        Application.Quit();
+        ApplicationUtils.QuitOrStopPlayMode();
     }
 
     public void SwitchToMainView()
