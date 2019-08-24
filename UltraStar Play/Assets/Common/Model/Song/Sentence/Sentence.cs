@@ -16,16 +16,15 @@ public class Sentence
         }
         Notes = notes;
         LinebreakBeat = linebreakBeat;
-    }
 
-    public uint GetStartBeat()
-    {
-        return Notes[0].StartBeat;
-    }
+        Note firstNote = Notes[0];
+        StartBeat = firstNote.StartBeat;
 
-    public uint GetEndBeat()
-    {
         Note lastNote = Notes[Notes.Count-1];
-        return lastNote.StartBeat + lastNote.Length;
+        EndBeat = lastNote.StartBeat + lastNote.Length;
     }
+
+    public uint StartBeat { get; internal set; }
+
+    public uint EndBeat { get; internal set; }
 }
