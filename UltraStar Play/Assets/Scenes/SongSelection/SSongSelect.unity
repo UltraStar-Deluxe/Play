@@ -2160,10 +2160,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 902712226}
     m_Modifications:
-    - target: {fileID: 5876904140282198729, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
+    - target: {fileID: 5876904140282198731, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
         type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
+      propertyPath: m_Name
+      value: Song1Button
       objectReference: {fileID: 0}
     - target: {fileID: 5876904140282198730, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
         type: 3}
@@ -2270,10 +2270,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5876904140282198731, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
+    - target: {fileID: 5876904140282198729, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
         type: 3}
-      propertyPath: m_Name
-      value: Song1Button
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5876904141203199938, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
         type: 3}

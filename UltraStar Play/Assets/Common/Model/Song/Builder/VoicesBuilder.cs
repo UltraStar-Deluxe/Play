@@ -230,11 +230,11 @@ public class MutableVoice
         else if (m_sentences.Count > 0)
         {
             Sentence lastSentence = m_sentences[m_sentences.Count - 1];
-            if (lastSentence.GetEndBeat() > sentence.GetStartBeat())
+            if (lastSentence.EndBeat > sentence.StartBeat)
             {
                 throw new VoicesBuilderException("Sentence starts before previous sentence is over");
             }
-            else if (lastSentence.LinebreakBeat > sentence.GetStartBeat())
+            else if (lastSentence.LinebreakBeat > sentence.StartBeat)
             {
                 throw new VoicesBuilderException("Sentence conflicts with linebreak of previous sentence");
             }
