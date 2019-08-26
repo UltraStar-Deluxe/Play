@@ -48,7 +48,7 @@ public class SSingController : MonoBehaviour
         Invoke("StartVideoPlayback", m_songMeta.VideoGap);
     }
 
-    void OnDisable()
+    void OnDestroy()
     {
         UnloadAudio();
     }
@@ -61,6 +61,7 @@ public class SSingController : MonoBehaviour
         if(CurrentBeat < 0) {
             CurrentBeat = 0;
         }
+
         // Debug.Log($"secondsInSongAfterGap: {millisInSongAfterGap / 1000.0}");
         // Debug.Log($"Current beat: {CurrentBeat}");
     }
@@ -126,7 +127,7 @@ public class SSingController : MonoBehaviour
             mMainOutputStream = new Mp3FileReader(tmpStr);
             mVolumeStream = new WaveChannel32(mMainOutputStream);
 
-            mWaveOutDevice = new WaveOut();
+            mWaveOutDevice = new WaveOutEvent();
             mWaveOutDevice.Init(mVolumeStream);
 
             return true;
