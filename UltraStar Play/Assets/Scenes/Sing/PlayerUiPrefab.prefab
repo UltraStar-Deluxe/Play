@@ -123,6 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4410698265539509269}
+  - component: {fileID: 157823663299260099}
   m_Layer: 5
   m_Name: Lines
   m_TagString: Untagged
@@ -150,6 +151,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &157823663299260099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4410698265539509270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05684973d504ca64b83624270e3edce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LinePrefab: {fileID: 1194152596973659647, guid: 0e44a1330a41aac458b12308c1a1ddfa,
+    type: 3}
 --- !u!1 &4410698265858749455
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,7 +175,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4410698265858749454}
   - component: {fileID: 4410698265858749453}
-  - component: {fileID: 7516210063614036386}
   m_Layer: 5
   m_Name: SentenceDisplayer
   m_TagString: Untagged
@@ -202,31 +216,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UiNotePrefab: {fileID: 2444222340775961529, guid: 67fe67780e740264b9c255cd9777445d,
     type: 3}
---- !u!114 &7516210063614036386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4410698265858749455}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
 --- !u!1 &4410698266006340637
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,12 +512,12 @@ PrefabInstance:
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 25.1445
       objectReference: {fileID: 0}
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -14
       objectReference: {fileID: 0}
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
@@ -548,7 +537,7 @@ PrefabInstance:
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
@@ -558,7 +547,7 @@ PrefabInstance:
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8590359238075033077, guid: 67fe67780e740264b9c255cd9777445d,
         type: 3}

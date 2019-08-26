@@ -21,6 +21,11 @@ public class SentenceDisplayer : MonoBehaviour
 
     private SSingController m_ssingController;
 
+    // The number of lines on which notes can be placed.
+    // One can imagine that notes can be placed not only on the drawn lines,
+    // but also the rows between two lines.
+    public const int NoteLineCount = 16;
+
     void Start() {
         // Reduced update frequency.
         InvokeRepeating("UpdateCurrentSentence", 0, 0.25f);
@@ -79,17 +84,32 @@ public class SentenceDisplayer : MonoBehaviour
             Destroy(uiNote.gameObject);
         }
 
+        var minPitch = m_sentence.Notes.Select(it => it.Pitch).Min();
+        var maxPitch = m_sentence.Notes.Select(it => it.Pitch).Max();
         foreach(var note in m_sentence.Notes) {
-            DisplayNote(note);
+            DisplayNote(note, minPitch, maxPitch);
         }
     }
 
-    private void DisplayNote(Note note)
+    private void DisplayNote(Note note, int minPitch, int maxPitch)
     {
         UiNote uiNote = Instantiate(UiNotePrefab);
         uiNote.transform.SetParent(transform);
 
         var uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text;
+
+        // TODO: Position the note to illustrate its pitch
+        // with respect to the other notes in the sentence.
+        var uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
+        var midPitch = minPitch + (maxPitch - minPitch) / 2.0;
+        var noteLine = (note.Pitch % NoteLineCount);
+        var anchorY = (double)noteLine / (double)NoteLineCount;
+        var anchorX = ((double)m_sentence.Notes.IndexOf(note) + 0.5) / (double)m_sentence.Notes.Count;
+        var anchor = new Vector2((float)anchorX, (float)anchorY);
+        Debug.Log(anchor);
+        uiNoteRectTransform.anchorMin = anchor;
+        uiNoteRectTransform.anchorMax = anchor;
+        uiNoteRectTransform.anchoredPosition = Vector2.zero;
     }
 }
