@@ -70,7 +70,7 @@ public class SSingController : MonoBehaviour
         var videoPath = m_songMeta.Directory + Path.DirectorySeparatorChar + m_songMeta.Video;
         if(File.Exists(videoPath)) {
             m_videoPlayer.url = "file://" + videoPath;
-            InvokeRepeating("SyncVideoWithMusic", 0.5f, 0.5f);
+            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
         } else {
             m_videoPlayer.enabled = false;
             // TODO: Use cover as fallback
