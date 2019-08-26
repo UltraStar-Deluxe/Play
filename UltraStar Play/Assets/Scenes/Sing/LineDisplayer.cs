@@ -20,6 +20,9 @@ public class LineDisplayer : MonoBehaviour
     {
         var line = Instantiate(LinePrefab);
         line.SetParent(transform);
+        // The lines should be the first children,
+        // such that they are in the background and the notes are drawn above the lines.
+        line.SetSiblingIndex(0);
 
         var anchor = new Vector2(0.5f, (float)((double)index / (double)LineCount));
         line.anchorMin = anchor;

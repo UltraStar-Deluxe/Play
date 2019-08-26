@@ -100,14 +100,12 @@ public class SentenceDisplayer : MonoBehaviour
             Destroy(uiNote.gameObject);
         }
 
-        var minPitch = m_sentence.Notes.Select(it => it.Pitch).Min();
-        var maxPitch = m_sentence.Notes.Select(it => it.Pitch).Max();
         foreach(var note in m_sentence.Notes) {
-            DisplayNote(note, minPitch, maxPitch);
+            DisplayNote(note);
         }
     }
 
-    private void DisplayNote(Note note, int minPitch, int maxPitch)
+    private void DisplayNote(Note note)
     {
         UiNote uiNote = Instantiate(UiNotePrefab);
         uiNote.transform.SetParent(transform);
@@ -115,17 +113,17 @@ public class SentenceDisplayer : MonoBehaviour
         var uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text;
 
-        // TODO: Position the note to illustrate its pitch
-        // with respect to the other notes in the sentence.
+        var beatsInSentence = m_sentence.EndBeat - m_sentence.StartBeat;
+
         var uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
-        var midPitch = minPitch + (maxPitch - minPitch) / 2.0;
-        var noteLine = (note.Pitch % NoteLineCount);
+        var noteLine = note.Pitch % NoteLineCount;
         var anchorY = (double)noteLine / (double)NoteLineCount;
-        var anchorX = ((double)m_sentence.Notes.IndexOf(note) + 0.5) / (double)m_sentence.Notes.Count;
+        var anchorX = (double)(note.StartBeat - m_sentence.StartBeat) / (double)beatsInSentence;
         var anchor = new Vector2((float)anchorX, (float)anchorY);
-        Debug.Log(anchor);
         uiNoteRectTransform.anchorMin = anchor;
         uiNoteRectTransform.anchorMax = anchor;
         uiNoteRectTransform.anchoredPosition = Vector2.zero;
+
+        uiNoteRectTransform.sizeDelta = new Vector2(800 * note.Length / beatsInSentence, uiNoteRectTransform.sizeDelta.y);
     }
 }
