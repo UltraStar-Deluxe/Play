@@ -11,6 +11,8 @@ using UnityEngine.UI;
 public class SentenceDisplayer : MonoBehaviour
 {
     public UiNote UiNotePrefab;
+    public LyricsDisplayer LyricsDisplayer;
+
     private AudioSource m_audioSource;
 
     private SongMeta m_songMeta;
@@ -76,6 +78,20 @@ public class SentenceDisplayer : MonoBehaviour
         var sentenceTexts = m_sentence.Notes.Select(it => it.Text);
         Debug.Log("Loaded sentence: "+string.Join(" ", sentenceTexts));
         Debug.Log($"End beat: {m_sentence.EndBeat}");
+
+        if(LyricsDisplayer != null) {
+            LoadCurrentSentenceInLyricsDisplayer();
+        }
+    }
+
+    private void LoadCurrentSentenceInLyricsDisplayer()
+    {
+        LyricsDisplayer.SetCurrentSentence(m_sentence);
+        if(m_sentenceIndex < m_voice.Sentences.Count) {
+            LyricsDisplayer.SetNextSentence(m_voice.Sentences[m_sentenceIndex + 1]);
+        } else {
+            LyricsDisplayer.SetNextSentence(null);
+        }
     }
 
     private void DisplayCurrentNotes()
