@@ -95,8 +95,12 @@ public class SSingController : MonoBehaviour
         var playerUi = GameObject.Instantiate(PlayerUiPrefab);
         playerUi.SetParent(PlayerUiArea);
 
-        // Load the voice for the SentenceDisplayer of the PlayerUi
+        // Associate a LyricsDisplayer with the SentenceDisplayer
         var sentenceDisplayer = playerUi.GetComponentInChildren<SentenceDisplayer>();
+        var lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
+        sentenceDisplayer.LyricsDisplayer = lyricsDisplayer;
+
+        // Load the voice for the SentenceDisplayer of the PlayerUi
         sentenceDisplayer.LoadVoice(m_songMeta, null);
     }
 
