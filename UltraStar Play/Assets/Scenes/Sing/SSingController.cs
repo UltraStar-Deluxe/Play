@@ -15,37 +15,59 @@ public class SSingController : MonoBehaviour
     public RectTransform PlayerUiArea;
     public RectTransform PlayerUiPrefab;
 
-    private SongMeta m_songMeta;
-    private PlayerProfile m_playerProfile;
+    public SongMeta SongMeta;
+    public PlayerProfile PlayerProfile;
 
-    private VideoPlayer m_videoPlayer;
+    public VideoPlayer VideoPlayer;
 
-    private IWavePlayer mWaveOutDevice;
-    private WaveStream mMainOutputStream;
-    private WaveChannel32 mVolumeStream;
+    private IWavePlayer m_WaveOutDevice;
+    private WaveStream m_MainOutputStream;
+    private WaveChannel32 m_VolumeStream;
 
-    public double CurrentBeat { get; internal set; }
+    public double CurrentBeat {
+        get {
+            double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            var millisInSongAfterGap = millisInSong - SongMeta.Gap;
+            var result = SongMeta.Bpm * millisInSongAfterGap / 1000.0 / 60.0;
+            if(result < 0) {
+                result = 0;
+            }
+            return result;
+        }
+    }
+
+    // The current position in the song in milliseconds.
+    public double PositionInSongInMillis { 
+        get {
+            return m_MainOutputStream.CurrentTime.TotalMilliseconds;
+        }
+    }
+
+    // The current position in the song in milliseconds.
+    public double PositionInSongInSeconds { 
+        get {
+            return m_MainOutputStream.CurrentTime.TotalSeconds;
+        }
+    }
 
     void Start() {
-        m_songMeta = SceneDataBus.GetData(ESceneData.Song, GetDefaultSongMeta );
-        m_playerProfile = SceneDataBus.GetData(ESceneData.PlayerProfile, GetDefaultPlayerProfile );
+        SongMeta = SceneDataBus.GetData(ESceneData.Song, GetDefaultSongMeta );
+        PlayerProfile = SceneDataBus.GetData(ESceneData.PlayerProfile, GetDefaultPlayerProfile );
 
-        m_videoPlayer = FindObjectOfType<VideoPlayer>();
+        VideoPlayer = FindObjectOfType<VideoPlayer>();
 
-        Debug.Log($"{m_playerProfile.Name} starts singing of {m_songMeta.Title}.");
+        Debug.Log($"{PlayerProfile.Name} starts singing of {SongMeta.Title}.");
 
-        var songMetaPath = m_songMeta.Directory + Path.DirectorySeparatorChar + m_songMeta.Filename;
-        var songPath = m_songMeta.Directory + Path.DirectorySeparatorChar + m_songMeta.Mp3;
+        var songMetaPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
+        var songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
 
         LoadAudio(songPath);
-        mWaveOutDevice.Play();
+        m_WaveOutDevice.Play();
         
         // Create player ui for each player (currently there is only one player)
         CreatePlayerUi();
         
-        InvokeRepeating("UpdateCurrentBeat", m_songMeta.Gap / 1000.0f, 0.1f);
-
-        Invoke("StartVideoPlayback", m_songMeta.VideoGap);
+        Invoke("StartVideoPlayback", SongMeta.VideoGap);
     }
 
     void OnDestroy()
@@ -53,34 +75,21 @@ public class SSingController : MonoBehaviour
         UnloadAudio();
     }
 
-    void UpdateCurrentBeat() {
-        // Map time in song to current beat.
-        double millisInSong = mMainOutputStream.CurrentTime.TotalMilliseconds;
-        var millisInSongAfterGap = millisInSong - m_songMeta.Gap;
-        CurrentBeat = m_songMeta.Bpm * millisInSongAfterGap / 1000.0 / 60.0;
-        if(CurrentBeat < 0) {
-            CurrentBeat = 0;
-        }
-
-        // Debug.Log($"secondsInSongAfterGap: {millisInSongAfterGap / 1000.0}");
-        // Debug.Log($"Current beat: {CurrentBeat}");
-    }
-
     private void StartVideoPlayback() {
-        var videoPath = m_songMeta.Directory + Path.DirectorySeparatorChar + m_songMeta.Video;
+        var videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
         if(File.Exists(videoPath)) {
-            m_videoPlayer.url = "file://" + videoPath;
+            VideoPlayer.url = "file://" + videoPath;
             InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
         } else {
-            m_videoPlayer.enabled = false;
+            VideoPlayer.enabled = false;
             // TODO: Use cover as fallback
         }
     }
 
     private void SyncVideoWithMusic() {
-        var secondsInSong = mMainOutputStream.CurrentTime.TotalSeconds;
-        if(m_videoPlayer.length > secondsInSong) {
-            m_videoPlayer.time = secondsInSong;
+        var secondsInSong = m_MainOutputStream.CurrentTime.TotalSeconds;
+        if(VideoPlayer.length > secondsInSong) {
+            VideoPlayer.time = secondsInSong;
         }
     }
 
@@ -101,7 +110,7 @@ public class SSingController : MonoBehaviour
         sentenceDisplayer.LyricsDisplayer = lyricsDisplayer;
 
         // Load the voice for the SentenceDisplayer of the PlayerUi
-        sentenceDisplayer.LoadVoice(m_songMeta, null);
+        sentenceDisplayer.LoadVoice(SongMeta, null);
     }
 
     private PlayerProfile GetDefaultPlayerProfile()
@@ -128,11 +137,11 @@ public class SSingController : MonoBehaviour
         try
         {
             MemoryStream tmpStr = new MemoryStream(data);
-            mMainOutputStream = new Mp3FileReader(tmpStr);
-            mVolumeStream = new WaveChannel32(mMainOutputStream);
+            m_MainOutputStream = new Mp3FileReader(tmpStr);
+            m_VolumeStream = new WaveChannel32(m_MainOutputStream);
 
-            mWaveOutDevice = new WaveOutEvent();
-            mWaveOutDevice.Init(mVolumeStream);
+            m_WaveOutDevice = new WaveOutEvent();
+            m_WaveOutDevice.Init(m_VolumeStream);
 
             return true;
         }
@@ -162,25 +171,26 @@ public class SSingController : MonoBehaviour
     }
 
     private void UnloadAudio() {
-        if (mWaveOutDevice != null)
+        if (m_WaveOutDevice != null)
         {
-            mWaveOutDevice.Stop();
+            m_WaveOutDevice.Stop();
         }
 
-        if (mMainOutputStream != null)
+        if (m_MainOutputStream != null)
         {
             // this one really closes the file and ACM conversion
-            mVolumeStream.Close();
-            mVolumeStream = null;
+            m_VolumeStream.Close();
+            m_VolumeStream = null;
 
             // this one does the metering stream
-            mMainOutputStream.Close();
-            mMainOutputStream = null;
+            m_MainOutputStream.Close();
+            m_MainOutputStream = null;
         }
-        if (mWaveOutDevice != null)
+        if (m_WaveOutDevice != null)
         {
-            mWaveOutDevice.Dispose();
-            mWaveOutDevice = null;
+            m_WaveOutDevice.Dispose();
+            m_WaveOutDevice = null;
         }
     }
+
 }

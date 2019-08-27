@@ -10,6 +10,12 @@ public class Note
     public int Pitch {get;}
     public string Text {get;}
 
+    public uint EndBeat {
+        get {
+            return StartBeat + Length;
+        }
+    }
+    
     public Note(ENoteType type, uint startBeat, uint length, int pitch, string text)
     {
         if (length < 1)

@@ -755,6 +755,7 @@ MonoBehaviour:
   PlayerUiArea: {fileID: 245391953}
   PlayerUiPrefab: {fileID: 4410698265183144018, guid: c476fd55a093e0f43bdc324f326218f3,
     type: 3}
+  VideoPlayer: {fileID: 0}
 --- !u!4 &1427931089
 Transform:
   m_ObjectHideFlags: 0
@@ -1169,6 +1170,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1570843823628408574, guid: 5ca122de3e6e3e046b5afdf99555504c,
+        type: 3}
+      propertyPath: m_Name
+      value: CurrentSentenceText
+      objectReference: {fileID: 0}
     - target: {fileID: 1570843823581990805, guid: 5ca122de3e6e3e046b5afdf99555504c,
         type: 3}
       propertyPath: CurrentSentenceText
@@ -1179,11 +1185,6 @@ PrefabInstance:
       propertyPath: NextSentenceText
       value: 
       objectReference: {fileID: 631484575}
-    - target: {fileID: 1570843823628408574, guid: 5ca122de3e6e3e046b5afdf99555504c,
-        type: 3}
-      propertyPath: m_Name
-      value: CurrentSentenceText
-      objectReference: {fileID: 0}
     - target: {fileID: 1570843825482846072, guid: 5ca122de3e6e3e046b5afdf99555504c,
         type: 3}
       propertyPath: m_Name
@@ -1203,6 +1204,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Type
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7727155977087375594, guid: 5ca122de3e6e3e046b5afdf99555504c,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263258894705517097, guid: 5ca122de3e6e3e046b5afdf99555504c,
+        type: 3}
+      propertyPath: m_Name
+      value: PositionInLyricsIndicator
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ca122de3e6e3e046b5afdf99555504c, type: 3}
