@@ -76,8 +76,6 @@ public class SentenceDisplayer : MonoBehaviour
         DisplayCurrentNotes();
 
         var sentenceTexts = m_sentence.Notes.Select(it => it.Text);
-        Debug.Log("Loaded sentence: "+string.Join(" ", sentenceTexts));
-        Debug.Log($"End beat: {m_sentence.EndBeat}");
 
         if(LyricsDisplayer != null) {
             LoadCurrentSentenceInLyricsDisplayer();

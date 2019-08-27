@@ -10,8 +10,11 @@ public class LyricsDisplayer : MonoBehaviour
     public Text CurrentSentenceText;
     public Text NextSentenceText;
 
+    public Sentence CurrentSentence { get; private set; }
+
     public void SetCurrentSentence(Sentence sentence)
     {
+        CurrentSentence = sentence;
         CurrentSentenceText.text = CreateStringFromSentence(sentence);
     }
 
