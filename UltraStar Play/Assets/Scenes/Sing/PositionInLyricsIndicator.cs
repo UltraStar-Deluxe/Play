@@ -45,11 +45,11 @@ public class PositionInLyricsIndicator : MonoBehaviour
         if(m_lastSentence != CurrentSentence) {
             m_lastSentence = CurrentSentence;
             Reset();
+        } else {
+            var step = (float)velocityPerSecond * Time.deltaTime;
+            m_rectTransform.anchoredPosition = new Vector2(m_rectTransform.anchoredPosition.x + step, m_rectTransform.anchoredPosition.y);
         }
-
         CalculateVelocity();
-        var step = (float)velocityPerSecond * Time.deltaTime;
-        m_rectTransform.anchoredPosition = new Vector2(m_rectTransform.anchoredPosition.x + step, m_rectTransform.anchoredPosition.y);
     }
 
     public void Reset() {
@@ -62,7 +62,9 @@ public class PositionInLyricsIndicator : MonoBehaviour
     }
 
     private void CalculateVelocity() {
-        if(CurrentSentence == null) {
+        if(CurrentSentence == null
+            || CurrentSentenceText.text.Length == 0
+            || CurrentSentenceText.cachedTextGenerator.vertexCount == 0) {
             return;
         }
         var positionInSongInSeconds = m_ssingController.PositionInSongInSeconds;
@@ -83,8 +85,8 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
             if(positionInSentenceInSeconds <= sentenceStartInSeconds) {
                 // Range before first note of sentence.
-                var sentenceFirstCharacterPosition = GetLeftPositionOfCharacter(CurrentSentenceText, 0);
-                endPos = sentenceFirstCharacterPosition.x;
+                var sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
+                endPos = sentenceFirstCharacterPosition;
                 endTimeInSeconds = sentenceStartInSeconds;
             } else if (positionInSentenceInSeconds <= sentenceEndInSeconds) {
                 // Range inside sentence.
@@ -96,8 +98,12 @@ public class PositionInLyricsIndicator : MonoBehaviour
                 }
             }
             var remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
-            if(endPos > float.MinValue && remainingTime > 0) {
-                velocityPerSecond = (endPos - m_rectTransform.anchoredPosition.x) / remainingTime;
+            if(endPos > float.MinValue) {
+                if(remainingTime > 0) {
+                    velocityPerSecond = (endPos - m_rectTransform.anchoredPosition.x) / remainingTime;
+                } else {
+                    m_rectTransform.anchoredPosition = new Vector2(endPos, m_rectTransform.anchoredPosition.y);
+                }
             }
         }
     }
@@ -125,16 +131,16 @@ public class PositionInLyricsIndicator : MonoBehaviour
     }
 
     private Vector3 GetLeftPositionOfCharacter(Text text, int charIndex) {
-        var vertIndex = charIndex * 4;
         // Use position of a vertex on the left side of the character.
+        var vertIndex = charIndex * 4;
         var vertexOfCharacter = text.cachedTextGenerator.verts[ vertIndex ];
         var positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
     }
 
     private Vector3 GetRightPositionOfCharacter(Text text, int charIndex) {
-        var vertIndex = ((charIndex + 1) * 4) - 3; 
         // Use position of a vertex on the right side of the character.
+        var vertIndex = ((charIndex + 1) * 4) - 3; 
         var vertexOfCharacter = text.cachedTextGenerator.verts[ vertIndex ];
         var positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
