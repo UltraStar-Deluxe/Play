@@ -72,11 +72,13 @@ public class SentenceDisplayer : MonoBehaviour
     }
 
     private void LoadCurrentSentence() {
-        m_sentence = m_voice.Sentences[m_sentenceIndex];
+        if(m_sentenceIndex < m_voice.Sentences.Count) {
+            m_sentence = m_voice.Sentences[m_sentenceIndex];
+        } else {
+            m_sentence = null;
+        }
+
         DisplayCurrentNotes();
-
-        var sentenceTexts = m_sentence.Notes.Select(it => it.Text);
-
         if(LyricsDisplayer != null) {
             LoadCurrentSentenceInLyricsDisplayer();
         }
@@ -85,7 +87,7 @@ public class SentenceDisplayer : MonoBehaviour
     private void LoadCurrentSentenceInLyricsDisplayer()
     {
         LyricsDisplayer.SetCurrentSentence(m_sentence);
-        if(m_sentenceIndex < m_voice.Sentences.Count) {
+        if(m_sentenceIndex < m_voice.Sentences.Count - 1) {
             LyricsDisplayer.SetNextSentence(m_voice.Sentences[m_sentenceIndex + 1]);
         } else {
             LyricsDisplayer.SetNextSentence(null);
@@ -98,6 +100,10 @@ public class SentenceDisplayer : MonoBehaviour
             Destroy(uiNote.gameObject);
         }
 
+        if(m_sentence == null) {
+            return;
+        }
+        
         foreach(var note in m_sentence.Notes) {
             DisplayNote(note);
         }
