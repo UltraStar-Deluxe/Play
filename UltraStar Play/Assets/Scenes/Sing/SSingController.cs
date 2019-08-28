@@ -27,8 +27,7 @@ public class SSingController : MonoBehaviour
     public double CurrentBeat {
         get {
             double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
-            var millisInSongAfterGap = millisInSong - SongMeta.Gap;
-            var result = SongMeta.Bpm * millisInSongAfterGap / 1000.0 / 60.0;
+            var result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
             if(result < 0) {
                 result = 0;
             }
