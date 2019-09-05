@@ -5,11 +5,11 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 
-public class SLoadingController : MonoBehaviour
+public class LoadingSceneController : MonoBehaviour
 {
     public Text m_labelStatus;
 
-    void Start ()
+    void Start()
     {
         foreach (string device in Microphone.devices)
         {
@@ -19,9 +19,9 @@ public class SLoadingController : MonoBehaviour
         SongMetaManager.ScanFiles();
     }
 
-    void Update ()
+    void Update()
     {
-        if(m_labelStatus != null)
+        if (m_labelStatus != null)
         {
             int found = SongMetaManager.GetNumberOfSongsFound();
             int success = SongMetaManager.GetNumberOfSongsSuccess();
@@ -30,9 +30,9 @@ public class SLoadingController : MonoBehaviour
             m_labelStatus.text =
                 System.DateTime.Now.ToLongTimeString()
                 + Environment.NewLine
-                + "Scanned "+(success+failed)+" out of "+found+" possible songs,"
+                + "Scanned " + (success + failed) + " out of " + found + " possible songs,"
                 + Environment.NewLine
-                + "of which "+success+" successful and "+failed+" failed."
+                + "of which " + success + " successful and " + failed + " failed."
                 + Environment.NewLine;
         }
 

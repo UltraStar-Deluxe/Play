@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SMainController : MonoBehaviour
+public class MainSceneController : MonoBehaviour
 {
 }

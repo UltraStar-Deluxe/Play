@@ -2,34 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EScreen
+public enum EScene
 {
     // base
-    SMainView = 1,
-    SLoadingView = 0,
-    SAboutView = 3,
+    MainScene = 1,
+    LoadingScene = 0,
+    AboutScene = 3,
 
     // player
-    SSetupPlayerView = 7,
+    SetupPlayerScene = 7,
 
     // result
-    SHighscoreView = 8,
-    SResultSongView = 9,
-    SStatsView = 10,
+    HighscoreScene = 8,
+    ResultSongScene = 9,
+    StatsScene = 10,
 
     // setting
-    SOptionsView = 2,
-    SOptionsGameView = 4,
-    SOptionsGraphicsView = 5,
-    SOptionsSoundView = 6,
+    OptionsScene = 2,
+    OptionsGameScene = 4,
+    OptionsGraphicsScene = 5,
+    OptionsSoundScene = 6,
 
     // sing
-    SSingView = 11,
-    SJukeboxView = 15,
+    SingScene = 11,
+    JukeboxScene = 15,
 
-    // songSelection
-    SSongFolderView = 12,
-    SSongPlaylistView = 13,
-    SSongSelectView = 14
-
+    // song selection
+    SongFolderScene = 12,
+    SongPlaylistScene = 13,
+    SongSelectScene = 14
 }
