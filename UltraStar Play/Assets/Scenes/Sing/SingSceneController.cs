@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
+using UnityEngine.Networking;
+using System.Threading;
 
 public class SingSceneController : MonoBehaviour
 {
@@ -119,7 +121,7 @@ public class SingSceneController : MonoBehaviour
         else
         {
             VideoPlayer.enabled = false;
-            // TODO: Use cover as fallback
+            // TODO: Use cover or background tag as fallback
         }
     }
 
@@ -197,18 +199,15 @@ public class SingSceneController : MonoBehaviour
 
     private void LoadAudio(string path)
     {
-        var url = "file://" + path;
-        WWW www = new WWW(url);
-        while (!www.isDone) { };
-        if (!string.IsNullOrEmpty(www.error))
+        byte[] bytes = File.ReadAllBytes(path);
+        if (bytes == null)
         {
-            throw new Exception(www.error);
+            throw new Exception("Loading the mp3 data failed.");
         }
 
-        byte[] bytes = www.bytes;
         if (!LoadAudioFromData(bytes))
         {
-            throw new Exception("Cannot open mp3 file!");
+            throw new Exception("Loading the audio from the mp3 data failed.");
         }
 
         Resources.UnloadUnusedAssets();
