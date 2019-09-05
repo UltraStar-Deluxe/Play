@@ -952,10 +952,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultSongName: Summer Wine
   DefaultPlayerProfileName: Player 01
+  defaultSongNamePasteBin: 
   PlayerUiArea: {fileID: 245391953}
   PlayerUiPrefab: {fileID: 4410698265183144018, guid: c476fd55a093e0f43bdc324f326218f3,
     type: 3}
-  VideoPlayer: {fileID: 0}
 --- !u!4 &1427931089
 Transform:
   m_ObjectHideFlags: 0

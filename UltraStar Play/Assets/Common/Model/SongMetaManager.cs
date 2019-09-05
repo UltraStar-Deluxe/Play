@@ -4,13 +4,22 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using UnityEngine;
 
-public static class SongMetaManager
+public class SongMetaManager : MonoBehaviour
 {
     private static readonly List<SongMeta> s_songMetas = new List<SongMeta>();
     private static object s_scanLock = new object();
     private static int s_songsFound;
     private static int s_songsSuccess;
     private static int s_songsFailed;
+
+    void OnEnable()
+    {
+        if (!SceneDataBus.HasData(ESceneData.AllSongMetas))
+        {
+            ScanFiles();
+            SceneDataBus.PutData(ESceneData.AllSongMetas, s_songMetas);
+        }
+    }
 
     public static void Add(SongMeta songMeta)
     {
@@ -48,10 +57,6 @@ public static class SongMetaManager
     {
         Debug.Log("Scanning for UltraStar Songs");
         ScanFilesSynchronously();
-
-        // TODO: Load songs asynchronously and emit event to update UI when done
-        // Thread thread = new Thread(new ThreadStart(ScanFilesSynchronously));
-        // thread.Start();
     }
 
     private static void ScanFilesSynchronously()
@@ -62,11 +67,12 @@ public static class SongMetaManager
             s_songsSuccess = 0;
             s_songsFailed = 0;
             FolderScanner scannerTxt = new FolderScanner("*.txt");
-            
+
             // Find all txt files in the song directories
             List<string> txtFiles = new List<string>();
             List<string> songDirs = SettingsManager.GetSetting(ESetting.SongDirs) as List<string>;
-            foreach(var songDir in songDirs) {
+            foreach (var songDir in songDirs)
+            {
                 List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
                 txtFiles.AddRange(txtFilesInSongDir);
             }
@@ -82,7 +88,7 @@ public static class SongMetaManager
                 }
                 catch (SongMetaBuilderException e)
                 {
-                    Debug.Log("nope::"+path+"\n"+e.Message);
+                    Debug.Log("nope::" + path + "\n" + e.Message);
                     Interlocked.Increment(ref s_songsFailed);
                 }
                 catch (Exception ex)

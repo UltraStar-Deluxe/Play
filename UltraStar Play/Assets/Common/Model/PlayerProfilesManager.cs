@@ -6,30 +6,29 @@ using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
 
-public static class PlayerProfilesManager
+public class PlayerProfilesManager : MonoBehaviour
 {
-    private static List<PlayerProfile> s_playerProfiles;
-
-    public static List<PlayerProfile> PlayerProfiles
+    void OnEnable()
     {
-        get {
-            if(s_playerProfiles == null) {
-                InitPlayerProfiles();
-            }
-            return s_playerProfiles; 
+        if (!SceneDataBus.HasData(ESceneData.AllPlayerProfiles))
+        {
+            LoadPlayerProfiles();
         }
     }
 
-    private static void InitPlayerProfiles()
+    private void LoadPlayerProfiles()
     {
-        var xconfig = XElement.Load("./Config.xml");
-        var xplayerProfiles = xconfig.Element("Profiles");
-        s_playerProfiles = xplayerProfiles.Elements("PlayerProfile")
-            .Select(xplayerProfile => {
+        XElement xconfig = XElement.Load("./Config.xml");
+        XElement xplayerProfiles = xconfig.Element("Profiles");
+        List<PlayerProfile> playerProfiles = xplayerProfiles.Elements("PlayerProfile")
+            .Select(xplayerProfile =>
+            {
                 var playerProfile = new PlayerProfile();
                 playerProfile.Name = xplayerProfile.Attribute("name").Value;
                 playerProfile.MicDevice = xplayerProfile.Attribute("mic").Value;
                 return playerProfile;
-                } ).ToList();
+            }).ToList();
+
+        SceneDataBus.PutData(ESceneData.AllPlayerProfiles, playerProfiles);
     }
 }

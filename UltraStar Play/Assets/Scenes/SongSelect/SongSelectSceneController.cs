@@ -20,17 +20,24 @@ public class SongSelectSceneController : MonoBehaviour
 
     private PlayerProfile selectedPlayerProfile;
 
-    public void Start()
+    void OnEnable()
     {
-        // TODO: Scanning the files should not be done here.
-        // Think of startup procedure and order of events and asynchronous loading.
-        SongMetaManager.ScanFiles();
+    }
 
+    void Start()
+    {
+        SceneDataBus.AwaitData(ESceneData.AllSongMetas, OnAllSongsLoaded);
+        SceneDataBus.AwaitData(ESceneData.AllPlayerProfiles, OnAllPlayerProfilesLoaded);
+    }
+
+    private void OnAllSongsLoaded()
+    {
         PopulateSongList();
+    }
 
-        // Load Player Profiles from config
-        // TODO: Move to PlayerProfilesManager
-        var playerProfiles = PlayerProfilesManager.PlayerProfiles;
+    private void OnAllPlayerProfilesLoaded()
+    {
+        var playerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
         PopulatePlayerProfileList(playerProfiles);
     }
 
@@ -87,9 +94,10 @@ public class SongSelectSceneController : MonoBehaviour
     {
         Debug.Log($"Clicked on song button: {songMeta.Title}");
 
-        SceneDataBus.PutData(ESceneData.Song, songMeta);
-        var defaultPlayerProfile = PlayerProfilesManager.PlayerProfiles[0];
-        SceneDataBus.PutData(ESceneData.PlayerProfile, selectedPlayerProfile.OrElse(defaultPlayerProfile));
+        SceneDataBus.PutData(ESceneData.SelectedSong, songMeta);
+        var allPlayerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
+        var defaultPlayerProfile = allPlayerProfiles[0];
+        SceneDataBus.PutData(ESceneData.SelectedPlayerProfile, selectedPlayerProfile.OrElse(defaultPlayerProfile));
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene);
     }

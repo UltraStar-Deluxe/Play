@@ -30,17 +30,28 @@ public class SingSceneController : MonoBehaviour
     private WaveStream m_MainOutputStream;
     private WaveChannel32 m_VolumeStream;
 
+    private List<ESceneData> loadedData = new List<ESceneData>();
+
+    private double positionInSongMillis;
+
     public double CurrentBeat
     {
         get
         {
-            double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
-            var result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
-            if (result < 0)
+            if (m_MainOutputStream == null)
             {
-                result = 0;
+                return 0;
             }
-            return result;
+            else
+            {
+                double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+                var result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+                if (result < 0)
+                {
+                    result = 0;
+                }
+                return result;
+            }
         }
     }
 
@@ -49,7 +60,14 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            return m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            if (m_MainOutputStream == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            }
         }
     }
 
@@ -58,14 +76,30 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            return m_MainOutputStream.CurrentTime.TotalSeconds;
+            if (m_MainOutputStream == null)
+            {
+                return 0;
+            }
+            else
+            {
+                return m_MainOutputStream.CurrentTime.TotalSeconds;
+            }
         }
     }
 
     void Start()
     {
-        SongMeta = SceneDataBus.GetData(ESceneData.Song, GetDefaultSongMeta);
-        PlayerProfile = SceneDataBus.GetData(ESceneData.PlayerProfile, GetDefaultPlayerProfile);
+        Debug.Log("Start: " + loadedData);
+        loadedData.Clear();
+        SceneDataBus.AwaitData(ESceneData.AllPlayerProfiles, OnAllPlayerProfiledLoaded);
+        SceneDataBus.AwaitData(ESceneData.AllSongMetas, OnAllSongMetasLoaded);
+    }
+
+    private void StartAfterAllLoaded()
+    {
+        Debug.Log("StartAfterAllLoaded");
+        SongMeta = SceneDataBus.GetData(ESceneData.SelectedSong, GetDefaultSongMeta);
+        PlayerProfile = SceneDataBus.GetData(ESceneData.SelectedPlayerProfile, GetDefaultPlayerProfile);
 
         VideoPlayer = FindObjectOfType<VideoPlayer>();
 
@@ -76,22 +110,68 @@ public class SingSceneController : MonoBehaviour
 
         LoadAudio(songPath);
         m_WaveOutDevice.Play();
+        if (positionInSongMillis > 0)
+        {
+            m_MainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(positionInSongMillis);
+        }
 
         // Create player ui for each player (currently there is only one player)
         CreatePlayerUi();
 
+        // Start any associated video
         Invoke("StartVideoPlayback", SongMeta.VideoGap);
 
+        // Go to next scene when the song finishes
         Invoke("CheckSongFinished", m_MainOutputStream.TotalTime.Seconds);
     }
 
-    void OnDestroy()
+    private void OnAllPlayerProfiledLoaded()
     {
-        UnloadAudio();
+        loadedData.Add(ESceneData.AllPlayerProfiles);
+        if (loadedData.Contains(ESceneData.AllPlayerProfiles) && loadedData.Contains(ESceneData.AllSongMetas))
+        {
+            StartAfterAllLoaded();
+        }
+    }
+
+    private void OnAllSongMetasLoaded()
+    {
+        loadedData.Add(ESceneData.AllSongMetas);
+        if (loadedData.Contains(ESceneData.AllPlayerProfiles) && loadedData.Contains(ESceneData.AllSongMetas))
+        {
+            StartAfterAllLoaded();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (m_MainOutputStream != null)
+        {
+            positionInSongMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            UnloadAudio();
+        }
+        if (VideoPlayer != null)
+        {
+            VideoPlayer.Stop();
+        }
+    }
+
+    void OnEnable()
+    {
+        if (m_MainOutputStream == null && positionInSongMillis > 0)
+        {
+            Debug.Log("reloading");
+            Start();
+        }
     }
 
     private void CheckSongFinished()
     {
+        if (m_MainOutputStream == null)
+        {
+            return;
+        }
+
         double totalMillis = m_MainOutputStream.TotalTime.TotalMilliseconds;
         double currentMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
         double missingMillis = totalMillis - currentMillis;
@@ -127,6 +207,11 @@ public class SingSceneController : MonoBehaviour
 
     private void SyncVideoWithMusic()
     {
+        if (m_MainOutputStream == null)
+        {
+            return;
+        }
+
         var secondsInSong = m_MainOutputStream.CurrentTime.TotalSeconds;
         if (VideoPlayer.length > secondsInSong)
         {
@@ -157,7 +242,8 @@ public class SingSceneController : MonoBehaviour
 
     private PlayerProfile GetDefaultPlayerProfile()
     {
-        var defaultPlayerProfiles = PlayerProfilesManager.PlayerProfiles.Where(it => it.Name == DefaultPlayerProfileName);
+        var allPlayerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
+        var defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == DefaultPlayerProfileName);
         if (defaultPlayerProfiles.Count() == 0)
         {
             throw new Exception("The default player profile was not found.");
