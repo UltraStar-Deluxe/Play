@@ -120,7 +120,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
             var remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
             if (endPos > float.MinValue)
             {
-                if (remainingTime > 0)
+                if (remainingTime > 0 && endPos > m_rectTransform.anchoredPosition.x)
                 {
                     velocityPerSecond = (endPos - m_rectTransform.anchoredPosition.x) / remainingTime;
                 }
