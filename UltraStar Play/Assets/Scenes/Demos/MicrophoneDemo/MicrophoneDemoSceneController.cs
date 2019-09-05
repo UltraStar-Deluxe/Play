@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using Pitch;
 
 [RequireComponent(typeof(AudioSource))]
-public class MicrophoneDemo : MonoBehaviour
+public class MicrophoneDemoSceneController : MonoBehaviour
 {
     private const int SAMPLE_RATE = 22050;
     private const int BUFFER_STEPS = 10;
@@ -25,17 +25,20 @@ public class MicrophoneDemo : MonoBehaviour
         pitchTracker = new PitchTracker();
         pitchTracker.PitchRecordHistorySize = 5;
         pitchTracker.SampleRate = SAMPLE_RATE;
-        
+
         micAudioSource = GetComponent<AudioSource>();
 
-        if(Microphone.devices.Length == 0) {
+        if (Microphone.devices.Length == 0)
+        {
             throw new Exception("No mic found");
         }
-        foreach(var device in Microphone.devices) {
+        foreach (var device in Microphone.devices)
+        {
             Debug.Log("Found mic: " + device);
         }
 
-        if( Array.Exists( Microphone.devices, (device) => device.Equals(micDeviceName) ) ) {
+        if (Array.Exists(Microphone.devices, (device) => device.Equals(micDeviceName)))
+        {
             Debug.Log($"Start recording with '{micDeviceName}'");
             // Code for low-latency microphone input taken from
             // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
@@ -43,22 +46,28 @@ public class MicrophoneDemo : MonoBehaviour
             AudioSource audio = GetComponent<AudioSource>();
             micAudioSource.clip = Microphone.Start(null, true, 1, SAMPLE_RATE);
             micAudioSource.loop = true;
-            if(playRecordedAudio) {
+            if (playRecordedAudio)
+            {
                 while (!(Microphone.GetPosition(null) > 0)) { /* Busy waiting */ }
                 Debug.Log("Start playing... position is " + Microphone.GetPosition(null));
                 micAudioSource.Play();
             }
             pitchTracker.PitchDetected += new PitchTracker.PitchDetectedHandler(OnPitchDetected);
-        } else {
+        }
+        else
+        {
             throw new Exception($"Microphone '{micDeviceName}' not found. Please, provide the name of a found microphone.");
         }
     }
 
     void Update()
     {
-        if(playRecordedAudio && !micAudioSource.isPlaying) {
+        if (playRecordedAudio && !micAudioSource.isPlaying)
+        {
             micAudioSource.Play();
-        } else if(!playRecordedAudio && micAudioSource.isPlaying) {
+        }
+        else if (!playRecordedAudio && micAudioSource.isPlaying)
+        {
             micAudioSource.Stop();
         }
 
@@ -73,9 +82,12 @@ public class MicrophoneDemo : MonoBehaviour
     {
         // Show the note that has been detected
         var midiNote = pitchRecord.MidiNote;
-        if(midiNote > 0) {
-            currentNoteLabel.text = "Note: "+MidiUtils.MidiNoteToAbsoluteName(midiNote);
-        } else {
+        if (midiNote > 0)
+        {
+            currentNoteLabel.text = "Note: " + MidiUtils.MidiNoteToAbsoluteName(midiNote);
+        }
+        else
+        {
             currentNoteLabel.text = "Note: unkown";
         }
     }

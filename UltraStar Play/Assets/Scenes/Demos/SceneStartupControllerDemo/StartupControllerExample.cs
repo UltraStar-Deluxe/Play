@@ -8,10 +8,11 @@ public class TestSceneStartupController : MonoBehaviour
 
     void Awake()
     {
-        StartupAction action = new StartupAction(name, () => Debug.Log($"{name} executed") );
-        if( !string.IsNullOrEmpty(DependsOn) ) {
+        StartupAction action = new StartupAction(name, () => Debug.Log($"{name} executed"));
+        if (!string.IsNullOrEmpty(DependsOn))
+        {
             action.DependsOn(DependsOn);
         }
-        SceneStartupController.AddStartupAction(action);
+        StartupController.AddStartupAction(action);
     }
 }

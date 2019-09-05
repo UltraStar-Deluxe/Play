@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
 
-public class SSingController : MonoBehaviour
+public class SingSceneController : MonoBehaviour
 {
     public string DefaultSongName;
     public string DefaultPlayerProfileName;
@@ -24,11 +24,14 @@ public class SSingController : MonoBehaviour
     private WaveStream m_MainOutputStream;
     private WaveChannel32 m_VolumeStream;
 
-    public double CurrentBeat {
-        get {
+    public double CurrentBeat
+    {
+        get
+        {
             double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
             var result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
-            if(result < 0) {
+            if (result < 0)
+            {
                 result = 0;
             }
             return result;
@@ -36,22 +39,27 @@ public class SSingController : MonoBehaviour
     }
 
     // The current position in the song in milliseconds.
-    public double PositionInSongInMillis { 
-        get {
+    public double PositionInSongInMillis
+    {
+        get
+        {
             return m_MainOutputStream.CurrentTime.TotalMilliseconds;
         }
     }
 
     // The current position in the song in milliseconds.
-    public double PositionInSongInSeconds { 
-        get {
+    public double PositionInSongInSeconds
+    {
+        get
+        {
             return m_MainOutputStream.CurrentTime.TotalSeconds;
         }
     }
 
-    void Start() {
-        SongMeta = SceneDataBus.GetData(ESceneData.Song, GetDefaultSongMeta );
-        PlayerProfile = SceneDataBus.GetData(ESceneData.PlayerProfile, GetDefaultPlayerProfile );
+    void Start()
+    {
+        SongMeta = SceneDataBus.GetData(ESceneData.Song, GetDefaultSongMeta);
+        PlayerProfile = SceneDataBus.GetData(ESceneData.PlayerProfile, GetDefaultPlayerProfile);
 
         VideoPlayer = FindObjectOfType<VideoPlayer>();
 
@@ -62,10 +70,10 @@ public class SSingController : MonoBehaviour
 
         LoadAudio(songPath);
         m_WaveOutDevice.Play();
-        
+
         // Create player ui for each player (currently there is only one player)
         CreatePlayerUi();
-        
+
         Invoke("StartVideoPlayback", SongMeta.VideoGap);
     }
 
@@ -74,20 +82,26 @@ public class SSingController : MonoBehaviour
         UnloadAudio();
     }
 
-    private void StartVideoPlayback() {
+    private void StartVideoPlayback()
+    {
         var videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
-        if(File.Exists(videoPath)) {
+        if (File.Exists(videoPath))
+        {
             VideoPlayer.url = "file://" + videoPath;
             InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
-        } else {
+        }
+        else
+        {
             VideoPlayer.enabled = false;
             // TODO: Use cover as fallback
         }
     }
 
-    private void SyncVideoWithMusic() {
+    private void SyncVideoWithMusic()
+    {
         var secondsInSong = m_MainOutputStream.CurrentTime.TotalSeconds;
-        if(VideoPlayer.length > secondsInSong) {
+        if (VideoPlayer.length > secondsInSong)
+        {
             VideoPlayer.time = secondsInSong;
         }
     }
@@ -95,7 +109,8 @@ public class SSingController : MonoBehaviour
     private void CreatePlayerUi()
     {
         // Remove old player ui
-        foreach(RectTransform oldPlayerUi in PlayerUiArea) {
+        foreach (RectTransform oldPlayerUi in PlayerUiArea)
+        {
             GameObject.Destroy(oldPlayerUi.gameObject);
         }
 
@@ -115,7 +130,8 @@ public class SSingController : MonoBehaviour
     private PlayerProfile GetDefaultPlayerProfile()
     {
         var defaultPlayerProfiles = PlayerProfilesManager.PlayerProfiles.Where(it => it.Name == DefaultPlayerProfileName);
-        if(defaultPlayerProfiles.Count() == 0) {
+        if (defaultPlayerProfiles.Count() == 0)
+        {
             throw new Exception("The default player profile was not found.");
         }
         return defaultPlayerProfiles.First();
@@ -125,7 +141,8 @@ public class SSingController : MonoBehaviour
     {
         SongMetaManager.ScanFiles();
         var defaultSongMetas = SongMetaManager.GetSongMetas().Where(it => it.Title == DefaultSongName);
-        if(defaultSongMetas.Count() == 0) {
+        if (defaultSongMetas.Count() == 0)
+        {
             throw new Exception("The default song was not found.");
         }
         return defaultSongMetas.First();
@@ -152,11 +169,13 @@ public class SSingController : MonoBehaviour
         return false;
     }
 
-    private void LoadAudio(string path) {
-        var url = "file://"+path;
+    private void LoadAudio(string path)
+    {
+        var url = "file://" + path;
         WWW www = new WWW(url);
         while (!www.isDone) { };
-        if (!string.IsNullOrEmpty(www.error)) {
+        if (!string.IsNullOrEmpty(www.error))
+        {
             throw new Exception(www.error);
         }
 
@@ -165,11 +184,12 @@ public class SSingController : MonoBehaviour
         {
             throw new Exception("Cannot open mp3 file!");
         }
-        
+
         Resources.UnloadUnusedAssets();
     }
 
-    private void UnloadAudio() {
+    private void UnloadAudio()
+    {
         if (m_WaveOutDevice != null)
         {
             m_WaveOutDevice.Stop();

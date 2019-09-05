@@ -8,27 +8,33 @@ public class PositionInLyricsIndicator : MonoBehaviour
 {
     public LyricsDisplayer LyricsDisplayer;
 
-    private SSingController m_ssingController;
+    private SingSceneController m_singSceneController;
 
     private double velocityPerSecond;
 
     private Sentence m_lastSentence;
 
-    private Sentence CurrentSentence {
-        get {
+    private Sentence CurrentSentence
+    {
+        get
+        {
             return LyricsDisplayer.CurrentSentence;
         }
     }
 
-    private Text CurrentSentenceText {
-        get {
+    private Text CurrentSentenceText
+    {
+        get
+        {
             return LyricsDisplayer.CurrentSentenceText;
         }
     }
 
-    private SongMeta SongMeta {
-        get {
-            return m_ssingController.SongMeta;
+    private SongMeta SongMeta
+    {
+        get
+        {
+            return m_singSceneController.SongMeta;
         }
     }
 
@@ -36,40 +42,49 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private const int canvasWidth = 800;
 
-    void Start() {
+    void Start()
+    {
         m_rectTransform = GetComponent<RectTransform>();
-        m_ssingController = FindObjectOfType<SSingController>();
+        m_singSceneController = FindObjectOfType<SingSceneController>();
     }
 
-    void Update() {
-        if(m_lastSentence != CurrentSentence) {
+    void Update()
+    {
+        if (m_lastSentence != CurrentSentence)
+        {
             m_lastSentence = CurrentSentence;
             Reset();
-        } else {
+        }
+        else
+        {
             var step = (float)velocityPerSecond * Time.deltaTime;
             m_rectTransform.anchoredPosition = new Vector2(m_rectTransform.anchoredPosition.x + step, m_rectTransform.anchoredPosition.y);
         }
         CalculateVelocity();
     }
 
-    public void Reset() {
+    public void Reset()
+    {
         MoveToLeftSideOfScreen();
         velocityPerSecond = 0;
     }
 
-    private void MoveToLeftSideOfScreen() {
+    private void MoveToLeftSideOfScreen()
+    {
         m_rectTransform.anchoredPosition = new Vector2(-canvasWidth / 2.0f, m_rectTransform.anchoredPosition.y);
     }
 
-    private void CalculateVelocity() {
-        if(CurrentSentence == null
+    private void CalculateVelocity()
+    {
+        if (CurrentSentence == null
             || CurrentSentenceText.text.Length == 0
-            || CurrentSentenceText.cachedTextGenerator.vertexCount == 0) {
+            || CurrentSentenceText.cachedTextGenerator.vertexCount == 0)
+        {
             return;
         }
-        var positionInSongInSeconds = m_ssingController.PositionInSongInSeconds;
+        var positionInSongInSeconds = m_singSceneController.PositionInSongInSeconds;
 
-        var currentBeat = m_ssingController.CurrentBeat;
+        var currentBeat = m_singSceneController.CurrentBeat;
         var sentenceStartBeat = CurrentSentence.StartBeat;
         var sentenceEndBeat = CurrentSentence.EndBeat;
 
@@ -79,29 +94,38 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
         var positionIndicatorStartInSeconds = sentenceStartInSeconds - 2.0f;
 
-        if (positionInSentenceInSeconds >= positionIndicatorStartInSeconds) {
+        if (positionInSentenceInSeconds >= positionIndicatorStartInSeconds)
+        {
             var endPos = float.MinValue;
             var endTimeInSeconds = 0f;
 
-            if(positionInSentenceInSeconds <= sentenceStartInSeconds) {
+            if (positionInSentenceInSeconds <= sentenceStartInSeconds)
+            {
                 // Range before first note of sentence.
                 var sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
                 endPos = sentenceFirstCharacterPosition;
                 endTimeInSeconds = sentenceStartInSeconds;
-            } else if (positionInSentenceInSeconds <= sentenceEndInSeconds) {
+            }
+            else if (positionInSentenceInSeconds <= sentenceEndInSeconds)
+            {
                 // Range inside sentence.
                 var currentNote = GetCurrentOrNextNote(currentBeat);
-                if (currentNote != null) {
+                if (currentNote != null)
+                {
                     var noteEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, currentNote.EndBeat);
                     endPos = GetEndPositionOfNote(CurrentSentenceText, CurrentSentence, currentNote);
                     endTimeInSeconds = noteEndInSeconds;
                 }
             }
             var remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
-            if(endPos > float.MinValue) {
-                if(remainingTime > 0) {
+            if (endPos > float.MinValue)
+            {
+                if (remainingTime > 0)
+                {
                     velocityPerSecond = (endPos - m_rectTransform.anchoredPosition.x) / remainingTime;
-                } else {
+                }
+                else
+                {
                     m_rectTransform.anchoredPosition = new Vector2(endPos, m_rectTransform.anchoredPosition.y);
                 }
             }
@@ -124,24 +148,27 @@ public class PositionInLyricsIndicator : MonoBehaviour
         return pos.x;
     }
 
-    private Note GetCurrentOrNextNote(double currentBeat) {
+    private Note GetCurrentOrNextNote(double currentBeat)
+    {
         var note = CurrentSentence.Notes
-            .Where( it => (currentBeat <= it.EndBeat) ).FirstOrDefault();
+            .Where(it => (currentBeat <= it.EndBeat)).FirstOrDefault();
         return note;
     }
 
-    private Vector3 GetLeftPositionOfCharacter(Text text, int charIndex) {
+    private Vector3 GetLeftPositionOfCharacter(Text text, int charIndex)
+    {
         // Use position of a vertex on the left side of the character.
         var vertIndex = charIndex * 4;
-        var vertexOfCharacter = text.cachedTextGenerator.verts[ vertIndex ];
+        var vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
         var positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
     }
 
-    private Vector3 GetRightPositionOfCharacter(Text text, int charIndex) {
+    private Vector3 GetRightPositionOfCharacter(Text text, int charIndex)
+    {
         // Use position of a vertex on the right side of the character.
-        var vertIndex = ((charIndex + 1) * 4) - 3; 
-        var vertexOfCharacter = text.cachedTextGenerator.verts[ vertIndex ];
+        var vertIndex = ((charIndex + 1) * 4) - 3;
+        var vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
         var positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
     }
