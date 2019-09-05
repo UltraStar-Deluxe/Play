@@ -12,13 +12,17 @@ public class SingSceneController : MonoBehaviour
     public string DefaultSongName;
     public string DefaultPlayerProfileName;
 
+    [TextArea(3, 8)]
+    /// Convenience text field to paste and copy song names when debugging.
+    public string defaultSongNamePasteBin;
+
     public RectTransform PlayerUiArea;
     public RectTransform PlayerUiPrefab;
 
     public SongMeta SongMeta;
     public PlayerProfile PlayerProfile;
 
-    public VideoPlayer VideoPlayer;
+    private VideoPlayer VideoPlayer;
 
     private IWavePlayer m_WaveOutDevice;
     private WaveStream m_MainOutputStream;
@@ -75,11 +79,33 @@ public class SingSceneController : MonoBehaviour
         CreatePlayerUi();
 
         Invoke("StartVideoPlayback", SongMeta.VideoGap);
+
+        Invoke("CheckSongFinished", m_MainOutputStream.TotalTime.Seconds);
     }
 
     void OnDestroy()
     {
         UnloadAudio();
+    }
+
+    private void CheckSongFinished()
+    {
+        double totalMillis = m_MainOutputStream.TotalTime.TotalMilliseconds;
+        double currentMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+        double missingMillis = totalMillis - currentMillis;
+        if (missingMillis <= 0)
+        {
+            Invoke("FinishScene", 1f);
+        }
+        else
+        {
+            Invoke("CheckSongFinished", (float)(missingMillis / 1000.0));
+        }
+    }
+
+    private void FinishScene()
+    {
+        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
     }
 
     private void StartVideoPlayback()
