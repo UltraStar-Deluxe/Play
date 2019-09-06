@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87d83187f9944d34485e52a296f4aed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentSentenceText: {fileID: 1570843823628408568}
-  NextSentenceText: {fileID: 1570843825482846074}
+  currentSentenceText: {fileID: 1570843823628408568}
+  nextSentenceText: {fileID: 1570843825482846074}
 --- !u!1 &1570843823628408574
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,4 +375,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b648bb0572e58b42a6831722e8b8494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LyricsDisplayer: {fileID: 1570843823581990805}
+  lyricsDisplayer: {fileID: 1570843823581990805}

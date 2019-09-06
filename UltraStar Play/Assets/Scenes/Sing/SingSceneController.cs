@@ -6,22 +6,20 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
-using UnityEngine.Networking;
-using System.Threading;
 
 public class SingSceneController : MonoBehaviour
 {
     public SingSceneData singSceneData;
 
-    public string DefaultSongName;
-    public string DefaultPlayerProfileName;
+    public string defaultSongName;
+    public string defaultPlayerProfileName;
 
     [TextArea(3, 8)]
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 
-    public RectTransform PlayerUiArea;
-    public RectTransform PlayerUiPrefab;
+    public RectTransform playerUiArea;
+    public RectTransform playerUiPrefab;
 
     public SongMeta SongMeta
     {
@@ -39,24 +37,24 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private VideoPlayer VideoPlayer;
+    private VideoPlayer videoPlayer;
 
-    private IWavePlayer m_WaveOutDevice;
-    private WaveStream m_MainOutputStream;
-    private WaveChannel32 m_VolumeStream;
+    private IWavePlayer waveOutDevice;
+    private WaveStream mainOutputStream;
+    private WaveChannel32 volumeStream;
 
     public double CurrentBeat
     {
         get
         {
-            if (m_MainOutputStream == null)
+            if (mainOutputStream == null)
             {
                 return 0;
             }
             else
             {
-                double millisInSong = m_MainOutputStream.CurrentTime.TotalMilliseconds;
-                var result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+                double millisInSong = mainOutputStream.CurrentTime.TotalMilliseconds;
+                double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
                 if (result < 0)
                 {
                     result = 0;
@@ -71,13 +69,13 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            if (m_MainOutputStream == null)
+            if (mainOutputStream == null)
             {
                 return 0;
             }
             else
             {
-                return m_MainOutputStream.CurrentTime.TotalMilliseconds;
+                return mainOutputStream.CurrentTime.TotalMilliseconds;
             }
         }
     }
@@ -87,13 +85,13 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            if (m_MainOutputStream == null)
+            if (mainOutputStream == null)
             {
                 return 0;
             }
             else
             {
-                return m_MainOutputStream.CurrentTime.TotalSeconds;
+                return mainOutputStream.CurrentTime.TotalSeconds;
             }
         }
     }
@@ -117,23 +115,23 @@ public class SingSceneController : MonoBehaviour
 
     void Start()
     {
-        if (m_WaveOutDevice != null && m_WaveOutDevice.PlaybackState == PlaybackState.Playing)
+        if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
         {
             Debug.Log("Song already playing");
             return;
         }
 
-        VideoPlayer = FindObjectOfType<VideoPlayer>();
+        videoPlayer = FindObjectOfType<VideoPlayer>();
 
         Debug.Log($"{PlayerProfile.Name} starts singing of {SongMeta.Title}.");
 
-        var songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
+        string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
 
         LoadAudio(songPath);
-        m_WaveOutDevice.Play();
+        waveOutDevice.Play();
         if (singSceneData.PositionInSongMillis > 0)
         {
-            m_MainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(singSceneData.PositionInSongMillis);
+            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(singSceneData.PositionInSongMillis);
         }
 
         // Create player ui for each player (currently there is only one player)
@@ -143,19 +141,19 @@ public class SingSceneController : MonoBehaviour
         Invoke("StartVideoPlayback", SongMeta.VideoGap);
 
         // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", m_MainOutputStream.TotalTime.Seconds);
+        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
     }
 
     void OnDisable()
     {
-        if (m_MainOutputStream != null)
+        if (mainOutputStream != null)
         {
-            singSceneData.PositionInSongMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            singSceneData.PositionInSongMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
             UnloadAudio();
         }
-        if (VideoPlayer != null)
+        if (videoPlayer != null)
         {
-            VideoPlayer.Stop();
+            videoPlayer.Stop();
         }
     }
 
@@ -167,9 +165,9 @@ public class SingSceneController : MonoBehaviour
             singSceneData.PositionInSongMillis = 0;
         }
 
-        if (m_MainOutputStream == null && singSceneData.PositionInSongMillis > 0)
+        if (mainOutputStream == null && singSceneData.PositionInSongMillis > 0)
         {
-            Debug.Log("Reloading Song...");
+            Debug.Log("Reloading Song..");
             Start();
         }
     }
@@ -182,13 +180,13 @@ public class SingSceneController : MonoBehaviour
 
     private void CheckSongFinished()
     {
-        if (m_MainOutputStream == null)
+        if (mainOutputStream == null)
         {
             return;
         }
 
-        double totalMillis = m_MainOutputStream.TotalTime.TotalMilliseconds;
-        double currentMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+        double totalMillis = mainOutputStream.TotalTime.TotalMilliseconds;
+        double currentMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
         double missingMillis = totalMillis - currentMillis;
         if (missingMillis <= 0)
         {
@@ -207,47 +205,47 @@ public class SingSceneController : MonoBehaviour
 
     private void StartVideoPlayback()
     {
-        var videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
+        string videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
         if (File.Exists(videoPath))
         {
-            VideoPlayer.url = "file://" + videoPath;
+            videoPlayer.url = "file://" + videoPath;
             InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
         }
         else
         {
-            VideoPlayer.enabled = false;
+            videoPlayer.enabled = false;
         }
     }
 
     private void SyncVideoWithMusic()
     {
-        if (m_MainOutputStream == null)
+        if (mainOutputStream == null)
         {
             return;
         }
 
-        var secondsInSong = m_MainOutputStream.CurrentTime.TotalSeconds;
-        if (VideoPlayer.length > secondsInSong)
+        double secondsInSong = mainOutputStream.CurrentTime.TotalSeconds;
+        if (videoPlayer.length > secondsInSong)
         {
-            VideoPlayer.time = secondsInSong;
+            videoPlayer.time = secondsInSong;
         }
     }
 
     private void CreatePlayerUi()
     {
         // Remove old player ui
-        foreach (RectTransform oldPlayerUi in PlayerUiArea)
+        foreach (RectTransform oldPlayerUi in playerUiArea)
         {
             GameObject.Destroy(oldPlayerUi.gameObject);
         }
 
         // Create new player ui for each player.
-        var playerUi = GameObject.Instantiate(PlayerUiPrefab);
-        playerUi.SetParent(PlayerUiArea);
+        RectTransform playerUi = GameObject.Instantiate(playerUiPrefab);
+        playerUi.SetParent(playerUiArea);
 
         // Associate a LyricsDisplayer with the SentenceDisplayer
-        var sentenceDisplayer = playerUi.GetComponentInChildren<SentenceDisplayer>();
-        var lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
+        SentenceDisplayer sentenceDisplayer = playerUi.GetComponentInChildren<SentenceDisplayer>();
+        LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
         sentenceDisplayer.LyricsDisplayer = lyricsDisplayer;
 
         // Load the voice for the SentenceDisplayer of the PlayerUi
@@ -256,8 +254,8 @@ public class SingSceneController : MonoBehaviour
 
     private PlayerProfile GetDefaultPlayerProfile()
     {
-        var allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        var defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == DefaultPlayerProfileName);
+        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
+        IEnumerable<PlayerProfile> defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == defaultPlayerProfileName);
         if (defaultPlayerProfiles.Count() == 0)
         {
             throw new Exception("The default player profile was not found.");
@@ -267,7 +265,7 @@ public class SingSceneController : MonoBehaviour
 
     private SongMeta GetDefaultSongMeta()
     {
-        var defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == DefaultSongName);
+        IEnumerable<SongMeta> defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == defaultSongName);
         if (defaultSongMetas.Count() == 0)
         {
             throw new Exception("The default song was not found.");
@@ -280,11 +278,11 @@ public class SingSceneController : MonoBehaviour
         try
         {
             MemoryStream tmpStr = new MemoryStream(data);
-            m_MainOutputStream = new Mp3FileReader(tmpStr);
-            m_VolumeStream = new WaveChannel32(m_MainOutputStream);
+            mainOutputStream = new Mp3FileReader(tmpStr);
+            volumeStream = new WaveChannel32(mainOutputStream);
 
-            m_WaveOutDevice = new WaveOutEvent();
-            m_WaveOutDevice.Init(m_VolumeStream);
+            waveOutDevice = new WaveOutEvent();
+            waveOutDevice.Init(volumeStream);
 
             return true;
         }
@@ -314,25 +312,25 @@ public class SingSceneController : MonoBehaviour
 
     private void UnloadAudio()
     {
-        if (m_WaveOutDevice != null)
+        if (waveOutDevice != null)
         {
-            m_WaveOutDevice.Stop();
+            waveOutDevice.Stop();
         }
 
-        if (m_MainOutputStream != null)
+        if (mainOutputStream != null)
         {
             // this one really closes the file and ACM conversion
-            m_VolumeStream.Close();
-            m_VolumeStream = null;
+            volumeStream.Close();
+            volumeStream = null;
 
             // this one does the metering stream
-            m_MainOutputStream.Close();
-            m_MainOutputStream = null;
+            mainOutputStream.Close();
+            mainOutputStream = null;
         }
-        if (m_WaveOutDevice != null)
+        if (waveOutDevice != null)
         {
-            m_WaveOutDevice.Dispose();
-            m_WaveOutDevice = null;
+            waveOutDevice.Dispose();
+            waveOutDevice = null;
         }
     }
 

@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05684973d504ca64b83624270e3edce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LinePrefab: {fileID: 1194152596973659647, guid: 0e44a1330a41aac458b12308c1a1ddfa,
+  linePrefab: {fileID: 1194152596973659647, guid: 0e44a1330a41aac458b12308c1a1ddfa,
     type: 3}
 --- !u!1 &4410698265858749455
 GameObject:
@@ -215,9 +215,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6eaaeab7b2a6e314c8688153047d1924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UiNotePrefab: {fileID: 2444222340775961529, guid: 67fe67780e740264b9c255cd9777445d,
+  uiNotePrefab: {fileID: 2444222340775961529, guid: 67fe67780e740264b9c255cd9777445d,
     type: 3}
-  LyricsDisplayer: {fileID: 0}
+  lyricsDisplayer: {fileID: 0}
 --- !u!1 &4410698266006340637
 GameObject:
   m_ObjectHideFlags: 0

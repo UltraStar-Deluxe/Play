@@ -7,30 +7,31 @@ using UnityEngine.UI;
 
 public class LyricsDisplayer : MonoBehaviour
 {
-    public Text CurrentSentenceText;
-    public Text NextSentenceText;
+    public Text currentSentenceText;
+    public Text nextSentenceText;
 
     public Sentence CurrentSentence { get; private set; }
 
     public void SetCurrentSentence(Sentence sentence)
     {
         CurrentSentence = sentence;
-        CurrentSentenceText.text = CreateStringFromSentence(sentence);
+        currentSentenceText.text = CreateStringFromSentence(sentence);
     }
 
     public void SetNextSentence(Sentence sentence)
     {
-        NextSentenceText.text = CreateStringFromSentence(sentence);
+        nextSentenceText.text = CreateStringFromSentence(sentence);
     }
 
     private string CreateStringFromSentence(Sentence sentence)
     {
-        if(sentence == null) {
+        if (sentence == null)
+        {
             return "";
         }
 
-        var noteTexts = sentence.Notes.Select(it => it.Text);
-        var joinedNoteTexts = string.Join("", noteTexts);
+        IEnumerable<string> noteTexts = sentence.Notes.Select(it => it.Text);
+        string joinedNoteTexts = string.Join("", noteTexts);
         return joinedNoteTexts;
     }
 }

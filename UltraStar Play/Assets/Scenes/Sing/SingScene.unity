@@ -156,7 +156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -131, y: -23.7}
+  m_AnchoredPosition: {x: -131, y: -23.699951}
   m_SizeDelta: {x: 99.1, y: 47.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &77866317
@@ -950,11 +950,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultSongName: Summer Wine
-  DefaultPlayerProfileName: Player 01
+  defaultSongName: Summer Wine
+  defaultPlayerProfileName: Player 01
   defaultSongNamePasteBin: 
-  PlayerUiArea: {fileID: 245391953}
-  PlayerUiPrefab: {fileID: 4410698265183144018, guid: c476fd55a093e0f43bdc324f326218f3,
+  playerUiArea: {fileID: 245391953}
+  playerUiPrefab: {fileID: 4410698265183144018, guid: c476fd55a093e0f43bdc324f326218f3,
     type: 3}
 --- !u!4 &1427931089
 Transform:

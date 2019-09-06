@@ -6,19 +6,21 @@ using UnityEngine.UI;
 
 public class PositionInLyricsIndicator : MonoBehaviour
 {
-    public LyricsDisplayer LyricsDisplayer;
+    private const int CanvasWidth = 800;
 
-    private SingSceneController m_singSceneController;
+    public LyricsDisplayer lyricsDisplayer;
+
+    private SingSceneController singSceneController;
 
     private double velocityPerSecond;
 
-    private Sentence m_lastSentence;
+    private Sentence lastSentence;
 
     private Sentence CurrentSentence
     {
         get
         {
-            return LyricsDisplayer.CurrentSentence;
+            return lyricsDisplayer.CurrentSentence;
         }
     }
 
@@ -26,7 +28,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
     {
         get
         {
-            return LyricsDisplayer.CurrentSentenceText;
+            return lyricsDisplayer.currentSentenceText;
         }
     }
 
@@ -34,31 +36,29 @@ public class PositionInLyricsIndicator : MonoBehaviour
     {
         get
         {
-            return m_singSceneController.SongMeta;
+            return singSceneController.SongMeta;
         }
     }
 
-    private RectTransform m_rectTransform;
-
-    private const int canvasWidth = 800;
+    private RectTransform rectTransform;
 
     void Start()
     {
-        m_rectTransform = GetComponent<RectTransform>();
-        m_singSceneController = FindObjectOfType<SingSceneController>();
+        rectTransform = GetComponent<RectTransform>();
+        singSceneController = FindObjectOfType<SingSceneController>();
     }
 
     void Update()
     {
-        if (m_lastSentence != CurrentSentence)
+        if (lastSentence != CurrentSentence)
         {
-            m_lastSentence = CurrentSentence;
+            lastSentence = CurrentSentence;
             Reset();
         }
         else
         {
             var step = (float)velocityPerSecond * Time.deltaTime;
-            m_rectTransform.anchoredPosition = new Vector2(m_rectTransform.anchoredPosition.x + step, m_rectTransform.anchoredPosition.y);
+            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x + step, rectTransform.anchoredPosition.y);
         }
         CalculateVelocity();
     }
@@ -71,7 +71,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private void MoveToLeftSideOfScreen()
     {
-        m_rectTransform.anchoredPosition = new Vector2(-canvasWidth / 2.0f, m_rectTransform.anchoredPosition.y);
+        rectTransform.anchoredPosition = new Vector2(-CanvasWidth / 2.0f, rectTransform.anchoredPosition.y);
     }
 
     private void CalculateVelocity()
@@ -82,51 +82,51 @@ public class PositionInLyricsIndicator : MonoBehaviour
         {
             return;
         }
-        var positionInSongInSeconds = m_singSceneController.PositionInSongInSeconds;
+        double positionInSongInSeconds = singSceneController.PositionInSongInSeconds;
 
-        var currentBeat = m_singSceneController.CurrentBeat;
-        var sentenceStartBeat = CurrentSentence.StartBeat;
-        var sentenceEndBeat = CurrentSentence.EndBeat;
+        double currentBeat = singSceneController.CurrentBeat;
+        double sentenceStartBeat = CurrentSentence.StartBeat;
+        double sentenceEndBeat = CurrentSentence.EndBeat;
 
-        var positionInSentenceInSeconds = positionInSongInSeconds - (SongMeta.Gap / 1000.0f);
-        var sentenceStartInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceStartBeat);
-        var sentenceEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceEndBeat);
+        double positionInSentenceInSeconds = positionInSongInSeconds - (SongMeta.Gap / 1000.0f);
+        double sentenceStartInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceStartBeat);
+        double sentenceEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceEndBeat);
 
-        var positionIndicatorStartInSeconds = sentenceStartInSeconds - 2.0f;
+        double positionIndicatorStartInSeconds = sentenceStartInSeconds - 2.0f;
 
         if (positionInSentenceInSeconds >= positionIndicatorStartInSeconds)
         {
-            var endPos = float.MinValue;
-            var endTimeInSeconds = 0f;
+            double endPos = double.MinValue;
+            double endTimeInSeconds = 0f;
 
             if (positionInSentenceInSeconds <= sentenceStartInSeconds)
             {
                 // Range before first note of sentence.
-                var sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
+                double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
                 endPos = sentenceFirstCharacterPosition;
                 endTimeInSeconds = sentenceStartInSeconds;
             }
             else if (positionInSentenceInSeconds <= sentenceEndInSeconds)
             {
                 // Range inside sentence.
-                var currentNote = GetCurrentOrNextNote(currentBeat);
+                Note currentNote = GetCurrentOrNextNote(currentBeat);
                 if (currentNote != null)
                 {
-                    var noteEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, currentNote.EndBeat);
+                    double noteEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, currentNote.EndBeat);
                     endPos = GetEndPositionOfNote(CurrentSentenceText, CurrentSentence, currentNote);
                     endTimeInSeconds = noteEndInSeconds;
                 }
             }
-            var remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
-            if (endPos > float.MinValue)
+            double remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
+            if (endPos > double.MinValue)
             {
-                if (remainingTime > 0 && endPos > m_rectTransform.anchoredPosition.x)
+                if (remainingTime > 0 && endPos > rectTransform.anchoredPosition.x)
                 {
-                    velocityPerSecond = (endPos - m_rectTransform.anchoredPosition.x) / remainingTime;
+                    velocityPerSecond = (endPos - rectTransform.anchoredPosition.x) / remainingTime;
                 }
                 else
                 {
-                    m_rectTransform.anchoredPosition = new Vector2(endPos, m_rectTransform.anchoredPosition.y);
+                    rectTransform.anchoredPosition = new Vector2((float)endPos, rectTransform.anchoredPosition.y);
                 }
             }
         }
@@ -134,23 +134,23 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private float GetEndPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        var noteAndNotesBefore = sentence.Notes.ElementsBefore(note, true);
-        var countNonWhitespaceChars = noteAndNotesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
-        var pos = GetRightPositionOfCharacter(currentSentenceText, countNonWhitespaceChars - 1);
+        List<Note> noteAndNotesBefore = sentence.Notes.ElementsBefore(note, true);
+        int countNonWhitespaceChars = noteAndNotesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
+        Vector3 pos = GetRightPositionOfCharacter(currentSentenceText, countNonWhitespaceChars - 1);
         return pos.x;
     }
 
     private float GetStartPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        var notesBefore = sentence.Notes.ElementsBefore(note, false);
-        var countNonWhitespaceChars = notesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
-        var pos = GetLeftPositionOfCharacter(currentSentenceText, countNonWhitespaceChars);
+        List<Note> notesBefore = sentence.Notes.ElementsBefore(note, false);
+        int countNonWhitespaceChars = notesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
+        Vector3 pos = GetLeftPositionOfCharacter(currentSentenceText, countNonWhitespaceChars);
         return pos.x;
     }
 
     private Note GetCurrentOrNextNote(double currentBeat)
     {
-        var note = CurrentSentence.Notes
+        Note note = CurrentSentence.Notes
             .Where(it => (currentBeat <= it.EndBeat)).FirstOrDefault();
         return note;
     }
@@ -158,18 +158,18 @@ public class PositionInLyricsIndicator : MonoBehaviour
     private Vector3 GetLeftPositionOfCharacter(Text text, int charIndex)
     {
         // Use position of a vertex on the left side of the character.
-        var vertIndex = charIndex * 4;
-        var vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
-        var positionOfVertex = vertexOfCharacter.position;
+        int vertIndex = charIndex * 4;
+        UIVertex vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
+        Vector3 positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
     }
 
     private Vector3 GetRightPositionOfCharacter(Text text, int charIndex)
     {
         // Use position of a vertex on the right side of the character.
-        var vertIndex = ((charIndex + 1) * 4) - 3;
-        var vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
-        var positionOfVertex = vertexOfCharacter.position;
+        int vertIndex = ((charIndex + 1) * 4) - 3;
+        UIVertex vertexOfCharacter = text.cachedTextGenerator.verts[vertIndex];
+        Vector3 positionOfVertex = vertexOfCharacter.position;
         return positionOfVertex;
     }
 }
