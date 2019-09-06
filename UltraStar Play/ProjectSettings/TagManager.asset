@@ -6,6 +6,7 @@ TagManager:
   tags:
   - SceneStartupController
   - SceneNavigator
+  - I18NManager
   layers:
   - Default
   - TransparentFX
