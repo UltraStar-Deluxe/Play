@@ -31,7 +31,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         {
             throw new Exception("No mic found");
         }
-        foreach (var device in Microphone.devices)
+        foreach (string device in Microphone.devices)
         {
             Debug.Log("Found mic: " + device);
         }
@@ -81,7 +81,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
     private void OnPitchDetected(PitchTracker sender, PitchTracker.PitchRecord pitchRecord)
     {
         // Show the note that has been detected
-        var midiNote = pitchRecord.MidiNote;
+        int midiNote = pitchRecord.MidiNote;
         if (midiNote > 0)
         {
             currentNoteLabel.text = "Note: " + MidiUtils.MidiNoteToAbsoluteName(midiNote);

@@ -16,7 +16,7 @@ public static class ListExtensions
         }
         else
         {
-            var result = list.GetRange(0, (inclusive) ? indexOfElement + 1 : indexOfElement);
+            List<T> result = list.GetRange(0, (inclusive) ? indexOfElement + 1 : indexOfElement);
             return result;
         }
     }

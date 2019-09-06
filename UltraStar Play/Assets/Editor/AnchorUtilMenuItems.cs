@@ -40,7 +40,7 @@ public class AnchorUtilMenuItems
 
     private static List<T> GetSelection<T>()
     {
-        var result = new List<T>();
+        List<T> result = new List<T>();
 
         GameObject[] activeGameObjects = Selection.gameObjects;
         if (activeGameObjects == null || activeGameObjects.Length == 0)
@@ -48,9 +48,9 @@ public class AnchorUtilMenuItems
             return result;
         }
 
-        foreach (var gameObject in activeGameObjects)
+        foreach (GameObject gameObject in activeGameObjects)
         {
-            var rectTransform = gameObject.GetComponent<T>();
+            T rectTransform = gameObject.GetComponent<T>();
             if (rectTransform != null)
             {
                 result.Add(rectTransform);

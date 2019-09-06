@@ -12,7 +12,7 @@ public class I18NTextInspector : EditorBase
     {
         DrawDefaultInspector();
 
-        var myScript = target as I18NText;
+        I18NText myScript = target as I18NText;
         if (GUILayout.Button("Update Translation"))
         {
             myScript.UpdateTranslation();

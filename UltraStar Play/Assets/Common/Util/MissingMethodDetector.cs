@@ -23,8 +23,8 @@ abstract public class MissingMethodDetector<T> : MonoBehaviour where T : UnityEn
 
     protected void SearchForMissingFunctions()
     {
-        var objects = FindObjects();
-        foreach (var o in objects)
+        T[] objects = FindObjects();
+        foreach (T o in objects)
         {
             SearchForMissingFunctions(o);
         }
@@ -40,7 +40,7 @@ abstract public class MissingMethodDetector<T> : MonoBehaviour where T : UnityEn
     protected void CheckExistance(UnityEngine.Object target, string methodName, GameObject source)
     {
         //Check that the class that holds the function exists
-        var objectExists = CheckObjectExists(target, source);
+        bool objectExists = CheckObjectExists(target, source);
         if (objectExists)
         {
             CheckMethodExists(target, methodName, source);
@@ -59,7 +59,7 @@ abstract public class MissingMethodDetector<T> : MonoBehaviour where T : UnityEn
     {
         Type type = target.GetType();
         MethodInfo[] infos = type.GetMethods();
-        foreach (var info in infos)
+        foreach (MethodInfo info in infos)
         {
             if (info.Name == functionName)
             {

@@ -57,7 +57,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
         }
         else
         {
-            var step = (float)velocityPerSecond * Time.deltaTime;
+            float step = (float)velocityPerSecond * Time.deltaTime;
             rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x + step, rectTransform.anchoredPosition.y);
         }
         CalculateVelocity();
