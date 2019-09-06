@@ -11,28 +11,39 @@ using System.Threading;
 
 public class SingSceneController : MonoBehaviour
 {
+    public SingSceneData singSceneData;
+
     public string DefaultSongName;
     public string DefaultPlayerProfileName;
 
     [TextArea(3, 8)]
-    /// Convenience text field to paste and copy song names when debugging.
+    [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 
     public RectTransform PlayerUiArea;
     public RectTransform PlayerUiPrefab;
 
-    public SongMeta SongMeta;
-    public PlayerProfile PlayerProfile;
+    public SongMeta SongMeta
+    {
+        get
+        {
+            return singSceneData.SelectedSongMeta;
+        }
+    }
+
+    public PlayerProfile PlayerProfile
+    {
+        get
+        {
+            return singSceneData.SelectedPlayerProfiles[0];
+        }
+    }
 
     private VideoPlayer VideoPlayer;
 
     private IWavePlayer m_WaveOutDevice;
     private WaveStream m_MainOutputStream;
     private WaveChannel32 m_VolumeStream;
-
-    private List<ESceneData> loadedData = new List<ESceneData>();
-
-    private double positionInSongMillis;
 
     public double CurrentBeat
     {
@@ -87,23 +98,42 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
+    void Awake()
+    {
+        // Load scene data from static reference, if any
+        singSceneData = SceneNavigator.Instance.GetSceneData(singSceneData);
+
+        // Fill scene data with default values
+        if (singSceneData.SelectedSongMeta == null)
+        {
+            singSceneData.SelectedSongMeta = GetDefaultSongMeta();
+        }
+
+        if (singSceneData.SelectedPlayerProfiles == null || singSceneData.SelectedPlayerProfiles.Count == 0)
+        {
+            singSceneData.AddPlayerProfile(GetDefaultPlayerProfile());
+        }
+    }
+
     void Start()
     {
-        SongMeta = SceneDataBus.GetData(ESceneData.SelectedSong, GetDefaultSongMeta);
-        PlayerProfile = SceneDataBus.GetData(ESceneData.SelectedPlayerProfile, GetDefaultPlayerProfile);
+        if (m_WaveOutDevice != null && m_WaveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            Debug.Log("Song already playing");
+            return;
+        }
 
         VideoPlayer = FindObjectOfType<VideoPlayer>();
 
         Debug.Log($"{PlayerProfile.Name} starts singing of {SongMeta.Title}.");
 
-        var songMetaPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
         var songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
 
         LoadAudio(songPath);
         m_WaveOutDevice.Play();
-        if (positionInSongMillis > 0)
+        if (singSceneData.PositionInSongMillis > 0)
         {
-            m_MainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(positionInSongMillis);
+            m_MainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(singSceneData.PositionInSongMillis);
         }
 
         // Create player ui for each player (currently there is only one player)
@@ -120,7 +150,7 @@ public class SingSceneController : MonoBehaviour
     {
         if (m_MainOutputStream != null)
         {
-            positionInSongMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
+            singSceneData.PositionInSongMillis = m_MainOutputStream.CurrentTime.TotalMilliseconds;
             UnloadAudio();
         }
         if (VideoPlayer != null)
@@ -131,11 +161,23 @@ public class SingSceneController : MonoBehaviour
 
     void OnEnable()
     {
-        if (m_MainOutputStream == null && positionInSongMillis > 0)
+        if (singSceneData.IsRestart)
         {
-            Debug.Log("reloading");
+            singSceneData.IsRestart = false;
+            singSceneData.PositionInSongMillis = 0;
+        }
+
+        if (m_MainOutputStream == null && singSceneData.PositionInSongMillis > 0)
+        {
+            Debug.Log("Reloading Song...");
             Start();
         }
+    }
+
+    public void Restart()
+    {
+        singSceneData.IsRestart = true;
+        SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void CheckSongFinished()
@@ -174,7 +216,6 @@ public class SingSceneController : MonoBehaviour
         else
         {
             VideoPlayer.enabled = false;
-            // TODO: Use cover or background tag as fallback
         }
     }
 
