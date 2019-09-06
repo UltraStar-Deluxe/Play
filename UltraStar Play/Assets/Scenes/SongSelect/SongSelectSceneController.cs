@@ -80,14 +80,15 @@ public class SongSelectSceneController : MonoBehaviour
 
     private void OnSongButtonClicked(SongMeta songMeta)
     {
-        Debug.Log($"Clicked on song button: {songMeta.Title}");
+        SingSceneData singSceneData = new SingSceneData();
+        singSceneData.SelectedSongMeta = songMeta;
 
-        SceneDataBus.PutData(ESceneData.SelectedSong, songMeta);
         var allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         var defaultPlayerProfile = allPlayerProfiles[0];
-        SceneDataBus.PutData(ESceneData.SelectedPlayerProfile, selectedPlayerProfile.OrElse(defaultPlayerProfile));
+        PlayerProfile playerProfile = selectedPlayerProfile.OrElse(defaultPlayerProfile);
+        singSceneData.AddPlayerProfile(playerProfile);
 
-        SceneNavigator.Instance.LoadScene(EScene.SingScene);
+        SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void OnPlayerProfileButtonClicked(PlayerProfile playerProfile)

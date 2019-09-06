@@ -6,18 +6,18 @@ using System.IO;
 public class SongMeta
 {
     // required helper fields
-    public string Directory { get; }
-    public string Filename { get; }
+    public string Directory { get; private set; }
+    public string Filename { get; private set; }
 
     // required fields
-    public string Artist { get; }
-    public float Bpm { get; }
-    public string Mp3 { get; }
-    public string Title { get; }
+    public string Artist { get; private set; }
+    public float Bpm { get; private set; }
+    public string Mp3 { get; private set; }
+    public string Title { get; private set; }
 
     // required special fields
-    public Dictionary<string, string> VoiceNames { get; }
-    public Encoding Encoding { get; }
+    public Dictionary<string, string> VoiceNames { get; private set; }
+    public Encoding Encoding { get; private set; }
 
     // optional fields
     public string Background { get; set; }
