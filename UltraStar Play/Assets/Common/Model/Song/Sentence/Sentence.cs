@@ -5,8 +5,8 @@ using UnityEngine;
 public class Sentence
 {
     // this needs to be switched over to IReadOnlyList
-    public List<Note> Notes {get;}
-    public uint LinebreakBeat {get;}
+    public List<Note> Notes { get; }
+    public uint LinebreakBeat { get; }
 
     public Sentence(List<Note> notes, uint linebreakBeat)
     {
@@ -20,7 +20,7 @@ public class Sentence
         Note firstNote = Notes[0];
         StartBeat = firstNote.StartBeat;
 
-        Note lastNote = Notes[Notes.Count-1];
+        Note lastNote = Notes[Notes.Count - 1];
         EndBeat = lastNote.StartBeat + lastNote.Length;
     }
 

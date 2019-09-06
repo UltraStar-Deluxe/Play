@@ -8,20 +8,20 @@ using UnityEngine;
 
 public class FolderScanner
 {
-    private readonly string m_fileExtensionPattern;
+    private readonly string fileExtensionPattern;
 
     public FolderScanner(string fileExtensionPattern)
     {
-        m_fileExtensionPattern = fileExtensionPattern;
+        this.fileExtensionPattern = fileExtensionPattern;
 
         // Checks
-        if (m_fileExtensionPattern == null || m_fileExtensionPattern.Trim().Length < 3)
+        if (this.fileExtensionPattern == null || this.fileExtensionPattern.Trim().Length < 3)
         {
             throw new UnityException("Can not scan for songs. Invalid file extension specified!");
         }
     }
 
-    public List<string> GetFiles(string folder) 
+    public List<string> GetFiles(string folder)
     {
         return GetFiles(folder, true);
     }
@@ -32,12 +32,12 @@ public class FolderScanner
         var dirInfo = new DirectoryInfo(folder);
         if (folder == null || !System.IO.Directory.Exists(folder))
         {
-            throw new UnityException("Can not scan for songs. Folder '"+folder+"' does not exist or can not be read!");
+            throw new UnityException("Can not scan for songs. Folder '" + folder + "' does not exist or can not be read!");
         }
 
         try
         {
-            foreach (FileInfo file in dirInfo.GetFiles(m_fileExtensionPattern))
+            foreach (FileInfo file in dirInfo.GetFiles(fileExtensionPattern))
             {
                 result.Add(file.FullName);
             }

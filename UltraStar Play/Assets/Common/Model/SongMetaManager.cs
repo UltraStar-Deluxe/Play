@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SongMetaManager : MonoBehaviour
 {
-    private static object scanLock = new object();
+    private static readonly object scanLock = new object();
 
     public int SongsFound { get; private set; }
     public int SongsSuccess { get; private set; }
@@ -20,7 +20,7 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
-    private static List<SongMeta> songMetas = new List<SongMeta>();
+    private static readonly List<SongMeta> songMetas = new List<SongMeta>();
     public List<SongMeta> SongMetas
     {
         get

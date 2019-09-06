@@ -32,16 +32,16 @@ static class SongMetaBuilder
                 {
                     if (lineNumber == 1)
                     {
-                        throw new SongMetaBuilderException(path+" does not look like a song file; ignoring");
+                        throw new SongMetaBuilderException(path + " does not look like a song file; ignoring");
                     }
                     finishedHeaders = true;
                     break;
                 }
-                char[] separator = {':'};
+                char[] separator = { ':' };
                 string[] parts = line.Substring(1).Split(separator, 2);
                 if (parts.Length < 2 || parts[0].Length < 1 || parts[1].Length < 1)
                 {
-                    throw new SongMetaBuilderException("Invalid line formatting on line "+line+" of file "+path);
+                    throw new SongMetaBuilderException("Invalid line formatting on line " + line + " of file " + path);
                 }
                 string tag = parts[0].ToLowerInvariant();
                 string val = parts[1];
@@ -84,7 +84,7 @@ static class SongMetaBuilder
                 {
                     if (otherFields.ContainsKey(tag))
                     {
-                        throw new SongMetaBuilderException("Cannot set '"+tag+"' twice in file "+path);
+                        throw new SongMetaBuilderException("Cannot set '" + tag + "' twice in file " + path);
                     }
                     otherFields.Add(tag, val);
                 }
@@ -93,16 +93,17 @@ static class SongMetaBuilder
             // this _should_ get handled by the ArgumentNullException
             // further down below, but that produces really vague
             // messages about a parameter 's' for some reason
-            foreach(var item in requiredFields)
+            foreach (var item in requiredFields)
             {
                 if (item.Value == null)
                 {
-                    throw new SongMetaBuilderException("Required tag '"+item.Key+"' was not set in file: "+path);
+                    throw new SongMetaBuilderException("Required tag '" + item.Key + "' was not set in file: " + path);
                 }
             }
 
 
-            try {
+            try
+            {
                 SongMeta res = new SongMeta(
                     directory,
                     filename,
@@ -113,9 +114,9 @@ static class SongMetaBuilder
                     voiceNames,
                     reader.CurrentEncoding
                 );
-                foreach(var item in otherFields)
+                foreach (var item in otherFields)
                 {
-                    switch(item.Key)
+                    switch (item.Key)
                     {
                         case "background":
                             res.Background = item.Value;
@@ -160,7 +161,7 @@ static class SongMetaBuilder
             catch (ArgumentNullException e)
             {
                 // if you get these with e.ParamName == "s", it's probably one of the non-nullable things (ie, float, uint, etc)
-                throw new SongMetaBuilderException("Required tag '"+e.ParamName+"' was not set in file: "+path);
+                throw new SongMetaBuilderException("Required tag '" + e.ParamName + "' was not set in file: " + path);
             }
         }
     }
@@ -170,7 +171,7 @@ static class SongMetaBuilder
         float res;
         if (!float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out res))
         {
-            throw new SongMetaBuilderException("Could not convert "+s+" to a float.");
+            throw new SongMetaBuilderException("Could not convert " + s + " to a float.");
         }
         return res;
     }
@@ -183,7 +184,7 @@ static class SongMetaBuilder
         }
         catch (FormatException e)
         {
-            throw new SongMetaBuilderException("Could not convert "+s+" to an uint. Reason: "+e.Message);
+            throw new SongMetaBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message);
         }
     }
 }
