@@ -44,7 +44,15 @@ public class PropertiesFileParser
         string unquotedTrimmedKeyPart = RemoveQuotes(trimmedKeyPart);
         string unquotedTrimmedValuePart = RemoveQuotes(trimmedValuePart);
 
-        return new KeyValuePair<string, string>(unquotedTrimmedKeyPart, unquotedTrimmedValuePart);
+        string finalValue = ReplaceEscapedCharacters(unquotedTrimmedValuePart);
+
+        return new KeyValuePair<string, string>(unquotedTrimmedKeyPart, finalValue);
+    }
+
+    private static string ReplaceEscapedCharacters(string text)
+    {
+        string result = text.Replace(@"\n", "\n");
+        return result;
     }
 
     private static string RemoveQuotes(string text)
