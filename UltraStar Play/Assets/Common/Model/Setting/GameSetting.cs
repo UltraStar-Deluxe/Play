@@ -38,7 +38,7 @@ public class GameSetting
         settings.Add(ESetting.EffectSing, true);
         settings.Add(ESetting.FullScreen, true);
         settings.Add(ESetting.JukeboxShowLyrics, true);
-        settings.Add(ESetting.Language, ELanguage.English);
+        settings.Add(ESetting.Language, SystemLanguage.English);
         settings.Add(ESetting.LineBonus, true);
         settings.Add(ESetting.LoadAnimation, true);
         settings.Add(ESetting.LyricsAlpha, (float)0.9d);
@@ -98,7 +98,7 @@ public class GameSetting
     {
         System.Object value;
         m_settings.TryGetValue(key, out value);
-        if(value == null)
+        if (value == null)
         {
             throw new UnityException("Illegal ESetting as setting!");
         }
