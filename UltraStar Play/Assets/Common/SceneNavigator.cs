@@ -9,16 +9,7 @@ public class SceneNavigator : MonoBehaviour
     {
         get
         {
-            var obj = GameObject.FindGameObjectWithTag("SceneNavigator");
-            if (obj)
-            {
-                return obj.GetComponent<SceneNavigator>();
-            }
-            else
-            {
-                Debug.LogError("Cannot find instance");
-                return null;
-            }
+            return GameObjectUtils.FindComponentWithTag<SceneNavigator>("SceneNavigator");
         }
     }
 

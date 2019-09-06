@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public static class MidiUtils {
+public static class MidiUtils
+{
 
-    public static string MidiNoteToAbsoluteName(int midiNote) {
+    public static string MidiNoteToAbsoluteName(int midiNote)
+    {
         // 12: "C0"
         // 13: "C#0"
         // 14: "D0"
@@ -14,10 +16,12 @@ public static class MidiUtils {
         return MidiNoteToRelativeName(midiNote) + octave;
     }
 
-    public static string MidiNoteToRelativeName(int midiNote) {
+    public static string MidiNoteToRelativeName(int midiNote)
+    {
         midiNote %= 12;
 
-        switch(midiNote) {
+        switch (midiNote)
+        {
             case 0: return "C";
             case 1: return "C#";
             case 2: return "D";

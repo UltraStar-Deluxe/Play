@@ -14,16 +14,7 @@ public class I18NManager : MonoBehaviour
     {
         get
         {
-            GameObject obj = GameObject.FindGameObjectWithTag("I18NManager");
-            if (obj)
-            {
-                return obj.GetComponent<I18NManager>();
-            }
-            else
-            {
-                Debug.LogError("No I18NManager found.");
-                return null;
-            }
+            return GameObjectUtils.FindComponentWithTag<I18NManager>("I18NManager");
         }
     }
 
