@@ -6,17 +6,16 @@ using Pitch;
 [RequireComponent(typeof(AudioSource))]
 public class MicrophoneDemoSceneController : MonoBehaviour
 {
-    private const int SAMPLE_RATE = 22050;
-    private const int BUFFER_STEPS = 10;
-    private const int BUFFER_SIZE = SAMPLE_RATE / BUFFER_STEPS;
-    private int bufferIndex;
+    private const int SampleRate = 22050;
+    private const int BufferSteps = 10;
+    private const int BufferSize = SampleRate / BufferSteps;
 
     public string micDeviceName = "Mikrofon (2- USB Microphone)";
     public Text currentNoteLabel;
     public bool playRecordedAudio;
 
     private AudioSource micAudioSource;
-    private float[] audioClipData = new float[BUFFER_SIZE];
+    private float[] audioClipData = new float[BufferSize];
 
     private PitchTracker pitchTracker;
 
@@ -24,7 +23,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
     {
         pitchTracker = new PitchTracker();
         pitchTracker.PitchRecordHistorySize = 5;
-        pitchTracker.SampleRate = SAMPLE_RATE;
+        pitchTracker.SampleRate = SampleRate;
 
         micAudioSource = GetComponent<AudioSource>();
 
@@ -44,7 +43,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
             // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
             // It seems that there is still a latency of more than 200ms, which is too much for real-time processing.
             AudioSource audio = GetComponent<AudioSource>();
-            micAudioSource.clip = Microphone.Start(null, true, 1, SAMPLE_RATE);
+            micAudioSource.clip = Microphone.Start(null, true, 1, SampleRate);
             micAudioSource.loop = true;
             if (playRecordedAudio)
             {
@@ -56,7 +55,8 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         }
         else
         {
-            throw new Exception($"Microphone '{micDeviceName}' not found. Please, provide the name of a found microphone.");
+            gameObject.SetActive(false);
+            throw new Exception($"Microphone '{micDeviceName}' not found. Please, provide the name of a found mic.");
         }
     }
 
@@ -72,7 +72,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         }
 
         // Fill buffer with raw sample data from microphone
-        micAudioSource.clip.GetData(audioClipData, BUFFER_SIZE);
+        micAudioSource.clip.GetData(audioClipData, BufferSize);
 
         // Detect the pitch of the sample
         pitchTracker.ProcessBuffer(audioClipData, 0);
