@@ -93,7 +93,7 @@ public class I18NManager : MonoBehaviour
         SystemLanguage oldLangauge = language;
 
         language = Application.systemLanguage;
-        if (isOverwriteSystemLanguage)
+        if (Application.isEditor && isOverwriteSystemLanguage)
         {
             language = overwriteLanguage;
         }
