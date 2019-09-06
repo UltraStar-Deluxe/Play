@@ -4,8 +4,8 @@ using UnityEngine;
 public class Voice
 {
     // this needs to be switched over to IReadOnlyList
-    public List<Sentence> Sentences {get;}
-    
+    public List<Sentence> Sentences { get; }
+
     public Voice(List<Sentence> sentences)
     {
         if (sentences == null || sentences.Count < 1)

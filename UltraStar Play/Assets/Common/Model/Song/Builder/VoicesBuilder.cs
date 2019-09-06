@@ -60,7 +60,7 @@ static class VoicesBuilder
                         }
                         catch (KeyNotFoundException)
                         {
-                            ThrowLineError(lineNumber, "No such voice: "+line);
+                            ThrowLineError(lineNumber, "No such voice: " + line);
                         }
                         break;
                     case '-':
@@ -106,7 +106,7 @@ static class VoicesBuilder
                         }
                         break;
                     default:
-                        ThrowLineError(lineNumber, "Invalid instruction: "+line);
+                        ThrowLineError(lineNumber, "Invalid instruction: " + line);
                         break;
                 }
             }
@@ -127,7 +127,7 @@ static class VoicesBuilder
 
     private static Note ParseNote(string line)
     {
-        char[] splitChars = {' '};
+        char[] splitChars = { ' ' };
         string[] data = line.Split(splitChars, 5);
         if (data.Length < 5)
         {
@@ -163,14 +163,14 @@ static class VoicesBuilder
                 res = ENoteType.RapGolden;
                 break;
             default:
-                throw new VoicesBuilderException("Cannot convert '"+s+"' to a ENoteType");
+                throw new VoicesBuilderException("Cannot convert '" + s + "' to a ENoteType");
         }
         return res;
     }
 
     private static void ThrowLineError(uint lineNumber, string message)
     {
-        throw new VoicesBuilderException("Error at line "+lineNumber+": "+message);
+        throw new VoicesBuilderException("Error at line " + lineNumber + ": " + message);
     }
 
     private static uint ConvertToUInt32(string s)
@@ -181,7 +181,7 @@ static class VoicesBuilder
         }
         catch (FormatException e)
         {
-            throw new VoicesBuilderException("Could not convert "+s+" to an uint. Reason: "+e.Message);
+            throw new VoicesBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message);
         }
     }
 
@@ -193,7 +193,7 @@ static class VoicesBuilder
         }
         catch (FormatException e)
         {
-            throw new VoicesBuilderException("Could not convert "+s+" to an int. Reason: "+e.Message);
+            throw new VoicesBuilderException("Could not convert " + s + " to an int. Reason: " + e.Message);
         }
     }
 }
@@ -245,7 +245,7 @@ public class MutableVoice
         }
         else
         {
-             m_sentences.Add(sentence);
+            m_sentences.Add(sentence);
         }
     }
 
@@ -285,7 +285,8 @@ public class MutableSentence
         {
             throw new VoicesBuilderException("New note overlaps with existing sentence");
         }
-        else {
+        else
+        {
             m_notes.Add(note);
         }
     }
@@ -296,7 +297,7 @@ public class MutableSentence
         {
             return 0;
         }
-        Note lastNote = m_notes[m_notes.Count-1];
+        Note lastNote = m_notes[m_notes.Count - 1];
         return lastNote.StartBeat + lastNote.Length;
     }
 
