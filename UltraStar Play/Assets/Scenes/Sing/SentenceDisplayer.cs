@@ -10,23 +10,22 @@ using UnityEngine.UI;
 
 public class SentenceDisplayer : MonoBehaviour
 {
-    public UiNote UiNotePrefab;
-    public LyricsDisplayer LyricsDisplayer;
-
-    private AudioSource m_audioSource;
-
-    private SongMeta m_songMeta;
-
-    private int m_sentenceIndex;
-    private Voice m_voice;
-    private Sentence m_sentence;
-
-    private SingSceneController m_singSceneController;
-
     // The number of lines on which notes can be placed.
     // One can imagine that notes can be placed not only on the drawn lines,
     // but also the rows between two lines.
     public const int NoteLineCount = 16;
+
+    public UiNote uiNotePrefab;
+
+    private SongMeta songMeta;
+
+    private int sentenceIndex;
+    private Voice voice;
+    private Sentence sentence;
+
+    private SingSceneController singSceneController;
+
+    public LyricsDisplayer LyricsDisplayer { get; set; }
 
     void Start()
     {
@@ -36,22 +35,22 @@ public class SentenceDisplayer : MonoBehaviour
 
     void UpdateCurrentSentence()
     {
-        if (m_songMeta == null || m_voice == null || m_sentence == null)
+        if (songMeta == null || voice == null || sentence == null)
         {
             return;
         }
 
-        if (m_singSceneController == null)
+        if (singSceneController == null)
         {
-            m_singSceneController = FindObjectOfType<SingSceneController>();
+            singSceneController = FindObjectOfType<SingSceneController>();
         }
 
         // Change the sentence, when the current beat is over its last note.
-        if (m_voice.Sentences.Count > m_sentenceIndex - 1)
+        if (voice.Sentences.Count > sentenceIndex - 1)
         {
-            if ((uint)m_singSceneController.CurrentBeat > m_sentence.EndBeat)
+            if ((uint)singSceneController.CurrentBeat > sentence.EndBeat)
             {
-                m_sentenceIndex++;
+                sentenceIndex++;
                 LoadCurrentSentence();
             }
             else
@@ -63,36 +62,36 @@ public class SentenceDisplayer : MonoBehaviour
 
     public void LoadVoice(SongMeta songMeta, string voiceIdentifier)
     {
-        m_songMeta = songMeta;
+        this.songMeta = songMeta;
 
-        string filePath = m_songMeta.Directory + Path.DirectorySeparatorChar + m_songMeta.Filename;
+        string filePath = this.songMeta.Directory + Path.DirectorySeparatorChar + this.songMeta.Filename;
         Debug.Log($"Loading voice of {filePath}");
-        var voices = VoicesBuilder.ParseFile(filePath, m_songMeta.Encoding, new List<string>());
+        Dictionary<string, Voice> voices = VoicesBuilder.ParseFile(filePath, this.songMeta.Encoding, new List<string>());
         if (string.IsNullOrEmpty(voiceIdentifier))
         {
-            m_voice = voices.Values.First();
+            voice = voices.Values.First();
         }
         else
         {
-            if (!voices.TryGetValue(voiceIdentifier, out m_voice))
+            if (!voices.TryGetValue(voiceIdentifier, out voice))
             {
                 throw new Exception($"The song does not contain a voice for {voiceIdentifier}");
             }
         }
 
-        m_sentenceIndex = 0;
+        sentenceIndex = 0;
         LoadCurrentSentence();
     }
 
     private void LoadCurrentSentence()
     {
-        if (m_sentenceIndex < m_voice.Sentences.Count)
+        if (sentenceIndex < voice.Sentences.Count)
         {
-            m_sentence = m_voice.Sentences[m_sentenceIndex];
+            sentence = voice.Sentences[sentenceIndex];
         }
         else
         {
-            m_sentence = null;
+            sentence = null;
         }
 
         DisplayCurrentNotes();
@@ -104,10 +103,10 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void LoadCurrentSentenceInLyricsDisplayer()
     {
-        LyricsDisplayer.SetCurrentSentence(m_sentence);
-        if (m_sentenceIndex < m_voice.Sentences.Count - 1)
+        LyricsDisplayer.SetCurrentSentence(sentence);
+        if (sentenceIndex < voice.Sentences.Count - 1)
         {
-            LyricsDisplayer.SetNextSentence(m_voice.Sentences[m_sentenceIndex + 1]);
+            LyricsDisplayer.SetNextSentence(voice.Sentences[sentenceIndex + 1]);
         }
         else
         {
@@ -122,12 +121,12 @@ public class SentenceDisplayer : MonoBehaviour
             Destroy(uiNote.gameObject);
         }
 
-        if (m_sentence == null)
+        if (sentence == null)
         {
             return;
         }
 
-        foreach (var note in m_sentence.Notes)
+        foreach (Note note in sentence.Notes)
         {
             DisplayNote(note);
         }
@@ -135,19 +134,19 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void DisplayNote(Note note)
     {
-        UiNote uiNote = Instantiate(UiNotePrefab);
+        UiNote uiNote = Instantiate(uiNotePrefab);
         uiNote.transform.SetParent(transform);
 
-        var uiNoteText = uiNote.GetComponentInChildren<Text>();
+        Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text;
 
-        var beatsInSentence = m_sentence.EndBeat - m_sentence.StartBeat;
+        uint beatsInSentence = sentence.EndBeat - sentence.StartBeat;
 
-        var uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
-        var noteLine = note.Pitch % NoteLineCount;
-        var anchorY = (double)noteLine / (double)NoteLineCount;
-        var anchorX = (double)(note.StartBeat - m_sentence.StartBeat) / (double)beatsInSentence;
-        var anchor = new Vector2((float)anchorX, (float)anchorY);
+        RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
+        int noteLine = note.Pitch % NoteLineCount;
+        double anchorY = (double)noteLine / (double)NoteLineCount;
+        double anchorX = (double)(note.StartBeat - sentence.StartBeat) / (double)beatsInSentence;
+        Vector2 anchor = new Vector2((float)anchorX, (float)anchorY);
         uiNoteRectTransform.anchorMin = anchor;
         uiNoteRectTransform.anchorMax = anchor;
         uiNoteRectTransform.anchoredPosition = Vector2.zero;
