@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PropertiesFileParser
 {
-    private static KeyValuePair<string, string> emptyKeyValuePair = new KeyValuePair<string, string>("", "");
+    private static readonly KeyValuePair<string, string> emptyKeyValuePair = new KeyValuePair<string, string>("", "");
 
     public static Dictionary<string, string> Parse(string path)
     {

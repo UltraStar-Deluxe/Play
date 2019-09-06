@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(Text))]
 public class I18NText : MonoBehaviour
 {
     public string key;

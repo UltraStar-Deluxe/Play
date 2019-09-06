@@ -16,7 +16,7 @@ public static class GameObjectUtils
             {
                 Debug.LogError($"Did not find Component '{typeof(T)}' in GameObject with tag '{tag}'.", obj);
             }
-            return default(T);
+            return component;
         }
 
         return default(T);
