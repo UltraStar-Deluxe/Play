@@ -16,15 +16,7 @@ public class SongMetaManager : MonoBehaviour
     {
         get
         {
-            GameObject obj = GameObject.FindGameObjectWithTag("SongMetaManager");
-            if (obj)
-            {
-                return obj.GetComponent<SongMetaManager>();
-            }
-            else
-            {
-                return null;
-            }
+            return GameObjectUtils.FindComponentWithTag<SongMetaManager>("SongMetaManager");
         }
     }
 

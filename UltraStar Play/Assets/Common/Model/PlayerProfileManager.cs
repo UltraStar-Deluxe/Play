@@ -12,15 +12,7 @@ public class PlayerProfileManager : MonoBehaviour
     {
         get
         {
-            GameObject obj = GameObject.FindGameObjectWithTag("PlayerProfileManager");
-            if (obj)
-            {
-                return obj.GetComponent<PlayerProfileManager>();
-            }
-            else
-            {
-                return null;
-            }
+            return GameObjectUtils.FindComponentWithTag<PlayerProfileManager>("PlayerProfileManager");
         }
     }
 
