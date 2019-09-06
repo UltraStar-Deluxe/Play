@@ -2,36 +2,36 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using System.IO;
-
+[Serializable]
 public class SongMeta
 {
     // required helper fields
-    public string Directory {get;}
-    public string Filename {get;}
+    public string Directory { get; }
+    public string Filename { get; }
 
     // required fields
-    public string Artist {get;}
-    public float Bpm {get;}
-    public string Mp3 {get;}
-    public string Title {get;}
+    public string Artist { get; }
+    public float Bpm { get; }
+    public string Mp3 { get; }
+    public string Title { get; }
 
     // required special fields
-    public Dictionary<string, string> VoiceNames {get;}
-    public Encoding Encoding {get;}
+    public Dictionary<string, string> VoiceNames { get; }
+    public Encoding Encoding { get; }
 
     // optional fields
-    public string Background {get; set;}
-    public string Cover {get; set;}
-    public string Edition {get; set;}
-    public float End {get; set;}
-    public float Gap {get; set;}
-    public string Genre {get; set;}
-    public string Language {get; set;}
-    public bool Relative {get; set;}// = false; // setting default values here does not work in C# 4.0
-    public float Start {get; set;}// = 0; // setting default values here does not work in C# 4.0
-    public string Video {get; set;}
-    public float VideoGap {get; set;}
-    public uint Year {get; set;}
+    public string Background { get; set; }
+    public string Cover { get; set; }
+    public string Edition { get; set; }
+    public float End { get; set; }
+    public float Gap { get; set; }
+    public string Genre { get; set; }
+    public string Language { get; set; }
+    public bool Relative { get; set; }// = false; // setting default values here does not work in C# 4.0
+    public float Start { get; set; }// = 0; // setting default values here does not work in C# 4.0
+    public string Video { get; set; }
+    public float VideoGap { get; set; }
+    public uint Year { get; set; }
 
     public SongMeta(
         // required helper fields
@@ -48,25 +48,32 @@ public class SongMeta
     )
     {
         // C# 4.0 does not support the 'nameof' keyword, hence the strings
-        if (directory == null) {
+        if (directory == null)
+        {
             throw new ArgumentNullException("directory");
         }
-        if (filename == null) {
+        if (filename == null)
+        {
             throw new ArgumentNullException("filename");
         }
-        if (artist == null) {
+        if (artist == null)
+        {
             throw new ArgumentNullException("artist");
         }
-        if (mp3 == null) {
+        if (mp3 == null)
+        {
             throw new ArgumentNullException("mp3");
         }
-        if (title == null) {
+        if (title == null)
+        {
             throw new ArgumentNullException("title");
         }
-        if (voiceNames == null) {
+        if (voiceNames == null)
+        {
             throw new ArgumentNullException("voiceNames");
         }
-        if (encoding == null) {
+        if (encoding == null)
+        {
             throw new ArgumentNullException("encoding");
         }
 
