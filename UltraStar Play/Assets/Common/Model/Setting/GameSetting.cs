@@ -19,8 +19,8 @@ public class GameSetting
         settings.Clear();
 
         // Load Config.xml
-        var xconfig = XElement.Load("./Config.xml");
-        var xgame = xconfig.Element("Game");
+        XElement xconfig = XElement.Load("./Config.xml");
+        XElement xgame = xconfig.Element("Game");
 
         // Load song directories
         List<string> songDirs = new List<string>();

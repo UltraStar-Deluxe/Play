@@ -39,7 +39,7 @@ public class SongSelectSceneController : MonoBehaviour
         }
 
         // Create new buttons. One for each profile.
-        foreach (var playerProfile in playerProfiles)
+        foreach (PlayerProfile playerProfile in playerProfiles)
         {
             AddPlayerProfileButton(playerProfile);
         }
@@ -63,7 +63,7 @@ public class SongSelectSceneController : MonoBehaviour
         }
 
         // Create new song buttons. One for each loaded song.
-        foreach (var songMeta in songMetas)
+        foreach (SongMeta songMeta in songMetas)
         {
             AddSongButton(songMeta);
         }
@@ -71,7 +71,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     private void AddSongButton(SongMeta songMeta)
     {
-        var newButton = RectTransform.Instantiate(songButtonPrefab);
+        RectTransform newButton = RectTransform.Instantiate(songButtonPrefab);
         newButton.SetParent(songListContent);
 
         newButton.GetComponentInChildren<Text>().text = songMeta.Title;
@@ -83,8 +83,8 @@ public class SongSelectSceneController : MonoBehaviour
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
 
-        var allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        var defaultPlayerProfile = allPlayerProfiles[0];
+        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
+        PlayerProfile defaultPlayerProfile = allPlayerProfiles[0];
         PlayerProfile playerProfile = selectedPlayerProfile.IfNull(defaultPlayerProfile);
         singSceneData.AddPlayerProfile(playerProfile);
 

@@ -83,7 +83,7 @@ public class SongMetaManager : MonoBehaviour
             // Find all txt files in the song directories
             List<string> txtFiles = new List<string>();
             List<string> songDirs = SettingsManager.GetSetting(ESetting.SongDirs) as List<string>;
-            foreach (var songDir in songDirs)
+            foreach (string songDir in songDirs)
             {
                 List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
                 txtFiles.AddRange(txtFilesInSongDir);

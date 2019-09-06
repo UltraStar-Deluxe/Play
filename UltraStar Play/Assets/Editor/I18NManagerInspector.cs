@@ -11,7 +11,6 @@ public class I18NManagerInspector : EditorBase
     {
         DrawDefaultInspector();
 
-        var myScript = target as I18NManager;
         if (GUILayout.Button("Update All Translations"))
         {
             I18NText[] i18nTexts = GameObject.FindObjectsOfType<I18NText>();
