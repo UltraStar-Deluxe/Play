@@ -89,15 +89,6 @@ public class SingSceneController : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Start: " + loadedData);
-        loadedData.Clear();
-        SceneDataBus.AwaitData(ESceneData.AllPlayerProfiles, OnAllPlayerProfiledLoaded);
-        SceneDataBus.AwaitData(ESceneData.AllSongMetas, OnAllSongMetasLoaded);
-    }
-
-    private void StartAfterAllLoaded()
-    {
-        Debug.Log("StartAfterAllLoaded");
         SongMeta = SceneDataBus.GetData(ESceneData.SelectedSong, GetDefaultSongMeta);
         PlayerProfile = SceneDataBus.GetData(ESceneData.SelectedPlayerProfile, GetDefaultPlayerProfile);
 
@@ -123,24 +114,6 @@ public class SingSceneController : MonoBehaviour
 
         // Go to next scene when the song finishes
         Invoke("CheckSongFinished", m_MainOutputStream.TotalTime.Seconds);
-    }
-
-    private void OnAllPlayerProfiledLoaded()
-    {
-        loadedData.Add(ESceneData.AllPlayerProfiles);
-        if (loadedData.Contains(ESceneData.AllPlayerProfiles) && loadedData.Contains(ESceneData.AllSongMetas))
-        {
-            StartAfterAllLoaded();
-        }
-    }
-
-    private void OnAllSongMetasLoaded()
-    {
-        loadedData.Add(ESceneData.AllSongMetas);
-        if (loadedData.Contains(ESceneData.AllPlayerProfiles) && loadedData.Contains(ESceneData.AllSongMetas))
-        {
-            StartAfterAllLoaded();
-        }
     }
 
     void OnDisable()
@@ -242,7 +215,7 @@ public class SingSceneController : MonoBehaviour
 
     private PlayerProfile GetDefaultPlayerProfile()
     {
-        var allPlayerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
+        var allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         var defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == DefaultPlayerProfileName);
         if (defaultPlayerProfiles.Count() == 0)
         {
@@ -253,8 +226,7 @@ public class SingSceneController : MonoBehaviour
 
     private SongMeta GetDefaultSongMeta()
     {
-        SongMetaManager.ScanFiles();
-        var defaultSongMetas = SongMetaManager.GetSongMetas().Where(it => it.Title == DefaultSongName);
+        var defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == DefaultSongName);
         if (defaultSongMetas.Count() == 0)
         {
             throw new Exception("The default song was not found.");

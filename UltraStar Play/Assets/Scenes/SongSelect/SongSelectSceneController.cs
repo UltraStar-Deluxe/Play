@@ -16,8 +16,6 @@ public class SongSelectSceneController : MonoBehaviour
     public RectTransform playerProfileListContent;
     public RectTransform playerProfileButtonPrefab;
 
-    private List<SongMeta> songs;
-
     private PlayerProfile selectedPlayerProfile;
 
     void OnEnable()
@@ -26,18 +24,9 @@ public class SongSelectSceneController : MonoBehaviour
 
     void Start()
     {
-        SceneDataBus.AwaitData(ESceneData.AllSongMetas, OnAllSongsLoaded);
-        SceneDataBus.AwaitData(ESceneData.AllPlayerProfiles, OnAllPlayerProfilesLoaded);
-    }
-
-    private void OnAllSongsLoaded()
-    {
-        PopulateSongList();
-    }
-
-    private void OnAllPlayerProfilesLoaded()
-    {
-        var playerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
+        List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;
+        PopulateSongList(songMetas);
+        List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PopulatePlayerProfileList(playerProfiles);
     }
 
@@ -58,14 +47,14 @@ public class SongSelectSceneController : MonoBehaviour
 
     private void AddPlayerProfileButton(PlayerProfile playerProfile)
     {
-        var newButton = RectTransform.Instantiate(playerProfileButtonPrefab);
+        RectTransform newButton = RectTransform.Instantiate(playerProfileButtonPrefab);
         newButton.SetParent(playerProfileListContent);
 
         newButton.GetComponentInChildren<Text>().text = playerProfile.Name;
         newButton.GetComponent<Button>().onClick.AddListener(() => OnPlayerProfileButtonClicked(playerProfile));
     }
 
-    private void PopulateSongList()
+    private void PopulateSongList(List<SongMeta> songMetas)
     {
         // Remove old buttons.
         foreach (RectTransform element in songListContent)
@@ -74,7 +63,6 @@ public class SongSelectSceneController : MonoBehaviour
         }
 
         // Create new song buttons. One for each loaded song.
-        var songMetas = SongMetaManager.GetSongMetas();
         foreach (var songMeta in songMetas)
         {
             AddSongButton(songMeta);
@@ -95,7 +83,7 @@ public class SongSelectSceneController : MonoBehaviour
         Debug.Log($"Clicked on song button: {songMeta.Title}");
 
         SceneDataBus.PutData(ESceneData.SelectedSong, songMeta);
-        var allPlayerProfiles = SceneDataBus.GetData(ESceneData.AllPlayerProfiles, new List<PlayerProfile>());
+        var allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         var defaultPlayerProfile = allPlayerProfiles[0];
         SceneDataBus.PutData(ESceneData.SelectedPlayerProfile, selectedPlayerProfile.OrElse(defaultPlayerProfile));
 

@@ -6,66 +6,86 @@ using UnityEngine;
 
 public class SongMetaManager : MonoBehaviour
 {
-    private static readonly List<SongMeta> s_songMetas = new List<SongMeta>();
-    private static object s_scanLock = new object();
-    private static int s_songsFound;
-    private static int s_songsSuccess;
-    private static int s_songsFailed;
+    private static object scanLock = new object();
 
-    void OnEnable()
+    public int SongsFound { get; private set; }
+    public int SongsSuccess { get; private set; }
+    public int SongsFailed { get; private set; }
+
+    public static SongMetaManager Instance
     {
-        if (!SceneDataBus.HasData(ESceneData.AllSongMetas))
+        get
         {
-            ScanFiles();
-            SceneDataBus.PutData(ESceneData.AllSongMetas, s_songMetas);
+            GameObject obj = GameObject.FindGameObjectWithTag("SongMetaManager");
+            if (obj)
+            {
+                return obj.GetComponent<SongMetaManager>();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
-    public static void Add(SongMeta songMeta)
+    private static List<SongMeta> songMetas = new List<SongMeta>();
+    public List<SongMeta> SongMetas
+    {
+        get
+        {
+            if (songMetas.Count == 0)
+            {
+                ScanFiles();
+            }
+            return songMetas;
+        }
+    }
+
+    public void Add(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             throw new ArgumentNullException("songMeta");
         }
-        lock (s_songMetas)
+        lock (songMetas)
         {
-            s_songMetas.Add(songMeta);
+            songMetas.Add(songMeta);
         }
     }
 
-    public static void Remove(SongMeta songMeta)
+    public void Remove(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             throw new ArgumentNullException("songMeta");
         }
-        lock (s_songMetas)
+        lock (songMetas)
         {
-            s_songMetas.Remove(songMeta);
+            songMetas.Remove(songMeta);
         }
     }
 
-    public static ReadOnlyCollection<SongMeta> GetSongMetas()
+    public ReadOnlyCollection<SongMeta> GetSongMetas()
     {
-        lock (s_songMetas)
+        lock (songMetas)
         {
-            return s_songMetas.AsReadOnly();
+            return songMetas.AsReadOnly();
         }
     }
 
-    public static void ScanFiles()
+    public void ScanFiles()
     {
         Debug.Log("Scanning for UltraStar Songs");
         ScanFilesSynchronously();
     }
 
-    private static void ScanFilesSynchronously()
+    private void ScanFilesSynchronously()
     {
-        lock (s_scanLock)
+        lock (scanLock)
         {
-            s_songsFound = 0;
-            s_songsSuccess = 0;
-            s_songsFailed = 0;
+            SongsFound = 0;
+            SongsSuccess = 0;
+            SongsFailed = 0;
             FolderScanner scannerTxt = new FolderScanner("*.txt");
 
             // Find all txt files in the song directories
@@ -76,48 +96,33 @@ public class SongMetaManager : MonoBehaviour
                 List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
                 txtFiles.AddRange(txtFilesInSongDir);
             }
-            s_songsFound = txtFiles.Count;
-            Debug.Log($"Found {s_songsFound} songs in {songDirs.Count} configured song directories");
+            SongsFound = txtFiles.Count;
+            Debug.Log($"Found {SongsFound} songs in {songDirs.Count} configured song directories");
 
             txtFiles.ForEach(delegate (string path)
             {
                 try
                 {
                     Add(SongMetaBuilder.ParseFile(path));
-                    Interlocked.Increment(ref s_songsSuccess);
+                    SongsSuccess++;
                 }
                 catch (SongMetaBuilderException e)
                 {
-                    Debug.Log("nope::" + path + "\n" + e.Message);
-                    Interlocked.Increment(ref s_songsFailed);
+                    Debug.LogError(path + "\n" + e.Message);
+                    SongsFailed++;
                 }
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    Debug.Log("nope::" + path);
-                    Interlocked.Increment(ref s_songsFailed);
+                    Debug.LogError(path);
+                    SongsFailed++;
                 }
             });
         }
     }
 
-    public static int GetNumberOfSongsFound()
+    public int GetNumberOfSongsFound()
     {
-        return s_songsFound;
-    }
-
-    public static int GetNumberOfSongsScanned()
-    {
-        return s_songsSuccess + s_songsFailed;
-    }
-
-    public static int GetNumberOfSongsSuccess()
-    {
-        return s_songsSuccess;
-    }
-
-    public static int GetNumberOfSongsFailed()
-    {
-        return s_songsFailed;
+        return SongsFound;
     }
 }

@@ -99,7 +99,5 @@ public class SceneDataBus
 public enum ESceneData
 {
     SelectedSong,
-    SelectedPlayerProfile,
-    AllPlayerProfiles,
-    AllSongMetas
+    SelectedPlayerProfile
 }
