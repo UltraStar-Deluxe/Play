@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class I18NManager : MonoBehaviour
 {
-    private const string I18NFolder = "I18N";
+    private const string I18NFolder = "I18NMessages";
     private const string PropertiesFileExtension = ".properties";
     private const string PropertiesFileName = "messages";
 
@@ -71,14 +71,14 @@ public class I18NManager : MonoBehaviour
     {
         // Load the default properties file
         string path = GetPropertiesFilePath(PropertiesFileName);
-        fallbackMessages = PropertiesFileParser.Parse(path);
+        fallbackMessages = PropertiesFileParser.ParseFile(path);
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(language);
         path = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
         if (File.Exists(path))
         {
-            currentLanguageMessages = PropertiesFileParser.Parse(path);
+            currentLanguageMessages = PropertiesFileParser.ParseFile(path);
         }
         else
         {
