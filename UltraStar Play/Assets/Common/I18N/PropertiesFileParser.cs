@@ -2,22 +2,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 public class PropertiesFileParser
 {
     private static readonly KeyValuePair<string, string> emptyKeyValuePair = new KeyValuePair<string, string>("", "");
 
-    public static Dictionary<string, string> Parse(string path)
+    public static Dictionary<string, string> ParseFile(string path)
+    {
+        string text = File.ReadAllText(path);
+        return ParseText(text);
+    }
+
+    public static Dictionary<string, string> ParseText(string text)
     {
         Dictionary<string, string> map = new Dictionary<string, string>();
-        string[] lines = File.ReadAllLines(path);
-        foreach (string line in lines)
+        using (StringReader stringReader = new StringReader(text))
         {
-            KeyValuePair<string, string> entry = ParseLine(line);
-            if (!entry.Equals(emptyKeyValuePair))
+            for (string line = stringReader.ReadLine(); line != null; line = stringReader.ReadLine())
             {
-                map.Add(entry.Key, entry.Value);
+                KeyValuePair<string, string> entry = ParseLine(line);
+                if (!entry.Equals(emptyKeyValuePair))
+                {
+                    map.Add(entry.Key, entry.Value);
+                }
             }
         }
         return map;
