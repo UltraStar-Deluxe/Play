@@ -6,25 +6,25 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Base/LoadingScene.unity
+    path: Assets/Scenes/Loading/LoadingScene.unity
     guid: f84e2c77bfcb1144db540505b10291f4
   - enabled: 1
     path: Assets/Scenes/Main/MainScene.unity
     guid: a5ef89c15e3547345b26b12e8c78ac9a
   - enabled: 1
-    path: Assets/Scenes/Setting/OptionsScene.unity
+    path: Assets/Scenes/Options/OptionsScene.unity
     guid: 6c828cde566d47e4994dbf40c121d51d
   - enabled: 1
-    path: Assets/Scenes/Base/AboutScene.unity
+    path: Assets/Scenes/About/AboutScene.unity
     guid: 95c8c6f2708f1b247913f73397d51376
   - enabled: 1
-    path: Assets/Scenes/Setting/OptionsGameScene.unity
+    path: Assets/Scenes/Options/OptionsGameScene.unity
     guid: 5d43988ef109d4246b6a972076c93a6d
   - enabled: 1
-    path: Assets/Scenes/Setting/OptionsGraphicsScene.unity
+    path: Assets/Scenes/Options/OptionsGraphicsScene.unity
     guid: 8d4155580fdeff34a9db95f96b0f718f
   - enabled: 1
-    path: Assets/Scenes/Setting/OptionsSoundScene.unity
+    path: Assets/Scenes/Options/OptionsSoundScene.unity
     guid: c593716c83a53884bbbd31e8afc223bd
   - enabled: 1
     path: Assets/Scenes/Player/SetupPlayerScene.unity

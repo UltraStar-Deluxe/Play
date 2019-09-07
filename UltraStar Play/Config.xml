@@ -2,7 +2,6 @@
 <root>
 	<!-- Global Game Settings -->
     <Game>
-	    <SongDir>./Songs</SongDir>
         <SongDir>F:\Dev\UltraStar Songs Dev</SongDir>
     </Game>
 	
