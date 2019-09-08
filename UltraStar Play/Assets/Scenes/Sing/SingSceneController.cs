@@ -9,7 +9,7 @@ using NAudio.Wave;
 
 public class SingSceneController : MonoBehaviour
 {
-    public SingSceneData singSceneData;
+    public SingSceneData sceneData;
 
     public string defaultSongName;
     public string defaultPlayerProfileName;
@@ -25,7 +25,7 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            return singSceneData.SelectedSongMeta;
+            return sceneData.SelectedSongMeta;
         }
     }
 
@@ -33,7 +33,7 @@ public class SingSceneController : MonoBehaviour
     {
         get
         {
-            return singSceneData.SelectedPlayerProfiles[0];
+            return sceneData.SelectedPlayerProfiles[0];
         }
     }
 
@@ -99,42 +99,66 @@ public class SingSceneController : MonoBehaviour
     void Awake()
     {
         // Load scene data from static reference, if any
-        singSceneData = SceneNavigator.Instance.GetSceneData(singSceneData);
+        sceneData = SceneNavigator.Instance.GetSceneData(sceneData);
 
         // Fill scene data with default values
-        if (singSceneData.SelectedSongMeta == null)
+        if (sceneData.SelectedSongMeta == null)
         {
-            singSceneData.SelectedSongMeta = GetDefaultSongMeta();
+            sceneData.SelectedSongMeta = GetDefaultSongMeta();
         }
 
-        if (singSceneData.SelectedPlayerProfiles == null || singSceneData.SelectedPlayerProfiles.Count == 0)
+        if (sceneData.SelectedPlayerProfiles == null || sceneData.SelectedPlayerProfiles.Count == 0)
         {
-            singSceneData.AddPlayerProfile(GetDefaultPlayerProfile());
+            sceneData.AddPlayerProfile(GetDefaultPlayerProfile());
         }
     }
 
-    void Start()
+    void OnDisable()
+    {
+        if (sceneData.IsRestart)
+        {
+            sceneData.IsRestart = false;
+            sceneData.PositionInSongMillis = 0;
+        }
+        else
+        {
+            sceneData.PositionInSongMillis = PositionInSongInMillis;
+        }
+
+        if (mainOutputStream != null)
+        {
+            UnloadAudio();
+        }
+
+        if (videoPlayer != null)
+        {
+            videoPlayer.Stop();
+        }
+    }
+
+    void OnEnable()
     {
         if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
         {
-            Debug.Log("Song already playing");
+            Debug.LogWarning("Song already playing");
             return;
         }
 
         videoPlayer = FindObjectOfType<VideoPlayer>();
 
-        Debug.Log($"{PlayerProfile.Name} starts singing of {SongMeta.Title}.");
+        Debug.Log($"{PlayerProfile.Name} starts (or continues) singing of {SongMeta.Title}.");
 
         string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
-
         LoadAudio(songPath);
         waveOutDevice.Play();
-        if (singSceneData.PositionInSongMillis > 0)
+        if (sceneData.PositionInSongMillis > 0)
         {
-            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(singSceneData.PositionInSongMillis);
+            Debug.Log($"Skipping forward to {sceneData.PositionInSongMillis} milliseconds");
+            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(sceneData.PositionInSongMillis);
         }
 
         // Create player ui for each player (currently there is only one player)
+        // TODO: support for multiple players.
         CreatePlayerUi();
 
         // Start any associated video
@@ -144,38 +168,20 @@ public class SingSceneController : MonoBehaviour
         Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
     }
 
-    void OnDisable()
-    {
-        if (mainOutputStream != null)
-        {
-            singSceneData.PositionInSongMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
-            UnloadAudio();
-        }
-        if (videoPlayer != null)
-        {
-            videoPlayer.Stop();
-        }
-    }
-
-    void OnEnable()
-    {
-        if (singSceneData.IsRestart)
-        {
-            singSceneData.IsRestart = false;
-            singSceneData.PositionInSongMillis = 0;
-        }
-
-        if (mainOutputStream == null && singSceneData.PositionInSongMillis > 0)
-        {
-            Debug.Log("Reloading Song..");
-            Start();
-        }
-    }
-
     public void Restart()
     {
-        singSceneData.IsRestart = true;
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
+        sceneData.IsRestart = true;
+        SceneNavigator.Instance.LoadScene(EScene.SingScene, sceneData);
+    }
+
+    public void OnOpenInEditorClicked()
+    {
+        SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
+        songEditorSceneData.PreviousSceneData = sceneData;
+        songEditorSceneData.PreviousScene = EScene.SingScene;
+        songEditorSceneData.PositionInSongMillis = PositionInSongInMillis;
+        songEditorSceneData.SelectedSongMeta = SongMeta;
+        SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
     private void CheckSongFinished()

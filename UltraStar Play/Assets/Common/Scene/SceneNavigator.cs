@@ -34,7 +34,10 @@ public class SceneNavigator : MonoBehaviour
 
     public void LoadScene(EScene scene, SceneData sceneData)
     {
-        AddSceneData(sceneData);
+        if (sceneData != null)
+        {
+            AddSceneData(sceneData);
+        }
         SceneManager.LoadScene((int)scene);
     }
 
