@@ -10,41 +10,25 @@ UltraStar Play is a free and open source karaoke singing game for Windows, Linux
 The game uses the Unity 2D framework and mostly c# (mono/.Net) as software development language.
 
 ### 2. Minimal Game Requirements
-- Windows Vista SP1 or Android OS 4.1 or iOS 7.0 or Mac OS X 10.9, Ubuntu 12.04, SteamOS or any newer
-- DirectX 10 with Shader Model 4.0 or OpenGL ES 2.0 or any newer
-- speakers, USB microphones (or similar), big screen
-- plenty gigabytes of storage space for songs, videos and other game content - varies depending on quantity and quality
+- Windows 7 SP1+, macOS 10.12+, Ubuntu 16.04+
+- Graphics card with DX10 (shader model 4.0) capabilities.
+- iOS player requires iOS 9.0 or higher.
+- Android: OS 4.1 or later; ARMv7 CPU with NEON support or Atom CPU; OpenGL ES 2.0 or later.
+- Speakers, USB microphones (or similar)
 
 ### 3. Development Requirements
-- Windows 7 SP1+, 8, 10, only 64-bit; Mac OS X 10.9+.
-- DX10 with Shader Model 4.0+
-- plenty of free time
-- see [How to Compile the Game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game)
+- See [Unity system requirements](https://unity3d.com/unity/system-requirements)
+- Plenty of free time
 
 ### 4. Documentation
-see [the project wiki](https://github.com/UltraStar-Deluxe/Play/wiki)
+- See [the project wiki](https://github.com/UltraStar-Deluxe/Play/wiki)
 
 ### 5. How to contribute
-see [CONTRIBUTING.md](https://github.com/UltraStar-Deluxe/Play/blob/master/CONTRIBUTING.md) and also [How to Compile the Game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game)
+- See [CONTRIBUTING.md](https://github.com/UltraStar-Deluxe/Play/blob/master/CONTRIBUTING.md) and also [How to Compile the Game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game)
+- See [How to Compile the Game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game)
 
 ### 6. Support
-- if you just want to play sing-along karaoke, please use UltraStar Deluxe or Performous or Vocaluxe instead.
-- see documentation sources mentioned above
+- If you just want to play sing-along karaoke, please use UltraStar Deluxe or Performous or Vocaluxe instead.
+- See documentation sources mentioned above
 - [Issue Tracker](https://github.com/UltraStar-Deluxe/Play/issues)
-- "the code is documentation enough" << sorry, this project just started, there will be more places for support later on
-
-### 7. Repository Folder Structure
-The current folder structure is just a first draft, and you are encouraged to improve it, if you have extensive knowledge of / experience in open source unity games.
-
-| Where | What |
-|---|---|
-| / | Main repo folder. Try to not add any new files here, but instead place them in a fitting subfolder |
-| /tools/ | any build scripts, templates, helper stuff for devs, code checking stuff, lint templates |
-| /UltraStar Play/ | Unity project |
-| /UltraStar Play/Assets/Editor/ | unit tests or integration tests go here |
-| /UltraStar Play/Assets/Materials/theme/ | theme content: image files, animations, click sounds, background music |
-| /UltraStar Play/Assets/src/ | actual code of this project |
-| ./src/audio/ | any audio input / output / pitch detection / microphone related code goes here |
-| ./src/model/ | code related to the data model, static classes for songs-manager, players-manager, settings-manager |
-| ./src/util/ |  rather generic utility code that is not specific to this karaoke game |
-| ./src/view/ | all the screens/views and any code that is specific for these screens, currently also contains all the "in-game logic" |
+- "The code is documentation enough" << sorry, this project just started, there will be more places for support later on

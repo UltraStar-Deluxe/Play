@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<!-- Global Game Settings -->
+    <Game>
+        <SongDir>F:\Dev\UltraStar Songs Dev</SongDir>
+    </Game>
+	
+	<!-- Profiles -->
+	<Profiles>
+		<PlayerProfile name="Player 01" mic="Mikrofon (2- USB Microphone)" />
+		<PlayerProfile name="Player 02" mic="" />
+	</Profiles>
+</root>
