@@ -35,7 +35,7 @@ static class BuildCommand
 
         if (buildTargetName.ToLower(CultureInfo.InvariantCulture) == "android")
         {
-            EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Internal;
+            EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
         }
 
         return ToEnum<BuildTarget>(buildTargetName, BuildTarget.NoTarget);

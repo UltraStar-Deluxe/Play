@@ -1,0 +1,2 @@
+NAudio 1.8.0
+Downloaded from: https://github.com/naudio/NAudio/releases/tag/NAudio_1.8_Release

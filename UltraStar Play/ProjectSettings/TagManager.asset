@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - SceneStartupController
+  - SceneNavigator
+  - I18NManager
+  - PlayerProfileManager
+  - SongMetaManager
   layers:
   - Default
   - TransparentFX
