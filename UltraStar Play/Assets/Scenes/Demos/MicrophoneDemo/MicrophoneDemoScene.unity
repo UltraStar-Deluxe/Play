@@ -171,7 +171,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Note: A1'
+  m_Text: 'Note: ??'
 --- !u!222 &97651271
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -406,7 +406,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   micDeviceName: Mikrofon (2- USB Microphone)
   currentNoteLabel: {fileID: 97651270}
-  playRecordedAudio: 1
 --- !u!4 &1772179363
 Transform:
   m_ObjectHideFlags: 0
@@ -609,3 +608,77 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6082356490196974450
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_Name
+      value: MicrophonePitchTracker
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 367.07086
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 298.62274
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -388.67264
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dca6af5cdc2880d4a90d299ff4951525, type: 3}
