@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Pitch;
 using UnityEngine;
 
@@ -8,8 +9,11 @@ using UnityEngine;
 public class PlayerNoteRecorder : MonoBehaviour
 {
     public List<RecordedNote> recordedNotes = new List<RecordedNote>();
+    public List<RecordedSentence> recordedSentences = new List<RecordedSentence>();
 
     private SingSceneController singSceneController;
+
+    private SentenceDisplayer sentenceDisplayer;
 
     private PlayerProfile playerProfile;
     public PlayerProfile PlayerProfile
@@ -26,6 +30,7 @@ public class PlayerNoteRecorder : MonoBehaviour
     }
 
     private RecordedNote lastRecordedNote;
+    private RecordedSentence lastRecordedSentence;
     private int lastRecordedFrame;
     private float lastRecordedTime;
 
@@ -40,6 +45,8 @@ public class PlayerNoteRecorder : MonoBehaviour
     void Awake()
     {
         singSceneController = GameObject.FindObjectOfType<SingSceneController>();
+        // TODO: This should be instantiated by the singSceneController
+        sentenceDisplayer = GameObject.FindObjectOfType<SentenceDisplayer>();
 
         if (playerProfile == null)
         {
@@ -62,12 +69,12 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private void OnPitchDetected(PitchTracker sender, PitchTracker.PitchRecord pitchRecord)
     {
-        // Ignore events that happen nearly at same instant (humans won't notice anyway).
-        if (lastRecordedTime > Time.time - 0.1f)
+        // Ignore multiple events at same frame
+        if (lastRecordedFrame == Time.frameCount)
         {
             return;
         }
-        lastRecordedTime = Time.time;
+        lastRecordedFrame = Time.frameCount;
 
         if (pitchRecord.MidiNote <= 0)
         {
@@ -81,29 +88,68 @@ public class PlayerNoteRecorder : MonoBehaviour
         else
         {
             double currentPositionInMillis = singSceneController.PositionInSongInMillis;
+            double currentBeat = singSceneController.CurrentBeat;
             if (lastRecordedNote == null)
             {
                 // Started singing of new note
-                lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis);
-                recordedNotes.Add(lastRecordedNote);
+                lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
+                AddRecordedNote(lastRecordedNote);
                 // Debug.Log("started singing");
             }
             else
             {
-                if (lastRecordedNote.midiNote == pitchRecord.MidiNote)
+                if (lastRecordedNote.MidiNote == pitchRecord.MidiNote)
                 {
                     // Continued singing on same pitch
-                    lastRecordedNote.endPositionInMilliseconds = currentPositionInMillis;
-                    // Debug.Log("same pitch");
+                    lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
+                    lastRecordedNote.EndBeat = currentBeat;
+                    // Debug.Log("same pitch, pos in millis " + currentPositionInMillis);
+                    if (sentenceDisplayer != null)
+                    {
+                        RecordedSentence recordedSentence = recordedSentences.Where(it => it.Sentence == sentenceDisplayer.CurrentSentence).FirstOrDefault();
+                        sentenceDisplayer.DisplayRecordedNotes(recordedSentence);
+                    }
                 }
                 else
                 {
                     // Continued singing on different pitch
-                    lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis);
-                    recordedNotes.Add(lastRecordedNote);
+                    lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
+                    AddRecordedNote(lastRecordedNote);
                     // Debug.Log("new pitch");
                 }
             }
+        }
+    }
+
+    private void AddRecordedNote(RecordedNote recordedNote)
+    {
+        recordedNotes.Add(lastRecordedNote);
+
+        // Find corresponding sentence for recorded note
+        if (sentenceDisplayer == null)
+        {
+            return;
+        }
+        Sentence currentSentence = sentenceDisplayer.CurrentSentence;
+        if (currentSentence == null)
+        {
+            return;
+        }
+
+        // Create RecordedSentence for the currently displayed Sentence.
+        if (lastRecordedSentence == null || lastRecordedSentence.Sentence != currentSentence)
+        {
+            lastRecordedSentence = new RecordedSentence(currentSentence);
+            recordedSentences.Add(lastRecordedSentence);
+            // Debug.Log("new rec sentence");
+        }
+
+        // Add note to RecordedSentence if it fits.
+        if (recordedNote.StartBeat < lastRecordedSentence.Sentence.EndBeat &&
+            recordedNote.EndBeat > lastRecordedSentence.Sentence.StartBeat)
+        {
+            lastRecordedSentence.AddRecordedNote(recordedNote);
+            // Debug.Log("add note to rec sentence");
         }
     }
 }

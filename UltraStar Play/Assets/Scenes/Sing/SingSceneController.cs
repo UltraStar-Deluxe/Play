@@ -43,6 +43,11 @@ public class SingSceneController : MonoBehaviour
     private WaveStream mainOutputStream;
     private WaveChannel32 volumeStream;
 
+    private List<SentenceDisplayer> sentenceDisplayers = new List<SentenceDisplayer>();
+
+    private double timeOfLastMeasuredPositionInSongInMillis;
+    private double lastMeasuredPositionInSongInMillis;
+
     public double CurrentBeat
     {
         get
@@ -53,7 +58,7 @@ public class SingSceneController : MonoBehaviour
             }
             else
             {
-                double millisInSong = mainOutputStream.CurrentTime.TotalMilliseconds;
+                double millisInSong = PositionInSongInMillis;
                 double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
                 if (result < 0)
                 {
@@ -75,7 +80,23 @@ public class SingSceneController : MonoBehaviour
             }
             else
             {
-                return mainOutputStream.CurrentTime.TotalMilliseconds;
+                // The resolution of the NAudio time measurement is about 150 ms.
+                // For the time between these measurements,
+                // we improve the approximation by counting time using Unity's Time.deltaTime.
+                double posInMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
+                if (posInMillis != lastMeasuredPositionInSongInMillis)
+                {
+                    // Got new measurement from the audio lib. This is (relatively) accurate.
+                    lastMeasuredPositionInSongInMillis = posInMillis;
+                    timeOfLastMeasuredPositionInSongInMillis = 0;
+                    return posInMillis;
+                }
+                else
+                {
+                    // No new measurement from the audio lib.
+                    // Improve approximation by adding the time since the last new measurement.
+                    return posInMillis + timeOfLastMeasuredPositionInSongInMillis;
+                }
             }
         }
     }
@@ -91,7 +112,7 @@ public class SingSceneController : MonoBehaviour
             }
             else
             {
-                return mainOutputStream.CurrentTime.TotalSeconds;
+                return PositionInSongInMillis / 1000.0;
             }
         }
     }
@@ -136,6 +157,11 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
+    }
+
     void OnEnable()
     {
         if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
@@ -160,6 +186,8 @@ public class SingSceneController : MonoBehaviour
         // Create player ui for each player (currently there is only one player)
         // TODO: support for multiple players.
         CreatePlayerUi();
+
+        InvokeRepeating("UpdateCurrentSentence", 0, 0.25f);
 
         // Start any associated video
         Invoke("StartVideoPlayback", SongMeta.VideoGap);
@@ -237,9 +265,18 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
+    private void UpdateCurrentSentence()
+    {
+        foreach (SentenceDisplayer sentenceDisplayer in sentenceDisplayers)
+        {
+            sentenceDisplayer.SetCurrentBeat(CurrentBeat);
+        }
+    }
+
     private void CreatePlayerUi()
     {
         // Remove old player ui
+        sentenceDisplayers.Clear();
         foreach (RectTransform oldPlayerUi in playerUiArea)
         {
             GameObject.Destroy(oldPlayerUi.gameObject);
@@ -256,6 +293,7 @@ public class SingSceneController : MonoBehaviour
 
         // Load the voice for the SentenceDisplayer of the PlayerUi
         sentenceDisplayer.LoadVoice(SongMeta, null);
+        sentenceDisplayers.Add(sentenceDisplayer);
     }
 
     private PlayerProfile GetDefaultPlayerProfile()
