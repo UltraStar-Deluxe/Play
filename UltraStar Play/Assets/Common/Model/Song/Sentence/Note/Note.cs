@@ -10,6 +10,15 @@ public class Note
     public int Pitch { get; }
     public string Text { get; }
 
+    public int MidiNote
+    {
+        get
+        {
+            // MIDI_Pitch = 60, is middle c, is 0 in lyrics txt file.
+            return Pitch + 60;
+        }
+    }
+
     public uint EndBeat
     {
         get
