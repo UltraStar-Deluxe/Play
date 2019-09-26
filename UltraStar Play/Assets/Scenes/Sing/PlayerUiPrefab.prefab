@@ -217,7 +217,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiNotePrefab: {fileID: 2444222340775961529, guid: 67fe67780e740264b9c255cd9777445d,
     type: 3}
-  lyricsDisplayer: {fileID: 0}
+  uiRecordedNotePrefab: {fileID: 2003371037910514456, guid: cc8f106d10591de4a91b0218e3d137da,
+    type: 3}
 --- !u!1 &4410698266006340637
 GameObject:
   m_ObjectHideFlags: 0

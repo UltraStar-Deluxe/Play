@@ -1336,6 +1336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recordedNotes: []
+  recordedSentences: []
 --- !u!4 &1586563090
 Transform:
   m_ObjectHideFlags: 0
