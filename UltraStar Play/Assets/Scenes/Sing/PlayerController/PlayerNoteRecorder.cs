@@ -13,7 +13,7 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private SingSceneController singSceneController;
 
-    private SentenceDisplayer sentenceDisplayer;
+    private PlayerController playerController;
 
     private PlayerProfile playerProfile;
     public PlayerProfile PlayerProfile
@@ -32,7 +32,6 @@ public class PlayerNoteRecorder : MonoBehaviour
     private RecordedNote lastRecordedNote;
     private RecordedSentence lastRecordedSentence;
     private int lastRecordedFrame;
-    private float lastRecordedTime;
 
     private MicrophonePitchTracker MicrophonePitchTracker
     {
@@ -42,11 +41,14 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
+    public void Init(PlayerController playerController)
+    {
+        this.playerController = playerController;
+    }
+
     void Awake()
     {
         singSceneController = GameObject.FindObjectOfType<SingSceneController>();
-        // TODO: This should be instantiated by the singSceneController
-        sentenceDisplayer = GameObject.FindObjectOfType<SentenceDisplayer>();
 
         if (playerProfile == null)
         {
@@ -104,10 +106,10 @@ public class PlayerNoteRecorder : MonoBehaviour
                     lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
                     lastRecordedNote.EndBeat = currentBeat;
                     // Debug.Log("same pitch, pos in millis " + currentPositionInMillis);
-                    if (sentenceDisplayer != null)
+                    if (playerController != null)
                     {
-                        RecordedSentence recordedSentence = recordedSentences.Where(it => it.Sentence == sentenceDisplayer.CurrentSentence).FirstOrDefault();
-                        sentenceDisplayer.DisplayRecordedNotes(recordedSentence);
+                        RecordedSentence recordedSentence = recordedSentences.Where(it => it.Sentence == playerController.CurrentSentence).FirstOrDefault();
+                        playerController.DisplayRecordedSentence(recordedSentence);
                     }
                 }
                 else
@@ -126,11 +128,11 @@ public class PlayerNoteRecorder : MonoBehaviour
         recordedNotes.Add(lastRecordedNote);
 
         // Find corresponding sentence for recorded note
-        if (sentenceDisplayer == null)
+        if (playerController == null)
         {
             return;
         }
-        Sentence currentSentence = sentenceDisplayer.CurrentSentence;
+        Sentence currentSentence = playerController.CurrentSentence;
         if (currentSentence == null)
         {
             return;

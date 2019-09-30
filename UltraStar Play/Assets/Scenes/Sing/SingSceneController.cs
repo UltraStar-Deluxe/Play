@@ -18,8 +18,18 @@ public class SingSceneController : MonoBehaviour
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 
-    public RectTransform playerUiArea;
-    public RectTransform playerUiPrefab;
+    public PlayerController playerControllerPrefab;
+
+    private VideoPlayer videoPlayer;
+    private List<PlayerController> playerControllers = new List<PlayerController>();
+
+    private IWavePlayer waveOutDevice;
+    private WaveStream mainOutputStream;
+    private WaveChannel32 volumeStream;
+
+    private double timeOfLastMeasuredPositionInSongInMillis;
+    private double lastMeasuredPositionInSongInMillis;
+
 
     public SongMeta SongMeta
     {
@@ -28,25 +38,6 @@ public class SingSceneController : MonoBehaviour
             return sceneData.SelectedSongMeta;
         }
     }
-
-    public PlayerProfile PlayerProfile
-    {
-        get
-        {
-            return sceneData.SelectedPlayerProfiles[0];
-        }
-    }
-
-    private VideoPlayer videoPlayer;
-
-    private IWavePlayer waveOutDevice;
-    private WaveStream mainOutputStream;
-    private WaveChannel32 volumeStream;
-
-    private List<SentenceDisplayer> sentenceDisplayers = new List<SentenceDisplayer>();
-
-    private double timeOfLastMeasuredPositionInSongInMillis;
-    private double lastMeasuredPositionInSongInMillis;
 
     public double CurrentBeat
     {
@@ -101,22 +92,6 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    // The current position in the song in milliseconds.
-    public double PositionInSongInSeconds
-    {
-        get
-        {
-            if (mainOutputStream == null)
-            {
-                return 0;
-            }
-            else
-            {
-                return PositionInSongInMillis / 1000.0;
-            }
-        }
-    }
-
     void Awake()
     {
         // Load scene data from static reference, if any
@@ -132,6 +107,31 @@ public class SingSceneController : MonoBehaviour
         {
             sceneData.AddPlayerProfile(GetDefaultPlayerProfile());
         }
+    }
+
+    void OnEnable()
+    {
+        string playerProfilesCsv = String.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
+        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
+
+        // Start the music
+        StartAudioPlayback();
+
+        // Start any associated video
+        Invoke("StartVideoPlayback", SongMeta.VideoGap);
+
+        // Go to next scene when the song finishes
+        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
+
+        // Handle players        
+        foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
+        {
+            CreatePlayerController(playerProfile);
+        }
+
+        // Associate LyricsDisplayer with one of the (duett) players
+        LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
+        playerControllers[0].LyricsDisplayer = lyricsDisplayer;
     }
 
     void OnDisable()
@@ -160,40 +160,7 @@ public class SingSceneController : MonoBehaviour
     void Update()
     {
         timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
-    }
-
-    void OnEnable()
-    {
-        if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
-        {
-            Debug.LogWarning("Song already playing");
-            return;
-        }
-
-        videoPlayer = FindObjectOfType<VideoPlayer>();
-
-        Debug.Log($"{PlayerProfile.Name} starts (or continues) singing of {SongMeta.Title}.");
-
-        string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
-        LoadAudio(songPath);
-        waveOutDevice.Play();
-        if (sceneData.PositionInSongMillis > 0)
-        {
-            Debug.Log($"Skipping forward to {sceneData.PositionInSongMillis} milliseconds");
-            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(sceneData.PositionInSongMillis);
-        }
-
-        // Create player ui for each player (currently there is only one player)
-        // TODO: support for multiple players.
-        CreatePlayerUi();
-
-        InvokeRepeating("UpdateCurrentSentence", 0, 0.25f);
-
-        // Start any associated video
-        Invoke("StartVideoPlayback", SongMeta.VideoGap);
-
-        // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
+        playerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
     public void Restart()
@@ -239,6 +206,7 @@ public class SingSceneController : MonoBehaviour
 
     private void StartVideoPlayback()
     {
+        videoPlayer = FindObjectOfType<VideoPlayer>();
         string videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
         if (File.Exists(videoPath))
         {
@@ -253,7 +221,7 @@ public class SingSceneController : MonoBehaviour
 
     private void SyncVideoWithMusic()
     {
-        if (mainOutputStream == null)
+        if (mainOutputStream == null || videoPlayer == null)
         {
             return;
         }
@@ -265,35 +233,29 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private void UpdateCurrentSentence()
+    private void CreatePlayerController(PlayerProfile playerProfile)
     {
-        foreach (SentenceDisplayer sentenceDisplayer in sentenceDisplayers)
-        {
-            sentenceDisplayer.SetCurrentBeat(CurrentBeat);
-        }
+        playerControllers.Clear();
+
+        string voiceIdentifier = GetVoiceIdentifier(playerProfile);
+        PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
+        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier);
+
+        playerControllers.Add(playerController);
     }
 
-    private void CreatePlayerUi()
+    private string GetVoiceIdentifier(PlayerProfile playerProfile)
     {
-        // Remove old player ui
-        sentenceDisplayers.Clear();
-        foreach (RectTransform oldPlayerUi in playerUiArea)
+        bool isDuett = false;
+        if (isDuett && sceneData.SelectedPlayerProfiles.Count == 2)
         {
-            GameObject.Destroy(oldPlayerUi.gameObject);
+            int voiceIndex = sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2;
+            return "P" + voiceIndex;
         }
-
-        // Create new player ui for each player.
-        RectTransform playerUi = GameObject.Instantiate(playerUiPrefab);
-        playerUi.SetParent(playerUiArea);
-
-        // Associate a LyricsDisplayer with the SentenceDisplayer
-        SentenceDisplayer sentenceDisplayer = playerUi.GetComponentInChildren<SentenceDisplayer>();
-        LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-        sentenceDisplayer.LyricsDisplayer = lyricsDisplayer;
-
-        // Load the voice for the SentenceDisplayer of the PlayerUi
-        sentenceDisplayer.LoadVoice(SongMeta, null);
-        sentenceDisplayers.Add(sentenceDisplayer);
+        else
+        {
+            return null;
+        }
     }
 
     private PlayerProfile GetDefaultPlayerProfile()
@@ -315,6 +277,24 @@ public class SingSceneController : MonoBehaviour
             throw new Exception("The default song was not found.");
         }
         return defaultSongMetas.First();
+    }
+
+    private void StartAudioPlayback()
+    {
+        if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            Debug.LogWarning("Song already playing");
+            return;
+        }
+
+        string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
+        LoadAudio(songPath);
+        waveOutDevice.Play();
+        if (sceneData.PositionInSongMillis > 0)
+        {
+            Debug.Log($"Skipping forward to {sceneData.PositionInSongMillis} milliseconds");
+            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(sceneData.PositionInSongMillis);
+        }
     }
 
     private bool LoadAudioFromData(byte[] data)
