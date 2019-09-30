@@ -15,7 +15,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public string MicDevice { get; set; }
 
-    private AudioSource micAudioSource;
+    private AudioSource audioSource;
     private float[] audioClipData = new float[BufferSize];
 
     private PitchTracker pitchTracker = new PitchTracker();
@@ -31,13 +31,9 @@ public class MicrophonePitchTracker : MonoBehaviour
         pitchTracker.PitchDetected -= new PitchTracker.PitchDetectedHandler(handler);
     }
 
-    void Awake()
-    {
-        micAudioSource = GetComponent<AudioSource>();
-    }
-
     void OnEnable()
     {
+        audioSource = GetComponent<AudioSource>();
         // Initialize the pitch tracker
         pitchTracker.PitchRecordHistorySize = 5;
         pitchTracker.SampleRate = SampleRate;
@@ -51,13 +47,13 @@ public class MicrophonePitchTracker : MonoBehaviour
     void Update()
     {
         // Enable / disable microphone audio playback
-        if (playRecordedAudio && !micAudioSource.isPlaying)
+        if (playRecordedAudio && !audioSource.isPlaying)
         {
-            micAudioSource.Play();
+            audioSource.Play();
         }
-        else if (!playRecordedAudio && micAudioSource.isPlaying)
+        else if (!playRecordedAudio && audioSource.isPlaying)
         {
-            micAudioSource.Stop();
+            audioSource.Stop();
         }
 
         UpdatePitchDetection();
@@ -86,14 +82,14 @@ public class MicrophonePitchTracker : MonoBehaviour
         // Code for low-latency microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         // It seems that there is still a latency of more than 200ms, which is too much for real-time processing.
-        AudioSource audio = GetComponent<AudioSource>();
-        micAudioSource.clip = Microphone.Start(MicDevice, true, 1, SampleRate);
-        micAudioSource.loop = true;
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = Microphone.Start(MicDevice, true, 1, SampleRate);
+        audioSource.loop = true;
         if (playRecordedAudio)
         {
             while (!(Microphone.GetPosition(null) > 0)) { /* Busy waiting */ }
             // Debug.Log("Start playing... position is " + Microphone.GetPosition(null));
-            micAudioSource.Play();
+            audioSource.Play();
         }
     }
 
@@ -111,12 +107,12 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
 
         // Fill buffer with raw sample data from microphone
-        if (micAudioSource.clip == null)
+        if (audioSource.clip == null)
         {
             Debug.LogWarning("AudioSource.clip is null");
             return;
         }
-        micAudioSource.clip.GetData(audioClipData, BufferSize);
+        audioSource.clip.GetData(audioClipData, BufferSize);
 
         // Detect the pitch of the sample
         pitchTracker.ProcessBuffer(audioClipData, 0);

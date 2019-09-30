@@ -82,47 +82,49 @@ public class PositionInLyricsIndicator : MonoBehaviour
         {
             return;
         }
-        double positionInSongInSeconds = singSceneController.PositionInSongInSeconds;
+        double positionInSongInMillis = singSceneController.PositionInSongInMillis;
 
         double currentBeat = singSceneController.CurrentBeat;
         double sentenceStartBeat = CurrentSentence.StartBeat;
         double sentenceEndBeat = CurrentSentence.EndBeat;
 
-        double positionInSentenceInSeconds = positionInSongInSeconds - (SongMeta.Gap / 1000.0f);
-        double sentenceStartInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceStartBeat);
-        double sentenceEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, sentenceEndBeat);
+        double positionInSentenceInMillis = positionInSongInMillis - SongMeta.Gap;
+        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, sentenceStartBeat);
+        double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, sentenceEndBeat);
 
-        double positionIndicatorStartInSeconds = sentenceStartInSeconds - 2.0f;
+        double positionIndicatorStartInMillis = sentenceStartInMillis - 2000;
 
-        if (positionInSentenceInSeconds >= positionIndicatorStartInSeconds)
+        if (positionInSentenceInMillis >= positionIndicatorStartInMillis)
         {
             double endPos = double.MinValue;
-            double endTimeInSeconds = 0f;
+            double endTimeInMillis = 0f;
 
-            if (positionInSentenceInSeconds <= sentenceStartInSeconds)
+            if (positionInSentenceInMillis <= sentenceStartInMillis)
             {
                 // Range before first note of sentence.
                 double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
                 endPos = sentenceFirstCharacterPosition;
-                endTimeInSeconds = sentenceStartInSeconds;
+                endTimeInMillis = sentenceStartInMillis;
             }
-            else if (positionInSentenceInSeconds <= sentenceEndInSeconds)
+            else if (positionInSentenceInMillis <= sentenceEndInMillis)
             {
                 // Range inside sentence.
                 Note currentNote = GetCurrentOrNextNote(currentBeat);
                 if (currentNote != null)
                 {
-                    double noteEndInSeconds = BpmUtils.BeatToSecondsInSong(SongMeta, currentNote.EndBeat);
+                    double noteEndInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, currentNote.EndBeat);
                     endPos = GetEndPositionOfNote(CurrentSentenceText, CurrentSentence, currentNote);
-                    endTimeInSeconds = noteEndInSeconds;
+                    endTimeInMillis = noteEndInMillis;
                 }
             }
-            double remainingTime = endTimeInSeconds - positionInSentenceInSeconds;
+
+            double remainingTimeInMillis = endTimeInMillis - positionInSentenceInMillis;
             if (endPos > double.MinValue)
             {
-                if (remainingTime > 0 && endPos > rectTransform.anchoredPosition.x)
+                if (remainingTimeInMillis > 0 && endPos > rectTransform.anchoredPosition.x)
                 {
-                    velocityPerSecond = (endPos - rectTransform.anchoredPosition.x) / remainingTime;
+                    double remainingTimeInSeconds = remainingTimeInMillis / 1000;
+                    velocityPerSecond = (endPos - rectTransform.anchoredPosition.x) / remainingTimeInSeconds;
                 }
                 else
                 {
