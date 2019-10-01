@@ -11,7 +11,8 @@ public class SentenceRatingPopup : MonoBehaviour
     {
         set
         {
-            GetComponentInChildren<Text>().text = value.RatingText;
+            GetComponentInChildren<Text>().text = value.Text;
+            GetComponentInChildren<Image>().color = value.BackgroundColor;
         }
     }
 
