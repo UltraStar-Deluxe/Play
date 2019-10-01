@@ -8,8 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MicrophonePitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour
 {
-    public List<RecordedNote> recordedNotes = new List<RecordedNote>();
-    public List<RecordedSentence> recordedSentences = new List<RecordedSentence>();
+    public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
 
     private SingSceneController singSceneController;
 
@@ -69,6 +68,12 @@ public class PlayerNoteRecorder : MonoBehaviour
         MicrophonePitchTracker.StopPitchDetection();
     }
 
+    public List<RecordedNote> GetRecordedNotes(Sentence sentence)
+    {
+        sentenceToRecordedNotesMap.TryGetValue(sentence, out List<RecordedNote> recordedNotes);
+        return recordedNotes;
+    }
+
     private void OnPitchDetected(PitchTracker sender, PitchTracker.PitchRecord pitchRecord)
     {
         // Ignore multiple events at same frame
@@ -91,67 +96,86 @@ public class PlayerNoteRecorder : MonoBehaviour
         {
             double currentPositionInMillis = singSceneController.PositionInSongInMillis;
             double currentBeat = singSceneController.CurrentBeat;
-            if (lastRecordedNote == null)
+            if (lastRecordedNote != null && lastRecordedNote.MidiNote == pitchRecord.MidiNote)
             {
-                // Started singing of new note
-                lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
-                AddRecordedNote(lastRecordedNote);
-                // Debug.Log("started singing");
+                // Continued singing on same pitch
+                lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
+                lastRecordedNote.EndBeat = currentBeat;
+                OnContinuedNote(lastRecordedNote, currentBeat);
             }
             else
             {
-                if (lastRecordedNote.MidiNote == pitchRecord.MidiNote)
-                {
-                    // Continued singing on same pitch
-                    lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
-                    lastRecordedNote.EndBeat = currentBeat;
-                    // Debug.Log("same pitch, pos in millis " + currentPositionInMillis);
-                    if (playerController != null)
-                    {
-                        RecordedSentence recordedSentence = recordedSentences.Where(it => it.Sentence == playerController.CurrentSentence).FirstOrDefault();
-                        playerController.DisplayRecordedSentence(recordedSentence);
-                    }
-                }
-                else
-                {
-                    // Continued singing on different pitch
-                    lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
-                    AddRecordedNote(lastRecordedNote);
-                    // Debug.Log("new pitch");
-                }
+                // Start new note
+                lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
             }
         }
     }
 
-    private void AddRecordedNote(RecordedNote recordedNote)
+    private void OnContinuedNote(RecordedNote recordedNote, double currentBeat)
     {
-        recordedNotes.Add(lastRecordedNote);
-
-        // Find corresponding sentence for recorded note
         if (playerController == null)
         {
+            lastRecordedNote = null;
             return;
         }
         Sentence currentSentence = playerController.CurrentSentence;
         if (currentSentence == null)
         {
+            lastRecordedNote = null;
             return;
         }
 
-        // Create RecordedSentence for the currently displayed Sentence.
-        if (lastRecordedSentence == null || lastRecordedSentence.Sentence != currentSentence)
+        // Only accept recorded notes where a note is expected in the song
+        Note noteAtCurrentBeat = GetNoteAtBeat(currentSentence, currentBeat);
+        if (noteAtCurrentBeat == null)
         {
-            lastRecordedSentence = new RecordedSentence(currentSentence);
-            recordedSentences.Add(lastRecordedSentence);
-            // Debug.Log("new rec sentence");
+            lastRecordedNote = null;
+            return;
         }
 
-        // Add note to RecordedSentence if it fits.
-        if (recordedNote.StartBeat < lastRecordedSentence.Sentence.EndBeat &&
-            recordedNote.EndBeat > lastRecordedSentence.Sentence.StartBeat)
+        // Limit recorded note bounds to target note bounds
+        if (recordedNote.StartBeat < noteAtCurrentBeat.StartBeat)
         {
-            lastRecordedSentence.AddRecordedNote(recordedNote);
-            // Debug.Log("add note to rec sentence");
+            recordedNote.StartBeat = noteAtCurrentBeat.StartBeat;
+        }
+        if (recordedNote.EndBeat > noteAtCurrentBeat.EndBeat)
+        {
+            recordedNote.EndBeat = noteAtCurrentBeat.EndBeat;
+        }
+
+        // Remember this note and show it in the UI
+        AddRecordedNote(lastRecordedNote, currentSentence);
+        playerController.DisplayRecordedNotes(GetRecordedNotes(currentSentence));
+    }
+
+    private Note GetNoteAtBeat(Sentence sentence, double beat)
+    {
+        foreach (Note note in sentence.Notes)
+        {
+            if (beat >= note.StartBeat && beat <= note.EndBeat)
+            {
+                return note;
+            }
+        }
+        return null;
+    }
+
+    private void AddRecordedNote(RecordedNote recordedNote, Sentence currentSentence)
+    {
+        // Add new recorded note to collection of recorded notes that is associated with the sentence.
+        // Thereby, construct collections of recorded notes if needed and associate it with the sentence.
+        if (sentenceToRecordedNotesMap.TryGetValue(currentSentence, out List<RecordedNote> recordedNotes))
+        {
+            if (!recordedNotes.Contains(recordedNote))
+            {
+                recordedNotes.Add(recordedNote);
+            }
+        }
+        else
+        {
+            recordedNotes = new List<RecordedNote>();
+            recordedNotes.Add(recordedNote);
+            sentenceToRecordedNotesMap.Add(currentSentence, recordedNotes);
         }
     }
 }

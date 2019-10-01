@@ -67,8 +67,12 @@ public class PlayerController : MonoBehaviour
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
     {
+        // Change the current sentence, when the current beat is over its last note.
         double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
-        SetCurrentBeat(currentBeat);
+        if (CurrentSentence != null && currentBeat > (double)CurrentSentence.EndBeat)
+        {
+            OnSentenceEnded();
+        }
     }
 
     private Voice LoadVoice(SongMeta songMeta, string voiceIdentifier)
@@ -89,18 +93,6 @@ public class PlayerController : MonoBehaviour
             else
             {
                 throw new Exception($"The song does not contain a voice for {voiceIdentifier}");
-            }
-        }
-    }
-
-    private void SetCurrentBeat(double currentBeat)
-    {
-        // Change the sentence, when the current beat is over its last note.
-        if (voice != null && voice.Sentences.Count > sentenceIndex - 1)
-        {
-            if (currentBeat > 0 && CurrentSentence != null && (uint)currentBeat > CurrentSentence.EndBeat)
-            {
-                OnSentenceEnded();
             }
         }
     }
@@ -130,6 +122,11 @@ public class PlayerController : MonoBehaviour
         UpdateLyricsDisplayer();
     }
 
+    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    {
+        playerUiController.DisplayRecordedNotes(recordedNotes);
+    }
+
     private void UpdateLyricsDisplayer()
     {
         if (lyricsDisplayer != null)
@@ -143,10 +140,5 @@ public class PlayerController : MonoBehaviour
     {
         Sentence sentence = (index < voice.Sentences.Count - 1) ? voice.Sentences[index] : null;
         return sentence;
-    }
-
-    internal void DisplayRecordedSentence(RecordedSentence recordedSentence)
-    {
-        playerUiController.DisplayRecordedSentence(recordedSentence);
     }
 }

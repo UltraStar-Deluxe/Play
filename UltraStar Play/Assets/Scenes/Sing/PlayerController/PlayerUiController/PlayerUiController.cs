@@ -28,11 +28,6 @@ public class PlayerUiController : MonoBehaviour
         sentenceDisplayer.DisplayRecordedNotes(null);
     }
 
-    public void DisplayRecordedSentence(RecordedSentence recordedSentence)
-    {
-        sentenceDisplayer.DisplayRecordedNotes(recordedSentence);
-    }
-
     public void ShowSentenceRating(SentenceRating sentenceRating, int scoreForSentence)
     {
         sentenceRatingDisplayer.ShowSentenceRating(sentenceRating, scoreForSentence);
@@ -41,5 +36,10 @@ public class PlayerUiController : MonoBehaviour
     public void ShowTotalScore(int score)
     {
         totalScoreDisplayer.ShowTotalScore(score);
+    }
+
+    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    {
+        sentenceDisplayer.DisplayRecordedNotes(recordedNotes);
     }
 }
