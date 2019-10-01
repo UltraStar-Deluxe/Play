@@ -56,26 +56,25 @@ public class SentenceDisplayer : MonoBehaviour
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
     }
 
-    public void DisplayRecordedNotes(RecordedSentence recordedSentence)
+    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
     {
         foreach (UiRecordedNote uiNote in GetComponentsInChildren<UiRecordedNote>())
         {
             Destroy(uiNote.gameObject);
         }
 
-        if (recordedSentence == null)
+        if (recordedNotes == null)
         {
             return;
         }
 
-        // Debug.Log("drawing recorded notes");
-        foreach (RecordedNote recordedNote in recordedSentence.RecordedNotes)
+        foreach (RecordedNote recordedNote in recordedNotes)
         {
-            DisplayRecordedNote(recordedSentence, recordedNote);
+            DisplayRecordedNote(recordedNote);
         }
     }
 
-    private void DisplayRecordedNote(RecordedSentence recordedSentence, RecordedNote recordedNote)
+    private void DisplayRecordedNote(RecordedNote recordedNote)
     {
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
         uiNote.transform.SetParent(transform);
