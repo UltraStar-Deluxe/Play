@@ -30,6 +30,18 @@ public class SingSceneController : MonoBehaviour
     private double timeOfLastMeasuredPositionInSongInMillis;
     private double lastMeasuredPositionInSongInMillis;
 
+    private static SingSceneController instance;
+    public static SingSceneController Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<SingSceneController>();
+            }
+            return instance;
+        }
+    }
 
     public SongMeta SongMeta
     {
@@ -89,6 +101,15 @@ public class SingSceneController : MonoBehaviour
                     return posInMillis + timeOfLastMeasuredPositionInSongInMillis;
                 }
             }
+        }
+
+        set
+        {
+            if (mainOutputStream == null)
+            {
+                return;
+            }
+            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(value);
         }
     }
 
@@ -161,6 +182,16 @@ public class SingSceneController : MonoBehaviour
     {
         timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
         playerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+    }
+
+    public void SkipGap()
+    {
+        double targetPositionInMillis = SongMeta.Gap - 500;
+        if (PositionInSongInMillis < targetPositionInMillis)
+        {
+            Debug.Log("Skipping gap");
+            PositionInSongInMillis = targetPositionInMillis;
+        }
     }
 
     public void Restart()
@@ -293,7 +324,7 @@ public class SingSceneController : MonoBehaviour
         if (sceneData.PositionInSongMillis > 0)
         {
             Debug.Log($"Skipping forward to {sceneData.PositionInSongMillis} milliseconds");
-            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(sceneData.PositionInSongMillis);
+            PositionInSongInMillis = sceneData.PositionInSongMillis;
         }
     }
 
