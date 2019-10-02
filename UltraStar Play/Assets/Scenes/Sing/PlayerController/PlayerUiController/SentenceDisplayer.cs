@@ -17,14 +17,19 @@ public class SentenceDisplayer : MonoBehaviour
     // This must be a multiply of 12, such that a note that is shifted by an octave
     // will be wrapped around and placed on the same line as without the shift
     // (so only relative note value is relevant).
-    public const int NoteLineCount = 24;
+    private int noteLineCount = 12;
 
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
 
     private Sentence displayedSentence;
 
-    public void DisplayNotes(Sentence sentence)
+    public void Init(int noteLineCount)
+    {
+        this.noteLineCount = noteLineCount;
+    }
+
+    public void DisplaySentence(Sentence sentence)
     {
         displayedSentence = sentence;
 
@@ -50,7 +55,7 @@ public class SentenceDisplayer : MonoBehaviour
         uiNote.transform.SetParent(transform);
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = note.Text;
+        uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
@@ -70,34 +75,41 @@ public class SentenceDisplayer : MonoBehaviour
 
         foreach (RecordedNote recordedNote in recordedNotes)
         {
-            DisplayRecordedNote(recordedNote);
+            DisplayRecordedNote(recordedNote, true);
+            if (recordedNote.RecordedMidiNote != recordedNote.RoundedMidiNote)
+            {
+                DisplayRecordedNote(recordedNote, false);
+            }
         }
     }
 
-    private void DisplayRecordedNote(RecordedNote recordedNote)
+    private void DisplayRecordedNote(RecordedNote recordedNote, bool useRoundedNote = true)
     {
+        int midiNote = (useRoundedNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
+
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
         uiNote.transform.SetParent(transform);
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = MidiUtils.MidiNoteToAbsoluteName(recordedNote.MidiNote);
+        uiNoteText.text = (useRoundedNote) ? MidiUtils.GetAbsoluteName(recordedNote.RoundedMidiNote)
+                                           : MidiUtils.GetAbsoluteName(recordedNote.RecordedMidiNote);
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
-        PositionUiNote(uiNoteRectTransform, recordedNote.MidiNote, recordedNote.StartBeat, recordedNote.EndBeat);
+        PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
     }
 
     private void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         // Calculate offset, such that the average note will be on the middle line
         // (thus, middle line has offset of zero).
-        int offset = (NoteLineCount / 2) - (((int)displayedSentence.AvgMidiNote) % NoteLineCount);
-        int noteLine = (offset + midiNote) % NoteLineCount;
+        int offset = (noteLineCount / 2) - (((int)displayedSentence.AvgMidiNote) % noteLineCount);
+        int noteLine = (offset + midiNote) % noteLineCount;
 
         uint sentenceStartBeat = displayedSentence.StartBeat;
         uint sentenceEndBeat = displayedSentence.EndBeat;
         uint beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
-        double anchorY = (double)noteLine / (double)NoteLineCount;
+        double anchorY = (double)noteLine / (double)noteLineCount;
         double anchorX = (double)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
         Vector2 anchor = new Vector2((float)anchorX, (float)anchorY);
         uiNote.anchorMin = anchor;

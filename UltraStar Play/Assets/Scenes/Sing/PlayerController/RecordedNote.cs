@@ -6,7 +6,9 @@ using Pitch;
 [Serializable]
 public class RecordedNote
 {
-    public int MidiNote { get; set; }
+    public int RecordedMidiNote { get; set; }
+    public int RoundedMidiNote { get; set; }
+
     public double StartPositionInMilliseconds { get; set; }
     public double EndPositionInMilliseconds { get; set; }
 
@@ -15,7 +17,8 @@ public class RecordedNote
 
     public RecordedNote(int midiNote, double startPositionInMilliseconds, double endPositionInMilliseconds, double startBeat, double endBeat)
     {
-        this.MidiNote = midiNote;
+        this.RecordedMidiNote = midiNote;
+        this.RoundedMidiNote = midiNote;
         this.StartPositionInMilliseconds = startPositionInMilliseconds;
         this.EndPositionInMilliseconds = endPositionInMilliseconds;
         this.StartBeat = startBeat;

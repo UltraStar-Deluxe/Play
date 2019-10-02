@@ -1140,9 +1140,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  positionInSongDelayInMillis: 150
   defaultSongName: Summer Wine
   defaultPlayerProfileName: Player 01
-  defaultSongNamePasteBin: 
+  defaultSongNamePasteBin: 'Summer Wine
+
+    EmptyTitle'
   playerControllerPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
 --- !u!4 &1427931089

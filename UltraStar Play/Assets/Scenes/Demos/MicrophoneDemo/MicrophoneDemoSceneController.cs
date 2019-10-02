@@ -34,7 +34,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         int midiNote = pitchRecord.MidiNote;
         if (midiNote > 0)
         {
-            currentNoteLabel.text = "Note: " + MidiUtils.MidiNoteToAbsoluteName(midiNote);
+            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(midiNote);
         }
         else
         {
