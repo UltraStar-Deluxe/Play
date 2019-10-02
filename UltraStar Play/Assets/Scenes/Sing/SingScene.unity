@@ -424,6 +424,49 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &234276795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 234276796}
+  - component: {fileID: 234276797}
+  m_Layer: 0
+  m_Name: SingSceneKeyboadInputController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &234276796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234276795}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 341.7316, y: 290.46182, z: -417.23804}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &234276797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234276795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35ef2734292163c45a563380ea54c792, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &242843841
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,6 +552,7 @@ GameObject:
   m_Component:
   - component: {fileID: 245391953}
   - component: {fileID: 245391954}
+  - component: {fileID: 245391955}
   m_Layer: 5
   m_Name: PlayerUiArea
   m_TagString: Untagged
@@ -556,11 +600,23 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_Spacing: 8
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &245391955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245391952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45aa4a7409203e649931d4e0d4ece132, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &320770002
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,11 +1140,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  positionInSongDelayInMillis: 150
   defaultSongName: Summer Wine
   defaultPlayerProfileName: Player 01
-  defaultSongNamePasteBin: 
-  playerUiArea: {fileID: 245391953}
-  playerUiPrefab: {fileID: 4410698265183144018, guid: c476fd55a093e0f43bdc324f326218f3,
+  defaultSongNamePasteBin: 'Summer Wine
+
+    EmptyTitle'
+  playerControllerPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
 --- !u!4 &1427931089
 Transform:
@@ -1832,6 +1890,11 @@ PrefabInstance:
       value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 4410698266006340636, guid: c476fd55a093e0f43bdc324f326218f3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2880757047877764256, guid: c476fd55a093e0f43bdc324f326218f3,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
