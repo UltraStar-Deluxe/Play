@@ -89,8 +89,8 @@ public class PositionInLyricsIndicator : MonoBehaviour
         double sentenceEndBeat = CurrentSentence.EndBeat;
 
         double positionInSentenceInMillis = positionInSongInMillis - SongMeta.Gap;
-        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, sentenceStartBeat);
-        double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, sentenceEndBeat);
+        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceStartBeat);
+        double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceEndBeat);
 
         double positionIndicatorStartInMillis = sentenceStartInMillis - 2000;
 
@@ -112,7 +112,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
                 Note currentNote = GetCurrentOrNextNote(currentBeat);
                 if (currentNote != null)
                 {
-                    double noteEndInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, currentNote.EndBeat);
+                    double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, currentNote.EndBeat);
                     endPos = GetEndPositionOfNote(CurrentSentenceText, CurrentSentence, currentNote);
                     endTimeInMillis = noteEndInMillis;
                 }

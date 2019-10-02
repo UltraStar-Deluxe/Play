@@ -7,18 +7,15 @@ public class LineDisplayer : MonoBehaviour
 {
     public RectTransform linePrefab;
 
-    public const int LineCount = SentenceDisplayer.NoteLineCount / 2;
-
-    void Start()
+    public void Init(int lineCount)
     {
-        // Create lines
-        for (int i = 0; i < LineCount; i++)
+        for (int i = 0; i < lineCount; i++)
         {
-            CreateLine(i);
+            CreateLine(i, lineCount);
         }
     }
 
-    private void CreateLine(int index)
+    private void CreateLine(int index, int lineCount)
     {
         RectTransform line = Instantiate(linePrefab);
         line.SetParent(transform);
@@ -26,7 +23,8 @@ public class LineDisplayer : MonoBehaviour
         // such that they are in the background and the notes are drawn above the lines.
         line.SetSiblingIndex(0);
 
-        Vector2 anchor = new Vector2(0.5f, (float)((double)index / (double)LineCount));
+        double indexPercentage = (double)index / (double)lineCount;
+        Vector2 anchor = new Vector2(0.5f, (float)indexPercentage);
         line.anchorMin = anchor;
         line.anchorMax = anchor;
         line.anchoredPosition = Vector2.zero;

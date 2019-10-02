@@ -8,6 +8,7 @@ public class PlayerUiController : MonoBehaviour
     private SongMeta songMeta;
     private PlayerProfile playerProfile;
 
+    private LineDisplayer lineDisplayer;
     private SentenceDisplayer sentenceDisplayer;
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
@@ -17,15 +18,20 @@ public class PlayerUiController : MonoBehaviour
         this.songMeta = songMeta;
         this.playerProfile = playerProfile;
 
+        lineDisplayer = GetComponentInChildren<LineDisplayer>();
+        lineDisplayer.Init(6);
+
         sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
+        sentenceDisplayer.Init(12);
+
         totalScoreDisplayer = GetComponentInChildren<TotalScoreDisplayer>();
+
         sentenceRatingDisplayer = GetComponentInChildren<SentenceRatingDisplayer>();
     }
 
-    public void SetCurrentSentence(Sentence currentSentence)
+    public void DisplaySentence(Sentence currentSentence)
     {
-        sentenceDisplayer.DisplayNotes(currentSentence);
-        sentenceDisplayer.DisplayRecordedNotes(null);
+        sentenceDisplayer.DisplaySentence(currentSentence);
     }
 
     public void ShowSentenceRating(SentenceRating sentenceRating, int scoreForSentence)

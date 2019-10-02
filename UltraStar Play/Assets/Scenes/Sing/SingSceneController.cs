@@ -9,6 +9,10 @@ using NAudio.Wave;
 
 public class SingSceneController : MonoBehaviour
 {
+    // Constant delay when querying the position in the song.
+    // Its source could be that calculating the position in the song takes some time for itself.
+    public double positionInSongDelayInMillis = 150;
+
     public SingSceneData sceneData;
 
     public string defaultSongName;
@@ -87,6 +91,8 @@ public class SingSceneController : MonoBehaviour
                 // For the time between these measurements,
                 // we improve the approximation by counting time using Unity's Time.deltaTime.
                 double posInMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
+                // Reduce by constant offset. Could be that the measurement takes time itself ?
+                posInMillis -= positionInSongDelayInMillis;
                 if (posInMillis != lastMeasuredPositionInSongInMillis)
                 {
                     // Got new measurement from the audio lib. This is (relatively) accurate.
@@ -184,12 +190,17 @@ public class SingSceneController : MonoBehaviour
         playerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
-    public void SkipGap()
+    public void SkipToNextSentence()
     {
-        double targetPositionInMillis = SongMeta.Gap - 500;
-        if (PositionInSongInMillis < targetPositionInMillis)
+        double nextStartBeat = playerControllers.Select(it => it.GetNextStartBeat()).Min();
+        if (nextStartBeat == double.MaxValue)
         {
-            Debug.Log("Skipping gap");
+            return;
+        }
+
+        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - 500;
+        if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
+        {
             PositionInSongInMillis = targetPositionInMillis;
         }
     }

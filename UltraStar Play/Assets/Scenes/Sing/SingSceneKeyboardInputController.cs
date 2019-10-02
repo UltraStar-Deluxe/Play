@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class SingSceneKeyboardInputController : MonoBehaviour
 {
-    private const string SkipGapShortcut = "s";
+    private const string SkipShortcut = "s";
 
     void Update()
     {
-        if (Input.GetKeyUp(SkipGapShortcut))
+        if (Input.GetKeyUp(SkipShortcut))
         {
-            SingSceneController.Instance.SkipGap();
+            SingSceneController.Instance.SkipToNextSentence();
         }
     }
 }

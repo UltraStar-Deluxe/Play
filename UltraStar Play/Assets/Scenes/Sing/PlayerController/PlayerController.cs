@@ -26,6 +26,14 @@ public class PlayerController : MonoBehaviour
 
     public RecordedSentence RecordedSentence { get; set; }
 
+    private Difficulty Difficulty
+    {
+        get
+        {
+            return playerProfile.Difficulty;
+        }
+    }
+
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
     {
@@ -49,7 +57,7 @@ public class PlayerController : MonoBehaviour
         playerScoreController.Init(voice);
 
         playerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-        playerNoteRecorder.Init(this);
+        playerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
 
         CreatePlayerUi();
 
@@ -114,11 +122,22 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateSentences(int currentSentenceIndex)
     {
+        Sentence lastSentence = CurrentSentence;
         CurrentSentence = GetSentence(currentSentenceIndex);
         NextSentence = GetSentence(currentSentenceIndex + 1);
 
+        if (lastSentence != CurrentSentence && CurrentSentence == null)
+        {
+            Debug.Log("Finished last sentence");
+        }
+        if (lastSentence == null && CurrentSentence == null)
+        {
+            Debug.Log("Song contains no sentences");
+        }
+
         // Update the UI
-        playerUiController.SetCurrentSentence(CurrentSentence);
+        playerUiController.DisplaySentence(CurrentSentence);
+        playerUiController.DisplayRecordedNotes(null);
         UpdateLyricsDisplayer();
     }
 
@@ -138,7 +157,16 @@ public class PlayerController : MonoBehaviour
 
     private Sentence GetSentence(int index)
     {
-        Sentence sentence = (index < voice.Sentences.Count - 1) ? voice.Sentences[index] : null;
+        Sentence sentence = (index < voice.Sentences.Count) ? voice.Sentences[index] : null;
         return sentence;
+    }
+
+    public double GetNextStartBeat()
+    {
+        if (CurrentSentence == null)
+        {
+            return double.MaxValue;
+        }
+        return CurrentSentence.StartBeat;
     }
 }

@@ -28,8 +28,9 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
+    private int RoundingDistance { get; set; }
+
     private RecordedNote lastRecordedNote;
-    private RecordedSentence lastRecordedSentence;
     private int lastRecordedFrame;
 
     private MicrophonePitchTracker MicrophonePitchTracker
@@ -40,9 +41,10 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
-    public void Init(PlayerController playerController)
+    public void Init(PlayerController playerController, int roundingDistance)
     {
         this.playerController = playerController;
+        this.RoundingDistance = roundingDistance;
     }
 
     void Awake()
@@ -88,7 +90,6 @@ public class PlayerNoteRecorder : MonoBehaviour
             if (lastRecordedNote != null)
             {
                 // Ended singing
-                // Debug.Log("ended singing");
                 lastRecordedNote = null;
             }
         }
@@ -96,7 +97,7 @@ public class PlayerNoteRecorder : MonoBehaviour
         {
             double currentPositionInMillis = singSceneController.PositionInSongInMillis;
             double currentBeat = singSceneController.CurrentBeat;
-            if (lastRecordedNote != null && lastRecordedNote.MidiNote == pitchRecord.MidiNote)
+            if (lastRecordedNote != null && lastRecordedNote.RecordedMidiNote == pitchRecord.MidiNote)
             {
                 // Continued singing on same pitch
                 lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
@@ -143,9 +144,25 @@ public class PlayerNoteRecorder : MonoBehaviour
             recordedNote.EndBeat = noteAtCurrentBeat.EndBeat;
         }
 
+        // Round pitch of recorded note to pitch of note in song
+        recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, noteAtCurrentBeat.MidiNote, RoundingDistance);
+
         // Remember this note and show it in the UI
         AddRecordedNote(lastRecordedNote, currentSentence);
         playerController.DisplayRecordedNotes(GetRecordedNotes(currentSentence));
+    }
+
+    private int GetRoundedMidiNote(int recordedMidiNote, int targetMidiNote, int roundingDistance)
+    {
+        int distance = MidiUtils.GetRelativePitchDistance(recordedMidiNote, targetMidiNote);
+        if (distance <= roundingDistance)
+        {
+            return targetMidiNote;
+        }
+        else
+        {
+            return recordedMidiNote;
+        }
     }
 
     private Note GetNoteAtBeat(Sentence sentence, double beat)
