@@ -9,6 +9,30 @@ public class Sentence
     public List<Note> Notes { get; }
     public uint LinebreakBeat { get; }
 
+    public List<Note> GoldenNotes
+    {
+        get
+        {
+            return Notes.Where(it => it.IsGolden).ToList();
+        }
+    }
+
+    public List<Note> NormalNotes
+    {
+        get
+        {
+            return Notes.Where(it => it.IsNormal).ToList();
+        }
+    }
+
+    public List<Note> FreestyleNotes
+    {
+        get
+        {
+            return Notes.Where(it => it.IsFreestyle).ToList();
+        }
+    }
+
     public Sentence(List<Note> notes, uint linebreakBeat)
     {
         if (notes == null || notes.Count < 1)

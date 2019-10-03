@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class SentenceRating
 {
-    private static readonly SentenceRating Perfect = new SentenceRating(0.95, "rating.sentence.perfect", "3AFF4E");
-    private static readonly SentenceRating Cool = new SentenceRating(0.8, "rating.sentence.cool", "7FE82A");
-    private static readonly SentenceRating Great = new SentenceRating(0.7, "rating.sentence.great", "7FE82A");
-    private static readonly SentenceRating Good = new SentenceRating(0.6, "rating.sentence.good", "E4FF1F");
-    private static readonly SentenceRating NotBad = new SentenceRating(0.5, "rating.sentence.notbad", "E4FF1F");
-    private static readonly SentenceRating Bad = new SentenceRating(0.3, "rating.sentence.bad", "FF9C4F");
-    private static readonly SentenceRating Poor = new SentenceRating(0.2, "rating.sentence.poor", "E848E6");
-    private static readonly SentenceRating Awful = new SentenceRating(0, "rating.sentence.awful", "764FFF");
+    public static readonly SentenceRating Perfect = new SentenceRating(0.95, "rating.sentence.perfect", "3AFF4E");
+    public static readonly SentenceRating Cool = new SentenceRating(0.8, "rating.sentence.cool", "7FE82A");
+    public static readonly SentenceRating Great = new SentenceRating(0.7, "rating.sentence.great", "7FE82A");
+    public static readonly SentenceRating Good = new SentenceRating(0.6, "rating.sentence.good", "E4FF1F");
+    public static readonly SentenceRating NotBad = new SentenceRating(0.5, "rating.sentence.notbad", "E4FF1F");
+    public static readonly SentenceRating Bad = new SentenceRating(0.3, "rating.sentence.bad", "FF9C4F");
+    public static readonly SentenceRating Poor = new SentenceRating(0.2, "rating.sentence.poor", "E848E6");
+    public static readonly SentenceRating Awful = new SentenceRating(0, "rating.sentence.awful", "764FFF");
 
     private string i18nCode;
     public double PercentageThreshold { get; private set; }
