@@ -22,10 +22,6 @@ public class PlayerController : MonoBehaviour
     public Sentence CurrentSentence { get; set; }
     public Sentence NextSentence { get; set; }
 
-    public int Score { get; private set; }
-
-    public RecordedSentence RecordedSentence { get; set; }
-
     private Difficulty Difficulty
     {
         get
@@ -107,13 +103,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnSentenceEnded()
     {
-        int scoreForSentence = playerScoreController.CalculateScoreForSentence(CurrentSentence, RecordedSentence);
-        Score += scoreForSentence;
+        List<RecordedNote> recordedNotes = playerNoteRecorder.GetRecordedNotes(CurrentSentence);
+        double correctNotesPercentage = playerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
 
-        SentenceRating sentenceRating = playerScoreController.GetSentenceRating(CurrentSentence, scoreForSentence);
+        SentenceRating sentenceRating = playerScoreController.GetSentenceRating(CurrentSentence, correctNotesPercentage);
         if (sentenceRating != null)
         {
-            playerUiController.ShowSentenceRating(sentenceRating, scoreForSentence);
+            playerUiController.ShowSentenceRating(sentenceRating);
         }
 
         sentenceIndex++;

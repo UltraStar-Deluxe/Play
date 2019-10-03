@@ -27,6 +27,30 @@ public class Note
         }
     }
 
+    public bool IsGolden
+    {
+        get
+        {
+            return Type == ENoteType.Golden || Type == ENoteType.RapGolden;
+        }
+    }
+
+    public bool IsNormal
+    {
+        get
+        {
+            return Type == ENoteType.Normal || Type == ENoteType.Rap;
+        }
+    }
+
+    public bool IsFreestyle
+    {
+        get
+        {
+            return Type == ENoteType.Freestyle;
+        }
+    }
+
     public Note(ENoteType type, uint startBeat, uint length, int pitch, string text)
     {
         if (length < 1)

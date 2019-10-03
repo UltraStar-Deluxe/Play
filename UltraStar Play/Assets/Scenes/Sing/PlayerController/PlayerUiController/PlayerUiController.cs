@@ -34,9 +34,9 @@ public class PlayerUiController : MonoBehaviour
         sentenceDisplayer.DisplaySentence(currentSentence);
     }
 
-    public void ShowSentenceRating(SentenceRating sentenceRating, int scoreForSentence)
+    public void ShowSentenceRating(SentenceRating sentenceRating)
     {
-        sentenceRatingDisplayer.ShowSentenceRating(sentenceRating, scoreForSentence);
+        sentenceRatingDisplayer.ShowSentenceRating(sentenceRating);
     }
 
     public void ShowTotalScore(int score)

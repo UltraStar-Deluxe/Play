@@ -7,7 +7,7 @@ public class SentenceRatingDisplayer : MonoBehaviour
 {
     public SentenceRatingPopup sentenceRatingPopupPrefab;
 
-    public void ShowSentenceRating(SentenceRating sentenceRating, int scoreForSentence)
+    public void ShowSentenceRating(SentenceRating sentenceRating)
     {
         SentenceRatingPopup sentenceRatingPopup = Instantiate(sentenceRatingPopupPrefab);
         sentenceRatingPopup.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
