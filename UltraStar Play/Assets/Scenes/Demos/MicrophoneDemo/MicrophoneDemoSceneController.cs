@@ -12,11 +12,17 @@ public class MicrophoneDemoSceneController : MonoBehaviour
 
     void Awake()
     {
-        microphonePitchTracker = GameObject.FindObjectOfType<MicrophonePitchTracker>();
+        microphonePitchTracker = FindObjectOfType<MicrophonePitchTracker>();
+        FloatArrayVisualizer floatArrayVisualizer = FindObjectOfType<FloatArrayVisualizer>();
+        floatArrayVisualizer.Init(microphonePitchTracker.MicData);
     }
 
     void OnEnable()
     {
+        if (microphonePitchTracker == null)
+        {
+            return;
+        }
         microphonePitchTracker.MicDevice = micDeviceName;
         microphonePitchTracker.AddPitchDetectedHandler(OnPitchDetected);
         microphonePitchTracker.StartPitchDetection();
@@ -24,6 +30,10 @@ public class MicrophoneDemoSceneController : MonoBehaviour
 
     void OnDisable()
     {
+        if (microphonePitchTracker == null)
+        {
+            return;
+        }
         microphonePitchTracker.RemovePitchDetectedHandler(OnPitchDetected);
         microphonePitchTracker.StopPitchDetection();
     }
