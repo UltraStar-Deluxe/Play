@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
 {
     public PlayerUiController playerUiControllerPrefab;
 
-    private SongMeta songMeta;
-    private PlayerProfile playerProfile;
-    private Voice voice;
+    public SongMeta SongMeta { get; private set; }
+    public PlayerProfile PlayerProfile { get; private set; }
+    public Voice Voice { get; private set; }
 
     private PlayerUiArea playerUiArea;
     private PlayerUiController playerUiController;
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            return playerProfile.Difficulty;
+            return PlayerProfile.Difficulty;
         }
     }
 
@@ -42,15 +42,15 @@ public class PlayerController : MonoBehaviour
 
     public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier)
     {
-        this.songMeta = songMeta;
-        this.playerProfile = playerProfile;
+        this.SongMeta = songMeta;
+        this.PlayerProfile = playerProfile;
 
-        voice = LoadVoice(songMeta, voiceIdentifier);
+        Voice = LoadVoice(songMeta, voiceIdentifier);
 
         playerUiArea = FindObjectOfType<PlayerUiArea>();
 
         playerScoreController = GetComponentInChildren<PlayerScoreController>();
-        playerScoreController.Init(voice);
+        playerScoreController.Init(Voice);
 
         playerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
         playerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
@@ -66,13 +66,13 @@ public class PlayerController : MonoBehaviour
         playerUiController = GameObject.Instantiate(playerUiControllerPrefab);
         RectTransform playerUiAreaTransform = playerUiArea.GetComponent<RectTransform>();
         playerUiController.GetComponent<RectTransform>().SetParent(playerUiAreaTransform);
-        playerUiController.Init(songMeta, voice, playerProfile);
+        playerUiController.Init(SongMeta, Voice, PlayerProfile);
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
     {
         // Change the current sentence, when the current beat is over its last note.
-        double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        double currentBeat = BpmUtils.MillisecondInSongToBeat(SongMeta, positionInSongInMillis);
         if (CurrentSentence != null && currentBeat > (double)CurrentSentence.EndBeat)
         {
             OnSentenceEnded();
@@ -105,6 +105,7 @@ public class PlayerController : MonoBehaviour
     {
         List<RecordedNote> recordedNotes = playerNoteRecorder.GetRecordedNotes(CurrentSentence);
         double correctNotesPercentage = playerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
+        playerUiController.ShowTotalScore((int)playerScoreController.TotalScore);
 
         SentenceRating sentenceRating = playerScoreController.GetSentenceRating(CurrentSentence, correctNotesPercentage);
         if (sentenceRating != null)
@@ -153,7 +154,7 @@ public class PlayerController : MonoBehaviour
 
     private Sentence GetSentence(int index)
     {
-        Sentence sentence = (index < voice.Sentences.Count) ? voice.Sentences[index] : null;
+        Sentence sentence = (index < Voice.Sentences.Count) ? Voice.Sentences[index] : null;
         return sentence;
     }
 

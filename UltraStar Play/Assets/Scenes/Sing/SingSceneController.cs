@@ -25,7 +25,7 @@ public class SingSceneController : MonoBehaviour
     public PlayerController playerControllerPrefab;
 
     private VideoPlayer videoPlayer;
-    private List<PlayerController> playerControllers = new List<PlayerController>();
+    public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
 
     private IWavePlayer waveOutDevice;
     private WaveStream mainOutputStream;
@@ -119,6 +119,19 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
+    public double DurationOfSongInMillis
+    {
+        get
+        {
+            if (mainOutputStream == null)
+            {
+                return 0;
+            }
+
+            return mainOutputStream.TotalTime.TotalMilliseconds;
+        }
+    }
+
     void Awake()
     {
         // Load scene data from static reference, if any
@@ -158,7 +171,7 @@ public class SingSceneController : MonoBehaviour
 
         // Associate LyricsDisplayer with one of the (duett) players
         LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-        playerControllers[0].LyricsDisplayer = lyricsDisplayer;
+        PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
     }
 
     void OnDisable()
@@ -187,12 +200,12 @@ public class SingSceneController : MonoBehaviour
     void Update()
     {
         timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
-        playerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
     public void SkipToNextSentence()
     {
-        double nextStartBeat = playerControllers.Select(it => it.GetNextStartBeat()).Min();
+        double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
         if (nextStartBeat == double.MaxValue)
         {
             return;
@@ -241,7 +254,7 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private void FinishScene()
+    public void FinishScene()
     {
         SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
     }
@@ -277,13 +290,13 @@ public class SingSceneController : MonoBehaviour
 
     private void CreatePlayerController(PlayerProfile playerProfile)
     {
-        playerControllers.Clear();
+        PlayerControllers.Clear();
 
         string voiceIdentifier = GetVoiceIdentifier(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
         playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier);
 
-        playerControllers.Add(playerController);
+        PlayerControllers.Add(playerController);
     }
 
     private string GetVoiceIdentifier(PlayerProfile playerProfile)
