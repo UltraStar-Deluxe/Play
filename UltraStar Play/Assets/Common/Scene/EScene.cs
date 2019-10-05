@@ -14,7 +14,7 @@ public enum EScene
 
     // result
     HighscoreScene = 8,
-    ResultSongScene = 9,
+    SingingResultsScene = 9,
     StatsScene = 10,
 
     // setting

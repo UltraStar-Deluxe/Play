@@ -15,8 +15,8 @@ public class PlayerController : MonoBehaviour
 
     private PlayerUiArea playerUiArea;
     private PlayerUiController playerUiController;
-    private PlayerScoreController playerScoreController;
     private PlayerNoteRecorder playerNoteRecorder;
+    public PlayerScoreController PlayerScoreController { get; set; }
 
     private int sentenceIndex;
     public Sentence CurrentSentence { get; set; }
@@ -49,8 +49,8 @@ public class PlayerController : MonoBehaviour
 
         playerUiArea = FindObjectOfType<PlayerUiArea>();
 
-        playerScoreController = GetComponentInChildren<PlayerScoreController>();
-        playerScoreController.Init(Voice);
+        PlayerScoreController = GetComponentInChildren<PlayerScoreController>();
+        PlayerScoreController.Init(Voice);
 
         playerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
         playerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
@@ -104,10 +104,10 @@ public class PlayerController : MonoBehaviour
     private void OnSentenceEnded()
     {
         List<RecordedNote> recordedNotes = playerNoteRecorder.GetRecordedNotes(CurrentSentence);
-        double correctNotesPercentage = playerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
-        playerUiController.ShowTotalScore((int)playerScoreController.TotalScore);
+        double correctNotesPercentage = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
+        playerUiController.ShowTotalScore((int)PlayerScoreController.TotalScore);
 
-        SentenceRating sentenceRating = playerScoreController.GetSentenceRating(CurrentSentence, correctNotesPercentage);
+        SentenceRating sentenceRating = PlayerScoreController.GetSentenceRating(CurrentSentence, correctNotesPercentage);
         if (sentenceRating != null)
         {
             playerUiController.ShowSentenceRating(sentenceRating);
