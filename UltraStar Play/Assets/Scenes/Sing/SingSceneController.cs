@@ -256,7 +256,19 @@ public class SingSceneController : MonoBehaviour
 
     public void FinishScene()
     {
-        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+        // Open the singing results scene.
+        SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
+        singingResultsSceneData.SongMeta = SongMeta;
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();
+            scoreData.TotalScore = playerController.PlayerScoreController.TotalScore;
+            scoreData.GoldenNotesScore = playerController.PlayerScoreController.GoldenNotesTotalScore;
+            scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
+            scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
+            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
+        }
+        SceneNavigator.Instance.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
     private void StartVideoPlayback()
