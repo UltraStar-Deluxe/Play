@@ -24,9 +24,9 @@ public class PlayerScoreController : MonoBehaviour
     public double GoldenNotesTotalScore { get; private set; }
     public double PerfectSentenceBonusTotalScore { get; private set; }
 
-    private double ScoreForACorrectBeatOfNormalNotes { get; set; }
-    private double ScoreForACorrectBeatOfGoldenNotes { get; set; }
-    private double ScoreForAPerfectSentence { get; set; }
+    private double ScoreForCorrectBeatOfNormalNotes { get; set; }
+    private double ScoreForCorrectBeatOfGoldenNotes { get; set; }
+    private double ScoreForPerfectSentence { get; set; }
 
     public void Init(Voice voice)
     {
@@ -53,15 +53,15 @@ public class PlayerScoreController : MonoBehaviour
         double correctNotesPercentage = correctNotesLength / totalNotesLength;
 
         // Score for notes
-        double scoreForNormalNotes = correctNormalNoteLength * ScoreForACorrectBeatOfNormalNotes;
-        double scoreForGoldenNotes = correctGoldenNoteLength * ScoreForACorrectBeatOfGoldenNotes;
+        double scoreForNormalNotes = correctNormalNoteLength * ScoreForCorrectBeatOfNormalNotes;
+        double scoreForGoldenNotes = correctGoldenNoteLength * ScoreForCorrectBeatOfGoldenNotes;
         NormalNotesTotalScore += scoreForNormalNotes;
         GoldenNotesTotalScore += scoreForGoldenNotes;
 
         // Score for a perfect sentence
         if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
         {
-            PerfectSentenceBonusTotalScore = (PerfectSentenceBonusTotalScore + ScoreForAPerfectSentence);
+            PerfectSentenceBonusTotalScore = (PerfectSentenceBonusTotalScore + ScoreForPerfectSentence);
         }
         // Not all sentences need to be perfect to achieve the maximum perfect sentence bonus score.
         // Thus, the limit has to be checked that it does not exceed the maximum.
@@ -153,12 +153,12 @@ public class PlayerScoreController : MonoBehaviour
             goldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        ScoreForACorrectBeatOfNormalNotes = MaxScoreForNotes / (normalNoteLengthTotal + (2 * goldenNoteLengthTotal));
-        ScoreForACorrectBeatOfGoldenNotes = 2 * ScoreForACorrectBeatOfNormalNotes;
+        ScoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / (normalNoteLengthTotal + (2 * goldenNoteLengthTotal));
+        ScoreForCorrectBeatOfGoldenNotes = 2 * ScoreForCorrectBeatOfNormalNotes;
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
-        double pointsForAllNotes = ScoreForACorrectBeatOfNormalNotes * normalNoteLengthTotal
-                                 + ScoreForACorrectBeatOfGoldenNotes * goldenNoteLengthTotal;
+        double pointsForAllNotes = ScoreForCorrectBeatOfNormalNotes * normalNoteLengthTotal
+                                 + ScoreForCorrectBeatOfGoldenNotes * goldenNoteLengthTotal;
         bool isSound = (MaxScoreForNotes == pointsForAllNotes);
         if (!isSound)
         {
@@ -169,10 +169,10 @@ public class PlayerScoreController : MonoBehaviour
         // This is a bonus score of which the maximum amount can be achieved without all sentences beeing perfect.
         // Thus, there is a minimum value given here.
         // As a result, the score for perfect sentences has to be checked not to exceed the maximum.
-        ScoreForAPerfectSentence = (int)Math.Ceiling((double)MaxPerfectSentenceBonusScore / sentences.Count);
-        if (ScoreForAPerfectSentence < 50)
+        ScoreForPerfectSentence = (int)Math.Ceiling((double)MaxPerfectSentenceBonusScore / sentences.Count);
+        if (ScoreForPerfectSentence < 50)
         {
-            ScoreForAPerfectSentence = 50;
+            ScoreForPerfectSentence = 50;
         }
     }
 
