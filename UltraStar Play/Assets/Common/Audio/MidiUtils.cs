@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public static class MidiUtils
 {
 
-    public static string MidiNoteToAbsoluteName(int midiNote)
+    public static int GetOctave(int midiNote)
     {
         // 12: "C0"
         // 13: "C#0"
@@ -13,12 +13,19 @@ public static class MidiUtils
         // ...
         // 24: "C1"
         int octave = (midiNote / 12) - 1;
-        return MidiNoteToRelativeName(midiNote) + octave;
+        return octave;
     }
 
-    public static string MidiNoteToRelativeName(int midiNote)
+    public static string GetAbsoluteName(int midiNote)
     {
-        midiNote %= 12;
+        int octave = GetOctave(midiNote);
+        string absoluteName = GetRelativeName(midiNote) + octave;
+        return absoluteName;
+    }
+
+    public static string GetRelativeName(int midiNote)
+    {
+        midiNote = GetRelativePitch(midiNote);
 
         switch (midiNote)
         {
@@ -37,5 +44,33 @@ public static class MidiUtils
             default:
                 return midiNote.ToString();
         }
+    }
+
+    public static int GetRelativePitch(int midiNote)
+    {
+        return midiNote % 12;
+    }
+
+    public static int GetRoundedMidiNote(int midiNote, int midiCents, int resolution)
+    {
+        int accurateMidiNote = (midiNote * 100) + midiCents;
+        int accurateRoundedMidiNote = accurateMidiNote % resolution;
+        int roundedMidiNote = accurateRoundedMidiNote / 100;
+        return roundedMidiNote;
+    }
+
+    public static int GetRelativePitchDistance(int recordedMidiNote, int targetMidiNote)
+    {
+        int recordedRelativePitch = GetRelativePitch(recordedMidiNote);
+        int targetRelativePitch = GetRelativePitch(targetMidiNote);
+
+        // Distance when going from 2 to 10 via 3, 4, 5...
+        int distanceUnwrapped = Math.Abs(targetRelativePitch - recordedRelativePitch);
+        // Distance when going from 2 to 10 via 1, 11, 10
+        int distanceWrapped = 12 - distanceUnwrapped;
+        // Note that (distanceUnwrapped + distanceWrapped) == 12, which is going a full circle in any direction.
+
+        // Distance in shortest direction is result distance
+        return Math.Min(distanceUnwrapped, distanceWrapped);
     }
 }
