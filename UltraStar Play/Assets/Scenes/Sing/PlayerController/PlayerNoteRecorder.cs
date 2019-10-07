@@ -145,7 +145,16 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
 
         // Round pitch of recorded note to pitch of note in song
-        recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, noteAtCurrentBeat.MidiNote, RoundingDistance);
+        if (noteAtCurrentBeat.Type == ENoteType.Rap || noteAtCurrentBeat.Type == ENoteType.RapGolden)
+        {
+            // Rap notes accept any noise as correct note.
+            recordedNote.RoundedMidiNote = noteAtCurrentBeat.MidiNote;
+        }
+        else
+        {
+            // Round recorded note if it is close to the target note.
+            recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, noteAtCurrentBeat.MidiNote, RoundingDistance);
+        }
 
         // Remember this note and show it in the UI
         AddRecordedNote(lastRecordedNote, currentSentence);
