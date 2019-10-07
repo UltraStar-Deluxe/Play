@@ -14,7 +14,7 @@ public enum EScene
 
     // result
     HighscoreScene = 8,
-    ResultSongScene = 9,
+    SingingResultsScene = 9,
     StatsScene = 10,
 
     // setting
@@ -30,5 +30,8 @@ public enum EScene
     // song selection
     SongFolderScene = 12,
     SongPlaylistScene = 13,
-    SongSelectScene = 14
+    SongSelectScene = 14,
+
+    // song editor
+    SongEditorScene = 15
 }

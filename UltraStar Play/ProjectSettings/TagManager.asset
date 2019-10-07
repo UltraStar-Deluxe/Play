@@ -9,6 +9,7 @@ TagManager:
   - I18NManager
   - PlayerProfileManager
   - SongMetaManager
+  - ApplicationManager
   layers:
   - Default
   - TransparentFX

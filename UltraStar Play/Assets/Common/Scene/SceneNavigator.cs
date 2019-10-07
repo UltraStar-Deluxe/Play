@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,8 +35,12 @@ public class SceneNavigator : MonoBehaviour
 
     public void LoadScene(EScene scene, SceneData sceneData)
     {
+        if (sceneData == null)
+        {
+            throw new Exception("SceneData cannot be null. Use LoadScene(EScene) if no SceneData is required.");
+        }
         AddSceneData(sceneData);
-        SceneManager.LoadScene((int)scene);
+        LoadScene(scene);
     }
 
     public T GetSceneData<T>(T defaultValue) where T : SceneData

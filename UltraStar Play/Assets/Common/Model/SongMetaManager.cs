@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -55,6 +56,12 @@ public class SongMetaManager : MonoBehaviour
         {
             songMetas.Remove(songMeta);
         }
+    }
+
+    public SongMeta FindSongMeta(string songTitle)
+    {
+        SongMeta songMeta = SongMetas.Find(it => it.Title == songTitle);
+        return songMeta;
     }
 
     public ReadOnlyCollection<SongMeta> GetSongMetas()

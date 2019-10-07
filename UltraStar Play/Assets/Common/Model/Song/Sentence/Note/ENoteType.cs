@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum ENoteType
+﻿public enum ENoteType
 {
     // 1 Pointweight, pitch
     Normal,

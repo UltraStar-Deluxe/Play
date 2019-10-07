@@ -33,7 +33,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Result/HighscoreScene.unity
     guid: 4aae204a79a088d488888b1ce72c2dda
   - enabled: 1
-    path: Assets/Scenes/Result/PlayerRankingScene.unity
+    path: Assets/Scenes/SingingResults/SingingResultsScene.unity
     guid: 9647cd7b9dee4b44fb9a7e98c6c4b234
   - enabled: 1
     path: Assets/Scenes/Result/StatisticsScene.unity
@@ -51,6 +51,6 @@ EditorBuildSettings:
     path: Assets/Scenes/SongSelect/SongSelectScene.unity
     guid: 68528565b160881499d24604093545b8
   - enabled: 1
-    path: Assets/Scenes/Sing/SJukebox.unity
-    guid: 0cd4f7b19b4fa5949b8acc1b0430ef27
+    path: Assets/Scenes/SongEditor/SongEditorScene.unity
+    guid: 1b6a6dcadb95d264ebd70baedd7dcec5
   m_configObjects: {}
