@@ -85,7 +85,7 @@ public class SongSelectSceneController : MonoBehaviour
 
         List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PlayerProfile defaultPlayerProfile = allPlayerProfiles[0];
-        PlayerProfile playerProfile = selectedPlayerProfile.IfNull(defaultPlayerProfile);
+        PlayerProfile playerProfile = selectedPlayerProfile.OrIfNull(defaultPlayerProfile);
         singSceneData.AddPlayerProfile(playerProfile);
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);

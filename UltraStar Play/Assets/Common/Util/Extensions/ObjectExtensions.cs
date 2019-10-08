@@ -1,8 +1,11 @@
 
+using System;
+
 public static class ObjectExtensions
 {
 
-    public static T IfNull<T>(this T obj, T fallbackObject)
+    /// Returns the fallback object if obj is null.
+    public static T OrIfNull<T>(this T obj, T fallbackObject)
     {
         if (obj == null)
         {
@@ -12,5 +15,29 @@ public static class ObjectExtensions
         {
             return obj;
         }
+    }
+
+    /// Returns true iff the value is one of the specified values.
+    public static bool IsOneOf<T>(T value, params T[] values)
+    {
+        foreach (T v in values)
+        {
+            if (value.Equals(v))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// Returns true iff the value is one of the specified values.
+    public static bool IsOneOf(this ValueType value, params ValueType[] values)
+    {
+        foreach (ValueType v in values)
+        {
+            if (value.Equals(v))
+                return true;
+        }
+
+        return false;
     }
 }
