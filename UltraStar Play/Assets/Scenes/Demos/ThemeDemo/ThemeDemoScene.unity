@@ -170,7 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageName: smiley2
+  imagePath: themedemo/smiley2
+  imageResource: 2
   target: {fileID: 258787933}
 --- !u!114 &258787933
 MonoBehaviour:
@@ -223,7 +224,7 @@ GameObject:
   - component: {fileID: 860388683}
   - component: {fileID: 860388682}
   m_Layer: 5
-  m_Name: ImageWithThemeableImageThatUsesFallback
+  m_Name: ImageWithThemeableImageThatUsesFallbackFromBaseTheme
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -260,7 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageName: smiley3
+  imagePath: themedemo/smiley3
+  imageResource: 3
   target: {fileID: 860388683}
 --- !u!114 &860388683
 MonoBehaviour:
@@ -395,6 +397,7 @@ RectTransform:
   - {fileID: 258787931}
   - {fileID: 860388681}
   - {fileID: 1793075903}
+  - {fileID: 1537310914}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -532,7 +535,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75eb2dba6fdabf6438840f067978af15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorName: demo_color
+  colorsFileName: themedemo/colors
+  colorName: demo_color1
+  colorResource: 1
   target: {fileID: 1368557776}
 --- !u!114 &1368557776
 MonoBehaviour:
@@ -572,6 +577,98 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1368557773}
   m_CullTransparentMesh: 0
+--- !u!1 &1537310913
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1537310914}
+  - component: {fileID: 1537310916}
+  - component: {fileID: 1537310915}
+  m_Layer: 5
+  m_Name: Description
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1537310914
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537310913}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 891474974}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -4.6, y: 177.7}
+  m_SizeDelta: {x: 771.6, y: 226.8}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1537310915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537310913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 1
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Start the Scene and change the current theme name in the ThemeManager.
+
+    Available themes are loaded from the themes.xml file under the Assets/Resources
+    folder.
+
+    Currently available are ''base'' and ''christmas''.
+
+
+    A theme can have a parent theme. If a resource is not found then it is searched
+    in the parent theme.
+
+
+    You can change which theme resource is used by the GameObjects from a drop down
+    of available resources.'
+--- !u!222 &1537310916
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537310913}
+  m_CullTransparentMesh: 0
 --- !u!1 &1793075902
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,8 +681,8 @@ GameObject:
   - component: {fileID: 1793075907}
   - component: {fileID: 1793075906}
   - component: {fileID: 1793075905}
-  - component: {fileID: 1793075904}
   - component: {fileID: 1793075908}
+  - component: {fileID: 1793075904}
   m_Layer: 5
   m_Name: ButtonWithThemeableAudio
   m_TagString: Untagged
@@ -802,7 +899,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1793075902}
-  m_CullTransparentMesh: 0
+  m_CullTransparentMesh: 1
 --- !u!114 &1793075908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -815,7 +912,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ce5b27129d3ad46acc6cc0de9dbc68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioName: button_click1
+  audioPath: themedemo/button_click1
+  audioResource: 1
   target: {fileID: 1793075904}
 --- !u!1 &1968708900
 GameObject:
@@ -972,7 +1070,7 @@ PrefabInstance:
     - target: {fileID: 9158773460734947099, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
       propertyPath: currentThemeName
-      value: wuhu
+      value: base
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}

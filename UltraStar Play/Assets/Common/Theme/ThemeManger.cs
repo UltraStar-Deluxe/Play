@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class ThemeManger : MonoBehaviour
 {
     public string currentThemeName;
@@ -19,13 +20,17 @@ public class ThemeManger : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        ReloadThemes();
+    }
+
     public void UpdateThemeResources()
     {
         ReloadThemes();
 
         if (GetCurrentTheme() == null)
         {
-            Debug.LogError("Theme does not exist: " + currentThemeName);
             return;
         }
 
@@ -44,7 +49,12 @@ public class ThemeManger : MonoBehaviour
 
     public Theme GetCurrentTheme()
     {
-        return GetTheme(currentThemeName);
+        Theme currentTheme = GetTheme(currentThemeName);
+        if (currentTheme == null)
+        {
+            throw new Exception($"Current theme {currentThemeName} does not exist: ");
+        }
+        return currentTheme;
     }
 
     public Theme GetTheme(string themeName)
