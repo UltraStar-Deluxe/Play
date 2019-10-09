@@ -195,6 +195,8 @@ public class SingSceneController : MonoBehaviour
         {
             videoPlayer.Stop();
         }
+
+        PlayerControllers.Clear();
     }
 
     void Update()
