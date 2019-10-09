@@ -6,8 +6,12 @@ using UnityEngine.UI;
 [ExecuteInEditMode]
 public class ThemeableImage : Themeable
 {
-    public string imageName;
+    [ReadOnly]
+    public string imagePath;
+    public EImageResource imageResource = EImageResource.NONE;
     public Image target;
+
+    private EImageResource lastImageResource = EImageResource.NONE;
 
     void OnEnable()
     {
@@ -17,11 +21,23 @@ public class ThemeableImage : Themeable
         }
     }
 
+#if UNITY_EDITOR
+    void Update()
+    {
+        if (imageResource != EImageResource.NONE && lastImageResource != imageResource)
+        {
+            lastImageResource = imageResource;
+            imagePath = imageResource.GetPath();
+            ReloadResources();
+        }
+    }
+#endif
+
     public override void ReloadResources()
     {
-        if (string.IsNullOrEmpty(imageName))
+        if (string.IsNullOrEmpty(imagePath))
         {
-            Debug.LogWarning($"Missing image name", gameObject);
+            Debug.LogWarning($"Theme resource not specified", gameObject);
             return;
         }
         if (target == null)
@@ -30,10 +46,10 @@ public class ThemeableImage : Themeable
             return;
         }
 
-        Sprite loadedSprite = LoadAssetFromTheme<Sprite>(imageName);
+        Sprite loadedSprite = LoadResourceFromTheme<Sprite>(imagePath);
         if (loadedSprite == null)
         {
-            Debug.LogError($"Could not load image {imageName}", gameObject);
+            Debug.LogError($"Could not load image {imagePath}", gameObject);
         }
         else
         {

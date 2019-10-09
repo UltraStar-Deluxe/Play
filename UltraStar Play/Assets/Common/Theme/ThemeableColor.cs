@@ -6,8 +6,14 @@ using UnityEngine.UI;
 [ExecuteInEditMode]
 public class ThemeableColor : Themeable
 {
+    [ReadOnly]
+    public string colorsFileName = "colors";
+    [ReadOnly]
     public string colorName;
+    public EColorResource colorResource = EColorResource.NONE;
     public Image target;
+
+    private EColorResource lastColorResource = EColorResource.NONE;
 
     void OnEnable()
     {
@@ -16,6 +22,19 @@ public class ThemeableColor : Themeable
             target = GetComponent<Image>();
         }
     }
+
+#if UNITY_EDITOR
+    void Update()
+    {
+        if (lastColorResource != colorResource)
+        {
+            lastColorResource = colorResource;
+            colorsFileName = colorResource.GetPath();
+            colorName = colorResource.GetName();
+            ReloadResources();
+        }
+    }
+#endif
 
     public override void ReloadResources()
     {
@@ -30,7 +49,7 @@ public class ThemeableColor : Themeable
             return;
         }
 
-        if (TryLoadColorFromTheme(colorName, out Color loadedColor))
+        if (TryLoadColorFromTheme(colorsFileName, colorName, out Color loadedColor))
         {
             target.color = loadedColor;
         }

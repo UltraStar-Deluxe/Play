@@ -30,10 +30,16 @@ public class ThemeManagerInspector : EditorBase
         {
             UpdateThemeResources();
         }
+
+        if (GUILayout.Button("Refresh Resources Folder"))
+        {
+            RefreshAssetsInResourcesFolder();
+        }
     }
 
     private void UpdateThemeResources()
     {
+        // Update the themes
         ThemeManger.Instance.UpdateThemeResources();
         UpdateQuickThemeSelect();
 
@@ -43,6 +49,12 @@ public class ThemeManagerInspector : EditorBase
         {
             EditorUtility.SetDirty(themeable.gameObject);
         }
+    }
+
+    private void RefreshAssetsInResourcesFolder()
+    {
+        // Update Unity's version of files in the Resources folder
+        AssetDatabase.ImportAsset("Assets/Resources", ImportAssetOptions.ImportRecursive);
     }
 
     private void UpdateQuickThemeSelect()

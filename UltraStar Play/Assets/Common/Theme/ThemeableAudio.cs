@@ -5,8 +5,12 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class ThemeableAudio : Themeable
 {
-    public string audioName;
+    [ReadOnly]
+    public string audioPath;
+    public EAudioResource audioResource = EAudioResource.NONE;
     public AudioSource target;
+
+    private EAudioResource lastAudioResource = EAudioResource.NONE;
 
     void OnEnable()
     {
@@ -16,9 +20,21 @@ public class ThemeableAudio : Themeable
         }
     }
 
+#if UNITY_EDITOR
+    void Update()
+    {
+        if (audioResource != EAudioResource.NONE && lastAudioResource != audioResource)
+        {
+            lastAudioResource = audioResource;
+            audioPath = audioResource.GetPath();
+            ReloadResources();
+        }
+    }
+#endif
+
     public override void ReloadResources()
     {
-        if (string.IsNullOrEmpty(audioName))
+        if (string.IsNullOrEmpty(audioPath))
         {
             Debug.LogWarning($"Missing audio file name", gameObject);
             return;
@@ -29,10 +45,10 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioClip audioClip = LoadAssetFromTheme<AudioClip>(audioName);
+        AudioClip audioClip = LoadResourceFromTheme<AudioClip>(audioPath);
         if (audioClip == null)
         {
-            Debug.LogError($"Could not load audio file {audioName}", gameObject);
+            Debug.LogError($"Could not load audio file {audioPath}", gameObject);
         }
         else
         {
