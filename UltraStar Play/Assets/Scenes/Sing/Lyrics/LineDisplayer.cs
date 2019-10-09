@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class LineDisplayer : MonoBehaviour
 {
+    public StarParticle perfectSentenceStarPrefab;
     public RectTransform linePrefab;
 
     public void Init(int lineCount)
@@ -28,5 +29,30 @@ public class LineDisplayer : MonoBehaviour
         line.anchorMin = anchor;
         line.anchorMax = anchor;
         line.anchoredPosition = Vector2.zero;
+    }
+
+    public void CreatePerfectSentenceEffect()
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            CreatePerfectSentenceStar();
+        }
+    }
+
+    private void CreatePerfectSentenceStar()
+    {
+        StarParticle star = Instantiate(perfectSentenceStarPrefab);
+        star.transform.SetParent(transform);
+        RectTransform starRectTransform = star.GetComponent<RectTransform>();
+        float anchorX = UnityEngine.Random.Range(0f, 1f);
+        float anchorY = UnityEngine.Random.Range(0f, 1f);
+        starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
+        starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
+        starRectTransform.anchoredPosition = Vector2.zero;
+
+        star.Init();
+        star.TargetLifetimeInSeconds = 1f;
+        star.StartScale = UnityEngine.Random.Range(0.2f, 0.6f);
+        star.TargetScale = 0;
     }
 }

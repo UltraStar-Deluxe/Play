@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     public Sentence CurrentSentence { get; set; }
     public Sentence NextSentence { get; set; }
 
+    private int perfectSentenceChain;
+
     private Difficulty Difficulty
     {
         get
@@ -101,16 +103,49 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnRecordedNoteEnded(RecordedNote lastRecordedNote)
+    {
+        CheckPerfectlySungNote(CurrentSentence, lastRecordedNote);
+    }
+
+    private void CheckPerfectlySungNote(Sentence sentence, RecordedNote lastRecordedNote)
+    {
+        if (sentence == null || lastRecordedNote == null)
+        {
+            return;
+        }
+        Note perfectlySungNote = sentence.Notes.Where(note =>
+               note.MidiNote == lastRecordedNote.RoundedMidiNote
+            && note.StartBeat >= lastRecordedNote.StartBeat
+            && note.EndBeat <= lastRecordedNote.EndBeat).FirstOrDefault();
+        if (perfectlySungNote != null)
+        {
+            playerUiController.CreatePerfectNoteEffect(perfectlySungNote);
+        }
+    }
+
     private void OnSentenceEnded()
     {
         List<RecordedNote> recordedNotes = playerNoteRecorder.GetRecordedNotes(CurrentSentence);
-        double correctNotesPercentage = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
+        SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
         playerUiController.ShowTotalScore((int)PlayerScoreController.TotalScore);
-
-        SentenceRating sentenceRating = PlayerScoreController.GetSentenceRating(CurrentSentence, correctNotesPercentage);
         if (sentenceRating != null)
         {
             playerUiController.ShowSentenceRating(sentenceRating);
+
+            if (sentenceRating == SentenceRating.Perfect)
+            {
+                perfectSentenceChain++;
+            }
+            else
+            {
+                perfectSentenceChain = 0;
+            }
+
+            if (perfectSentenceChain >= 2)
+            {
+                playerUiController.CreatePerfectSentenceEffect();
+            }
         }
 
         sentenceIndex++;

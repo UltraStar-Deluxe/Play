@@ -33,16 +33,16 @@ public class PlayerScoreController : MonoBehaviour
         UpdateMaxScores(voice.Sentences);
     }
 
-    public double CalculateScoreForSentence(Sentence sentence, List<RecordedNote> recordedNotes)
+    public SentenceRating CalculateScoreForSentence(Sentence sentence, List<RecordedNote> recordedNotes)
     {
         if (sentence.Notes == null || sentence.Notes.Count == 0)
         {
-            return -1;
+            return null;
         }
 
         if (recordedNotes == null || recordedNotes.Count == 0)
         {
-            return 0;
+            return SentenceRating.Awful;
         }
 
         // Correctly sung notes
@@ -70,7 +70,8 @@ public class PlayerScoreController : MonoBehaviour
             PerfectSentenceBonusTotalScore = MaxPerfectSentenceBonusScore;
         }
 
-        return correctNotesPercentage;
+        SentenceRating sentenceRating = GetSentenceRating(sentence, correctNotesPercentage);
+        return sentenceRating;
     }
 
     private double GetCorrectlySungNoteLength(List<Note> notes, List<RecordedNote> recordedNotes)

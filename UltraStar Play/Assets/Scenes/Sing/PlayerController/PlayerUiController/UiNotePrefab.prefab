@@ -49,6 +49,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d54530773a300841a10fc3fb518226d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goldenStarPrefab: {fileID: 1024530491236135733, guid: 85627b6debe57ac42b90356e955b29e2,
+    type: 3}
+  perfectStarPrefab: {fileID: 3432090795416568970, guid: b1c90144fedb745429b21b08991253ac,
+    type: 3}
+  isGolden: 0
 --- !u!1 &8590359238081736743
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,7 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8490566, g: 0.8490566, b: 0.8490566, a: 1}
+  m_Color: {r: 0.4565682, g: 0.7169812, b: 0.518245, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

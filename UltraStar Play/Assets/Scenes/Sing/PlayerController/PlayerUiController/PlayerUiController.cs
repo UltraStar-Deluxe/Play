@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerUiController : MonoBehaviour
@@ -47,5 +48,19 @@ public class PlayerUiController : MonoBehaviour
     public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
     {
         sentenceDisplayer.DisplayRecordedNotes(recordedNotes);
+    }
+
+    public void CreatePerfectSentenceEffect()
+    {
+        lineDisplayer.CreatePerfectSentenceEffect();
+    }
+
+    public void CreatePerfectNoteEffect(Note perfectNote)
+    {
+        UiNote uiNote = GetComponentsInChildren<UiNote>().Where(it => it.Note == perfectNote).FirstOrDefault();
+        if (uiNote != null)
+        {
+            uiNote.CreatePerfectNoteEffect();
+        }
     }
 }
