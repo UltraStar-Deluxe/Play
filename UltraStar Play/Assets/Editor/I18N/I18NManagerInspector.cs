@@ -18,7 +18,7 @@ public class I18NManagerInspector : EditorBase
             foreach (I18NText i18nText in i18nTexts)
             {
                 i18nText.UpdateTranslation();
-                EditorUtility.SetDirty(i18nText);
+                EditorUtility.SetDirty(i18nText.gameObject);
             }
         }
     }
