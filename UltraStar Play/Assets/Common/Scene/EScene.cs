@@ -25,13 +25,10 @@ public enum EScene
 
     // sing
     SingScene = 11,
-    JukeboxScene = 15,
 
     // song selection
-    SongFolderScene = 12,
-    SongPlaylistScene = 13,
-    SongSelectScene = 14,
+    SongSelectScene = 12,
 
     // song editor
-    SongEditorScene = 15
+    SongEditorScene = 13
 }

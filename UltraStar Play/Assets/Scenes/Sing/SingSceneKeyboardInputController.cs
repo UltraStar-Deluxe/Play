@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class SingSceneKeyboardInputController : MonoBehaviour
 {
-    private const string SkipShortcut = "s";
-    private const string OpenInEditorShortcut = "e";
-    private const string RestartShortcut = "r";
-    private const string BackToSongSelectShortcut = "backspace";
+    private const KeyCode SkipShortcut = KeyCode.S;
+    private const KeyCode OpenInEditorShortcut = KeyCode.E;
+    private const KeyCode RestartShortcut = KeyCode.R;
+    private const KeyCode BackToSongSelectShortcut = KeyCode.Backspace;
+    private const KeyCode BackToSongSelectShortcut2 = KeyCode.Escape;
 
     void Update()
     {
@@ -26,7 +27,7 @@ public class SingSceneKeyboardInputController : MonoBehaviour
             SingSceneController.Instance.Restart();
         }
 
-        if (Input.GetKeyUp(BackToSongSelectShortcut))
+        if (Input.GetKeyUp(BackToSongSelectShortcut) || Input.GetKeyUp(BackToSongSelectShortcut2))
         {
             SingSceneController.Instance.FinishScene();
         }
