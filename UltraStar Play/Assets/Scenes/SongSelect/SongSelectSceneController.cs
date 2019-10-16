@@ -10,6 +10,12 @@ using System.Linq;
 
 public class SongSelectSceneController : MonoBehaviour
 {
+    public ArtistText artistText;
+    public Text songTitleText;
+    public Text songCountText;
+    public GameObject videoIndicator;
+    public GameObject duetIndicator;
+
     public RectTransform songListContent;
     public RectTransform songButtonPrefab;
 
@@ -18,12 +24,26 @@ public class SongSelectSceneController : MonoBehaviour
 
     private PlayerProfile selectedPlayerProfile;
 
+    private SongRouletteController songRouletteController;
+
+    public static SongSelectSceneController Instance
+    {
+        get
+        {
+            return FindObjectOfType<SongSelectSceneController>();
+        }
+    }
+
     void Start()
     {
         List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;
         PopulateSongList(songMetas);
         List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PopulatePlayerProfileList(playerProfiles);
+
+        songRouletteController = FindObjectOfType<SongRouletteController>();
+        songRouletteController.SongSelectSceneController = this;
+        songRouletteController.SetSongs(songMetas);
     }
 
     private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
@@ -71,10 +91,10 @@ public class SongSelectSceneController : MonoBehaviour
         newButton.SetParent(songListContent);
 
         newButton.GetComponentInChildren<Text>().text = songMeta.Title;
-        newButton.GetComponent<Button>().onClick.AddListener(() => OnSongButtonClicked(songMeta));
+        newButton.GetComponent<Button>().onClick.AddListener(() => StartSingScene(songMeta));
     }
 
-    private void OnSongButtonClicked(SongMeta songMeta)
+    private void StartSingScene(SongMeta songMeta)
     {
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
@@ -93,4 +113,31 @@ public class SongSelectSceneController : MonoBehaviour
         selectedPlayerProfile = playerProfile;
     }
 
+    public void OnSongSelected(SongMeta selectedSong, int selectedSongIndex, List<SongMeta> songs)
+    {
+        artistText.SetText(selectedSong.Artist);
+        songTitleText.text = selectedSong.Title;
+        songCountText.text = (selectedSongIndex + 1) + "/" + songs.Count;
+
+        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
+        videoIndicator.SetActive(hasVideo);
+
+        bool isDuet = selectedSong.VoiceNames.Keys.Count == 2;
+        duetIndicator.SetActive(isDuet);
+    }
+
+    public void OnNextSong()
+    {
+        songRouletteController.SelectNextSong();
+    }
+
+    public void OnPreviousSong()
+    {
+        songRouletteController.SelectPreviousSong();
+    }
+
+    public void OnStartSingScene()
+    {
+        StartSingScene(songRouletteController.SelectedSong);
+    }
 }
