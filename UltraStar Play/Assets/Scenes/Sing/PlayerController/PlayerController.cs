@@ -35,6 +35,10 @@ public class PlayerController : MonoBehaviour
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
     {
+        get
+        {
+            return lyricsDisplayer;
+        }
         set
         {
             lyricsDisplayer = value;
