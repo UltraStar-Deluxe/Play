@@ -7,10 +7,6 @@ public class SentenceRatingPopup : MonoBehaviour
 {
     private float lifetime;
 
-    void Awake()
-    {
-    }
-
     void Update()
     {
         if (lifetime > 1f)
