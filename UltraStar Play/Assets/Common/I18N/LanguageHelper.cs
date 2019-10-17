@@ -3,7 +3,7 @@ using System.Collections;
 
 /// Original code by Martin Schultz (special thanks to him!):
 /// https://github.com/MartinSchultz/unity3d/blob/master/LanguageHelper.cs
-public class LanguageHelper
+public static class LanguageHelper
 {
 
     /// <summary>
