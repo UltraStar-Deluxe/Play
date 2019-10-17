@@ -24,6 +24,7 @@ public class AnchorsFollowCornersInspector : EditorBase
 
         if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
         {
+            Undo.RecordObject(myTarget.GetComponent<RectTransform>(), "Move Anchors To Corners");
             myTarget.MoveAnchorsToCorners();
         }
     }
