@@ -9,9 +9,9 @@ public class PlayerScoreController : MonoBehaviour
     // A total of 10000 points can be achieved.
     // Golden notes give double points.
     // Singing perfect lines gives a bonus of up to 1000 points.
-    public const int MaxScore = 10000;
-    public const int MaxPerfectSentenceBonusScore = 1000;
-    public const int MaxScoreForNotes = MaxScore - MaxPerfectSentenceBonusScore;
+    public static readonly int MaxScore = 10000;
+    public static readonly int MaxPerfectSentenceBonusScore = 1000;
+    public static readonly int MaxScoreForNotes = MaxScore - MaxPerfectSentenceBonusScore;
 
     public double TotalScore
     {
