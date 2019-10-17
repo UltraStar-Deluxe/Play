@@ -22,31 +22,37 @@ public class CountingNumberText : MonoBehaviour
 
     void Update()
     {
+        displayedValue = GetNextValue(displayedValue, TargetValue);
+        DisplayNumber(displayedValue);
+    }
+
+    public static double GetNextValue(double currentValue, double targetValue)
+    {
         double roundingDistance = 5;
-        double distance = TargetValue - displayedValue;
+        double distance = targetValue - currentValue;
         if (Math.Abs(distance) < roundingDistance)
         {
-            DisplayNumber(TargetValue);
+            return targetValue;
         }
         else
         {
             double minStep = 3;
             double step = distance / 10.0f;
-            if (TargetValue > displayedValue)
+            if (targetValue > currentValue)
             {
                 if (step < minStep)
                 {
                     step = minStep;
                 }
             }
-            else if (TargetValue < displayedValue)
+            else if (targetValue < currentValue)
             {
                 if (step > -minStep)
                 {
                     step = -minStep;
                 }
             }
-            DisplayNumber(displayedValue + step);
+            return currentValue + step;
         }
     }
 
