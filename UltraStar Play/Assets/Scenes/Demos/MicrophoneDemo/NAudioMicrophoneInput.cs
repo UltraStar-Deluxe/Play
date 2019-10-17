@@ -19,7 +19,6 @@ public class NAudioMicrophoneInput : MonoBehaviour
         waveIn = new WaveInEvent();
         waveIn.DeviceNumber = deviceNumber;
         waveIn.DataAvailable += OnDataAvailable;
-        // waveIn.WaveFormat = new WaveFormat(22050, 8, 1);
         Debug.Log(waveIn.WaveFormat.ToString());
         waveIn.StartRecording();
 
@@ -57,7 +56,6 @@ public class NAudioMicrophoneInput : MonoBehaviour
     {
         if (isRecording)
         {
-            // writer.Write(args.Buffer, 0, args.BytesRecorded);
             bufferedWaveProvider.AddSamples(args.Buffer, 0, args.BytesRecorded);
         }
     }
