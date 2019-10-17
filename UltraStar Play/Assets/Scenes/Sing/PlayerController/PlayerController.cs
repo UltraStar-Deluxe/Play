@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
         playerUiController = GameObject.Instantiate(playerUiControllerPrefab);
         RectTransform playerUiAreaTransform = playerUiArea.GetComponent<RectTransform>();
         playerUiController.GetComponent<RectTransform>().SetParent(playerUiAreaTransform);
-        playerUiController.Init(SongMeta, Voice, PlayerProfile);
+        playerUiController.Init();
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
