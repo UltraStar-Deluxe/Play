@@ -6,19 +6,13 @@ using UnityEngine;
 
 public class PlayerUiController : MonoBehaviour
 {
-    private SongMeta songMeta;
-    private PlayerProfile playerProfile;
-
     private LineDisplayer lineDisplayer;
     private SentenceDisplayer sentenceDisplayer;
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    public void Init(SongMeta songMeta, Voice voice, PlayerProfile playerProfile)
+    public void Init()
     {
-        this.songMeta = songMeta;
-        this.playerProfile = playerProfile;
-
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
         lineDisplayer.Init(6);
 

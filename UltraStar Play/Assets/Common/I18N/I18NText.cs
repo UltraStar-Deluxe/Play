@@ -9,7 +9,6 @@ using UnityEngine.UIElements;
 public class I18NText : MonoBehaviour
 {
     public string key;
-    private string translation;
 
     void Start()
     {
@@ -27,7 +26,7 @@ public class I18NText : MonoBehaviour
 
         Text text = GetComponent<Text>();
         Dictionary<string, string> translationArguments = GetTranslationArguments();
-        translation = I18NManager.Instance.GetTranslation(timmedKey, translationArguments);
+        string translation = I18NManager.Instance.GetTranslation(timmedKey, translationArguments);
         text.text = translation;
     }
 
