@@ -7,15 +7,6 @@ public class SentenceRatingPopup : MonoBehaviour
 {
     private float lifetime;
 
-    public SentenceRating SentenceRating
-    {
-        set
-        {
-            GetComponentInChildren<Text>().text = value.Text;
-            GetComponentInChildren<Image>().color = value.BackgroundColor;
-        }
-    }
-
     void Awake()
     {
     }
@@ -31,5 +22,11 @@ public class SentenceRatingPopup : MonoBehaviour
             transform.Translate(0, 0.5f, 0);
             lifetime += Time.deltaTime;
         }
+    }
+
+    public void SetSentenceRating(SentenceRating sentenceRating)
+    {
+        GetComponentInChildren<Text>().text = sentenceRating.Text;
+        GetComponentInChildren<Image>().color = sentenceRating.BackgroundColor;
     }
 }
