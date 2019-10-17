@@ -22,16 +22,22 @@ public class EditorBase : Editor
         while (iterator.NextVisible(enterChildren))
         {
             if (ignoreProperties.Contains(iterator.propertyPath))
+            {
                 continue;
+            }
 
             if (iterator.propertyPath == "m_Script")
+            {
                 GUI.enabled = false;
+            }
 
             EditorGUILayout.PropertyField(iterator, true, new GUILayoutOption[0]);
             enterChildren = false;
 
             if (iterator.propertyPath == "m_Script")
+            {
                 GUI.enabled = true;
+            }
         }
         obj.ApplyModifiedProperties();
         return EditorGUI.EndChangeCheck();
@@ -64,7 +70,9 @@ public class EditorBase : Editor
         if (GUI.changed)
         {
             foreach (Object o in targets)
+            {
                 EditorUtility.SetDirty(o);
+            }
         }
         serializedObject.ApplyModifiedProperties();
     }
