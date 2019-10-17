@@ -108,7 +108,7 @@ public class I18NManager : MonoBehaviour
     {
         if (language != SystemLanguage.English)
         {
-            return "_" + LanguageHelper.Get2LetterISOCodeFromSystemLanguage(language).ToLower();
+            return "_" + LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(language).ToLower();
         }
         else
         {
