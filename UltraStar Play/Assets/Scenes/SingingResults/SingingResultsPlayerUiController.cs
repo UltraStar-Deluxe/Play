@@ -21,6 +21,7 @@ public class SingingResultsPlayerUiController : MonoBehaviour
         GetComponentInChildren<SongRatingText>().SetSongRating(songRating);
         GetComponentInChildren<SongRatingImage>().SetSongRating(songRating);
         GetComponentInChildren<SingingResultsTotalScoreText>().TargetValue = totalScore;
+        GetComponentInChildren<SingingResultsScoreBar>().TargetValue = totalScore;
     }
 
     private SongRating GetSongRating(double totalScore)
