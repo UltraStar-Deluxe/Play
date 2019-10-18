@@ -5,13 +5,14 @@ using UnityEngine;
 public class SingingResultsSceneKeyboardController : MonoBehaviour
 {
 
-    private const string ContinueToNextSceneShortcut = "return";
+    private const KeyCode ContinueToNextSceneShortcut = KeyCode.Return;
+    private const KeyCode ContinueToNextSceneShortcut2 = KeyCode.Escape;
 
     void Update()
     {
-        if (Input.GetKeyUp(ContinueToNextSceneShortcut))
+        if (Input.GetKeyUp(ContinueToNextSceneShortcut) || Input.GetKeyUp(ContinueToNextSceneShortcut2))
         {
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            SingingResultsSceneController.Instance.FinishScene();
         }
     }
 }

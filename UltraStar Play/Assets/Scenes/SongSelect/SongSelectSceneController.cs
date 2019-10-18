@@ -23,6 +23,8 @@ public class SongSelectSceneController : MonoBehaviour
 
     private SongRouletteController songRouletteController;
 
+    private SongSelectSceneData sceneData;
+
     public static SongSelectSceneController Instance
     {
         get
@@ -33,6 +35,8 @@ public class SongSelectSceneController : MonoBehaviour
 
     void Start()
     {
+        sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
+
         List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;
         List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PopulatePlayerProfileList(playerProfiles);
@@ -40,6 +44,10 @@ public class SongSelectSceneController : MonoBehaviour
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
         songRouletteController.SetSongs(songMetas);
+        if (sceneData.SongMeta != null)
+        {
+            songRouletteController.SelectSong(sceneData.SongMeta);
+        }
     }
 
     private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
@@ -83,6 +91,12 @@ public class SongSelectSceneController : MonoBehaviour
     {
         Debug.Log($"Clicked on player profile button: {playerProfile.Name}");
         selectedPlayerProfile = playerProfile;
+    }
+
+    private SongSelectSceneData CreateDefaultSceneData()
+    {
+        SongSelectSceneData sceneData = new SongSelectSceneData();
+        return sceneData;
     }
 
     public void OnSongSelected(SongMeta selectedSong, int selectedSongIndex, List<SongMeta> songs)
