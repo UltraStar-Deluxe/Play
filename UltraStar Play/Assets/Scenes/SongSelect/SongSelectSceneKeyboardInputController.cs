@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,29 +7,48 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
 {
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
-    private const KeyCode BackToMainMenuShortcut = KeyCode.Escape;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
+
+    private const KeyCode QuickSearchSong = KeyCode.LeftControl;
+    private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
 
     void Update()
     {
+        SongSelectSceneController songSelectSceneController = SongSelectSceneController.Instance;
         if (Input.GetKeyUp(NextSongShortcut))
         {
-            SongSelectSceneController.Instance.OnNextSong();
+            songSelectSceneController.OnNextSong();
         }
 
         if (Input.GetKeyUp(PreviousSongShortcut))
         {
-            SongSelectSceneController.Instance.OnPreviousSong();
+            songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(BackToMainMenuShortcut))
+        if (Input.GetKeyUp(KeyCode.Escape))
         {
-            SceneNavigator.Instance.LoadScene(EScene.MainScene);
+            if (songSelectSceneController.IsSearchEnabled())
+            {
+                songSelectSceneController.DisableSearch();
+            }
+            else
+            {
+                SceneNavigator.Instance.LoadScene(EScene.MainScene);
+            }
         }
 
         if (Input.GetKeyUp(StartSingSceneShortcut))
         {
-            SongSelectSceneController.Instance.OnStartSingScene();
+            songSelectSceneController.OnStartSingScene();
+        }
+
+        if (Input.GetKeyDown(QuickSearchArtist))
+        {
+            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByArtist);
+        }
+        if (Input.GetKeyDown(QuickSearchSong))
+        {
+            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.BySongTitle);
         }
     }
 }
