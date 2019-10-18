@@ -3,7 +3,7 @@ using System.Collections;
 
 /// Original code by Martin Schultz (special thanks to him!):
 /// https://github.com/MartinSchultz/unity3d/blob/master/LanguageHelper.cs
-public class LanguageHelper
+public static class LanguageHelper
 {
 
     /// <summary>
@@ -13,55 +13,54 @@ public class LanguageHelper
     /// countries.
     /// </summary>
     /// <returns>The 2-letter ISO code from system language.</returns>
-    public static string Get2LetterISOCodeFromSystemLanguage(SystemLanguage lang)
+    public static string Get2LetterIsoCodeFromSystemLanguage(SystemLanguage lang)
     {
-        string res = "EN";
         switch (lang)
         {
-            case SystemLanguage.Afrikaans: res = "AF"; break;
-            case SystemLanguage.Arabic: res = "AR"; break;
-            case SystemLanguage.Basque: res = "EU"; break;
-            case SystemLanguage.Belarusian: res = "BY"; break;
-            case SystemLanguage.Bulgarian: res = "BG"; break;
-            case SystemLanguage.Catalan: res = "CA"; break;
-            case SystemLanguage.Chinese: res = "ZH"; break;
-            case SystemLanguage.Czech: res = "CS"; break;
-            case SystemLanguage.Danish: res = "DA"; break;
-            case SystemLanguage.Dutch: res = "NL"; break;
-            case SystemLanguage.English: res = "EN"; break;
-            case SystemLanguage.Estonian: res = "ET"; break;
-            case SystemLanguage.Faroese: res = "FO"; break;
-            case SystemLanguage.Finnish: res = "FI"; break;
-            case SystemLanguage.French: res = "FR"; break;
-            case SystemLanguage.German: res = "DE"; break;
-            case SystemLanguage.Greek: res = "EL"; break;
-            case SystemLanguage.Hebrew: res = "IW"; break;
-            case SystemLanguage.Hungarian: res = "HU"; break;
-            case SystemLanguage.Icelandic: res = "IS"; break;
-            case SystemLanguage.Indonesian: res = "IN"; break;
-            case SystemLanguage.Italian: res = "IT"; break;
-            case SystemLanguage.Japanese: res = "JA"; break;
-            case SystemLanguage.Korean: res = "KO"; break;
-            case SystemLanguage.Latvian: res = "LV"; break;
-            case SystemLanguage.Lithuanian: res = "LT"; break;
-            case SystemLanguage.Norwegian: res = "NO"; break;
-            case SystemLanguage.Polish: res = "PL"; break;
-            case SystemLanguage.Portuguese: res = "PT"; break;
-            case SystemLanguage.Romanian: res = "RO"; break;
-            case SystemLanguage.Russian: res = "RU"; break;
-            case SystemLanguage.SerboCroatian: res = "SH"; break;
-            case SystemLanguage.Slovak: res = "SK"; break;
-            case SystemLanguage.Slovenian: res = "SL"; break;
-            case SystemLanguage.Spanish: res = "ES"; break;
-            case SystemLanguage.Swedish: res = "SV"; break;
-            case SystemLanguage.Thai: res = "TH"; break;
-            case SystemLanguage.Turkish: res = "TR"; break;
-            case SystemLanguage.Ukrainian: res = "UK"; break;
-            case SystemLanguage.Unknown: res = "EN"; break;
-            case SystemLanguage.Vietnamese: res = "VI"; break;
-            default: Debug.LogError("Unkown system language: " + lang); break;
+            case SystemLanguage.Afrikaans: return "AF";
+            case SystemLanguage.Arabic: return "AR";
+            case SystemLanguage.Basque: return "EU";
+            case SystemLanguage.Belarusian: return "BY";
+            case SystemLanguage.Bulgarian: return "BG";
+            case SystemLanguage.Catalan: return "CA";
+            case SystemLanguage.Chinese: return "ZH";
+            case SystemLanguage.Czech: return "CS";
+            case SystemLanguage.Danish: return "DA";
+            case SystemLanguage.Dutch: return "NL";
+            case SystemLanguage.English: return "EN";
+            case SystemLanguage.Estonian: return "ET";
+            case SystemLanguage.Faroese: return "FO";
+            case SystemLanguage.Finnish: return "FI";
+            case SystemLanguage.French: return "FR";
+            case SystemLanguage.German: return "DE";
+            case SystemLanguage.Greek: return "EL";
+            case SystemLanguage.Hebrew: return "IW";
+            case SystemLanguage.Hungarian: return "HU";
+            case SystemLanguage.Icelandic: return "IS";
+            case SystemLanguage.Indonesian: return "IN";
+            case SystemLanguage.Italian: return "IT";
+            case SystemLanguage.Japanese: return "JA";
+            case SystemLanguage.Korean: return "KO";
+            case SystemLanguage.Latvian: return "LV";
+            case SystemLanguage.Lithuanian: return "LT";
+            case SystemLanguage.Norwegian: return "NO";
+            case SystemLanguage.Polish: return "PL";
+            case SystemLanguage.Portuguese: return "PT";
+            case SystemLanguage.Romanian: return "RO";
+            case SystemLanguage.Russian: return "RU";
+            case SystemLanguage.SerboCroatian: return "SH";
+            case SystemLanguage.Slovak: return "SK";
+            case SystemLanguage.Slovenian: return "SL";
+            case SystemLanguage.Spanish: return "ES";
+            case SystemLanguage.Swedish: return "SV";
+            case SystemLanguage.Thai: return "TH";
+            case SystemLanguage.Turkish: return "TR";
+            case SystemLanguage.Ukrainian: return "UK";
+            case SystemLanguage.Unknown: return "EN";
+            case SystemLanguage.Vietnamese: return "VI";
+            default:
+                Debug.LogError("Unkown system language: " + lang + ". Returning English as fallback.");
+                return "EN";
         }
-        //		Debug.Log ("Lang: " + res);
-        return res;
     }
 }
