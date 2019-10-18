@@ -14,6 +14,14 @@ public class SingingResultsSceneController : MonoBehaviour
 
     private SingingResultsSceneData sceneData;
 
+    public static SingingResultsSceneController Instance
+    {
+        get
+        {
+            return FindObjectOfType<SingingResultsSceneController>();
+        }
+    }
+
     void Start()
     {
         sceneData = SceneNavigator.Instance.GetSceneData<SingingResultsSceneData>(CreateDefaultSceneData());
@@ -79,5 +87,13 @@ public class SingingResultsSceneController : MonoBehaviour
 
         data.AddPlayerScores(PlayerProfileManager.Instance.PlayerProfiles[0], playerScoreData);
         return data;
+    }
+
+    public void FinishScene()
+    {
+        SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+        songSelectSceneData.SongMeta = sceneData.SongMeta;
+
+        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 }
