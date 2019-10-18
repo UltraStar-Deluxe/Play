@@ -519,8 +519,8 @@ RectTransform:
   m_Father: {fileID: 532231402}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.000000035077687, y: 0.42589545}
-  m_AnchorMax: {x: 1.0000005, y: 0.57410437}
+  m_AnchorMin: {x: 0.00000007015535, y: 0.26914603}
+  m_AnchorMax: {x: 1.0000005, y: 0.5743798}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -577,7 +577,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 25
     m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -827,9 +827,6 @@ MonoBehaviour:
   songCountText: {fileID: 778661798}
   videoIndicator: {fileID: 909180080}
   duetIndicator: {fileID: 1246195317}
-  songListContent: {fileID: 0}
-  songButtonPrefab: {fileID: 5876904140282198730, guid: 4dbdba3a5b74fb349bc429fdf2867a5b,
-    type: 3}
   playerProfileListContent: {fileID: 246735763}
   playerProfileButtonPrefab: {fileID: 7381675215237823552, guid: 9a920f1cec87adf47b9f921da360a972,
     type: 3}
@@ -1678,8 +1675,8 @@ RectTransform:
   m_Father: {fileID: 532231402}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.00000007015537, y: 0.7730031}
-  m_AnchorMax: {x: 1.0000005, y: 0.92121196}
+  m_AnchorMin: {x: 0.00000007015535, y: 0.6305787}
+  m_AnchorMax: {x: 1.0000005, y: 0.92148745}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1748,7 +1745,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 25
     m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1

@@ -16,9 +16,6 @@ public class SongSelectSceneController : MonoBehaviour
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
-    public RectTransform songListContent;
-    public RectTransform songButtonPrefab;
-
     public RectTransform playerProfileListContent;
     public RectTransform playerProfileButtonPrefab;
 
@@ -37,7 +34,6 @@ public class SongSelectSceneController : MonoBehaviour
     void Start()
     {
         List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;
-        PopulateSongList(songMetas);
         List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PopulatePlayerProfileList(playerProfiles);
 
@@ -68,30 +64,6 @@ public class SongSelectSceneController : MonoBehaviour
 
         newButton.GetComponentInChildren<Text>().text = playerProfile.Name;
         newButton.GetComponent<Button>().onClick.AddListener(() => OnPlayerProfileButtonClicked(playerProfile));
-    }
-
-    private void PopulateSongList(List<SongMeta> songMetas)
-    {
-        // Remove old buttons.
-        foreach (RectTransform element in songListContent)
-        {
-            GameObject.Destroy(element.gameObject);
-        }
-
-        // Create new song buttons. One for each loaded song.
-        foreach (SongMeta songMeta in songMetas)
-        {
-            AddSongButton(songMeta);
-        }
-    }
-
-    private void AddSongButton(SongMeta songMeta)
-    {
-        RectTransform newButton = RectTransform.Instantiate(songButtonPrefab);
-        newButton.SetParent(songListContent);
-
-        newButton.GetComponentInChildren<Text>().text = songMeta.Title;
-        newButton.GetComponent<Button>().onClick.AddListener(() => StartSingScene(songMeta));
     }
 
     private void StartSingScene(SongMeta songMeta)
