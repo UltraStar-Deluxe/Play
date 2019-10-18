@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-public class ApplicationUtils
+public static class ApplicationUtils
 {
 
     public static void QuitOrStopPlayMode()

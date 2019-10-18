@@ -18,10 +18,6 @@ public class SongSelectSceneController : MonoBehaviour
 
     private PlayerProfile selectedPlayerProfile;
 
-    void OnEnable()
-    {
-    }
-
     void Start()
     {
         List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;

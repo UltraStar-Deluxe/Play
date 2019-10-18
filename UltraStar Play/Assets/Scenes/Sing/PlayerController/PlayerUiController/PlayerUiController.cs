@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerUiController : MonoBehaviour
 {
-    private SongMeta songMeta;
-    private PlayerProfile playerProfile;
-
     private LineDisplayer lineDisplayer;
     private SentenceDisplayer sentenceDisplayer;
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    public void Init(SongMeta songMeta, Voice voice, PlayerProfile playerProfile)
+    public void Init()
     {
-        this.songMeta = songMeta;
-        this.playerProfile = playerProfile;
-
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
         lineDisplayer.Init(6);
 
@@ -47,5 +42,19 @@ public class PlayerUiController : MonoBehaviour
     public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
     {
         sentenceDisplayer.DisplayRecordedNotes(recordedNotes);
+    }
+
+    public void CreatePerfectSentenceEffect()
+    {
+        lineDisplayer.CreatePerfectSentenceEffect();
+    }
+
+    public void CreatePerfectNoteEffect(Note perfectNote)
+    {
+        UiNote uiNote = GetComponentsInChildren<UiNote>().Where(it => it.Note == perfectNote).FirstOrDefault();
+        if (uiNote != null)
+        {
+            uiNote.CreatePerfectNoteEffect();
+        }
     }
 }

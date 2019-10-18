@@ -106,6 +106,7 @@ public class PlayerNoteRecorder : MonoBehaviour
             }
             else
             {
+                playerController.OnRecordedNoteEnded(lastRecordedNote);
                 // Start new note
                 lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
             }

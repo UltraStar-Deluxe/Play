@@ -53,6 +53,8 @@ public class SentenceDisplayer : MonoBehaviour
     {
         UiNote uiNote = Instantiate(uiNotePrefab);
         uiNote.transform.SetParent(transform);
+        uiNote.Note = note;
+        uiNote.isGolden = note.IsGolden;
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";

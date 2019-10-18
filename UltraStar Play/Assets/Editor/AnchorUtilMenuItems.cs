@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// Tools to set the anchoredPosition and sizeDelta with respect to the anchor.
-public class AnchorUtilMenuItems
+public static class AnchorUtilMenuItems
 {
     [MenuItem("Tools/Anchors (RectTransform)/Set Size To Anchors")]
     public static void SetSizeToAnchors()

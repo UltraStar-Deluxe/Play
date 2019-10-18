@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BpmUtils
+public static class BpmUtils
 {
 
     public static double BeatToMillisecondsInSong(SongMeta songMeta, double beat)

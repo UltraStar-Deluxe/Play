@@ -23,7 +23,9 @@ public static class ObjectExtensions
         foreach (T v in values)
         {
             if (value.Equals(v))
+            {
                 return true;
+            }
         }
 
         return false;
@@ -35,7 +37,9 @@ public static class ObjectExtensions
         foreach (ValueType v in values)
         {
             if (value.Equals(v))
+            {
                 return true;
+            }
         }
 
         return false;

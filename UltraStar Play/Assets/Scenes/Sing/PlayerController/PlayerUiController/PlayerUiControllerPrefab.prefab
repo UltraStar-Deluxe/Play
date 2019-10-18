@@ -228,7 +228,7 @@ GameObject:
   - component: {fileID: 4410698265183144018}
   - component: {fileID: 4350760975549093568}
   m_Layer: 5
-  m_Name: PlayerUiPrefab
+  m_Name: PlayerUiControllerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -396,6 +396,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05684973d504ca64b83624270e3edce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  perfectSentenceStarPrefab: {fileID: 3432090795416568970, guid: b1c90144fedb745429b21b08991253ac,
+    type: 3}
   linePrefab: {fileID: 1194152596973659647, guid: 0e44a1330a41aac458b12308c1a1ddfa,
     type: 3}
 --- !u!1 &4410698265858749455
