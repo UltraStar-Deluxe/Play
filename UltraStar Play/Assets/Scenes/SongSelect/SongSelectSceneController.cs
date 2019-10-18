@@ -19,11 +19,24 @@ public class SongSelectSceneController : MonoBehaviour
     public RectTransform playerProfileListContent;
     public RectTransform playerProfileButtonPrefab;
 
+    private SearchInputField searchTextInputField;
+
     private PlayerProfile selectedPlayerProfile;
 
     private SongRouletteController songRouletteController;
 
     private SongSelectSceneData sceneData;
+    private List<SongMeta> songMetas;
+
+    private SongMeta selectedSongBeforeSearch;
+
+    private SongMeta SelectedSong
+    {
+        get
+        {
+            return songRouletteController.SelectedSong;
+        }
+    }
 
     public static SongSelectSceneController Instance
     {
@@ -37,7 +50,9 @@ public class SongSelectSceneController : MonoBehaviour
     {
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
-        List<SongMeta> songMetas = SongMetaManager.Instance.SongMetas;
+        searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
+
+        songMetas = SongMetaManager.Instance.SongMetas;
         List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PopulatePlayerProfileList(playerProfiles);
 
@@ -55,7 +70,7 @@ public class SongSelectSceneController : MonoBehaviour
         // Remove old buttons.
         foreach (RectTransform element in playerProfileListContent)
         {
-            GameObject.Destroy(element.gameObject);
+            Destroy(element.gameObject);
         }
 
         // Create new buttons. One for each profile.
@@ -89,7 +104,6 @@ public class SongSelectSceneController : MonoBehaviour
 
     private void OnPlayerProfileButtonClicked(PlayerProfile playerProfile)
     {
-        Debug.Log($"Clicked on player profile button: {playerProfile.Name}");
         selectedPlayerProfile = playerProfile;
     }
 
@@ -101,6 +115,12 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void OnSongSelected(SongMeta selectedSong, int selectedSongIndex, List<SongMeta> songs)
     {
+        if (selectedSong == null)
+        {
+            SetEmptySongDetails();
+            return;
+        }
+
         artistText.SetText(selectedSong.Artist);
         songTitleText.text = selectedSong.Title;
         songCountText.text = (selectedSongIndex + 1) + "/" + songs.Count;
@@ -110,6 +130,15 @@ public class SongSelectSceneController : MonoBehaviour
 
         bool isDuet = selectedSong.VoiceNames.Keys.Count == 2;
         duetIndicator.SetActive(isDuet);
+    }
+
+    private void SetEmptySongDetails()
+    {
+        artistText.SetText("");
+        songTitleText.text = "";
+        songCountText.text = "0/0";
+        videoIndicator.SetActive(false);
+        duetIndicator.SetActive(false);
     }
 
     public void OnNextSong()
@@ -124,6 +153,66 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void OnStartSingScene()
     {
-        StartSingScene(songRouletteController.SelectedSong);
+        if (SelectedSong != null)
+        {
+            StartSingScene(SelectedSong);
+        }
+    }
+
+    public void OnSearchTextChanged()
+    {
+        SongMeta lastSelectedSong = SelectedSong;
+        string searchText = searchTextInputField.Text.ToLower();
+        if (string.IsNullOrEmpty(searchText))
+        {
+            songRouletteController.SetSongs(songMetas);
+            if (lastSelectedSong != null)
+            {
+                songRouletteController.SelectSong(lastSelectedSong);
+            }
+            else if (selectedSongBeforeSearch != null)
+            {
+                songRouletteController.SelectSong(selectedSongBeforeSearch);
+            }
+        }
+        else
+        {
+            switch (searchTextInputField.SearchMode)
+            {
+                case SearchInputField.ESearchMode.BySongTitle:
+                    DoSearch((songMeta) => songMeta.Title.ToLower().Contains(searchText));
+                    break;
+                case SearchInputField.ESearchMode.ByArtist:
+                    DoSearch((songMeta) => songMeta.Artist.ToLower().Contains(searchText));
+                    break;
+            }
+        }
+    }
+
+    private void DoSearch(Func<SongMeta, bool> condition)
+    {
+        List<SongMeta> matchingSongs = songMetas.Where(condition).ToList();
+        songRouletteController.SetSongs(matchingSongs);
+    }
+
+    public void EnableSearch(SearchInputField.ESearchMode searchMode)
+    {
+        selectedSongBeforeSearch = songRouletteController.SelectedSong;
+
+        searchTextInputField.Show();
+        searchTextInputField.RequestFocus();
+        searchTextInputField.SearchMode = searchMode;
+        searchTextInputField.Text = "";
+    }
+
+    public void DisableSearch()
+    {
+        searchTextInputField.Text = "";
+        searchTextInputField.Hide();
+    }
+
+    public bool IsSearchEnabled()
+    {
+        return searchTextInputField.isActiveAndEnabled;
     }
 }

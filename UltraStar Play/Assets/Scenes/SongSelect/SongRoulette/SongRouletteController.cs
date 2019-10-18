@@ -159,13 +159,23 @@ public class SongRouletteController : MonoBehaviour
             SelectedSong = songs[selectedSongIndex];
             FindActiveRouletteItems();
             UpdateRouletteItemsActiveState();
-            SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
         }
         else
         {
             SelectedSong = null;
             selectedSongIndex = -1;
+            RemoveAllSongRouletteItems();
         }
+        SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
+    }
+
+    private void RemoveAllSongRouletteItems()
+    {
+        foreach (SongRouletteItem songRouletteItem in songRouletteItems)
+        {
+            songRouletteItem.TargetRouletteItem = null;
+        }
+        songRouletteItems.Clear();
     }
 
     public void SelectSong(SongMeta songMeta)
