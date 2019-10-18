@@ -30,8 +30,9 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private int RoundingDistance { get; set; }
 
+    private double lastPitchDetectedBeat;
+
     private RecordedNote lastRecordedNote;
-    private int lastRecordedFrame;
 
     private MicrophonePitchTracker MicrophonePitchTracker
     {
@@ -76,41 +77,40 @@ public class PlayerNoteRecorder : MonoBehaviour
         return recordedNotes;
     }
 
-    private void OnPitchDetected(PitchTracker sender, PitchTracker.PitchRecord pitchRecord)
+    public void OnPitchDetected(int midiNote)
     {
-        // Ignore multiple events at same frame
-        if (lastRecordedFrame == Time.frameCount)
-        {
-            return;
-        }
-        lastRecordedFrame = Time.frameCount;
-
-        if (pitchRecord.MidiNote <= 0)
+        double currentBeat = singSceneController.CurrentBeat;
+        if (midiNote <= 0)
         {
             if (lastRecordedNote != null)
             {
-                // Ended singing
+                // End singing of last recorded note.
+                // Do this seamlessly, i.e., continue the last recorded note until now.
+                lastRecordedNote.EndBeat = currentBeat;
+                OnContinuedNote(lastRecordedNote, currentBeat);
                 lastRecordedNote = null;
+                // Debug.Log("Ended singing");
             }
         }
         else
         {
-            double currentPositionInMillis = singSceneController.PositionInSongInMillis;
-            double currentBeat = singSceneController.CurrentBeat;
-            if (lastRecordedNote != null && lastRecordedNote.RecordedMidiNote == pitchRecord.MidiNote)
+            if (lastRecordedNote != null && lastRecordedNote.RecordedMidiNote == midiNote)
             {
-                // Continued singing on same pitch
-                lastRecordedNote.EndPositionInMilliseconds = currentPositionInMillis;
+                // Continue singing on same pitch
                 lastRecordedNote.EndBeat = currentBeat;
                 OnContinuedNote(lastRecordedNote, currentBeat);
+                // Debug.Log("Continued note");
             }
             else
             {
                 playerController.OnRecordedNoteEnded(lastRecordedNote);
-                // Start new note
-                lastRecordedNote = new RecordedNote(pitchRecord.MidiNote, currentPositionInMillis, currentPositionInMillis, currentBeat, currentBeat);
+                // Start new note.
+                // Do this seamlessly, i.e., start the new note at the time the last note was recorded.
+                lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
+                // Debug.Log("Start new note");
             }
         }
+        lastPitchDetectedBeat = currentBeat;
     }
 
     private void OnContinuedNote(RecordedNote recordedNote, double currentBeat)
@@ -175,7 +175,7 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
-    private Note GetNoteAtBeat(Sentence sentence, double beat)
+    public static Note GetNoteAtBeat(Sentence sentence, double beat)
     {
         foreach (Note note in sentence.Notes)
         {
