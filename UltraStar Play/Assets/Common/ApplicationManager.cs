@@ -12,6 +12,7 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    [Range(5, 60)]
     public int targetFrameRate = 30;
 
     void Start()
