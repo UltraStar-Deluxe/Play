@@ -25,12 +25,11 @@ public static class GameObjectUtils
         return default(T);
     }
 
-
     // Looks for a GameObject with the given component, optionally including inactive components.
-    // Note that this is a costly method that should not be called frequently.
+    // Note that this is a costly method (it searches through all Transforms and their components)
+    // that should not be called frequently.
     public static T FindObjectOfType<T>(bool includeInactive) where T : MonoBehaviour
     {
-        // The current implementation of finding the root transforms is costly.
         List<Transform> rootTransforms = GameObject.FindObjectsOfType<Transform>().Where(it => it.root == it).ToList();
         if (includeInactive)
         {
@@ -42,6 +41,7 @@ public static class GameObjectUtils
                     return obj;
                 }
             }
+            Debug.LogWarning("No object of Type " + typeof(T) + " has been found in the scene.");
             return null;
         }
         else
