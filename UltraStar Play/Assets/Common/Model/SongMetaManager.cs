@@ -107,7 +107,7 @@ public class SongMetaManager : MonoBehaviour
                 }
                 catch (SongMetaBuilderException e)
                 {
-                    Debug.LogError(path + "\n" + e.Message);
+                    Debug.LogWarning(path + "\n" + e.Message);
                     SongsFailed++;
                 }
                 catch (Exception ex)

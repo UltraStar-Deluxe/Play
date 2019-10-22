@@ -65,7 +65,7 @@ public class ImageManager
         {
             Image image = transform.GetComponent<Image>();
             ISpriteHolder spriteHolder = transform.GetComponent<ISpriteHolder>();
-            if (image != null || spriteHolder != null)
+            if (image != null && spriteHolder != null)
             {
                 usedSprites.Add(image.sprite);
             }
