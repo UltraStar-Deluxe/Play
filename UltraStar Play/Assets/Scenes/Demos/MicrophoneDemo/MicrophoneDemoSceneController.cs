@@ -10,11 +10,14 @@ public class MicrophoneDemoSceneController : MonoBehaviour
 
     private MicrophonePitchTracker microphonePitchTracker;
 
+    public FloatArrayVisualizer micDataVisualizer;
+    public FloatArrayVisualizer pitchDetectionBufferVisualizer;
+
     void Awake()
     {
         microphonePitchTracker = FindObjectOfType<MicrophonePitchTracker>();
-        FloatArrayVisualizer floatArrayVisualizer = FindObjectOfType<FloatArrayVisualizer>();
-        floatArrayVisualizer.Init(microphonePitchTracker.MicData);
+        micDataVisualizer.Init(microphonePitchTracker.MicData);
+        pitchDetectionBufferVisualizer.Init(microphonePitchTracker.PitchDetectionBuffer);
     }
 
     void OnEnable()
@@ -38,10 +41,9 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         microphonePitchTracker.StopPitchDetection();
     }
 
-    private void OnPitchDetected(PitchTracker sender, PitchTracker.PitchRecord pitchRecord)
+    private void OnPitchDetected(int midiNote)
     {
         // Show the note that has been detected
-        int midiNote = pitchRecord.MidiNote;
         if (midiNote > 0)
         {
             currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(midiNote);

@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerUiArea playerUiArea;
     private PlayerUiController playerUiController;
-    private PlayerNoteRecorder playerNoteRecorder;
+    public PlayerNoteRecorder PlayerNoteRecorder { get; set; }
     public PlayerScoreController PlayerScoreController { get; set; }
 
     private int sentenceIndex;
@@ -58,8 +58,8 @@ public class PlayerController : MonoBehaviour
         PlayerScoreController = GetComponentInChildren<PlayerScoreController>();
         PlayerScoreController.Init(Voice);
 
-        playerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-        playerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
+        PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
+        PlayerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
 
         CreatePlayerUi();
 
@@ -130,7 +130,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnSentenceEnded()
     {
-        List<RecordedNote> recordedNotes = playerNoteRecorder.GetRecordedNotes(CurrentSentence);
+        List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(CurrentSentence);
         SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
         playerUiController.ShowTotalScore((int)PlayerScoreController.TotalScore);
         if (sentenceRating != null)

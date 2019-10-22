@@ -34,7 +34,7 @@ public class FloatArrayVisualizer : MonoBehaviour
         {
             float y = floatArray[i * step] * yscale;
             Vector3 oldPos = cubes[i].transform.position;
-            cubes[i].transform.position = new Vector3(oldPos.x, y, oldPos.z);
+            cubes[i].transform.localPosition = new Vector3(oldPos.x, y, oldPos.z);
         }
     }
 
@@ -46,7 +46,7 @@ public class FloatArrayVisualizer : MonoBehaviour
             GameObject cube = Instantiate(cubePrefab);
             cube.transform.SetParent(transform);
             float x = i * xscale;
-            cube.transform.position = new Vector3(x, 0, 0);
+            cube.transform.localPosition = new Vector3(x, 0, 0);
 
             cubes[i] = cube;
         }
