@@ -72,18 +72,24 @@ public class MicrophonePitchTracker : MonoBehaviour
     public void StartPitchDetection()
     {
         startedPitchDetection = true;
+        List<string> soundcards = new List<string>(Microphone.devices);
 
         // Check for microphone existence.
-        if (Microphone.devices.Length == 0)
+        if (soundcards.Count == 0)
         {
             Debug.LogError($"No mic devices found.");
             gameObject.SetActive(false);
             return;
         }
-        List<string> micDeviceNames = new List<string>(Microphone.devices);
-        if (!micDeviceNames.Contains(MicDevice))
+        else if (soundcards.Count == 1 && MicDevice != soundcards[0])
         {
-            string micDevicesCsv = String.Join(",", micDeviceNames);
+            Debug.LogWarning($"Did not find mic '{MicDevice}'. Falling back to use {soundcards[0]} as microphone instead.");
+            MicDevice = soundcards[0];
+        }
+        Debug.Log($"available soundcards: '{string.Join(",", soundcards)}'");
+        if (!soundcards.Contains(MicDevice))
+        {
+            string micDevicesCsv = string.Join(",", soundcards);
             Debug.LogError($"Did not find mic '{MicDevice}'. Available mic devices: {micDevicesCsv}");
             gameObject.SetActive(false);
             return;

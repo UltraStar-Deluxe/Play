@@ -163,7 +163,7 @@ public class PlayerScoreController : MonoBehaviour
         bool isSound = (MaxScoreForNotes == pointsForAllNotes);
         if (!isSound)
         {
-            Debug.LogError("The definition of scores for normal or golden notes does not make sense.");
+            Debug.LogWarning("The definition of scores for normal or golden notes does not make sense.");
         }
 
         // Calculate score for a perfect line.
