@@ -5,8 +5,8 @@ using UnityEngine;
 public class Note
 {
     public ENoteType Type { get; }
-    public uint StartBeat { get; }
-    public uint Length { get; }
+    public int StartBeat { get; }
+    public int Length { get; }
     public int Pitch { get; }
     public string Text { get; }
 
@@ -19,7 +19,7 @@ public class Note
         }
     }
 
-    public uint EndBeat
+    public int EndBeat
     {
         get
         {
@@ -51,7 +51,7 @@ public class Note
         }
     }
 
-    public Note(ENoteType type, uint startBeat, uint length, int pitch, string text)
+    public Note(ENoteType type, int startBeat, int length, int pitch, string text)
     {
         if (length < 1)
         {

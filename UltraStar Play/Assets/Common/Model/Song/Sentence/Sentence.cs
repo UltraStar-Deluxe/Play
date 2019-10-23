@@ -7,7 +7,7 @@ public class Sentence
 {
     // this needs to be switched over to IReadOnlyList
     public List<Note> Notes { get; }
-    public uint LinebreakBeat { get; }
+    public int LinebreakBeat { get; }
 
     public List<Note> GoldenNotes
     {
@@ -33,7 +33,7 @@ public class Sentence
         }
     }
 
-    public Sentence(List<Note> notes, uint linebreakBeat)
+    public Sentence(List<Note> notes, int linebreakBeat)
     {
         if (notes == null || notes.Count < 1)
         {
@@ -65,9 +65,9 @@ public class Sentence
         AvgMidiNote = Notes.Select(it => it.MidiNote).Average();
     }
 
-    public uint StartBeat { get; private set; }
+    public int StartBeat { get; private set; }
 
-    public uint EndBeat { get; private set; }
+    public int EndBeat { get; private set; }
 
     public Note MinNote { get; private set; }
 
