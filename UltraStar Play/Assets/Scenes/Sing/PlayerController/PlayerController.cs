@@ -59,6 +59,10 @@ public class PlayerController : MonoBehaviour
         PlayerScoreController.Init(Voice);
 
         PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
+        if (PlayerNoteRecorder == null)
+        {
+            throw new NullReferenceException("PlayerNoteRecorder is null!");
+        }
         PlayerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
 
         CreatePlayerUi();
