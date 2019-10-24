@@ -31,12 +31,13 @@ public class ThemeableColor : Themeable
             lastColorResource = colorResource;
             colorsFileName = colorResource.GetPath();
             colorName = colorResource.GetName();
-            ReloadResources();
+            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
+            ReloadResources(currentTheme);
         }
     }
 #endif
 
-    public override void ReloadResources()
+    public override void ReloadResources(Theme theme)
     {
         if (string.IsNullOrEmpty(colorName))
         {
@@ -49,7 +50,7 @@ public class ThemeableColor : Themeable
             return;
         }
 
-        if (TryLoadColorFromTheme(colorsFileName, colorName, out Color loadedColor))
+        if (TryLoadColorFromTheme(theme, colorsFileName, colorName, out Color loadedColor))
         {
             target.color = loadedColor;
         }
