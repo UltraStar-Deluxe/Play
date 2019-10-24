@@ -120,9 +120,9 @@ static class VoicesBuilder
         return actualRes;
     }
 
-    private static uint ParseLinebreak(string line)
+    private static int ParseLinebreak(string line)
     {
-        return ConvertToUInt32(line);
+        return ConvertToInt32(line);
     }
 
     private static Note ParseNote(string line)
@@ -135,8 +135,8 @@ static class VoicesBuilder
         }
         return new Note(
             GetNoteType(data[0]),
-            ConvertToUInt32(data[1]),
-            ConvertToUInt32(data[2]),
+            ConvertToInt32(data[1]),
+            ConvertToInt32(data[2]),
             ConvertToInt32(data[3]),
             data[4]
         );
@@ -173,18 +173,6 @@ static class VoicesBuilder
         throw new VoicesBuilderException("Error at line " + lineNumber + ": " + message);
     }
 
-    private static uint ConvertToUInt32(string s)
-    {
-        try
-        {
-            return Convert.ToUInt32(s, 10);
-        }
-        catch (FormatException e)
-        {
-            throw new VoicesBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message);
-        }
-    }
-
     private static int ConvertToInt32(string s)
     {
         try
@@ -219,7 +207,7 @@ public class VoicesBuilderException : Exception
 // this should be internal but tests become impossible
 public class MutableVoice
 {
-    private readonly List<Sentence> m_sentences = new List<Sentence>();
+    private readonly List<Sentence> sentences = new List<Sentence>();
 
     public void Add(Sentence sentence)
     {
@@ -227,9 +215,9 @@ public class MutableVoice
         {
             throw new ArgumentNullException("sentence");
         }
-        else if (m_sentences.Count > 0)
+        else if (sentences.Count > 0)
         {
-            Sentence lastSentence = m_sentences[m_sentences.Count - 1];
+            Sentence lastSentence = sentences[sentences.Count - 1];
             if (lastSentence.EndBeat > sentence.StartBeat)
             {
                 throw new VoicesBuilderException("Sentence starts before previous sentence is over");
@@ -240,19 +228,19 @@ public class MutableVoice
             }
             else
             {
-                m_sentences.Add(sentence);
+                sentences.Add(sentence);
             }
         }
         else
         {
-            m_sentences.Add(sentence);
+            sentences.Add(sentence);
         }
     }
 
     // this needs to be switched over to IReadOnlyList
     public List<Sentence> GetSentences()
     {
-        return m_sentences;
+        return sentences;
     }
 
     public static explicit operator Voice(MutableVoice mv)
@@ -268,8 +256,8 @@ public class MutableVoice
 // this should be internal but tests become impossible
 public class MutableSentence
 {
-    private readonly List<Note> m_notes = new List<Note>();
-    private uint m_linebreakBeat;
+    private readonly List<Note> notes = new List<Note>();
+    private int linebreakBeat;
 
     public void Add(Note note)
     {
@@ -277,7 +265,7 @@ public class MutableSentence
         {
             throw new ArgumentNullException("note");
         }
-        if (m_linebreakBeat != 0)
+        if (linebreakBeat != 0)
         {
             throw new VoicesBuilderException("Adding more notes after the linebreak has already been set is not allowed");
         }
@@ -287,38 +275,38 @@ public class MutableSentence
         }
         else
         {
-            m_notes.Add(note);
+            notes.Add(note);
         }
     }
 
-    private uint GetUntilBeat()
+    private int GetUntilBeat()
     {
-        if (m_notes.Count == 0)
+        if (notes.Count == 0)
         {
             return 0;
         }
-        Note lastNote = m_notes[m_notes.Count - 1];
+        Note lastNote = notes[notes.Count - 1];
         return lastNote.StartBeat + lastNote.Length;
     }
 
     // this needs to be switched over to IReadOnlyList
     public List<Note> GetNotes()
     {
-        return m_notes;
+        return notes;
     }
 
-    public void SetLinebreakBeat(uint beat)
+    public void SetLinebreakBeat(int beat)
     {
         if (beat < GetUntilBeat())
         {
             throw new VoicesBuilderException("Linebreak conflicts with existing sentence");
         }
-        m_linebreakBeat = beat;
+        linebreakBeat = beat;
     }
 
-    public uint GetLinebreakBeat()
+    public int GetLinebreakBeat()
     {
-        return m_linebreakBeat;
+        return linebreakBeat;
     }
 
     public static explicit operator Sentence(MutableSentence ms)
