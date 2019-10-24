@@ -107,9 +107,9 @@ public class SentenceDisplayer : MonoBehaviour
         int offset = (noteLineCount / 2) - (((int)displayedSentence.AvgMidiNote) % noteLineCount);
         int noteLine = (offset + midiNote) % noteLineCount;
 
-        uint sentenceStartBeat = displayedSentence.StartBeat;
-        uint sentenceEndBeat = displayedSentence.EndBeat;
-        uint beatsInSentence = sentenceEndBeat - sentenceStartBeat;
+        int sentenceStartBeat = displayedSentence.StartBeat;
+        int sentenceEndBeat = displayedSentence.EndBeat;
+        int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
         double anchorY = (double)noteLine / (double)noteLineCount;
         double anchorX = (double)(noteStartBeat - sentenceStartBeat) / beatsInSentence;

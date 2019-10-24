@@ -460,15 +460,15 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'UltraStar Deluxe Play is a free and open source sing-along karaoke game
-    written by some guy who apparently has too much free time as his hands. It looks
+  m_Text: 'UltraStar Play is a free and open source sing-along karaoke game written
+    by some people who apparently have too much free time at their hands. It looks
     like you might have some free spare time left over, too... Please consider helping
     this project by submitting bug reports, better sprites, background images, other
     art or feel free to contribute some source code to this game and thus help to
     improve it!
 
 
-    No ponies were harmed during development of this game.'
+    https://usplay.net'
 --- !u!222 &699323124
 CanvasRenderer:
   m_ObjectHideFlags: 0
