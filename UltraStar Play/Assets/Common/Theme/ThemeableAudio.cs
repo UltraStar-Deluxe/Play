@@ -27,12 +27,13 @@ public class ThemeableAudio : Themeable
         {
             lastAudioResource = audioResource;
             audioPath = audioResource.GetPath();
-            ReloadResources();
+            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
+            ReloadResources(currentTheme);
         }
     }
 #endif
 
-    public override void ReloadResources()
+    public override void ReloadResources(Theme theme)
     {
         if (string.IsNullOrEmpty(audioPath))
         {
@@ -45,7 +46,7 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioClip audioClip = LoadResourceFromTheme<AudioClip>(audioPath);
+        AudioClip audioClip = LoadResourceFromTheme<AudioClip>(theme, audioPath);
         if (audioClip == null)
         {
             Debug.LogError($"Could not load audio file {audioPath}", gameObject);
