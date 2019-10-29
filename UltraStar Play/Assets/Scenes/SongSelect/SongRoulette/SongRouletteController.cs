@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 public class SongRouletteController : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class SongRouletteController : MonoBehaviour
     private int centerItemIndex;
 
     private List<SongMeta> songs = new List<SongMeta>();
-    public SongMeta SelectedSong { get; private set; }
+    public IReactiveProperty<SongMeta> SelectedSong { get; private set; } = new ReactiveProperty<SongMeta>();
     private int selectedSongIndex;
 
     private List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
@@ -167,7 +168,7 @@ public class SongRouletteController : MonoBehaviour
         if (songs.Count > 0)
         {
             selectedSongIndex = 0;
-            SelectedSong = songs[selectedSongIndex];
+            SelectedSong.Value = songs[selectedSongIndex];
             FindActiveRouletteItems();
             UpdateRouletteItemsActiveState();
         }
@@ -177,7 +178,7 @@ public class SongRouletteController : MonoBehaviour
             selectedSongIndex = -1;
             RemoveAllSongRouletteItems();
         }
-        SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
+        SongSelectSceneController.OnSongSelected(SelectedSong.Value, selectedSongIndex, songs);
     }
 
     private void RemoveAllSongRouletteItems()
@@ -199,19 +200,19 @@ public class SongRouletteController : MonoBehaviour
         SongMeta matchingSong = songs.Where(song => song.Title == songMeta.Title).FirstOrDefault();
         if (matchingSong != null)
         {
-            SelectedSong = matchingSong;
-            selectedSongIndex = songs.IndexOf(SelectedSong);
+            SelectedSong.Value = matchingSong;
+            selectedSongIndex = songs.IndexOf(SelectedSong.Value);
 
             if (SongSelectSceneController != null)
             {
-                SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
+                SongSelectSceneController.OnSongSelected(SelectedSong.Value, selectedSongIndex, songs);
             }
         }
     }
 
     public void SelectNextSong()
     {
-        int indexOfSelectedSong = songs.IndexOf(SelectedSong);
+        int indexOfSelectedSong = songs.IndexOf(SelectedSong.Value);
         int nextIndex;
         if (indexOfSelectedSong == -1)
         {
@@ -227,7 +228,7 @@ public class SongRouletteController : MonoBehaviour
 
     public void SelectPreviousSong()
     {
-        int indexOfSelectedSong = songs.IndexOf(SelectedSong);
+        int indexOfSelectedSong = songs.IndexOf(SelectedSong.Value);
         int nextIndex;
         if (indexOfSelectedSong == -1)
         {
