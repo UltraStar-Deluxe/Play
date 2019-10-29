@@ -7,6 +7,7 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Linq;
+using UniRx;
 
 public class SongSelectSceneController : MonoBehaviour
 {
@@ -34,7 +35,7 @@ public class SongSelectSceneController : MonoBehaviour
     {
         get
         {
-            return songRouletteController.SelectedSong;
+            return songRouletteController.SelectedSong.Value;
         }
     }
 
@@ -58,6 +59,8 @@ public class SongSelectSceneController : MonoBehaviour
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
+        songRouletteController.SelectedSong.Where(x => x != null).Select(x => x.Title).SubscribeToText(songTitleText);
+        songRouletteController.SelectedSong.Where(x => x == null).Select(_ => "").SubscribeToText(songTitleText);
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
@@ -122,7 +125,7 @@ public class SongSelectSceneController : MonoBehaviour
         }
 
         artistText.SetText(selectedSong.Artist);
-        songTitleText.text = selectedSong.Title;
+        // songTitleText.text = selectedSong.Title;
         songCountText.text = (selectedSongIndex + 1) + "/" + songs.Count;
 
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
@@ -135,7 +138,7 @@ public class SongSelectSceneController : MonoBehaviour
     private void SetEmptySongDetails()
     {
         artistText.SetText("");
-        songTitleText.text = "";
+        // songTitleText.text = "";
         songCountText.text = "0/0";
         videoIndicator.SetActive(false);
         duetIndicator.SetActive(false);
@@ -197,7 +200,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
     {
-        selectedSongBeforeSearch = songRouletteController.SelectedSong;
+        selectedSongBeforeSearch = songRouletteController.SelectedSong.Value;
 
         searchTextInputField.Show();
         searchTextInputField.RequestFocus();
