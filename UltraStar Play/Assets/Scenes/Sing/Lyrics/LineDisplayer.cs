@@ -50,9 +50,8 @@ public class LineDisplayer : MonoBehaviour
         starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
         starRectTransform.anchoredPosition = Vector2.zero;
 
-        star.Init();
-        star.TargetLifetimeInSeconds = 1f;
-        star.StartScale = UnityEngine.Random.Range(0.2f, 0.6f);
-        star.TargetScale = 0;
+        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.6f);
+        LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
+            .setOnComplete(() => Destroy(star.gameObject));
     }
 }
