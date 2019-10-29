@@ -57,8 +57,10 @@ public class UiNote : MonoBehaviour
         starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
         starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
         starRectTransform.anchoredPosition = Vector2.zero;
-        star.Init();
-        star.StartScale = Random.Range(0, 0.5f);
+
+        star.RectTransform.localScale = Vector3.one * Random.Range(0, 0.5f);
+        LeanTween.scale(star.RectTransform, Vector3.one * Random.Range(0.5f, 1f), Random.Range(1f, 2f))
+            .setOnComplete(() => Destroy(star.gameObject));
     }
 
     public void CreatePerfectNoteEffect()
@@ -83,11 +85,9 @@ public class UiNote : MonoBehaviour
         starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
         starRectTransform.anchoredPosition = Vector2.zero;
 
-        star.Init();
-        star.TargetLifetimeInSeconds = 1f;
-        star.StartScale = Random.Range(0.5f, 0.8f);
-        star.TargetScale = 0;
-
+        star.RectTransform.localScale = Vector3.one * Random.Range(0.5f, 0.8f);
+        LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
+            .setOnComplete(() => Destroy(star.gameObject));
         return star;
     }
 }
