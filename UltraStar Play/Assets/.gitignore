@@ -1,2 +1,13 @@
 LeanTween/
+
+Plugins/LeanTween/
+Plugins/LeanTween.meta
+
+Plugins/LitJson/
+Plugins/LitJson.meta
+
 Plugins/UniRx/
+Plugins/UniRx.meta
+
+Plugins/FullSerializer/
+Plugins/FullSerializer.meta
