@@ -64,10 +64,14 @@ public class ImageManager
         foreach (Transform transform in GameObject.FindObjectsOfType<Transform>())
         {
             Image image = transform.GetComponent<Image>();
-            ISpriteHolder spriteHolder = transform.GetComponent<ISpriteHolder>();
-            if (image != null && spriteHolder != null)
+            if (image != null)
             {
                 usedSprites.Add(image.sprite);
+            }
+            ISpriteHolder spriteHolder = transform.GetComponent<ISpriteHolder>();
+            if (spriteHolder != null)
+            {
+                usedSprites.Add(spriteHolder.GetSprite());
             }
         }
 
