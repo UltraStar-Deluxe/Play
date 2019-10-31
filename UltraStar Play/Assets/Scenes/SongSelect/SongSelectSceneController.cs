@@ -11,6 +11,14 @@ using UniRx;
 
 public class SongSelectSceneController : MonoBehaviour
 {
+    public static SongSelectSceneController Instance
+    {
+        get
+        {
+            return FindObjectOfType<SongSelectSceneController>();
+        }
+    }
+
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
@@ -31,19 +39,11 @@ public class SongSelectSceneController : MonoBehaviour
 
     private SongMeta selectedSongBeforeSearch;
 
-    private SongMeta SelectedSong
+    private SongMeta selectedSong
     {
         get
         {
-            return songRouletteController.SelectedSong.Value;
-        }
-    }
-
-    public static SongSelectSceneController Instance
-    {
-        get
-        {
-            return FindObjectOfType<SongSelectSceneController>();
+            return songRouletteController.Selection.Value.SongMeta;
         }
     }
 
@@ -59,13 +59,33 @@ public class SongSelectSceneController : MonoBehaviour
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
-        songRouletteController.SelectedSong.Where(x => x != null).Select(x => x.Title).SubscribeToText(songTitleText);
-        songRouletteController.SelectedSong.Where(x => x == null).Select(_ => "").SubscribeToText(songTitleText);
+        songRouletteController.Selection.Subscribe(OnNewSongSelection);
+
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
             songRouletteController.SelectSong(sceneData.SongMeta);
         }
+    }
+
+    private void OnNewSongSelection(SongSelection selection)
+    {
+        SongMeta selectedSong = selection.SongMeta;
+        if (selectedSong == null)
+        {
+            SetEmptySongDetails();
+            return;
+        }
+
+        artistText.SetText(selectedSong.Artist);
+        songTitleText.text = selectedSong.Title;
+        songCountText.text = (selection.SongIndex + 1) + "/" + selection.SongsCount;
+
+        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
+        videoIndicator.SetActive(hasVideo);
+
+        bool isDuet = selectedSong.VoiceNames.Keys.Count > 1;
+        duetIndicator.SetActive(isDuet);
     }
 
     private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
@@ -116,25 +136,6 @@ public class SongSelectSceneController : MonoBehaviour
         return sceneData;
     }
 
-    public void OnSongSelected(SongMeta selectedSong, int selectedSongIndex, List<SongMeta> songs)
-    {
-        if (selectedSong == null)
-        {
-            SetEmptySongDetails();
-            return;
-        }
-
-        artistText.SetText(selectedSong.Artist);
-        // songTitleText.text = selectedSong.Title;
-        songCountText.text = (selectedSongIndex + 1) + "/" + songs.Count;
-
-        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
-        videoIndicator.SetActive(hasVideo);
-
-        bool isDuet = selectedSong.VoiceNames.Keys.Count == 2;
-        duetIndicator.SetActive(isDuet);
-    }
-
     private void SetEmptySongDetails()
     {
         artistText.SetText("");
@@ -156,15 +157,15 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void OnStartSingScene()
     {
-        if (SelectedSong != null)
+        if (selectedSong != null)
         {
-            StartSingScene(SelectedSong);
+            StartSingScene(selectedSong);
         }
     }
 
     public void OnSearchTextChanged()
     {
-        SongMeta lastSelectedSong = SelectedSong;
+        SongMeta lastSelectedSong = selectedSong;
         string searchText = searchTextInputField.Text.ToLower();
         if (string.IsNullOrEmpty(searchText))
         {
@@ -200,7 +201,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
     {
-        selectedSongBeforeSearch = songRouletteController.SelectedSong.Value;
+        selectedSongBeforeSearch = selectedSong;
 
         searchTextInputField.Show();
         searchTextInputField.RequestFocus();
