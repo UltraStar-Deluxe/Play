@@ -1,5 +1,5 @@
 #!/bin/sh
-#-------------------------------------------
+
 old_dir=$(PWD)
 
 echo "Removing old UniRx folder..."
@@ -24,4 +24,3 @@ rm --recursive ./Assets
 cd "$old_dir"
 echo "Downloading UniRx done"
 echo ""
-#-------------------------------------------
