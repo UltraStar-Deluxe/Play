@@ -1,3 +1,4 @@
+#!/bin/sh
 #-------------------------------------------
 echo "Removing old LeanTween folder..."
 rm --recursive --force LeanTween
