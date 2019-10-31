@@ -1,9 +1,35 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static class ListExtensions
 {
+
+    // Returns true if the predicate is true for all elements in the list. Otherwise, returns false.
+    public static bool All<T>(this IList<T> list, Func<T, bool> predicate)
+    {
+        foreach (T t in list)
+        {
+            if (!predicate(t))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Returns true if the predicate is true for any element in the list. Otherwise, returns false.
+    public static bool Any<T>(this IList<T> list, Func<T, bool> predicate)
+    {
+        foreach (T t in list)
+        {
+            if (predicate(t))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Returns the elements of the list that are before the given element.
     // Thereby, the given element is included in the result list if inclusive is true.
     // If the given element is not in the list, then an empty list is returned.

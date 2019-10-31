@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -21,8 +22,6 @@ public class PlayerController : MonoBehaviour
     private int sentenceIndex;
     public Sentence CurrentSentence { get; set; }
     public Sentence NextSentence { get; set; }
-
-    private int perfectSentenceChain;
 
     private Difficulty Difficulty
     {
@@ -46,6 +45,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
+
     public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier)
     {
         this.SongMeta = songMeta;
@@ -66,6 +67,14 @@ public class PlayerController : MonoBehaviour
         PlayerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
 
         CreatePlayerUi();
+
+        // Create effect when there are at least two perfect sentences in a row.
+        // Therefor, consider the currently finished sentence and its predecessor.
+        sentenceRatingStream.Buffer(2, 1)
+            // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
+            .Where(xs => xs.All(x => x == SentenceRating.Perfect))
+            // Create an effect for these.
+            .Subscribe(xs => playerUiController.CreatePerfectSentenceEffect());
 
         sentenceIndex = 0;
         UpdateSentences(sentenceIndex);
@@ -140,20 +149,7 @@ public class PlayerController : MonoBehaviour
         if (sentenceRating != null)
         {
             playerUiController.ShowSentenceRating(sentenceRating);
-
-            if (sentenceRating == SentenceRating.Perfect)
-            {
-                perfectSentenceChain++;
-            }
-            else
-            {
-                perfectSentenceChain = 0;
-            }
-
-            if (perfectSentenceChain >= 2)
-            {
-                playerUiController.CreatePerfectSentenceEffect();
-            }
+            sentenceRatingStream.OnNext(sentenceRating);
         }
 
         sentenceIndex++;
