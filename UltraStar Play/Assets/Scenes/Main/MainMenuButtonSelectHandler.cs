@@ -5,11 +5,11 @@ using UnityEngine.UI;
 public class MainMenuButtonSelectHandler : MonoBehaviour, ISelectHandler
 {
     public string buttonDescription;
-    private ButtonDescription uiButtonDescriptionText;
+    private MainMenuButtonDescription uiButtonDescriptionText;
 
     void Start()
     {
-        uiButtonDescriptionText = FindObjectOfType<ButtonDescription>();
+        uiButtonDescriptionText = FindObjectOfType<MainMenuButtonDescription>();
     }
 
     public void OnSelect(BaseEventData eventData)

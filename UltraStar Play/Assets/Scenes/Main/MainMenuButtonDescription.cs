@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Text))]
-public class ButtonDescription : MonoBehaviour
+public class MainMenuButtonDescription : MonoBehaviour
 {
     private Text text;
 

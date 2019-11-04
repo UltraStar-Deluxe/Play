@@ -30,5 +30,8 @@ public enum EScene
     SongSelectScene = 12,
 
     // song editor
-    SongEditorScene = 13
+    SongEditorScene = 13,
+
+    // credits 
+    CreditsScene = 14,
 }
