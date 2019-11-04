@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class SongSelectSceneKeyboardInputController : MonoBehaviour
 {
+    private const KeyCode MainMenuShortcut = KeyCode.Escape;
+    private const KeyCode MainMenuShortcut2 = KeyCode.Backspace;
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
@@ -25,7 +27,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyUp(MainMenuShortcut) || Input.GetKeyUp(MainMenuShortcut2))
         {
             if (songSelectSceneController.IsSearchEnabled())
             {
