@@ -6,7 +6,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using System;
 
-public class MainSceneController : MonoBehaviour
+public class DefaultButtonSelector : MonoBehaviour
 {
     public Button defaultButton;
 
