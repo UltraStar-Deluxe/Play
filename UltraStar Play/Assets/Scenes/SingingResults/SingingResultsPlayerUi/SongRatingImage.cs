@@ -14,6 +14,12 @@ public class SongRatingImage : MonoBehaviour
         image = GetComponent<Image>();
     }
 
+    void Start()
+    {
+        LeanTween.scale(gameObject, Vector3.one, 1f)
+            .setFrom(Vector3.one * 0.75f).setEaseSpring();
+    }
+
     public void SetSongRating(SongRating rating)
     {
         SongRatingImageHolder[] holders = FindObjectsOfType<SongRatingImageHolder>();

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-[CustomEditor(typeof(ThemeManger))]
+[CustomEditor(typeof(ThemeManager))]
 public class ThemeManagerInspector : EditorBase
 {
 
@@ -21,7 +21,7 @@ public class ThemeManagerInspector : EditorBase
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
-                ThemeManger.Instance.currentThemeName = quickThemeSelectItems[quickThemeSelectIndex];
+                ThemeManager.Instance.currentThemeName = quickThemeSelectItems[quickThemeSelectIndex];
                 UpdateThemeResources();
             }
         }
@@ -40,7 +40,7 @@ public class ThemeManagerInspector : EditorBase
     private void UpdateThemeResources()
     {
         // Update the themes
-        ThemeManger.Instance.UpdateThemeResources();
+        ThemeManager.Instance.UpdateThemeResources();
         UpdateQuickThemeSelect();
 
         // Make Themeable instances dirty, such they will be refreshed in the Unity Editor.
@@ -59,9 +59,9 @@ public class ThemeManagerInspector : EditorBase
 
     private void UpdateQuickThemeSelect()
     {
-        List<string> loadedThemeNames = ThemeManger.Instance.GetLoadedThemeNames();
+        List<string> loadedThemeNames = ThemeManager.Instance.GetLoadedThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
-        Theme currentTheme = ThemeManger.Instance.GetCurrentTheme();
+        Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
         if (currentTheme != null)
         {
             quickThemeSelectIndex = loadedThemeNames.IndexOf(currentTheme.Name);
