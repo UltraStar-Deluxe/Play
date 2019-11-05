@@ -8,6 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class CornersFollowAnchors : MonoBehaviour
 {
+    public bool manualRefresh;
     public bool followPosition = true;
     public bool followSize = true;
 
@@ -23,6 +24,10 @@ public class CornersFollowAnchors : MonoBehaviour
 #if UNITY_EDITOR
     void Update()
     {
+        if (manualRefresh)
+        {
+            manualRefresh = false;
+        }
         UpdatePositionFollowAnchors();
     }
 #endif
@@ -33,15 +38,14 @@ public class CornersFollowAnchors : MonoBehaviour
         {
             lastAnchorMax = rectTransform.anchorMax;
             lastAnchorMin = rectTransform.anchorMin;
-
-            if (followPosition)
-            {
-                rectTransform.anchoredPosition = Vector2.zero;
-            }
-            if (followSize)
-            {
-                rectTransform.sizeDelta = Vector2.zero;
-            }
+        }
+        if (followPosition && rectTransform.anchoredPosition != Vector2.zero)
+        {
+            rectTransform.anchoredPosition = Vector2.zero;
+        }
+        if (followSize && rectTransform.sizeDelta != Vector2.zero)
+        {
+            rectTransform.sizeDelta = Vector2.zero;
         }
     }
 }
