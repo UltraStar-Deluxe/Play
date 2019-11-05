@@ -2,14 +2,14 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class MainMenuButtonSelectHandler : MonoBehaviour, ISelectHandler
+public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler
 {
     public string buttonDescription;
-    private MainMenuButtonDescription uiButtonDescriptionText;
+    private MenuButtonDescriptionText uiButtonDescriptionText;
 
     void Start()
     {
-        uiButtonDescriptionText = FindObjectOfType<MainMenuButtonDescription>();
+        uiButtonDescriptionText = FindObjectOfType<MenuButtonDescriptionText>();
     }
 
     public void OnSelect(BaseEventData eventData)

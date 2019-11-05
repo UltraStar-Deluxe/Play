@@ -135,10 +135,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 337235265}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Not implemented yet
+  buttonDescription: Not yet implemented
 --- !u!1001 &339024703
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -294,7 +294,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 339024705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonDescription: About this game
@@ -603,10 +603,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 699375192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Configure settings
+  buttonDescription: Edit the options
 --- !u!1 &743028458
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manualRefresh: 0
   followPosition: 1
   followSize: 1
 --- !u!114 &743028461
@@ -767,6 +768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manualRefresh: 0
   followPosition: 1
   followSize: 1
 --- !u!114 &773743382
@@ -962,10 +964,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 958459793}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Not implemented yet
+  buttonDescription: Not yet implemented
 --- !u!1001 &1061399165
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1136,10 +1138,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1061399167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Close the game
+  buttonDescription: End the game
 --- !u!1001 &1177802556
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1424,7 +1426,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1777700774}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25930caa225f5464a83f7e92342b177f, type: 3}
+  m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonDescription: Sing a song
@@ -1627,7 +1629,7 @@ GameObject:
   - component: {fileID: 2054057980}
   - component: {fileID: 2054057984}
   m_Layer: 5
-  m_Name: ButtonDescription
+  m_Name: Subtitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1664,6 +1666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manualRefresh: 0
   followPosition: 1
   followSize: 1
 --- !u!114 &2054057981
@@ -1850,11 +1853,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5124115183525111795, guid: be0e3235464c346458a464603cce47c0,
-        type: 3}
-      propertyPath: m_Type
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111794, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -1865,6 +1863,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 7070348881521034252}
+    - target: {fileID: 5124115183525111795, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be0e3235464c346458a464603cce47c0, type: 3}
 --- !u!1001 &7070348881521034251
