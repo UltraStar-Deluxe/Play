@@ -30,30 +30,31 @@ public class SongRouletteItem : MonoBehaviour
         }
         set
         {
-            targetRouletteItem = value;
             if (targetRouletteItem != null)
             {
-                startAnchorMin = RectTransform.anchorMin;
-                startAnchorMax = RectTransform.anchorMax;
-                AnimTime = 0;
+                // Cancel old animation
+                LeanTween.cancel(gameObject, animIdAnchorMin);
+                LeanTween.cancel(gameObject, animIdAnchorMax);
+            }
+
+            targetRouletteItem = value;
+
+            if (targetRouletteItem != null)
+            {
+                transform.SetSiblingIndex(TargetRouletteItem.renderOrder);
+
+                // Animate transition to target position
+                float animTimeInSeconds = 0.2f;
+                animIdAnchorMin = LeanTween.value(gameObject, RectTransform.anchorMin, TargetRouletteItem.RectTransform.anchorMin, animTimeInSeconds)
+                    .setOnUpdate((Vector2 val) => RectTransform.anchorMin = val).id;
+                animIdAnchorMax = LeanTween.value(gameObject, RectTransform.anchorMax, TargetRouletteItem.RectTransform.anchorMax, animTimeInSeconds)
+                    .setOnUpdate((Vector2 val) => RectTransform.anchorMax = val).id;
             }
         }
     }
 
-    private Vector2 startAnchorMin;
-    private Vector2 startAnchorMax;
-
-    public Vector3 Scale
-    {
-        get
-        {
-            return RectTransform.localScale;
-        }
-        set
-        {
-            RectTransform.localScale = value;
-        }
-    }
+    private int animIdAnchorMin;
+    private int animIdAnchorMax;
 
     private RectTransform rectTransform;
     public RectTransform RectTransform
@@ -68,31 +69,16 @@ public class SongRouletteItem : MonoBehaviour
         }
     }
 
-    public float AnimTime { get; set; }
-    public float ScaleTime { get; set; }
-
-    void Update()
+    public void Start()
     {
-        ScaleTime += 10 * Time.deltaTime;
-        if (ScaleTime >= 1)
-        {
-            ScaleTime = 1;
-        }
-        Scale = new Vector2(ScaleTime, ScaleTime);
+        // Animate to full scale
+        LeanTween.scale(RectTransform, Vector3.one, 0.2f);
+    }
 
-        AnimTime += 10 * Time.deltaTime;
-        if (AnimTime >= 1)
-        {
-            AnimTime = 1;
-        }
-
-        if (TargetRouletteItem != null)
-        {
-            transform.SetSiblingIndex(TargetRouletteItem.renderOrder);
-            RectTransform.anchorMin = Vector2.Lerp(startAnchorMin, TargetRouletteItem.RectTransform.anchorMin, AnimTime);
-            RectTransform.anchorMax = Vector2.Lerp(startAnchorMax, TargetRouletteItem.RectTransform.anchorMax, AnimTime);
-        }
-        else
+    public void Update()
+    {
+        // Destory this item when it does not have a target.
+        if (TargetRouletteItem == null)
         {
             Destroy(gameObject);
         }

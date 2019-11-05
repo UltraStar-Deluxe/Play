@@ -28,12 +28,13 @@ public class ThemeableImage : Themeable
         {
             lastImageResource = imageResource;
             imagePath = imageResource.GetPath();
-            ReloadResources();
+            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
+            ReloadResources(currentTheme);
         }
     }
 #endif
 
-    public override void ReloadResources()
+    public override void ReloadResources(Theme theme)
     {
         if (string.IsNullOrEmpty(imagePath))
         {
@@ -46,7 +47,7 @@ public class ThemeableImage : Themeable
             return;
         }
 
-        Sprite loadedSprite = LoadResourceFromTheme<Sprite>(imagePath);
+        Sprite loadedSprite = LoadResourceFromTheme<Sprite>(theme, imagePath);
         if (loadedSprite == null)
         {
             Debug.LogError($"Could not load image {imagePath}", gameObject);

@@ -14,7 +14,8 @@ public class ThemeableInspector : EditorBase
         Themeable myScript = target as Themeable;
         if (GUILayout.Button("Update Resources"))
         {
-            myScript.ReloadResources();
+            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
+            myScript.ReloadResources(currentTheme);
         }
     }
 }

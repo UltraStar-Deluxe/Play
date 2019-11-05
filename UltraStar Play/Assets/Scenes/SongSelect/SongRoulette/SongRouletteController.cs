@@ -20,9 +20,11 @@ public class SongRouletteController : MonoBehaviour
 
     private List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
 
-    public bool showRouletteItems;
+    public bool showRouletteItemPlaceholders;
 
     public SongSelectSceneController SongSelectSceneController { get; set; }
+
+    private bool isInitialized;
 
     void Start()
     {
@@ -30,7 +32,7 @@ public class SongRouletteController : MonoBehaviour
         centerItemIndex = (int)Math.Floor(rouletteItemPlaceholders.Count / 2f);
         centerItem = rouletteItemPlaceholders[centerItemIndex];
 
-        if (!showRouletteItems)
+        if (!showRouletteItemPlaceholders)
         {
             foreach (RouletteItemPlaceholder item in rouletteItemPlaceholders)
             {
@@ -48,6 +50,16 @@ public class SongRouletteController : MonoBehaviour
         }
 
         UpdateSongRouletteItems();
+
+        // Initially, let all items start with full size
+        if (!isInitialized)
+        {
+            isInitialized = true;
+            foreach (SongRouletteItem songRouletteItem in songRouletteItems)
+            {
+                songRouletteItem.RectTransform.localScale = Vector3.one;
+            }
+        }
     }
 
     private void UpdateSongRouletteItems()
@@ -104,8 +116,7 @@ public class SongRouletteController : MonoBehaviour
         item.RectTransform.sizeDelta = Vector2.zero;
         item.RectTransform.anchoredPosition = Vector2.zero;
         item.TargetRouletteItem = rouletteItem;
-        item.AnimTime = 1;
-        item.ScaleTime = 1;
+        item.RectTransform.localScale = Vector3.zero;
 
         item.GetComponent<Button>().onClick.AddListener(() => SelectSong(songMeta));
 
