@@ -39,7 +39,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     private SongMeta selectedSongBeforeSearch;
 
-    private SongMeta selectedSong
+    private SongMeta SelectedSong
     {
         get
         {
@@ -139,7 +139,7 @@ public class SongSelectSceneController : MonoBehaviour
     private void SetEmptySongDetails()
     {
         artistText.SetText("");
-        // songTitleText.text = "";
+        songTitleText.text = "";
         songCountText.text = "0/0";
         videoIndicator.SetActive(false);
         duetIndicator.SetActive(false);
@@ -157,15 +157,15 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void OnStartSingScene()
     {
-        if (selectedSong != null)
+        if (SelectedSong != null)
         {
-            StartSingScene(selectedSong);
+            StartSingScene(SelectedSong);
         }
     }
 
     public void OnSearchTextChanged()
     {
-        SongMeta lastSelectedSong = selectedSong;
+        SongMeta lastSelectedSong = SelectedSong;
         string searchText = searchTextInputField.Text.ToLower();
         if (string.IsNullOrEmpty(searchText))
         {
@@ -201,7 +201,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
     {
-        selectedSongBeforeSearch = selectedSong;
+        selectedSongBeforeSearch = SelectedSong;
 
         searchTextInputField.Show();
         searchTextInputField.RequestFocus();
