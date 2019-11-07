@@ -1,36 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public static class SettingsManager
+public class SettingsManager : MonoBehaviour
 {
-    private static GameSetting setting = new GameSetting();
-
-    public static object GetSetting(ESetting key)
+    public static SettingsManager Instance
     {
-        lock (setting)
+        get
         {
-            return setting.GetSettingNotNull(key);
+            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
         }
     }
 
-    public static void SetSetting(ESetting key, object settingValue)
+    private readonly string settingsPath = "Settings.json";
+
+    private Settings settings;
+    public Settings Settings
     {
-        if (settingValue == null)
+        get
         {
-            throw new UnityException("Cannot set setting because value is null");
-        }
-        lock (setting)
-        {
-            setting.SetSetting(key, settingValue);
+            if (settings == null)
+            {
+                Reload();
+            }
+            return settings;
         }
     }
 
-    public static void Reload()
+    public void Save()
     {
-        lock (setting)
-        {
-            setting = new GameSetting();
-        }
+        string json = JsonConverter.ToJson(Settings, true);
+        File.WriteAllText(settingsPath, json);
+    }
+
+    public void Reload()
+    {
+        string fileContent = File.ReadAllText(settingsPath);
+        settings = JsonConverter.FromJson<Settings>(fileContent);
     }
 }

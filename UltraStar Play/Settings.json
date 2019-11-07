@@ -1,0 +1,18 @@
+{
+    "GameSettings" : {
+        "language" : 15,
+        "songDirs" : [
+            "./Songs",
+			"F:\\Dev\\UltraStar Songs Dev"
+        ]
+    },
+    "GraphicSettings" : {
+        "resolution" : {
+            "width" : 1024,
+            "height" : 764,
+            "refreshRate" : 60
+        },
+        "fullScreenMode" : 3,
+        "useImageAsCursor" : true
+    }
+}
