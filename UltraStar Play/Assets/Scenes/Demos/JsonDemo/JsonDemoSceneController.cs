@@ -15,7 +15,7 @@ public class JsonDemoSceneController : MonoBehaviour
         JsonDemoSerializable child = new JsonDemoSerializable();
         root.otherSerializable = child;
 
-        string json = JsonUtility.ToJson(root);
+        string json = JsonUtility.ToJson(root, true);
         uiText.text = json;
 
         loadedInstance = JsonUtility.FromJson<JsonDemoSerializable>(json);

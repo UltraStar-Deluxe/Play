@@ -1,9 +1,6 @@
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 [Serializable]
 public class StringToStringMap : SerializableDictionary<string, string>
 {
-
 }
