@@ -11,6 +11,7 @@ TagManager:
   - SongMetaManager
   - ApplicationManager
   - ThemeManager
+  - SettingsManager
   layers:
   - Default
   - TransparentFX
