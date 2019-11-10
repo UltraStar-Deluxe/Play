@@ -30,6 +30,14 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    // Non-static settings field for debugging of the settings in the Unity Inspector.
+    public Settings nonStaticSettings;
+
+    void Start()
+    {
+        nonStaticSettings = settings;
+    }
+
     public void Save()
     {
         string json = JsonConverter.ToJson(Settings, true);
@@ -40,5 +48,6 @@ public class SettingsManager : MonoBehaviour
     {
         string fileContent = File.ReadAllText(settingsPath);
         settings = JsonConverter.FromJson<Settings>(fileContent);
+        nonStaticSettings = settings;
     }
 }

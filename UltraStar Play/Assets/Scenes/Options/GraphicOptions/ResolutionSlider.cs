@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UniRx;
 
 public class ResolutionSlider : TextItemSlider<Resolution>
 {
@@ -16,8 +17,9 @@ public class ResolutionSlider : TextItemSlider<Resolution>
         else
         {
             Items = GetResolutions();
-            Selection.Value = Items.Where(it => it.Equals(Screen.currentResolution)).FirstOrDefault();
+            Selection.Value = Items.Where(it => it.Equals(Screen.currentResolution)).FirstOrDefault().OrIfNull(Items[0]);
         }
+        Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.resolution = newValue);
     }
 
     protected override string GetDisplayString(Resolution item)
