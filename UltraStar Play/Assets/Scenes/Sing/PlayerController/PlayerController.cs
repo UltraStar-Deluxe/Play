@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
+    private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
 
     public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier)
     {
