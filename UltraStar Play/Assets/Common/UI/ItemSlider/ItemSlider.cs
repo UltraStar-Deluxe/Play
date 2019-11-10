@@ -24,6 +24,7 @@ abstract public class ItemSlider<T> : MonoBehaviour
             }
             else
             {
+                // Return a copy of the item list, to not mess up the item list from the outside.
                 items = new List<T>(value);
             }
 
