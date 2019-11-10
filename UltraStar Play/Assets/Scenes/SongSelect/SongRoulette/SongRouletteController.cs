@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 public class SongRouletteController : MonoBehaviour
 {
@@ -15,8 +16,16 @@ public class SongRouletteController : MonoBehaviour
     private int centerItemIndex;
 
     private List<SongMeta> songs = new List<SongMeta>();
-    public SongMeta SelectedSong { get; private set; }
-    private int selectedSongIndex;
+
+    public IReactiveProperty<SongSelection> Selection { get; } = new ReactiveProperty<SongSelection>();
+
+    private int SelectedSongIndex
+    {
+        get
+        {
+            return (Selection.Value.SongMeta == null) ? -1 : Selection.Value.SongIndex;
+        }
+    }
 
     private List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
 
@@ -72,7 +81,7 @@ public class SongRouletteController : MonoBehaviour
         {
             int index = activeRouletteItemPlaceholders.IndexOf(rouletteItem);
             int activeCenterDistance = index - activeCenterIndex;
-            int songIndex = selectedSongIndex + activeCenterDistance;
+            int songIndex = SelectedSongIndex + activeCenterDistance;
             SongMeta songMeta = GetSongAtIndex(songIndex);
 
             // Get or create SongRouletteItem for the song at the index
@@ -166,18 +175,15 @@ public class SongRouletteController : MonoBehaviour
         songs = new List<SongMeta>(songMetas);
         if (songs.Count > 0)
         {
-            selectedSongIndex = 0;
-            SelectedSong = songs[selectedSongIndex];
+            Selection.Value = new SongSelection(songs[0], 0, songs.Count);
             FindActiveRouletteItems();
             UpdateRouletteItemsActiveState();
         }
         else
         {
-            SelectedSong = null;
-            selectedSongIndex = -1;
+            Selection.Value = new SongSelection(null, -1, 0);
             RemoveAllSongRouletteItems();
         }
-        SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
     }
 
     private void RemoveAllSongRouletteItems()
@@ -199,27 +205,20 @@ public class SongRouletteController : MonoBehaviour
         SongMeta matchingSong = songs.Where(song => song.Title == songMeta.Title).FirstOrDefault();
         if (matchingSong != null)
         {
-            SelectedSong = matchingSong;
-            selectedSongIndex = songs.IndexOf(SelectedSong);
-
-            if (SongSelectSceneController != null)
-            {
-                SongSelectSceneController.OnSongSelected(SelectedSong, selectedSongIndex, songs);
-            }
+            Selection.Value = new SongSelection(matchingSong, songs.IndexOf(matchingSong), songs.Count);
         }
     }
 
     public void SelectNextSong()
     {
-        int indexOfSelectedSong = songs.IndexOf(SelectedSong);
         int nextIndex;
-        if (indexOfSelectedSong == -1)
+        if (SelectedSongIndex < 0)
         {
             nextIndex = 0;
         }
         else
         {
-            nextIndex = indexOfSelectedSong + 1;
+            nextIndex = SelectedSongIndex + 1;
         }
         SongMeta nextSong = GetSongAtIndex(nextIndex);
         SelectSong(nextSong);
@@ -227,15 +226,14 @@ public class SongRouletteController : MonoBehaviour
 
     public void SelectPreviousSong()
     {
-        int indexOfSelectedSong = songs.IndexOf(SelectedSong);
         int nextIndex;
-        if (indexOfSelectedSong == -1)
+        if (SelectedSongIndex < 0)
         {
             nextIndex = 0;
         }
         else
         {
-            nextIndex = indexOfSelectedSong - 1;
+            nextIndex = SelectedSongIndex - 1;
         }
         SongMeta nextSong = GetSongAtIndex(nextIndex);
         SelectSong(nextSong);
