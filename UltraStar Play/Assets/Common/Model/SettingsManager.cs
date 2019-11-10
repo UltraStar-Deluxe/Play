@@ -15,7 +15,9 @@ public class SettingsManager : MonoBehaviour
 
     private readonly string settingsPath = "Settings.json";
 
-    private Settings settings;
+    // The settings field is static to persist it across scene changes.
+    // The SettingsManager is meant to be used as a singleton, such that this static field should not be a problem.
+    private static Settings settings;
     public Settings Settings
     {
         get
