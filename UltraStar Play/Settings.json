@@ -1,18 +1,16 @@
 {
-    "GameSettings" : {
-        "language" : 15,
-        "songDirs" : [
+    "GameSettings":{
+        "language":"German",
+        "songDirs":[
             "./Songs",
-			"F:\\Dev\\UltraStar Songs Dev"
+            "F:\\Dev\\UltraStar Songs Dev"
         ]
     },
-    "GraphicSettings" : {
-        "resolution" : {
-            "width" : 1024,
-            "height" : 764,
-            "refreshRate" : 60
+    "GraphicSettings":{
+        "resolution":{
+            
         },
-        "fullScreenMode" : 3,
-        "useImageAsCursor" : true
+        "fullScreenMode":"Windowed",
+        "useImageAsCursor":true
     }
 }
