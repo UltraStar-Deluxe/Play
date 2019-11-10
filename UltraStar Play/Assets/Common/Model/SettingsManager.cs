@@ -38,6 +38,11 @@ public class SettingsManager : MonoBehaviour
         nonStaticSettings = settings;
     }
 
+    void OnDisable()
+    {
+        Save();
+    }
+
     public void Save()
     {
         string json = JsonConverter.ToJson(Settings, true);
