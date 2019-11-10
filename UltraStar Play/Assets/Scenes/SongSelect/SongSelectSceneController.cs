@@ -7,9 +7,18 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Linq;
+using UniRx;
 
 public class SongSelectSceneController : MonoBehaviour
 {
+    public static SongSelectSceneController Instance
+    {
+        get
+        {
+            return FindObjectOfType<SongSelectSceneController>();
+        }
+    }
+
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
@@ -34,15 +43,7 @@ public class SongSelectSceneController : MonoBehaviour
     {
         get
         {
-            return songRouletteController.SelectedSong;
-        }
-    }
-
-    public static SongSelectSceneController Instance
-    {
-        get
-        {
-            return FindObjectOfType<SongSelectSceneController>();
+            return songRouletteController.Selection.Value.SongMeta;
         }
     }
 
@@ -58,11 +59,33 @@ public class SongSelectSceneController : MonoBehaviour
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
+        songRouletteController.Selection.Subscribe(OnNewSongSelection);
+
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
             songRouletteController.SelectSong(sceneData.SongMeta);
         }
+    }
+
+    private void OnNewSongSelection(SongSelection selection)
+    {
+        SongMeta selectedSong = selection.SongMeta;
+        if (selectedSong == null)
+        {
+            SetEmptySongDetails();
+            return;
+        }
+
+        artistText.SetText(selectedSong.Artist);
+        songTitleText.text = selectedSong.Title;
+        songCountText.text = (selection.SongIndex + 1) + "/" + selection.SongsCount;
+
+        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
+        videoIndicator.SetActive(hasVideo);
+
+        bool isDuet = selectedSong.VoiceNames.Keys.Count > 1;
+        duetIndicator.SetActive(isDuet);
     }
 
     private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
@@ -111,25 +134,6 @@ public class SongSelectSceneController : MonoBehaviour
     {
         SongSelectSceneData sceneData = new SongSelectSceneData();
         return sceneData;
-    }
-
-    public void OnSongSelected(SongMeta selectedSong, int selectedSongIndex, List<SongMeta> songs)
-    {
-        if (selectedSong == null)
-        {
-            SetEmptySongDetails();
-            return;
-        }
-
-        artistText.SetText(selectedSong.Artist);
-        songTitleText.text = selectedSong.Title;
-        songCountText.text = (selectedSongIndex + 1) + "/" + songs.Count;
-
-        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
-        videoIndicator.SetActive(hasVideo);
-
-        bool isDuet = selectedSong.VoiceNames.Keys.Count == 2;
-        duetIndicator.SetActive(isDuet);
     }
 
     private void SetEmptySongDetails()
@@ -197,7 +201,7 @@ public class SongSelectSceneController : MonoBehaviour
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
     {
-        selectedSongBeforeSearch = songRouletteController.SelectedSong;
+        selectedSongBeforeSearch = SelectedSong;
 
         searchTextInputField.Show();
         searchTextInputField.RequestFocus();
