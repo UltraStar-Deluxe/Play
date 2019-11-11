@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using UnityEngine;
 
 abstract public class Themeable : MonoBehaviour
