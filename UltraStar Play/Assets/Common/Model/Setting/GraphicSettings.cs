@@ -5,28 +5,8 @@ using UnityEngine;
 [Serializable]
 public class GraphicSettings
 {
-    public Resolution resolution = GetResolution();
+    // Screen.currentResolution may only be called from Start() and Awake(), thus use a dummy here.
+    public ScreenResolution resolution = new ScreenResolution(800, 600, 60);
     public FullScreenMode fullScreenMode = FullScreenMode.Windowed;
     public bool useImageAsCursor = true;
-
-    private static Resolution GetResolution()
-    {
-        if (Application.isEditor)
-        {
-            return GetDummyResolutions();
-        }
-        else
-        {
-            return Screen.currentResolution;
-        }
-    }
-
-    private static Resolution GetDummyResolutions()
-    {
-        Resolution res = new Resolution();
-        res.width = 1024;
-        res.height = 764;
-        res.refreshRate = 60;
-        return res;
-    }
 }

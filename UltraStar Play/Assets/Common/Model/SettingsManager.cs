@@ -30,12 +30,21 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    private static bool initializedResolution;
+
     // Non-static settings field for debugging of the settings in the Unity Inspector.
     public Settings nonStaticSettings;
 
     void Start()
     {
+        // Load reference from last scene if needed
         nonStaticSettings = settings;
+        if (!initializedResolution)
+        {
+            initializedResolution = true;
+            // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
+            Settings.GraphicSettings.resolution = ApplicationUtils.GetCurrentAppResolution();
+        }
     }
 
     void OnDisable()
