@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerProfileManager : MonoBehaviour
@@ -31,23 +26,6 @@ public class PlayerProfileManager : MonoBehaviour
 
     private void LoadPlayerProfiles()
     {
-        playerProfiles = new List<PlayerProfile>();
-
-        XElement xconfig = XElement.Load("./Config.xml");
-        XElement xprofiles = xconfig.Element("Profiles");
-        IEnumerable<XElement> xplayerProfiles = xprofiles.Elements("PlayerProfile");
-        foreach (XElement xplayerProfile in xplayerProfiles)
-        {
-            PlayerProfile playerProfile = CreatePlayerProfile(xplayerProfile);
-            playerProfiles.Add(playerProfile);
-        }
-    }
-
-    private PlayerProfile CreatePlayerProfile(XElement xplayerProfile)
-    {
-        PlayerProfile playerProfile = new PlayerProfile();
-        playerProfile.Name = xplayerProfile.Attribute("name").Value;
-        playerProfile.MicDevice = xplayerProfile.Attribute("mic").Value;
-        return playerProfile;
+        playerProfiles = new List<PlayerProfile>(SettingsManager.Instance.Settings.PlayerProfiles);
     }
 }
