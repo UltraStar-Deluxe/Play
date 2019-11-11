@@ -8,9 +8,39 @@
     },
     "GraphicSettings":{
         "resolution":{
-            
+            "Width":800,
+            "Height":600,
+            "RefreshRate":59
         },
         "fullScreenMode":"Windowed",
         "useImageAsCursor":true
-    }
+    },
+    "PlayerProfiles":[
+        {
+            "Name":"Player01",
+            "MicDevice":"Mikrofon (2- USB Microphone)",
+            "Difficulty":{
+                "RoundingDistance":1
+            },
+            "Color":{
+                "r":0.0,
+                "g":1.0,
+                "b":1.0,
+                "a":1.0
+            }
+        },
+        {
+            "Name":"Player02",
+            "MicDevice":"",
+            "Difficulty":{
+                "RoundingDistance":2
+            },
+            "Color":{
+                "r":1.0,
+                "g":0.0,
+                "b":1.0,
+                "a":1.0
+            }
+        }
+    ]
 }
