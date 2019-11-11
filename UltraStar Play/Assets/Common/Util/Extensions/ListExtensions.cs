@@ -4,6 +4,12 @@ using System.Collections.Generic;
 public static class ListExtensions
 {
 
+    // Returns true if and only if the given collection is null or does not contain any values.
+    public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
+    {
+        return (collection == null) || (collection.Count == 0);
+    }
+
     // Returns true if the predicate is true for all elements in the list. Otherwise, returns false.
     public static bool All<T>(this IList<T> list, Func<T, bool> predicate)
     {

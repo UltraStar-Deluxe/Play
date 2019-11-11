@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 
-public class ResolutionSlider : TextItemSlider<Resolution>
+public class ResolutionSlider : TextItemSlider<ScreenResolution>
 {
     protected override void Start()
     {
@@ -17,37 +17,36 @@ public class ResolutionSlider : TextItemSlider<Resolution>
         else
         {
             Items = GetResolutions();
-            Selection.Value = Items.Where(it => it.Equals(Screen.currentResolution)).FirstOrDefault().OrIfNull(Items[0]);
+            ScreenResolution currentScreenResolution = ApplicationUtils.GetCurrentAppResolution();
+            Selection.Value = Items.Where(it => it.Equals(currentScreenResolution))
+                .FirstOrDefault().OrIfNull(Items[0]);
         }
         Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.resolution = newValue);
     }
 
-    protected override string GetDisplayString(Resolution item)
+    protected override string GetDisplayString(ScreenResolution item)
     {
-        return $"{item.width} x {item.height} ({item.refreshRate} Hz)";
+        return $"{item.Width} x {item.Height} ({item.RefreshRate} Hz)";
     }
 
-    private List<Resolution> GetDummyResolutions()
+    private List<ScreenResolution> GetDummyResolutions()
     {
-        List<Resolution> result = new List<Resolution>();
+        List<ScreenResolution> result = new List<ScreenResolution>();
         result.Add(CreateResolution(800, 600, 60));
         result.Add(CreateResolution(1024, 768, 60));
         result.Add(CreateResolution(1920, 1080, 60));
         return result;
     }
 
-    private Resolution CreateResolution(int v1, int v2, int v3)
+    private ScreenResolution CreateResolution(int width, int height, int refreshRate)
     {
-        Resolution res = new Resolution();
-        res.width = v1;
-        res.height = v2;
-        res.refreshRate = v3;
+        ScreenResolution res = new ScreenResolution(width, height, refreshRate);
         return res;
     }
 
-    private List<Resolution> GetResolutions()
+    private List<ScreenResolution> GetResolutions()
     {
-        List<Resolution> result = new List<Resolution>(Screen.resolutions);
+        List<ScreenResolution> result = Screen.resolutions.Select(it => new ScreenResolution(it)).ToList();
         return result;
     }
 }

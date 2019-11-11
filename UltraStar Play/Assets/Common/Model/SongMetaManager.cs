@@ -21,12 +21,13 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
+    // The list of songs is static to be persisted across scenes.
     private static readonly List<SongMeta> songMetas = new List<SongMeta>();
     public List<SongMeta> SongMetas
     {
         get
         {
-            if (songMetas.Count == 0)
+            if (songMetas.IsNullOrEmpty())
             {
                 ScanFiles();
             }
