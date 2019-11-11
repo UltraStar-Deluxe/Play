@@ -11,6 +11,6 @@ public class VersionLabel : MonoBehaviour
     void OnEnable()
     {
         Text text = GetComponent<Text>();
-        text.text = prefix + ApplicationManager.AppVersion + suffix;
+        text.text = prefix + ApplicationUtils.AppVersion + suffix;
     }
 }

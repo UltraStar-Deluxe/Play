@@ -12,14 +12,6 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    public static string AppVersion
-    {
-        get
-        {
-            return "0.1.0";
-        }
-    }
-
     [Range(5, 60)]
     public int targetFrameRate = 30;
 
