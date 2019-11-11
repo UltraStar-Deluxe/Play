@@ -18,17 +18,6 @@ public class SerializationDemoSceneController : MonoBehaviour
         root = new DemoSerializable("root", child);
 
         JsonExample();
-        // XmlExample();
-    }
-
-    private void XmlExample()
-    {
-        // Xml serialization of C# has issues with Dictionary and nested objects if not marked explicitly.
-        string xml = XmlConverter.ToXml(root);
-        serializedText.text = xml;
-
-        loadedInstance = XmlConverter.FromXml<DemoSerializable>(xml);
-        deserializedText.text = XmlConverter.ToXml(loadedInstance);
     }
 
     private void JsonExample()
