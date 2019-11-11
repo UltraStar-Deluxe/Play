@@ -3,6 +3,14 @@ using UnityEngine;
 public static class ApplicationUtils
 {
 
+    public static string AppVersion
+    {
+        get
+        {
+            return "0.1.0";
+        }
+    }
+
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR
