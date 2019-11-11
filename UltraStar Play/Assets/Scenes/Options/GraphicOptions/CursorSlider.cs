@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UniRx;
 
-public class CursorImageSlider : BoolItemSlider
+public class CursorSlider : BoolItemSlider
 {
 
-    void Start()
+    protected override void Start()
     {
         base.Start();
         Selection.Value = SettingsManager.Instance.Settings.GraphicSettings.useImageAsCursor;
