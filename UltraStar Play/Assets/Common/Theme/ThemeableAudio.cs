@@ -10,7 +10,9 @@ public class ThemeableAudio : Themeable
     public EAudioResource audioResource = EAudioResource.NONE;
     public AudioSource target;
 
+#if UNITY_EDITOR
     private EAudioResource lastAudioResource = EAudioResource.NONE;
+#endif
 
     void OnEnable()
     {
