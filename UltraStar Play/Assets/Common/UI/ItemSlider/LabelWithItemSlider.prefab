@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 9202059109578588013}
   - component: {fileID: 6462421124906617625}
   m_Layer: 5
-  m_Name: ResolutionLabel
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -325,7 +325,7 @@ PrefabInstance:
     - target: {fileID: 6750085590155641733, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: m_Name
-      value: ResolutionSlider
+      value: ItemSlider
       objectReference: {fileID: 0}
     - target: {fileID: 6750085590155641732, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
@@ -487,22 +487,22 @@ PrefabInstance:
       propertyPath: sizeDelta.y
       value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641730, guid: 263498a12963d4f47a8fc3dce7c5912a,
+    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641730, guid: 263498a12963d4f47a8fc3dce7c5912a,
+    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: manualRefresh
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
+    - target: {fileID: 6750085590155641730, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
+    - target: {fileID: 6750085590155641730, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: manualRefresh
       value: 0
