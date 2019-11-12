@@ -4,7 +4,7 @@ using System.Linq;
 
 // Implements serialization / deserialization of JSON using
 // the serialization lib FullSerializer.
-public class JsonConverter
+public static class JsonConverter
 {
     // Indentation for pretty printing JSON.
     private const string INDENT_STRING = "    ";
@@ -13,8 +13,8 @@ public class JsonConverter
 
     private static fsSerializer CreateSerializer()
     {
-        fsSerializer serializer = new fsSerializer();
-        return serializer;
+        fsSerializer newSerializer = new fsSerializer();
+        return newSerializer;
     }
 
     public static string ToJson<T>(T obj)

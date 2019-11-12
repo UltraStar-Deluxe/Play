@@ -29,12 +29,9 @@ abstract public class ItemSlider<T> : MonoBehaviour
             }
 
             // Remove selection if not in the new items list.
-            if (SelectedItem != null)
+            if (HasSelectedItem && !items.Contains(SelectedItem))
             {
-                if (!items.Contains(SelectedItem))
-                {
-                    Selection.Value = default(T);
-                }
+                Selection.Value = default(T);
             }
         }
     }
@@ -46,6 +43,14 @@ abstract public class ItemSlider<T> : MonoBehaviour
         get
         {
             return Selection.Value;
+        }
+    }
+
+    public bool HasSelectedItem
+    {
+        get
+        {
+            return !object.Equals(SelectedItem, default(T));
         }
     }
 
@@ -71,27 +76,33 @@ abstract public class ItemSlider<T> : MonoBehaviour
 
     public void SelectPreviousItem()
     {
-        if (SelectedItem == null)
+        if (HasSelectedItem)
+        {
+            if (wrapAround || SelectedItemIndex > 0)
+            {
+                Selection.Value = Items.ElementBefore(SelectedItem, wrapAround);
+            }
+        }
+        else
         {
             Selection.Value = Items[0];
             return;
-        }
-        if (wrapAround || SelectedItemIndex > 0)
-        {
-            Selection.Value = Items.ElementBefore(SelectedItem, wrapAround);
         }
     }
 
     public void SelectNextItem()
     {
-        if (SelectedItem == null)
+        if (HasSelectedItem)
+        {
+            if (wrapAround || SelectedItemIndex < Items.Count - 1)
+            {
+                Selection.Value = Items.ElementAfter(SelectedItem, wrapAround);
+            }
+        }
+        else
         {
             Selection.Value = Items[0];
             return;
-        }
-        if (wrapAround || SelectedItemIndex < Items.Count - 1)
-        {
-            Selection.Value = Items.ElementAfter(SelectedItem, wrapAround);
         }
     }
 }
