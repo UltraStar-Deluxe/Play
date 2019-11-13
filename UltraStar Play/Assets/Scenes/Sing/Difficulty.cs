@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class Difficulty
 {
     public static readonly Difficulty Easy = new Difficulty("difficulty.easy", 2);
@@ -24,5 +26,13 @@ public class Difficulty
     {
         this.i18nCode = i18nCode;
         RoundingDistance = roundingDistance;
+    }
+
+    public static List<Difficulty> Values
+    {
+        get
+        {
+            return new List<Difficulty> { Easy, Medium, Hard };
+        }
     }
 }

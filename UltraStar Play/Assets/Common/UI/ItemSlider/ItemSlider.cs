@@ -46,11 +46,13 @@ abstract public class ItemSlider<T> : MonoBehaviour
         }
     }
 
-    public bool HasSelectedItem
+    public virtual bool HasSelectedItem
     {
         get
         {
-            return !object.Equals(SelectedItem, default(T));
+            // Enum values are never null, and thus always selected.
+            // Comparing with default(T) is used e.g. for structs, which are never null.
+            return typeof(T).IsEnum || !object.Equals(SelectedItem, default(T));
         }
     }
 

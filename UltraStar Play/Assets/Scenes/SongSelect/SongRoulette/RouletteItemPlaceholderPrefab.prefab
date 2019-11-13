@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3296845389576685943}
   - component: {fileID: 3741094789097670527}
   m_Layer: 5
-  m_Name: LeftLeft
+  m_Name: RouletteItemPlaceholderPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
