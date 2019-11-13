@@ -23,6 +23,7 @@ public enum EScene
     OptionsGraphicsScene = 5,
     OptionsSoundScene = 6,
     RecordingOptionsScene = 15,
+    PlayerProfileSetupScene = 16,
 
     // sing
     SingScene = 11,

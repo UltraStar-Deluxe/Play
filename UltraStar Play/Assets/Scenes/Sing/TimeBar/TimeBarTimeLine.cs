@@ -67,6 +67,7 @@ public class TimeBarTimeLine : MonoBehaviour
         rectTransform.anchorMax = new Vector2((float)endPosPercentage, rectTransform.anchorMax.y);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = Vector2.zero;
-        timeLineRect.SetColor(playerProfile.Color);
+        // TODO: Set color to color of MicProfile
+        // timeLineRect.SetColor(playerProfile.Color);
     }
 }

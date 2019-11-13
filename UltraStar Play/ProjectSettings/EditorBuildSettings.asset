@@ -53,4 +53,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
+  - enabled: 1
+    path: Assets/Scenes/Options/PlayerProfileSetup/PlayerProfileSetupScene.unity
+    guid: f509dae09ad85ac4e9c41ff79fa95d6d
   m_configObjects: {}
