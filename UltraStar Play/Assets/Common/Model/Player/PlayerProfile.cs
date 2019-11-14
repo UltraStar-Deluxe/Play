@@ -10,6 +10,7 @@ public class PlayerProfile
     public string MicDevice { get; set; } = "";
     public Difficulty Difficulty { get; set; } = Difficulty.Medium;
     public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
+    public bool IsEnabled { get; set; } = true;
 
     public PlayerProfile()
     {
