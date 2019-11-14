@@ -22,7 +22,8 @@
             "Difficulty":{
                 "RoundingDistance":0
             },
-            "Avatar":"GenericPlayer01"
+            "Avatar":"GenericPlayer01",
+            "IsEnabled":true
         },
         {
             "Name":"Player02",
@@ -30,7 +31,8 @@
             "Difficulty":{
                 "RoundingDistance":0
             },
-            "Avatar":"GenericPlayer02"
+            "Avatar":"GenericPlayer02",
+            "IsEnabled":false
         }
     ],
     "MicProfiles":[
