@@ -1,9 +1,11 @@
 #!/bin/sh
-#-------------------------------------------
+
+old_dir=$(PWD)
+
 echo "Removing old LeanTween folder..."
-rm --recursive --force LeanTween
-mkdir LeanTween
-cd LeanTween
+rm --recursive --force Plugins/LeanTween
+mkdir Plugins/LeanTween
+cd Plugins/LeanTween
 
 echo "Cloning LeanTween from remote..."
 git init
@@ -22,7 +24,6 @@ echo "Moving downloaded files to correct position for this project..."
 mv --verbose ./Assets/LeanTween/* ./
 rm --recursive ./Assets
 
-cd ..
+cd "$old_dir"
 echo "Downloading LeanTween done"
 echo ""
-#-------------------------------------------

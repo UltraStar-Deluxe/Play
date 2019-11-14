@@ -22,6 +22,7 @@ public enum EScene
     OptionsGameScene = 4,
     OptionsGraphicsScene = 5,
     OptionsSoundScene = 6,
+    RecordingOptionsScene = 15,
 
     // sing
     SingScene = 11,
@@ -30,5 +31,8 @@ public enum EScene
     SongSelectScene = 12,
 
     // song editor
-    SongEditorScene = 13
+    SongEditorScene = 13,
+
+    // credits 
+    CreditsScene = 14,
 }

@@ -13,7 +13,9 @@ public class ThemeableColor : Themeable
     public EColorResource colorResource = EColorResource.NONE;
     public Image target;
 
+#if UNITY_EDITOR
     private EColorResource lastColorResource = EColorResource.NONE;
+#endif
 
     void OnEnable()
     {
