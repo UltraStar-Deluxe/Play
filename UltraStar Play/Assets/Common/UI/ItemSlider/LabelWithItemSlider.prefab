@@ -45,7 +45,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2793207500214643716}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
   m_Name: 
@@ -487,16 +487,6 @@ PrefabInstance:
       propertyPath: sizeDelta.y
       value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
-        type: 3}
-      propertyPath: manualRefresh
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6750085590155641730, guid: 263498a12963d4f47a8fc3dce7c5912a,
         type: 3}
       propertyPath: m_Enabled
@@ -556,6 +546,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: 1920 x 1080
+      objectReference: {fileID: 0}
+    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6750085590155641731, guid: 263498a12963d4f47a8fc3dce7c5912a,
+        type: 3}
+      propertyPath: manualRefresh
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 263498a12963d4f47a8fc3dce7c5912a, type: 3}

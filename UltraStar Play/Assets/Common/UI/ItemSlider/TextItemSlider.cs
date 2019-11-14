@@ -6,6 +6,15 @@ abstract public class TextItemSlider<T> : ItemSlider<T>
 {
     public Text uiItemText;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        if (uiItemText == null)
+        {
+            GetComponentInChildren<ItemSliderUiText>().IfNotNull(it => uiItemText = it.GetComponent<Text>());
+        }
+    }
+
     protected override void Start()
     {
         base.Start();
