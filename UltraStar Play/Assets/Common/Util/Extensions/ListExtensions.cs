@@ -4,6 +4,14 @@ using System.Collections.Generic;
 public static class ListExtensions
 {
 
+    public static void AddIfNotContains<T>(this List<T> list, T item)
+    {
+        if (!list.Contains(item))
+        {
+            list.Add(item);
+        }
+    }
+
     // Returns true if and only if the given collection is null or does not contain any values.
     public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
     {
@@ -38,7 +46,7 @@ public static class ListExtensions
 
     /// Returns the element before the given element in the list.
     /// If wrapAround is true and the given element is the first one in the list, then the last element in the list is returned.
-    /// Otherwise returns null if already at the first element at the list. Also returns null if the list is empty.
+    /// Otherwise returns default if already at the first element at the list. Also returns default if the list is empty.
     public static T ElementBefore<T>(this List<T> list, T element, bool wrapAround)
     {
         if (list.Count == 0)
@@ -65,7 +73,7 @@ public static class ListExtensions
 
     /// Returns the element after the given element in the list.
     /// If wrapAround is true and the given element is the last one in the list, then the first element in the list is returned.
-    /// Otherwise returns null if already at the last element at the list. Also returns null if the list is empty.
+    /// Otherwise returns default if already at the last element at the list. Also returns default if the list is empty.
     public static T ElementAfter<T>(this List<T> list, T element, bool wrapAround)
     {
         if (list.Count == 0)

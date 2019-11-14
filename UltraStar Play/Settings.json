@@ -32,5 +32,19 @@
             },
             "Avatar":"GenericPlayer02"
         }
+    ],
+    "MicProfiles":[
+        {
+            "Name":"Mikrofon (2- USB Microphone)",
+            "Color":{
+                "r":0.1176471,
+                "g":0.5647059,
+                "b":1.0,
+                "a":1.0
+            },
+            "Amplification":12,
+            "NoiseSuppression":10,
+            "IsEnabled":true
+        }
     ]
 }

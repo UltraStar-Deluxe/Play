@@ -9,6 +9,7 @@ public class Settings
     public GameSettings GameSettings { get; set; } = new GameSettings();
     public GraphicSettings GraphicSettings { get; set; } = new GraphicSettings();
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
+    public List<MicProfile> MicProfiles { get; set; } = new List<MicProfile>();
 
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
