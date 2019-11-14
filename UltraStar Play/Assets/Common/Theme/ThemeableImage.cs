@@ -11,7 +11,9 @@ public class ThemeableImage : Themeable
     public EImageResource imageResource = EImageResource.NONE;
     public Image target;
 
+#if UNITY_EDITOR
     private EImageResource lastImageResource = EImageResource.NONE;
+#endif
 
     void OnEnable()
     {

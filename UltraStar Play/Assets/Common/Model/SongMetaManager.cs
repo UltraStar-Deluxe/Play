@@ -21,12 +21,13 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
+    // The list of songs is static to be persisted across scenes.
     private static readonly List<SongMeta> songMetas = new List<SongMeta>();
     public List<SongMeta> SongMetas
     {
         get
         {
-            if (songMetas.Count == 0)
+            if (songMetas.IsNullOrEmpty())
             {
                 ScanFiles();
             }
@@ -89,7 +90,7 @@ public class SongMetaManager : MonoBehaviour
 
             // Find all txt files in the song directories
             List<string> txtFiles = new List<string>();
-            List<string> songDirs = SettingsManager.GetSetting(ESetting.SongDirs) as List<string>;
+            List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
             foreach (string songDir in songDirs)
             {
                 List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);

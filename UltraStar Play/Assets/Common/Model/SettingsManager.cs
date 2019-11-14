@@ -1,36 +1,67 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public static class SettingsManager
+public class SettingsManager : MonoBehaviour
 {
-    private static GameSetting setting = new GameSetting();
-
-    public static object GetSetting(ESetting key)
+    public static SettingsManager Instance
     {
-        lock (setting)
+        get
         {
-            return setting.GetSettingNotNull(key);
+            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
         }
     }
 
-    public static void SetSetting(ESetting key, object settingValue)
+    private readonly string settingsPath = "Settings.json";
+
+    // The settings field is static to persist it across scene changes.
+    // The SettingsManager is meant to be used as a singleton, such that this static field should not be a problem.
+    private static Settings settings;
+    public Settings Settings
     {
-        if (settingValue == null)
+        get
         {
-            throw new UnityException("Cannot set setting because value is null");
-        }
-        lock (setting)
-        {
-            setting.SetSetting(key, settingValue);
+            if (settings == null)
+            {
+                Reload();
+            }
+            return settings;
         }
     }
 
-    public static void Reload()
+    private static bool initializedResolution;
+
+    // Non-static settings field for debugging of the settings in the Unity Inspector.
+    public Settings nonStaticSettings;
+
+    void Start()
     {
-        lock (setting)
+        // Load reference from last scene if needed
+        nonStaticSettings = settings;
+        if (!initializedResolution)
         {
-            setting = new GameSetting();
+            initializedResolution = true;
+            // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
+            Settings.GraphicSettings.resolution = ApplicationUtils.GetCurrentAppResolution();
         }
+    }
+
+    void OnDisable()
+    {
+        Save();
+    }
+
+    public void Save()
+    {
+        string json = JsonConverter.ToJson(Settings, true);
+        File.WriteAllText(settingsPath, json);
+    }
+
+    public void Reload()
+    {
+        string fileContent = File.ReadAllText(settingsPath);
+        settings = JsonConverter.FromJson<Settings>(fileContent);
+        nonStaticSettings = settings;
     }
 }

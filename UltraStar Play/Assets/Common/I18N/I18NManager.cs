@@ -62,7 +62,7 @@ public class I18NManager : MonoBehaviour
             else
             {
                 Debug.LogError($"No translation for key '{key}'");
-                return "MISSING_TEXT";
+                return key;
             }
         }
     }
@@ -71,19 +71,22 @@ public class I18NManager : MonoBehaviour
     {
         // Load the default properties file
         string path = GetPropertiesFilePath(PropertiesFileName);
+        if (!File.Exists(path))
+        {
+            Debug.LogError("File not found: " + path);
+            return;
+        }
         fallbackMessages = PropertiesFileParser.ParseFile(path);
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(language);
         path = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
-        if (File.Exists(path))
-        {
-            currentLanguageMessages = PropertiesFileParser.ParseFile(path);
-        }
-        else
+        if (!File.Exists(path))
         {
             Debug.LogError("File not found: " + path);
+            return;
         }
+        currentLanguageMessages = PropertiesFileParser.ParseFile(path);
     }
 
     /// Decide which language to use.
