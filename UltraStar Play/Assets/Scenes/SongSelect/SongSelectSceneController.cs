@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using System.Xml.Linq;
 using System;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using System.Linq;
 using UniRx;
 
@@ -30,8 +26,6 @@ public class SongSelectSceneController : MonoBehaviour
 
     private SearchInputField searchTextInputField;
 
-    private PlayerProfile selectedPlayerProfile;
-
     private SongRouletteController songRouletteController;
 
     private SongSelectSceneData sceneData;
@@ -55,11 +49,10 @@ public class SongSelectSceneController : MonoBehaviour
 
         songMetas = SongMetaManager.Instance.SongMetas;
         List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        PopulatePlayerProfileList(playerProfiles);
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
-        songRouletteController.Selection.Subscribe(OnNewSongSelection);
+        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
 
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
@@ -88,30 +81,6 @@ public class SongSelectSceneController : MonoBehaviour
         duetIndicator.SetActive(isDuet);
     }
 
-    private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
-    {
-        // Remove old buttons.
-        foreach (RectTransform element in playerProfileListContent)
-        {
-            Destroy(element.gameObject);
-        }
-
-        // Create new buttons. One for each profile.
-        foreach (PlayerProfile playerProfile in playerProfiles)
-        {
-            AddPlayerProfileButton(playerProfile);
-        }
-    }
-
-    private void AddPlayerProfileButton(PlayerProfile playerProfile)
-    {
-        RectTransform newButton = RectTransform.Instantiate(playerProfileButtonPrefab);
-        newButton.SetParent(playerProfileListContent);
-
-        newButton.GetComponentInChildren<Text>().text = playerProfile.Name;
-        newButton.GetComponent<Button>().onClick.AddListener(() => OnPlayerProfileButtonClicked(playerProfile));
-    }
-
     private void StartSingScene(SongMeta songMeta)
     {
         SingSceneData singSceneData = new SingSceneData();
@@ -119,15 +88,10 @@ public class SongSelectSceneController : MonoBehaviour
 
         List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         PlayerProfile defaultPlayerProfile = allPlayerProfiles[0];
-        PlayerProfile playerProfile = selectedPlayerProfile.OrIfNull(defaultPlayerProfile);
+        PlayerProfile playerProfile = defaultPlayerProfile;
         singSceneData.AddPlayerProfile(playerProfile);
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
-    }
-
-    private void OnPlayerProfileButtonClicked(PlayerProfile playerProfile)
-    {
-        selectedPlayerProfile = playerProfile;
     }
 
     private SongSelectSceneData CreateDefaultSceneData()

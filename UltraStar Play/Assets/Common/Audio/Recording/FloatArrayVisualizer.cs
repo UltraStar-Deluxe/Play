@@ -12,13 +12,6 @@ public class FloatArrayVisualizer : MonoBehaviour
     private RectTransform[] dataPoints;
     private bool isInitialized = false;
 
-    private RectTransform rectTransform;
-
-    void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();
-    }
-
     public void Init(float[] array)
     {
         floatArray = array;
