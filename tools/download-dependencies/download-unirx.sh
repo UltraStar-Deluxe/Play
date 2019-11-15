@@ -2,10 +2,11 @@
 
 old_dir=$(PWD)
 
+cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old UniRx folder..."
-rm --recursive --force Plugins/UniRx
-mkdir Plugins/UniRx
-cd Plugins/UniRx
+rm --recursive --force UniRx
+mkdir UniRx
+cd UniRx
 
 echo "Cloning UniRx from remote..."
 git init
