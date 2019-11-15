@@ -2,10 +2,11 @@
 
 old_dir=$(PWD)
 
+cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old LeanTween folder..."
-rm --recursive --force Plugins/LeanTween
-mkdir Plugins/LeanTween
-cd Plugins/LeanTween
+rm --recursive --force LeanTween
+mkdir LeanTween
+cd LeanTween
 
 echo "Cloning LeanTween from remote..."
 git init

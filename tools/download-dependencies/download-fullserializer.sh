@@ -2,10 +2,11 @@
 
 old_dir=$(PWD)
 
+cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old FullSerializer folder..."
-rm --recursive --force Plugins/FullSerializer
-mkdir Plugins/FullSerializer
-cd Plugins/FullSerializer
+rm --recursive --force FullSerializer
+mkdir FullSerializer
+cd FullSerializer
 
 echo "Cloning FullSerializer from remote..."
 git init
