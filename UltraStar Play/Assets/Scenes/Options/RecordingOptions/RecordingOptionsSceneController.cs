@@ -16,6 +16,8 @@ public class RecordingOptionsSceneController : MonoBehaviour
 
     public GameObject noHardwareWarningAndDeleteButton;
 
+    public RecordingOptionsMicVisualizer micVisualizer;
+
     void Start()
     {
         recordingDeviceSlider.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
@@ -51,6 +53,8 @@ public class RecordingOptionsSceneController : MonoBehaviour
 
         bool hasNoHardware = !micProfile.IsConnected;
         noHardwareWarningAndDeleteButton.SetActive(hasNoHardware);
+
+        micVisualizer.SetMicProfile(micProfile);
     }
 
     private void DeleteSelectedRecordingDevice()

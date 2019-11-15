@@ -13,7 +13,28 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public bool playRecordedAudio;
 
-    public string MicDevice { get; set; }
+    private string micDevice;
+    public string MicDevice
+    {
+        get
+        {
+            return micDevice;
+        }
+        set
+        {
+            bool restartPitchDetection = startedPitchDetection;
+            if (startedPitchDetection)
+            {
+                StopPitchDetection();
+            }
+            micDevice = value;
+            if (restartPitchDetection && !string.IsNullOrEmpty(micDevice))
+            {
+                StartPitchDetection();
+            }
+        }
+    }
+
     public float[] MicData { get; private set; } = new float[SampleRate];
     public float[] PitchDetectionBuffer { get; private set; } = new float[SampleRate];
 
@@ -71,6 +92,11 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StartPitchDetection()
     {
+        if (startedPitchDetection)
+        {
+            return;
+        }
+
         startedPitchDetection = true;
         List<string> soundcards = new List<string>(Microphone.devices);
 
@@ -86,7 +112,6 @@ public class MicrophonePitchTracker : MonoBehaviour
             Debug.LogWarning($"Did not find mic '{MicDevice}'. Falling back to use {soundcards[0]} as microphone instead.");
             MicDevice = soundcards[0];
         }
-        Debug.Log($"available soundcards: '{string.Join(",", soundcards)}'");
         if (!soundcards.Contains(MicDevice))
         {
             string micDevicesCsv = string.Join(",", soundcards);
@@ -110,6 +135,12 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StopPitchDetection()
     {
+        if (!startedPitchDetection)
+        {
+            return;
+        }
+
+        Debug.Log($"Stop recording with '{MicDevice}'");
         Microphone.End(MicDevice);
         startedPitchDetection = false;
     }
