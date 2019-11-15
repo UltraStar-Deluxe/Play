@@ -44,6 +44,7 @@ public class MicrophonePitchTracker : MonoBehaviour
     private PitchTracker pitchTracker = new PitchTracker();
     private bool startedPitchDetection;
 
+    // TODO: Rewrite this event using UniRx Subject
     public delegate void PitchDetectedHandler(int midiNote);
     public event PitchDetectedHandler PitchDetected;
 
@@ -94,6 +95,7 @@ public class MicrophonePitchTracker : MonoBehaviour
     {
         if (startedPitchDetection)
         {
+            Debug.Log("Pitch detection already started.");
             return;
         }
 
@@ -137,6 +139,7 @@ public class MicrophonePitchTracker : MonoBehaviour
     {
         if (!startedPitchDetection)
         {
+            Debug.Log("Pitch detection already stopped.");
             return;
         }
 
@@ -215,7 +218,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         List<PitchRecord> sortedpitchRecordHistory = new List<PitchRecord>(pitchRecordHistory);
         sortedpitchRecordHistory.Sort(new PitchRecordComparer());
         int midiNoteMedian = sortedpitchRecordHistory[sortedpitchRecordHistory.Count / 2].MidiNote;
-        PitchDetected(midiNoteMedian);
+        PitchDetected?.Invoke(midiNoteMedian);
 
         // Update label in inspector for debugging.
         if (midiNoteMedian > 0)
