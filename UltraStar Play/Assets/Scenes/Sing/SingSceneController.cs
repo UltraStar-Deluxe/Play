@@ -16,7 +16,6 @@ public class SingSceneController : MonoBehaviour
     public SingSceneData sceneData;
 
     public string defaultSongName;
-    public string defaultPlayerProfileName;
 
     [TextArea(3, 8)]
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
@@ -143,15 +142,15 @@ public class SingSceneController : MonoBehaviour
             sceneData.SelectedSongMeta = GetDefaultSongMeta();
         }
 
-        if (sceneData.SelectedPlayerProfiles == null || sceneData.SelectedPlayerProfiles.Count == 0)
+        if (sceneData.SelectedPlayerProfiles.IsNullOrEmpty())
         {
-            sceneData.AddPlayerProfile(GetDefaultPlayerProfile());
+            sceneData.SelectedPlayerProfiles.Add(GetDefaultPlayerProfile());
         }
     }
 
     void OnEnable()
     {
-        string playerProfilesCsv = String.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
+        string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
 
         // Start the music
@@ -330,12 +329,12 @@ public class SingSceneController : MonoBehaviour
     private PlayerProfile GetDefaultPlayerProfile()
     {
         List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        IEnumerable<PlayerProfile> defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == defaultPlayerProfileName);
-        if (defaultPlayerProfiles.Count() == 0)
+        if (allPlayerProfiles.IsNullOrEmpty())
         {
-            throw new Exception("The default player profile was not found.");
+            throw new Exception("No player profiles found.");
         }
-        return defaultPlayerProfiles.First();
+        PlayerProfile result = allPlayerProfiles[0];
+        return result;
     }
 
     private SongMeta GetDefaultSongMeta()
