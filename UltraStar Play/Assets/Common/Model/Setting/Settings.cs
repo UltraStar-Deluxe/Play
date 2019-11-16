@@ -14,8 +14,8 @@ public class Settings
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
         List<PlayerProfile> result = new List<PlayerProfile>();
-        result.Add(new PlayerProfile("Player01", "Mikrofon (2- USB Microphone)", Difficulty.Medium, EAvatar.GenericPlayer01));
-        result.Add(new PlayerProfile("Player02", "", Difficulty.Easy, EAvatar.GenericPlayer02));
+        result.Add(new PlayerProfile("Player01", Difficulty.Medium, EAvatar.GenericPlayer01));
+        result.Add(new PlayerProfile("Player02", Difficulty.Easy, EAvatar.GenericPlayer02));
         return result;
     }
 }

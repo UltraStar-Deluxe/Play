@@ -88,7 +88,8 @@ public class SongSelectSceneController : MonoBehaviour
         List<PlayerProfile> selectedPlayerProfiles = playerProfileListController.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            throw new UnityException("No player profile selected for singing.");
+            UiManager.Instance.CreateWarningDialog("No player selected", "Select a player profile for singing.\n New player profiles can be create in the settings.");
+            return;
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 

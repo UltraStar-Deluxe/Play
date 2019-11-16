@@ -7,7 +7,6 @@ using UnityEngine;
 public class PlayerProfile
 {
     public string Name { get; set; } = "New Player";
-    public string MicDevice { get; set; } = "";
     public Difficulty Difficulty { get; set; } = Difficulty.Medium;
     public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
     public bool IsEnabled { get; set; } = true;
@@ -16,10 +15,9 @@ public class PlayerProfile
     {
     }
 
-    public PlayerProfile(string name, string micDevice, Difficulty difficulty, EAvatar avatar)
+    public PlayerProfile(string name, Difficulty difficulty, EAvatar avatar)
     {
         this.Name = name;
-        this.MicDevice = micDevice;
         this.Difficulty = difficulty;
         this.Avatar = avatar;
     }
