@@ -12,6 +12,7 @@ TagManager:
   - ApplicationManager
   - ThemeManager
   - SettingsManager
+  - EventSystem
   layers:
   - Default
   - TransparentFX

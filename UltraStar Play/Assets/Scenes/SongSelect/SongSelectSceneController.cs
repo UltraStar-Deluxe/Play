@@ -21,8 +21,7 @@ public class SongSelectSceneController : MonoBehaviour
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
-    public RectTransform playerProfileListContent;
-    public RectTransform playerProfileButtonPrefab;
+    public SongSelectPlayerProfileListController playerProfileListController;
 
     private SearchInputField searchTextInputField;
 
@@ -86,10 +85,15 @@ public class SongSelectSceneController : MonoBehaviour
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
 
-        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        PlayerProfile defaultPlayerProfile = allPlayerProfiles[0];
-        PlayerProfile playerProfile = defaultPlayerProfile;
-        singSceneData.AddPlayerProfile(playerProfile);
+        List<PlayerProfile> selectedPlayerProfiles = playerProfileListController.GetSelectedPlayerProfiles();
+        if (selectedPlayerProfiles.IsNullOrEmpty())
+        {
+            throw new UnityException("No player profile selected for singing.");
+        }
+        singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
+
+        Dictionary<PlayerProfile, MicProfile> playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
+        singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
     }
