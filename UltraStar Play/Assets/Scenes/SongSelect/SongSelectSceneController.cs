@@ -47,7 +47,7 @@ public class SongSelectSceneController : MonoBehaviour
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
         songMetas = SongMetaManager.Instance.SongMetas;
-        List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
+        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
