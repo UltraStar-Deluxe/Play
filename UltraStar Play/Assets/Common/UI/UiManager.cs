@@ -12,16 +12,11 @@ public class UiManager : MonoBehaviour
         }
     }
 
-    private Canvas canvas;
     public WarningDialog warningDialogPrefab;
-
-    void Awake()
-    {
-        canvas = FindObjectOfType<Canvas>();
-    }
 
     public WarningDialog CreateWarningDialog(string title, string message)
     {
+        Canvas canvas = FindObjectOfType<Canvas>();
         WarningDialog warningDialog = Instantiate(warningDialogPrefab);
         warningDialog.transform.SetParent(canvas.transform);
         warningDialog.transform.SetAsLastSibling();
