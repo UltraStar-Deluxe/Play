@@ -9,6 +9,7 @@ public class SingSceneKeyboardInputController : MonoBehaviour
     private const KeyCode RestartShortcut = KeyCode.R;
     private const KeyCode BackToSongSelectShortcut = KeyCode.Backspace;
     private const KeyCode BackToSongSelectShortcut2 = KeyCode.Escape;
+    private const KeyCode PauseShortcut = KeyCode.Space;
 
     void Update()
     {
@@ -30,6 +31,11 @@ public class SingSceneKeyboardInputController : MonoBehaviour
         if (Input.GetKeyUp(BackToSongSelectShortcut) || Input.GetKeyUp(BackToSongSelectShortcut2))
         {
             SingSceneController.Instance.FinishScene();
+        }
+
+        if (Input.GetKeyUp(PauseShortcut))
+        {
+            SingSceneController.Instance.TogglePauseSinging();
         }
     }
 }

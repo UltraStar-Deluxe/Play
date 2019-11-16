@@ -21,6 +21,8 @@ public class SingSceneController : MonoBehaviour
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 
+    public GameObject pauseOverlay;
+
     public PlayerController playerControllerPrefab;
 
     private VideoPlayer videoPlayer;
@@ -30,7 +32,7 @@ public class SingSceneController : MonoBehaviour
     private WaveStream mainOutputStream;
     private WaveChannel32 volumeStream;
 
-    private double timeOfLastMeasuredPositionInSongInMillis;
+    private double timeSinceLastMeasuredPositionInSongInMillis;
     private double lastMeasuredPositionInSongInMillis;
 
     private static SingSceneController instance;
@@ -96,14 +98,14 @@ public class SingSceneController : MonoBehaviour
                 {
                     // Got new measurement from the audio lib. This is (relatively) accurate.
                     lastMeasuredPositionInSongInMillis = posInMillis;
-                    timeOfLastMeasuredPositionInSongInMillis = 0;
+                    timeSinceLastMeasuredPositionInSongInMillis = 0;
                     return posInMillis;
                 }
                 else
                 {
                     // No new measurement from the audio lib.
                     // Improve approximation by adding the time since the last new measurement.
-                    return posInMillis + timeOfLastMeasuredPositionInSongInMillis;
+                    return posInMillis + timeSinceLastMeasuredPositionInSongInMillis;
                 }
             }
         }
@@ -215,7 +217,10 @@ public class SingSceneController : MonoBehaviour
 
     void Update()
     {
-        timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
+        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
+        }
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
@@ -365,6 +370,28 @@ public class SingSceneController : MonoBehaviour
             throw new UnityException("The default song was not found.");
         }
         return defaultSongMetas.First();
+    }
+
+    public void TogglePauseSinging()
+    {
+        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            pauseOverlay.SetActive(true);
+            waveOutDevice.Pause();
+            if (videoPlayer != null && videoPlayer.enabled)
+            {
+                videoPlayer.Pause();
+            }
+        }
+        else if (waveOutDevice.PlaybackState == PlaybackState.Paused)
+        {
+            pauseOverlay.SetActive(false);
+            waveOutDevice.Play();
+            if (videoPlayer != null && videoPlayer.enabled)
+            {
+                videoPlayer.Play();
+            }
+        }
     }
 
     private void StartAudioPlayback()
