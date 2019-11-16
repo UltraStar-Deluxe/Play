@@ -144,7 +144,9 @@ public class SingSceneController : MonoBehaviour
 
         if (sceneData.SelectedPlayerProfiles.IsNullOrEmpty())
         {
-            sceneData.SelectedPlayerProfiles.Add(GetDefaultPlayerProfile());
+            PlayerProfile playerProfile = GetDefaultPlayerProfile();
+            sceneData.SelectedPlayerProfiles.Add(playerProfile);
+            sceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
         }
     }
 
@@ -163,9 +165,22 @@ public class SingSceneController : MonoBehaviour
         Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
 
         // Handle players        
+        List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
         {
-            CreatePlayerController(playerProfile);
+            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            if (micProfile == null)
+            {
+                playerProfilesWithoutMic.Add(playerProfile);
+            }
+            CreatePlayerController(playerProfile, micProfile);
+        }
+
+        // Create warning about missing microphones
+        string playerNameCsv = string.Join(",", playerProfilesWithoutMic.Select(it => it.Name).ToList());
+        if (!playerProfilesWithoutMic.IsNullOrEmpty())
+        {
+            UiManager.Instance.CreateWarningDialog("Missing microphones", $"No microphone for player(s) {playerNameCsv}");
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
@@ -301,13 +316,13 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private void CreatePlayerController(PlayerProfile playerProfile)
+    private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
         PlayerControllers.Clear();
 
         string voiceIdentifier = GetVoiceIdentifier(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
-        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier);
+        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier, micProfile);
 
         PlayerControllers.Add(playerController);
     }
@@ -331,10 +346,15 @@ public class SingSceneController : MonoBehaviour
         List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
         if (allPlayerProfiles.IsNullOrEmpty())
         {
-            throw new Exception("No player profiles found.");
+            throw new UnityException("No player profiles found.");
         }
         PlayerProfile result = allPlayerProfiles[0];
         return result;
+    }
+
+    private MicProfile GetDefaultMicProfile()
+    {
+        return SettingsManager.Instance.Settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
     }
 
     private SongMeta GetDefaultSongMeta()
@@ -342,7 +362,7 @@ public class SingSceneController : MonoBehaviour
         IEnumerable<SongMeta> defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == defaultSongName);
         if (defaultSongMetas.Count() == 0)
         {
-            throw new Exception("The default song was not found.");
+            throw new UnityException("The default song was not found.");
         }
         return defaultSongMetas.First();
     }
@@ -391,12 +411,12 @@ public class SingSceneController : MonoBehaviour
         byte[] bytes = File.ReadAllBytes(path);
         if (bytes == null)
         {
-            throw new Exception("Loading the mp3 data failed.");
+            throw new UnityException("Loading the mp3 data failed.");
         }
 
         if (!LoadAudioFromData(bytes))
         {
-            throw new Exception("Loading the audio from the mp3 data failed.");
+            throw new UnityException("Loading the audio from the mp3 data failed.");
         }
 
         Resources.UnloadUnusedAssets();
