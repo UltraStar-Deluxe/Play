@@ -348,7 +348,7 @@ public class SingSceneController : MonoBehaviour
 
     private PlayerProfile GetDefaultPlayerProfile()
     {
-        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
+        List<PlayerProfile> allPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
         if (allPlayerProfiles.IsNullOrEmpty())
         {
             throw new UnityException("No player profiles found.");
