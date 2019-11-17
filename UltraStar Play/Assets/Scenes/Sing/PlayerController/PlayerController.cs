@@ -23,14 +23,6 @@ public class PlayerController : MonoBehaviour
     public Sentence CurrentSentence { get; set; }
     public Sentence NextSentence { get; set; }
 
-    private Difficulty Difficulty
-    {
-        get
-        {
-            return PlayerProfile.Difficulty;
-        }
-    }
-
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
     {

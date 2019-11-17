@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DifficultySlider : TextItemSlider<Difficulty>
+public class DifficultySlider : TextItemSlider<EDifficulty>
 {
     protected override void Start()
     {
         base.Start();
-        Items = Difficulty.Values;
+        Items = EnumUtils.GetValuesAsList<EDifficulty>();
     }
 
-    protected override string GetDisplayString(Difficulty value)
+    protected override string GetDisplayString(EDifficulty value)
     {
-        if (value == null)
-        {
-            return "";
-        }
-        return value.Name;
+        return value.GetTranslatedName();
     }
 }

@@ -42,7 +42,7 @@ public class PlayerNoteRecorder : MonoBehaviour
         this.playerProfile = playerProfile;
         this.micProfile = micProfile;
 
-        RoundingDistance = playerProfile.Difficulty.RoundingDistance;
+        RoundingDistance = playerProfile.Difficulty.GetRoundingDistance();
 
         if (micProfile != null)
         {
