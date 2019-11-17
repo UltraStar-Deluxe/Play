@@ -15,6 +15,9 @@ public class SingSceneController : MonoBehaviour
 
     public SingSceneData sceneData;
 
+    [Range(0, 1)]
+    public float volume = 1;
+
     public string defaultSongName;
 
     [TextArea(3, 8)]
@@ -221,6 +224,7 @@ public class SingSceneController : MonoBehaviour
         {
             timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
         }
+        volumeStream.Volume = volume;
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
@@ -419,6 +423,7 @@ public class SingSceneController : MonoBehaviour
             MemoryStream tmpStr = new MemoryStream(data);
             mainOutputStream = new Mp3FileReader(tmpStr);
             volumeStream = new WaveChannel32(mainOutputStream);
+            volumeStream.Volume = volume;
 
             waveOutDevice = new WaveOutEvent();
             waveOutDevice.Init(volumeStream);

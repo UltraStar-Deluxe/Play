@@ -1440,6 +1440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   positionInSongDelayInMillis: 150
+  volume: 1
   defaultSongName: Summer Wine
   defaultSongNamePasteBin: 'Summer Wine
 
