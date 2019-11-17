@@ -588,8 +588,8 @@ MonoBehaviour:
     of your note.
 
 
-    In the scene window (not game), you can see a simple visualization of the audio
-    data using cubes.'
+    The squares below are a visualization of the mic data samples (above rect) and
+    the portion of the mic data that is analyzed in the last frame (below rect)'
 --- !u!222 &1403799434
 CanvasRenderer:
   m_ObjectHideFlags: 0

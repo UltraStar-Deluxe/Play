@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
+using System;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour
 {
     public Text currentNoteLabel;
     public FloatArrayVisualizer floatArrayVisualizer;
     public MicrophonePitchTracker microphonePitchTracker;
+
+    private IDisposable pitchEventStreamDisposable;
 
     void Start()
     {
@@ -23,20 +27,20 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     void OnEnable()
     {
-        microphonePitchTracker.AddPitchDetectedHandler(OnPitchDetected);
+        pitchEventStreamDisposable = microphonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
     }
 
     void OnDisable()
     {
-        microphonePitchTracker.RemovePitchDetectedHandler(OnPitchDetected);
+        pitchEventStreamDisposable?.Dispose();
     }
 
-    private void OnPitchDetected(int midiNote)
+    private void OnPitchDetected(PitchEvent pitchEvent)
     {
         // Show the note that has been detected
-        if (midiNote > 0)
+        if (pitchEvent.MidiNote > 0)
         {
-            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(midiNote);
+            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
         }
         else
         {

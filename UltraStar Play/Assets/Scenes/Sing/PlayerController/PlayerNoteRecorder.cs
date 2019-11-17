@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Pitch;
 using UnityEngine;
+using UniRx;
 
 [RequireComponent(typeof(MicrophonePitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour
@@ -24,6 +25,8 @@ public class PlayerNoteRecorder : MonoBehaviour
     private MicProfile micProfile;
 
     private bool wasStartedAlready;
+
+    private IDisposable pitchEventStreamDisposable;
 
     private MicrophonePitchTracker MicrophonePitchTracker
     {
@@ -69,7 +72,7 @@ public class PlayerNoteRecorder : MonoBehaviour
         wasStartedAlready = true;
         if (micProfile != null)
         {
-            MicrophonePitchTracker.AddPitchDetectedHandler(OnPitchDetected);
+            pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
             MicrophonePitchTracker.StartPitchDetection();
         }
         else
@@ -82,7 +85,7 @@ public class PlayerNoteRecorder : MonoBehaviour
     {
         if (micProfile != null)
         {
-            MicrophonePitchTracker.RemovePitchDetectedHandler(OnPitchDetected);
+            pitchEventStreamDisposable?.Dispose();
             MicrophonePitchTracker.StopPitchDetection();
         }
     }
@@ -93,8 +96,9 @@ public class PlayerNoteRecorder : MonoBehaviour
         return recordedNotes;
     }
 
-    public void OnPitchDetected(int midiNote)
+    public void OnPitchDetected(PitchEvent pitchEvent)
     {
+        int midiNote = pitchEvent.MidiNote;
         double currentBeat = singSceneController.CurrentBeat;
         if (midiNote <= 0)
         {

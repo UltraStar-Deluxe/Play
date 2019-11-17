@@ -2,16 +2,19 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Pitch;
+using UniRx;
 
 public class MicrophoneDemoSceneController : MonoBehaviour
 {
     public string micDeviceName = "Mikrofon (2- USB Microphone)";
     public Text currentNoteLabel;
 
-    private MicrophonePitchTracker microphonePitchTracker;
-
     public FloatArrayVisualizer micDataVisualizer;
     public FloatArrayVisualizer pitchDetectionBufferVisualizer;
+
+    private MicrophonePitchTracker microphonePitchTracker;
+
+    private IDisposable pitchEventStreamDisposable;
 
     void Awake()
     {
@@ -27,7 +30,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
             return;
         }
         microphonePitchTracker.MicDevice = micDeviceName;
-        microphonePitchTracker.AddPitchDetectedHandler(OnPitchDetected);
+        pitchEventStreamDisposable = microphonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
         microphonePitchTracker.StartPitchDetection();
     }
 
@@ -37,16 +40,16 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         {
             return;
         }
-        microphonePitchTracker.RemovePitchDetectedHandler(OnPitchDetected);
+        pitchEventStreamDisposable?.Dispose();
         microphonePitchTracker.StopPitchDetection();
     }
 
-    private void OnPitchDetected(int midiNote)
+    private void OnPitchDetected(PitchEvent pitchEvent)
     {
         // Show the note that has been detected
-        if (midiNote > 0)
+        if (pitchEvent.MidiNote > 0)
         {
-            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(midiNote);
+            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
         }
         else
         {
