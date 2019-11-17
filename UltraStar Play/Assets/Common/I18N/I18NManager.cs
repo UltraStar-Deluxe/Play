@@ -26,6 +26,18 @@ public class I18NManager : MonoBehaviour
     private Dictionary<string, string> currentLanguageMessages = new Dictionary<string, string>();
     private Dictionary<string, string> fallbackMessages = new Dictionary<string, string>();
 
+    public List<string> GetKeys()
+    {
+        UpdateCurrentLanguageAndTranslations();
+
+        List<string> result = new List<string>();
+        foreach (string key in fallbackMessages.Keys)
+        {
+            result.Add(key);
+        }
+        return result;
+    }
+
     public string GetTranslation(string key, Dictionary<string, string> placeholders)
     {
         string translation = GetTranslation(key);
@@ -46,7 +58,7 @@ public class I18NManager : MonoBehaviour
 
     public string GetTranslation(string key)
     {
-        UpdateLanguageAndTranslations();
+        UpdateCurrentLanguageAndTranslations();
 
         if (currentLanguageMessages.TryGetValue(key, out string translation))
         {
@@ -91,7 +103,7 @@ public class I18NManager : MonoBehaviour
 
     /// Decide which language to use.
     /// Update the translation mappings if the language changed or it is not loaded yet.
-    private void UpdateLanguageAndTranslations()
+    private void UpdateCurrentLanguageAndTranslations()
     {
         SystemLanguage oldLangauge = language;
 
