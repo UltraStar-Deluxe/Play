@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerProfile
 {
     public string Name { get; set; } = "New Player";
-    public Difficulty Difficulty { get; set; } = Difficulty.Medium;
+    public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
     public bool IsEnabled { get; set; } = true;
 
@@ -15,7 +15,7 @@ public class PlayerProfile
     {
     }
 
-    public PlayerProfile(string name, Difficulty difficulty, EAvatar avatar)
+    public PlayerProfile(string name, EDifficulty difficulty, EAvatar avatar)
     {
         this.Name = name;
         this.Difficulty = difficulty;
