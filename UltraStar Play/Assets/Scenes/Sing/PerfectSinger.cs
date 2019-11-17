@@ -43,6 +43,6 @@ public class PerfectSinger : MonoBehaviour
         {
             currentMidiNote = noteAtCurrentBeat.MidiNote;
         }
-        playerController.PlayerNoteRecorder.OnPitchDetected(currentMidiNote);
+        playerController.PlayerNoteRecorder.OnPitchDetected(new PitchEvent(currentMidiNote));
     }
 }
