@@ -13,8 +13,8 @@ public class RecordingDeviceColorSlider : ColorItemSlider
     protected override void Awake()
     {
         base.Awake();
-        Items = new List<Color> { Colors.Crimson, Colors.ForestGreen, Colors.DodgerBlue,
-                                  Colors.Gold, Colors.GreenYellow, Colors.Salmon, Colors.Violet };
+        Items = new List<Color> { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
+                                  Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
     }
 
     public void SetMicProfile(MicProfile micProfile)
