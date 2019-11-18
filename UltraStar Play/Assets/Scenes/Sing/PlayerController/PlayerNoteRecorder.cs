@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Pitch;
 using UnityEngine;
+using UniRx;
 
 [RequireComponent(typeof(MicrophonePitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour
@@ -14,25 +15,18 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private PlayerController playerController;
 
-    private PlayerProfile playerProfile;
-    public PlayerProfile PlayerProfile
-    {
-        get
-        {
-            return playerProfile;
-        }
-        set
-        {
-            playerProfile = value;
-            MicrophonePitchTracker.MicDevice = playerProfile.MicDevice;
-        }
-    }
-
     private int RoundingDistance { get; set; }
 
     private double lastPitchDetectedBeat;
 
     private RecordedNote lastRecordedNote;
+
+    private PlayerProfile playerProfile;
+    private MicProfile micProfile;
+
+    private bool wasStartedAlready;
+
+    private IDisposable pitchEventStreamDisposable;
 
     private MicrophonePitchTracker MicrophonePitchTracker
     {
@@ -42,33 +36,58 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
-    public void Init(PlayerController playerController, int roundingDistance)
+    public void Init(PlayerController playerController, PlayerProfile playerProfile, MicProfile micProfile)
     {
         this.playerController = playerController;
-        this.RoundingDistance = roundingDistance;
+        this.playerProfile = playerProfile;
+        this.micProfile = micProfile;
+
+        RoundingDistance = playerProfile.Difficulty.GetRoundingDistance();
+
+        if (micProfile != null)
+        {
+            MicrophonePitchTracker.MicDevice = micProfile.Name;
+        }
     }
 
     void Awake()
     {
         singSceneController = GameObject.FindObjectOfType<SingSceneController>();
-
-        if (playerProfile == null)
-        {
-            playerProfile = PlayerProfileManager.Instance.PlayerProfiles[0];
-        }
     }
 
     void OnEnable()
     {
-        MicrophonePitchTracker.MicDevice = playerProfile.MicDevice;
-        MicrophonePitchTracker.AddPitchDetectedHandler(OnPitchDetected);
-        MicrophonePitchTracker.StartPitchDetection();
+        // Start is not called after hot-swap, but OnEnable is called before the Init method (before Instantiate(...) returns).
+        // However, if OnEnable is called after the object has been initialized, then we know we are called after hot-swap.
+        // TODO: Introduce a new common base class on top of MonoBehaviour that handles this.
+        if (wasStartedAlready)
+        {
+            // This is called after hot-swap, because Start has been called before and we are in OnEnable.
+            Start();
+        }
+    }
+
+    void Start()
+    {
+        wasStartedAlready = true;
+        if (micProfile != null)
+        {
+            pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+            MicrophonePitchTracker.StartPitchDetection();
+        }
+        else
+        {
+            Debug.LogWarning("No mic for player " + playerProfile.Name + ". Not recording player notes.");
+        }
     }
 
     void OnDisable()
     {
-        MicrophonePitchTracker.RemovePitchDetectedHandler(OnPitchDetected);
-        MicrophonePitchTracker.StopPitchDetection();
+        if (micProfile != null)
+        {
+            pitchEventStreamDisposable?.Dispose();
+            MicrophonePitchTracker.StopPitchDetection();
+        }
     }
 
     public List<RecordedNote> GetRecordedNotes(Sentence sentence)
@@ -77,8 +96,9 @@ public class PlayerNoteRecorder : MonoBehaviour
         return recordedNotes;
     }
 
-    public void OnPitchDetected(int midiNote)
+    public void OnPitchDetected(PitchEvent pitchEvent)
     {
+        int midiNote = pitchEvent.MidiNote;
         double currentBeat = singSceneController.CurrentBeat;
         if (midiNote <= 0)
         {

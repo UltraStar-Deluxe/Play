@@ -7,6 +7,7 @@ public class TimeBarTimeLine : MonoBehaviour
 {
     public TimeBarTimeLineRect timeLineRectPrefab;
 
+    private SingSceneController singSceneController;
     private bool isInitialized;
 
     void OnEnable()
@@ -19,7 +20,7 @@ public class TimeBarTimeLine : MonoBehaviour
         if (!isInitialized)
         {
             isInitialized = true;
-            SingSceneController singSceneController = SingSceneController.Instance;
+            singSceneController = SingSceneController.Instance;
             double durationOfSongInMillis = singSceneController.DurationOfSongInMillis;
             SongMeta songMeta = singSceneController.SongMeta;
             List<PlayerController> playerControllers = singSceneController.PlayerControllers;
@@ -53,7 +54,6 @@ public class TimeBarTimeLine : MonoBehaviour
 
     private void CreateTimeLineRect(PlayerProfile playerProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis)
     {
-        double lengthInMillis = endPosInMillis - startPosInMillis;
         double startPosPercentage = startPosInMillis / durationOfSongInMillis;
         double endPosPercentage = endPosInMillis / durationOfSongInMillis;
 
@@ -67,6 +67,8 @@ public class TimeBarTimeLine : MonoBehaviour
         rectTransform.anchorMax = new Vector2((float)endPosPercentage, rectTransform.anchorMax.y);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = Vector2.zero;
-        timeLineRect.SetColor(playerProfile.Color);
+
+        // Set color of rect to color of mic.
+        singSceneController.GetMicProfile(playerProfile).IfNotNull(micProfile => timeLineRect.SetColor(micProfile.Color));
     }
 }

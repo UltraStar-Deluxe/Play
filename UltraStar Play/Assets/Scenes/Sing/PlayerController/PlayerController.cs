@@ -23,14 +23,6 @@ public class PlayerController : MonoBehaviour
     public Sentence CurrentSentence { get; set; }
     public Sentence NextSentence { get; set; }
 
-    private Difficulty Difficulty
-    {
-        get
-        {
-            return PlayerProfile.Difficulty;
-        }
-    }
-
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
     {
@@ -47,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
     private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
 
-    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier)
+    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
     {
         this.SongMeta = songMeta;
         this.PlayerProfile = playerProfile;
@@ -60,11 +52,7 @@ public class PlayerController : MonoBehaviour
         PlayerScoreController.Init(Voice);
 
         PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-        if (PlayerNoteRecorder == null)
-        {
-            throw new NullReferenceException("PlayerNoteRecorder is null!");
-        }
-        PlayerNoteRecorder.Init(this, playerProfile.Difficulty.RoundingDistance);
+        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
 
         CreatePlayerUi();
 

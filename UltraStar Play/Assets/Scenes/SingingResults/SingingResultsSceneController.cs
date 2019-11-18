@@ -85,7 +85,8 @@ public class SingingResultsSceneController : MonoBehaviour
         playerScoreData.GoldenNotesScore = 2000;
         playerScoreData.PerfectSentenceBonusScore = 500;
 
-        data.AddPlayerScores(PlayerProfileManager.Instance.PlayerProfiles[0], playerScoreData);
+        PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
+        data.AddPlayerScores(playerProfile, playerScoreData);
         return data;
     }
 

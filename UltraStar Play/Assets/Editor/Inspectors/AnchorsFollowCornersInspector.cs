@@ -17,7 +17,7 @@ public class AnchorsFollowCornersInspector : EditorBase
 
     void OnSceneGUI()
     {
-        if (Event.current == null || myTarget == null)
+        if (Event.current == null || myTarget == null || !myTarget.enabled)
         {
             return;
         }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Pitch;
+using UniRx;
 using UnityEngine;
 using static Pitch.PitchTracker;
 
@@ -13,37 +14,54 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public bool playRecordedAudio;
 
-    public string MicDevice { get; set; }
+    private string micDevice;
+    public string MicDevice
+    {
+        get
+        {
+            return micDevice;
+        }
+        set
+        {
+            bool restartPitchDetection = startedPitchDetection;
+            if (startedPitchDetection)
+            {
+                StopPitchDetection();
+            }
+            micDevice = value;
+            if (restartPitchDetection && !string.IsNullOrEmpty(micDevice))
+            {
+                StartPitchDetection();
+            }
+        }
+    }
+
     public float[] MicData { get; private set; } = new float[SampleRate];
     public float[] PitchDetectionBuffer { get; private set; } = new float[SampleRate];
 
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
-    private PitchTracker pitchTracker = new PitchTracker();
+    private readonly PitchTracker pitchTracker = new PitchTracker();
     private bool startedPitchDetection;
 
-    public delegate void PitchDetectedHandler(int midiNote);
-    public event PitchDetectedHandler PitchDetected;
+    private readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
+    public IObservable<PitchEvent> PitchEventStream
+    {
+        get
+        {
+            return pitchEventStream;
+        }
+    }
 
     [Range(1, 20)]
     public int pitchRecordHistoryLength = 5;
-    private List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
+    private readonly List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
 
     [ReadOnly]
     public string lastMidiNoteName;
 
     private int lastRecordedFrame;
-
-    public void AddPitchDetectedHandler(PitchDetectedHandler handler)
-    {
-        PitchDetected += new PitchDetectedHandler(handler);
-    }
-
-    public void RemovePitchDetectedHandler(PitchDetectedHandler handler)
-    {
-        PitchDetected -= new PitchDetectedHandler(handler);
-    }
 
     void OnEnable()
     {
@@ -71,27 +89,21 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StartPitchDetection()
     {
+        if (startedPitchDetection)
+        {
+            Debug.Log("Pitch detection already started.");
+            return;
+        }
+
         startedPitchDetection = true;
         List<string> soundcards = new List<string>(Microphone.devices);
 
         // Check for microphone existence.
-        if (soundcards.Count == 0)
-        {
-            Debug.LogError($"No mic devices found.");
-            gameObject.SetActive(false);
-            return;
-        }
-        else if (soundcards.Count == 1 && MicDevice != soundcards[0])
-        {
-            Debug.LogWarning($"Did not find mic '{MicDevice}'. Falling back to use {soundcards[0]} as microphone instead.");
-            MicDevice = soundcards[0];
-        }
-        Debug.Log($"available soundcards: '{string.Join(",", soundcards)}'");
         if (!soundcards.Contains(MicDevice))
         {
             string micDevicesCsv = string.Join(",", soundcards);
             Debug.LogError($"Did not find mic '{MicDevice}'. Available mic devices: {micDevicesCsv}");
-            gameObject.SetActive(false);
+            startedPitchDetection = false;
             return;
         }
         Debug.Log($"Start recording with '{MicDevice}'");
@@ -110,6 +122,13 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StopPitchDetection()
     {
+        if (!startedPitchDetection)
+        {
+            Debug.Log("Pitch detection already stopped.");
+            return;
+        }
+
+        Debug.Log($"Stop recording with '{MicDevice}'");
         Microphone.End(MicDevice);
         startedPitchDetection = false;
     }
@@ -184,7 +203,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         List<PitchRecord> sortedpitchRecordHistory = new List<PitchRecord>(pitchRecordHistory);
         sortedpitchRecordHistory.Sort(new PitchRecordComparer());
         int midiNoteMedian = sortedpitchRecordHistory[sortedpitchRecordHistory.Count / 2].MidiNote;
-        PitchDetected(midiNoteMedian);
+        pitchEventStream.OnNext(new PitchEvent(midiNoteMedian));
 
         // Update label in inspector for debugging.
         if (midiNoteMedian > 0)

@@ -10,7 +10,8 @@ public class ThemeManager : MonoBehaviour
 {
     public string currentThemeName;
 
-    private readonly List<Theme> themes = new List<Theme>();
+    // Themes is static to be persisted across scenes.
+    private static readonly List<Theme> themes = new List<Theme>();
 
     public static ThemeManager Instance
     {
@@ -22,7 +23,10 @@ public class ThemeManager : MonoBehaviour
 
     void OnEnable()
     {
-        ReloadThemes();
+        if (themes.IsNullOrEmpty())
+        {
+            ReloadThemes();
+        }
     }
 
     public void UpdateThemeResources()
