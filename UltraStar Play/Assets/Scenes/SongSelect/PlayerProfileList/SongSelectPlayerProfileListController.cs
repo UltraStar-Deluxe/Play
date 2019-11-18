@@ -10,7 +10,7 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
     public SongSelectPlayerProfileListEntry listEntryPrefab;
     public GameObject scrollViewContent;
 
-    private List<SongSelectPlayerProfileListEntry> listEntries = new List<SongSelectPlayerProfileListEntry>();
+    private readonly List<SongSelectPlayerProfileListEntry> listEntries = new List<SongSelectPlayerProfileListEntry>();
 
     void Start()
     {
@@ -72,8 +72,8 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
 
     public List<PlayerProfile> GetSelectedPlayerProfiles()
     {
-        SongSelectPlayerProfileListEntry[] listEntries = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
-        List<PlayerProfile> result = listEntries.Where(it => it.IsSelected).Select(it => it.PlayerProfile).ToList();
+        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
+        List<PlayerProfile> result = listEntriesInScrollView.Where(it => it.IsSelected).Select(it => it.PlayerProfile).ToList();
         return result;
     }
 

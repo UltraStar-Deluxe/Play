@@ -42,10 +42,10 @@ public class MicrophonePitchTracker : MonoBehaviour
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
-    private PitchTracker pitchTracker = new PitchTracker();
+    private readonly PitchTracker pitchTracker = new PitchTracker();
     private bool startedPitchDetection;
 
-    private Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
+    private readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
     public IObservable<PitchEvent> PitchEventStream
     {
         get
@@ -56,7 +56,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     [Range(1, 20)]
     public int pitchRecordHistoryLength = 5;
-    private List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
+    private readonly List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
 
     [ReadOnly]
     public string lastMidiNoteName;
