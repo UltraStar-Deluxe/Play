@@ -15,12 +15,16 @@ public class SingSceneController : MonoBehaviour
 
     public SingSceneData sceneData;
 
+    [Range(0, 1)]
+    public float volume = 1;
+
     public string defaultSongName;
-    public string defaultPlayerProfileName;
 
     [TextArea(3, 8)]
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
+
+    public GameObject pauseOverlay;
 
     public PlayerController playerControllerPrefab;
 
@@ -31,7 +35,7 @@ public class SingSceneController : MonoBehaviour
     private WaveStream mainOutputStream;
     private WaveChannel32 volumeStream;
 
-    private double timeOfLastMeasuredPositionInSongInMillis;
+    private double timeSinceLastMeasuredPositionInSongInMillis;
     private double lastMeasuredPositionInSongInMillis;
 
     private static SingSceneController instance;
@@ -97,14 +101,14 @@ public class SingSceneController : MonoBehaviour
                 {
                     // Got new measurement from the audio lib. This is (relatively) accurate.
                     lastMeasuredPositionInSongInMillis = posInMillis;
-                    timeOfLastMeasuredPositionInSongInMillis = 0;
+                    timeSinceLastMeasuredPositionInSongInMillis = 0;
                     return posInMillis;
                 }
                 else
                 {
                     // No new measurement from the audio lib.
                     // Improve approximation by adding the time since the last new measurement.
-                    return posInMillis + timeOfLastMeasuredPositionInSongInMillis;
+                    return posInMillis + timeSinceLastMeasuredPositionInSongInMillis;
                 }
             }
         }
@@ -143,15 +147,17 @@ public class SingSceneController : MonoBehaviour
             sceneData.SelectedSongMeta = GetDefaultSongMeta();
         }
 
-        if (sceneData.SelectedPlayerProfiles == null || sceneData.SelectedPlayerProfiles.Count == 0)
+        if (sceneData.SelectedPlayerProfiles.IsNullOrEmpty())
         {
-            sceneData.AddPlayerProfile(GetDefaultPlayerProfile());
+            PlayerProfile playerProfile = GetDefaultPlayerProfile();
+            sceneData.SelectedPlayerProfiles.Add(playerProfile);
+            sceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
         }
     }
 
     void OnEnable()
     {
-        string playerProfilesCsv = String.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
+        string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
 
         // Start the music
@@ -164,9 +170,22 @@ public class SingSceneController : MonoBehaviour
         Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
 
         // Handle players        
+        List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
         {
-            CreatePlayerController(playerProfile);
+            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            if (micProfile == null)
+            {
+                playerProfilesWithoutMic.Add(playerProfile);
+            }
+            CreatePlayerController(playerProfile, micProfile);
+        }
+
+        // Create warning about missing microphones
+        string playerNameCsv = string.Join(",", playerProfilesWithoutMic.Select(it => it.Name).ToList());
+        if (!playerProfilesWithoutMic.IsNullOrEmpty())
+        {
+            UiManager.Instance.CreateWarningDialog("Missing microphones", $"No microphone for player(s) {playerNameCsv}");
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
@@ -201,8 +220,18 @@ public class SingSceneController : MonoBehaviour
 
     void Update()
     {
-        timeOfLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
+        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
+        }
+        volumeStream.Volume = volume;
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+    }
+
+    public MicProfile GetMicProfile(PlayerProfile playerProfile)
+    {
+        sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+        return micProfile;
     }
 
     public void SkipToNextSentence()
@@ -302,13 +331,13 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private void CreatePlayerController(PlayerProfile playerProfile)
+    private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
         PlayerControllers.Clear();
 
         string voiceIdentifier = GetVoiceIdentifier(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
-        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier);
+        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier, micProfile);
 
         PlayerControllers.Add(playerController);
     }
@@ -329,13 +358,18 @@ public class SingSceneController : MonoBehaviour
 
     private PlayerProfile GetDefaultPlayerProfile()
     {
-        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        IEnumerable<PlayerProfile> defaultPlayerProfiles = allPlayerProfiles.Where(it => it.Name == defaultPlayerProfileName);
-        if (defaultPlayerProfiles.Count() == 0)
+        List<PlayerProfile> allPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
+        if (allPlayerProfiles.IsNullOrEmpty())
         {
-            throw new Exception("The default player profile was not found.");
+            throw new UnityException("No player profiles found.");
         }
-        return defaultPlayerProfiles.First();
+        PlayerProfile result = allPlayerProfiles[0];
+        return result;
+    }
+
+    private MicProfile GetDefaultMicProfile()
+    {
+        return SettingsManager.Instance.Settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
     }
 
     private SongMeta GetDefaultSongMeta()
@@ -343,9 +377,31 @@ public class SingSceneController : MonoBehaviour
         IEnumerable<SongMeta> defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == defaultSongName);
         if (defaultSongMetas.Count() == 0)
         {
-            throw new Exception("The default song was not found.");
+            throw new UnityException("The default song was not found.");
         }
         return defaultSongMetas.First();
+    }
+
+    public void TogglePauseSinging()
+    {
+        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        {
+            pauseOverlay.SetActive(true);
+            waveOutDevice.Pause();
+            if (videoPlayer != null && videoPlayer.enabled)
+            {
+                videoPlayer.Pause();
+            }
+        }
+        else if (waveOutDevice.PlaybackState == PlaybackState.Paused)
+        {
+            pauseOverlay.SetActive(false);
+            waveOutDevice.Play();
+            if (videoPlayer != null && videoPlayer.enabled)
+            {
+                videoPlayer.Play();
+            }
+        }
     }
 
     private void StartAudioPlayback()
@@ -373,6 +429,7 @@ public class SingSceneController : MonoBehaviour
             MemoryStream tmpStr = new MemoryStream(data);
             mainOutputStream = new Mp3FileReader(tmpStr);
             volumeStream = new WaveChannel32(mainOutputStream);
+            volumeStream.Volume = volume;
 
             waveOutDevice = new WaveOutEvent();
             waveOutDevice.Init(volumeStream);
@@ -392,12 +449,12 @@ public class SingSceneController : MonoBehaviour
         byte[] bytes = File.ReadAllBytes(path);
         if (bytes == null)
         {
-            throw new Exception("Loading the mp3 data failed.");
+            throw new UnityException("Loading the mp3 data failed.");
         }
 
         if (!LoadAudioFromData(bytes))
         {
-            throw new Exception("Loading the audio from the mp3 data failed.");
+            throw new UnityException("Loading the audio from the mp3 data failed.");
         }
 
         Resources.UnloadUnusedAssets();

@@ -7,19 +7,18 @@ using UnityEngine;
 public class PlayerProfile
 {
     public string Name { get; set; } = "New Player";
-    public string MicDevice { get; set; } = "";
-    public Difficulty Difficulty { get; private set; } = Difficulty.Medium;
-    public Color Color { get; set; } = new Color(0, 0.8f, 0, 1);
+    public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
+    public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
+    public bool IsEnabled { get; set; } = true;
 
     public PlayerProfile()
     {
     }
 
-    public PlayerProfile(string name, string micDevice, Difficulty difficulty, Color color)
+    public PlayerProfile(string name, EDifficulty difficulty, EAvatar avatar)
     {
         this.Name = name;
-        this.MicDevice = micDevice;
         this.Difficulty = difficulty;
-        this.Color = color;
+        this.Avatar = avatar;
     }
 }

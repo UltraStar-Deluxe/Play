@@ -46,11 +46,13 @@ abstract public class ItemSlider<T> : MonoBehaviour
         }
     }
 
-    public bool HasSelectedItem
+    public virtual bool HasSelectedItem
     {
         get
         {
-            return !object.Equals(SelectedItem, default(T));
+            // ValueTypes are never null, and thus always selected.
+            // Comparing with default(T) is used e.g. for structs, which are never null.
+            return typeof(T).IsValueType || !object.Equals(SelectedItem, default(T));
         }
     }
 
@@ -59,6 +61,18 @@ abstract public class ItemSlider<T> : MonoBehaviour
         get
         {
             return Items.IndexOf(SelectedItem);
+        }
+    }
+
+    protected virtual void Awake()
+    {
+        if (previousItemButton == null)
+        {
+            GetComponentInChildren<ItemSliderPreviousItemButton>().IfNotNull(it => previousItemButton = it.GetComponent<Button>());
+        }
+        if (nextItemButton == null)
+        {
+            GetComponentInChildren<ItemSliderNextItemButton>().IfNotNull(it => nextItemButton = it.GetComponent<Button>());
         }
     }
 

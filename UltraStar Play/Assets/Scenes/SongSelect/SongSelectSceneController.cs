@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using System.Xml.Linq;
 using System;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using System.Linq;
 using UniRx;
 
@@ -25,12 +21,9 @@ public class SongSelectSceneController : MonoBehaviour
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
-    public RectTransform playerProfileListContent;
-    public RectTransform playerProfileButtonPrefab;
+    public SongSelectPlayerProfileListController playerProfileListController;
 
     private SearchInputField searchTextInputField;
-
-    private PlayerProfile selectedPlayerProfile;
 
     private SongRouletteController songRouletteController;
 
@@ -54,12 +47,11 @@ public class SongSelectSceneController : MonoBehaviour
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
         songMetas = SongMetaManager.Instance.SongMetas;
-        List<PlayerProfile> playerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        PopulatePlayerProfileList(playerProfiles);
+        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
-        songRouletteController.Selection.Subscribe(OnNewSongSelection);
+        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
 
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
@@ -88,46 +80,23 @@ public class SongSelectSceneController : MonoBehaviour
         duetIndicator.SetActive(isDuet);
     }
 
-    private void PopulatePlayerProfileList(List<PlayerProfile> playerProfiles)
-    {
-        // Remove old buttons.
-        foreach (RectTransform element in playerProfileListContent)
-        {
-            Destroy(element.gameObject);
-        }
-
-        // Create new buttons. One for each profile.
-        foreach (PlayerProfile playerProfile in playerProfiles)
-        {
-            AddPlayerProfileButton(playerProfile);
-        }
-    }
-
-    private void AddPlayerProfileButton(PlayerProfile playerProfile)
-    {
-        RectTransform newButton = RectTransform.Instantiate(playerProfileButtonPrefab);
-        newButton.SetParent(playerProfileListContent);
-
-        newButton.GetComponentInChildren<Text>().text = playerProfile.Name;
-        newButton.GetComponent<Button>().onClick.AddListener(() => OnPlayerProfileButtonClicked(playerProfile));
-    }
-
     private void StartSingScene(SongMeta songMeta)
     {
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
 
-        List<PlayerProfile> allPlayerProfiles = PlayerProfileManager.Instance.PlayerProfiles;
-        PlayerProfile defaultPlayerProfile = allPlayerProfiles[0];
-        PlayerProfile playerProfile = selectedPlayerProfile.OrIfNull(defaultPlayerProfile);
-        singSceneData.AddPlayerProfile(playerProfile);
+        List<PlayerProfile> selectedPlayerProfiles = playerProfileListController.GetSelectedPlayerProfiles();
+        if (selectedPlayerProfiles.IsNullOrEmpty())
+        {
+            UiManager.Instance.CreateWarningDialog("No player selected", "Select a player profile for singing.\n New player profiles can be create in the settings.");
+            return;
+        }
+        singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
+
+        Dictionary<PlayerProfile, MicProfile> playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
+        singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
-    }
-
-    private void OnPlayerProfileButtonClicked(PlayerProfile playerProfile)
-    {
-        selectedPlayerProfile = playerProfile;
     }
 
     private SongSelectSceneData CreateDefaultSceneData()

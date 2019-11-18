@@ -24,6 +24,11 @@ public class CornersFollowAnchors : MonoBehaviour
 #if UNITY_EDITOR
     void Update()
     {
+        if (Application.isPlaying)
+        {
+            return;
+        }
+
         if (manualRefresh)
         {
             manualRefresh = false;

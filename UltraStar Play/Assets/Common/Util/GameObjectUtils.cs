@@ -2,9 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public static class GameObjectUtils
 {
+
+    /// Returns the currentSelectedGameObject from the EventSystem.
+    /// Normally, this is the UI control that has the focus (e.g. a Button, InputField or Toggle).
+    public static GameObject GetSelectedGameObject()
+    {
+        EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
+        GameObject result = eventSystem.currentSelectedGameObject;
+        return result;
+    }
 
     /// Looks in the GameObject with the given tag
     /// for the component that is specified by the generic type parameter.

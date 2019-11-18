@@ -18,29 +18,47 @@
     "PlayerProfiles":[
         {
             "Name":"Player01",
-            "MicDevice":"Mikrofon (2- USB Microphone)",
-            "Difficulty":{
-                "RoundingDistance":1
-            },
-            "Color":{
-                "r":0.0,
-                "g":1.0,
-                "b":1.0,
-                "a":1.0
-            }
+            "Difficulty":"Easy",
+            "Avatar":"GenericPlayer01",
+            "IsEnabled":true
         },
         {
             "Name":"Player02",
-            "MicDevice":"",
-            "Difficulty":{
-                "RoundingDistance":2
-            },
+            "Difficulty":"Medium",
+            "Avatar":"GenericPlayer02",
+            "IsEnabled":false
+        },
+        {
+            "Name":"Player03",
+            "Difficulty":"Hard",
+            "Avatar":"GenericPlayer01",
+            "IsEnabled":true
+        }
+    ],
+    "MicProfiles":[
+        {
+            "Name":"Mikrofon (2- USB Microphone)",
             "Color":{
-                "r":1.0,
-                "g":0.0,
-                "b":1.0,
+                "r":0.1333333,
+                "g":0.5450981,
+                "b":0.1333333,
                 "a":1.0
-            }
+            },
+            "Amplification":12,
+            "NoiseSuppression":10,
+            "IsEnabled":true
+        },
+        {
+            "Name":"Mikrofon (Realtek High Definition Audio)",
+            "Color":{
+                "r":0.8627451,
+                "g":0.07843138,
+                "b":0.2352941,
+                "a":1.0
+            },
+            "Amplification":0,
+            "NoiseSuppression":5,
+            "IsEnabled":false
         }
     ]
 }
