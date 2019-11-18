@@ -7,7 +7,7 @@ using UnityEngine;
 public class MicProfile
 {
     public string Name { get; set; }
-    public Color Color { get; set; } = Colors.Crimson;
+    public Color Color { get; set; } = Colors.crimson;
     public int Amplification { get; set; }
     public int NoiseSuppression { get; set; } = 5;
     public bool IsEnabled { get; set; }
