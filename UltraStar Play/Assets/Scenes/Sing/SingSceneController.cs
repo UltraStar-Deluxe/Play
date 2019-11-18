@@ -228,6 +228,12 @@ public class SingSceneController : MonoBehaviour
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
+    public MicProfile GetMicProfile(PlayerProfile playerProfile)
+    {
+        sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+        return micProfile;
+    }
+
     public void SkipToNextSentence()
     {
         double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
