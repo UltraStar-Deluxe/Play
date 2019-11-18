@@ -10,7 +10,7 @@ public class FloatArrayVisualizer : MonoBehaviour
     private float[] floatArray;
     private int step;
     private RectTransform[] dataPoints;
-    private bool isInitialized = false;
+    private bool isInitialized;
 
     public void Init(float[] array)
     {
