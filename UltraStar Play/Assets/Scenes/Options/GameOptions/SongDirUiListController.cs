@@ -36,25 +36,25 @@ public class SongDirUiListController : MonoBehaviour
         }
     }
 
-    private void CreateListEntry(string songDir, int songDirIndexInList)
+    private void CreateListEntry(string songDir, int indexInList)
     {
         SongDirUiListEntry songDirUiListEntry = Instantiate(listEntryPrefab);
         songDirUiListEntry.transform.SetParent(scrollViewContent);
 
-        songDirUiListEntry.SetSongDir(songDir, songDirIndexInList);
+        songDirUiListEntry.SetSongDir(songDir, indexInList);
 
-        songDirUiListEntry.deleteButton.OnClickAsObservable().Subscribe(_ => DeleteSongDir(songDir, songDirIndexInList));
-        songDirUiListEntry.inputField.OnValueChangedAsObservable().Subscribe(newValue => ChangeSongDir(newValue, songDirIndexInList));
+        songDirUiListEntry.deleteButton.OnClickAsObservable().Subscribe(_ => DeleteSongDir(indexInList));
+        songDirUiListEntry.inputField.OnValueChangedAsObservable().Subscribe(newValue => ChangeSongDir(newValue, indexInList));
     }
 
-    private void ChangeSongDir(string newValue, int songDirIndexInList)
+    private void ChangeSongDir(string newValue, int indexInList)
     {
-        SettingsManager.Instance.Settings.GameSettings.songDirs[songDirIndexInList] = newValue;
+        SettingsManager.Instance.Settings.GameSettings.songDirs[indexInList] = newValue;
     }
 
-    private void DeleteSongDir(string songDir, int songDirIndexInList)
+    private void DeleteSongDir(int indexInList)
     {
-        SettingsManager.Instance.Settings.GameSettings.songDirs.RemoveAt(songDirIndexInList);
+        SettingsManager.Instance.Settings.GameSettings.songDirs.RemoveAt(indexInList);
         UpdateListEntries();
     }
 
