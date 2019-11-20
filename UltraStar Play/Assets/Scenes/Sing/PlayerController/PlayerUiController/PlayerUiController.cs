@@ -11,6 +11,13 @@ public class PlayerUiController : MonoBehaviour
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
+    void Start()
+    {
+        // TODO: For some reason this GameObject does not have a scale of (1,1,1) after instantiation.
+        // Maybe the VerticalLayoutGroup is messing with it. Anyway, the following is a workaround.
+        transform.localScale = Vector3.one;
+    }
+
     public void Init()
     {
         lineDisplayer = GetComponentInChildren<LineDisplayer>();

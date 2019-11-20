@@ -71,8 +71,8 @@ public class PlayerController : MonoBehaviour
     private void CreatePlayerUi()
     {
         playerUiController = GameObject.Instantiate(playerUiControllerPrefab);
-        RectTransform playerUiAreaTransform = playerUiArea.GetComponent<RectTransform>();
-        playerUiController.GetComponent<RectTransform>().SetParent(playerUiAreaTransform);
+        playerUiController.transform.SetParent(playerUiArea.transform);
+        playerUiController.transform.SetAsFirstSibling();
         playerUiController.Init();
     }
 

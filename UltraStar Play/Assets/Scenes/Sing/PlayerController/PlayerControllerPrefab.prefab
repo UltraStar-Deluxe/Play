@@ -93,8 +93,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b23705d715dd213418e9f5d739c7621b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordedNotes: []
-  recordedSentences: []
 --- !u!114 &6166246499440108607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,6 +106,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
+  pitchRecordHistoryLength: 5
+  lastMidiNoteName: 
 --- !u!82 &2112286677205179149
 AudioSource:
   m_ObjectHideFlags: 0
@@ -249,5 +249,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9f4992be2165ce4dbe3c61528ee71e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUiControllerPrefab: {fileID: 4350760975549093568, guid: c476fd55a093e0f43bdc324f326218f3,
+  playerUiControllerPrefab: {fileID: 2671619950860038949, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
     type: 3}
