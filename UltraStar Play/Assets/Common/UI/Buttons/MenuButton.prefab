@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 5124115183525111792}
   - component: {fileID: 5124115183525111795}
   - component: {fileID: 5124115183525111794}
-  - component: {fileID: 7390061747104496988}
-  - component: {fileID: 3224661575443254101}
   - component: {fileID: -8801961142622241638}
   m_Layer: 5
   m_Name: MenuButton
@@ -136,34 +134,6 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &7390061747104496988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5124115183525111804}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
---- !u!114 &3224661575443254101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5124115183525111804}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
-  followPosition: 1
-  followSize: 1
 --- !u!114 &-8801961142622241638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,12 +146,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aaf1d1e493f55e4495a8cd9683ffd1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchorMin: {x: 0, y: 0}
-  anchorMax: {x: 0, y: 0}
-  pivot: {x: 0, y: 0}
-  localPosition: {x: 0, y: 0, z: 0}
+  anchorMin: {x: 0.1, y: 0.35789996}
+  anchorMax: {x: 0.35, y: 0.4579}
+  pivot: {x: 0.5, y: 0.5}
+  localPosition: {x: -220, y: -55.260017, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 0, y: 0}
+  size: {x: 200, y: 60.000015}
 --- !u!1 &5124115183637839173
 GameObject:
   m_ObjectHideFlags: 0
