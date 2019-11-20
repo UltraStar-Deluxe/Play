@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3742349457644551198}
   - component: {fileID: 3742349457644551199}
   - component: {fileID: 3742349457644551196}
-  - component: {fileID: 3742349457644551193}
   m_Layer: 5
   m_Name: InputField
   m_TagString: Untagged
@@ -146,19 +145,6 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
---- !u!114 &3742349457644551193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3742349457644551170}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!1 &3742349459387787861
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +154,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3742349459387787860}
-  - component: {fileID: 3742349459387787863}
   - component: {fileID: 1154575408314943243}
   m_Layer: 5
   m_Name: SongDirUiListEntry
@@ -198,19 +183,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 32}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &3742349459387787863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3742349459387787861}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!114 &1154575408314943243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,6 +368,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DeleteButton
       objectReference: {fileID: 0}
+    - target: {fileID: 5124115183525111794, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -501,10 +478,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5124115183525111794, guid: be0e3235464c346458a464603cce47c0,
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      propertyPath: m_Text
+      value: Delete
       objectReference: {fileID: 0}
     - target: {fileID: -8801961142622241638, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -539,7 +516,7 @@ PrefabInstance:
     - target: {fileID: -8801961142622241638, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: localPosition.x
-      value: 399.4883
+      value: 303.21695
       objectReference: {fileID: 0}
     - target: {fileID: -8801961142622241638, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -549,7 +526,7 @@ PrefabInstance:
     - target: {fileID: -8801961142622241638, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: size.x
-      value: 222.4823
+      value: 168.86707
       objectReference: {fileID: 0}
     - target: {fileID: -8801961142622241638, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -565,11 +542,6 @@ PrefabInstance:
         type: 3}
       propertyPath: sizeDelta.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
-        type: 3}
-      propertyPath: m_Text
-      value: Delete
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be0e3235464c346458a464603cce47c0, type: 3}
