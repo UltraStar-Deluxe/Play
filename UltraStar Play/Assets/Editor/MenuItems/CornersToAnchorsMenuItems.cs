@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-/// MenuItems to set the anchoredPosition and sizeDelta of a RectTransform to its anchors.
 public static class CornersToAnchorsMenuItems
 {
 
