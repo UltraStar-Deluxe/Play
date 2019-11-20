@@ -33,7 +33,7 @@ public class I18NTextInspector : EditorBase
 
         // Change i18nKey via drop-down
         int lastIndex = i18nKeyIndex;
-        i18nKeyIndex = EditorGUILayout.Popup("I18N key", i18nKeyIndex, i18nKeys);
+        i18nKeyIndex = EditorGUILayout.Popup("Key", i18nKeyIndex, i18nKeys);
         if (i18nKeyIndex < 0)
         {
             i18nKeyIndex = 0;
