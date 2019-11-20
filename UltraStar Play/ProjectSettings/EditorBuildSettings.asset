@@ -27,8 +27,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/SoundOptions/OptionsSoundScene.unity
     guid: c593716c83a53884bbbd31e8afc223bd
   - enabled: 1
-    path: Assets/Scenes/Player/SetupPlayerScene.unity
-    guid: 4ba41a1acfbb8a6409cb0a9cdb4c380a
+    path: Assets/Scenes/Options/PlayerProfileSetup/PlayerProfileSetupScene.unity
+    guid: f509dae09ad85ac4e9c41ff79fa95d6d
   - enabled: 1
     path: Assets/Scenes/Result/HighscoreScene.unity
     guid: 4aae204a79a088d488888b1ce72c2dda
@@ -53,7 +53,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
-  - enabled: 1
-    path: Assets/Scenes/Options/PlayerProfileSetup/PlayerProfileSetupScene.unity
-    guid: f509dae09ad85ac4e9c41ff79fa95d6d
   m_configObjects: {}

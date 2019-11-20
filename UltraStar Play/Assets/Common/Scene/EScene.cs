@@ -9,9 +9,6 @@ public enum EScene
     LoadingScene = 0,
     AboutScene = 3,
 
-    // player
-    SetupPlayerScene = 7,
-
     // result
     HighscoreScene = 8,
     SingingResultsScene = 9,
@@ -23,7 +20,7 @@ public enum EScene
     OptionsGraphicsScene = 5,
     OptionsSoundScene = 6,
     RecordingOptionsScene = 15,
-    PlayerProfileSetupScene = 16,
+    PlayerProfileSetupScene = 7,
 
     // sing
     SingScene = 11,
