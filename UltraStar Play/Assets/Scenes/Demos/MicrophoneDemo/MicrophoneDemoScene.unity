@@ -208,7 +208,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 836577829}
-  - component: {fileID: 836577833}
   - component: {fileID: 836577832}
   - component: {fileID: 836577831}
   - component: {fileID: 836577830}
@@ -291,19 +290,6 @@ MonoBehaviour:
   dataPointPrefab: {fileID: 7698141773260701551, guid: b2dd41d0385312d47ac3d8099a8a3819,
     type: 3}
   visualizationLength: 50
---- !u!114 &836577833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 836577828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!1 &1032696876
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,7 +402,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1186806711}
-  - component: {fileID: 1186806715}
   - component: {fileID: 1186806714}
   - component: {fileID: 1186806713}
   - component: {fileID: 1186806712}
@@ -499,19 +484,6 @@ MonoBehaviour:
   dataPointPrefab: {fileID: 7698141773260701551, guid: b2dd41d0385312d47ac3d8099a8a3819,
     type: 3}
   visualizationLength: 50
---- !u!114 &1186806715
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1186806710}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!1 &1403799431
 GameObject:
   m_ObjectHideFlags: 0
