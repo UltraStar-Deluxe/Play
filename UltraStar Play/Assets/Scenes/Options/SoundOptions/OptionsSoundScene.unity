@@ -272,7 +272,9 @@ PrefabInstance:
       propertyPath: size.y
       value: 39.999992
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3372070600022588915, guid: d25b56f386ff678439032a836c95dd10, type: 3}
+    - {fileID: 7242503738783058938, guid: d25b56f386ff678439032a836c95dd10, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: d25b56f386ff678439032a836c95dd10, type: 3}
 --- !u!224 &1281663257 stripped
 RectTransform:
@@ -771,7 +773,12 @@ PrefabInstance:
       propertyPath: m_Text
       value: Sound Options
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3622033095437819808, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
+    - {fileID: 3622033095365871876, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
+    - {fileID: 3622033095099228109, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
+    - {fileID: 3622033095437819809, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
+    - {fileID: 3622033095365871877, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
 --- !u!224 &1651420447 stripped
 RectTransform:
