@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 4090027367172086655}
   - component: {fileID: 4090027367172086652}
   - component: {fileID: 4090027367172086653}
-  - component: {fileID: 1824230137588449747}
-  - component: {fileID: 5989362242762422234}
   - component: {fileID: 8793022488296390677}
   m_Layer: 5
   m_Name: CenterButton
@@ -125,34 +123,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &1824230137588449747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4090027367172086643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
---- !u!114 &5989362242762422234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4090027367172086643}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
-  followPosition: 1
-  followSize: 1
 --- !u!114 &8793022488296390677
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +322,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6750085590155641732}
   - component: {fileID: 6750085590155641729}
-  - component: {fileID: 6750085590155641730}
   m_Layer: 0
   m_Name: TextItemSlider
   m_TagString: Untagged
@@ -400,19 +369,6 @@ MonoBehaviour:
   localPosition: {x: -5.9000244, y: -60.600006, z: -616.995}
   sizeDelta: {x: 0, y: 0}
   size: {x: 250, y: 35}
---- !u!114 &6750085590155641730
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750085590155641733}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!1 &6750085590334753832
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,7 +381,6 @@ GameObject:
   - component: {fileID: 6750085590334753840}
   - component: {fileID: 6750085590334753841}
   - component: {fileID: 6750085590334753842}
-  - component: {fileID: 6750085590334753843}
   - component: {fileID: 6750085590334753845}
   - component: {fileID: 9011749559199016490}
   m_Layer: 5
@@ -538,19 +493,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &6750085590334753843
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750085590334753832}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!114 &6750085590334753845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -672,8 +614,6 @@ GameObject:
   - component: {fileID: 6750085590943520801}
   - component: {fileID: 6750085590943520802}
   - component: {fileID: 6750085590943520803}
-  - component: {fileID: 6750085590943520804}
-  - component: {fileID: 6750085590943520805}
   - component: {fileID: 6750085590943520806}
   - component: {fileID: 3864959810830050899}
   m_Layer: 5
@@ -786,34 +726,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &6750085590943520804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750085590943520793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
---- !u!114 &6750085590943520805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750085590943520793}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
-  followPosition: 1
-  followSize: 1
 --- !u!114 &6750085590943520806
 MonoBehaviour:
   m_ObjectHideFlags: 0

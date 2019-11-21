@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class PositionInLyricsIndicator : MonoBehaviour
 {
-    private const int CanvasWidth = 800;
+    private float canvasWidth;
 
     public LyricsDisplayer lyricsDisplayer;
 
@@ -46,6 +46,11 @@ public class PositionInLyricsIndicator : MonoBehaviour
     {
         rectTransform = GetComponent<RectTransform>();
         singSceneController = FindObjectOfType<SingSceneController>();
+
+        // Get the canvas width.
+        Canvas canvas = FindObjectOfType<Canvas>();
+        RectTransform canvasRectTransform = canvas.GetComponent<RectTransform>();
+        canvasWidth = canvasRectTransform.rect.width;
     }
 
     void Update()
@@ -71,7 +76,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private void MoveToLeftSideOfScreen()
     {
-        rectTransform.anchoredPosition = new Vector2(-CanvasWidth / 2.0f, rectTransform.anchoredPosition.y);
+        rectTransform.anchoredPosition = new Vector2(-canvasWidth / 2.0f, rectTransform.anchoredPosition.y);
     }
 
     private void CalculateVelocity()
