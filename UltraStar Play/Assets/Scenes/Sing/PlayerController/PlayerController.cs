@@ -108,24 +108,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnRecordedNoteEnded(RecordedNote lastRecordedNote)
+    public void OnRecordedNoteEnded(RecordedNote recordedNote)
     {
-        CheckPerfectlySungNote(CurrentSentence, lastRecordedNote);
+        CheckPerfectlySungNote(recordedNote);
+        DisplayRecordedNote(recordedNote);
     }
 
-    private void CheckPerfectlySungNote(Sentence sentence, RecordedNote lastRecordedNote)
+    public void OnRecordedNoteContinued(RecordedNote recordedNote)
     {
-        if (sentence == null || lastRecordedNote == null)
+        DisplayRecordedNote(recordedNote);
+    }
+
+    private void CheckPerfectlySungNote(RecordedNote lastRecordedNote)
+    {
+        if (lastRecordedNote == null || lastRecordedNote.TargetNote == null)
         {
             return;
         }
-        Note perfectlySungNote = sentence.Notes.Where(note =>
-               note.MidiNote == lastRecordedNote.RoundedMidiNote
-            && note.StartBeat >= lastRecordedNote.StartBeat
-            && note.EndBeat <= lastRecordedNote.EndBeat).FirstOrDefault();
-        if (perfectlySungNote != null)
+        Note targetNote = lastRecordedNote.TargetNote;
+        bool isPerfect = ((targetNote.MidiNote == lastRecordedNote.RoundedMidiNote)
+            && (targetNote.StartBeat >= lastRecordedNote.StartBeat)
+            && (targetNote.EndBeat <= lastRecordedNote.EndBeat));
+        if (isPerfect)
         {
-            playerUiController.CreatePerfectNoteEffect(perfectlySungNote);
+            playerUiController.CreatePerfectNoteEffect(targetNote);
         }
     }
 
@@ -161,13 +167,12 @@ public class PlayerController : MonoBehaviour
 
         // Update the UI
         playerUiController.DisplaySentence(CurrentSentence);
-        playerUiController.DisplayRecordedNotes(null);
         UpdateLyricsDisplayer();
     }
 
-    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        playerUiController.DisplayRecordedNotes(recordedNotes);
+        playerUiController.DisplayRecordedNote(recordedNote);
     }
 
     private void UpdateLyricsDisplayer()
