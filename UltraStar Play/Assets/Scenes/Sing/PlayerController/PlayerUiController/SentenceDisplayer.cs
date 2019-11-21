@@ -22,6 +22,10 @@ public class SentenceDisplayer : MonoBehaviour
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
 
+    public RectTransform uiNotesContainer;
+    public RectTransform uiRecordedNotesContainer;
+    public RectTransform uiEffectsContainer;
+
     private Sentence displayedSentence;
 
     public void Init(int noteLineCount)
@@ -33,7 +37,7 @@ public class SentenceDisplayer : MonoBehaviour
     {
         displayedSentence = sentence;
 
-        foreach (UiNote uiNote in GetComponentsInChildren<UiNote>())
+        foreach (UiNote uiNote in uiNotesContainer.GetComponentsInChildren<UiNote>())
         {
             Destroy(uiNote.gameObject);
         }
@@ -52,9 +56,8 @@ public class SentenceDisplayer : MonoBehaviour
     private void DisplayNote(Sentence sentence, Note note)
     {
         UiNote uiNote = Instantiate(uiNotePrefab);
-        uiNote.transform.SetParent(transform);
-        uiNote.Note = note;
-        uiNote.isGolden = note.IsGolden;
+        uiNote.transform.SetParent(uiNotesContainer);
+        uiNote.Init(note, uiEffectsContainer);
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";
@@ -65,7 +68,7 @@ public class SentenceDisplayer : MonoBehaviour
 
     public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
     {
-        foreach (UiRecordedNote uiNote in GetComponentsInChildren<UiRecordedNote>())
+        foreach (UiRecordedNote uiNote in uiRecordedNotesContainer.GetComponentsInChildren<UiRecordedNote>())
         {
             Destroy(uiNote.gameObject);
         }
@@ -90,7 +93,7 @@ public class SentenceDisplayer : MonoBehaviour
         int midiNote = (useRoundedNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
-        uiNote.transform.SetParent(transform);
+        uiNote.transform.SetParent(uiRecordedNotesContainer);
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = (useRoundedNote) ? MidiUtils.GetAbsoluteName(recordedNote.RoundedMidiNote)
