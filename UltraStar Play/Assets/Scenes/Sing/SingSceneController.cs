@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
 
-public class SingSceneController : MonoBehaviour
+public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     // Constant delay when querying the position in the song.
     // Its source could be that calculating the position in the song takes some time for itself.
@@ -138,6 +138,11 @@ public class SingSceneController : MonoBehaviour
 
     void Awake()
     {
+        LoadSceneData();
+    }
+
+    private void LoadSceneData()
+    {
         // Load scene data from static reference, if any
         sceneData = SceneNavigator.Instance.GetSceneData(sceneData);
 
@@ -153,23 +158,14 @@ public class SingSceneController : MonoBehaviour
             sceneData.SelectedPlayerProfiles.Add(playerProfile);
             sceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
         }
-    }
 
-    void OnEnable()
-    {
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
+    }
 
-        // Start the music
-        StartAudioPlayback();
-
-        // Start any associated video
-        Invoke("StartVideoPlayback", SongMeta.VideoGap);
-
-        // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
-
-        // Handle players        
+    void Start()
+    {
+        // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
         {
@@ -189,8 +185,30 @@ public class SingSceneController : MonoBehaviour
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
-        LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-        PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
+        if (!PlayerControllers.IsNullOrEmpty())
+        {
+            LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
+            PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
+        }
+
+        StartMusicAndVideo();
+    }
+
+    private void StartMusicAndVideo()
+    {
+        // Start the music 
+        StartAudioPlayback();
+
+        // Start any associated video
+        Invoke("StartVideoPlayback", SongMeta.VideoGap);
+
+        // Go to next scene when the song finishes
+        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
+    }
+
+    public void OnHotSwapFinished()
+    {
+        StartMusicAndVideo();
     }
 
     void OnDisable()
@@ -220,12 +238,25 @@ public class SingSceneController : MonoBehaviour
 
     void Update()
     {
+        UpdateMusic();
+        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+    }
+
+    private void UpdateMusic()
+    {
+        if (waveOutDevice == null)
+        {
+            return;
+        }
+
         if (waveOutDevice.PlaybackState == PlaybackState.Playing)
         {
             timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
         }
-        volumeStream.Volume = volume;
-        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+        if (Application.isEditor)
+        {
+            volumeStream.Volume = volume;
+        }
     }
 
     public MicProfile GetMicProfile(PlayerProfile playerProfile)
@@ -333,8 +364,6 @@ public class SingSceneController : MonoBehaviour
 
     private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
-        PlayerControllers.Clear();
-
         string voiceIdentifier = GetVoiceIdentifier(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
         playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier, micProfile);

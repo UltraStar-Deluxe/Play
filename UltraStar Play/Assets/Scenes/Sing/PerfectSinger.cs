@@ -6,22 +6,25 @@ using UnityEngine;
 
 public class PerfectSinger : MonoBehaviour
 {
-
     private SingSceneController singSceneController;
 
     void Start()
     {
         singSceneController = SingSceneController.Instance;
+    }
 
-        // Disable other pitch trackers
-        foreach (MicrophonePitchTracker microphonePitchTracker in FindObjectsOfType<MicrophonePitchTracker>())
+    private void DisableOtherPitchTrackers()
+    {
+        foreach (PlayerController playerController in singSceneController.PlayerControllers)
         {
-            microphonePitchTracker.gameObject.SetActive(false);
+            playerController.PlayerNoteRecorder.SetMicrophonePitchTrackerEnabled(false);
         }
     }
 
     void Update()
     {
+        DisableOtherPitchTrackers();
+
         double currentBeat = singSceneController.CurrentBeat;
         foreach (PlayerController playerController in singSceneController.PlayerControllers)
         {

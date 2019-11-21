@@ -39,23 +39,16 @@ public class PlayerController : MonoBehaviour
 
     private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
 
-    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
+    void Awake()
     {
-        this.SongMeta = songMeta;
-        this.PlayerProfile = playerProfile;
-
-        Voice = LoadVoice(songMeta, voiceIdentifier);
-
         playerUiArea = FindObjectOfType<PlayerUiArea>();
-
         PlayerScoreController = GetComponentInChildren<PlayerScoreController>();
-        PlayerScoreController.Init(Voice);
-
         PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
+    }
 
+    void Start()
+    {
         CreatePlayerUi();
-
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         sentenceRatingStream.Buffer(2, 1)
@@ -68,10 +61,19 @@ public class PlayerController : MonoBehaviour
         UpdateSentences(sentenceIndex);
     }
 
+    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
+    {
+        this.SongMeta = songMeta;
+        this.PlayerProfile = playerProfile;
+
+        Voice = LoadVoice(songMeta, voiceIdentifier);
+        PlayerScoreController.Init(Voice);
+        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
+    }
+
     private void CreatePlayerUi()
     {
-        playerUiController = GameObject.Instantiate(playerUiControllerPrefab);
-        playerUiController.transform.SetParent(playerUiArea.transform);
+        playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
         playerUiController.transform.SetAsFirstSibling();
         playerUiController.Init();
     }
