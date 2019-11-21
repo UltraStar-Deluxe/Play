@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(Text))]
 public class I18NText : MonoBehaviour
 {
+    [ReadOnly]
     public string key;
 
     void Start()

@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using static UnityEngine.RectTransform;
 
 /// Mimics several fields of a RectTransform for easier editing in the Inspector.
 /// Some of these fields are sometimes unavailable in the normal Inspector for a RectTransform.
@@ -34,7 +32,7 @@ public class RectTransformHelper : MonoBehaviour
 
     void OnEnable()
     {
-        rectTransform = GetRectTransform();
+        rectTransform = GetComponent<RectTransform>();
 
         // Initialize the current and old values to the values of the RectTransform
         anchorMin = rectTransform.anchorMin;
@@ -74,8 +72,8 @@ public class RectTransformHelper : MonoBehaviour
     {
         if (sizeOld != size)
         {
-            rectTransform.SetSizeWithCurrentAnchors(Axis.Horizontal, size.x);
-            rectTransform.SetSizeWithCurrentAnchors(Axis.Vertical, size.y);
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
         }
         else if (rectTransform.rect.width != size.x || rectTransform.rect.height != size.y)
         {
@@ -147,10 +145,5 @@ public class RectTransformHelper : MonoBehaviour
             anchorMax = rectTransform.anchorMax;
         }
         anchorMaxOld = anchorMax;
-    }
-
-    public RectTransform GetRectTransform()
-    {
-        return GetComponent<RectTransform>();
     }
 }

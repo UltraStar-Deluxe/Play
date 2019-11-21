@@ -8,6 +8,7 @@ public class SongSelectMicListController : MonoBehaviour
 {
     public SongSelectMicListEntry listEntryPrefab;
     public GameObject scrollViewContent;
+    public GameObject emptyListLabel;
 
     void Start()
     {
@@ -25,9 +26,17 @@ public class SongSelectMicListController : MonoBehaviour
         // Create new entries
         List<MicProfile> micProfiles = SettingsManager.Instance.Settings.MicProfiles;
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles.Where(it => it.IsEnabled && it.IsConnected).ToList();
-        foreach (MicProfile micProfile in enabledAndConnectedMicProfiles)
+        if (enabledAndConnectedMicProfiles.IsNullOrEmpty())
         {
-            CreateListEntry(micProfile);
+            emptyListLabel.SetActive(true);
+        }
+        else
+        {
+            emptyListLabel.SetActive(false);
+            foreach (MicProfile micProfile in enabledAndConnectedMicProfiles)
+            {
+                CreateListEntry(micProfile);
+            }
         }
     }
 

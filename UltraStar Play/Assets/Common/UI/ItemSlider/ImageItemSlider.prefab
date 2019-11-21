@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6787901102088867876}
   - component: {fileID: 6787901102088867875}
   - component: {fileID: 6787901102088867874}
-  - component: {fileID: 6787901102088867877}
   - component: {fileID: 5896016305314546760}
   m_Layer: 0
   m_Name: Image
@@ -77,19 +76,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6787901102088867877
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6787901102088867879}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!114 &5896016305314546760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,8 +100,6 @@ GameObject:
   - component: {fileID: 7576045534658651221}
   - component: {fileID: 7576045534658651222}
   - component: {fileID: 7576045534658651223}
-  - component: {fileID: 7576045534658651216}
-  - component: {fileID: 7576045534658651217}
   - component: {fileID: 7576045534658651218}
   - component: {fileID: 2259195312343837405}
   m_Layer: 5
@@ -228,34 +212,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &7576045534658651216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7576045534658651245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
---- !u!114 &7576045534658651217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7576045534658651245}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
-  followPosition: 1
-  followSize: 1
 --- !u!114 &7576045534658651218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,8 +333,6 @@ GameObject:
   - component: {fileID: 7576045534990463044}
   - component: {fileID: 7576045534990463045}
   - component: {fileID: 7576045534990463046}
-  - component: {fileID: 7576045534990463047}
-  - component: {fileID: 7576045534990463040}
   - component: {fileID: 7576045534990463041}
   - component: {fileID: 4569376660054123315}
   m_Layer: 5
@@ -491,34 +445,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &7576045534990463047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7576045534990463068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
---- !u!114 &7576045534990463040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7576045534990463068}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1322c66e7da5ab544a1a9ab55f9ea73f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
-  followPosition: 1
-  followSize: 1
 --- !u!114 &7576045534990463041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -559,7 +485,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7576045535348228080}
   - component: {fileID: 7576045535348228085}
-  - component: {fileID: 7576045535348228086}
   m_Layer: 0
   m_Name: ImageItemSlider
   m_TagString: Untagged
@@ -607,19 +532,6 @@ MonoBehaviour:
   localPosition: {x: 222.67216, y: 0.5, z: -616.995}
   sizeDelta: {x: -1, y: -1}
   size: {x: 354.65567, y: 599}
---- !u!114 &7576045535348228086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7576045535348228081}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1eedd48fb1f1e149b4935bb719b9097, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manualRefresh: 0
 --- !u!1 &7576045535471846415
 GameObject:
   m_ObjectHideFlags: 0
