@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,14 @@ public class AvatarImage : MonoBehaviour
 
     public void SetPlayerProfile(PlayerProfile playerProfile)
     {
-        // TODO: Change image
+        AvatarImageReference imageRef = FindObjectsOfType<AvatarImageReference>().Where(it => it.avatar == playerProfile.Avatar).FirstOrDefault();
+        if (imageRef != null)
+        {
+            image.sprite = imageRef.Sprite;
+        }
+        else
+        {
+            Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
+        }
     }
 }
