@@ -12,6 +12,17 @@ public class UiNote : MonoBehaviour
     public Note Note { get; set; }
     public bool isGolden;
 
+    private RectTransform uiEffectsContainer;
+
+    private List<StarParticle> stars = new List<StarParticle>();
+
+    public void Init(Note note, RectTransform uiEffectsContainer)
+    {
+        this.Note = note;
+        this.isGolden = note.IsGolden;
+        this.uiEffectsContainer = uiEffectsContainer;
+    }
+
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -21,6 +32,7 @@ public class UiNote : MonoBehaviour
     {
         if (isGolden)
         {
+            RemoveDestroyedStarsFromList();
             CreateGoldenNoteEffect();
         }
         else
@@ -29,17 +41,38 @@ public class UiNote : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        DestroyStars();
+    }
+
+    private void RemoveDestroyedStarsFromList()
+    {
+        foreach (StarParticle star in new List<StarParticle>(stars))
+        {
+            if (!star)
+            {
+                stars.Remove(star);
+            }
+        }
+    }
+
     private void DestroyStars()
     {
-        foreach (StarParticle starParticle in GetComponentsInChildren<StarParticle>())
+        foreach (StarParticle star in stars)
         {
-            Destroy(starParticle.gameObject);
+            if (star)
+            {
+                Destroy(star.gameObject);
+            }
         }
+        stars.Clear();
     }
 
     private void CreateGoldenNoteEffect()
     {
-        int starCount = GetComponentsInChildren<StarParticle>().Length;
+        // Create several particles. Longer notes require more particles because they have more space to fill.
+        int starCount = stars.Count;
         int targetStarCount = Mathf.Max(6, (int)rectTransform.rect.width / 10);
         if (starCount < targetStarCount)
         {
@@ -50,7 +83,7 @@ public class UiNote : MonoBehaviour
     private void CreateGoldenStar()
     {
         StarParticle star = Instantiate(goldenStarPrefab);
-        star.transform.SetParent(transform);
+        star.transform.SetParent(rectTransform);
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
         float anchorX = Random.Range(0f, 1f);
         float anchorY = Random.Range(0f, 1f);
@@ -61,6 +94,11 @@ public class UiNote : MonoBehaviour
         star.RectTransform.localScale = Vector3.one * Random.Range(0, 0.5f);
         LeanTween.scale(star.RectTransform, Vector3.one * Random.Range(0.5f, 1f), Random.Range(1f, 2f))
             .setOnComplete(() => Destroy(star.gameObject));
+
+        // Move to another parent to ensure that it is drawn in front of the notes.
+        star.transform.SetParent(uiEffectsContainer);
+
+        stars.Add(star);
     }
 
     public void CreatePerfectNoteEffect()
@@ -68,13 +106,11 @@ public class UiNote : MonoBehaviour
         int targetStarCount = Mathf.Max(6, (int)rectTransform.rect.width / 20);
         for (int i = 0; i < targetStarCount; i++)
         {
-            StarParticle star = CreatePerfectStar();
-            // Change parent, because this note will be destoyed soon.
-            star.transform.SetParent(transform.parent);
+            CreatePerfectStar();
         }
     }
 
-    private StarParticle CreatePerfectStar()
+    private void CreatePerfectStar()
     {
         StarParticle star = Instantiate(perfectStarPrefab);
         star.transform.SetParent(transform);
@@ -88,6 +124,8 @@ public class UiNote : MonoBehaviour
         star.RectTransform.localScale = Vector3.one * Random.Range(0.5f, 0.8f);
         LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
             .setOnComplete(() => Destroy(star.gameObject));
-        return star;
+
+        // Move to another parent to ensure that it is drawn in front of the notes.
+        star.transform.SetParent(uiEffectsContainer);
     }
 }
