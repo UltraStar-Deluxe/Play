@@ -103,11 +103,7 @@ public class UiNote : MonoBehaviour
 
     public void CreatePerfectNoteEffect()
     {
-        int targetStarCount = Mathf.Max(6, (int)rectTransform.rect.width / 20);
-        for (int i = 0; i < targetStarCount; i++)
-        {
-            CreatePerfectStar();
-        }
+        CreatePerfectStar();
     }
 
     private void CreatePerfectStar()
@@ -115,13 +111,14 @@ public class UiNote : MonoBehaviour
         StarParticle star = Instantiate(perfectStarPrefab);
         star.transform.SetParent(transform);
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
-        float anchorX = Random.Range(0f, 1f);
-        float anchorY = Random.Range(0f, 1f);
+        float anchorX = 1;
+        float anchorY = 0.9f;
         starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
         starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
         starRectTransform.anchoredPosition = Vector2.zero;
+        starRectTransform.localEulerAngles = new Vector3(0, 0, Random.Range(0, 180));
 
-        star.RectTransform.localScale = Vector3.one * Random.Range(0.5f, 0.8f);
+        star.RectTransform.localScale = Vector3.one * 1f;
         LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
             .setOnComplete(() => Destroy(star.gameObject));
 
