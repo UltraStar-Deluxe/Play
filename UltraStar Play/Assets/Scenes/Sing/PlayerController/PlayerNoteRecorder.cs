@@ -107,27 +107,38 @@ public class PlayerNoteRecorder : MonoBehaviour
                 // End singing of last recorded note.
                 // Do this seamlessly, i.e., continue the last recorded note until now.
                 lastRecordedNote.EndBeat = currentBeat;
-                OnContinuedNote(lastRecordedNote, currentBeat);
+                LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
+                playerController.OnRecordedNoteEnded(lastRecordedNote);
                 lastRecordedNote = null;
                 // Debug.Log("Ended singing");
             }
         }
         else
         {
-            if (lastRecordedNote != null && lastRecordedNote.RecordedMidiNote == midiNote)
+            if (lastRecordedNote != null)
             {
-                // Continue singing on same pitch
-                lastRecordedNote.EndBeat = currentBeat;
-                OnContinuedNote(lastRecordedNote, currentBeat);
-                // Debug.Log("Continued note");
+                if (lastRecordedNote.RecordedMidiNote == midiNote)
+                {
+                    // Continue singing on same pitch
+                    lastRecordedNote.EndBeat = currentBeat;
+                    OnContinuedNote(lastRecordedNote, currentBeat);
+                    playerController.OnRecordedNoteContinued(lastRecordedNote);
+                    // Debug.Log("Continued note");
+                }
+                else
+                {
+                    // Continue singing on different pitch.
+                    playerController.OnRecordedNoteEnded(lastRecordedNote);
+                    // Do this seamlessly, i.e., start the new note at the time the last note was recorded.
+                    lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
+                    // Debug.Log("Start new note (continued singing)");
+                }
             }
             else
             {
-                playerController.OnRecordedNoteEnded(lastRecordedNote);
-                // Start new note.
-                // Do this seamlessly, i.e., start the new note at the time the last note was recorded.
+                // Start singing
                 lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
-                // Debug.Log("Start new note");
+                // Debug.Log("Start new note (started singing)");
             }
         }
         lastPitchDetectedBeat = currentBeat;
@@ -135,6 +146,7 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private void OnContinuedNote(RecordedNote recordedNote, double currentBeat)
     {
+        // Limit recorded note bounds to target note bounds
         if (playerController == null)
         {
             lastRecordedNote = null;
@@ -155,31 +167,44 @@ public class PlayerNoteRecorder : MonoBehaviour
             return;
         }
 
-        // Limit recorded note bounds to target note bounds
-        if (recordedNote.StartBeat < noteAtCurrentBeat.StartBeat)
-        {
-            recordedNote.StartBeat = noteAtCurrentBeat.StartBeat;
-        }
-        if (recordedNote.EndBeat > noteAtCurrentBeat.EndBeat)
-        {
-            recordedNote.EndBeat = noteAtCurrentBeat.EndBeat;
-        }
+        // The note at the same beat is the target note that should be sung
+        recordedNote.TargetNote = noteAtCurrentBeat;
+        LimitRecordedNoteBoundsToTargetNoteBounds(recordedNote);
+        RoundRecordedNotePitchToTargetNotePitch(recordedNote);
 
-        // Round pitch of recorded note to pitch of note in song
-        if (noteAtCurrentBeat.Type == ENoteType.Rap || noteAtCurrentBeat.Type == ENoteType.RapGolden)
+        // Remember this note
+        AddRecordedNote(lastRecordedNote, currentSentence);
+    }
+
+    private void RoundRecordedNotePitchToTargetNotePitch(RecordedNote recordedNote)
+    {
+        Note targetNote = recordedNote.TargetNote;
+        if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
         {
             // Rap notes accept any noise as correct note.
-            recordedNote.RoundedMidiNote = noteAtCurrentBeat.MidiNote;
+            recordedNote.RoundedMidiNote = targetNote.MidiNote;
         }
         else
         {
             // Round recorded note if it is close to the target note.
-            recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, noteAtCurrentBeat.MidiNote, RoundingDistance);
+            recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, targetNote.MidiNote, RoundingDistance);
         }
+    }
 
-        // Remember this note and show it in the UI
-        AddRecordedNote(lastRecordedNote, currentSentence);
-        playerController.DisplayRecordedNotes(GetRecordedNotes(currentSentence));
+    private void LimitRecordedNoteBoundsToTargetNoteBounds(RecordedNote recordedNote)
+    {
+        Note targetNote = recordedNote.TargetNote;
+        if (targetNote != null)
+        {
+            if (recordedNote.StartBeat < targetNote.StartBeat)
+            {
+                recordedNote.StartBeat = targetNote.StartBeat;
+            }
+            if (recordedNote.EndBeat > targetNote.EndBeat)
+            {
+                recordedNote.EndBeat = targetNote.EndBeat;
+            }
+        }
     }
 
     private int GetRoundedMidiNote(int recordedMidiNote, int targetMidiNote, int roundingDistance)

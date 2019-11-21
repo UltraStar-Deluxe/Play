@@ -36,6 +36,11 @@ public class PlayerUiController : MonoBehaviour
         sentenceDisplayer.DisplaySentence(currentSentence);
     }
 
+    public void RemoveAllDisplayedNotes()
+    {
+        sentenceDisplayer.RemoveAllDisplayedNotes();
+    }
+
     public void ShowSentenceRating(SentenceRating sentenceRating)
     {
         sentenceRatingDisplayer.ShowSentenceRating(sentenceRating);
@@ -46,9 +51,9 @@ public class PlayerUiController : MonoBehaviour
         totalScoreDisplayer.ShowTotalScore(score);
     }
 
-    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        sentenceDisplayer.DisplayRecordedNotes(recordedNotes);
+        sentenceDisplayer.DisplayRecordedNote(recordedNote);
     }
 
     public void CreatePerfectSentenceEffect()
