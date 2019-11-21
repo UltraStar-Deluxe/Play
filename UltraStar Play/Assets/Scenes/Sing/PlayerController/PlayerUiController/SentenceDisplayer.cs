@@ -22,6 +22,8 @@ public class SentenceDisplayer : MonoBehaviour
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
 
+    public StarParticle perfectSentenceStarPrefab;
+
     public RectTransform uiNotesContainer;
     public RectTransform uiRecordedNotesContainer;
     public RectTransform uiEffectsContainer;
@@ -145,5 +147,28 @@ public class SentenceDisplayer : MonoBehaviour
 
         float length = (float)(noteEndBeat - noteStartBeat);
         uiNote.sizeDelta = new Vector2(800f * length / (float)beatsInSentence, uiNote.sizeDelta.y);
+    }
+
+    public void CreatePerfectSentenceEffect()
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            CreatePerfectSentenceStar();
+        }
+    }
+
+    private void CreatePerfectSentenceStar()
+    {
+        StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
+        RectTransform starRectTransform = star.GetComponent<RectTransform>();
+        float anchorX = UnityEngine.Random.Range(0f, 1f);
+        float anchorY = UnityEngine.Random.Range(0f, 1f);
+        starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
+        starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
+        starRectTransform.anchoredPosition = Vector2.zero;
+
+        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.6f);
+        LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
+            .setOnComplete(() => Destroy(star.gameObject));
     }
 }

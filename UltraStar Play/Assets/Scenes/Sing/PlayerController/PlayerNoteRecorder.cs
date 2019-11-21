@@ -7,7 +7,7 @@ using UnityEngine;
 using UniRx;
 
 [RequireComponent(typeof(MicrophonePitchTracker))]
-public class PlayerNoteRecorder : MonoBehaviour
+public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 {
     public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
 
@@ -23,8 +23,6 @@ public class PlayerNoteRecorder : MonoBehaviour
 
     private PlayerProfile playerProfile;
     private MicProfile micProfile;
-
-    private bool wasStartedAlready;
 
     private IDisposable pitchEventStreamDisposable;
 
@@ -50,26 +48,18 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
     }
 
+    public void SetMicrophonePitchTrackerEnabled(bool newValue)
+    {
+        MicrophonePitchTracker.enabled = newValue;
+    }
+
     void Awake()
     {
         singSceneController = GameObject.FindObjectOfType<SingSceneController>();
     }
 
-    void OnEnable()
-    {
-        // Start is not called after hot-swap, but OnEnable is called before the Init method (before Instantiate(...) returns).
-        // However, if OnEnable is called after the object has been initialized, then we know we are called after hot-swap.
-        // TODO: Introduce a new common base class on top of MonoBehaviour that handles this.
-        if (wasStartedAlready)
-        {
-            // This is called after hot-swap, because Start has been called before and we are in OnEnable.
-            Start();
-        }
-    }
-
     void Start()
     {
-        wasStartedAlready = true;
         if (micProfile != null)
         {
             pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
@@ -79,6 +69,11 @@ public class PlayerNoteRecorder : MonoBehaviour
         {
             Debug.LogWarning("No mic for player " + playerProfile.Name + ". Not recording player notes.");
         }
+    }
+
+    public void OnHotSwapFinished()
+    {
+        Start();
     }
 
     void OnDisable()
@@ -121,8 +116,11 @@ public class PlayerNoteRecorder : MonoBehaviour
                 {
                     // Continue singing on same pitch
                     lastRecordedNote.EndBeat = currentBeat;
-                    OnContinuedNote(lastRecordedNote, currentBeat);
-                    playerController.OnRecordedNoteContinued(lastRecordedNote);
+                    HandleContinuedNote(currentBeat);
+                    if (lastRecordedNote != null)
+                    {
+                        playerController.OnRecordedNoteContinued(lastRecordedNote);
+                    }
                     // Debug.Log("Continued note");
                 }
                 else
@@ -144,9 +142,13 @@ public class PlayerNoteRecorder : MonoBehaviour
         lastPitchDetectedBeat = currentBeat;
     }
 
-    private void OnContinuedNote(RecordedNote recordedNote, double currentBeat)
+    private void HandleContinuedNote(double currentBeat)
     {
-        // Limit recorded note bounds to target note bounds
+        if (lastRecordedNote == null)
+        {
+            return;
+        }
+
         if (playerController == null)
         {
             lastRecordedNote = null;
@@ -168,9 +170,9 @@ public class PlayerNoteRecorder : MonoBehaviour
         }
 
         // The note at the same beat is the target note that should be sung
-        recordedNote.TargetNote = noteAtCurrentBeat;
-        LimitRecordedNoteBoundsToTargetNoteBounds(recordedNote);
-        RoundRecordedNotePitchToTargetNotePitch(recordedNote);
+        lastRecordedNote.TargetNote = noteAtCurrentBeat;
+        LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
+        RoundRecordedNotePitchToTargetNotePitch(lastRecordedNote);
 
         // Remember this note
         AddRecordedNote(lastRecordedNote, currentSentence);
@@ -238,10 +240,7 @@ public class PlayerNoteRecorder : MonoBehaviour
         // Thereby, construct collections of recorded notes if needed and associate it with the sentence.
         if (sentenceToRecordedNotesMap.TryGetValue(currentSentence, out List<RecordedNote> recordedNotes))
         {
-            if (!recordedNotes.Contains(recordedNote))
-            {
-                recordedNotes.Add(recordedNote);
-            }
+            recordedNotes.AddIfNotContains(recordedNote);
         }
         else
         {
