@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class SongSelectSceneKeyboardInputController : MonoBehaviour
 {
-    private const KeyCode MainMenuShortcut = KeyCode.Escape;
-    private const KeyCode MainMenuShortcut2 = KeyCode.Backspace;
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
@@ -17,6 +15,33 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
     void Update()
     {
         SongSelectSceneController songSelectSceneController = SongSelectSceneController.Instance;
+        // Open / close search
+        if (Input.GetKeyDown(QuickSearchArtist))
+        {
+            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByArtist);
+        }
+        if (Input.GetKeyDown(QuickSearchSong))
+        {
+            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.BySongTitle);
+        }
+
+        if (songSelectSceneController.IsSearchEnabled())
+        {
+            // When the search is enabled, then close it via Escape
+            if (Input.GetKeyUp(KeyCode.Escape))
+            {
+                songSelectSceneController.DisableSearch();
+            }
+        }
+        else
+        {
+            // When the search is not enabled, then open the main menu via Escape or Backspace
+            if (Input.GetKeyUp(KeyCode.Escape) || Input.GetKeyUp(KeyCode.Backspace))
+            {
+                SceneNavigator.Instance.LoadScene(EScene.MainScene);
+            }
+        }
+
         if (Input.GetKeyUp(NextSongShortcut))
         {
             songSelectSceneController.OnNextSong();
@@ -27,30 +52,15 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(MainMenuShortcut) || Input.GetKeyUp(MainMenuShortcut2))
-        {
-            if (songSelectSceneController.IsSearchEnabled())
-            {
-                songSelectSceneController.DisableSearch();
-            }
-            else
-            {
-                SceneNavigator.Instance.LoadScene(EScene.MainScene);
-            }
-        }
-
         if (Input.GetKeyUp(StartSingSceneShortcut))
         {
-            songSelectSceneController.OnStartSingScene();
-        }
-
-        if (Input.GetKeyDown(QuickSearchArtist))
-        {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByArtist);
-        }
-        if (Input.GetKeyDown(QuickSearchSong))
-        {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.BySongTitle);
+            GameObject focusedControl = GameObjectUtils.GetSelectedGameObject();
+            bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
+            bool focusedControlIsSearchField = (focusedControl != null && focusedControl.GetComponent<SearchInputField>() != null);
+            if (focusedControl == null || focusedControlIsSongButton || focusedControlIsSearchField)
+            {
+                songSelectSceneController.StartSingScene();
+            }
         }
     }
 }

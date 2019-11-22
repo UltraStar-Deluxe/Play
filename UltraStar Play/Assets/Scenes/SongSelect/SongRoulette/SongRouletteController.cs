@@ -62,10 +62,6 @@ public class SongRouletteController : MonoBehaviour
 
         UpdateSongRouletteItems();
 
-        // The button of the selected song should always be the UI control that has the focus.
-        // Otherwise, a keystroke (such as enter) can change another UI control before starting the song.
-        SetSelectedSongButtonFocus();
-
         // Initially, let all items start with full size
         if (!isInitialized)
         {
@@ -73,19 +69,6 @@ public class SongRouletteController : MonoBehaviour
             foreach (SongRouletteItem songRouletteItem in songRouletteItems)
             {
                 songRouletteItem.RectTransform.localScale = Vector3.one;
-            }
-        }
-    }
-
-    private void SetSelectedSongButtonFocus()
-    {
-        if (Selection.Value.SongMeta != null)
-        {
-            Button buttonOfSelectedSongMeta = songMetaToButtonMap[Selection.Value.SongMeta];
-            GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
-            if (selectedGameObject != buttonOfSelectedSongMeta.gameObject)
-            {
-                buttonOfSelectedSongMeta.Select();
             }
         }
     }
@@ -147,7 +130,7 @@ public class SongRouletteController : MonoBehaviour
         item.RectTransform.localScale = Vector3.zero;
 
         Button button = item.GetComponent<Button>();
-        button.onClick.AddListener(() => SelectSong(songMeta));
+        button.onClick.AddListener(() => OnSongButtonClicked(songMeta));
         songMetaToButtonMap[songMeta] = button;
 
         songRouletteItems.Add(item);
@@ -270,5 +253,17 @@ public class SongRouletteController : MonoBehaviour
         int wrappedIndexModulo = wrappedIndex % songs.Count;
         SongMeta song = songs[wrappedIndexModulo];
         return song;
+    }
+
+    private void OnSongButtonClicked(SongMeta songMeta)
+    {
+        if (Selection.Value.SongMeta != null && Selection.Value.SongMeta == songMeta)
+        {
+            SongSelectSceneController.Instance.StartSingScene();
+        }
+        else
+        {
+            SelectSong(songMeta);
+        }
     }
 }
