@@ -124,6 +124,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
                 return;
             }
             mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(value);
+            SyncVideoWithMusic();
         }
     }
 
@@ -274,9 +275,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void UpdateVideoStart()
     {
-        if (SongMeta.VideoGap > 0 && videoPlayer.gameObject.activeInHierarchy && videoPlayer.isPaused)
+        // Negative VideoGap: Start video after a pause in seconds.
+        if (SongMeta.VideoGap < 0 && videoPlayer.gameObject.activeInHierarchy && videoPlayer.isPaused)
         {
-            if (PositionInSongInMillis >= SongMeta.VideoGap * 1000)
+            if (PositionInSongInMillis >= (-SongMeta.VideoGap * 1000))
             {
                 videoPlayer.Play();
             }
@@ -381,18 +383,20 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
         else
         {
-            if (SongMeta.VideoGap < 0)
+            if (SongMeta.VideoGap > 0)
             {
-                // Negative VideoGap, thus skip the start of the video
-                videoPlayer.time = -SongMeta.VideoGap;
+                // Positive VideoGap, thus skip the start of the video
+                videoPlayer.time = SongMeta.VideoGap;
                 videoPlayer.Play();
             }
-            else if (SongMeta.VideoGap > 0)
+            else if (SongMeta.VideoGap < 0)
             {
+                // Negative VideoGap, thus wait a little before starting the video
                 videoPlayer.Pause();
             }
             else
             {
+                // No VideoGap, thus start the video immediately
                 videoPlayer.Play();
             }
             InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
@@ -443,21 +447,21 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void SyncVideoWithMusic()
     {
-        if (mainOutputStream == null || videoPlayer == null)
+        if (mainOutputStream == null || !videoPlayer.gameObject.activeInHierarchy)
         {
             return;
         }
 
-        if (PositionInSongInMillis < SongMeta.VideoGap * 1000)
+        if (SongMeta.VideoGap < 0 && PositionInSongInMillis < (-SongMeta.VideoGap * 1000))
         {
             // Still waiting for the start of the video
             return;
         }
 
-        double secondsInSong = mainOutputStream.CurrentTime.TotalSeconds;
-        if (videoPlayer.length > secondsInSong)
+        float positionInVideoInSeconds = (float)(SongMeta.VideoGap + PositionInSongInMillis / 1000);
+        if (videoPlayer.length > positionInVideoInSeconds)
         {
-            videoPlayer.time = secondsInSong;
+            videoPlayer.time = positionInVideoInSeconds;
         }
     }
 
