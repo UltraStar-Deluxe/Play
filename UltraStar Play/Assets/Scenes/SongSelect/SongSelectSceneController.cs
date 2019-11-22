@@ -124,7 +124,7 @@ public class SongSelectSceneController : MonoBehaviour
         songRouletteController.SelectPreviousSong();
     }
 
-    public void OnStartSingScene()
+    public void StartSingScene()
     {
         if (SelectedSong != null)
         {
