@@ -168,12 +168,17 @@ static class SongMetaBuilder
 
     private static float ConvertToFloat(string s)
     {
-        float res;
-        if (!float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out res))
+        // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
+        // Convert this to English notation.
+        string sWithDotAsDecimalSeparator = s.Replace(",", ".");
+        if (float.TryParse(sWithDotAsDecimalSeparator, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        {
+            return res;
+        }
+        else
         {
             throw new SongMetaBuilderException("Could not convert " + s + " to a float.");
         }
-        return res;
     }
 
     private static uint ConvertToUInt32(string s)
