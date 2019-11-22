@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
+using UnityEngine.UI;
 
 public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
@@ -27,6 +28,9 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     public GameObject pauseOverlay;
 
     public PlayerController playerControllerPrefab;
+
+    public Image backgroundImage;
+    public GameObject videoImageAndPlayerContainer;
 
     private VideoPlayer videoPlayer;
     public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
@@ -139,6 +143,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     void Awake()
     {
         LoadSceneData();
+        videoPlayer = FindObjectOfType<VideoPlayer>();
     }
 
     private void LoadSceneData()
@@ -200,7 +205,14 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         StartAudioPlayback();
 
         // Start any associated video
-        Invoke("StartVideoPlayback", SongMeta.VideoGap);
+        if (string.IsNullOrEmpty(SongMeta.Video))
+        {
+            ShowBackgroundImage();
+        }
+        else
+        {
+            StartVideoPlayback();
+        }
 
         // Go to next scene when the song finishes
         Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
@@ -228,7 +240,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             UnloadAudio();
         }
 
-        if (videoPlayer != null)
+        if (videoPlayer != null && videoPlayer.gameObject.activeInHierarchy)
         {
             videoPlayer.Stop();
         }
@@ -239,6 +251,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     void Update()
     {
         UpdateMusic();
+        UpdateVideoStart();
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
@@ -256,6 +269,17 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         if (Application.isEditor)
         {
             volumeStream.Volume = volume;
+        }
+    }
+
+    private void UpdateVideoStart()
+    {
+        if (SongMeta.VideoGap > 0 && videoPlayer.gameObject.activeInHierarchy && videoPlayer.isPaused)
+        {
+            if (PositionInSongInMillis >= SongMeta.VideoGap * 1000)
+            {
+                videoPlayer.Play();
+            }
         }
     }
 
@@ -335,16 +359,85 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void StartVideoPlayback()
     {
-        videoPlayer = FindObjectOfType<VideoPlayer>();
         string videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
         if (File.Exists(videoPath))
         {
-            videoPlayer.url = "file://" + videoPath;
-            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
+            StartVideoPlayback(videoPath);
         }
         else
         {
-            videoPlayer.enabled = false;
+            Debug.LogWarning("Video file '" + videoPath + "' does not exist. Showing background image instead.");
+            ShowBackgroundImage();
+        }
+    }
+
+    private void StartVideoPlayback(string videoPath)
+    {
+        videoPlayer.url = "file://" + videoPath;
+        if (string.IsNullOrEmpty(videoPlayer.url))
+        {
+            Debug.LogWarning("Setting VideoPlayer URL failed. Showing background image instead.");
+            ShowBackgroundImage();
+        }
+        else
+        {
+            if (SongMeta.VideoGap < 0)
+            {
+                // Negative VideoGap, thus skip the start of the video
+                videoPlayer.time = -SongMeta.VideoGap;
+                videoPlayer.Play();
+            }
+            else if (SongMeta.VideoGap > 0)
+            {
+                videoPlayer.Pause();
+            }
+            else
+            {
+                videoPlayer.Play();
+            }
+            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
+        }
+    }
+
+    private void ShowBackgroundImage()
+    {
+        videoImageAndPlayerContainer.gameObject.SetActive(false);
+        if (string.IsNullOrEmpty(SongMeta.Background))
+        {
+            ShowCoverImageAsBackground();
+        }
+        else
+        {
+            string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
+            if (File.Exists(backgroundImagePath))
+            {
+                Sprite backgroundImageSprite = ImageManager.LoadSprite(backgroundImagePath);
+                backgroundImage.sprite = backgroundImageSprite;
+            }
+            else
+            {
+                Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
+                ShowCoverImageAsBackground();
+            }
+        }
+    }
+
+    private void ShowCoverImageAsBackground()
+    {
+        if (string.IsNullOrEmpty(SongMeta.Cover))
+        {
+            return;
+        }
+
+        string coverImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Cover;
+        if (File.Exists(coverImagePath))
+        {
+            Sprite coverImageSprite = ImageManager.LoadSprite(coverImagePath);
+            backgroundImage.sprite = coverImageSprite;
+        }
+        else
+        {
+            Debug.LogWarning("Cover image '" + coverImagePath + "'does not exist.");
         }
     }
 
@@ -352,6 +445,12 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         if (mainOutputStream == null || videoPlayer == null)
         {
+            return;
+        }
+
+        if (PositionInSongInMillis < SongMeta.VideoGap * 1000)
+        {
+            // Still waiting for the start of the video
             return;
         }
 

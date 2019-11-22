@@ -447,7 +447,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 0
+  m_Spacing: 16
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
@@ -947,7 +947,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &908260463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1287,15 +1287,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionInSongDelayInMillis: 150
   volume: 0
-  defaultSongName: Me And My Broken Heart
+  defaultSongName: Marry You
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
 
-    Me And My Broken Heart'
+    Me And My Broken Heart
+
+    Somewhere Over The Rainbow (Wonderful World)
+
+    Marry You'
   pauseOverlay: {fileID: 1219814411}
   playerControllerPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
+  backgroundImage: {fileID: 242843843}
+  videoImageAndPlayerContainer: {fileID: 227833044}
 --- !u!4 &1427931089
 Transform:
   m_ObjectHideFlags: 0
@@ -1670,7 +1676,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2063730582}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -35.689217, y: 249.72699, z: -162.22272}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 227833045}
