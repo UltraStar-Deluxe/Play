@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UiNote : MonoBehaviour
 {
@@ -16,8 +17,12 @@ public class UiNote : MonoBehaviour
 
     private List<StarParticle> stars = new List<StarParticle>();
 
+    private Image image;
+
     public void Init(Note note, RectTransform uiEffectsContainer)
     {
+        image = GetComponentInChildren<Image>();
+
         this.Note = note;
         this.isGolden = note.IsGolden;
         this.uiEffectsContainer = uiEffectsContainer;
@@ -44,6 +49,11 @@ public class UiNote : MonoBehaviour
     void OnDestroy()
     {
         DestroyStars();
+    }
+
+    public void SetColorOfMicProfile(MicProfile micProfile)
+    {
+        image.color = micProfile.Color;
     }
 
     private void RemoveDestroyedStarsFromList()

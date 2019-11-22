@@ -32,10 +32,13 @@ public class SentenceDisplayer : MonoBehaviour
 
     private Sentence displayedSentence;
 
+    private MicProfile micProfile;
+
     public bool displayRoundedAndActualRecordedNotes;
 
-    public void Init(int noteLineCount)
+    public void Init(int noteLineCount, MicProfile micProfile)
     {
+        this.micProfile = micProfile;
         this.noteLineCount = noteLineCount;
     }
 
@@ -93,6 +96,10 @@ public class SentenceDisplayer : MonoBehaviour
         UiNote uiNote = Instantiate(uiNotePrefab);
         uiNote.transform.SetParent(uiNotesContainer);
         uiNote.Init(note, uiEffectsContainer);
+        if (micProfile != null)
+        {
+            uiNote.SetColorOfMicProfile(micProfile);
+        }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";
@@ -116,6 +123,10 @@ public class SentenceDisplayer : MonoBehaviour
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
         uiNote.transform.SetParent(uiRecordedNotesContainer);
+        if (micProfile != null)
+        {
+            uiNote.SetColorOfMicProfile(micProfile);
+        }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
         uiNoteText.text = (useRoundedMidiNote) ? MidiUtils.GetAbsoluteName(recordedNote.RoundedMidiNote)

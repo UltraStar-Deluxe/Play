@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     public SongMeta SongMeta { get; private set; }
     public PlayerProfile PlayerProfile { get; private set; }
+    public MicProfile MicProfile { get; private set; }
     public Voice Voice { get; private set; }
 
     private PlayerUiArea playerUiArea;
@@ -65,6 +66,7 @@ public class PlayerController : MonoBehaviour
     {
         this.SongMeta = songMeta;
         this.PlayerProfile = playerProfile;
+        this.MicProfile = micProfile;
 
         Voice = LoadVoice(songMeta, voiceIdentifier);
         PlayerScoreController.Init(Voice);
@@ -75,7 +77,7 @@ public class PlayerController : MonoBehaviour
     {
         playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
         playerUiController.transform.SetAsFirstSibling();
-        playerUiController.Init();
+        playerUiController.Init(PlayerProfile, MicProfile);
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)

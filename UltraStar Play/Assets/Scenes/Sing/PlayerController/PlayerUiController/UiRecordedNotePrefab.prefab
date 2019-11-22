@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9030090544604440398}
   - component: {fileID: 2003371037910514456}
   m_Layer: 0
-  m_Name: UiRecordedNote
+  m_Name: UiRecordedNotePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.09803922, g: 0.30588236, b: 0.8392157, a: 1}
+  m_Color: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

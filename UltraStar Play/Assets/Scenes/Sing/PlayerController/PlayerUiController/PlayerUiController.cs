@@ -11,17 +11,29 @@ public class PlayerUiController : MonoBehaviour
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    public void Init()
+    public void Init(PlayerProfile playerProfile, MicProfile micProfile)
     {
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
         lineDisplayer.Init(6);
 
         sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
-        sentenceDisplayer.Init(12);
+        sentenceDisplayer.Init(12, micProfile);
 
         totalScoreDisplayer = GetComponentInChildren<TotalScoreDisplayer>();
 
         sentenceRatingDisplayer = GetComponentInChildren<SentenceRatingDisplayer>();
+
+        PlayerNameText playerNameText = GetComponentInChildren<PlayerNameText>();
+        playerNameText.SetPlayerProfile(playerProfile);
+
+        AvatarImage avatarImage = GetComponentInChildren<AvatarImage>();
+        avatarImage.SetPlayerProfile(playerProfile);
+
+        if (micProfile != null)
+        {
+            totalScoreDisplayer.SetColorOfMicProfile(micProfile);
+            avatarImage.SetColorOfMicProfile(micProfile);
+        }
     }
 
     public void DisplaySentence(Sentence currentSentence)

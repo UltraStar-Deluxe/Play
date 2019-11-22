@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerNameText : MonoBehaviour
@@ -15,5 +13,15 @@ public class PlayerNameText : MonoBehaviour
     public void SetText(string value)
     {
         text.text = value;
+    }
+
+    public void SetPlayerProfile(PlayerProfile playerProfile)
+    {
+        text.text = playerProfile.Name;
+    }
+
+    public void SetColorOfMicProfile(MicProfile micProfile)
+    {
+        text.color = micProfile.Color;
     }
 }

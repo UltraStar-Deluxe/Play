@@ -9,7 +9,7 @@ public class AvatarImage : MonoBehaviour
 {
     private Image image;
 
-    void OnEnable()
+    void Awake()
     {
         image = GetComponent<Image>();
     }
@@ -25,5 +25,10 @@ public class AvatarImage : MonoBehaviour
         {
             Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
         }
+    }
+
+    public void SetColorOfMicProfile(MicProfile micProfile)
+    {
+        image.color = micProfile.Color;
     }
 }

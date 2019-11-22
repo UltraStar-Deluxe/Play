@@ -2000,6 +2000,21 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1740204220567833651, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 29.712524
+      objectReference: {fileID: 0}
+    - target: {fileID: 1740204220567833651, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1740204220567833660, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Name
+      value: PlayerNameBackground
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba, type: 3}
 --- !u!1001 &5578050610347760275
