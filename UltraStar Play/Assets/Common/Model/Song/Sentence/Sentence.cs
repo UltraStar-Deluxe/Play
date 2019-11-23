@@ -1,13 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[Serializable]
 public class Sentence
 {
     // this needs to be switched over to IReadOnlyList
-    public List<Note> Notes { get; }
-    public int LinebreakBeat { get; }
+    public List<Note> Notes { get; private set; }
+    public int LinebreakBeat { get; private set; }
 
     public List<Note> GoldenNotes
     {
