@@ -167,7 +167,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
     }
-    
+
     void Start()
     {
         LoadSceneData();
@@ -580,12 +580,16 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         byte[] bytes = File.ReadAllBytes(path);
         if (bytes == null)
         {
-            throw new UnityException("Loading the mp3 data failed.");
+            Debug.LogError("Loading the mp3 data failed.");
+            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            return;
         }
 
         if (!LoadAudioFromData(bytes))
         {
-            throw new UnityException("Loading the audio from the mp3 data failed.");
+            Debug.LogError("Loading the audio from the mp3 data failed.");
+            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            return;
         }
 
         Resources.UnloadUnusedAssets();
