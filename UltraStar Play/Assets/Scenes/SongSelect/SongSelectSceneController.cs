@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using UniRx;
 
-public class SongSelectSceneController : MonoBehaviour
+public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     public static SongSelectSceneController Instance
     {
@@ -51,13 +51,24 @@ public class SongSelectSceneController : MonoBehaviour
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
-        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
 
+        InitSongRoulette();
+    }
+
+    public void OnHotSwapFinished()
+    {
+        InitSongRoulette();
+    }
+
+    private void InitSongRoulette()
+    {
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
             songRouletteController.SelectSong(sceneData.SongMeta);
         }
+
+        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
     }
 
     private void OnNewSongSelection(SongSelection selection)
@@ -76,7 +87,7 @@ public class SongSelectSceneController : MonoBehaviour
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetActive(hasVideo);
 
-        bool isDuet = selectedSong.VoiceNames.Keys.Count > 1;
+        bool isDuet = selectedSong?.VoiceNames?.Keys?.Count > 1;
         duetIndicator.SetActive(isDuet);
     }
 

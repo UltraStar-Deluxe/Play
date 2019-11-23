@@ -9,9 +9,8 @@ public class SentenceRatingDisplayer : MonoBehaviour
 
     public void ShowSentenceRating(SentenceRating sentenceRating)
     {
-        SentenceRatingPopup sentenceRatingPopup = Instantiate(sentenceRatingPopupPrefab);
-        sentenceRatingPopup.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-        sentenceRatingPopup.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        SentenceRatingPopup sentenceRatingPopup = Instantiate(sentenceRatingPopupPrefab, transform);
+        sentenceRatingPopup.GetComponent<RectTransform>().MoveCornersToAnchors();
         sentenceRatingPopup.SetSentenceRating(sentenceRating);
     }
 }
