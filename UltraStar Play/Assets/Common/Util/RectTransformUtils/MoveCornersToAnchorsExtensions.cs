@@ -2,6 +2,12 @@ using UnityEngine;
 
 public static class MoveCornersToAnchorsExtensions
 {
+    public static void MoveCornersToAnchors(this RectTransform rectTransform)
+    {
+        rectTransform.sizeDelta = new Vector2(0, 0);
+        rectTransform.anchoredPosition = Vector2.zero;
+    }
+
     public static void MoveCornersToAnchors_Width(this RectTransform rectTransform)
     {
         rectTransform.sizeDelta = new Vector2(0, rectTransform.sizeDelta.y);

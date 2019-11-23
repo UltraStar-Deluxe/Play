@@ -143,7 +143,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     void Awake()
     {
-        LoadSceneData();
         videoPlayer = FindObjectOfType<VideoPlayer>();
     }
 
@@ -168,9 +167,11 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
     }
-
+    
     void Start()
     {
+        LoadSceneData();
+
         // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
@@ -245,8 +246,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             videoPlayer.Stop();
         }
-
-        PlayerControllers.Clear();
     }
 
     void Update()
