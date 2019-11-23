@@ -93,7 +93,7 @@ public class SongSelectSceneController : MonoBehaviour
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
-        Dictionary<PlayerProfile, MicProfile> playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
+        PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
         singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
