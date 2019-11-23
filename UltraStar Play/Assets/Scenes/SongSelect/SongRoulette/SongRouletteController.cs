@@ -17,7 +17,7 @@ public class SongRouletteController : MonoBehaviour
 
     private List<SongMeta> songs = new List<SongMeta>();
 
-    public IReactiveProperty<SongSelection> Selection { get; } = new ReactiveProperty<SongSelection>();
+    public IReactiveProperty<SongSelection> Selection { get; private set; } = new ReactiveProperty<SongSelection>();
 
     private readonly Dictionary<SongMeta, Button> songMetaToButtonMap = new Dictionary<SongMeta, Button>();
 
