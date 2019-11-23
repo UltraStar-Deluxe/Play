@@ -8,8 +8,8 @@
     },
     "GraphicSettings":{
         "resolution":{
-            "Width":800,
-            "Height":600,
+            "Width":1031,
+            "Height":619,
             "RefreshRate":59
         },
         "fullScreenMode":"Windowed",
@@ -30,7 +30,7 @@
         },
         {
             "Name":"Player03",
-            "Difficulty":"Hard",
+            "Difficulty":"Easy",
             "Avatar":"GenericPlayer01",
             "IsEnabled":true
         }
@@ -58,7 +58,7 @@
             },
             "Amplification":0,
             "NoiseSuppression":5,
-            "IsEnabled":false
+            "IsEnabled":true
         }
     ]
 }
