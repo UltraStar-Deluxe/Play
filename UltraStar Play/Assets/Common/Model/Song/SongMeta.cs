@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using System.IO;
+using System.Linq;
+
 [Serializable]
 public class SongMeta
 {
@@ -16,7 +18,24 @@ public class SongMeta
     public string Title { get; private set; }
 
     // required special fields
-    public Dictionary<string, string> VoiceNames { get; private set; }
+    private Dictionary<string, string> voiceNames;
+    public Dictionary<string, string> VoiceNames
+    {
+        get
+        {
+            // If the voice names were not given in the header of the UltraStar song file,
+            // then use the voice names that are found when parsing the complete file.
+            if (voiceNames.IsNullOrEmpty())
+            {
+                voiceNames = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, Voice> voiceNameAndVoicePair in GetVoices())
+                {
+                    voiceNames.Add(voiceNameAndVoicePair.Key, voiceNameAndVoicePair.Key);
+                }
+            }
+            return voiceNames;
+        }
+    }
     public Encoding Encoding { get; private set; }
 
     // optional fields
@@ -32,6 +51,8 @@ public class SongMeta
     public string Video { get; set; }
     public float VideoGap { get; set; }
     public uint Year { get; set; }
+
+    private Dictionary<string, Voice> voices;
 
     public SongMeta(
         // required helper fields
@@ -85,7 +106,7 @@ public class SongMeta
         Mp3 = mp3;
         Title = title;
 
-        VoiceNames = voiceNames;
+        this.voiceNames = voiceNames;
         Encoding = encoding;
 
         // set some defaults that we could not set otherwise
@@ -96,6 +117,10 @@ public class SongMeta
 
     public Dictionary<string, Voice> GetVoices()
     {
-        return VoicesBuilder.ParseFile(Directory + Path.DirectorySeparatorChar + Filename, Encoding, VoiceNames.Keys);
+        if (voices.IsNullOrEmpty())
+        {
+            voices = VoicesBuilder.ParseFile(Directory + Path.DirectorySeparatorChar + Filename, Encoding, voiceNames.Keys);
+        }
+        return voices;
     }
 }
