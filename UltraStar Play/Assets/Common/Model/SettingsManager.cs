@@ -60,6 +60,13 @@ public class SettingsManager : MonoBehaviour
 
     public void Reload()
     {
+        if (!File.Exists(settingsPath))
+        {
+            Debug.LogWarning("Settings file not found. Creating default settings.");
+            settings = new Settings();
+            Save();
+            return;
+        }
         string fileContent = File.ReadAllText(settingsPath);
         settings = JsonConverter.FromJson<Settings>(fileContent);
         nonStaticSettings = settings;
