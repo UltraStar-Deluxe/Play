@@ -97,7 +97,8 @@ public class PlayerController : MonoBehaviour
         Dictionary<string, Voice> voices = VoicesBuilder.ParseFile(filePath, songMeta.Encoding, new List<string>());
         if (string.IsNullOrEmpty(voiceIdentifier))
         {
-            return voices.Values.First();
+            Voice mergedVoice = CreateMergedVoice(voices);
+            return mergedVoice;
         }
         else
         {
@@ -110,6 +111,53 @@ public class PlayerController : MonoBehaviour
                 throw new Exception($"The song does not contain a voice for {voiceIdentifier}");
             }
         }
+    }
+
+    private Voice CreateMergedVoice(Dictionary<string, Voice> voices)
+    {
+        if (voices.Count == 1)
+        {
+            return voices.Values.First();
+        }
+
+        MutableVoice mergedVoice = new MutableVoice();
+        List<Sentence> allSentences = voices.Values.SelectMany(voice => voice.Sentences).ToList();
+        List<Note> allNotes = allSentences.SelectMany(sentence => sentence.Notes).ToList();
+        // Sort notes by start beat
+        allNotes.Sort((note1, note2) => note1.StartBeat.CompareTo(note2.StartBeat));
+        // Find sentence borders
+        List<int> lineBreaks = allSentences.Select(sentence => sentence.LinebreakBeat).Where(lineBreak => lineBreak > 0).ToList();
+        lineBreaks.Sort();
+        int lineBreakIndex = 0;
+        int nextLineBreakBeat = lineBreaks[lineBreakIndex];
+        // Create sentences
+        MutableSentence mutableSentence = new MutableSentence();
+        foreach (Note note in allNotes)
+        {
+            if (!mutableSentence.GetNotes().IsNullOrEmpty()
+                && (nextLineBreakBeat >= 0 && note.StartBeat > nextLineBreakBeat))
+            {
+                // Finish the last sentence
+                mutableSentence.SetLinebreakBeat(nextLineBreakBeat);
+                mergedVoice.Add((Sentence)mutableSentence);
+                mutableSentence = new MutableSentence();
+
+                lineBreakIndex++;
+                if (lineBreakIndex < lineBreaks.Count)
+                {
+                    nextLineBreakBeat = lineBreaks[lineBreakIndex];
+                }
+                else
+                {
+                    lineBreakIndex = -1;
+                }
+            }
+            mutableSentence.Add(note);
+        }
+
+        // Finish the last sentence
+        mergedVoice.Add((Sentence)mutableSentence);
+        return (Voice)mergedVoice;
     }
 
     public void OnRecordedNoteEnded(RecordedNote recordedNote)
@@ -198,7 +246,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentSentence == null)
         {
-            return double.MaxValue;
+            return -1d;
         }
         return CurrentSentence.StartBeat;
     }

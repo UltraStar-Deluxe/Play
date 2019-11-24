@@ -293,7 +293,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     public void SkipToNextSentence()
     {
         double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
-        if (nextStartBeat == double.MaxValue)
+        if (nextStartBeat < 0)
         {
             return;
         }
@@ -475,10 +475,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private string GetVoiceIdentifier(PlayerProfile playerProfile)
     {
-        bool isDuett = false;
+        bool isDuett = SongMeta.VoiceNames.Count > 1;
         if (isDuett && sceneData.SelectedPlayerProfiles.Count == 2)
         {
-            int voiceIndex = sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2;
+            int voiceIndex = (sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2) + 1;
             return "P" + voiceIndex;
         }
         else

@@ -87,7 +87,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetActive(hasVideo);
 
-        bool isDuet = selectedSong?.VoiceNames?.Keys?.Count > 1;
+        bool isDuet = selectedSong.VoiceNames.Count > 1;
         duetIndicator.SetActive(isDuet);
     }
 
