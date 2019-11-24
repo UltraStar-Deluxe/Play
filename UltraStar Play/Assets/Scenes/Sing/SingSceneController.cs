@@ -144,6 +144,11 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     void Awake()
     {
         videoPlayer = FindObjectOfType<VideoPlayer>();
+
+        if (!Application.isEditor && volume < 1)
+        {
+            volume = 1;
+        }
     }
 
     private void LoadSceneData()
@@ -553,45 +558,20 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
-    private bool LoadAudioFromData(byte[] data)
+    private void LoadAudio(string path)
     {
         try
         {
-            MemoryStream tmpStr = new MemoryStream(data);
-            mainOutputStream = new Mp3FileReader(tmpStr);
+            mainOutputStream = new AudioFileReader(path);
             volumeStream = new WaveChannel32(mainOutputStream);
-            if (!Application.isEditor && volume < 1)
-            {
-                volume = 1;
-            }
             volumeStream.Volume = volume;
 
             waveOutDevice = new WaveOutEvent();
             waveOutDevice.Init(volumeStream);
-
-            return true;
         }
         catch (System.Exception ex)
         {
             Debug.LogError("Error Loading Audio: " + ex.Message);
-        }
-
-        return false;
-    }
-
-    private void LoadAudio(string path)
-    {
-        byte[] bytes = File.ReadAllBytes(path);
-        if (bytes == null)
-        {
-            Debug.LogError("Loading the mp3 data failed.");
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
-            return;
-        }
-
-        if (!LoadAudioFromData(bytes))
-        {
-            Debug.LogError("Loading the audio from the mp3 data failed.");
             SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
             return;
         }
