@@ -19,9 +19,10 @@ static class VoicesBuilder
         bool endFound = false;
 
         // if this is a solo song (without a named voice) then just add one with identifier "" (empty string)
+        string soloVoiceIdentifier = "";
         if (res.Count == 0)
         {
-            res.Add("", new MutableVoice());
+            res.Add(soloVoiceIdentifier, new MutableVoice());
             currentVoice = res[""];
         }
 
@@ -52,16 +53,17 @@ static class VoicesBuilder
                         {
                             currentVoice.Add((Sentence)currentSentence);
                         }
-                        // switch to the new voice
-                        try
+                        // switch to or create new voice
+                        if (!res.TryGetValue(line, out MutableVoice nextVoice))
                         {
-                            currentVoice = res[line];
-                            currentSentence = null;
+                            // Voice has not been found, so create new one.
+                            nextVoice = new MutableVoice();
+                            res.Add(line, nextVoice);
                         }
-                        catch (KeyNotFoundException)
-                        {
-                            ThrowLineError(lineNumber, "No such voice: " + line);
-                        }
+                        currentVoice = nextVoice;
+                        currentSentence = null;
+                        // Remove the default voice for solo songs.
+                        res.Remove(soloVoiceIdentifier);
                         break;
                     case '-':
                         if (currentVoice == null)
@@ -122,7 +124,21 @@ static class VoicesBuilder
 
     private static int ParseLinebreak(string line)
     {
-        return ConvertToInt32(line);
+        // Format of line breaks: - STARTBEAT ENDBEAT
+        // Thereby, ENDBEAT is optional.
+        int indexOfSpace = line.IndexOf(" ");
+        if (indexOfSpace >= 0)
+        {
+            string startBeatText = line.Substring(0, indexOfSpace + 1);
+            string endBeatText = line.Substring(indexOfSpace + 1, line.Length - (indexOfSpace + 1));
+            // TODO: Store endBeatText in SongMeta.
+            return ConvertToInt32(startBeatText);
+        }
+        else
+        {
+            return ConvertToInt32(line);
+        }
+
     }
 
     private static Note ParseNote(string line)
@@ -177,7 +193,7 @@ static class VoicesBuilder
     {
         try
         {
-            return Convert.ToInt32(s, 10);
+            return Convert.ToInt32(s.Trim(), 10);
         }
         catch (FormatException e)
         {
@@ -211,16 +227,13 @@ public class MutableVoice
 
     public void Add(Sentence sentence)
     {
-        if (sentence == null)
-        {
-            throw new ArgumentNullException("sentence");
-        }
-        else if (sentences.Count > 0)
+        if (sentences.Count > 0)
         {
             Sentence lastSentence = sentences[sentences.Count - 1];
             if (lastSentence.EndBeat > sentence.StartBeat)
             {
-                throw new VoicesBuilderException("Sentence starts before previous sentence is over");
+                Debug.LogWarning($"Sentence starts before previous sentence is over (last ended on beat {lastSentence.EndBeat}, next should start on beat {sentence.StartBeat}). Skipping this sentence.");
+                return;
             }
             else if (lastSentence.LinebreakBeat > sentence.StartBeat)
             {
@@ -297,9 +310,11 @@ public class MutableSentence
 
     public void SetLinebreakBeat(int beat)
     {
-        if (beat < GetUntilBeat())
+        int untilBeat = GetUntilBeat();
+        if (beat < untilBeat)
         {
-            throw new VoicesBuilderException("Linebreak conflicts with existing sentence");
+            Debug.LogWarning($"Linebreak on beat {beat} conflicts with existing sentence. Using the beat {untilBeat + 1} instead");
+            beat = untilBeat + 1;
         }
         linebreakBeat = beat;
     }
