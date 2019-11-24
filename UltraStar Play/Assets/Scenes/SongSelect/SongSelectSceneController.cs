@@ -32,6 +32,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     private SongMeta selectedSongBeforeSearch;
 
+    public GameObject noSongsFoundMessage;
+
     private SongMeta SelectedSong
     {
         get
@@ -53,6 +55,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SongSelectSceneController = this;
 
         InitSongRoulette();
+
+        // Show a message when no songs have been found.
+        noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
     }
 
     public void OnHotSwapFinished()
