@@ -66,6 +66,14 @@ static class SongMetaBuilder
                 {
                     requiredFields[tag] = val;
                 }
+                else if (tag.Equals("previewstart"))
+                {
+                    otherFields[tag] = val;
+                }
+                else if (tag.StartsWith("previewend"))
+                {
+                    otherFields[tag] = val;
+                }
                 else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
                 {
                     if (!voiceNames.ContainsKey(tag.ToUpperInvariant()))
