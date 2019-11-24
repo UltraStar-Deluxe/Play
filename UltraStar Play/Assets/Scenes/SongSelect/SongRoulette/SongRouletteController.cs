@@ -206,11 +206,7 @@ public class SongRouletteController : MonoBehaviour
             return;
         }
 
-        SongMeta matchingSong = songs.Where(song => song.Title == songMeta.Title).FirstOrDefault();
-        if (matchingSong != null)
-        {
-            Selection.Value = new SongSelection(matchingSong, songs.IndexOf(matchingSong), songs.Count);
-        }
+        Selection.Value = new SongSelection(songMeta, songs.IndexOf(songMeta), songs.Count);
     }
 
     public void SelectNextSong()
