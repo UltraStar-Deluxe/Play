@@ -280,12 +280,12 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     private void UpdateVideoStart()
     {
         // Negative VideoGap: Start video after a pause in seconds.
-        if (SongMeta.VideoGap < 0 && videoPlayer.gameObject.activeInHierarchy && videoPlayer.isPaused)
+        if (SongMeta.VideoGap < 0
+            && videoPlayer.gameObject.activeInHierarchy
+            && videoPlayer.isPaused
+            && (PositionInSongInMillis >= (-SongMeta.VideoGap * 1000)))
         {
-            if (PositionInSongInMillis >= (-SongMeta.VideoGap * 1000))
-            {
-                videoPlayer.Play();
-            }
+            videoPlayer.Play();
         }
     }
 

@@ -28,6 +28,18 @@ public class PlayerProfile : IEquatable<PlayerProfile>
         return Name == other.Name && Difficulty == other.Difficulty && Avatar == other.Avatar && IsEnabled == other.IsEnabled;
     }
 
+    public override bool Equals(object obj)
+    {
+        if (obj is PlayerProfile)
+        {
+            return Equals(obj as PlayerProfile);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public override int GetHashCode()
     {
         // TODO: Use HashCodeBuilder or something similar for C#

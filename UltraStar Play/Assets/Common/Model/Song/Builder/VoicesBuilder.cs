@@ -126,12 +126,12 @@ static class VoicesBuilder
     {
         // Format of line breaks: - STARTBEAT ENDBEAT
         // Thereby, ENDBEAT is optional.
-        int indexOfSpace = line.IndexOf(" ");
+        int indexOfSpace = line.IndexOf(" ", StringComparison.InvariantCulture);
         if (indexOfSpace >= 0)
         {
             string startBeatText = line.Substring(0, indexOfSpace + 1);
-            string endBeatText = line.Substring(indexOfSpace + 1, line.Length - (indexOfSpace + 1));
             // TODO: Store endBeatText in SongMeta.
+            // string endBeatText = line.Substring(indexOfSpace + 1, line.Length - (indexOfSpace + 1));
             return ConvertToInt32(startBeatText);
         }
         else
@@ -232,8 +232,8 @@ public class MutableVoice
             Sentence lastSentence = sentences[sentences.Count - 1];
             if (lastSentence.EndBeat > sentence.StartBeat)
             {
-                Debug.LogWarning($"Sentence starts before previous sentence is over (last ended on beat {lastSentence.EndBeat}, next should start on beat {sentence.StartBeat}). Skipping this sentence.");
-                return;
+                Debug.LogWarning($"Sentence starts before previous sentence is over. Skipping this sentence."
+                + " (last ended on beat {lastSentence.EndBeat}, this should start on beat {sentence.StartBeat})");
             }
             else if (lastSentence.LinebreakBeat > sentence.StartBeat)
             {
