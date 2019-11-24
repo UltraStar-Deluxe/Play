@@ -76,7 +76,6 @@ public class PlayerController : MonoBehaviour
     private void CreatePlayerUi()
     {
         playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
-        playerUiController.transform.SetAsFirstSibling();
         playerUiController.Init(PlayerProfile, MicProfile);
     }
 
