@@ -11,29 +11,39 @@ public class PlayerUiController : MonoBehaviour
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    void Start()
-    {
-        // TODO: For some reason this GameObject does not have a scale of (1,1,1) after instantiation.
-        // Maybe the VerticalLayoutGroup is messing with it. Anyway, the following is a workaround.
-        transform.localScale = Vector3.one;
-    }
-
-    public void Init()
+    public void Init(PlayerProfile playerProfile, MicProfile micProfile)
     {
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
         lineDisplayer.Init(6);
 
         sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
-        sentenceDisplayer.Init(12);
+        sentenceDisplayer.Init(12, micProfile);
 
         totalScoreDisplayer = GetComponentInChildren<TotalScoreDisplayer>();
 
         sentenceRatingDisplayer = GetComponentInChildren<SentenceRatingDisplayer>();
+
+        PlayerNameText playerNameText = GetComponentInChildren<PlayerNameText>();
+        playerNameText.SetPlayerProfile(playerProfile);
+
+        AvatarImage avatarImage = GetComponentInChildren<AvatarImage>();
+        avatarImage.SetPlayerProfile(playerProfile);
+
+        if (micProfile != null)
+        {
+            totalScoreDisplayer.SetColorOfMicProfile(micProfile);
+            avatarImage.SetColorOfMicProfile(micProfile);
+        }
     }
 
     public void DisplaySentence(Sentence currentSentence)
     {
         sentenceDisplayer.DisplaySentence(currentSentence);
+    }
+
+    public void RemoveAllDisplayedNotes()
+    {
+        sentenceDisplayer.RemoveAllDisplayedNotes();
     }
 
     public void ShowSentenceRating(SentenceRating sentenceRating)
@@ -46,14 +56,14 @@ public class PlayerUiController : MonoBehaviour
         totalScoreDisplayer.ShowTotalScore(score);
     }
 
-    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        sentenceDisplayer.DisplayRecordedNotes(recordedNotes);
+        sentenceDisplayer.DisplayRecordedNote(recordedNote);
     }
 
     public void CreatePerfectSentenceEffect()
     {
-        lineDisplayer.CreatePerfectSentenceEffect();
+        sentenceDisplayer.CreatePerfectSentenceEffect();
     }
 
     public void CreatePerfectNoteEffect(Note perfectNote)

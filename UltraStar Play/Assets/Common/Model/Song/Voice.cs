@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class Voice
 {
     // this needs to be switched over to IReadOnlyList
-    public List<Sentence> Sentences { get; }
+    public List<Sentence> Sentences { get; private set; }
 
     public Voice(List<Sentence> sentences)
     {

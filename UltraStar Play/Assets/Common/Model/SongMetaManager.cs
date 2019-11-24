@@ -77,6 +77,13 @@ public class SongMetaManager : MonoBehaviour
     {
         Debug.Log("Scanning for UltraStar Songs");
         ScanFilesSynchronously();
+        SortSongMetas();
+    }
+
+    private void SortSongMetas()
+    {
+        // Sort by artist
+        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true));
     }
 
     private void ScanFilesSynchronously()

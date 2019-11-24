@@ -22,21 +22,39 @@ public class SentenceDisplayer : MonoBehaviour
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
 
+    public StarParticle perfectSentenceStarPrefab;
+
+    public RectTransform uiNotesContainer;
+    public RectTransform uiRecordedNotesContainer;
+    public RectTransform uiEffectsContainer;
+
+    public bool displayRoundedAndActualRecordedNotes;
+    public bool showPitchOfNotes;
+    public bool showLyricsOfNotes;
+
+    private readonly Dictionary<RecordedNote, UiRecordedNote> recordedNoteToUiRecordedNoteMap = new Dictionary<RecordedNote, UiRecordedNote>();
+
     private Sentence displayedSentence;
 
-    public void Init(int noteLineCount)
+    private MicProfile micProfile;
+
+    public void Init(int noteLineCount, MicProfile micProfile)
     {
+        this.micProfile = micProfile;
         this.noteLineCount = noteLineCount;
+    }
+
+    public void RemoveAllDisplayedNotes()
+    {
+        RemoveUiNotes();
+        RemoveUiRecordedNotes();
     }
 
     public void DisplaySentence(Sentence sentence)
     {
         displayedSentence = sentence;
 
-        foreach (UiNote uiNote in GetComponentsInChildren<UiNote>())
-        {
-            Destroy(uiNote.gameObject);
-        }
+        RemoveAllDisplayedNotes();
 
         if (sentence == null)
         {
@@ -45,59 +63,104 @@ public class SentenceDisplayer : MonoBehaviour
 
         foreach (Note note in sentence.Notes)
         {
-            DisplayNote(sentence, note);
+            CreateUiNote(note);
         }
     }
 
-    private void DisplayNote(Sentence sentence, Note note)
+    public void DisplayRecordedNote(RecordedNote recordedNote)
+    {
+        // Remove any existing UiRecordedNote that has been drawn before for this RecordedNote.
+        if (recordedNoteToUiRecordedNoteMap.TryGetValue(recordedNote, out UiRecordedNote uiRecordedNote))
+        {
+            recordedNoteToUiRecordedNoteMap.Remove(recordedNote);
+            Destroy(uiRecordedNote.gameObject);
+        }
+
+        // Draw the bar for the rounded note
+        // and draw the bar for the actually recorded pitch if needed.
+        CreateUiRecordedNote(recordedNote, true);
+        if (displayRoundedAndActualRecordedNotes && (recordedNote.RecordedMidiNote != recordedNote.RoundedMidiNote))
+        {
+            CreateUiRecordedNote(recordedNote, false);
+        }
+    }
+
+    private void RemoveUiNotes()
+    {
+        foreach (UiNote uiNote in uiNotesContainer.GetComponentsInChildren<UiNote>())
+        {
+            Destroy(uiNote.gameObject);
+        }
+    }
+
+    private void CreateUiNote(Note note)
     {
         UiNote uiNote = Instantiate(uiNotePrefab);
-        uiNote.transform.SetParent(transform);
-        uiNote.Note = note;
-        uiNote.isGolden = note.IsGolden;
+        uiNote.transform.SetParent(uiNotesContainer);
+        uiNote.Init(note, uiEffectsContainer);
+        if (micProfile != null)
+        {
+            uiNote.SetColorOfMicProfile(micProfile);
+        }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";
+        string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
+        if (showLyricsOfNotes && showPitchOfNotes)
+        {
+            uiNoteText.text = note.Text + " (" + pitchName + ")";
+        }
+        else if (showLyricsOfNotes)
+        {
+            uiNoteText.text = note.Text;
+        }
+        else if (showPitchOfNotes)
+        {
+            uiNoteText.text = pitchName;
+        }
+        else
+        {
+            uiNoteText.text = "";
+        }
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
     }
 
-    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    private void RemoveUiRecordedNotes()
     {
-        foreach (UiRecordedNote uiNote in GetComponentsInChildren<UiRecordedNote>())
+        foreach (UiRecordedNote uiNote in uiRecordedNotesContainer.GetComponentsInChildren<UiRecordedNote>())
         {
             Destroy(uiNote.gameObject);
         }
-
-        if (recordedNotes == null)
-        {
-            return;
-        }
-
-        foreach (RecordedNote recordedNote in recordedNotes)
-        {
-            DisplayRecordedNote(recordedNote, true);
-            if (recordedNote.RecordedMidiNote != recordedNote.RoundedMidiNote)
-            {
-                DisplayRecordedNote(recordedNote, false);
-            }
-        }
+        recordedNoteToUiRecordedNoteMap.Clear();
     }
 
-    private void DisplayRecordedNote(RecordedNote recordedNote, bool useRoundedNote = true)
+    private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
-        int midiNote = (useRoundedNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
+        int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
-        uiNote.transform.SetParent(transform);
+        uiNote.transform.SetParent(uiRecordedNotesContainer);
+        if (micProfile != null)
+        {
+            uiNote.SetColorOfMicProfile(micProfile);
+        }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = (useRoundedNote) ? MidiUtils.GetAbsoluteName(recordedNote.RoundedMidiNote)
-                                           : MidiUtils.GetAbsoluteName(recordedNote.RecordedMidiNote);
+        if (showPitchOfNotes)
+        {
+            string pitchName = MidiUtils.GetAbsoluteName(midiNote);
+            uiNoteText.text = " (" + pitchName + ")";
+        }
+        else
+        {
+            uiNoteText.text = "";
+        }
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
+
+        recordedNoteToUiRecordedNoteMap[recordedNote] = uiNote;
     }
 
     private void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
@@ -120,5 +183,28 @@ public class SentenceDisplayer : MonoBehaviour
 
         float length = (float)(noteEndBeat - noteStartBeat);
         uiNote.sizeDelta = new Vector2(800f * length / (float)beatsInSentence, uiNote.sizeDelta.y);
+    }
+
+    public void CreatePerfectSentenceEffect()
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            CreatePerfectSentenceStar();
+        }
+    }
+
+    private void CreatePerfectSentenceStar()
+    {
+        StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
+        RectTransform starRectTransform = star.GetComponent<RectTransform>();
+        float anchorX = UnityEngine.Random.Range(0f, 1f);
+        float anchorY = UnityEngine.Random.Range(0f, 1f);
+        starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
+        starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
+        starRectTransform.anchoredPosition = Vector2.zero;
+
+        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.6f);
+        LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
+            .setOnComplete(() => Destroy(star.gameObject));
     }
 }

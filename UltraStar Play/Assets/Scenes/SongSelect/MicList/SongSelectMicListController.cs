@@ -4,13 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SongSelectMicListController : MonoBehaviour
+public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     public SongSelectMicListEntry listEntryPrefab;
     public GameObject scrollViewContent;
     public GameObject emptyListLabel;
 
     void Start()
+    {
+        UpdateListEntries();
+    }
+
+    public void OnHotSwapFinished()
     {
         UpdateListEntries();
     }

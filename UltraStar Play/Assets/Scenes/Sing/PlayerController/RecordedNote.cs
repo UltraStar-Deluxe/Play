@@ -14,6 +14,8 @@ public class RecordedNote
     public double StartBeat { get; set; }
     public double EndBeat { get; set; }
 
+    public Note TargetNote { get; set; }
+
     public RecordedNote(int midiNote, double startBeat, double endBeat)
     {
         this.RecordedMidiNote = midiNote;

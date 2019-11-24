@@ -6,8 +6,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
 using NAudio.Wave;
+using UnityEngine.UI;
 
-public class SingSceneController : MonoBehaviour
+public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     // Constant delay when querying the position in the song.
     // Its source could be that calculating the position in the song takes some time for itself.
@@ -27,6 +28,9 @@ public class SingSceneController : MonoBehaviour
     public GameObject pauseOverlay;
 
     public PlayerController playerControllerPrefab;
+
+    public Image backgroundImage;
+    public GameObject videoImageAndPlayerContainer;
 
     private VideoPlayer videoPlayer;
     public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
@@ -120,6 +124,7 @@ public class SingSceneController : MonoBehaviour
                 return;
             }
             mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(value);
+            SyncVideoWithMusic();
         }
     }
 
@@ -138,6 +143,16 @@ public class SingSceneController : MonoBehaviour
 
     void Awake()
     {
+        videoPlayer = FindObjectOfType<VideoPlayer>();
+
+        if (!Application.isEditor && volume < 1)
+        {
+            volume = 1;
+        }
+    }
+
+    private void LoadSceneData()
+    {
         // Load scene data from static reference, if any
         sceneData = SceneNavigator.Instance.GetSceneData(sceneData);
 
@@ -153,23 +168,16 @@ public class SingSceneController : MonoBehaviour
             sceneData.SelectedPlayerProfiles.Add(playerProfile);
             sceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
         }
-    }
 
-    void OnEnable()
-    {
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
         Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
+    }
 
-        // Start the music
-        StartAudioPlayback();
+    void Start()
+    {
+        LoadSceneData();
 
-        // Start any associated video
-        Invoke("StartVideoPlayback", SongMeta.VideoGap);
-
-        // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
-
-        // Handle players        
+        // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
         {
@@ -189,8 +197,37 @@ public class SingSceneController : MonoBehaviour
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
-        LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-        PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
+        if (!PlayerControllers.IsNullOrEmpty())
+        {
+            LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
+            PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
+        }
+
+        StartMusicAndVideo();
+    }
+
+    private void StartMusicAndVideo()
+    {
+        // Start the music 
+        StartAudioPlayback();
+
+        // Start any associated video
+        if (string.IsNullOrEmpty(SongMeta.Video))
+        {
+            ShowBackgroundImage();
+        }
+        else
+        {
+            StartVideoPlayback();
+        }
+
+        // Go to next scene when the song finishes
+        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
+    }
+
+    public void OnHotSwapFinished()
+    {
+        StartMusicAndVideo();
     }
 
     void OnDisable()
@@ -210,22 +247,46 @@ public class SingSceneController : MonoBehaviour
             UnloadAudio();
         }
 
-        if (videoPlayer != null)
+        if (videoPlayer != null && videoPlayer.gameObject.activeInHierarchy)
         {
             videoPlayer.Stop();
         }
-
-        PlayerControllers.Clear();
     }
 
     void Update()
     {
+        UpdateMusic();
+        UpdateVideoStart();
+        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+    }
+
+    private void UpdateMusic()
+    {
+        if (waveOutDevice == null)
+        {
+            return;
+        }
+
         if (waveOutDevice.PlaybackState == PlaybackState.Playing)
         {
             timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
         }
-        volumeStream.Volume = volume;
-        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+        if (Application.isEditor)
+        {
+            volumeStream.Volume = volume;
+        }
+    }
+
+    private void UpdateVideoStart()
+    {
+        // Negative VideoGap: Start video after a pause in seconds.
+        if (SongMeta.VideoGap < 0
+            && videoPlayer.gameObject.activeInHierarchy
+            && videoPlayer.isPaused
+            && (PositionInSongInMillis >= (-SongMeta.VideoGap * 1000)))
+        {
+            videoPlayer.Play();
+        }
     }
 
     public MicProfile GetMicProfile(PlayerProfile playerProfile)
@@ -237,7 +298,7 @@ public class SingSceneController : MonoBehaviour
     public void SkipToNextSentence()
     {
         double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
-        if (nextStartBeat == double.MaxValue)
+        if (nextStartBeat < 0)
         {
             return;
         }
@@ -304,37 +365,112 @@ public class SingSceneController : MonoBehaviour
 
     private void StartVideoPlayback()
     {
-        videoPlayer = FindObjectOfType<VideoPlayer>();
         string videoPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Video;
         if (File.Exists(videoPath))
         {
-            videoPlayer.url = "file://" + videoPath;
-            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
+            StartVideoPlayback(videoPath);
         }
         else
         {
-            videoPlayer.enabled = false;
+            Debug.LogWarning("Video file '" + videoPath + "' does not exist. Showing background image instead.");
+            ShowBackgroundImage();
+        }
+    }
+
+    private void StartVideoPlayback(string videoPath)
+    {
+        videoPlayer.url = "file://" + videoPath;
+        if (string.IsNullOrEmpty(videoPlayer.url))
+        {
+            Debug.LogWarning("Setting VideoPlayer URL failed. Showing background image instead.");
+            ShowBackgroundImage();
+        }
+        else
+        {
+            if (SongMeta.VideoGap > 0)
+            {
+                // Positive VideoGap, thus skip the start of the video
+                videoPlayer.time = SongMeta.VideoGap;
+                videoPlayer.Play();
+            }
+            else if (SongMeta.VideoGap < 0)
+            {
+                // Negative VideoGap, thus wait a little before starting the video
+                videoPlayer.Pause();
+            }
+            else
+            {
+                // No VideoGap, thus start the video immediately
+                videoPlayer.Play();
+            }
+            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
+        }
+    }
+
+    private void ShowBackgroundImage()
+    {
+        videoImageAndPlayerContainer.gameObject.SetActive(false);
+        if (string.IsNullOrEmpty(SongMeta.Background))
+        {
+            ShowCoverImageAsBackground();
+        }
+        else
+        {
+            string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
+            if (File.Exists(backgroundImagePath))
+            {
+                Sprite backgroundImageSprite = ImageManager.LoadSprite(backgroundImagePath);
+                backgroundImage.sprite = backgroundImageSprite;
+            }
+            else
+            {
+                Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
+                ShowCoverImageAsBackground();
+            }
+        }
+    }
+
+    private void ShowCoverImageAsBackground()
+    {
+        if (string.IsNullOrEmpty(SongMeta.Cover))
+        {
+            return;
+        }
+
+        string coverImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Cover;
+        if (File.Exists(coverImagePath))
+        {
+            Sprite coverImageSprite = ImageManager.LoadSprite(coverImagePath);
+            backgroundImage.sprite = coverImageSprite;
+        }
+        else
+        {
+            Debug.LogWarning("Cover image '" + coverImagePath + "'does not exist.");
         }
     }
 
     private void SyncVideoWithMusic()
     {
-        if (mainOutputStream == null || videoPlayer == null)
+        if (mainOutputStream == null || !videoPlayer.gameObject.activeInHierarchy)
         {
             return;
         }
 
-        double secondsInSong = mainOutputStream.CurrentTime.TotalSeconds;
-        if (videoPlayer.length > secondsInSong)
+        if (SongMeta.VideoGap < 0 && PositionInSongInMillis < (-SongMeta.VideoGap * 1000))
         {
-            videoPlayer.time = secondsInSong;
+            // Still waiting for the start of the video
+            return;
+        }
+
+        float positionInVideoInSeconds = (float)(SongMeta.VideoGap + PositionInSongInMillis / 1000);
+        if (videoPlayer.length > positionInVideoInSeconds)
+        {
+            videoPlayer.time = positionInVideoInSeconds;
         }
     }
 
     private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
-        PlayerControllers.Clear();
-
         string voiceIdentifier = GetVoiceIdentifier(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
         playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier, micProfile);
@@ -344,10 +480,10 @@ public class SingSceneController : MonoBehaviour
 
     private string GetVoiceIdentifier(PlayerProfile playerProfile)
     {
-        bool isDuett = false;
+        bool isDuett = SongMeta.VoiceNames.Count > 1;
         if (isDuett && sceneData.SelectedPlayerProfiles.Count == 2)
         {
-            int voiceIndex = sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2;
+            int voiceIndex = (sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2) + 1;
             return "P" + voiceIndex;
         }
         else
@@ -422,39 +558,22 @@ public class SingSceneController : MonoBehaviour
         }
     }
 
-    private bool LoadAudioFromData(byte[] data)
+    private void LoadAudio(string path)
     {
         try
         {
-            MemoryStream tmpStr = new MemoryStream(data);
-            mainOutputStream = new Mp3FileReader(tmpStr);
+            mainOutputStream = new AudioFileReader(path);
             volumeStream = new WaveChannel32(mainOutputStream);
             volumeStream.Volume = volume;
 
             waveOutDevice = new WaveOutEvent();
             waveOutDevice.Init(volumeStream);
-
-            return true;
         }
         catch (System.Exception ex)
         {
             Debug.LogError("Error Loading Audio: " + ex.Message);
-        }
-
-        return false;
-    }
-
-    private void LoadAudio(string path)
-    {
-        byte[] bytes = File.ReadAllBytes(path);
-        if (bytes == null)
-        {
-            throw new UnityException("Loading the mp3 data failed.");
-        }
-
-        if (!LoadAudioFromData(bytes))
-        {
-            throw new UnityException("Loading the audio from the mp3 data failed.");
+            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            return;
         }
 
         Resources.UnloadUnusedAssets();

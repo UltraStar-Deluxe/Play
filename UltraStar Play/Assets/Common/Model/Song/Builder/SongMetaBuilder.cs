@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 static class SongMetaBuilder
 {
@@ -41,7 +42,9 @@ static class SongMetaBuilder
                 string[] parts = line.Substring(1).Split(separator, 2);
                 if (parts.Length < 2 || parts[0].Length < 1 || parts[1].Length < 1)
                 {
-                    throw new SongMetaBuilderException("Invalid line formatting on line " + line + " of file " + path);
+                    Debug.LogWarning("Invalid line formatting on line " + line + " of file " + path);
+                    // Ignore this line. Continue with the next line.
+                    continue;
                 }
                 string tag = parts[0].ToLowerInvariant();
                 string val = parts[1];
@@ -62,6 +65,14 @@ static class SongMetaBuilder
                 else if (requiredFields.ContainsKey(tag))
                 {
                     requiredFields[tag] = val;
+                }
+                else if (tag.Equals("previewstart"))
+                {
+                    otherFields[tag] = val;
+                }
+                else if (tag.StartsWith("previewend"))
+                {
+                    otherFields[tag] = val;
                 }
                 else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
                 {
@@ -168,12 +179,17 @@ static class SongMetaBuilder
 
     private static float ConvertToFloat(string s)
     {
-        float res;
-        if (!float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out res))
+        // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
+        // Convert this to English notation.
+        string sWithDotAsDecimalSeparator = s.Replace(",", ".");
+        if (float.TryParse(sWithDotAsDecimalSeparator, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        {
+            return res;
+        }
+        else
         {
             throw new SongMetaBuilderException("Could not convert " + s + " to a float.");
         }
-        return res;
     }
 
     private static uint ConvertToUInt32(string s)
