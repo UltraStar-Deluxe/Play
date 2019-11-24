@@ -28,13 +28,15 @@ public class SentenceDisplayer : MonoBehaviour
     public RectTransform uiRecordedNotesContainer;
     public RectTransform uiEffectsContainer;
 
+    public bool displayRoundedAndActualRecordedNotes;
+    public bool showPitchOfNotes;
+    public bool showLyricsOfNotes;
+
     private readonly Dictionary<RecordedNote, UiRecordedNote> recordedNoteToUiRecordedNoteMap = new Dictionary<RecordedNote, UiRecordedNote>();
 
     private Sentence displayedSentence;
 
     private MicProfile micProfile;
-
-    public bool displayRoundedAndActualRecordedNotes;
 
     public void Init(int noteLineCount, MicProfile micProfile)
     {
@@ -102,7 +104,23 @@ public class SentenceDisplayer : MonoBehaviour
         }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = note.Text + " (" + MidiUtils.GetAbsoluteName(note.MidiNote) + ")";
+        string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
+        if (showLyricsOfNotes && showPitchOfNotes)
+        {
+            uiNoteText.text = note.Text + " (" + pitchName + ")";
+        }
+        else if (showLyricsOfNotes)
+        {
+            uiNoteText.text = note.Text;
+        }
+        else if (showPitchOfNotes)
+        {
+            uiNoteText.text = pitchName;
+        }
+        else
+        {
+            uiNoteText.text = "";
+        }
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
@@ -129,8 +147,15 @@ public class SentenceDisplayer : MonoBehaviour
         }
 
         Text uiNoteText = uiNote.GetComponentInChildren<Text>();
-        uiNoteText.text = (useRoundedMidiNote) ? MidiUtils.GetAbsoluteName(recordedNote.RoundedMidiNote)
-                                           : MidiUtils.GetAbsoluteName(recordedNote.RecordedMidiNote);
+        if (showPitchOfNotes)
+        {
+            string pitchName = MidiUtils.GetAbsoluteName(midiNote);
+            uiNoteText.text = " (" + pitchName + ")";
+        }
+        else
+        {
+            uiNoteText.text = "";
+        }
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
