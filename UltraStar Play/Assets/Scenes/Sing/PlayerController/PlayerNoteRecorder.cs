@@ -100,11 +100,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
             if (lastRecordedNote != null)
             {
                 // End singing of last recorded note.
-                // Do this seamlessly, i.e., continue the last recorded note until now.
-                lastRecordedNote.EndBeat = currentBeat;
-                LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
-                playerController.OnRecordedNoteEnded(lastRecordedNote);
-                lastRecordedNote = null;
+                HandleEndOfLastRecordedNote(currentBeat);
                 // Debug.Log("Ended singing");
             }
         }
@@ -126,8 +122,9 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
                 else
                 {
                     // Continue singing on different pitch.
-                    playerController.OnRecordedNoteEnded(lastRecordedNote);
-                    // Do this seamlessly, i.e., start the new note at the time the last note was recorded.
+                    // Do this seamlessly, i.e., continue the last recorded note until now
+                    // and start the new note at the time the last note was recorded.
+                    HandleEndOfLastRecordedNote(currentBeat);
                     lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
                     // Debug.Log("Start new note (continued singing)");
                 }
@@ -140,6 +137,15 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
             }
         }
         lastPitchDetectedBeat = currentBeat;
+    }
+
+    private void HandleEndOfLastRecordedNote(double currentBeat)
+    {
+        // End the note seamlessly, i.e., continue the last recorded note until now.
+        lastRecordedNote.EndBeat = currentBeat;
+        LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
+        playerController.OnRecordedNoteEnded(lastRecordedNote);
+        lastRecordedNote = null;
     }
 
     private void HandleContinuedNote(double currentBeat)
