@@ -21,6 +21,14 @@ abstract public class AbstractDummySinger : MonoBehaviour
         }
     }
 
+    void Awake()
+    {
+        if (!Application.isEditor)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     void Start()
     {
         singSceneController = SingSceneController.Instance;

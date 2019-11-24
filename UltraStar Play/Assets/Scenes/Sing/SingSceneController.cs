@@ -560,6 +560,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             MemoryStream tmpStr = new MemoryStream(data);
             mainOutputStream = new Mp3FileReader(tmpStr);
             volumeStream = new WaveChannel32(mainOutputStream);
+            if (!Application.isEditor && volume < 1)
+            {
+                volume = 1;
+            }
             volumeStream.Volume = volume;
 
             waveOutDevice = new WaveOutEvent();
