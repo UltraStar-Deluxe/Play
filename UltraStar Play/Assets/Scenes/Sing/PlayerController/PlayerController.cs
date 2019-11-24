@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     public SongMeta SongMeta { get; private set; }
     public PlayerProfile PlayerProfile { get; private set; }
+    public MicProfile MicProfile { get; private set; }
     public Voice Voice { get; private set; }
 
     private PlayerUiArea playerUiArea;
@@ -39,23 +40,16 @@ public class PlayerController : MonoBehaviour
 
     private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
 
-    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
+    void Awake()
     {
-        this.SongMeta = songMeta;
-        this.PlayerProfile = playerProfile;
-
-        Voice = LoadVoice(songMeta, voiceIdentifier);
-
         playerUiArea = FindObjectOfType<PlayerUiArea>();
-
         PlayerScoreController = GetComponentInChildren<PlayerScoreController>();
-        PlayerScoreController.Init(Voice);
-
         PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
+    }
 
+    void Start()
+    {
         CreatePlayerUi();
-
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         sentenceRatingStream.Buffer(2, 1)
@@ -68,12 +62,21 @@ public class PlayerController : MonoBehaviour
         UpdateSentences(sentenceIndex);
     }
 
+    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
+    {
+        this.SongMeta = songMeta;
+        this.PlayerProfile = playerProfile;
+        this.MicProfile = micProfile;
+
+        Voice = LoadVoice(songMeta, voiceIdentifier);
+        PlayerScoreController.Init(Voice);
+        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
+    }
+
     private void CreatePlayerUi()
     {
-        playerUiController = GameObject.Instantiate(playerUiControllerPrefab);
-        playerUiController.transform.SetParent(playerUiArea.transform);
-        playerUiController.transform.SetAsFirstSibling();
-        playerUiController.Init();
+        playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
+        playerUiController.Init(PlayerProfile, MicProfile);
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
@@ -93,7 +96,8 @@ public class PlayerController : MonoBehaviour
         Dictionary<string, Voice> voices = VoicesBuilder.ParseFile(filePath, songMeta.Encoding, new List<string>());
         if (string.IsNullOrEmpty(voiceIdentifier))
         {
-            return voices.Values.First();
+            Voice mergedVoice = CreateMergedVoice(voices);
+            return mergedVoice;
         }
         else
         {
@@ -108,24 +112,77 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnRecordedNoteEnded(RecordedNote lastRecordedNote)
+    private Voice CreateMergedVoice(Dictionary<string, Voice> voices)
     {
-        CheckPerfectlySungNote(CurrentSentence, lastRecordedNote);
+        if (voices.Count == 1)
+        {
+            return voices.Values.First();
+        }
+
+        MutableVoice mergedVoice = new MutableVoice();
+        List<Sentence> allSentences = voices.Values.SelectMany(voice => voice.Sentences).ToList();
+        List<Note> allNotes = allSentences.SelectMany(sentence => sentence.Notes).ToList();
+        // Sort notes by start beat
+        allNotes.Sort((note1, note2) => note1.StartBeat.CompareTo(note2.StartBeat));
+        // Find sentence borders
+        List<int> lineBreaks = allSentences.Select(sentence => sentence.LinebreakBeat).Where(lineBreak => lineBreak > 0).ToList();
+        lineBreaks.Sort();
+        int lineBreakIndex = 0;
+        int nextLineBreakBeat = lineBreaks[lineBreakIndex];
+        // Create sentences
+        MutableSentence mutableSentence = new MutableSentence();
+        foreach (Note note in allNotes)
+        {
+            if (!mutableSentence.GetNotes().IsNullOrEmpty()
+                && (nextLineBreakBeat >= 0 && note.StartBeat > nextLineBreakBeat))
+            {
+                // Finish the last sentence
+                mutableSentence.SetLinebreakBeat(nextLineBreakBeat);
+                mergedVoice.Add((Sentence)mutableSentence);
+                mutableSentence = new MutableSentence();
+
+                lineBreakIndex++;
+                if (lineBreakIndex < lineBreaks.Count)
+                {
+                    nextLineBreakBeat = lineBreaks[lineBreakIndex];
+                }
+                else
+                {
+                    lineBreakIndex = -1;
+                }
+            }
+            mutableSentence.Add(note);
+        }
+
+        // Finish the last sentence
+        mergedVoice.Add((Sentence)mutableSentence);
+        return (Voice)mergedVoice;
     }
 
-    private void CheckPerfectlySungNote(Sentence sentence, RecordedNote lastRecordedNote)
+    public void OnRecordedNoteEnded(RecordedNote recordedNote)
     {
-        if (sentence == null || lastRecordedNote == null)
+        CheckPerfectlySungNote(recordedNote);
+        DisplayRecordedNote(recordedNote);
+    }
+
+    public void OnRecordedNoteContinued(RecordedNote recordedNote)
+    {
+        DisplayRecordedNote(recordedNote);
+    }
+
+    private void CheckPerfectlySungNote(RecordedNote lastRecordedNote)
+    {
+        if (lastRecordedNote == null || lastRecordedNote.TargetNote == null)
         {
             return;
         }
-        Note perfectlySungNote = sentence.Notes.Where(note =>
-               note.MidiNote == lastRecordedNote.RoundedMidiNote
-            && note.StartBeat >= lastRecordedNote.StartBeat
-            && note.EndBeat <= lastRecordedNote.EndBeat).FirstOrDefault();
-        if (perfectlySungNote != null)
+        Note targetNote = lastRecordedNote.TargetNote;
+        bool isPerfect = ((targetNote.MidiNote == lastRecordedNote.RoundedMidiNote)
+            && (targetNote.StartBeat >= lastRecordedNote.StartBeat)
+            && (targetNote.EndBeat <= lastRecordedNote.EndBeat));
+        if (isPerfect)
         {
-            playerUiController.CreatePerfectNoteEffect(perfectlySungNote);
+            playerUiController.CreatePerfectNoteEffect(targetNote);
         }
     }
 
@@ -161,13 +218,12 @@ public class PlayerController : MonoBehaviour
 
         // Update the UI
         playerUiController.DisplaySentence(CurrentSentence);
-        playerUiController.DisplayRecordedNotes(null);
         UpdateLyricsDisplayer();
     }
 
-    public void DisplayRecordedNotes(List<RecordedNote> recordedNotes)
+    public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        playerUiController.DisplayRecordedNotes(recordedNotes);
+        playerUiController.DisplayRecordedNote(recordedNote);
     }
 
     private void UpdateLyricsDisplayer()
@@ -189,7 +245,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CurrentSentence == null)
         {
-            return double.MaxValue;
+            return -1d;
         }
         return CurrentSentence.StartBeat;
     }

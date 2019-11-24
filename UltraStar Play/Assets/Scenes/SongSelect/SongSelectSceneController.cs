@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using UniRx;
 
-public class SongSelectSceneController : MonoBehaviour
+public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     public static SongSelectSceneController Instance
     {
@@ -32,6 +32,8 @@ public class SongSelectSceneController : MonoBehaviour
 
     private SongMeta selectedSongBeforeSearch;
 
+    public GameObject noSongsFoundMessage;
+
     private SongMeta SelectedSong
     {
         get
@@ -51,13 +53,27 @@ public class SongSelectSceneController : MonoBehaviour
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
-        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
 
+        InitSongRoulette();
+
+        // Show a message when no songs have been found.
+        noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
+    }
+
+    public void OnHotSwapFinished()
+    {
+        InitSongRoulette();
+    }
+
+    private void InitSongRoulette()
+    {
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
             songRouletteController.SelectSong(sceneData.SongMeta);
         }
+
+        songRouletteController.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
     }
 
     private void OnNewSongSelection(SongSelection selection)
@@ -76,7 +92,7 @@ public class SongSelectSceneController : MonoBehaviour
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetActive(hasVideo);
 
-        bool isDuet = selectedSong.VoiceNames.Keys.Count > 1;
+        bool isDuet = selectedSong.VoiceNames.Count > 1;
         duetIndicator.SetActive(isDuet);
     }
 
@@ -93,7 +109,7 @@ public class SongSelectSceneController : MonoBehaviour
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
-        Dictionary<PlayerProfile, MicProfile> playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
+        PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
         singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
 
         SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
@@ -124,7 +140,7 @@ public class SongSelectSceneController : MonoBehaviour
         songRouletteController.SelectPreviousSong();
     }
 
-    public void OnStartSingScene()
+    public void StartSingScene()
     {
         if (SelectedSong != null)
         {

@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class Note
 {
-    public ENoteType Type { get; }
-    public int StartBeat { get; }
-    public int Length { get; }
-    public int Pitch { get; }
-    public string Text { get; }
+    public ENoteType Type { get; private set; }
+    public int StartBeat { get; private set; }
+    public int Length { get; private set; }
+    public int Pitch { get; private set; }
+    public string Text { get; private set; }
 
     public int MidiNote
     {

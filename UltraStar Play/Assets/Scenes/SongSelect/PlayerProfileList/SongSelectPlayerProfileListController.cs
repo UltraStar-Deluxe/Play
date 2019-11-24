@@ -77,9 +77,9 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
         return result;
     }
 
-    public Dictionary<PlayerProfile, MicProfile> GetSelectedPlayerProfileToMicProfileMap()
+    public PlayerProfileToMicProfileMap GetSelectedPlayerProfileToMicProfileMap()
     {
-        Dictionary<PlayerProfile, MicProfile> result = new Dictionary<PlayerProfile, MicProfile>();
+        PlayerProfileToMicProfileMap result = new PlayerProfileToMicProfileMap();
         SongSelectPlayerProfileListEntry[] listEntries = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
         foreach (SongSelectPlayerProfileListEntry entry in listEntries)
         {

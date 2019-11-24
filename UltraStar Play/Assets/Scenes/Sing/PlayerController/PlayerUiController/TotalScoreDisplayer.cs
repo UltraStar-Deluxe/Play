@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class TotalScoreDisplayer : MonoBehaviour
@@ -13,8 +10,13 @@ public class TotalScoreDisplayer : MonoBehaviour
         text = GetComponentInChildren<Text>();
     }
 
-    internal void ShowTotalScore(int score)
+    public void ShowTotalScore(int score)
     {
         text.text = score.ToString();
+    }
+
+    public void SetColorOfMicProfile(MicProfile micProfile)
+    {
+        GetComponentInChildren<Image>().color = micProfile.Color;
     }
 }

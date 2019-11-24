@@ -13,5 +13,9 @@ public class DummySpaceIfOnlyOnePlayerController : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        else
+        {
+            transform.SetAsLastSibling();
+        }
     }
 }
