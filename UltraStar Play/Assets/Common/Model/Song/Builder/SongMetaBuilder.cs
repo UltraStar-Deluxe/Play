@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 static class SongMetaBuilder
 {
@@ -41,7 +42,9 @@ static class SongMetaBuilder
                 string[] parts = line.Substring(1).Split(separator, 2);
                 if (parts.Length < 2 || parts[0].Length < 1 || parts[1].Length < 1)
                 {
-                    throw new SongMetaBuilderException("Invalid line formatting on line " + line + " of file " + path);
+                    Debug.LogWarning("Invalid line formatting on line " + line + " of file " + path);
+                    // Ignore this line. Continue with the next line.
+                    continue;
                 }
                 string tag = parts[0].ToLowerInvariant();
                 string val = parts[1];
