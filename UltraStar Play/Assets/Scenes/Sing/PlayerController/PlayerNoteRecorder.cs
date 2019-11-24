@@ -113,10 +113,6 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
                     // Continue singing on same pitch
                     lastRecordedNote.EndBeat = currentBeat;
                     HandleContinuedNote(currentBeat);
-                    if (lastRecordedNote != null)
-                    {
-                        playerController.OnRecordedNoteContinued(lastRecordedNote);
-                    }
                     // Debug.Log("Continued note");
                 }
                 else
@@ -182,6 +178,8 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
         // Remember this note
         AddRecordedNote(lastRecordedNote, currentSentence);
+
+        playerController.OnRecordedNoteContinued(lastRecordedNote);
     }
 
     private void RoundRecordedNotePitchToTargetNotePitch(RecordedNote recordedNote)

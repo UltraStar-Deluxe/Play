@@ -15,7 +15,7 @@ public class UiNote : MonoBehaviour
 
     private RectTransform uiEffectsContainer;
 
-    private List<StarParticle> stars = new List<StarParticle>();
+    private readonly List<StarParticle> stars = new List<StarParticle>();
 
     private Image image;
 

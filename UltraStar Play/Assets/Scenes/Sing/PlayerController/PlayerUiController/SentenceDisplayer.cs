@@ -135,7 +135,7 @@ public class SentenceDisplayer : MonoBehaviour
         recordedNoteToUiRecordedNoteMap.Clear();
     }
 
-    private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote = true)
+    private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
         int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
