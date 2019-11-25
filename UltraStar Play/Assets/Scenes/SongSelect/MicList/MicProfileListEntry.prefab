@@ -233,12 +233,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4408495301249745294}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf2308ba4a559d3488166d7bdad4d41d, type: 3}
+  m_Script: {fileID: 11500000, guid: fc6df168ad6574f4f8b9eb8b32ed43d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
-  pitchRecordHistoryLength: 5
-  lastMidiNoteName: 
+  silenceThreasholdInDecibel: -25
+  tolerance: 0.1
+  pitchDetectionAlgorithm: 4
 --- !u!1 &4408495303113264892
 GameObject:
   m_ObjectHideFlags: 0
