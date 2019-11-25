@@ -12,8 +12,7 @@ public class SongSelectMicListEntry : MonoBehaviour
 
         micImage.color = micProfile.Color;
         microphonePitchTracker.MicDevice = micProfile.Name;
-        microphonePitchTracker.StartPitchDetection();
+        microphonePitchTracker.StartMicRecording();
         floatArrayVisualizer.Init(microphonePitchTracker.MicData);
     }
-
 }

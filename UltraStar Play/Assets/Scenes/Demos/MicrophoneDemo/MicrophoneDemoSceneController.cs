@@ -12,44 +12,52 @@ public class MicrophoneDemoSceneController : MonoBehaviour
     public FloatArrayVisualizer micDataVisualizer;
     public FloatArrayVisualizer pitchDetectionBufferVisualizer;
 
-    private MicrophonePitchTracker microphonePitchTracker;
+    private AbstractMicPitchTracker micPitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
 
     void Awake()
     {
-        microphonePitchTracker = FindObjectOfType<MicrophonePitchTracker>();
-        micDataVisualizer.Init(microphonePitchTracker.MicData);
-        pitchDetectionBufferVisualizer.Init(microphonePitchTracker.PitchDetectionBuffer);
+        if (micPitchTracker == null)
+        {
+            micPitchTracker = FindObjectOfType<AbstractMicPitchTracker>();
+        }
+        if (micPitchTracker == null)
+        {
+            throw new UnityException("No microphone pitch tracker found in the scene");
+        }
+        micDataVisualizer.Init(micPitchTracker.MicData);
+        pitchDetectionBufferVisualizer.Init(micPitchTracker.PitchDetectionBuffer);
     }
 
     void OnEnable()
     {
-        if (microphonePitchTracker == null)
+        if (micPitchTracker == null)
         {
             return;
         }
-        microphonePitchTracker.MicDevice = micDeviceName;
-        pitchEventStreamDisposable = microphonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
-        microphonePitchTracker.StartPitchDetection();
+        micPitchTracker.MicDevice = micDeviceName;
+        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+        micPitchTracker.StartMicRecording();
     }
 
     void OnDisable()
     {
-        if (microphonePitchTracker == null)
+        if (micPitchTracker == null)
         {
             return;
         }
+        micPitchTracker.StopMicRecording();
         pitchEventStreamDisposable?.Dispose();
-        microphonePitchTracker.StopPitchDetection();
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
         // Show the note that has been detected
-        if (pitchEvent.MidiNote > 0)
+        int midiNote = pitchEvent.MidiNote;
+        if (midiNote > 0)
         {
-            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
+            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(midiNote) + " (" + midiNote + ")";
         }
         else
         {

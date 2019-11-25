@@ -63,7 +63,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         if (micProfile != null)
         {
             pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
-            MicrophonePitchTracker.StartPitchDetection();
+            MicrophonePitchTracker.StartMicRecording();
         }
         else
         {
@@ -81,7 +81,6 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         if (micProfile != null)
         {
             pitchEventStreamDisposable?.Dispose();
-            MicrophonePitchTracker.StopPitchDetection();
         }
     }
 

@@ -21,7 +21,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         microphonePitchTracker.MicDevice = micProfile.Name;
         if (!string.IsNullOrEmpty(micProfile.Name))
         {
-            microphonePitchTracker.StartPitchDetection();
+            microphonePitchTracker.StartMicRecording();
         }
     }
 
