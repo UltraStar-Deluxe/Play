@@ -1,0 +1,7 @@
+This is libaubio-5.dll from aubio-0.4.6-win64.
+It has been renamed to "aubio.dll" because this name is expected by the Aubio.NET library.
+
+aubio on GitHub: https://github.com/aubio/aubio
+
+Aubio.NET on GitHub: https://github.com/aybe/aubio.net
+(Note: At the time of writing (25. Nov 2019), the "develop" branch of the Aubio.NET repository contains much more files than the master, including the API for pitch detection)
