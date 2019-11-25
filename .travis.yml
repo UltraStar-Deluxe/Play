@@ -2,7 +2,7 @@ sudo: required
 language: bash
 env:
   global:
-  - IMAGE_NAME=gableroux/unity3d:2019.2.8f1
+  - IMAGE_NAME=gableroux/unity3d:2019.2.11f1
   - BUILD_NAME="UltraStar Play"
   - UNITYCI_PROJECT_NAME="UltraStar Play"
   
@@ -26,6 +26,8 @@ before_install:
   - chmod +x ./tools/travis/build.sh
   - chmod +x ./tools/travis/before_script.sh
   - chmod +x ./tools/travis/test.sh
+  - chmod +x ./tools/download-dependencies/*.sh
+  - (cd tools/download-dependencies/; sh download-dependencies.sh)
   - export UNITY_LICENSE_CONTENT=`cat tools/travis/activat.ion`
   - rm tools/travis/activat.ion
   - docker pull $IMAGE_NAME
