@@ -2,7 +2,7 @@ sudo: required
 language: bash
 env:
   global:
-  - IMAGE_NAME=gableroux/unity3d:2019.2.8f1
+  - IMAGE_NAME=gableroux/unity3d:2019.2.11f1
   - BUILD_NAME="UltraStar Play"
   - UNITYCI_PROJECT_NAME="UltraStar Play"
   
