@@ -27,7 +27,7 @@ before_install:
   - chmod +x ./tools/travis/before_script.sh
   - chmod +x ./tools/travis/test.sh
   - chmod +x ./tools/download-dependencies/*.sh
-  - ./tools/download-dependencies/download-dependencies.sh
+  - sh ./tools/download-dependencies/download-dependencies.sh
   - export UNITY_LICENSE_CONTENT=`cat tools/travis/activat.ion`
   - rm tools/travis/activat.ion
   - docker pull $IMAGE_NAME
