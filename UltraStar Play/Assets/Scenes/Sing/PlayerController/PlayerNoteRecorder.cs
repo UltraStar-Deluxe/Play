@@ -6,7 +6,6 @@ using Pitch;
 using UnityEngine;
 using UniRx;
 
-[RequireComponent(typeof(MicrophonePitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 {
     public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
@@ -26,11 +25,11 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
     private IDisposable pitchEventStreamDisposable;
 
-    private MicrophonePitchTracker MicrophonePitchTracker
+    private AbstractMicPitchTracker MicPitchTracker
     {
         get
         {
-            return GetComponent<MicrophonePitchTracker>();
+            return GetComponent<AbstractMicPitchTracker>();
         }
     }
 
@@ -44,13 +43,13 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
         if (micProfile != null)
         {
-            MicrophonePitchTracker.MicDevice = micProfile.Name;
+            MicPitchTracker.MicDevice = micProfile.Name;
         }
     }
 
     public void SetMicrophonePitchTrackerEnabled(bool newValue)
     {
-        MicrophonePitchTracker.enabled = newValue;
+        MicPitchTracker.enabled = newValue;
     }
 
     void Awake()
@@ -62,8 +61,8 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
     {
         if (micProfile != null)
         {
-            pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
-            MicrophonePitchTracker.StartMicRecording();
+            pitchEventStreamDisposable = MicPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+            MicPitchTracker.StartMicRecording();
         }
         else
         {

@@ -58,7 +58,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7882357268378806898}
   - component: {fileID: 1426883935623920857}
-  - component: {fileID: 6166246499440108607}
+  - component: {fileID: 5901133340743594753}
   - component: {fileID: 2112286677205179149}
   m_Layer: 0
   m_Name: PlayerNoteRecorder
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b23705d715dd213418e9f5d739c7621b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6166246499440108607
+--- !u!114 &5901133340743594753
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,12 +102,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4909833499222852315}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf2308ba4a559d3488166d7bdad4d41d, type: 3}
+  m_Script: {fileID: 11500000, guid: fc6df168ad6574f4f8b9eb8b32ed43d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
-  pitchRecordHistoryLength: 5
-  lastMidiNoteName: 
+  silenceThreasholdInDecibel: -25
+  tolerance: 0.1
+  pitchDetectionAlgorithm: 4
 --- !u!82 &2112286677205179149
 AudioSource:
   m_ObjectHideFlags: 0

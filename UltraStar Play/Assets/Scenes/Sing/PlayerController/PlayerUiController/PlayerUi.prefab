@@ -566,7 +566,7 @@ MonoBehaviour:
   uiNotesContainer: {fileID: 5214595654765679579}
   uiRecordedNotesContainer: {fileID: 2587138191213194081}
   uiEffectsContainer: {fileID: 5977041234652890053}
-  displayRoundedAndActualRecordedNotes: 1
+  displayRoundedAndActualRecordedNotes: 0
   showPitchOfNotes: 0
   showLyricsOfNotes: 1
 --- !u!1 &2434205905051527726

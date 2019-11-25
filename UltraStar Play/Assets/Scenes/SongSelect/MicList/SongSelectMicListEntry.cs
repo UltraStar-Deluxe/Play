@@ -7,7 +7,7 @@ public class SongSelectMicListEntry : MonoBehaviour
 
     public void Init(MicProfile micProfile)
     {
-        MicrophonePitchTracker microphonePitchTracker = GetComponentInChildren<MicrophonePitchTracker>();
+        AbstractMicPitchTracker microphonePitchTracker = GetComponentInChildren<AbstractMicPitchTracker>();
         FloatArrayVisualizer floatArrayVisualizer = GetComponentInChildren<FloatArrayVisualizer>();
 
         micImage.color = micProfile.Color;

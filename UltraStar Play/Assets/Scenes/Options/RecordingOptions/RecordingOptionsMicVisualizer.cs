@@ -7,7 +7,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 {
     public Text currentNoteLabel;
     public FloatArrayVisualizer floatArrayVisualizer;
-    public MicrophonePitchTracker microphonePitchTracker;
+    public AbstractMicPitchTracker microphonePitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
 
