@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public static class GameObjectUtils
 {
@@ -40,12 +41,12 @@ public static class GameObjectUtils
     // that should not be called frequently.
     public static T FindObjectOfType<T>(bool includeInactive) where T : MonoBehaviour
     {
-        List<Transform> rootTransforms = GameObject.FindObjectsOfType<Transform>().Where(it => it.root == it).ToList();
+        GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
         if (includeInactive)
         {
-            foreach (Transform rootTransform in rootTransforms)
+            foreach (GameObject rootObject in rootObjects)
             {
-                T obj = rootTransform.GetComponentInChildren<T>(true);
+                T obj = rootObject.GetComponentInChildren<T>(true);
                 if (obj != null)
                 {
                     return obj;
