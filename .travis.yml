@@ -68,4 +68,4 @@ jobs:
     addons:
       artifacts:
         paths:
-        - "./Builds/"
+        - "./${REPO}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.zip"
