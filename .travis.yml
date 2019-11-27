@@ -39,33 +39,33 @@ jobs:
     env: TEST_PLATFORM=editmode
     addons:
       artifacts:
-        target_paths:
+        paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
     script: "./tools/travis/docker_test.sh"
     env: TEST_PLATFORM=playmode
     addons:
       artifacts:
-        target_paths:
+        paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
 #  - stage: build
 #    env: BUILD_TARGET=StandaloneLinux64
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
 #      artifacts:
-#        target_paths:
+#        paths:
 #        - "./Builds/"
 #  - stage: build
 #    env: BUILD_TARGET=StandaloneOSX
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
 #      artifacts:
-#        target_paths:
+#        paths:
 #        - "./Builds/"
   - stage: build
     env: BUILD_TARGET=StandaloneWindows64
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
-        target_paths:
+        paths:
         - "./Builds/"
