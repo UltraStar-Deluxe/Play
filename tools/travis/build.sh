@@ -34,7 +34,6 @@ else
 fi
 
 ls -la "$BUILD_PATH"
-ls -la ./Builds/
-ls -la ./build
+ls -la "$BASISBIT_PLACEHOLDER"
 
-zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./build
+zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./Builds
