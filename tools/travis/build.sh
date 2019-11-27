@@ -34,6 +34,7 @@ else
 fi
 
 ls -la "$BUILD_PATH"
-[ -n "$(ls -A $BUILD_PATH)" ] # fail job if build folder is empty
+ls -la ./Builds/
+ls -la ./build
 
-zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./Builds
+zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./build
