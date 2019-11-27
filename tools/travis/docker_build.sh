@@ -12,3 +12,5 @@ docker run \
   -v $(pwd):/project/ \
   $IMAGE_NAME \
   /bin/bash -c "/project/tools/travis/before_script.sh && /project/tools/travis/build.sh"
+ 
+zip -r ${REPO}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}.zip build
