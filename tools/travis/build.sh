@@ -33,4 +33,7 @@ else
   echo "Unexpected exit code $UNITY_EXIT_CODE";
 fi
 
-ls -la "UltraStar Play/$BUILD_PATH"
+ls -la "$BUILD_PATH"
+[ -n "$(ls -A $BUILD_PATH)" ] # fail job if build folder is empty
+
+zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./Builds
