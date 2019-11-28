@@ -47,7 +47,6 @@ public class MutableSentenceTests
         VoicesBuilderException vbe = Assert.Throws<VoicesBuilderException>(delegate { ms.Add(new Note(ENoteType.Normal, 1, 1, 0, "")); });
         Assert.AreEqual("New note overlaps with existing sentence", vbe.Message);
     }
-
     [Test]
     public void TestNotes()
     {
@@ -56,13 +55,5 @@ public class MutableSentenceTests
         List<Note> notes = ms.GetNotes();
         Assert.AreEqual(1, notes.Count);
         Assert.AreEqual(testNote, notes[0]);
-    }
-
-    [Test]
-    public void TestOverlappingLinebreakThrowsException()
-    {
-        ms.Add(new Note(ENoteType.Normal, 0, 2, 0, ""));
-        VoicesBuilderException vbe = Assert.Throws<VoicesBuilderException>(delegate { ms.SetLinebreakBeat(1); });
-        Assert.AreEqual("Linebreak conflicts with existing sentence", vbe.Message);
     }
 }
