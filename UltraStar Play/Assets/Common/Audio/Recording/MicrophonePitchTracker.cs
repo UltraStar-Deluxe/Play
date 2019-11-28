@@ -22,8 +22,8 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
         set
         {
-            bool restartPitchDetection = startedMicRecording;
-            if (startedMicRecording)
+            bool restartPitchDetection = startedPitchDetection;
+            if (startedPitchDetection)
             {
                 StopPitchDetection();
             }
@@ -41,9 +41,9 @@ public class MicrophonePitchTracker : MonoBehaviour
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
-    private bool startedMicRecording;
+    private bool startedPitchDetection;
 
-    protected readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
+    private readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
     public IObservable<PitchEvent> PitchEventStream
     {
         get
@@ -85,13 +85,13 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StartPitchDetection()
     {
-        if (startedMicRecording)
+        if (startedPitchDetection)
         {
             Debug.Log("Mic recoding already started.");
             return;
         }
 
-        startedMicRecording = true;
+        startedPitchDetection = true;
         List<string> soundcards = new List<string>(Microphone.devices);
 
         // Check for microphone existence.
@@ -99,7 +99,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         {
             string micDevicesCsv = string.Join(",", soundcards);
             Debug.LogError($"Did not find mic '{MicDevice}'. Available mic devices: {micDevicesCsv}");
-            startedMicRecording = false;
+            startedPitchDetection = false;
             return;
         }
         Debug.Log($"Start recording with '{MicDevice}'");
@@ -118,7 +118,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public void StopPitchDetection()
     {
-        if (!startedMicRecording)
+        if (!startedPitchDetection)
         {
             Debug.Log("Mic recording already stopped.");
             return;
@@ -126,12 +126,12 @@ public class MicrophonePitchTracker : MonoBehaviour
 
         Debug.Log($"Stop recording with '{MicDevice}'");
         Microphone.End(MicDevice);
-        startedMicRecording = false;
+        startedPitchDetection = false;
     }
 
     private void UpdatePitchDetection()
     {
-        if (!startedMicRecording)
+        if (!startedPitchDetection)
         {
             return;
         }
