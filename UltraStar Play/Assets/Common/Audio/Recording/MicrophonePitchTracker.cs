@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Pitch;
 using UniRx;
 using UnityEngine;
-using static Pitch.PitchTracker;
 
 [RequireComponent(typeof(AudioSource))]
 public class MicrophonePitchTracker : MonoBehaviour
 {
-    private const int SampleRate = 22050;
+    public const int SampleRate = 22050;
 
     public bool playRecordedAudio;
+
+    [ReadOnly]
+    public string lastMidiNoteName;
 
     private string micDevice;
     public string MicDevice
@@ -42,7 +41,6 @@ public class MicrophonePitchTracker : MonoBehaviour
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
-    private readonly PitchTracker pitchTracker = new PitchTracker();
     private bool startedPitchDetection;
 
     private readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
@@ -54,31 +52,29 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
     }
 
-    [Range(1, 20)]
-    public int pitchRecordHistoryLength = 5;
-    private readonly List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
+    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
-    [ReadOnly]
-    public string lastMidiNoteName;
+    void Awake()
+    {
+        // TODO: Use an own pitch detection implementation for an IAudioSamplesAnalyzer.
+        audioSamplesAnalyzer = new CSharpPitchTrackerLibraryAudioSamplesAnalyzer(pitchEventStream);
 
-    private int lastRecordedFrame;
+        // Update label in inspector for debugging.
+        pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = ((pitchEvent.MidiNote > 0)
+                                                                    ? MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)
+                                                                    : ""));
+    }
 
     void OnEnable()
     {
         audioSource = GetComponent<AudioSource>();
-        // Initialize the pitch tracker
-        pitchTracker.PitchRecordsPerSecond = 30;
-        pitchTracker.RecordPitchRecords = true;
-        pitchTracker.PitchRecordHistorySize = 5;
-        pitchTracker.SampleRate = SampleRate;
-
-        pitchTracker.PitchDetected += new PitchTracker.PitchDetectedHandler(OnPitchDetected);
+        audioSamplesAnalyzer.Enable();
     }
 
     void OnDisable()
     {
-        pitchTracker.PitchDetected -= new PitchTracker.PitchDetectedHandler(OnPitchDetected);
         StopPitchDetection();
+        audioSamplesAnalyzer.Disable();
     }
 
     void Update()
@@ -91,7 +87,7 @@ public class MicrophonePitchTracker : MonoBehaviour
     {
         if (startedPitchDetection)
         {
-            Debug.Log("Pitch detection already started.");
+            Debug.Log("Mic recoding already started.");
             return;
         }
 
@@ -124,7 +120,7 @@ public class MicrophonePitchTracker : MonoBehaviour
     {
         if (!startedPitchDetection)
         {
-            Debug.Log("Pitch detection already stopped.");
+            Debug.Log("Mic recording already stopped.");
             return;
         }
 
@@ -167,7 +163,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
 
         // Detect the pitch of the sample.
-        pitchTracker.ProcessBuffer(PitchDetectionBuffer, samplesSinceLastFrame);
+        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame);
     }
 
     private void UpdateMicrophoneAudioPlayback()
@@ -179,48 +175,6 @@ public class MicrophonePitchTracker : MonoBehaviour
         else if (!playRecordedAudio && audioSource.isPlaying)
         {
             audioSource.Stop();
-        }
-    }
-
-    private void OnPitchDetected(PitchTracker sender, PitchRecord pitchRecord)
-    {
-        // Ignore multiple events in same frame.
-        if (lastRecordedFrame == Time.frameCount)
-        {
-            return;
-        }
-        lastRecordedFrame = Time.frameCount;
-
-        // Create history of PitchRecord events
-        pitchRecordHistory.Add(pitchRecord);
-        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
-        {
-            pitchRecordHistory.RemoveAt(0);
-        }
-
-        // Calculate median of recorded midi note values.
-        // This is done to make the pitch detection more stable, but it increases the latency.
-        List<PitchRecord> sortedpitchRecordHistory = new List<PitchRecord>(pitchRecordHistory);
-        sortedpitchRecordHistory.Sort(new PitchRecordComparer());
-        int midiNoteMedian = sortedpitchRecordHistory[sortedpitchRecordHistory.Count / 2].MidiNote;
-        pitchEventStream.OnNext(new PitchEvent(midiNoteMedian));
-
-        // Update label in inspector for debugging.
-        if (midiNoteMedian > 0)
-        {
-            lastMidiNoteName = MidiUtils.GetAbsoluteName(midiNoteMedian);
-        }
-        else
-        {
-            lastMidiNoteName = "";
-        }
-    }
-
-    private class PitchRecordComparer : IComparer<PitchRecord>
-    {
-        public int Compare(PitchRecord x, PitchRecord y)
-        {
-            return x.MidiNote.CompareTo(y.MidiNote);
         }
     }
 }
