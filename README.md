@@ -28,7 +28,7 @@ The game uses the Unity 2D framework and mostly c# (mono/.Net) as software devel
 - See [How to Compile the Game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game)
 
 ### 6. Support
-- If you just want to play sing-along karaoke, please use UltraStar Deluxe or Performous or Vocaluxe instead.
+- If you just want to play sing-along karaoke, please use [UltraStar Deluxe](https://github.com/UltraStar-Deluxe/USDX) or [Performous](https://github.com/performous/performous) or [Vocaluxe](https://github.com/Vocaluxe/Vocaluxe) instead.
 - See documentation sources mentioned above
 - [Issue Tracker](https://github.com/UltraStar-Deluxe/Play/issues)
 - "The code is documentation enough" << sorry, this project just started, there will be more places for support later on
