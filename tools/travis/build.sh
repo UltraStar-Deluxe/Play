@@ -36,4 +36,4 @@ fi
 ls -la "$BUILD_PATH"
 
 
-tar -zcf UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.tar.gz /project/Builds/
+tar -zcf /project/UltraStarPlay-build.tar.gz /project/Builds/
