@@ -67,4 +67,4 @@ jobs:
     addons:
       artifacts:
         paths:
-        - "./UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip"
+        - "./UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.tar.gz"
