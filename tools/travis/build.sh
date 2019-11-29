@@ -35,4 +35,12 @@ fi
 
 ls -la "$BUILD_PATH"
 
-zip -r UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.zip ./Builds
+pwd
+
+find
+
+ls -la "$(pwd)/UltraStar Play"
+
+
+
+tar -zcf UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.tar.gz ./Builds
