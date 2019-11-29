@@ -38,6 +38,7 @@ jobs:
     env: TEST_PLATFORM=editmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     addons:
       artifacts:
+        s3_region: "eu-west-1"
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
@@ -45,6 +46,7 @@ jobs:
     env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     addons:
       artifacts:
+        s3_region: "eu-west-1"
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
 #  - stage: build
@@ -66,5 +68,6 @@ jobs:
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
+        s3_region: "eu-west-1"
         paths:
         - "/project/UltraStarPlay-build.tar.gz"
