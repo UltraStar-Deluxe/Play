@@ -34,40 +34,35 @@ before_install:
 jobs:
   include:
   - stage: test
-    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=editmode
+    env: TEST_PLATFORM=editmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     addons:
       artifacts:
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
-    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=playmode
+    env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     addons:
       artifacts:
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
 #  - stage: build
-#    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
-#    env: BUILD_TARGET=StandaloneLinux64
+#    env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
 #      artifacts:
 #        paths:
 #        - "./Builds/"
 #  - stage: build
-#    IMAGE_NAME=gableroux/unity3d:2019.2.11f1-mac
-#    env: BUILD_TARGET=StandaloneOSX
+#    env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=gableroux/unity3d:2019.2.11f1-mac
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
 #      artifacts:
 #        paths:
 #        - "./Builds/"
   - stage: build
-    IMAGE_NAME=gableroux/unity3d:2019.2.11f1-windows
-    env: BUILD_TARGET=StandaloneWindows64
+    env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1-windows
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
