@@ -70,4 +70,4 @@ jobs:
       artifacts:
         s3_region: "eu-west-1"
         paths:
-        - "/project/UltraStarPlay-build.tar.gz"
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
