@@ -5,7 +5,7 @@ set -x
 
 echo "Building for $BUILD_TARGET"
 
-export BUILD_PATH=./Builds/$BUILD_TARGET/
+export BUILD_PATH=/project/Builds/$BUILD_TARGET/
 mkdir -p $BUILD_PATH
 
 xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
@@ -15,7 +15,7 @@ xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
     -batchmode \
     -buildTarget $BUILD_TARGET \
     -customBuildTarget $BUILD_TARGET \
-    -customBuildName $BUILD_NAME \
+    -customBuildName "$BUILD_NAME" \
     -customBuildPath $BUILD_PATH \
     -customBuildOptions AcceptExternalModificationsToPlayer \
     -executeMethod BuildCommand.PerformBuild \
@@ -35,12 +35,5 @@ fi
 
 ls -la "$BUILD_PATH"
 
-pwd
 
-find
-
-ls -la "$(pwd)/UltraStar Play"
-
-
-
-tar -zcf UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.tar.gz ./Builds
+tar -zcf UltraStarPlay-build${TRAVIS_BUILD_NUMBER}.tar.gz /project/Builds/
