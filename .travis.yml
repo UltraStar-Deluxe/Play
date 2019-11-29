@@ -2,7 +2,6 @@ sudo: required
 language: bash
 env:
   global:
-  - IMAGE_NAME=gableroux/unity3d:2019.2.11f1
   - BUILD_NAME="UltraStar Play"
   - UNITYCI_PROJECT_NAME="UltraStar Play"
   
@@ -35,6 +34,7 @@ before_install:
 jobs:
   include:
   - stage: test
+    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     script: "./tools/travis/docker_test.sh"
     env: TEST_PLATFORM=editmode
     addons:
@@ -42,6 +42,7 @@ jobs:
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
+    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     script: "./tools/travis/docker_test.sh"
     env: TEST_PLATFORM=playmode
     addons:
@@ -49,6 +50,7 @@ jobs:
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
 #  - stage: build
+#    IMAGE_NAME=gableroux/unity3d:2019.2.11f1
 #    env: BUILD_TARGET=StandaloneLinux64
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
@@ -56,6 +58,7 @@ jobs:
 #        paths:
 #        - "./Builds/"
 #  - stage: build
+#    IMAGE_NAME=gableroux/unity3d:2019.2.11f1-mac
 #    env: BUILD_TARGET=StandaloneOSX
 #    script: "./tools/travis/docker_build.sh"
 #    addons:
@@ -63,6 +66,7 @@ jobs:
 #        paths:
 #        - "./Builds/"
   - stage: build
+    IMAGE_NAME=gableroux/unity3d:2019.2.11f1-windows
     env: BUILD_TARGET=StandaloneWindows64
     script: "./tools/travis/docker_build.sh"
     addons:
