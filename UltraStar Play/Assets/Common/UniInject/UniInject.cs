@@ -5,7 +5,11 @@ namespace UniInject
 {
     public class UniInject
     {
+        // Global injector
         public static Injector GlobalInjector { get; set; } = new Injector(null);
+
+        // Injector for the current scene. The SceneInjectionManager will create and remove the instance.
+        public static Injector SceneInjector { get; internal set; }
 
         // Holds information how to instantiate objects of types during Dependency Injection.
         // This includes the parameters that must be resolved to call the constructor.
@@ -20,6 +24,20 @@ namespace UniInject
                 constructorInjectionDatas[type] = injectionData;
             }
             return injectionData;
+        }
+
+        // Creates a new Injector.
+        // If no parent is given, then the GlobalInjector is used as parent.
+        public static Injector CreateInjector(Injector parent = null)
+        {
+            if (parent != null)
+            {
+                return new Injector(parent);
+            }
+            else
+            {
+                return new Injector(GlobalInjector);
+            }
         }
     }
 }
