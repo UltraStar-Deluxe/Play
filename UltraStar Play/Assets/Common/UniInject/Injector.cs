@@ -44,7 +44,7 @@ namespace UniInject
             return result;
         }
 
-        public void Inject(object target)
+        public void InjectAll(object target)
         {
             // Find all members to be injected via reflection.
             List<InjectionData> injectionDatas = ReflectionUtils.CreateInjectionDatas(target);
@@ -60,11 +60,11 @@ namespace UniInject
         {
             if (injectionData.searchMethod == SearchMethods.SearchInBindings)
             {
-                InjectMemberFromBindings(injectionData.TargetObject, injectionData.MemberInfo, injectionData.InjectionKeys);
+                InjectMemberFromBindings(injectionData.TargetObject, injectionData.MemberInfo, injectionData.InjectionKeys, injectionData.isOptional);
             }
             else if (injectionData.TargetObject is MonoBehaviour)
             {
-                InjectMemberFromUnitySearchMethod(injectionData.TargetObject as MonoBehaviour, injectionData.MemberInfo, injectionData.searchMethod);
+                InjectMemberFromUnitySearchMethod(injectionData.TargetObject as MonoBehaviour, injectionData.MemberInfo, injectionData.searchMethod, injectionData.isOptional);
             }
             else
             {
@@ -73,12 +73,28 @@ namespace UniInject
             }
         }
 
-        private void InjectMemberFromBindings(object target, MemberInfo memberInfo, object[] bindingKeys)
+        private void InjectMemberFromBindings(object target, MemberInfo memberInfo, object[] bindingKeys, bool isOptional)
         {
             object[] valuesToBeInjected;
             try
             {
-                valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                if (isOptional)
+                {
+                    try
+                    {
+                        valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                    }
+                    catch (MissingBindingException)
+                    {
+                        // Ignore because the injection is optional.
+                        return;
+                    }
+                }
+                else
+                {
+                    valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                }
+
                 if (valuesToBeInjected == null)
                 {
                     throw new InjectionException("No values to be injected.");
@@ -108,7 +124,7 @@ namespace UniInject
             }
         }
 
-        private void InjectMemberFromUnitySearchMethod(MonoBehaviour script, MemberInfo memberInfo, SearchMethods strategy)
+        private void InjectMemberFromUnitySearchMethod(MonoBehaviour script, MemberInfo memberInfo, SearchMethods strategy, bool isOptional)
         {
             Type componentType = ReflectionUtils.GetTypeOfFieldOrProperty(script, memberInfo);
             object component = null;
@@ -147,7 +163,7 @@ namespace UniInject
                         + $" Only Fields and Properties are supported for component injection via Unity methods.");
                 }
             }
-            else
+            else if (!isOptional)
             {
                 throw new Exception($"Cannot inject member {script.name}.{memberInfo.Name}."
                     + $" No component of type {componentType} found using method {strategy}");

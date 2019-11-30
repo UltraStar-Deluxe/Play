@@ -1,5 +1,6 @@
 ﻿using UniInject;
 using UnityEngine;
+using UnityEngine.UI;
 using static UniInject.UniInject;
 
 // Ignore warnings about unassigned fields.
@@ -31,6 +32,13 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     // Inject property
     [Inject]
     private Settings Settings { get; set; }
+
+    // Inject optional
+    [Inject(optional = true)]
+    private SceneNavigator sceneNavigator;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
+    private Text uiText;
 
     // Inject field using a specific key instead of the type.
     [Inject(key = "author")]
@@ -76,6 +84,9 @@ public class ScriptThatNeedsInjection : MonoBehaviour
         Debug.Log("Instance of an interface (field 2):" + demoInterfaceInstance2.GetGreeting());
 
         Debug.Log("Instance of an interface with constructor parameters:" + demoInterfaceInstanceWithConstructorParameters.GetByeBye());
+
+        Debug.Log("Optional sceneNavigator: " + sceneNavigator);
+        Debug.Log("Optional uiText: " + uiText);
 
         Debug.Log("An int: " + GlobalInjector.GetInstance<int>());
         Debug.Log("An instance of an interface: " + GlobalInjector.GetInstance<IDependencyInjectionDemoInterface>());
