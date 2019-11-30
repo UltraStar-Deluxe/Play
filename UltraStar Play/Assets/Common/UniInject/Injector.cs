@@ -44,29 +44,36 @@ namespace UniInject
             return result;
         }
 
-        public void InjectMembers(object target)
+        public void Inject(object target)
         {
             // Find all members to be injected via reflection.
+            List<InjectionData> injectionDatas = ReflectionUtils.CreateInjectionDatas(target);
 
             // Inject existing bindings into the fields.
+            foreach (InjectionData injectionData in injectionDatas)
+            {
+                Inject(injectionData);
+            }
         }
 
-        public void InjectField(object target, FieldInfo fieldInfo, object bindingKey)
+        public void Inject(InjectionData injectionData)
         {
-            InjectMember(target, fieldInfo, new object[] { bindingKey });
+            if (injectionData.searchMethod == SearchMethods.SearchInBindings)
+            {
+                InjectMemberFromBindings(injectionData.TargetObject, injectionData.MemberInfo, injectionData.InjectionKeys);
+            }
+            else if (injectionData.TargetObject is MonoBehaviour)
+            {
+                InjectMemberFromUnitySearchMethod(injectionData.TargetObject as MonoBehaviour, injectionData.MemberInfo, injectionData.searchMethod);
+            }
+            else
+            {
+                throw new InjectionException($"Cannot perform injection via {injectionData.searchMethod} into an object of type {injectionData.TargetObject.GetType()}."
+                    + " Only MonoBehaviour instances are supported.");
+            }
         }
 
-        public void InjectProperty(object target, PropertyInfo propertyInfo, object bindingKey)
-        {
-            InjectMember(target, propertyInfo, new object[] { bindingKey });
-        }
-
-        public void InjectMethod(object target, MethodInfo propertyInfo, object[] bindingKeys)
-        {
-            InjectMember(target, propertyInfo, bindingKeys);
-        }
-
-        public void InjectMember(object target, MemberInfo memberInfo, object[] bindingKeys)
+        private void InjectMemberFromBindings(object target, MemberInfo memberInfo, object[] bindingKeys)
         {
             object[] valuesToBeInjected;
             try
@@ -98,6 +105,52 @@ namespace UniInject
             catch (Exception e)
             {
                 throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}: " + e.Message, e);
+            }
+        }
+
+        private void InjectMemberFromUnitySearchMethod(MonoBehaviour script, MemberInfo memberInfo, SearchMethods strategy)
+        {
+            Type componentType = ReflectionUtils.GetTypeOfFieldOrProperty(script, memberInfo);
+            object component = null;
+            switch (strategy)
+            {
+                case SearchMethods.GetComponent:
+                    component = script.GetComponent(componentType);
+                    break;
+                case SearchMethods.GetComponentInChildren:
+                    component = script.GetComponentInChildren(componentType);
+                    break;
+                case SearchMethods.GetComponentInParent:
+                    component = script.GetComponentInParent(componentType);
+                    break;
+                case SearchMethods.FindObjectOfType:
+                    component = GameObject.FindObjectOfType(componentType);
+                    break;
+                default:
+                    throw new InjectionException($"Cannot inject {script.name}.{memberInfo.Name}."
+                        + $" Unkown Unity search method {strategy}");
+            }
+
+            if (component != null)
+            {
+                if (memberInfo is FieldInfo)
+                {
+                    (memberInfo as FieldInfo).SetValue(script, component);
+                }
+                else if (memberInfo is PropertyInfo)
+                {
+                    (memberInfo as PropertyInfo).SetValue(script, component);
+                }
+                else
+                {
+                    throw new Exception($"Cannot inject member {script.name}.{memberInfo}."
+                        + $" Only Fields and Properties are supported for component injection via Unity methods.");
+                }
+            }
+            else
+            {
+                throw new Exception($"Cannot inject member {script.name}.{memberInfo.Name}."
+                    + $" No component of type {componentType} found using method {strategy}");
             }
         }
 

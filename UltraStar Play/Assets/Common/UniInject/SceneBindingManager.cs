@@ -35,9 +35,9 @@ namespace UniInject
             }
 
             // (4) Inject the bindings from the GlobalInjector into the objects that need injection.
-            foreach (InjectionData memberToBeInjected in injectionDatas)
+            foreach (InjectionData injectionData in injectionDatas)
             {
-                UniInject.GlobalInjector.InjectMember(memberToBeInjected.TargetObject, memberToBeInjected.MemberInfo, memberToBeInjected.InjectionKeys);
+                UniInject.GlobalInjector.Inject(injectionData);
             }
         }
 
@@ -57,57 +57,6 @@ namespace UniInject
             foreach (Transform child in gameObject.transform)
             {
                 AnalyzeScriptsRecursively(child.gameObject);
-            }
-        }
-
-        private void AnalyzeInjectComponentAttribute(MonoBehaviour script, MemberInfo memberInfo)
-        {
-            InjectComponentAttribute injectComponentAttribute = memberInfo.GetCustomAttribute<InjectComponentAttribute>();
-            if (injectComponentAttribute != null)
-            {
-                DoComponentInjection(script, memberInfo, injectComponentAttribute);
-            }
-        }
-
-        private void DoComponentInjection(MonoBehaviour script, MemberInfo memberInfo, InjectComponentAttribute injectComponentAttribute)
-        {
-            Type componentType = ReflectionUtils.GetTypeOfFieldOrProperty(script, memberInfo);
-            object component = null;
-            switch (injectComponentAttribute.GetComponentMethod)
-            {
-                case GetComponentMethods.GetComponent:
-                    component = script.GetComponent(componentType);
-                    break;
-                case GetComponentMethods.GetComponentInChildren:
-                    component = script.GetComponentInChildren(componentType);
-                    break;
-                case GetComponentMethods.GetComponentInParent:
-                    component = script.GetComponentInParent(componentType);
-                    break;
-                case GetComponentMethods.FindObjectOfType:
-                    component = FindObjectOfType(componentType);
-                    break;
-            }
-            if (component != null)
-            {
-                if (memberInfo is FieldInfo)
-                {
-                    (memberInfo as FieldInfo).SetValue(script, component);
-                }
-                else if (memberInfo is PropertyInfo)
-                {
-                    (memberInfo as PropertyInfo).SetValue(script, component);
-                }
-                else
-                {
-                    throw new Exception($"Cannot inject member {script.name}.{memberInfo}."
-                                       + " Only Fields and Properties are supported for component injection via Unity methods.");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Cannot inject member {script.name}.{memberInfo.Name}."
-                              + $" No component of type {componentType} found using method {injectComponentAttribute.GetComponentMethod}");
             }
         }
     }

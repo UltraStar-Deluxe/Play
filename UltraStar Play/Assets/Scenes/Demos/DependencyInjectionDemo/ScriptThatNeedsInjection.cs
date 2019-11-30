@@ -8,6 +8,22 @@ using static UniInject.UniInject;
 
 public class ScriptThatNeedsInjection : MonoBehaviour
 {
+    // Inject field via GetComponentInChildren
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private ChildOfScriptThatNeedsInjection child;
+
+    // Inject property via GetComponentInParent
+    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    private ParentOfScriptThatNeedsInjection Parent { get; set; }
+
+    // Inject readonly field via GetComponentInParent
+    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    private readonly OtherComponentOfScriptThatNeedsInjection siblingComponent;
+
+    // Inject readonly property via FindObjectOfType
+    [Inject(searchMethod = SearchMethods.FindObjectOfType)]
+    private readonly Canvas canvas;
+
     // Inject field
     [Inject]
     private SettingsManager settingsManager;
@@ -20,25 +36,11 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     [Inject(key = "author")]
     private string nameOfAuthor { get; set; }
 
-    // Inject field via GetComponentInChildren
-    [InjectComponent(GetComponentMethods.GetComponentInChildren)]
-    private ChildOfScriptThatNeedsInjection child;
-
-    // Inject property via GetComponentInParent
-    [InjectComponent(GetComponentMethods.GetComponentInParent)]
-    private ParentOfScriptThatNeedsInjection Parent { get; set; }
-
-    // Inject readonly field via GetComponentInParent
-    [InjectComponent(GetComponentMethods.GetComponentInParent)]
-    private readonly OtherComponentOfScriptThatNeedsInjection siblingComponent;
-
-    // Inject readonly property via FindObjectOfType
-    [InjectComponent(GetComponentMethods.FindObjectOfType)]
-    private readonly Canvas canvas;
-
-    // The instance of this field is created during injection. And the new instance itself is injected.
+    // The instance of this field is created during injection.
+    // Depending how the interface is bound (singleton or not),
+    // the instances of demoInterfaceInstance1 and demoInterfaceInstance2 will be the same or different objects.
     [Inject]
-    private IDependencyInjectionDemoInterface demoInterfaceInstance1;
+    private readonly IDependencyInjectionDemoInterface demoInterfaceInstance1;
 
     [Inject]
     private IDependencyInjectionDemoInterface demoInterfaceInstance2;

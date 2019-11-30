@@ -8,7 +8,7 @@ namespace UniInject
         public static Injector GlobalInjector { get; set; } = new Injector(null);
 
         // Holds information how to instantiate objects of types during Dependency Injection.
-        // This incldes the parameters that must be resolved to call the constructor.
+        // This includes the parameters that must be resolved to call the constructor.
         private static readonly Dictionary<Type, ConstructorInjectionData> constructorInjectionDatas = new Dictionary<Type, ConstructorInjectionData>();
 
         public static ConstructorInjectionData GetConstructorInjectionData(Type type)

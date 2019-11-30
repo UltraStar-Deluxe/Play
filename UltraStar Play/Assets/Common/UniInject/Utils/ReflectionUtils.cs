@@ -54,7 +54,7 @@ namespace UniInject
                 injectionKey = typeOfMember;
             }
             object[] injectionKeys = new object[] { injectionKey };
-            InjectionData injectionData = new InjectionData(obj, memberInfo, injectionKeys);
+            InjectionData injectionData = new InjectionData(obj, memberInfo, injectionKeys, injectAttribute.searchMethod);
             return injectionData;
         }
 
@@ -68,7 +68,7 @@ namespace UniInject
                 int parameterIndex = parameterInfo.Position;
                 injectionKeys[parameterIndex] = injectionKey;
             }
-            InjectionData injectionData = new InjectionData(obj, methodInfo, injectionKeys);
+            InjectionData injectionData = new InjectionData(obj, methodInfo, injectionKeys, injectAttribute.searchMethod);
             return injectionData;
         }
 
