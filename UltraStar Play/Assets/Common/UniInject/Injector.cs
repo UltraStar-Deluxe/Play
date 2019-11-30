@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
 namespace UniInject
 {
@@ -69,6 +68,11 @@ namespace UniInject
             }
         }
 
+        internal object[] GetValuesForConstructorInjection(Type type)
+        {
+            return null;
+        }
+
         private object[] GetValuesToBeInjected(object[] bindingKeys)
         {
             object[] valuesToBeInjected = new object[bindingKeys.Length];
@@ -76,7 +80,15 @@ namespace UniInject
             foreach (object bindingKey in bindingKeys)
             {
                 IBinding binding = GetBinding(bindingKey);
-                object valueToBeInjected = binding.GetProvider().Get();
+                IProvider provider = binding.GetProvider();
+
+                // Providers that create new instances must inject newly created instances with the injector.
+                if (provider is NewInstancesProvider)
+                {
+                    (provider as NewInstancesProvider).SetInjector(this);
+                }
+
+                object valueToBeInjected = provider.Get();
                 valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {bindingKey} is null");
                 index++;
             }

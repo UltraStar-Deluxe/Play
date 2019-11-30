@@ -11,6 +11,7 @@ public class DependencyInjectionDemoBinder : MonoBehaviour, IBinder
         bb.Bind("author").ToInstance("Tolkien");
         bb.Bind(typeof(int)).ToInstance(42);
         bb.Bind("personWithAge").ToInstance("Bob");
+        bb.Bind(typeof(IDependencyInjectionDemoInterface)).ToNewInstancesOfType(typeof(DependencyInjectionDemoInterfaceImpl));
         return bb.GetBindings();
     }
 }

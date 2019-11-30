@@ -35,7 +35,14 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     [InjectComponent(GetComponentMethods.FindObjectOfType)]
     private readonly Canvas canvas;
 
-    // Field for method injection
+    // The instance of this field is created during injection. And the new instance itself is injected.
+    [Inject]
+    private IDependencyInjectionDemoInterface demoInterfaceInstance1;
+
+    [Inject]
+    private IDependencyInjectionDemoInterface demoInterfaceInstance2;
+
+    // This field is set in a method via method injection
     private string methodInjectionField;
 
     [Inject]
@@ -58,5 +65,8 @@ public class ScriptThatNeedsInjection : MonoBehaviour
         Debug.Log("Author: " + nameOfAuthor);
 
         Debug.Log("Field from method injection:" + methodInjectionField);
+
+        Debug.Log("Newly created instance of an interface (field 1):" + demoInterfaceInstance1.GetGreeting());
+        Debug.Log("Newly created instance of an interface (field 2):" + demoInterfaceInstance2.GetGreeting());
     }
 }
