@@ -88,7 +88,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour
         Debug.Log("Optional sceneNavigator: " + sceneNavigator);
         Debug.Log("Optional uiText: " + uiText);
 
-        Debug.Log("An int: " + GlobalInjector.GetInstance<int>());
-        Debug.Log("An instance of an interface: " + GlobalInjector.GetInstance<IDependencyInjectionDemoInterface>());
+        Debug.Log("An int: " + SceneInjector.GetInstance<int>());
+        Debug.Log("An instance of an interface: " + SceneInjector.GetInstance<IDependencyInjectionDemoInterface>());
     }
 }

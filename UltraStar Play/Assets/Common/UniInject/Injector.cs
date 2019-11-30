@@ -8,13 +8,17 @@ namespace UniInject
 {
     public class Injector
     {
+        // The parent Injector.
+        // If a binding is not found in this Injector, then it is searched in the parent injectors recursively.
         public Injector ParentInjector { get; private set; }
 
         private readonly List<IBinding> bindings = new List<IBinding>();
 
         private HashSet<Type> getValuesForConstructorInjectionVisitedTypes = new HashSet<Type>();
 
-        public Injector(Injector parent)
+        private List<UnitySearchMethodMockup> unitySearchMethodMockups = new List<UnitySearchMethodMockup>();
+
+        internal Injector(Injector parent)
         {
             this.ParentInjector = parent;
         }
@@ -44,7 +48,7 @@ namespace UniInject
             return result;
         }
 
-        public void InjectAll(object target)
+        public void Inject(object target)
         {
             // Find all members to be injected via reflection.
             List<InjectionData> injectionDatas = ReflectionUtils.CreateInjectionDatas(target);
@@ -124,27 +128,16 @@ namespace UniInject
             }
         }
 
-        private void InjectMemberFromUnitySearchMethod(MonoBehaviour script, MemberInfo memberInfo, SearchMethods strategy, bool isOptional)
+        private void InjectMemberFromUnitySearchMethod(MonoBehaviour script, MemberInfo memberInfo, SearchMethods searchMethod, bool isOptional)
         {
             Type componentType = ReflectionUtils.GetTypeOfFieldOrProperty(script, memberInfo);
-            object component = null;
-            switch (strategy)
+
+            // For testing, searching in the scene hierarchy using a Unity method can be simulated to return a mockup for a component.
+            object component = GetComponentFromUnitySearchMethodMockups(script, searchMethod, componentType);
+            if (component == null)
             {
-                case SearchMethods.GetComponent:
-                    component = script.GetComponent(componentType);
-                    break;
-                case SearchMethods.GetComponentInChildren:
-                    component = script.GetComponentInChildren(componentType);
-                    break;
-                case SearchMethods.GetComponentInParent:
-                    component = script.GetComponentInParent(componentType);
-                    break;
-                case SearchMethods.FindObjectOfType:
-                    component = GameObject.FindObjectOfType(componentType);
-                    break;
-                default:
-                    throw new InjectionException($"Cannot inject {script.name}.{memberInfo.Name}."
-                        + $" Unkown Unity search method {strategy}");
+                // No mockup found, thus use the real Unity search method.
+                component = GetComponentFromUnitySearchMethod(script, searchMethod, componentType);
             }
 
             if (component != null)
@@ -166,7 +159,39 @@ namespace UniInject
             else if (!isOptional)
             {
                 throw new Exception($"Cannot inject member {script.name}.{memberInfo.Name}."
-                    + $" No component of type {componentType} found using method {strategy}");
+                    + $" No component of type {componentType} found using method {searchMethod}");
+            }
+        }
+
+        private object GetComponentFromUnitySearchMethodMockups(MonoBehaviour script, SearchMethods searchMethod, Type componentType)
+        {
+            foreach (UnitySearchMethodMockup unitySearchMethodMockup in unitySearchMethodMockups)
+            {
+                Type mockedSearchReturnType = unitySearchMethodMockup.searchResult.GetType();
+                bool callingScriptMatches = (unitySearchMethodMockup.callingScript == null || unitySearchMethodMockup.callingScript == script);
+                bool returnTypeMatches = componentType.IsAssignableFrom(mockedSearchReturnType);
+                if (callingScriptMatches && returnTypeMatches)
+                {
+                    return unitySearchMethodMockup.searchResult;
+                }
+            }
+            return null;
+        }
+
+        private UnityEngine.Object GetComponentFromUnitySearchMethod(MonoBehaviour script, SearchMethods searchMethod, Type componentType)
+        {
+            switch (searchMethod)
+            {
+                case SearchMethods.GetComponent:
+                    return script.GetComponent(componentType);
+                case SearchMethods.GetComponentInChildren:
+                    return script.GetComponentInChildren(componentType);
+                case SearchMethods.GetComponentInParent:
+                    return script.GetComponentInParent(componentType);
+                case SearchMethods.FindObjectOfType:
+                    return GameObject.FindObjectOfType(componentType);
+                default:
+                    throw new InjectionException($" Unkown Unity search method {searchMethod}");
             }
         }
 
@@ -226,6 +251,26 @@ namespace UniInject
         public void AddBinding(IBinding binding)
         {
             bindings.Add(binding);
+        }
+
+        public void MockUnitySearchMethod(MonoBehaviour callingScript, SearchMethods searchMethod, object searchResult)
+        {
+            UnitySearchMethodMockup unitySearchMethodMockup = new UnitySearchMethodMockup(callingScript, searchMethod, searchResult);
+            unitySearchMethodMockups.Add(unitySearchMethodMockup);
+        }
+
+        private class UnitySearchMethodMockup
+        {
+            public MonoBehaviour callingScript;
+            public SearchMethods searchMethod;
+            public object searchResult;
+
+            public UnitySearchMethodMockup(MonoBehaviour callingScript, SearchMethods searchMethod, object mockup)
+            {
+                this.callingScript = callingScript;
+                this.searchMethod = searchMethod;
+                this.searchResult = mockup;
+            }
         }
     }
 }
