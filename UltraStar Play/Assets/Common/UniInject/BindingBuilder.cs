@@ -68,6 +68,20 @@ namespace UniInject
                 this.binding = binding;
             }
 
+            public void ToNewInstancesOfType(Type type)
+            {
+                IProvider provider = new NewInstancesProvider(type);
+                IBinding binding = new Binding(key, provider);
+                this.binding = binding;
+            }
+
+            public void ToSingleInstanceOfType(Type type)
+            {
+                IProvider provider = new SingleInstanceProvider(type);
+                IBinding binding = new Binding(key, provider);
+                this.binding = binding;
+            }
+
             public void ToProvider(IProvider provider)
             {
                 IBinding binding = new Binding(key, provider);
