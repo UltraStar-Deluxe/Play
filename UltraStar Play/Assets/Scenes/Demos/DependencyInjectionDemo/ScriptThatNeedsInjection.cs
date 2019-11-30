@@ -35,6 +35,15 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     [InjectComponent(GetComponentMethods.FindObjectOfType)]
     private readonly Canvas canvas;
 
+    // Field for method injection
+    private string methodInjectionField;
+
+    [Inject]
+    private void SetMethodInjectionField([InjectionKey("personWithAge")] string personWithAge, int age)
+    {
+        this.methodInjectionField = $"{personWithAge} is {age} years old";
+    }
+
     void Start()
     {
         Debug.Log("SettingsManager: " + settingsManager);
@@ -47,5 +56,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour
         Debug.Log("Canvas: " + canvas);
 
         Debug.Log("Author: " + nameOfAuthor);
+
+        Debug.Log("Field from method injection:" + methodInjectionField);
     }
 }

@@ -21,35 +21,66 @@ namespace UniInject
         {
             // Find all members to be injected via reflection.
 
-            // Inject any existing bindings into the fields.
+            // Inject existing bindings into the fields.
         }
 
-        public void InjectMember(object target, MemberInfo memberInfo, object bindingKey)
+        public void InjectField(object target, FieldInfo fieldInfo, object bindingKey)
         {
-            IBinding matchingBinding;
+            InjectMember(target, fieldInfo, new object[] { bindingKey });
+        }
+
+        public void InjectProperty(object target, PropertyInfo propertyInfo, object bindingKey)
+        {
+            InjectMember(target, propertyInfo, new object[] { bindingKey });
+        }
+
+        public void InjectMethod(object target, MethodInfo propertyInfo, object[] bindingKeys)
+        {
+            InjectMember(target, propertyInfo, bindingKeys);
+        }
+
+        public void InjectMember(object target, MemberInfo memberInfo, object[] bindingKeys)
+        {
+            object[] valuesToBeInjected;
             try
             {
-                matchingBinding = GetBinding(bindingKey);
+                valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
             }
             catch (Exception e)
             {
-                throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}", e);
-            }
-
-            object bindingValue = matchingBinding.GetProvider().Get();
-            if (bindingValue == null)
-            {
-                throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}. The value for the key {bindingKey} that should be injected is null.");
+                throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}: " + e.Message, e);
             }
 
             if (memberInfo is FieldInfo)
             {
-                (memberInfo as FieldInfo).SetValue(target, bindingValue);
+                (memberInfo as FieldInfo).SetValue(target, valuesToBeInjected[0]);
             }
             else if (memberInfo is PropertyInfo)
             {
-                (memberInfo as PropertyInfo).SetValue(target, bindingValue);
+                (memberInfo as PropertyInfo).SetValue(target, valuesToBeInjected[0]);
             }
+            else if (memberInfo is MethodInfo)
+            {
+                (memberInfo as MethodInfo).Invoke(target, valuesToBeInjected);
+            }
+            else
+            {
+                throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}. Only Fields, Properties and Methods are supported for injection.");
+            }
+        }
+
+        private object[] GetValuesToBeInjected(object[] bindingKeys)
+        {
+            object[] valuesToBeInjected = new object[bindingKeys.Length];
+            int index = 0;
+            foreach (object bindingKey in bindingKeys)
+            {
+                IBinding binding = GetBinding(bindingKey);
+                object valueToBeInjected = binding.GetProvider().Get();
+                valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {bindingKey} is null");
+                index++;
+            }
+            return valuesToBeInjected;
         }
 
         private IBinding GetBinding(object bindingKey)
