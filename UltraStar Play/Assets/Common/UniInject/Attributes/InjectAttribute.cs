@@ -10,6 +10,8 @@ namespace UniInject
     {
         public object key;
 
+        public SearchMethods searchMethod = SearchMethods.SearchInBindings;
+
         public InjectAttribute()
         {
         }

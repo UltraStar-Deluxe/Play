@@ -43,7 +43,7 @@ namespace UniInject
                 result = Activator.CreateInstance(type, constructorParameters);
             }
 
-            injector.InjectMembers(result);
+            injector.Inject(result);
 
             return result;
         }
