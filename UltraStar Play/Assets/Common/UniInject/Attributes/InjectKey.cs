@@ -1,6 +1,6 @@
 using System;
 
-namespace UniInject.Attributes
+namespace UniInject
 {
     [AttributeUsage(AttributeTargets.Parameter)]
     public class InjectionKeyAttribute : Attribute

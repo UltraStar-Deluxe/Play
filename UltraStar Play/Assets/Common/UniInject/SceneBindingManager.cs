@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UniInject.Attributes;
+using UniInject;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,25 +16,25 @@ namespace UniInject
         void Awake()
         {
             // (1) Iterate over scene hierarchy, thereby
-            // (a) find InjectorConfig instances
-            // (b) find objects that need injection
+            // (a) find IBinder instances.
+            // (b) find objects that need injection and how their members should be injected.
             GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
             foreach (GameObject rootObject in rootObjects)
             {
                 AnalyzeScriptsRecursively(rootObject);
             }
 
-            // (2) Store bindings of InjectorConfigs in the GlobalInjector
-            foreach (IBinder injectorConfig in binders)
+            // (2) Store bindings in the GlobalInjector
+            foreach (IBinder binder in binders)
             {
-                List<IBinding> bindings = injectorConfig.GetBindings();
+                List<IBinding> bindings = binder.GetBindings();
                 foreach (IBinding binding in bindings)
                 {
                     UniInject.GlobalInjector.AddBinding(binding);
                 }
             }
 
-            // (3) Inject the bindings from the GlobalInjector into the objects that need injection.
+            // (4) Inject the bindings from the GlobalInjector into the objects that need injection.
             foreach (InjectionData memberToBeInjected in injectionDatas)
             {
                 UniInject.GlobalInjector.InjectMember(memberToBeInjected.TargetObject, memberToBeInjected.MemberInfo, memberToBeInjected.InjectionKeys);
@@ -50,98 +50,14 @@ namespace UniInject
                 {
                     binders.Add(script as IBinder);
                 }
-                AnalyzeInjectionAnnotations(script);
+                List<InjectionData> newInjectionDatas = ReflectionUtils.CreateInjectionDatas(script);
+                injectionDatas.AddRange(newInjectionDatas);
             }
 
             foreach (Transform child in gameObject.transform)
             {
                 AnalyzeScriptsRecursively(child.gameObject);
             }
-        }
-
-        private void AnalyzeInjectionAnnotations(MonoBehaviour script)
-        {
-            Type type = script.GetType();
-            MemberInfo[] memberInfos = type.GetMembers(BindingFlags.Public
-                                                  | BindingFlags.NonPublic
-                                                  | BindingFlags.Instance);
-            foreach (MemberInfo memberInfo in memberInfos)
-            {
-                AnalyzeInjectAttribute(script, memberInfo);
-                AnalyzeInjectComponentAttribute(script, memberInfo);
-            }
-        }
-
-        private void AnalyzeInjectAttribute(MonoBehaviour script, MemberInfo memberInfo)
-        {
-            InjectAttribute injectAttribute = memberInfo.GetCustomAttribute<InjectAttribute>();
-            if (injectAttribute != null)
-            {
-                InjectionData injectionData = null;
-                if (memberInfo is FieldInfo || memberInfo is PropertyInfo)
-                {
-                    injectionData = CreateInjectionDataForFieldOrProperty(script, memberInfo, injectAttribute);
-                }
-                else if (memberInfo is MethodInfo)
-                {
-                    injectionData = CreateInjectionDataForMethod(script, memberInfo as MethodInfo, injectAttribute);
-                }
-
-                if (injectionData != null)
-                {
-                    injectionDatas.Add(injectionData);
-                }
-            }
-        }
-
-        private InjectionData CreateInjectionDataForMethod(MonoBehaviour script, MethodInfo methodInfo, InjectAttribute injectAttribute)
-        {
-            ParameterInfo[] parameterInfos = methodInfo.GetParameters();
-            object[] injectionKeys = new object[parameterInfos.Length];
-            foreach (ParameterInfo parameterInfo in parameterInfos)
-            {
-                InjectionKeyAttribute injectionKeyAttribute = parameterInfo.GetCustomAttribute<InjectionKeyAttribute>();
-                object injectionKey;
-                if (injectionKeyAttribute != null)
-                {
-                    injectionKey = injectionKeyAttribute.key;
-                }
-                else
-                {
-                    Type typeOfParameter = parameterInfo.ParameterType;
-                    injectionKey = typeOfParameter;
-                }
-                int parameterIndex = parameterInfo.Position;
-                injectionKeys[parameterIndex] = injectionKey;
-            }
-            InjectionData injectionData = new InjectionData(script, methodInfo, injectionKeys);
-            return injectionData;
-        }
-
-        private InjectionData CreateInjectionDataForFieldOrProperty(MonoBehaviour script, MemberInfo memberInfo, InjectAttribute injectAttribute)
-        {
-            object injectionKey = injectAttribute.key;
-            if (injectionKey == null)
-            {
-                Type typeOfMember = GetTypeOfFieldOrProperty(script, memberInfo);
-                injectionKey = typeOfMember;
-            }
-            object[] injectionKeys = new object[] { injectionKey };
-            InjectionData injectionData = new InjectionData(script, memberInfo, injectionKeys);
-            return injectionData;
-        }
-
-        private Type GetTypeOfFieldOrProperty(MonoBehaviour script, MemberInfo memberInfo)
-        {
-            if (memberInfo is FieldInfo)
-            {
-                return (memberInfo as FieldInfo).FieldType;
-            }
-            else if (memberInfo is PropertyInfo)
-            {
-                return (memberInfo as PropertyInfo).PropertyType;
-            }
-            throw new InjectionException($"Member is not supported for injection: {script.name}.{memberInfo.Name}");
         }
 
         private void AnalyzeInjectComponentAttribute(MonoBehaviour script, MemberInfo memberInfo)
@@ -155,7 +71,7 @@ namespace UniInject
 
         private void DoComponentInjection(MonoBehaviour script, MemberInfo memberInfo, InjectComponentAttribute injectComponentAttribute)
         {
-            Type componentType = GetTypeOfFieldOrProperty(script, memberInfo);
+            Type componentType = ReflectionUtils.GetTypeOfFieldOrProperty(script, memberInfo);
             object component = null;
             switch (injectComponentAttribute.GetComponentMethod)
             {
@@ -192,26 +108,6 @@ namespace UniInject
             {
                 Debug.LogError($"Cannot inject member {script.name}.{memberInfo.Name}."
                               + $" No component of type {componentType} found using method {injectComponentAttribute.GetComponentMethod}");
-            }
-        }
-
-        private class InjectionData
-        {
-            // The object that needs injection. The member belongs to this object.
-            public object TargetObject { get; private set; }
-
-            // The member of the target object that needs injection.
-            public MemberInfo MemberInfo { get; private set; }
-
-            // A method can have a multiple parameters and all of them have to be injected.
-            // Thus, there can be multiple injectionKeys for a member.
-            public object[] InjectionKeys { get; private set; }
-
-            public InjectionData(object targetObject, MemberInfo memberInfo, object[] injectionKeys)
-            {
-                this.TargetObject = targetObject;
-                this.MemberInfo = memberInfo;
-                this.InjectionKeys = injectionKeys;
             }
         }
     }

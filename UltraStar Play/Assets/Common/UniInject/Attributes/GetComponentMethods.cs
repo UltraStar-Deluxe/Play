@@ -1,4 +1,4 @@
-namespace UniInject.Attributes
+namespace UniInject
 {
     public enum GetComponentMethods
     {

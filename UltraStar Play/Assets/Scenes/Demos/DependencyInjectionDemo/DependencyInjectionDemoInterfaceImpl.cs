@@ -16,4 +16,9 @@ public class DependencyInjectionDemoInterfaceImpl : IDependencyInjectionDemoInte
     {
         return $"Hello world from instance {instanceIndex}!";
     }
+
+    public override string ToString()
+    {
+        return GetGreeting() + " (DependencyInjectionDemoInterfaceImpl)";
+    }
 }

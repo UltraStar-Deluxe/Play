@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace UniInject
 {
@@ -11,9 +12,36 @@ namespace UniInject
 
         private readonly List<IBinding> bindings = new List<IBinding>();
 
+        private HashSet<Type> getValuesForConstructorInjectionVisitedTypes = new HashSet<Type>();
+
         public Injector(Injector parent)
         {
             this.ParentInjector = parent;
+        }
+
+        public T GetInstance<T>()
+        {
+            object result = GetInstance(typeof(T));
+            if (result is T t)
+            {
+                return t;
+            }
+            throw new InjectionException($"Cannot create instance of type {typeof(T)}. No binding found.");
+        }
+
+        public object GetInstance(object bindingKey)
+        {
+            IBinding binding = GetBinding(bindingKey);
+            IProvider provider = binding.GetProvider();
+
+            // A provider that creates new instances must inject newly created instances with the injector.
+            if (provider is NewInstancesProvider)
+            {
+                (provider as NewInstancesProvider).SetInjector(this);
+            }
+
+            object result = provider.Get();
+            return result;
         }
 
         public void InjectMembers(object target)
@@ -44,51 +72,63 @@ namespace UniInject
             try
             {
                 valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                if (valuesToBeInjected == null)
+                {
+                    throw new InjectionException("No values to be injected.");
+                }
+
+                if (memberInfo is FieldInfo)
+                {
+                    (memberInfo as FieldInfo).SetValue(target, valuesToBeInjected[0]);
+                }
+                else if (memberInfo is PropertyInfo)
+                {
+                    (memberInfo as PropertyInfo).SetValue(target, valuesToBeInjected[0]);
+                }
+                else if (memberInfo is MethodInfo)
+                {
+                    (memberInfo as MethodInfo).Invoke(target, valuesToBeInjected);
+                }
+                else
+                {
+                    throw new InjectionException($"Only Fields, Properties and Methods are supported for injection.");
+                }
+
             }
             catch (Exception e)
             {
                 throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}: " + e.Message, e);
             }
-
-            if (memberInfo is FieldInfo)
-            {
-                (memberInfo as FieldInfo).SetValue(target, valuesToBeInjected[0]);
-            }
-            else if (memberInfo is PropertyInfo)
-            {
-                (memberInfo as PropertyInfo).SetValue(target, valuesToBeInjected[0]);
-            }
-            else if (memberInfo is MethodInfo)
-            {
-                (memberInfo as MethodInfo).Invoke(target, valuesToBeInjected);
-            }
-            else
-            {
-                throw new InjectionException($"Cannot inject {target}.{memberInfo.Name}. Only Fields, Properties and Methods are supported for injection.");
-            }
         }
 
         internal object[] GetValuesForConstructorInjection(Type type)
         {
-            return null;
+            if (getValuesForConstructorInjectionVisitedTypes.Contains(type))
+            {
+                throw new InjectionException($"Circular dependencies in the constructor parameters of type {type}");
+            }
+            getValuesForConstructorInjectionVisitedTypes.Add(type);
+
+            ConstructorInjectionData constructorInjectionData = UniInject.GetConstructorInjectionData(type);
+            object[] bindingKeys = constructorInjectionData.InjectionKeys;
+            object[] result = GetValuesToBeInjected(bindingKeys);
+
+            getValuesForConstructorInjectionVisitedTypes.Remove(type);
+            return result;
         }
 
         private object[] GetValuesToBeInjected(object[] bindingKeys)
         {
+            if (bindingKeys == null)
+            {
+                return null;
+            }
+
             object[] valuesToBeInjected = new object[bindingKeys.Length];
             int index = 0;
             foreach (object bindingKey in bindingKeys)
             {
-                IBinding binding = GetBinding(bindingKey);
-                IProvider provider = binding.GetProvider();
-
-                // Providers that create new instances must inject newly created instances with the injector.
-                if (provider is NewInstancesProvider)
-                {
-                    (provider as NewInstancesProvider).SetInjector(this);
-                }
-
-                object valueToBeInjected = provider.Get();
+                object valueToBeInjected = GetInstance(bindingKey);
                 valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {bindingKey} is null");
                 index++;
             }

@@ -1,5 +1,6 @@
-﻿using UniInject.Attributes;
+﻿using UniInject;
 using UnityEngine;
+using static UniInject.UniInject;
 
 // Ignore warnings about unassigned fields.
 // Their values are injected, but this is not visible to the compiler.
@@ -42,6 +43,9 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     [Inject]
     private IDependencyInjectionDemoInterface demoInterfaceInstance2;
 
+    [Inject]
+    private IDependencyInjectionDemoInterfaceWithConstructorParameters demoInterfaceInstanceWithConstructorParameters;
+
     // This field is set in a method via method injection
     private string methodInjectionField;
 
@@ -66,7 +70,12 @@ public class ScriptThatNeedsInjection : MonoBehaviour
 
         Debug.Log("Field from method injection:" + methodInjectionField);
 
-        Debug.Log("Newly created instance of an interface (field 1):" + demoInterfaceInstance1.GetGreeting());
-        Debug.Log("Newly created instance of an interface (field 2):" + demoInterfaceInstance2.GetGreeting());
+        Debug.Log("Instance of an interface (field 1):" + demoInterfaceInstance1.GetGreeting());
+        Debug.Log("Instance of an interface (field 2):" + demoInterfaceInstance2.GetGreeting());
+
+        Debug.Log("Instance of an interface with constructor parameters:" + demoInterfaceInstanceWithConstructorParameters.GetByeBye());
+
+        Debug.Log("An int: " + GlobalInjector.GetInstance<int>());
+        Debug.Log("An instance of an interface: " + GlobalInjector.GetInstance<IDependencyInjectionDemoInterface>());
     }
 }

@@ -28,7 +28,7 @@ namespace UniInject
         {
             if (injector == null)
             {
-                throw new InjectionException("Missing injector for instantiation of new object.");
+                throw new InjectionException($"{typeof(NewInstancesProvider)} - Missing injector for instantiation of new object.");
             }
 
             object result;
