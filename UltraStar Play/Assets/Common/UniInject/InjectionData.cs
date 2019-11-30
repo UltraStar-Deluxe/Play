@@ -18,17 +18,20 @@ namespace UniInject
 
         public SearchMethods searchMethod;
 
-        public InjectionData(object targetObject, MemberInfo memberInfo, object injectionKey, SearchMethods strategy)
-            : this(targetObject, memberInfo, new object[] { injectionKey }, strategy)
+        public bool isOptional;
+
+        public InjectionData(object targetObject, MemberInfo memberInfo, object injectionKey, SearchMethods strategy, bool isOptional)
+            : this(targetObject, memberInfo, new object[] { injectionKey }, strategy, isOptional)
         {
         }
 
-        public InjectionData(object targetObject, MemberInfo memberInfo, object[] injectionKeys, SearchMethods strategy)
+        public InjectionData(object targetObject, MemberInfo memberInfo, object[] injectionKeys, SearchMethods strategy, bool isOptional)
         {
             this.TargetObject = targetObject;
             this.MemberInfo = memberInfo;
             this.InjectionKeys = injectionKeys;
             this.searchMethod = strategy;
+            this.isOptional = isOptional;
         }
     }
 
