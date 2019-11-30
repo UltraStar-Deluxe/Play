@@ -9,6 +9,8 @@ public class DependencyInjectionDemoBinder : MonoBehaviour, IBinder
     {
         BindingBuilder bb = new BindingBuilder();
         bb.Bind("author").ToInstance("Tolkien");
+        bb.Bind(typeof(int)).ToInstance(42);
+        bb.Bind("personWithAge").ToInstance("Bob");
         return bb.GetBindings();
     }
 }
