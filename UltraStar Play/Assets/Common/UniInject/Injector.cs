@@ -302,15 +302,31 @@ namespace UniInject
             return matchingBindings[0];
         }
 
-        public void AddBinding(IBinding binding)
+        public void AddBindingForInstance<T>(T instance)
         {
-            bindings.Add(binding);
+            AddBindingForInstance(typeof(T), instance);
+        }
+
+        public void AddBindingForInstance<T>(object key, T instance)
+        {
+            IBinding binding = new Binding(key, new ExistingInstanceProvider<T>(instance));
+            AddBinding(binding);
         }
 
         public void AddBindings(BindingBuilder bindingBuilder)
         {
             List<IBinding> newBindings = bindingBuilder.GetBindings();
             newBindings.ForEach(newBinding => AddBinding(newBinding));
+        }
+
+        public void AddBinding(IBinding binding)
+        {
+            bindings.Add(binding);
+        }
+
+        public void ClearBindings()
+        {
+            bindings.Clear();
         }
 
         public void MockUnitySearchMethod(MonoBehaviour callingScript, SearchMethods searchMethod, object searchResult)
