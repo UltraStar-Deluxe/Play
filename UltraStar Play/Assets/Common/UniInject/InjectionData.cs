@@ -1,4 +1,5 @@
 
+using System;
 using System.Reflection;
 
 namespace UniInject
@@ -6,8 +7,8 @@ namespace UniInject
 
     public class InjectionData
     {
-        // The object that needs injection. The member belongs to this object.
-        public object TargetObject { get; private set; }
+        // The type that needs injection. The member belongs to this object.
+        public Type type;
 
         // The member of the target object that needs injection.
         public MemberInfo MemberInfo { get; private set; }
@@ -20,14 +21,14 @@ namespace UniInject
 
         public bool isOptional;
 
-        public InjectionData(object targetObject, MemberInfo memberInfo, object injectionKey, SearchMethods strategy, bool isOptional)
-            : this(targetObject, memberInfo, new object[] { injectionKey }, strategy, isOptional)
+        public InjectionData(Type type, MemberInfo memberInfo, object injectionKey, SearchMethods strategy, bool isOptional)
+            : this(type, memberInfo, new object[] { injectionKey }, strategy, isOptional)
         {
         }
 
-        public InjectionData(object targetObject, MemberInfo memberInfo, object[] injectionKeys, SearchMethods strategy, bool isOptional)
+        public InjectionData(Type type, MemberInfo memberInfo, object[] injectionKeys, SearchMethods strategy, bool isOptional)
         {
-            this.TargetObject = targetObject;
+            this.type = type;
             this.MemberInfo = memberInfo;
             this.InjectionKeys = injectionKeys;
             this.searchMethod = strategy;

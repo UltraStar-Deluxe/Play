@@ -1,23 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 namespace UniInject
 {
-    public static class ReflectionUtils
+    internal static class ReflectionUtils
     {
-        public static List<InjectionData> CreateInjectionDatas(object obj)
+        internal static List<InjectionData> CreateInjectionDatas(Type type)
         {
             List<InjectionData> result = new List<InjectionData>();
 
-            Type type = obj.GetType();
             MemberInfo[] memberInfos = type.GetMembers(BindingFlags.Public
                                                   | BindingFlags.NonPublic
                                                   | BindingFlags.Instance);
             foreach (MemberInfo memberInfo in memberInfos)
             {
-                InjectionData newInjectionData = CreateInjectionData(obj, memberInfo);
+                InjectionData newInjectionData = CreateInjectionData(type, memberInfo);
                 if (newInjectionData != null)
                 {
                     result.Add(newInjectionData);
@@ -26,7 +24,7 @@ namespace UniInject
             return result;
         }
 
-        public static InjectionData CreateInjectionData(object obj, MemberInfo memberInfo)
+        private static InjectionData CreateInjectionData(Type type, MemberInfo memberInfo)
         {
             InjectAttribute injectAttribute = memberInfo.GetCustomAttribute<InjectAttribute>();
             InjectionData result = null;
@@ -34,31 +32,31 @@ namespace UniInject
             {
                 if (memberInfo is FieldInfo || memberInfo is PropertyInfo)
                 {
-                    result = ReflectionUtils.CreateInjectionDataForFieldOrProperty(obj, memberInfo, injectAttribute);
+                    result = ReflectionUtils.CreateInjectionDataForFieldOrProperty(type, memberInfo, injectAttribute);
 
                 }
                 else if (memberInfo is MethodInfo)
                 {
-                    result = ReflectionUtils.CreateInjectionDataForMethod(obj, memberInfo as MethodInfo, injectAttribute);
+                    result = ReflectionUtils.CreateInjectionDataForMethod(type, memberInfo as MethodInfo, injectAttribute);
                 }
             }
             return result;
         }
 
-        public static InjectionData CreateInjectionDataForFieldOrProperty(object obj, MemberInfo memberInfo, InjectAttribute injectAttribute)
+        private static InjectionData CreateInjectionDataForFieldOrProperty(Type type, MemberInfo memberInfo, InjectAttribute injectAttribute)
         {
             object injectionKey = injectAttribute.key;
             if (injectionKey == null)
             {
-                Type typeOfMember = GetTypeOfFieldOrProperty(obj, memberInfo);
+                Type typeOfMember = GetTypeOfFieldOrProperty(type, memberInfo);
                 injectionKey = typeOfMember;
             }
             object[] injectionKeys = new object[] { injectionKey };
-            InjectionData injectionData = new InjectionData(obj, memberInfo, injectionKeys, injectAttribute.searchMethod, injectAttribute.optional);
+            InjectionData injectionData = new InjectionData(type, memberInfo, injectionKeys, injectAttribute.searchMethod, injectAttribute.optional);
             return injectionData;
         }
 
-        public static InjectionData CreateInjectionDataForMethod(object obj, MethodInfo methodInfo, InjectAttribute injectAttribute)
+        private static InjectionData CreateInjectionDataForMethod(Type type, MethodInfo methodInfo, InjectAttribute injectAttribute)
         {
             ParameterInfo[] parameterInfos = methodInfo.GetParameters();
             object[] injectionKeys = new object[parameterInfos.Length];
@@ -68,11 +66,11 @@ namespace UniInject
                 int parameterIndex = parameterInfo.Position;
                 injectionKeys[parameterIndex] = injectionKey;
             }
-            InjectionData injectionData = new InjectionData(obj, methodInfo, injectionKeys, injectAttribute.searchMethod, injectAttribute.optional);
+            InjectionData injectionData = new InjectionData(type, methodInfo, injectionKeys, injectAttribute.searchMethod, injectAttribute.optional);
             return injectionData;
         }
 
-        public static ConstructorInjectionData CreateConstructorInjectionData(Type type)
+        internal static ConstructorInjectionData CreateConstructorInjectionData(Type type)
         {
             ConstructorInfo[] constructorInfos = type.GetConstructors(BindingFlags.Public
                                                                     | BindingFlags.Instance);
@@ -121,7 +119,7 @@ namespace UniInject
             }
         }
 
-        public static ConstructorInjectionData CreateConstructorInjectionData(Type type, ConstructorInfo constructorInfo)
+        private static ConstructorInjectionData CreateConstructorInjectionData(Type type, ConstructorInfo constructorInfo)
         {
             ParameterInfo[] parameterInfos = constructorInfo.GetParameters();
             object[] injectionKeys = new object[parameterInfos.Length];
@@ -135,7 +133,7 @@ namespace UniInject
             return result;
         }
 
-        public static object GetInjectionKey(ParameterInfo parameterInfo)
+        private static object GetInjectionKey(ParameterInfo parameterInfo)
         {
             InjectionKeyAttribute injectionKeyAttribute = parameterInfo.GetCustomAttribute<InjectionKeyAttribute>();
             if (injectionKeyAttribute != null)
@@ -148,7 +146,7 @@ namespace UniInject
             }
         }
 
-        public static Type GetTypeOfFieldOrProperty(object obj, MemberInfo memberInfo)
+        internal static Type GetTypeOfFieldOrProperty(object obj, MemberInfo memberInfo)
         {
             if (memberInfo is FieldInfo)
             {
@@ -158,7 +156,7 @@ namespace UniInject
             {
                 return (memberInfo as PropertyInfo).PropertyType;
             }
-            throw new InjectionException($"Member is not supported for injection: {obj.GetType()}.{memberInfo.Name}");
+            throw new ArgumentException($"Member is neither a field nor a property: {obj.GetType()}.{memberInfo.Name}");
         }
     }
 }

@@ -95,30 +95,30 @@ namespace UniInject
             injectionKeyToObjectWithOngoingInjectionMap.Add(injectionKey, target);
 
             // Find all members to be injected via reflection.
-            List<InjectionData> injectionDatas = ReflectionUtils.CreateInjectionDatas(target);
+            List<InjectionData> injectionDatas = UniInjectUtils.GetInjectionDatas(target.GetType());
 
             // Inject existing bindings into the fields.
             foreach (InjectionData injectionData in injectionDatas)
             {
-                Inject(injectionData);
+                Inject(target, injectionData);
             }
 
             injectionKeyToObjectWithOngoingInjectionMap.Remove(injectionKey);
         }
 
-        public void Inject(InjectionData injectionData)
+        public void Inject(object target, InjectionData injectionData)
         {
             if (injectionData.searchMethod == SearchMethods.SearchInBindings)
             {
-                InjectMemberFromBindings(injectionData.TargetObject, injectionData.MemberInfo, injectionData.InjectionKeys, injectionData.isOptional);
+                InjectMemberFromBindings(target, injectionData.MemberInfo, injectionData.InjectionKeys, injectionData.isOptional);
             }
-            else if (injectionData.TargetObject is MonoBehaviour)
+            else if (target is MonoBehaviour)
             {
-                InjectMemberFromUnitySearchMethod(injectionData.TargetObject as MonoBehaviour, injectionData.MemberInfo, injectionData.searchMethod, injectionData.isOptional);
+                InjectMemberFromUnitySearchMethod(target as MonoBehaviour, injectionData.MemberInfo, injectionData.searchMethod, injectionData.isOptional);
             }
             else
             {
-                throw new InjectionException($"Cannot perform injection via {injectionData.searchMethod} into an object of type {injectionData.TargetObject.GetType()}."
+                throw new InjectionException($"Cannot perform injection via {injectionData.searchMethod} into an object of type {target.GetType()}."
                     + " Only MonoBehaviour instances are supported.");
             }
         }

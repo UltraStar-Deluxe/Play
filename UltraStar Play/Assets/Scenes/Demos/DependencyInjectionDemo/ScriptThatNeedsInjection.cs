@@ -25,13 +25,9 @@ public class ScriptThatNeedsInjection : MonoBehaviour
     [Inject(searchMethod = SearchMethods.FindObjectOfType)]
     private readonly Canvas canvas;
 
-    // Inject field
-    [Inject]
-    private SettingsManager settingsManager;
-
     // Inject property
     [Inject]
-    private Settings Settings { get; set; }
+    private SettingsManager SettingsManager { get; set; }
 
     // Inject optional
     [Inject(optional = true)]
@@ -67,8 +63,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("SettingsManager: " + settingsManager);
-        Debug.Log("Settings: " + Settings);
+        Debug.Log("SettingsManager: " + SettingsManager);
 
         Debug.Log("Parent: " + Parent);
         Debug.Log("Child: " + child);
