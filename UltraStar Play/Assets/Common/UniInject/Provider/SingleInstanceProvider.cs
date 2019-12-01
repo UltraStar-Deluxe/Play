@@ -2,21 +2,25 @@ using System;
 
 namespace UniInject
 {
-    public class SingleInstanceProvider : NewInstancesProvider
+    public class SingleInstanceProvider : IProvider
     {
-        private readonly Type type;
-
         private object singleInstance;
+        private readonly NewInstancesProvider newInstancesProvider;
 
-        public SingleInstanceProvider(Type type) : base(type)
+        public SingleInstanceProvider(Type type)
         {
+            newInstancesProvider = new NewInstancesProvider(type);
         }
 
-        public override object Get()
+        public object Get(Injector injector, out bool resultNeedsInjection)
         {
             if (singleInstance == null)
             {
-                singleInstance = base.CreateInstance();
+                singleInstance = newInstancesProvider.Get(injector, out resultNeedsInjection);
+            }
+            else
+            {
+                resultNeedsInjection = false;
             }
             return singleInstance;
         }

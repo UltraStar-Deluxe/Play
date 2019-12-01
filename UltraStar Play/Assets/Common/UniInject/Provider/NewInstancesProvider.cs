@@ -6,29 +6,16 @@ namespace UniInject
     {
         private readonly Type type;
 
-        private Injector injector;
-
         public NewInstancesProvider(Type type)
         {
             this.type = type;
         }
 
-        public void SetInjector(Injector injector)
-        {
-            this.injector = injector;
-        }
-
-        public virtual object Get()
-        {
-            object instance = CreateInstance();
-            return instance;
-        }
-
-        protected object CreateInstance()
+        public object Get(Injector injector, out bool resultNeedsInjection)
         {
             if (injector == null)
             {
-                throw new InjectionException($"{typeof(NewInstancesProvider)} - Missing injector for instantiation of new object.");
+                throw new InjectionException($"Missing Injector for instantiation of new object.");
             }
 
             object result;
@@ -42,9 +29,7 @@ namespace UniInject
                 // Instantiate with constructor injection
                 result = Activator.CreateInstance(type, constructorParameters);
             }
-
-            injector.Inject(result);
-
+            resultNeedsInjection = true;
             return result;
         }
     }
