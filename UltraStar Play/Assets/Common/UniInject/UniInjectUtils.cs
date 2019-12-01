@@ -13,17 +13,31 @@ namespace UniInject
 
         // Holds information how to instantiate objects of types during Dependency Injection.
         // This includes the parameters that must be resolved to call the constructor.
-        private static readonly Dictionary<Type, ConstructorInjectionData> constructorInjectionDatas = new Dictionary<Type, ConstructorInjectionData>();
+        private static readonly Dictionary<Type, ConstructorInjectionData> typeToConstructorInjectionDataMap = new Dictionary<Type, ConstructorInjectionData>();
+
+        // Holds information about members (fields, properties, methods) that need injection.
+        private static readonly Dictionary<Type, List<InjectionData>> typeToInjectionDatasMap = new Dictionary<Type, List<InjectionData>>();
 
         public static ConstructorInjectionData GetConstructorInjectionData(Type type)
         {
-            bool foundInjectionData = constructorInjectionDatas.TryGetValue(type, out ConstructorInjectionData injectionData);
-            if (!foundInjectionData)
+            bool found = typeToConstructorInjectionDataMap.TryGetValue(type, out ConstructorInjectionData injectionData);
+            if (!found)
             {
                 injectionData = ReflectionUtils.CreateConstructorInjectionData(type);
-                constructorInjectionDatas[type] = injectionData;
+                typeToConstructorInjectionDataMap.Add(type, injectionData);
             }
             return injectionData;
+        }
+
+        public static List<InjectionData> GetInjectionDatas(Type type)
+        {
+            bool found = typeToInjectionDatasMap.TryGetValue(type, out List<InjectionData> injectionDatas);
+            if (!found)
+            {
+                injectionDatas = ReflectionUtils.CreateInjectionDatas(type);
+                typeToInjectionDatasMap.Add(type, injectionDatas);
+            }
+            return injectionDatas;
         }
 
         // Creates a new Injector.
