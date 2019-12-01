@@ -215,8 +215,9 @@ namespace UniInject
             {
                 Type mockedSearchReturnType = unitySearchMethodMockup.searchResult.GetType();
                 bool callingScriptMatches = (unitySearchMethodMockup.callingScript == null || unitySearchMethodMockup.callingScript == script);
+                bool searchMethodMatches = (unitySearchMethodMockup.searchMethod == searchMethod);
                 bool returnTypeMatches = componentType.IsAssignableFrom(mockedSearchReturnType);
-                if (callingScriptMatches && returnTypeMatches)
+                if (callingScriptMatches && searchMethodMatches && returnTypeMatches)
                 {
                     return unitySearchMethodMockup.searchResult;
                 }
