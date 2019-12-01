@@ -11,6 +11,7 @@ namespace UniInject
         {
         }
 
+        // Equivalent to Bind(typeof(T)).ToExistingInstance(instance);
         public void BindExistingInstance<T>(T instance)
         {
             BindingUnderConstruction b = new BindingUnderConstruction(typeof(T));
@@ -18,14 +19,16 @@ namespace UniInject
             b.ToExistingInstance(instance);
         }
 
-        public void BindTypeToNewInstancesOfIt(Type type)
+        // Equivalent to Bind(type).ToNewInstancesOfType(type);
+        public void BindTypeToNewInstances(Type type)
         {
             BindingUnderConstruction b = new BindingUnderConstruction(type);
             bindingsUnderConstruction.Add(b);
             b.ToNewInstancesOfType(type);
         }
 
-        public void BindTypeToSingleInstanceOfIt(Type type)
+        // Equivalent to Bind(type).ToSingleInstanceOfType(type);
+        public void BindTypeToSingleInstance(Type type)
         {
             BindingUnderConstruction b = new BindingUnderConstruction(type);
             bindingsUnderConstruction.Add(b);

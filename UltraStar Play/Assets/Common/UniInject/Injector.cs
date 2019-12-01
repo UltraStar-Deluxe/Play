@@ -24,9 +24,30 @@ namespace UniInject
             this.ParentInjector = parent;
         }
 
+        internal object Create(Type type)
+        {
+            object newInstance;
+            object[] constructorParameters = GetValuesForConstructorInjection(type);
+            if (constructorParameters == null)
+            {
+                newInstance = Activator.CreateInstance(type);
+            }
+            else
+            {
+                newInstance = Activator.CreateInstance(type, constructorParameters);
+            }
+            return newInstance;
+        }
+
+        public T Create<T>()
+        {
+            T newInstance = (T)Create(typeof(T));
+            return newInstance;
+        }
+
         public T CreateAndInject<T>()
         {
-            T newInstance = (T)Activator.CreateInstance(typeof(T));
+            T newInstance = Create<T>();
             Inject(newInstance);
             return newInstance;
         }
@@ -224,7 +245,7 @@ namespace UniInject
         {
             if (getValuesForConstructorInjectionVisitedTypes.Contains(type))
             {
-                throw new InjectionException($"Circular dependencies in the constructor parameters of type {type}");
+                throw new CyclicConstructorDependenciesException($"Circular dependencies in the constructor parameters of type {type}");
             }
             getValuesForConstructorInjectionVisitedTypes.Add(type);
 

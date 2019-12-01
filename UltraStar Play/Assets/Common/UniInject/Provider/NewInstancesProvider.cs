@@ -18,17 +18,7 @@ namespace UniInject
                 throw new InjectionException($"Missing Injector for instantiation of new object.");
             }
 
-            object result;
-            object[] constructorParameters = injector.GetValuesForConstructorInjection(type);
-            if (constructorParameters == null)
-            {
-                result = Activator.CreateInstance(type);
-            }
-            else
-            {
-                // Instantiate with constructor injection
-                result = Activator.CreateInstance(type, constructorParameters);
-            }
+            object result = injector.Create(type);
             resultNeedsInjection = true;
             return result;
         }
