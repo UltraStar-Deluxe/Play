@@ -12,13 +12,15 @@ namespace UniInject
         [Test]
         public void FieldInjectionFromExistingInstance()
         {
-            string stringInstance = "abc";
+            BindingBuilder bb = new BindingBuilder();
+            bb.BindExistingInstance("abc");
+
             Injector injector = UniInjectUtils.CreateInjector();
-            injector.AddBinding(new Binding(typeof(string), new ExistingInstanceProvider<string>(stringInstance)));
+            injector.AddBindings(bb);
 
             NeedsFieldInjection needsInjection = new NeedsFieldInjection();
             injector.Inject(needsInjection);
-            Assert.AreEqual(stringInstance, needsInjection.GetString());
+            Assert.AreEqual("abc", needsInjection.theString);
         }
 
         [Test]
@@ -27,7 +29,7 @@ namespace UniInject
             ImplWithInstanceIndex.instanceCount = 0;
 
             BindingBuilder bb = new BindingBuilder();
-            bb.BindTypeToSingleInstanceOfIt(typeof(ImplWithInstanceIndex));
+            bb.BindTypeToSingleInstance(typeof(ImplWithInstanceIndex));
 
             Injector injector = UniInjectUtils.CreateInjector();
             injector.AddBindings(bb);
@@ -53,7 +55,7 @@ namespace UniInject
             ImplWithInstanceIndex.instanceCount = 0;
 
             BindingBuilder bb = new BindingBuilder();
-            bb.BindTypeToNewInstancesOfIt(typeof(ImplWithInstanceIndex));
+            bb.BindTypeToNewInstances(typeof(ImplWithInstanceIndex));
 
             Injector injector = UniInjectUtils.CreateInjector();
             injector.AddBindings(bb);
@@ -119,9 +121,9 @@ namespace UniInject
             NeedsFieldInjectionCyclic_C.instanceCount = 0;
 
             BindingBuilder bb = new BindingBuilder();
-            bb.BindTypeToNewInstancesOfIt(typeof(NeedsFieldInjectionCyclic_A));
-            bb.BindTypeToNewInstancesOfIt(typeof(NeedsFieldInjectionCyclic_B));
-            bb.BindTypeToNewInstancesOfIt(typeof(NeedsFieldInjectionCyclic_C));
+            bb.BindTypeToNewInstances(typeof(NeedsFieldInjectionCyclic_A));
+            bb.BindTypeToNewInstances(typeof(NeedsFieldInjectionCyclic_B));
+            bb.BindTypeToNewInstances(typeof(NeedsFieldInjectionCyclic_C));
 
             Injector injector = UniInjectUtils.CreateInjector();
             injector.AddBindings(bb);
@@ -200,15 +202,10 @@ namespace UniInject
         private class NeedsFieldInjection
         {
             [Inject(optional = true)]
-            private string theString;
+            public string theString;
 
             [Inject(optional = true)]
             public ImplWithInstanceIndex implWithInstanceCounter;
-
-            public string GetString()
-            {
-                return theString;
-            }
         }
 
         private interface IInstanceIndexHolder
