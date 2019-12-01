@@ -46,7 +46,7 @@ public static class GameObjectUtils
         {
             foreach (GameObject rootObject in rootObjects)
             {
-                T obj = rootObject.GetComponentInChildren<T>(true);
+                T obj = rootObject.GetComponentInChildren<T>(includeInactive);
                 if (obj != null)
                 {
                     return obj;
