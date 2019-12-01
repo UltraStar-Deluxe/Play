@@ -11,6 +11,27 @@ namespace UniInject
         {
         }
 
+        public void BindExistingInstance<T>(T instance)
+        {
+            BindingUnderConstruction b = new BindingUnderConstruction(typeof(T));
+            bindingsUnderConstruction.Add(b);
+            b.ToExistingInstance(instance);
+        }
+
+        public void BindTypeToNewInstancesOfIt(Type type)
+        {
+            BindingUnderConstruction b = new BindingUnderConstruction(type);
+            bindingsUnderConstruction.Add(b);
+            b.ToNewInstancesOfType(type);
+        }
+
+        public void BindTypeToSingleInstanceOfIt(Type type)
+        {
+            BindingUnderConstruction b = new BindingUnderConstruction(type);
+            bindingsUnderConstruction.Add(b);
+            b.ToSingleInstanceOfType(type);
+        }
+
         public BindingUnderConstruction Bind(Type key)
         {
             BindingUnderConstruction b = new BindingUnderConstruction(key);
@@ -61,7 +82,7 @@ namespace UniInject
                 this.key = key;
             }
 
-            public void ToInstance<T>(T instance)
+            public void ToExistingInstance<T>(T instance)
             {
                 IProvider provider = new ExistingInstanceProvider<T>(instance);
                 IBinding binding = new Binding(key, provider);

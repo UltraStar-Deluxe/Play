@@ -24,9 +24,16 @@ namespace UniInject
             this.ParentInjector = parent;
         }
 
-        public T GetInstance<T>()
+        public T CreateAndInject<T>()
         {
-            object result = GetInstance(typeof(T));
+            T newInstance = (T)Activator.CreateInstance(typeof(T));
+            Inject(newInstance);
+            return newInstance;
+        }
+
+        public T GetValueForInjectionKey<T>()
+        {
+            object result = GetValueForInjectionKey(typeof(T));
             if (result is T t)
             {
                 return t;
@@ -34,9 +41,9 @@ namespace UniInject
             throw new InjectionException($"Cannot create instance of type {typeof(T)}. No binding found.");
         }
 
-        public object GetInstance(object bindingKey)
+        public object GetValueForInjectionKey(object injectionKey)
         {
-            IBinding binding = GetBinding(bindingKey);
+            IBinding binding = GetBinding(injectionKey);
             IProvider provider = binding.GetProvider();
 
             // A provider that creates new instances must be able
@@ -46,14 +53,7 @@ namespace UniInject
             // If the result is newly created, then it has to be injected as well.
             if (resultNeedsInjection)
             {
-                // For circular dependencies, the object that is currently created for the injectionKey is stored temporarily.
-                // The map is prioritized when resolving dependencies.
-                // Thus, further newly created objects (i.e. dependencies of the result that is constructed here)
-                // that have a dependency to injectionKey (i.e. to the result that is constructed here),
-                // can have the object injected that has already been instantiated here.
-                injectionKeyToObjectWithOngoingInjectionMap.Add(bindingKey, result);
-                Inject(result);
-                injectionKeyToObjectWithOngoingInjectionMap.Remove(bindingKey);
+                Inject(result, injectionKey);
             }
 
             return result;
@@ -61,6 +61,18 @@ namespace UniInject
 
         public void Inject(object target)
         {
+            Inject(target, target.GetType());
+        }
+
+        private void Inject(object target, object injectionKey)
+        {
+            // For circular dependencies, the object that is currently created for the injectionKey is stored temporarily.
+            // The map is prioritized when resolving dependencies.
+            // Thus, further newly created objects (i.e. dependencies of the result that is constructed here)
+            // that have a dependency to injectionKey (i.e. to the result that is constructed here),
+            // can have the object injected that has already been instantiated here.
+            injectionKeyToObjectWithOngoingInjectionMap.Add(injectionKey, target);
+
             // Find all members to be injected via reflection.
             List<InjectionData> injectionDatas = ReflectionUtils.CreateInjectionDatas(target);
 
@@ -69,6 +81,8 @@ namespace UniInject
             {
                 Inject(injectionData);
             }
+
+            injectionKeyToObjectWithOngoingInjectionMap.Remove(injectionKey);
         }
 
         public void Inject(InjectionData injectionData)
@@ -88,7 +102,7 @@ namespace UniInject
             }
         }
 
-        private void InjectMemberFromBindings(object target, MemberInfo memberInfo, object[] bindingKeys, bool isOptional)
+        private void InjectMemberFromBindings(object target, MemberInfo memberInfo, object[] injectionKeys, bool isOptional)
         {
             object[] valuesToBeInjected;
             try
@@ -97,7 +111,7 @@ namespace UniInject
                 {
                     try
                     {
-                        valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                        valuesToBeInjected = GetValuesForInjectionKeys(injectionKeys);
                     }
                     catch (MissingBindingException)
                     {
@@ -107,7 +121,7 @@ namespace UniInject
                 }
                 else
                 {
-                    valuesToBeInjected = GetValuesToBeInjected(bindingKeys);
+                    valuesToBeInjected = GetValuesForInjectionKeys(injectionKeys);
                 }
 
                 if (valuesToBeInjected == null)
@@ -214,54 +228,54 @@ namespace UniInject
             }
             getValuesForConstructorInjectionVisitedTypes.Add(type);
 
-            ConstructorInjectionData constructorInjectionData = UniInject.GetConstructorInjectionData(type);
-            object[] bindingKeys = constructorInjectionData.InjectionKeys;
-            object[] result = GetValuesToBeInjected(bindingKeys);
+            ConstructorInjectionData constructorInjectionData = UniInjectUtils.GetConstructorInjectionData(type);
+            object[] injectionKeys = constructorInjectionData.InjectionKeys;
+            object[] result = GetValuesForInjectionKeys(injectionKeys);
 
             getValuesForConstructorInjectionVisitedTypes.Remove(type);
             return result;
         }
 
-        private object[] GetValuesToBeInjected(object[] bindingKeys)
+        private object[] GetValuesForInjectionKeys(object[] injectionKeys)
         {
-            if (bindingKeys == null)
+            if (injectionKeys == null)
             {
                 return null;
             }
 
-            object[] valuesToBeInjected = new object[bindingKeys.Length];
+            object[] valuesToBeInjected = new object[injectionKeys.Length];
             int index = 0;
-            foreach (object bindingKey in bindingKeys)
+            foreach (object injectionKey in injectionKeys)
             {
                 // Lookup in special map to resolve circular dependencies.
-                // It checks if there is already an object for the bindingKey that has been instantiated, but is currently injected with its own dependencies.
-                bool valueToBeInjectedFound = injectionKeyToObjectWithOngoingInjectionMap.TryGetValue(bindingKey, out object valueToBeInjected);
+                // It checks if there is already an object for the injectionKey that has been instantiated, but is currently injected with its own dependencies.
+                bool valueToBeInjectedFound = injectionKeyToObjectWithOngoingInjectionMap.TryGetValue(injectionKey, out object valueToBeInjected);
                 if (!valueToBeInjectedFound)
                 {
                     // Get (possibly newly created) instance.
-                    valueToBeInjected = GetInstance(bindingKey);
+                    valueToBeInjected = GetValueForInjectionKey(injectionKey);
                 }
 
-                valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {bindingKey} is null");
+                valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {injectionKey} is null");
                 index++;
             }
             return valuesToBeInjected;
         }
 
-        private IBinding GetBinding(object bindingKey)
+        private IBinding GetBinding(object injectionKey)
         {
-            List<IBinding> matchingBindings = bindings.Where(it => it.GetKey().Equals(bindingKey)).ToList();
+            List<IBinding> matchingBindings = bindings.Where(it => it.GetKey().Equals(injectionKey)).ToList();
             if (matchingBindings.Count == 0)
             {
                 if (ParentInjector != null)
                 {
-                    return ParentInjector.GetBinding(bindingKey);
+                    return ParentInjector.GetBinding(injectionKey);
                 }
-                throw new MissingBindingException("Missing binding for key " + bindingKey);
+                throw new MissingBindingException("Missing binding for key " + injectionKey);
             }
             else if (matchingBindings.Count > 1)
             {
-                throw new MultipleBindingsException("Multiple bindings for key " + bindingKey);
+                throw new MultipleBindingsException("Multiple bindings for key " + injectionKey);
             }
 
             return matchingBindings[0];
@@ -270,6 +284,12 @@ namespace UniInject
         public void AddBinding(IBinding binding)
         {
             bindings.Add(binding);
+        }
+
+        public void AddBindings(BindingBuilder bindingBuilder)
+        {
+            List<IBinding> newBindings = bindingBuilder.GetBindings();
+            newBindings.ForEach(newBinding => AddBinding(newBinding));
         }
 
         public void MockUnitySearchMethod(MonoBehaviour callingScript, SearchMethods searchMethod, object searchResult)

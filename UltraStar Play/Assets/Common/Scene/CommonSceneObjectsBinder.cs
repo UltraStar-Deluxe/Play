@@ -7,8 +7,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
-        bb.Bind(typeof(SettingsManager)).ToInstance(SettingsManager.Instance);
-        bb.Bind(typeof(Settings)).ToInstance(SettingsManager.Instance.Settings);
+        bb.Bind(typeof(SettingsManager)).ToExistingInstance(SettingsManager.Instance);
+        bb.Bind(typeof(Settings)).ToExistingInstance(SettingsManager.Instance.Settings);
         return bb.GetBindings();
     }
 }

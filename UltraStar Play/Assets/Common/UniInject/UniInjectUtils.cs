@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UniInject
 {
-    public class UniInject
+    public class UniInjectUtils
     {
         // Global injector
         public static Injector GlobalInjector { get; set; } = new Injector(null);

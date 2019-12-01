@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UniInject;
-using static UniInject.UniInject;
+using static UniInject.UniInjectUtils;
 using UnityEngine;
 
 public class SearchMethodMockupDemo : MonoBehaviour
