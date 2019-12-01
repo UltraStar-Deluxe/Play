@@ -14,9 +14,10 @@ namespace UniInject
 
         private readonly List<IBinding> bindings = new List<IBinding>();
 
-        private HashSet<Type> getValuesForConstructorInjectionVisitedTypes = new HashSet<Type>();
+        private readonly HashSet<Type> getValuesForConstructorInjectionVisitedTypes = new HashSet<Type>();
+        private readonly Dictionary<object, object> injectionKeyToObjectWithOngoingInjectionMap = new Dictionary<object, object>();
 
-        private List<UnitySearchMethodMockup> unitySearchMethodMockups = new List<UnitySearchMethodMockup>();
+        private readonly List<UnitySearchMethodMockup> unitySearchMethodMockups = new List<UnitySearchMethodMockup>();
 
         internal Injector(Injector parent)
         {
@@ -38,13 +39,23 @@ namespace UniInject
             IBinding binding = GetBinding(bindingKey);
             IProvider provider = binding.GetProvider();
 
-            // A provider that creates new instances must inject newly created instances with the injector.
-            if (provider is NewInstancesProvider)
+            // A provider that creates new instances must be able
+            // to resolve constructor parameters from the injector's context.
+            object result = provider.Get(this, out bool resultNeedsInjection);
+
+            // If the result is newly created, then it has to be injected as well.
+            if (resultNeedsInjection)
             {
-                (provider as NewInstancesProvider).SetInjector(this);
+                // For circular dependencies, the object that is currently created for the injectionKey is stored temporarily.
+                // The map is prioritized when resolving dependencies.
+                // Thus, further newly created objects (i.e. dependencies of the result that is constructed here)
+                // that have a dependency to injectionKey (i.e. to the result that is constructed here),
+                // can have the object injected that has already been instantiated here.
+                injectionKeyToObjectWithOngoingInjectionMap.Add(bindingKey, result);
+                Inject(result);
+                injectionKeyToObjectWithOngoingInjectionMap.Remove(bindingKey);
             }
 
-            object result = provider.Get();
             return result;
         }
 
@@ -222,7 +233,15 @@ namespace UniInject
             int index = 0;
             foreach (object bindingKey in bindingKeys)
             {
-                object valueToBeInjected = GetInstance(bindingKey);
+                // Lookup in special map to resolve circular dependencies.
+                // It checks if there is already an object for the bindingKey that has been instantiated, but is currently injected with its own dependencies.
+                bool valueToBeInjectedFound = injectionKeyToObjectWithOngoingInjectionMap.TryGetValue(bindingKey, out object valueToBeInjected);
+                if (!valueToBeInjectedFound)
+                {
+                    // Get (possibly newly created) instance.
+                    valueToBeInjected = GetInstance(bindingKey);
+                }
+
                 valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {bindingKey} is null");
                 index++;
             }

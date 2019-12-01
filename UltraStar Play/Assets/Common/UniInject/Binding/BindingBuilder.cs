@@ -63,7 +63,7 @@ namespace UniInject
 
             public void ToInstance<T>(T instance)
             {
-                IProvider provider = new InstanceProvider<T>(instance);
+                IProvider provider = new ExistingInstanceProvider<T>(instance);
                 IBinding binding = new Binding(key, provider);
                 this.binding = binding;
             }

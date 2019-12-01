@@ -2,6 +2,6 @@ namespace UniInject
 {
     public interface IProvider
     {
-        object Get();
+        object Get(Injector injector, out bool resultNeedsInjection);
     }
 }
