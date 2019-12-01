@@ -25,8 +25,8 @@ namespace UniInject
             stopwatch.Start();
 #endif
 
-            sceneInjector = UniInject.CreateInjector();
-            UniInject.SceneInjector = sceneInjector;
+            sceneInjector = UniInjectUtils.CreateInjector();
+            UniInjectUtils.SceneInjector = sceneInjector;
 
             // (1) Iterate over scene hierarchy, thereby
             // (a) find IBinder instances.

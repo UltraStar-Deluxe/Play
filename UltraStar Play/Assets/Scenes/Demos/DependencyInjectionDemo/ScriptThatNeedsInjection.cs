@@ -1,7 +1,7 @@
 ﻿using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
-using static UniInject.UniInject;
+using static UniInject.UniInjectUtils;
 
 // Ignore warnings about unassigned fields.
 // Their values are injected, but this is not visible to the compiler.
@@ -88,7 +88,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour
         Debug.Log("Optional sceneNavigator: " + sceneNavigator);
         Debug.Log("Optional uiText: " + uiText);
 
-        Debug.Log("An int: " + SceneInjector.GetInstance<int>());
-        Debug.Log("An instance of an interface: " + SceneInjector.GetInstance<IDependencyInjectionDemoInterface>());
+        Debug.Log("The bound int: " + SceneInjector.GetValueForInjectionKey<int>());
+        Debug.Log("The bound instance of an interface: " + SceneInjector.GetValueForInjectionKey<IDependencyInjectionDemoInterface>());
     }
 }
