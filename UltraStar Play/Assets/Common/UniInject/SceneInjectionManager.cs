@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,8 +13,18 @@ namespace UniInject
 
         private Injector sceneInjector;
 
+        // Only for development: measure time of scene injection
+#if UNITY_EDITOR
+        public bool logTime;
+        private Stopwatch stopwatch = new Stopwatch();
+#endif
+
         void Awake()
         {
+#if UNITY_EDITOR
+            stopwatch.Start();
+#endif
+
             sceneInjector = UniInject.CreateInjector();
             UniInject.SceneInjector = sceneInjector;
 
@@ -41,13 +52,27 @@ namespace UniInject
             {
                 sceneInjector.Inject(injectionData);
             }
+
+#if UNITY_EDITOR
+            stopwatch.Stop();
+            if (logTime)
+            {
+                UnityEngine.Debug.Log($"Injection of scene {SceneManager.GetActiveScene().name} done in {stopwatch.ElapsedMilliseconds} ms");
+            }
+#endif
         }
 
         private void AnalyzeScriptsRecursively(GameObject gameObject)
         {
             MonoBehaviour[] scripts = gameObject.GetComponents<MonoBehaviour>();
-            foreach (MonoBehaviour script in scripts.Where(it => it != null))
+            foreach (MonoBehaviour script in scripts)
             {
+                // If the script is null, then this is a missing component
+                if (script == null)
+                {
+                    continue;
+                }
+
                 if (script is IBinder)
                 {
                     binders.Add(script as IBinder);
