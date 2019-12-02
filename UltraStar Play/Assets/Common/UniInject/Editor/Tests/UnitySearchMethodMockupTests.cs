@@ -2,7 +2,7 @@
 using UniInject;
 using UnityEngine;
 
-namespace UniInject
+namespace UniInject.Tests
 {
 
     public class UnitySearchMethodMockupTests
