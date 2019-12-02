@@ -28,8 +28,8 @@ public class FolderScanner
 
     public List<string> GetFiles(string folder, bool recursive)
     {
-        var result = new List<string>();
-        var dirInfo = new DirectoryInfo(folder);
+        List<string> result = new List<string>();
+        DirectoryInfo dirInfo = new DirectoryInfo(folder);
         if (folder == null || !System.IO.Directory.Exists(folder))
         {
             Debug.LogError("Song folder '" + folder + "' does not exist or can not be read!");
