@@ -57,9 +57,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     void Awake()
     {
-        // TODO: Use an own pitch detection implementation for an IAudioSamplesAnalyzer.
         audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(pitchEventStream, SampleRateHz);
-        //new CSharpPitchTrackerLibraryAudioSamplesAnalyzer(pitchEventStream, SampleRateHz);
 
         // Update label in inspector for debugging.
         pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = ((pitchEvent.MidiNote > 0)
