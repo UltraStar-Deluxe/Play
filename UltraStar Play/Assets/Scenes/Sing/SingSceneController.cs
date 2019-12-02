@@ -5,19 +5,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Video;
-using NAudio.Wave;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
     // Constant delay when querying the position in the song.
     // Its source could be that calculating the position in the song takes some time for itself.
-    public double positionInSongDelayInMillis = 150;
+    // After a change of the audio library this may or may not be needed anymore.
+    // public double positionInSongDelayInMillis = 150;
 
     public SingSceneData sceneData;
-
-    [Range(0, 1)]
-    public float volume = 1;
 
     public string defaultSongName;
 
@@ -35,12 +33,8 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     private VideoPlayer videoPlayer;
     public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
 
-    private IWavePlayer waveOutDevice;
-    private WaveStream mainOutputStream;
-    private WaveChannel32 volumeStream;
+    private AudioSource audioPlayer;
 
-    private double timeSinceLastMeasuredPositionInSongInMillis;
-    private double lastMeasuredPositionInSongInMillis;
 
     private static SingSceneController instance;
     public static SingSceneController Instance
@@ -67,7 +61,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         get
         {
-            if (mainOutputStream == null)
+            if (audioPlayer.clip == null)
             {
                 return 0;
             }
@@ -89,41 +83,25 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         get
         {
-            if (mainOutputStream == null)
+            if (audioPlayer == null || audioPlayer.clip == null)
             {
                 return 0;
             }
             else
             {
-                // The resolution of the NAudio time measurement is about 150 ms.
-                // For the time between these measurements,
-                // we improve the approximation by counting time using Unity's Time.deltaTime.
-                double posInMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
-                // Reduce by constant offset. Could be that the measurement takes time itself ?
-                posInMillis -= positionInSongDelayInMillis;
-                if (posInMillis != lastMeasuredPositionInSongInMillis)
-                {
-                    // Got new measurement from the audio lib. This is (relatively) accurate.
-                    lastMeasuredPositionInSongInMillis = posInMillis;
-                    timeSinceLastMeasuredPositionInSongInMillis = 0;
-                    return posInMillis;
-                }
-                else
-                {
-                    // No new measurement from the audio lib.
-                    // Improve approximation by adding the time since the last new measurement.
-                    return posInMillis + timeSinceLastMeasuredPositionInSongInMillis;
-                }
+                return 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
             }
+
         }
 
         set
         {
-            if (mainOutputStream == null)
+            if (audioPlayer.clip == null)
             {
                 return;
             }
-            mainOutputStream.CurrentTime = TimeSpan.FromMilliseconds(value);
+            audioPlayer.timeSamples = (int)((value * 1000.0f) * audioPlayer.clip.frequency);
+
             SyncVideoWithMusic();
         }
     }
@@ -132,23 +110,20 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         get
         {
-            if (mainOutputStream == null)
+            if (audioPlayer.clip == null)
             {
                 return 0;
             }
+            return (audioPlayer.clip.samples / audioPlayer.clip.frequency) * 1000.0f;
 
-            return mainOutputStream.TotalTime.TotalMilliseconds;
         }
     }
 
     void Awake()
     {
         videoPlayer = FindObjectOfType<VideoPlayer>();
+        audioPlayer = FindObjectOfType<AudioSource>();
 
-        if (!Application.isEditor && volume < 1)
-        {
-            volume = 1;
-        }
     }
 
     private void LoadSceneData()
@@ -203,13 +178,13 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
         }
 
-        StartMusicAndVideo();
+        StartCoroutine(StartMusicAndVideo());
     }
 
-    private void StartMusicAndVideo()
+    private IEnumerator StartMusicAndVideo()
     {
-        // Start the music 
-        StartAudioPlayback();
+        // Start the music
+        yield return StartAudioPlayback();
 
         // Start any associated video
         if (string.IsNullOrEmpty(SongMeta.Video))
@@ -222,7 +197,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
 
         // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", mainOutputStream.TotalTime.Seconds);
+        Invoke("CheckSongFinished", (float)DurationOfSongInMillis * 1000.0f);
     }
 
     public void OnHotSwapFinished()
@@ -241,8 +216,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             sceneData.PositionInSongMillis = PositionInSongInMillis;
         }
-
-        if (mainOutputStream != null)
+        if (audioPlayer && audioPlayer.clip != null)
         {
             UnloadAudio();
         }
@@ -255,25 +229,18 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     void Update()
     {
-        UpdateMusic();
+        //UpdateMusic();
+        Debug.Log("Duration " + DurationOfSongInMillis);
+        Debug.Log("Position " + PositionInSongInMillis);
         UpdateVideoStart();
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
     }
 
     private void UpdateMusic()
     {
-        if (waveOutDevice == null)
+        if (audioPlayer.clip == null)
         {
             return;
-        }
-
-        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
-        {
-            timeSinceLastMeasuredPositionInSongInMillis += Time.deltaTime * 1000.0f;
-        }
-        if (Application.isEditor)
-        {
-            volumeStream.Volume = volume;
         }
     }
 
@@ -328,14 +295,12 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void CheckSongFinished()
     {
-        if (mainOutputStream == null)
+        if (audioPlayer.clip == null)
         {
             return;
         }
 
-        double totalMillis = mainOutputStream.TotalTime.TotalMilliseconds;
-        double currentMillis = mainOutputStream.CurrentTime.TotalMilliseconds;
-        double missingMillis = totalMillis - currentMillis;
+        double missingMillis = DurationOfSongInMillis - PositionInSongInMillis;
         if (missingMillis <= 0)
         {
             Invoke("FinishScene", 1f);
@@ -451,7 +416,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void SyncVideoWithMusic()
     {
-        if (mainOutputStream == null || !videoPlayer.gameObject.activeInHierarchy)
+        if (audioPlayer.clip == null || !videoPlayer.gameObject.activeInHierarchy)
         {
             return;
         }
@@ -520,19 +485,23 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     public void TogglePauseSinging()
     {
-        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        if (audioPlayer.clip == null)
+        {
+            return;
+        }
+        if (audioPlayer.isPlaying)
         {
             pauseOverlay.SetActive(true);
-            waveOutDevice.Pause();
+            audioPlayer.Pause();
             if (videoPlayer != null && videoPlayer.enabled)
             {
                 videoPlayer.Pause();
             }
         }
-        else if (waveOutDevice.PlaybackState == PlaybackState.Paused)
+        else
         {
             pauseOverlay.SetActive(false);
-            waveOutDevice.Play();
+            audioPlayer.UnPause();
             if (videoPlayer != null && videoPlayer.enabled)
             {
                 videoPlayer.Play();
@@ -540,17 +509,17 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
-    private void StartAudioPlayback()
+    private IEnumerator StartAudioPlayback()
     {
-        if (waveOutDevice != null && waveOutDevice.PlaybackState == PlaybackState.Playing)
+        if (audioPlayer.clip != null && audioPlayer.isPlaying)
         {
             Debug.LogWarning("Song already playing");
-            return;
+            yield break;
         }
 
         string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
-        LoadAudio(songPath);
-        waveOutDevice.Play();
+        yield return LoadAudio(songPath);
+        audioPlayer.Play();
         if (sceneData.PositionInSongMillis > 0)
         {
             Debug.Log($"Skipping forward to {sceneData.PositionInSongMillis} milliseconds");
@@ -558,48 +527,34 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
-    private void LoadAudio(string path)
+    private IEnumerator LoadAudio(string path)
     {
-        try
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
         {
-            mainOutputStream = new AudioFileReader(path);
-            volumeStream = new WaveChannel32(mainOutputStream);
-            volumeStream.Volume = volume;
+            yield return www.SendWebRequest();
 
-            waveOutDevice = new WaveOutEvent();
-            waveOutDevice.Init(volumeStream);
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError("Error Loading Audio: " + ex.Message);
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
-            return;
+            if (www.isNetworkError)
+            {
+                Debug.LogError("Error Loading Audio: " + path);
+                Debug.LogError(www.error);
+                SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+                yield break;
+            }
+            else
+            {
+                audioPlayer.clip = DownloadHandlerAudioClip.GetContent(www);
+            }
         }
 
-        Resources.UnloadUnusedAssets();
     }
 
     private void UnloadAudio()
     {
-        if (waveOutDevice != null)
+        if (audioPlayer.clip != null)
         {
-            waveOutDevice.Stop();
-        }
-
-        if (mainOutputStream != null)
-        {
-            // this one really closes the file and ACM conversion
-            volumeStream.Close();
-            volumeStream = null;
-
-            // this one does the metering stream
-            mainOutputStream.Close();
-            mainOutputStream = null;
-        }
-        if (waveOutDevice != null)
-        {
-            waveOutDevice.Dispose();
-            waveOutDevice = null;
+            audioPlayer.Stop();
+            audioPlayer.clip.UnloadAudioData();
+            audioPlayer.clip = null;
         }
     }
 
