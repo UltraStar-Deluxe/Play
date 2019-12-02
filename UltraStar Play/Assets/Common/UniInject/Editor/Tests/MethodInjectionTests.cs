@@ -4,7 +4,7 @@ using UniInject;
 // Disable warning about never assigned fields. The values are injected.
 #pragma warning disable CS0649
 
-namespace UniInject
+namespace UniInject.Tests
 {
     public class MethodInjectionTests
     {

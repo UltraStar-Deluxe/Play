@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using UniInject;
 
-namespace UniInject
+namespace UniInject.Tests
 {
     public class InjectorHierarchyTests
     {
