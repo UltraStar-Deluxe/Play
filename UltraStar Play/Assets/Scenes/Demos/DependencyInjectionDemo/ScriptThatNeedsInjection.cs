@@ -9,6 +9,11 @@ using static UniInject.UniInjectUtils;
 
 public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 {
+    // The marker attribute can be used to check that the field has been set.
+    // Use the corresponding menu item (under UniInject) to perform a check on the current scene.
+    [InjectedInInspector]
+    public Transform referencedTransform;
+
     // Inject field via GetComponentInChildren
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private ChildOfScriptThatNeedsInjection child;
