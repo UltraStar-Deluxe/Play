@@ -6,10 +6,11 @@ using UnityEngine;
 public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
     /** There are 49 halftones in the hearable audio spectrum (C2 to C6 (1046.5023 Hz)). */
-    const int NumHalftones = 49;
+    private const int NumHalftones = 49;
     /** A4 concert pitch of 440 Hz. */
-    const float BaseToneFreq = 440f;
-    const int BaseToneMidi = 33;
+    private const float BaseToneFreq = 440f;
+    private const int BaseToneMidi = 33;
+    private const int MinSampleLength = 256;
     private static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
 
     private readonly int[] halftoneDelays;
@@ -17,8 +18,8 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
     private readonly List<int> pitchRecordHistory = new List<int>();
     private readonly int pitchRecordHistoryLength = 5;
 
-    private bool isEnabled = false;
-    private int lastPitchDetectedFrame = 0;
+    private bool isEnabled;
+    private int lastPitchDetectedFrame;
 
     public CamdAudioSamplesAnalyzer(Subject<PitchEvent> pitchEventStream, int sampleRateHz)
     {
@@ -28,22 +29,22 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     private static double[] PrecalculateHalftoneFrequencies()
     {
-        double[] halftoneFrequencies = new double[NumHalftones];
+        double[] noteFrequencies = new double[NumHalftones];
         for (int index = 0; index < NumHalftones; index++)
         {
-            halftoneFrequencies[index] = BaseToneFreq * Math.Pow(2f, (index - BaseToneMidi) / 12f);
+            noteFrequencies[index] = BaseToneFreq * Math.Pow(2f, (index - BaseToneMidi) / 12f);
         }
-        return halftoneFrequencies;
+        return noteFrequencies;
     }
 
     private static int[] PrecalculateHalftoneDelays(double[] halftoneFrequencies, double sampleRateHz)
     {
-        int[] halftoneDelays = new int[NumHalftones];
+        int[] noteDelays = new int[NumHalftones];
         for (int index = 0; index < NumHalftones; index++)
         {
-            halftoneDelays[index] = Convert.ToInt32(((double)sampleRateHz) / halftoneFrequencies[index]);
+            noteDelays[index] = Convert.ToInt32((sampleRateHz) / halftoneFrequencies[index]);
         }
-        return halftoneDelays;
+        return noteDelays;
     }
 
     public void Enable()
@@ -58,13 +59,15 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     public void ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame)
     {
-        if (!isEnabled)
+        if (!isEnabled || samplesSinceLastFrame < MinSampleLength)
         {
             return;
         }
+        int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
+
         // check if samples is louder than threshhold
         bool passesThreshhold = false;
-        for (int index = 0; index < samplesSinceLastFrame; index++)
+        for (int index = 0; index < sampleCountToUse; index++)
         {
             if (Math.Abs(audioSamplesBuffer[index]) >= 0.05f)
             {
@@ -78,14 +81,25 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         }
 
         // get best fitting tone
-        double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, samplesSinceLastFrame);
+        double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse);
 
-        int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi;
+        // no idea where the +3 is coming from...
+        int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi + 3;
         if (halftone != -1 && isEnabled)
         {
             OnPitchDetected(halftone);
         }
         // else: no tone detected.
+    }
+
+    private static int PreviousPowerOfTwo(int x)
+    {
+        x |= (x >> 1);
+        x |= (x >> 2);
+        x |= (x >> 4);
+        x |= (x >> 8);
+        x |= (x >> 16);
+        return x - (x >> 1);
     }
 
     private static int CalculateBestFittingHalftone(double[] correlation)
