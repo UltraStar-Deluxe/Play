@@ -1,10 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
+
+// Ignore warnings about fields that always have the same value.
+// The logDebugInfos flag will be set in code if a developer needs it.
+#pragma warning disable CS0649
 
 namespace UniInject
 {
     public class UniInjectUtils
     {
+        private static readonly bool logDebugInfos;
+
         // Global injector
         public static Injector GlobalInjector { get; set; } = new Injector(null);
 
@@ -34,6 +42,10 @@ namespace UniInject
             bool found = typeToInjectionDatasMap.TryGetValue(type, out List<InjectionData> injectionDatas);
             if (!found)
             {
+                if (logDebugInfos)
+                {
+                    Debug.Log("Loading injection data of type: " + type);
+                }
                 injectionDatas = ReflectionUtils.CreateInjectionDatas(type);
                 typeToInjectionDatasMap.Add(type, injectionDatas);
             }
@@ -51,6 +63,16 @@ namespace UniInject
             else
             {
                 return new Injector(GlobalInjector);
+            }
+        }
+
+        public static void LoadInjectionDataForTypesInAssembly(Assembly assembly)
+        {
+            Type[] types = assembly.GetTypes();
+            foreach (Type type in types)
+            {
+                // Load the data of the type. The data is stored in a static map.
+                GetInjectionDatas(type);
             }
         }
     }

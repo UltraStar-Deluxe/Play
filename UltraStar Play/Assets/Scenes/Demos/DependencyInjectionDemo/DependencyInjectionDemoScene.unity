@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 795618697}
   - component: {fileID: 795618698}
   m_Layer: 0
-  m_Name: UniInjectSceneInjectionManager
+  m_Name: SceneInjectionManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -307,6 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73da825f684a4eb44aada2756bdb6549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onlyInjectScriptsWithMarkerInterface: 0
   logTime: 1
 --- !u!1 &869000811
 GameObject:

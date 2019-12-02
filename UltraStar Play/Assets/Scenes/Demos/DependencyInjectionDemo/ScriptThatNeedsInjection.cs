@@ -7,7 +7,7 @@ using static UniInject.UniInjectUtils;
 // Their values are injected, but this is not visible to the compiler.
 #pragma warning disable CS0649
 
-public class ScriptThatNeedsInjection : MonoBehaviour
+public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 {
     // Inject field via GetComponentInChildren
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
