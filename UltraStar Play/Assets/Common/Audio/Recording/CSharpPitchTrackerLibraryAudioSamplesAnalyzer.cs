@@ -17,12 +17,14 @@ public class CSharpPitchTrackerLibraryAudioSamplesAnalyzer : IAudioSamplesAnalyz
     private int lastPitchDetectedFrame;
     private readonly List<PitchRecord> pitchRecordHistory = new List<PitchRecord>();
     private readonly int pitchRecordHistoryLength = 5;
+    private readonly int sampleRateHz;
 
     private readonly Subject<PitchEvent> pitchEventStream;
 
-    public CSharpPitchTrackerLibraryAudioSamplesAnalyzer(Subject<PitchEvent> pitchEventStream)
+    public CSharpPitchTrackerLibraryAudioSamplesAnalyzer(Subject<PitchEvent> pitchEventStream, int sampleRateHz)
     {
         this.pitchEventStream = pitchEventStream;
+        this.sampleRateHz = sampleRateHz;
         pitchDetectedHandler = new PitchDetectedHandler(OnPitchDetected);
     }
 
@@ -31,7 +33,7 @@ public class CSharpPitchTrackerLibraryAudioSamplesAnalyzer : IAudioSamplesAnalyz
         pitchTracker.PitchRecordsPerSecond = 30;
         pitchTracker.RecordPitchRecords = true;
         pitchTracker.PitchRecordHistorySize = 5;
-        pitchTracker.SampleRate = MicrophonePitchTracker.SampleRate;
+        pitchTracker.SampleRate = sampleRateHz;
 
         pitchTracker.PitchDetected += pitchDetectedHandler;
     }
