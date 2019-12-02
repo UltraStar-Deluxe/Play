@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,9 +9,12 @@ namespace UniInject
     public class SceneInjectionManager : MonoBehaviour
     {
         private readonly List<IBinder> binders = new List<IBinder>();
-        private readonly List<MonoBehaviour> scriptsThatNeedInjection = new List<MonoBehaviour>();
+        private readonly List<object> scriptsThatNeedInjection = new List<object>();
 
         private Injector sceneInjector;
+
+        [Tooltip("Only inject scripts with marker interface INeedInjection")]
+        public bool onlyInjectScriptsWithMarkerInterface;
 
         public bool logTime;
 
@@ -34,23 +36,29 @@ namespace UniInject
             // (3) Inject the bindings from the sceneInjector into the objects that need injection.
             InjectScriptsThatNeedInjection();
 
-            StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene {SceneManager.GetActiveScene().name} took {stopwatch.ElapsedMilliseconds} ms");
+            StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene took {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                InjectScriptsThatNeedInjection();
+            }
         }
 
         private void AnalyzeScene()
         {
             Stopwatch stopwatch = CreateAndStartStopwatch();
 
-            GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            Scene scene = SceneManager.GetActiveScene();
+            GameObject[] rootObjects = scene.GetRootGameObjects();
             foreach (GameObject rootObject in rootObjects)
             {
                 AnalyzeScriptsRecursively(rootObject);
-
-                IBinder[] bindersUnderRootObject = rootObject.GetComponentsInChildren<IBinder>();
-                binders.AddRange(bindersUnderRootObject);
             }
 
-            StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing scene took {stopwatch.ElapsedMilliseconds} ms");
+            StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing scene {scene.name} took {stopwatch.ElapsedMilliseconds} ms");
         }
 
         private void CreateBindings()
@@ -73,7 +81,7 @@ namespace UniInject
         {
             Stopwatch stopwatch = CreateAndStartStopwatch();
 
-            foreach (MonoBehaviour script in scriptsThatNeedInjection)
+            foreach (object script in scriptsThatNeedInjection)
             {
                 sceneInjector.Inject(script);
             }
@@ -102,16 +110,33 @@ namespace UniInject
             MonoBehaviour[] scripts = gameObject.GetComponents<MonoBehaviour>();
             foreach (MonoBehaviour script in scripts)
             {
-                // If the script is null, then this is a missing component
+                // The script can be null if it is a missing component.
                 if (script == null)
                 {
                     continue;
                 }
 
-                List<InjectionData> injectionDatas = UniInjectUtils.GetInjectionDatas(script.GetType());
-                if (injectionDatas.Count > 0)
+                // Analyzing a type for InjectionData is costly.
+                // The types of the UnityEngine do not make use of UniInject.
+                // Thus, the scripts from the UnityEngine itself should be skipped for better performance.
+                Type type = script.GetType();
+                if (!string.IsNullOrEmpty(type.Namespace) && type.Namespace.StartsWith("UnityEngine."))
                 {
-                    scriptsThatNeedInjection.Add(script);
+                    continue;
+                }
+
+                if (script is IBinder)
+                {
+                    binders.Add(script as IBinder);
+                }
+
+                if (!onlyInjectScriptsWithMarkerInterface || script is INeedInjection)
+                {
+                    List<InjectionData> injectionDatas = UniInjectUtils.GetInjectionDatas(script.GetType());
+                    if (injectionDatas.Count > 0)
+                    {
+                        scriptsThatNeedInjection.Add(script);
+                    }
                 }
             }
 
