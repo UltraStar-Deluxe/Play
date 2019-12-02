@@ -6,8 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class MicrophonePitchTracker : MonoBehaviour
 {
-    // TODO: use default microphones sample rate or 44100Hz for max compatibility without swresample
-    private const int SampleRateHz = 22050;
+    // TODO: use 44100Hz (if supported) or fallback to default microphone sample rate
+    private const int SampleRateHz = 44100;
 
     public bool playRecordedAudio;
 
