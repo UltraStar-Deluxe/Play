@@ -487,9 +487,9 @@ MonoBehaviour:
   anchorMin: {x: 0.5, y: 0.1}
   anchorMax: {x: 0.5, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0, y: 1.6979418, z: 0}
+  localPosition: {x: 0, y: 1.6096449, z: 0}
   sizeDelta: {x: 2, y: 0}
-  size: {x: 2, y: 30.564054}
+  size: {x: 2, y: 28.974703}
 --- !u!1 &320770002
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,9 +612,9 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 515.5, y: 309.5, z: 0}
-  sizeDelta: {x: 799.99994, y: 480.31036}
-  size: {x: 799.99994, y: 480.31036}
+  localPosition: {x: 515.5, y: 293.5, z: 0}
+  sizeDelta: {x: 799.99994, y: 455.4801}
+  size: {x: 799.99994, y: 455.4801}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,9 +1464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionInSongDelayInMillis: 150
-  volume: 1
-  defaultSongName: Marry You
+  defaultSongName: Summer Wine
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
