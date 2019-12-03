@@ -77,7 +77,9 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         }
         if (!passesThreshhold)
         {
-            return;
+            // Subscribers (such as the PlayerNoteRecorder) must know that the singing ended.
+            // Therefore, a midi pitch of 0 is interpreted as "no singing".
+            OnPitchDetected(0);
         }
 
         // get best fitting tone
