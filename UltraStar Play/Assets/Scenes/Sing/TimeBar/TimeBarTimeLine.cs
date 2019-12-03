@@ -7,28 +7,7 @@ public class TimeBarTimeLine : MonoBehaviour
 {
     public TimeBarTimeLineRect timeLineRectPrefab;
 
-    private SingSceneController singSceneController;
-    private bool isInitialized;
-
-    void OnEnable()
-    {
-        isInitialized = false;
-    }
-
-    void Update()
-    {
-        if (!isInitialized)
-        {
-            isInitialized = true;
-            singSceneController = SingSceneController.Instance;
-            double durationOfSongInMillis = singSceneController.DurationOfSongInMillis;
-            SongMeta songMeta = singSceneController.SongMeta;
-            List<PlayerController> playerControllers = singSceneController.PlayerControllers;
-            Init(songMeta, playerControllers, durationOfSongInMillis);
-        }
-    }
-
-    private void Init(SongMeta songMeta, List<PlayerController> playerControllers, double durationOfSongInMillis)
+    public void Init(SongMeta songMeta, List<PlayerController> playerControllers, double durationOfSongInMillis)
     {
         foreach (TimeBarTimeLineRect timeLineRect in GetComponentsInChildren<TimeBarTimeLineRect>())
         {
@@ -48,11 +27,12 @@ public class TimeBarTimeLine : MonoBehaviour
             double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.StartBeat);
             double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.EndBeat);
             PlayerProfile playerProfile = playerController.PlayerProfile;
-            CreateTimeLineRect(playerProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis);
+            MicProfile micProfile = playerController.MicProfile;
+            CreateTimeLineRect(playerProfile, micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis);
         }
     }
 
-    private void CreateTimeLineRect(PlayerProfile playerProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis)
+    private void CreateTimeLineRect(PlayerProfile playerProfile, MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis)
     {
         double startPosPercentage = startPosInMillis / durationOfSongInMillis;
         double endPosPercentage = endPosInMillis / durationOfSongInMillis;
@@ -69,6 +49,9 @@ public class TimeBarTimeLine : MonoBehaviour
         rectTransform.sizeDelta = Vector2.zero;
 
         // Set color of rect to color of mic.
-        singSceneController.GetMicProfile(playerProfile).IfNotNull(micProfile => timeLineRect.SetColor(micProfile.Color));
+        if (micProfile != null)
+        {
+            timeLineRect.SetColor(micProfile.Color);
+        }
     }
 }

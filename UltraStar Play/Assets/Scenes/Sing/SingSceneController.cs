@@ -100,7 +100,8 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             {
                 return;
             }
-            audioPlayer.timeSamples = (int)((value * 1000.0f) * audioPlayer.clip.frequency);
+            int newTimeSamples = (int)((value / 1000.0) * audioPlayer.clip.frequency);
+            audioPlayer.timeSamples = newTimeSamples;
 
             SyncVideoWithMusic();
         }
@@ -181,6 +182,12 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         StartCoroutine(StartMusicAndVideo());
     }
 
+    private void InitTimeBar()
+    {
+        TimeBarTimeLine timeBarTimeLine = FindObjectOfType<TimeBarTimeLine>();
+        timeBarTimeLine.Init(SongMeta, PlayerControllers, DurationOfSongInMillis);
+    }
+
     private IEnumerator StartMusicAndVideo()
     {
         // Start the music
@@ -195,9 +202,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             StartVideoPlayback();
         }
-
-        // Go to next scene when the song finishes
-        Invoke("CheckSongFinished", (float)DurationOfSongInMillis * 1000.0f);
     }
 
     public void OnHotSwapFinished()
@@ -229,19 +233,8 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     void Update()
     {
-        //UpdateMusic();
-        Debug.Log("Duration " + DurationOfSongInMillis);
-        Debug.Log("Position " + PositionInSongInMillis);
         UpdateVideoStart();
         PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
-    }
-
-    private void UpdateMusic()
-    {
-        if (audioPlayer.clip == null)
-        {
-            return;
-        }
     }
 
     private void UpdateVideoStart()
@@ -291,24 +284,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         songEditorSceneData.PositionInSongMillis = PositionInSongInMillis;
         songEditorSceneData.SelectedSongMeta = SongMeta;
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
-    }
-
-    private void CheckSongFinished()
-    {
-        if (audioPlayer.clip == null)
-        {
-            return;
-        }
-
-        double missingMillis = DurationOfSongInMillis - PositionInSongInMillis;
-        if (missingMillis <= 0)
-        {
-            Invoke("FinishScene", 1f);
-        }
-        else
-        {
-            Invoke("CheckSongFinished", (float)(missingMillis / 1000.0));
-        }
     }
 
     public void FinishScene()
@@ -543,6 +518,13 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             else
             {
                 audioPlayer.clip = DownloadHandlerAudioClip.GetContent(www);
+
+                // The time bar needs the duration of the song to calculate positions.
+                // The duration of the song should be available now.
+                InitTimeBar();
+
+                // Go to next scene when the song finishes
+                Invoke("FinishScene", (float)DurationOfSongInMillis / 1000.0f);
             }
         }
 
