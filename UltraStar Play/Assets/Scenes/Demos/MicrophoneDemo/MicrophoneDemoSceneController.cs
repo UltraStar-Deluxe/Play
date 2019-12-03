@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
-using Pitch;
 using UniRx;
 
 public class MicrophoneDemoSceneController : MonoBehaviour
