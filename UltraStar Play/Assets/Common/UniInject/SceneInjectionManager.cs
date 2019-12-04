@@ -47,6 +47,14 @@ namespace UniInject
             }
         }
 
+        void OnDestroy()
+        {
+            if (UniInjectUtils.SceneInjector == sceneInjector)
+            {
+                UniInjectUtils.SceneInjector = null;
+            }
+        }
+
         private void AnalyzeScene()
         {
             Stopwatch stopwatch = CreateAndStartStopwatch();
