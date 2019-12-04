@@ -183,7 +183,7 @@ namespace UniInject
             if (component == null)
             {
                 // No mockup found, thus use the real Unity search method.
-                component = GetComponentFromUnitySearchMethod(script, searchMethod, componentType);
+                component = UniInjectUtils.InvokeUnitySearchMethod(script, searchMethod, componentType);
             }
 
             if (component != null)
@@ -223,23 +223,6 @@ namespace UniInject
                 }
             }
             return null;
-        }
-
-        private UnityEngine.Object GetComponentFromUnitySearchMethod(MonoBehaviour script, SearchMethods searchMethod, Type componentType)
-        {
-            switch (searchMethod)
-            {
-                case SearchMethods.GetComponent:
-                    return script.GetComponent(componentType);
-                case SearchMethods.GetComponentInChildren:
-                    return script.GetComponentInChildren(componentType);
-                case SearchMethods.GetComponentInParent:
-                    return script.GetComponentInParent(componentType);
-                case SearchMethods.FindObjectOfType:
-                    return GameObject.FindObjectOfType(componentType);
-                default:
-                    throw new InjectionException($" Unkown Unity search method {searchMethod}");
-            }
         }
 
         internal object[] GetValuesForConstructorInjection(Type type)

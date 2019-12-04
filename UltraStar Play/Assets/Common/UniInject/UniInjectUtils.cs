@@ -75,5 +75,22 @@ namespace UniInject
                 GetInjectionDatas(type);
             }
         }
+
+        public static UnityEngine.Object InvokeUnitySearchMethod(MonoBehaviour script, SearchMethods searchMethod, Type componentType)
+        {
+            switch (searchMethod)
+            {
+                case SearchMethods.GetComponent:
+                    return script.GetComponent(componentType);
+                case SearchMethods.GetComponentInChildren:
+                    return script.GetComponentInChildren(componentType);
+                case SearchMethods.GetComponentInParent:
+                    return script.GetComponentInParent(componentType);
+                case SearchMethods.FindObjectOfType:
+                    return GameObject.FindObjectOfType(componentType);
+                default:
+                    throw new InjectionException($" Unkown Unity search method {searchMethod}");
+            }
+        }
     }
 }
