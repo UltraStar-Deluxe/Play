@@ -119,7 +119,7 @@ namespace UniInject
             foreach (object key in injectionData.InjectionKeys)
             {
                 List<IBinding> matchingBindings = bindings.Where(binding => object.Equals(binding.GetKey(), key)).ToList();
-                if (matchingBindings.IsNullOrEmpty())
+                if (matchingBindings.Count == 0)
                 {
                     LogErrorCannotBeInjected($"Missing binding for key {key}",
                         script, type, injectionData.MemberInfo);
