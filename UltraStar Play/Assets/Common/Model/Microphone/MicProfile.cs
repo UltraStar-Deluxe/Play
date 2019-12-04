@@ -28,4 +28,19 @@ public class MicProfile
     {
         this.Name = name;
     }
+
+    public int AmplificationMultiplier()
+    {
+        switch (Amplification)
+        {
+            case 6:
+                return 2;
+            case 12:
+                return 4;
+            case 18:
+                return 8;
+            default:
+                return 1;
+        }
+    }
 }
