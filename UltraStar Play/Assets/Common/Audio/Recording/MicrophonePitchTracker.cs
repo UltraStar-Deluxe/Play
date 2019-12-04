@@ -14,12 +14,12 @@ public class MicrophonePitchTracker : MonoBehaviour
     [ReadOnly]
     public string lastMidiNoteName;
 
-    private string micDevice;
-    public string MicDevice
+    private MicProfile microphone;
+    public MicProfile Microphone
     {
         get
         {
-            return micDevice;
+            return microphone;
         }
         set
         {
@@ -28,8 +28,8 @@ public class MicrophonePitchTracker : MonoBehaviour
             {
                 StopPitchDetection();
             }
-            micDevice = value;
-            if (restartPitchDetection && !string.IsNullOrEmpty(micDevice))
+            microphone = value;
+            if (restartPitchDetection && microphone != null && !string.IsNullOrEmpty(microphone.Name))
             {
                 StartPitchDetection();
             }
@@ -92,23 +92,23 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
 
         startedPitchDetection = true;
-        List<string> soundcards = new List<string>(Microphone.devices);
+        List<string> soundcards = new List<string>(UnityEngine.Microphone.devices);
 
         // Check for microphone existence.
-        if (!soundcards.Contains(MicDevice))
+        if (!soundcards.Contains(Microphone.Name))
         {
             string micDevicesCsv = string.Join(",", soundcards);
-            Debug.LogError($"Did not find mic '{MicDevice}'. Available mic devices: {micDevicesCsv}");
+            Debug.LogError($"Did not find mic '{Microphone.Name}'. Available mic devices: {micDevicesCsv}");
             startedPitchDetection = false;
             return;
         }
-        Debug.Log($"Start recording with '{MicDevice}'");
+        Debug.Log($"Start recording with '{Microphone.Name}'");
 
         // Code for low-latency microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         // It seems that there is still a latency of more than 200ms, which is too much for real-time processing.
-        micAudioClip = Microphone.Start(MicDevice, true, 1, SampleRateHz);
-        while (Microphone.GetPosition(MicDevice) <= 0) { /* Busy waiting */ }
+        micAudioClip = UnityEngine.Microphone.Start(Microphone.Name, true, 1, SampleRateHz);
+        while (UnityEngine.Microphone.GetPosition(Microphone.Name) <= 0) { /* Busy waiting */ }
 
         // Configure audio playback
         audioSource = GetComponent<AudioSource>();
@@ -124,8 +124,8 @@ public class MicrophonePitchTracker : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Stop recording with '{MicDevice}'");
-        Microphone.End(MicDevice);
+        Debug.Log($"Stop recording with '{Microphone}'");
+        UnityEngine.Microphone.End(Microphone.Name);
         startedPitchDetection = false;
     }
 
@@ -143,7 +143,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
 
         // Fill buffer with raw sample data from microphone
-        int currentSamplePosition = Microphone.GetPosition(MicDevice);
+        int currentSamplePosition = UnityEngine.Microphone.GetPosition(Microphone.Name);
         micAudioClip.GetData(MicData, currentSamplePosition);
 
         // Prepare the portion that should be analyzed by the pitch detection library.
@@ -162,8 +162,33 @@ public class MicrophonePitchTracker : MonoBehaviour
             PitchDetectionBuffer[i] = 0;
         }
 
+        ApplyMicAmplification(samplesSinceLastFrame);
+
         // Detect the pitch of the sample.
-        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame);
+        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, microphone);
+    }
+
+    private void ApplyMicAmplification(int samplesSinceLastFrame)
+    {
+        if (microphone.Amplification == 0)
+        {
+            return;
+        }
+        int multiplier = microphone.AmplificationMultiplier();
+        float newSample;
+        for (int index = 0; index < samplesSinceLastFrame - 1; index++)
+        {
+            newSample = PitchDetectionBuffer[index] * multiplier;
+            if (newSample > 1)
+            {
+                newSample = 1;
+            }
+            else if (newSample < -1)
+            {
+                newSample = -1;
+            }
+            PitchDetectionBuffer[index] = newSample;
+        }
     }
 
     private void UpdateMicrophoneAudioPlayback()
