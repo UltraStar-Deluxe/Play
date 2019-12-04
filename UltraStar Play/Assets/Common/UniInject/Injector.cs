@@ -12,7 +12,7 @@ namespace UniInject
         // If a binding is not found in this Injector, then it is searched in the parent injectors recursively.
         public Injector ParentInjector { get; private set; }
 
-        private readonly List<IBinding> bindings = new List<IBinding>();
+        private readonly Dictionary<object, IProvider> injectionKeyToProviderMap = new Dictionary<object, IProvider>();
 
         private readonly HashSet<Type> getValuesForConstructorInjectionVisitedTypes = new HashSet<Type>();
         private readonly Dictionary<object, object> injectionKeyToObjectWithOngoingInjectionMap = new Dictionary<object, object>();
@@ -64,8 +64,7 @@ namespace UniInject
 
         public object GetValueForInjectionKey(object injectionKey)
         {
-            IBinding binding = GetBinding(injectionKey);
-            IProvider provider = binding.GetProvider();
+            IProvider provider = GetProvider(injectionKey);
 
             // A provider that creates new instances must be able
             // to resolve constructor parameters from the injector's context.
@@ -267,23 +266,19 @@ namespace UniInject
             return valuesToBeInjected;
         }
 
-        private IBinding GetBinding(object injectionKey)
+        private IProvider GetProvider(object injectionKey)
         {
-            List<IBinding> matchingBindings = bindings.Where(it => it.GetKey().Equals(injectionKey)).ToList();
-            if (matchingBindings.Count == 0)
+            injectionKeyToProviderMap.TryGetValue(injectionKey, out IProvider provider);
+            if (provider == null && ParentInjector != null)
             {
-                if (ParentInjector != null)
-                {
-                    return ParentInjector.GetBinding(injectionKey);
-                }
-                throw new MissingBindingException("Missing binding for key " + injectionKey);
-            }
-            else if (matchingBindings.Count > 1)
-            {
-                throw new MultipleBindingsException("Multiple bindings for key " + injectionKey);
+                provider = ParentInjector.GetProvider(injectionKey);
             }
 
-            return matchingBindings[0];
+            if (provider == null)
+            {
+                throw new MissingBindingException("Missing binding for key " + injectionKey);
+            }
+            return provider;
         }
 
         public void AddBindingForInstance<T>(T instance)
@@ -305,12 +300,17 @@ namespace UniInject
 
         public void AddBinding(IBinding binding)
         {
-            bindings.Add(binding);
+            object injectionKey = binding.GetKey();
+            if (injectionKeyToProviderMap.ContainsKey(injectionKey))
+            {
+                Debug.LogWarning($"Re-binding of key {injectionKey}");
+            }
+            injectionKeyToProviderMap[injectionKey] = binding.GetProvider();
         }
 
         public void ClearBindings()
         {
-            bindings.Clear();
+            injectionKeyToProviderMap.Clear();
         }
 
         public void MockUnitySearchMethod(MonoBehaviour callingScript, SearchMethods searchMethod, object searchResult)
