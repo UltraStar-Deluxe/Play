@@ -91,7 +91,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             {
                 return 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
             }
-
         }
 
         set
@@ -103,7 +102,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             int newTimeSamples = (int)((value / 1000.0) * audioPlayer.clip.frequency);
             audioPlayer.timeSamples = newTimeSamples;
 
-            SyncVideoWithMusic();
+            SyncVideoWithMusicImmediately();
         }
     }
 
@@ -343,7 +342,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
                 // No VideoGap, thus start the video immediately
                 videoPlayer.Play();
             }
-            InvokeRepeating("SyncVideoWithMusic", 5f, 10f);
+            InvokeRepeating("SyncVideoWithMusicSmoothly", 0.5f, 0.5f);
         }
     }
 
@@ -389,7 +388,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
-    private void SyncVideoWithMusic()
+    private void SyncVideoWithMusicSmoothly()
     {
         if (audioPlayer.clip == null || !videoPlayer.gameObject.activeInHierarchy)
         {
@@ -402,11 +401,29 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             return;
         }
 
-        float positionInVideoInSeconds = (float)(SongMeta.VideoGap + PositionInSongInMillis / 1000);
-        if (videoPlayer.length > positionInVideoInSeconds)
+        double positionInVideoInSeconds = SongMeta.VideoGap + PositionInSongInMillis / 1000;
+        double timeDifferenceInSeconds = positionInVideoInSeconds - videoPlayer.time;
+        // Smooth out the time difference over a duration of 2 seconds
+        float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
+        videoPlayer.playbackSpeed = playbackSpeed;
+    }
+
+    private void SyncVideoWithMusicImmediately()
+    {
+        if (audioPlayer.clip == null || !videoPlayer.gameObject.activeInHierarchy)
         {
-            videoPlayer.time = positionInVideoInSeconds;
+            return;
         }
+
+        if (SongMeta.VideoGap < 0 && PositionInSongInMillis < (-SongMeta.VideoGap * 1000))
+        {
+            // Still waiting for the start of the video
+            return;
+        }
+
+        double targetPositionInVideoInSeconds = SongMeta.VideoGap + PositionInSongInMillis / 1000;
+        videoPlayer.time = targetPositionInVideoInSeconds;
+        videoPlayer.playbackSpeed = 1f;
     }
 
     private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
