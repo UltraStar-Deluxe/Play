@@ -285,6 +285,24 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
+    private void CheckSongFinished()
+    {
+        if (audioPlayer.clip == null || DurationOfSongInMillis == 0)
+        {
+            return;
+        }
+
+        double missingMillis = DurationOfSongInMillis - PositionInSongInMillis;
+        if (missingMillis <= 0)
+        {
+            Invoke("FinishScene", 1f);
+        }
+        else
+        {
+            Invoke("CheckSongFinished", (float)(missingMillis / 1000.0));
+        }
+    }
+
     public void FinishScene()
     {
         // Open the singing results scene.
@@ -541,7 +559,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
                 InitTimeBar();
 
                 // Go to next scene when the song finishes
-                Invoke("FinishScene", (float)DurationOfSongInMillis / 1000.0f);
+                CheckSongFinished();
             }
         }
 
