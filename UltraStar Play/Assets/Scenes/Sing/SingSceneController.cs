@@ -114,7 +114,8 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             {
                 return 0;
             }
-            return (audioPlayer.clip.samples / audioPlayer.clip.frequency) * 1000.0f;
+            double lengthInMillis = 1000.0 * audioPlayer.clip.samples / audioPlayer.clip.frequency;
+            return lengthInMillis;
 
         }
     }
