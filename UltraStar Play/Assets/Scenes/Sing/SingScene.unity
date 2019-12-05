@@ -847,6 +847,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeLineRectPrefab: {fileID: 2269057298797317534, guid: cfe0e826bda13d04c9d90a045027b253,
     type: 3}
+--- !u!1 &727012070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 727012072}
+  - component: {fileID: 727012071}
+  m_Layer: 0
+  m_Name: StutterSinger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &727012071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727012070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91fdf6b0f43d1ba459e2dcd59a6ad805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerIndexToSimulate: 0
+--- !u!4 &727012072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727012070}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 509.63995, y: 300.0832, z: -547.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &746576793 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1740204220683369330, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
