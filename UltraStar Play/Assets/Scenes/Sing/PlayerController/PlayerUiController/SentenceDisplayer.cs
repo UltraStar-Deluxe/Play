@@ -95,6 +95,11 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void CreateUiNote(Note note)
     {
+        if (note.StartBeat == note.EndBeat)
+        {
+            return;
+        }
+
         UiNote uiNote = Instantiate(uiNotePrefab, uiNotesContainer);
         uiNote.Init(note, uiEffectsContainer);
         if (micProfile != null)
@@ -136,6 +141,11 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
+        if (recordedNote.StartBeat == recordedNote.EndBeat)
+        {
+            return;
+        }
+
         int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
@@ -157,7 +167,6 @@ public class SentenceDisplayer : MonoBehaviour
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
-
         recordedNoteToUiRecordedNoteMap[recordedNote] = uiNote;
     }
 
