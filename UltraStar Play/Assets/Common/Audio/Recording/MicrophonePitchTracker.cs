@@ -14,12 +14,13 @@ public class MicrophonePitchTracker : MonoBehaviour
     [ReadOnly]
     public string lastMidiNoteName;
 
-    private MicProfile microphone;
-    public MicProfile Microphone
+    private int micAmplifyMultiplier;
+    private MicProfile micProfile;
+    public MicProfile MicProfile
     {
         get
         {
-            return microphone;
+            return micProfile;
         }
         set
         {
@@ -28,8 +29,8 @@ public class MicrophonePitchTracker : MonoBehaviour
             {
                 StopPitchDetection();
             }
-            microphone = value;
-            if (restartPitchDetection && microphone != null && !string.IsNullOrEmpty(microphone.Name))
+            micProfile = value;
+            if (restartPitchDetection && micProfile != null && !string.IsNullOrEmpty(micProfile.Name))
             {
                 StartPitchDetection();
             }
@@ -95,20 +96,22 @@ public class MicrophonePitchTracker : MonoBehaviour
         List<string> soundcards = new List<string>(UnityEngine.Microphone.devices);
 
         // Check for microphone existence.
-        if (!soundcards.Contains(Microphone.Name))
+        if (!soundcards.Contains(MicProfile.Name))
         {
             string micDevicesCsv = string.Join(",", soundcards);
-            Debug.LogError($"Did not find mic '{Microphone.Name}'. Available mic devices: {micDevicesCsv}");
+            Debug.LogError($"Did not find mic '{MicProfile.Name}'. Available mic devices: {micDevicesCsv}");
             startedPitchDetection = false;
             return;
         }
-        Debug.Log($"Start recording with '{Microphone.Name}'");
+        Debug.Log($"Start recording with '{MicProfile.Name}'");
+
+        micAmplifyMultiplier = micProfile.AmplificationMultiplier();
 
         // Code for low-latency microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         // It seems that there is still a latency of more than 200ms, which is too much for real-time processing.
-        micAudioClip = UnityEngine.Microphone.Start(Microphone.Name, true, 1, SampleRateHz);
-        while (UnityEngine.Microphone.GetPosition(Microphone.Name) <= 0) { /* Busy waiting */ }
+        micAudioClip = UnityEngine.Microphone.Start(MicProfile.Name, true, 1, SampleRateHz);
+        while (UnityEngine.Microphone.GetPosition(MicProfile.Name) <= 0) { /* Busy waiting */ }
 
         // Configure audio playback
         audioSource = GetComponent<AudioSource>();
@@ -124,8 +127,8 @@ public class MicrophonePitchTracker : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Stop recording with '{Microphone}'");
-        UnityEngine.Microphone.End(Microphone.Name);
+        Debug.Log($"Stop recording with '{MicProfile}'");
+        UnityEngine.Microphone.End(MicProfile.Name);
         startedPitchDetection = false;
     }
 
@@ -143,7 +146,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         }
 
         // Fill buffer with raw sample data from microphone
-        int currentSamplePosition = UnityEngine.Microphone.GetPosition(Microphone.Name);
+        int currentSamplePosition = UnityEngine.Microphone.GetPosition(MicProfile.Name);
         micAudioClip.GetData(MicData, currentSamplePosition);
 
         // Prepare the portion that should be analyzed by the pitch detection library.
@@ -165,20 +168,19 @@ public class MicrophonePitchTracker : MonoBehaviour
         ApplyMicAmplification(samplesSinceLastFrame);
 
         // Detect the pitch of the sample.
-        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, microphone);
+        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
     }
 
     private void ApplyMicAmplification(int samplesSinceLastFrame)
     {
-        if (microphone.Amplification == 0)
+        if (micAmplifyMultiplier == 0)
         {
             return;
         }
-        int multiplier = microphone.AmplificationMultiplier();
         float newSample;
         for (int index = 0; index < samplesSinceLastFrame - 1; index++)
         {
-            newSample = PitchDetectionBuffer[index] * multiplier;
+            newSample = PitchDetectionBuffer[index] * micAmplifyMultiplier;
             if (newSample > 1)
             {
                 newSample = 1;
