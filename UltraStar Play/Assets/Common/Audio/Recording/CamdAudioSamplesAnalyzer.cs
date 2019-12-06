@@ -85,11 +85,11 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         // get best fitting tone
         double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse);
 
-        // no idea where the +3 is coming from...
-        int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi + 3;
+        int halftone = CalculateBestFittingHalftone(correlation);
         if (halftone != -1 && isEnabled)
         {
-            OnPitchDetected(halftone);
+            // add C5 (A4 + 3 halftones) as offset to the detected pitch
+            OnPitchDetected(halftone + BaseToneMidi + 3);
         }
         // else: no tone detected.
     }
@@ -139,7 +139,6 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
                         audioSamplesBuffer[(index + halftoneDelays[halftone]) & (samplesSinceLastFrame - 1)] -
                         audioSamplesBuffer[index]);
             }
-            correlation[halftone] = correlation[halftone] / samplesSinceLastFrame;
         }
         // return circular average magnitude difference
         return correlation;
