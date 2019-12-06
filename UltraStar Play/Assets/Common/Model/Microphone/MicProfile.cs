@@ -31,16 +31,6 @@ public class MicProfile
 
     public int AmplificationMultiplier()
     {
-        switch (Amplification)
-        {
-            case 6:
-                return 2;
-            case 12:
-                return 4;
-            case 18:
-                return 8;
-            default:
-                return 1;
-        }
+        return Convert.ToInt32(Math.Pow(10d, Amplification / 20d));
     }
 }

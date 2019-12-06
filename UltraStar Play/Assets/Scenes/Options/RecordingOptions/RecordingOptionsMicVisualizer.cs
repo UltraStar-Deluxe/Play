@@ -18,7 +18,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     public void SetMicProfile(MicProfile micProfile)
     {
-        microphonePitchTracker.Microphone = micProfile;
+        microphonePitchTracker.MicProfile = micProfile;
         if (!string.IsNullOrEmpty(micProfile.Name))
         {
             microphonePitchTracker.StartPitchDetection();

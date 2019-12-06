@@ -28,7 +28,7 @@ public class MicrophoneDemoSceneController : MonoBehaviour
         {
             return;
         }
-        microphonePitchTracker.Microphone = new MicProfile(micDeviceName);
+        microphonePitchTracker.MicProfile = new MicProfile(micDeviceName);
         pitchEventStreamDisposable = microphonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
         microphonePitchTracker.StartPitchDetection();
     }
