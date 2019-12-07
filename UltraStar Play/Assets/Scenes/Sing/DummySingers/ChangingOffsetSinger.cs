@@ -28,7 +28,7 @@ public class ChangingOffsetSinger : AbstractDummySinger
             // (falling flank: now there is no note, but in last frame there was one)
             noteOffset = (noteOffset + 1) % 5;
         }
-        playerController.PlayerNoteRecorder.OnPitchDetected(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
 
         lastNote = noteAtCurrentBeat;
     }
