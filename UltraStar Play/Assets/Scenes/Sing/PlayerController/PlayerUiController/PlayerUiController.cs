@@ -11,6 +11,7 @@ public class PlayerUiController : MonoBehaviour
     private TotalScoreDisplayer totalScoreDisplayer;
     private SentenceRatingDisplayer sentenceRatingDisplayer;
     private BeatGridDisplayer beatGridDisplayer;
+    private CurrentBeatGridDisplayer currentBeatGridDisplayer;
 
     public void Init(PlayerProfile playerProfile, MicProfile micProfile)
     {
@@ -25,6 +26,8 @@ public class PlayerUiController : MonoBehaviour
         sentenceRatingDisplayer = GetComponentInChildren<SentenceRatingDisplayer>();
 
         beatGridDisplayer = GetComponentInChildren<BeatGridDisplayer>();
+
+        currentBeatGridDisplayer = GetComponentInChildren<CurrentBeatGridDisplayer>();
 
         PlayerNameText playerNameText = GetComponentInChildren<PlayerNameText>();
         playerNameText.SetPlayerProfile(playerProfile);
@@ -43,6 +46,7 @@ public class PlayerUiController : MonoBehaviour
     {
         sentenceDisplayer.DisplaySentence(currentSentence);
         beatGridDisplayer?.DisplaySentence(currentSentence);
+        currentBeatGridDisplayer?.DisplaySentence(currentSentence);
     }
 
     public void RemoveAllDisplayedNotes()
