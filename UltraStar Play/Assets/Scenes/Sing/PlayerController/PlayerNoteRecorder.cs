@@ -43,7 +43,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
         if (micProfile != null)
         {
-            MicrophonePitchTracker.MicDevice = micProfile.Name;
+            MicrophonePitchTracker.MicProfile = micProfile;
         }
     }
 
