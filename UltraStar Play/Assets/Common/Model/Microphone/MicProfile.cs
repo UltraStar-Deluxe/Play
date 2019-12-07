@@ -28,4 +28,9 @@ public class MicProfile
     {
         this.Name = name;
     }
+
+    public int AmplificationMultiplier()
+    {
+        return Convert.ToInt32(Math.Pow(10d, Amplification / 20d));
+    }
 }

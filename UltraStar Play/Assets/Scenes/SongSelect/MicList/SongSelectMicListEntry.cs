@@ -11,7 +11,7 @@ public class SongSelectMicListEntry : MonoBehaviour
         FloatArrayVisualizer floatArrayVisualizer = GetComponentInChildren<FloatArrayVisualizer>();
 
         micImage.color = micProfile.Color;
-        microphonePitchTracker.MicDevice = micProfile.Name;
+        microphonePitchTracker.MicProfile = micProfile;
         microphonePitchTracker.StartPitchDetection();
         floatArrayVisualizer.Init(microphonePitchTracker.MicData);
     }

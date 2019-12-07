@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
-    /** There are 49 halftones in the hearable audio spectrum (C2 to C6 (1046.5023 Hz)). */
+    /** There are 49 halftones in the singable audio spectrum (C2 to C6 (1046.5023 Hz)). */
     private const int NumHalftones = 49;
     /** A4 concert pitch of 440 Hz. */
     private const float BaseToneFreq = 440f;
@@ -57,29 +57,30 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         isEnabled = false;
     }
 
-    public void ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame)
+    public void ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
     {
-        if (!isEnabled || samplesSinceLastFrame < MinSampleLength)
+        if (!isEnabled || samplesSinceLastFrame < MinSampleLength || lastPitchDetectedFrame == Time.frameCount)
         {
             return;
         }
+
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
         // check if samples is louder than threshhold
-        bool passesThreshhold = false;
+        bool passesThreshold = false;
+        float minThreshold = mic.NoiseSuppression / 100f;
         for (int index = 0; index < sampleCountToUse; index++)
         {
-            if (Math.Abs(audioSamplesBuffer[index]) >= 0.05f)
+            if (Math.Abs(audioSamplesBuffer[index]) >= minThreshold)
             {
-                passesThreshhold = true;
+                passesThreshold = true;
                 break;
             }
         }
-        if (!passesThreshhold)
+        if (!passesThreshold)
         {
-            // Subscribers (such as the PlayerNoteRecorder) must know that the singing ended.
-            // Therefore, a midi pitch of 0 is interpreted as "no singing".
-            OnPitchDetected(0);
+            OnNoPitchDetected();
+            return;
         }
 
         // get best fitting tone
@@ -91,7 +92,10 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         {
             OnPitchDetected(halftone);
         }
-        // else: no tone detected.
+        else
+        {
+            OnNoPitchDetected();
+        }
     }
 
     private static int PreviousPowerOfTwo(int x)
@@ -147,11 +151,6 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     private void OnPitchDetected(int midiPitch)
     {
-        // Ignore multiple events in same frame.
-        if (lastPitchDetectedFrame == Time.frameCount)
-        {
-            return;
-        }
         lastPitchDetectedFrame = Time.frameCount;
 
         // Create history of PitchRecord events
@@ -169,5 +168,14 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
         PitchEvent pitchEvent = new PitchEvent(midiNoteMedian);
         pitchEventStream.OnNext(pitchEvent);
+    }
+
+    private void OnNoPitchDetected()
+    {
+        // no tone detected.
+        // Subscribers (such as the PlayerNoteRecorder) must know that the singing ended.
+        // Therefore, a midi pitch of 0 is interpreted as "no singing".
+        pitchRecordHistory.Clear();
+        pitchEventStream.OnNext(new PitchEvent(0));
     }
 }
