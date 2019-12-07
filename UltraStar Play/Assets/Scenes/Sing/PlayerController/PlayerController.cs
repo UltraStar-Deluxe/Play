@@ -176,8 +176,11 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
         Note targetNote = lastRecordedNote.TargetNote;
-        bool isPerfect = ((targetNote.MidiNote == lastRecordedNote.RoundedMidiNote)
+        int targetMidiNoteRelative = MidiUtils.GetRelativePitch(targetNote.MidiNote);
+        int recordedMidiNoteRelative = MidiUtils.GetRelativePitch(lastRecordedNote.RoundedMidiNote);
+        bool isPerfect = ((targetMidiNoteRelative == recordedMidiNoteRelative)
             && (targetNote.StartBeat >= lastRecordedNote.StartBeat)
             && (targetNote.EndBeat <= lastRecordedNote.EndBeat));
         if (isPerfect)
