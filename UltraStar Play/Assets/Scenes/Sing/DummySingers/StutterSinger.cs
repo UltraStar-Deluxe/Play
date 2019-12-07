@@ -22,6 +22,6 @@ public class StutterSinger : AbstractDummySinger
         {
             currentMidiNote = 0;
         }
-        playerController.PlayerNoteRecorder.OnPitchDetected(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
     }
 }

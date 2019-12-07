@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UniRx;
 
@@ -16,14 +14,12 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
     private int RoundingDistance { get; set; }
 
-    private double lastPitchDetectedBeat;
-
     private RecordedNote lastRecordedNote;
+    private RecordedNote lastEndedNote;
+    private int nextNoteStartBeat;
 
     private PlayerProfile playerProfile;
     private MicProfile micProfile;
-
-    private IDisposable pitchEventStreamDisposable;
 
     private MicrophonePitchTracker MicrophonePitchTracker
     {
@@ -61,8 +57,8 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
     {
         if (micProfile != null)
         {
-            pitchEventStreamDisposable = MicrophonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
             MicrophonePitchTracker.StartPitchDetection();
+            MicrophonePitchTracker.PitchEventStream.Subscribe(HandlePitchEvent);
         }
         else
         {
@@ -79,7 +75,6 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
     {
         if (micProfile != null)
         {
-            pitchEventStreamDisposable?.Dispose();
             MicrophonePitchTracker.StopPitchDetection();
         }
     }
@@ -90,125 +85,125 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         return recordedNotes;
     }
 
-    public void OnPitchDetected(PitchEvent pitchEvent)
+    public void HandlePitchEvent(PitchEvent pitchEvent)
     {
-        int midiNote = pitchEvent.MidiNote;
         double currentBeat = singSceneController.CurrentBeat;
-        if (midiNote <= 0)
+        if (pitchEvent == null || pitchEvent.MidiNote <= 0)
         {
             if (lastRecordedNote != null)
             {
-                // End singing of last recorded note.
-                HandleEndOfLastRecordedNote(currentBeat);
-                // Debug.Log("Ended singing");
+                HandleRecordedNoteEnded(currentBeat);
             }
         }
         else
         {
             if (lastRecordedNote != null)
             {
-                if (lastRecordedNote.RecordedMidiNote == midiNote)
+                if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= RoundingDistance)
                 {
                     // Continue singing on same pitch
-                    lastRecordedNote.EndBeat = currentBeat;
-                    HandleContinuedNote(currentBeat);
-                    // Debug.Log("Continued note");
+                    HandleRecordedNoteContinued(currentBeat);
+                    // Debug.Log("Continued note to " + currentBeat);
                 }
                 else
                 {
-                    // Continue singing on different pitch.
-                    // Do this seamlessly, i.e., continue the last recorded note until now
-                    // and start the new note at the time the last note was recorded.
-                    HandleEndOfLastRecordedNote(currentBeat);
-                    lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
-                    // Debug.Log("Start new note (continued singing)");
+                    // Continue singing on different pitch. Finish the last recorded note.
+                    HandleRecordedNoteEnded(currentBeat);
                 }
             }
-            else
+
+            // The lastRecordedNote could be ended above, so the following null check is not redundant.
+            if (lastRecordedNote == null && currentBeat > nextNoteStartBeat)
             {
-                // Start singing
-                lastRecordedNote = new RecordedNote(midiNote, lastPitchDetectedBeat, currentBeat);
-                // Debug.Log("Start new note (started singing)");
+                // Start singing of a new note
+                HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
             }
         }
-        lastPitchDetectedBeat = currentBeat;
     }
 
-    private void HandleEndOfLastRecordedNote(double currentBeat)
+    private void HandleRecordedNoteStarted(int midiNote, double currentBeat)
     {
-        // End the note seamlessly, i.e., continue the last recorded note until now.
-        lastRecordedNote.EndBeat = currentBeat;
-        LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
-        playerController.OnRecordedNoteEnded(lastRecordedNote);
-        lastRecordedNote = null;
-    }
-
-    private void HandleContinuedNote(double currentBeat)
-    {
-        if (lastRecordedNote == null)
-        {
-            return;
-        }
-
-        if (playerController == null)
-        {
-            lastRecordedNote = null;
-            return;
-        }
         Sentence currentSentence = playerController.CurrentSentence;
-        if (currentSentence == null)
-        {
-            lastRecordedNote = null;
-            return;
-        }
 
         // Only accept recorded notes where a note is expected in the song
         Note noteAtCurrentBeat = GetNoteAtBeat(currentSentence, currentBeat);
         if (noteAtCurrentBeat == null)
         {
-            lastRecordedNote = null;
             return;
         }
 
+        // If the last note ended at the start of the new note, then continue using the last ended note.
+        int roundedMidiNote = GetRoundedMidiNoteForRecordedNote(noteAtCurrentBeat, midiNote);
+        double startBeat = Math.Floor(currentBeat);
+        if (lastEndedNote != null && lastEndedNote.EndBeat == startBeat && lastEndedNote.RoundedMidiNote == roundedMidiNote)
+        {
+            lastRecordedNote = lastEndedNote;
+            HandleRecordedNoteContinued(currentBeat);
+            // Debug.Log("Continue with last ended note");
+            return;
+        }
+
+        lastRecordedNote = new RecordedNote(midiNote, Math.Floor(currentBeat), currentBeat);
         // The note at the same beat is the target note that should be sung
         lastRecordedNote.TargetNote = noteAtCurrentBeat;
-        LimitRecordedNoteBoundsToTargetNoteBounds(lastRecordedNote);
-        RoundRecordedNotePitchToTargetNotePitch(lastRecordedNote);
+        lastRecordedNote.RoundedMidiNote = roundedMidiNote;
 
         // Remember this note
         AddRecordedNote(lastRecordedNote, currentSentence);
 
-        playerController.OnRecordedNoteContinued(lastRecordedNote);
+        // Debug.Log("Started new note at " + lastRecordedNote.StartBeat);
     }
 
-    private void RoundRecordedNotePitchToTargetNotePitch(RecordedNote recordedNote)
+    private void HandleRecordedNoteContinued(double currentBeat)
     {
-        Note targetNote = recordedNote.TargetNote;
+        lastRecordedNote.EndBeat = currentBeat;
+
+        bool targetNoteIsDone = (lastRecordedNote.TargetNote != null && lastRecordedNote.EndBeat >= lastRecordedNote.TargetNote.EndBeat);
+        if (targetNoteIsDone)
+        {
+            lastRecordedNote.EndBeat = lastRecordedNote.TargetNote.EndBeat;
+            playerController.OnRecordedNoteEnded(lastRecordedNote);
+        }
+        else
+        {
+            playerController.OnRecordedNoteContinued(lastRecordedNote);
+        }
+
+        if (targetNoteIsDone)
+        {
+            lastRecordedNote = null;
+        }
+    }
+
+    private void HandleRecordedNoteEnded(double currentBeat)
+    {
+        // Extend the note to the end of the beat
+        lastRecordedNote.EndBeat = Math.Ceiling(currentBeat);
+        if (lastRecordedNote.TargetNote != null
+            && lastRecordedNote.EndBeat > lastRecordedNote.TargetNote.EndBeat)
+        {
+            lastRecordedNote.EndBeat = lastRecordedNote.TargetNote.EndBeat;
+        }
+
+        // The next note can be recorded starting from the next beat.
+        nextNoteStartBeat = (int)lastRecordedNote.EndBeat;
+
+        playerController.OnRecordedNoteEnded(lastRecordedNote);
+        lastEndedNote = lastRecordedNote;
+        lastRecordedNote = null;
+    }
+
+    private int GetRoundedMidiNoteForRecordedNote(Note targetNote, int recordedMidiNote)
+    {
         if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
         {
             // Rap notes accept any noise as correct note.
-            recordedNote.RoundedMidiNote = targetNote.MidiNote;
+            return targetNote.MidiNote;
         }
         else
         {
             // Round recorded note if it is close to the target note.
-            recordedNote.RoundedMidiNote = GetRoundedMidiNote(recordedNote.RecordedMidiNote, targetNote.MidiNote, RoundingDistance);
-        }
-    }
-
-    private void LimitRecordedNoteBoundsToTargetNoteBounds(RecordedNote recordedNote)
-    {
-        Note targetNote = recordedNote.TargetNote;
-        if (targetNote != null)
-        {
-            if (recordedNote.StartBeat < targetNote.StartBeat)
-            {
-                recordedNote.StartBeat = targetNote.StartBeat;
-            }
-            if (recordedNote.EndBeat > targetNote.EndBeat)
-            {
-                recordedNote.EndBeat = targetNote.EndBeat;
-            }
+            return GetRoundedMidiNote(recordedMidiNote, targetNote.MidiNote, RoundingDistance);
         }
     }
 
@@ -227,6 +222,11 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
 
     public static Note GetNoteAtBeat(Sentence sentence, double beat)
     {
+        if (sentence == null)
+        {
+            return null;
+        }
+
         foreach (Note note in sentence.Notes)
         {
             if (beat >= note.StartBeat && beat <= note.EndBeat)

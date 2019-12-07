@@ -58,17 +58,16 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     void Awake()
     {
-        audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(pitchEventStream, SampleRateHz);
-
         // Update label in inspector for debugging.
-        pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = ((pitchEvent.MidiNote > 0)
+        pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = (pitchEvent != null)
                                                                     ? MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)
-                                                                    : ""));
+                                                                    : "");
     }
 
     void OnEnable()
     {
         audioSource = GetComponent<AudioSource>();
+        audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
         audioSamplesAnalyzer.Enable();
     }
 
@@ -168,7 +167,10 @@ public class MicrophonePitchTracker : MonoBehaviour
         ApplyMicAmplification(samplesSinceLastFrame);
 
         // Detect the pitch of the sample.
-        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
+
+        // Notify listeners
+        pitchEventStream.OnNext(pitchEvent);
     }
 
     private void ApplyMicAmplification(int samplesSinceLastFrame)

@@ -20,6 +20,6 @@ public class PerfectSinger : AbstractDummySinger
         {
             currentMidiNote = noteAtCurrentBeat.MidiNote;
         }
-        playerController.PlayerNoteRecorder.OnPitchDetected(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
     }
 }
