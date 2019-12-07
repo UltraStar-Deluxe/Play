@@ -1049,6 +1049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndexToSimulate: 0
+  offset: 12
 --- !u!4 &908260464
 Transform:
   m_ObjectHideFlags: 0

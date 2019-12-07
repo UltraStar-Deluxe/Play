@@ -6,9 +6,11 @@ using UnityEngine;
 
 public class PerfectSinger : AbstractDummySinger
 {
-    protected override void UpdateSinging(PlayerController playerController, double currentBeat)
+    public int offset = 12;
+
+    public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController.CurrentSentence;
+        Sentence currentSentence = playerController?.CurrentSentence;
         if (currentSentence == null)
         {
             return;
@@ -18,7 +20,7 @@ public class PerfectSinger : AbstractDummySinger
         Note noteAtCurrentBeat = PlayerNoteRecorder.GetNoteAtBeat(currentSentence, currentBeat);
         if (noteAtCurrentBeat != null)
         {
-            currentMidiNote = noteAtCurrentBeat.MidiNote;
+            currentMidiNote = noteAtCurrentBeat.MidiNote + offset;
         }
         playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
     }
