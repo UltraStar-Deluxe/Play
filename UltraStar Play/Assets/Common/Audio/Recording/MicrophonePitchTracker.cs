@@ -13,6 +13,8 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     [ReadOnly]
     public string lastMidiNoteName;
+    [ReadOnly]
+    public int lastMidiNote;
 
     private int micAmplifyMultiplier;
     private MicProfile micProfile;
@@ -59,9 +61,21 @@ public class MicrophonePitchTracker : MonoBehaviour
     void Awake()
     {
         // Update label in inspector for debugging.
-        pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = (pitchEvent != null)
-                                                                    ? MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)
-                                                                    : "");
+        pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
+    }
+
+    private void UpdateLastMidiNoteFields(PitchEvent pitchEvent)
+    {
+        if (pitchEvent == null)
+        {
+            lastMidiNoteName = "";
+            lastMidiNote = 0;
+        }
+        else
+        {
+            lastMidiNoteName = MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
+            lastMidiNote = pitchEvent.MidiNote;
+        }
     }
 
     void OnEnable()
