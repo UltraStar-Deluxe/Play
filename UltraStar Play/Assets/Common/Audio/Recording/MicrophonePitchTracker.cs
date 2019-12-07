@@ -126,7 +126,7 @@ public class MicrophonePitchTracker : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Stop recording with '{MicProfile}'");
+        Debug.Log($"Stop recording with '{MicProfile.Name}'");
         UnityEngine.Microphone.End(MicProfile.Name);
         startedPitchDetection = false;
     }
