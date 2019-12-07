@@ -4,6 +4,11 @@ using System.Collections.Generic;
 public static class ListExtensions
 {
 
+    public static string ToCsv<T>(this IEnumerable<T> values, string separator = ",", string prefix = "[", string suffix = "]")
+    {
+        return prefix + string.Join(separator, values) + suffix;
+    }
+
     public static void AddIfNotContains<T>(this List<T> list, T item)
     {
         if (!list.Contains(item))
