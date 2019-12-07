@@ -79,11 +79,10 @@ public class PlayerController : MonoBehaviour
         playerUiController.Init(PlayerProfile, MicProfile);
     }
 
-    public void SetPositionInSongInMillis(double positionInSongInMillis)
+    public void SetCurrentBeat(double currentBeat)
     {
         // Change the current sentence, when the current beat is over its last note.
-        double currentBeat = BpmUtils.MillisecondInSongToBeat(SongMeta, positionInSongInMillis);
-        if (CurrentSentence != null && currentBeat > (double)CurrentSentence.EndBeat)
+        if (CurrentSentence != null && currentBeat >= (double)CurrentSentence.EndBeat)
         {
             OnSentenceEnded();
         }
@@ -191,9 +190,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnSentenceEnded()
     {
+        PlayerNoteRecorder.OnSentenceEnded();
         List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(CurrentSentence);
         SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
-        playerUiController.ShowTotalScore((int)PlayerScoreController.TotalScore);
+        playerUiController.ShowTotalScore(PlayerScoreController.TotalScore);
         if (sentenceRating != null)
         {
             playerUiController.ShowSentenceRating(sentenceRating);

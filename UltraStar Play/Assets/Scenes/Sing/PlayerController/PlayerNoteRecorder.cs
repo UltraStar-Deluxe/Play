@@ -21,6 +21,8 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
     private PlayerProfile playerProfile;
     private MicProfile micProfile;
 
+    private double lastBeat;
+
     private MicrophonePitchTracker MicrophonePitchTracker
     {
         get
@@ -85,9 +87,40 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         return recordedNotes;
     }
 
+    public void OnSentenceEnded()
+    {
+        // Finish the last note.
+        if (lastRecordedNote != null)
+        {
+            double currentBeat = singSceneController.CurrentBeat;
+            HandleRecordedNoteEnded(currentBeat);
+        }
+    }
+
     public void HandlePitchEvent(PitchEvent pitchEvent)
     {
         double currentBeat = singSceneController.CurrentBeat;
+
+        // It could be that some beats have been missed, for example because the frame rate was too low.
+        // In this case, the pitch event is fired here also for the missed beats.
+        if (lastBeat < currentBeat)
+        {
+            int missedBeats = (int)(currentBeat - lastBeat);
+            if (missedBeats > 0)
+            {
+                for (int i = 1; i <= missedBeats; i++)
+                {
+                    HandlePitchEvent(pitchEvent, lastBeat + i);
+                }
+            }
+        }
+        HandlePitchEvent(pitchEvent, currentBeat);
+
+        lastBeat = currentBeat;
+    }
+
+    private void HandlePitchEvent(PitchEvent pitchEvent, double currentBeat)
+    {
         if (pitchEvent == null || pitchEvent.MidiNote <= 0)
         {
             if (lastRecordedNote != null)
@@ -103,7 +136,6 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
                 {
                     // Continue singing on same pitch
                     HandleRecordedNoteContinued(currentBeat);
-                    // Debug.Log("Continued note to " + currentBeat);
                 }
                 else
                 {
@@ -113,10 +145,13 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
             }
 
             // The lastRecordedNote could be ended above, so the following null check is not redundant.
-            if (lastRecordedNote == null && currentBeat > nextNoteStartBeat)
+            if (lastRecordedNote == null)
             {
-                // Start singing of a new note
-                HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
+                if (currentBeat >= nextNoteStartBeat)
+                {
+                    // Start singing of a new note
+                    HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
+                }
             }
         }
     }
@@ -135,23 +170,24 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         // If the last note ended at the start of the new note, then continue using the last ended note.
         int roundedMidiNote = GetRoundedMidiNoteForRecordedNote(noteAtCurrentBeat, midiNote);
         double startBeat = Math.Floor(currentBeat);
-        if (lastEndedNote != null && lastEndedNote.EndBeat == startBeat && lastEndedNote.RoundedMidiNote == roundedMidiNote)
+        if (lastEndedNote != null
+            && lastEndedNote.Sentence == currentSentence
+            && lastEndedNote.EndBeat == startBeat
+            && lastEndedNote.RoundedMidiNote == roundedMidiNote)
         {
             lastRecordedNote = lastEndedNote;
             HandleRecordedNoteContinued(currentBeat);
-            // Debug.Log("Continue with last ended note");
             return;
         }
 
         lastRecordedNote = new RecordedNote(midiNote, Math.Floor(currentBeat), currentBeat);
         // The note at the same beat is the target note that should be sung
         lastRecordedNote.TargetNote = noteAtCurrentBeat;
+        lastRecordedNote.Sentence = currentSentence;
         lastRecordedNote.RoundedMidiNote = roundedMidiNote;
 
         // Remember this note
         AddRecordedNote(lastRecordedNote, currentSentence);
-
-        // Debug.Log("Started new note at " + lastRecordedNote.StartBeat);
     }
 
     private void HandleRecordedNoteContinued(double currentBeat)

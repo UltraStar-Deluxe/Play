@@ -8,9 +8,9 @@ public class ChangingOffsetSinger : AbstractDummySinger
     private int noteOffset;
     Note lastNote;
 
-    protected override void UpdateSinging(PlayerController playerController, double currentBeat)
+    public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController.CurrentSentence;
+        Sentence currentSentence = playerController?.CurrentSentence;
         if (currentSentence == null)
         {
             return;
