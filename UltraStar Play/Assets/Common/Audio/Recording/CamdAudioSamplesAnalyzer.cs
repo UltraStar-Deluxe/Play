@@ -149,6 +149,27 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         // return circular average magnitude difference
         return correlation;
     }
+    
+    private void OnPitchDetected(int midiPitch)
+    {
+        lastPitchDetectedFrame = Time.frameCount;
+
+        // Create history of PitchRecord events
+        pitchRecordHistory.Add(midiPitch);
+        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
+        {
+            pitchRecordHistory.RemoveAt(0);
+        }
+
+        // Calculate median of recorded midi note values.
+        // This is done to make the pitch detection more stable, but it increases the latency.
+        List<int> sortedPitchRecordHistory = new List<int>(pitchRecordHistory);
+        sortedPitchRecordHistory.Sort((pitchRecord1, pitchRecord2) => pitchRecord1.CompareTo(pitchRecord2));
+        int midiNoteMedian = sortedPitchRecordHistory[sortedPitchRecordHistory.Count / 2];
+
+        PitchEvent pitchEvent = new PitchEvent(midiNoteMedian);
+        pitchEventStream.OnNext(pitchEvent);
+    }
 
     private void OnNoPitchDetected()
     {
