@@ -86,11 +86,11 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         // get best fitting tone
         double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse);
 
-        // no idea where the +3 is coming from...
-        int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi + 3;
+        int halftone = CalculateBestFittingHalftone(correlation);
         if (halftone != -1 && isEnabled)
         {
-            OnPitchDetected(halftone);
+            // add C5 (A4 + 3 halftones) as offset to the detected pitch
+            OnPitchDetected(halftone + BaseToneMidi + 3);
         }
         else
         {
@@ -143,31 +143,9 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
                         audioSamplesBuffer[(index + halftoneDelays[halftone]) & (samplesSinceLastFrame - 1)] -
                         audioSamplesBuffer[index]);
             }
-            correlation[halftone] = correlation[halftone] / samplesSinceLastFrame;
         }
         // return circular average magnitude difference
         return correlation;
-    }
-
-    private void OnPitchDetected(int midiPitch)
-    {
-        lastPitchDetectedFrame = Time.frameCount;
-
-        // Create history of PitchRecord events
-        pitchRecordHistory.Add(midiPitch);
-        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
-        {
-            pitchRecordHistory.RemoveAt(0);
-        }
-
-        // Calculate median of recorded midi note values.
-        // This is done to make the pitch detection more stable, but it increases the latency.
-        List<int> sortedPitchRecordHistory = new List<int>(pitchRecordHistory);
-        sortedPitchRecordHistory.Sort((pitchRecord1, pitchRecord2) => pitchRecord1.CompareTo(pitchRecord2));
-        int midiNoteMedian = sortedPitchRecordHistory[sortedPitchRecordHistory.Count / 2];
-
-        PitchEvent pitchEvent = new PitchEvent(midiNoteMedian);
-        pitchEventStream.OnNext(pitchEvent);
     }
 
     private void OnNoPitchDetected()
