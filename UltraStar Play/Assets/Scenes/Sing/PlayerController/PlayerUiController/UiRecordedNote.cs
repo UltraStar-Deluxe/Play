@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class UiRecordedNote : MonoBehaviour
 {
-    public float colorFactor = 0.7f;
+    public float colorFactor = 0.6f;
 
     private Image image;
 

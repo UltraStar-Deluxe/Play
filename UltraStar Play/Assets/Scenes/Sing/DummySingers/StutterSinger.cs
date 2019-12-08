@@ -1,13 +1,9 @@
-﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class PerfectSinger : AbstractDummySinger
+public class StutterSinger : AbstractDummySinger
 {
-    public int offset = 12;
-
     public override void UpdateSinging(double currentBeat)
     {
         Sentence currentSentence = playerController?.CurrentSentence;
@@ -16,11 +12,15 @@ public class PerfectSinger : AbstractDummySinger
             return;
         }
 
-        int currentMidiNote = 0;
+        int currentMidiNote = Random.Range(33, 70);
         Note noteAtCurrentBeat = PlayerNoteRecorder.GetNoteAtBeat(currentSentence, currentBeat);
         if (noteAtCurrentBeat != null)
         {
-            currentMidiNote = noteAtCurrentBeat.MidiNote + offset;
+            currentMidiNote = noteAtCurrentBeat.MidiNote + Random.Range(-3, 3);
+        }
+        if (Random.Range(0, 5) == 0)
+        {
+            currentMidiNote = 0;
         }
         playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
     }

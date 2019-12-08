@@ -1,25 +1,11 @@
+using System;
 using UnityEngine;
 
 abstract public class AbstractDummySinger : MonoBehaviour
 {
     public int playerIndexToSimulate;
 
-    private SingSceneController singSceneController;
-
-    private PlayerController PlayerController
-    {
-        get
-        {
-            if (singSceneController.PlayerControllers.Count > playerIndexToSimulate)
-            {
-                return singSceneController.PlayerControllers[playerIndexToSimulate];
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
+    protected PlayerController playerController;
 
     void Awake()
     {
@@ -29,25 +15,12 @@ abstract public class AbstractDummySinger : MonoBehaviour
         }
     }
 
-    void Start()
+    public abstract void UpdateSinging(double currentBeat);
+
+    public void SetPlayerController(PlayerController playerController)
     {
-        singSceneController = SingSceneController.Instance;
+        this.playerController = playerController;
+        // Disable real microphone input for this player
+        playerController.PlayerNoteRecorder.SetMicrophonePitchTrackerEnabled(false);
     }
-
-    void Update()
-    {
-        if (PlayerController == null)
-        {
-            return;
-        }
-
-        // Disable normal pitch detection of the PlayerController
-        PlayerController.PlayerNoteRecorder.SetMicrophonePitchTrackerEnabled(false);
-
-        // Simulate singing
-        double currentBeat = singSceneController.CurrentBeat;
-        UpdateSinging(PlayerController, currentBeat);
-    }
-
-    protected abstract void UpdateSinging(PlayerController playerController, double currentBeat);
 }
