@@ -145,13 +145,10 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
             }
 
             // The lastRecordedNote could be ended above, so the following null check is not redundant.
-            if (lastRecordedNote == null)
+            if (lastRecordedNote == null && currentBeat >= nextNoteStartBeat)
             {
-                if (currentBeat >= nextNoteStartBeat)
-                {
-                    // Start singing of a new note
-                    HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
-                }
+                // Start singing of a new note
+                HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
             }
         }
     }
@@ -199,15 +196,11 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         {
             lastRecordedNote.EndBeat = lastRecordedNote.TargetNote.EndBeat;
             playerController.OnRecordedNoteEnded(lastRecordedNote);
+            lastRecordedNote = null;
         }
         else
         {
             playerController.OnRecordedNoteContinued(lastRecordedNote);
-        }
-
-        if (targetNoteIsDone)
-        {
-            lastRecordedNote = null;
         }
     }
 
