@@ -4,7 +4,7 @@ public static class MoveCornersToAnchorsExtensions
 {
     public static void MoveCornersToAnchors(this RectTransform rectTransform)
     {
-        rectTransform.sizeDelta = new Vector2(0, 0);
+        rectTransform.sizeDelta = Vector2.zero;
         rectTransform.anchoredPosition = Vector2.zero;
     }
 

@@ -1,4 +1,4 @@
-public struct PitchEvent
+public class PitchEvent
 {
     public int MidiNote { get; set; }
 

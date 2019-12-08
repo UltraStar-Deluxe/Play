@@ -95,8 +95,12 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void CreateUiNote(Note note)
     {
-        UiNote uiNote = Instantiate(uiNotePrefab);
-        uiNote.transform.SetParent(uiNotesContainer);
+        if (note.StartBeat == note.EndBeat)
+        {
+            return;
+        }
+
+        UiNote uiNote = Instantiate(uiNotePrefab, uiNotesContainer);
         uiNote.Init(note, uiEffectsContainer);
         if (micProfile != null)
         {
@@ -137,10 +141,14 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
+        if (recordedNote.StartBeat == recordedNote.EndBeat)
+        {
+            return;
+        }
+
         int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
-        UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab);
-        uiNote.transform.SetParent(uiRecordedNotesContainer);
+        UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
         if (micProfile != null)
         {
             uiNote.SetColorOfMicProfile(micProfile);
@@ -159,7 +167,6 @@ public class SentenceDisplayer : MonoBehaviour
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
-
         recordedNoteToUiRecordedNoteMap[recordedNote] = uiNote;
     }
 
@@ -174,15 +181,14 @@ public class SentenceDisplayer : MonoBehaviour
         int sentenceEndBeat = displayedSentence.EndBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
-        double anchorY = (double)noteLine / (double)noteLineCount;
-        double anchorX = (double)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
-        Vector2 anchor = new Vector2((float)anchorX, (float)anchorY);
-        uiNote.anchorMin = anchor;
-        uiNote.anchorMax = anchor;
-        uiNote.anchoredPosition = Vector2.zero;
+        float anchorY = (float)noteLine / noteLineCount;
+        float anchorXStart = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
+        float anchorXEnd = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
 
-        float length = (float)(noteEndBeat - noteStartBeat);
-        uiNote.sizeDelta = new Vector2(800f * length / (float)beatsInSentence, uiNote.sizeDelta.y);
+        uiNote.anchorMin = new Vector2(anchorXStart, anchorY);
+        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY);
+        uiNote.MoveCornersToAnchors_Width();
+        uiNote.MoveCornersToAnchors_CenterPosition();
     }
 
     public void CreatePerfectSentenceEffect()
