@@ -14,16 +14,14 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
     private static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
 
     private readonly int[] halftoneDelays;
-    private readonly Subject<PitchEvent> pitchEventStream;
     private readonly List<int> pitchRecordHistory = new List<int>();
     private readonly int pitchRecordHistoryLength = 5;
 
     private bool isEnabled;
     private int lastPitchDetectedFrame;
 
-    public CamdAudioSamplesAnalyzer(Subject<PitchEvent> pitchEventStream, int sampleRateHz)
+    public CamdAudioSamplesAnalyzer(int sampleRateHz)
     {
-        this.pitchEventStream = pitchEventStream;
         halftoneDelays = PrecalculateHalftoneDelays(halftoneFrequencies, sampleRateHz);
     }
 
@@ -57,13 +55,13 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         isEnabled = false;
     }
 
-    public void ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
+    public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
     {
         if (!isEnabled || samplesSinceLastFrame < MinSampleLength || lastPitchDetectedFrame == Time.frameCount)
         {
-            return;
+            return null;
         }
-
+        lastPitchDetectedFrame = Time.frameCount;
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
         // check if samples is louder than threshhold
@@ -80,7 +78,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         if (!passesThreshold)
         {
             OnNoPitchDetected();
-            return;
+            return null;
         }
 
         // get best fitting tone
@@ -90,12 +88,15 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi + 3;
         if (halftone != -1 && isEnabled)
         {
-            OnPitchDetected(halftone);
+            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone);
+            if (midiNoteMedian > 0)
+            {
+                return new PitchEvent(midiNoteMedian);
+            }
         }
-        else
-        {
-            OnNoPitchDetected();
-        }
+
+        OnNoPitchDetected();
+        return null;
     }
 
     private static int PreviousPowerOfTwo(int x)
@@ -149,33 +150,31 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         return correlation;
     }
 
-    private void OnPitchDetected(int midiPitch)
+    private int GetMidiNoteAverageFromHistory(int midiNote)
     {
-        lastPitchDetectedFrame = Time.frameCount;
-
         // Create history of PitchRecord events
-        pitchRecordHistory.Add(midiPitch);
-        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
-        {
-            pitchRecordHistory.RemoveAt(0);
-        }
+        AddMidiNoteToHistory(midiNote);
 
         // Calculate median of recorded midi note values.
         // This is done to make the pitch detection more stable, but it increases the latency.
         List<int> sortedPitchRecordHistory = new List<int>(pitchRecordHistory);
-        sortedPitchRecordHistory.Sort((pitchRecord1, pitchRecord2) => pitchRecord1.CompareTo(pitchRecord2));
         int midiNoteMedian = sortedPitchRecordHistory[sortedPitchRecordHistory.Count / 2];
 
-        PitchEvent pitchEvent = new PitchEvent(midiNoteMedian);
-        pitchEventStream.OnNext(pitchEvent);
+        return midiNoteMedian;
+    }
+
+    private void AddMidiNoteToHistory(int midiNote)
+    {
+        pitchRecordHistory.Add(midiNote);
+        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
+        {
+            pitchRecordHistory.RemoveAt(0);
+        }
     }
 
     private void OnNoPitchDetected()
     {
-        // no tone detected.
-        // Subscribers (such as the PlayerNoteRecorder) must know that the singing ended.
-        // Therefore, a midi pitch of 0 is interpreted as "no singing".
+        // No tone detected.
         pitchRecordHistory.Clear();
-        pitchEventStream.OnNext(new PitchEvent(0));
     }
 }

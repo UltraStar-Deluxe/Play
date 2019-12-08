@@ -8,9 +8,9 @@ public class ChangingOffsetSinger : AbstractDummySinger
     private int noteOffset;
     Note lastNote;
 
-    protected override void UpdateSinging(PlayerController playerController, double currentBeat)
+    public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController.CurrentSentence;
+        Sentence currentSentence = playerController?.CurrentSentence;
         if (currentSentence == null)
         {
             return;
@@ -28,7 +28,7 @@ public class ChangingOffsetSinger : AbstractDummySinger
             // (falling flank: now there is no note, but in last frame there was one)
             noteOffset = (noteOffset + 1) % 5;
         }
-        playerController.PlayerNoteRecorder.OnPitchDetected(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
 
         lastNote = noteAtCurrentBeat;
     }

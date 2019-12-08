@@ -5,12 +5,10 @@ using UnityEngine;
 public class SingingResultsSceneKeyboardController : MonoBehaviour
 {
 
-    private const KeyCode ContinueToNextSceneShortcut = KeyCode.Return;
-    private const KeyCode ContinueToNextSceneShortcut2 = KeyCode.Escape;
-
     void Update()
     {
-        if (Input.GetKeyUp(ContinueToNextSceneShortcut) || Input.GetKeyUp(ContinueToNextSceneShortcut2))
+        if (Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.Escape) || Input.GetKeyUp(KeyCode.Space)
+            || Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
         {
             SingingResultsSceneController.Instance.FinishScene();
         }

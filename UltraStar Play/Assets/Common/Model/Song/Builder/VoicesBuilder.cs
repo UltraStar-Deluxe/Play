@@ -233,7 +233,7 @@ public class MutableVoice
             if (lastSentence.EndBeat > sentence.StartBeat)
             {
                 Debug.LogWarning($"Sentence starts before previous sentence is over. Skipping this sentence."
-                + " (last ended on beat {lastSentence.EndBeat}, this should start on beat {sentence.StartBeat})");
+                + $" (last ended on beat {lastSentence.EndBeat}, this should start on beat {sentence.StartBeat})");
             }
             else if (lastSentence.LinebreakBeat > sentence.StartBeat)
             {

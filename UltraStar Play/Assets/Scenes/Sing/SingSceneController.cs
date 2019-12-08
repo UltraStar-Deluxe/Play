@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using System.Threading;
 
 public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
@@ -33,8 +34,9 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     private VideoPlayer videoPlayer;
     public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
 
-    private AudioSource audioPlayer;
+    public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
 
+    private AudioSource audioPlayer;
 
     private static SingSceneController instance;
     public static SingSceneController Instance
@@ -78,7 +80,11 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
+    // The last frame in which the position in the song was calculated
+    private int positionInSongInMillisFrame;
+
     // The current position in the song in milliseconds.
+    private double positionInSongInMillis;
     public double PositionInSongInMillis
     {
         get
@@ -87,10 +93,16 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             {
                 return 0;
             }
-            else
+            // The samples of an AudioClip change concurrently,
+            // even when they are queried in the same frame (e.g. Update() of different scripts).
+            // For a given frame, the position in the song should be the same for all scripts,
+            // which is why the value is only updated once per frame.
+            if (positionInSongInMillisFrame != Time.frameCount)
             {
-                return 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
+                positionInSongInMillisFrame = Time.frameCount;
+                positionInSongInMillis = 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
             }
+            return positionInSongInMillis;
         }
 
         set
@@ -114,7 +126,8 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             {
                 return 0;
             }
-            return (audioPlayer.clip.samples / audioPlayer.clip.frequency) * 1000.0f;
+            double lengthInMillis = 1000.0 * audioPlayer.clip.samples / audioPlayer.clip.frequency;
+            return lengthInMillis;
 
         }
     }
@@ -162,6 +175,24 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
                 playerProfilesWithoutMic.Add(playerProfile);
             }
             CreatePlayerController(playerProfile, micProfile);
+        }
+
+        // Handle dummy singers
+        if (Application.isEditor)
+        {
+            DummySingers = FindObjectsOfType<AbstractDummySinger>().ToList();
+            foreach (AbstractDummySinger dummySinger in DummySingers)
+            {
+                if (dummySinger.playerIndexToSimulate < PlayerControllers.Count)
+                {
+                    dummySinger.SetPlayerController(PlayerControllers[dummySinger.playerIndexToSimulate]);
+                }
+                else
+                {
+                    Debug.LogWarning("DummySinger cannot simulate player with index " + dummySinger.playerIndexToSimulate);
+                    dummySinger.gameObject.SetActive(false);
+                }
+            }
         }
 
         // Create warning about missing microphones
@@ -233,7 +264,16 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     void Update()
     {
         UpdateVideoStart();
-        PlayerControllers.ForEach(it => it.SetPositionInSongInMillis(PositionInSongInMillis));
+        PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
+
+        // TODO: Updating the pitch detection (including the dummy singers) for this frame must come after updating the current sentence.
+        // Otherwise, a pitch event may be fired for a beat of the "previous" sentence where no note is expected,
+        // afterwards the sentence changes (the note is expected now), but the pitch event is lost.
+
+        if (Application.isEditor)
+        {
+            DummySingers.ForEach(it => it.UpdateSinging(CurrentBeat));
+        }
     }
 
     private void UpdateVideoStart()
@@ -283,24 +323,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         songEditorSceneData.PositionInSongMillis = PositionInSongInMillis;
         songEditorSceneData.SelectedSongMeta = SongMeta;
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
-    }
-
-    private void CheckSongFinished()
-    {
-        if (audioPlayer.clip == null || DurationOfSongInMillis == 0)
-        {
-            return;
-        }
-
-        double missingMillis = DurationOfSongInMillis - PositionInSongInMillis;
-        if (missingMillis <= 0)
-        {
-            Invoke("FinishScene", 1f);
-        }
-        else
-        {
-            Invoke("CheckSongFinished", (float)(missingMillis / 1000.0));
-        }
     }
 
     public void FinishScene()
@@ -557,9 +579,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
                 // The time bar needs the duration of the song to calculate positions.
                 // The duration of the song should be available now.
                 InitTimeBar();
-
-                // Go to next scene when the song finishes
-                CheckSongFinished();
             }
         }
 
