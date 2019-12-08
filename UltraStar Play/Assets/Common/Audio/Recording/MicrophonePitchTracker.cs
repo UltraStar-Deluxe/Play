@@ -13,6 +13,8 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     [ReadOnly]
     public string lastMidiNoteName;
+    [ReadOnly]
+    public int lastMidiNote;
 
     private int micAmplifyMultiplier;
     private MicProfile micProfile;
@@ -58,17 +60,28 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     void Awake()
     {
-        audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(pitchEventStream, SampleRateHz);
-
         // Update label in inspector for debugging.
-        pitchEventStream.Subscribe(pitchEvent => lastMidiNoteName = ((pitchEvent.MidiNote > 0)
-                                                                    ? MidiUtils.GetAbsoluteName(pitchEvent.MidiNote)
-                                                                    : ""));
+        pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
+    }
+
+    private void UpdateLastMidiNoteFields(PitchEvent pitchEvent)
+    {
+        if (pitchEvent == null)
+        {
+            lastMidiNoteName = "";
+            lastMidiNote = 0;
+        }
+        else
+        {
+            lastMidiNoteName = MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
+            lastMidiNote = pitchEvent.MidiNote;
+        }
     }
 
     void OnEnable()
     {
         audioSource = GetComponent<AudioSource>();
+        audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
         audioSamplesAnalyzer.Enable();
     }
 
@@ -127,7 +140,7 @@ public class MicrophonePitchTracker : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Stop recording with '{MicProfile}'");
+        Debug.Log($"Stop recording with '{MicProfile.Name}'");
         UnityEngine.Microphone.End(MicProfile.Name);
         startedPitchDetection = false;
     }
@@ -168,7 +181,10 @@ public class MicrophonePitchTracker : MonoBehaviour
         ApplyMicAmplification(samplesSinceLastFrame);
 
         // Detect the pitch of the sample.
-        audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
+
+        // Notify listeners
+        pitchEventStream.OnNext(pitchEvent);
     }
 
     private void ApplyMicAmplification(int samplesSinceLastFrame)

@@ -13,20 +13,58 @@ public class PlayerScoreController : MonoBehaviour
     public static readonly int MaxPerfectSentenceBonusScore = 1000;
     public static readonly int MaxScoreForNotes = MaxScore - MaxPerfectSentenceBonusScore;
 
-    public double TotalScore
+    public int TotalScore
     {
         get
         {
             return NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
         }
     }
-    public double NormalNotesTotalScore { get; private set; }
-    public double GoldenNotesTotalScore { get; private set; }
-    public double PerfectSentenceBonusTotalScore { get; private set; }
 
-    private double ScoreForCorrectBeatOfNormalNotes { get; set; }
-    private double ScoreForCorrectBeatOfGoldenNotes { get; set; }
-    private double ScoreForPerfectSentence { get; set; }
+    public int NormalNotesTotalScore
+    {
+        get
+        {
+            return (int)(maxScoreForNormalNotes * correctNormalNoteLengthTotal / normalNoteLengthTotal);
+        }
+    }
+
+    public int GoldenNotesTotalScore
+    {
+        get
+        {
+            return (int)(maxScoreForGoldenNotes * correctGoldenNoteLengthTotal / goldenNoteLengthTotal);
+        }
+    }
+
+    public int PerfectSentenceBonusTotalScore
+    {
+        get
+        {
+            int targetSentenceCount = (sentenceCount > 20) ? 20 : sentenceCount;
+            double score = (double)MaxPerfectSentenceBonusScore * perfectSentenceCount / targetSentenceCount;
+
+            // Round the score up
+            score = Math.Ceiling(score);
+            if (score > MaxPerfectSentenceBonusScore)
+            {
+                score = MaxPerfectSentenceBonusScore;
+            }
+            return (int)score;
+        }
+    }
+
+    private int perfectSentenceCount;
+    private int sentenceCount;
+
+    private double maxScoreForNormalNotes;
+    private double maxScoreForGoldenNotes;
+
+    private double normalNoteLengthTotal;
+    private double goldenNoteLengthTotal;
+
+    private double correctNormalNoteLengthTotal;
+    private double correctGoldenNoteLengthTotal;
 
     public void Init(Voice voice)
     {
@@ -46,135 +84,97 @@ public class PlayerScoreController : MonoBehaviour
         }
 
         // Correctly sung notes
-        double correctNormalNoteLength = GetCorrectlySungNoteLength(sentence.NormalNotes, recordedNotes);
-        double correctGoldenNoteLength = GetCorrectlySungNoteLength(sentence.GoldenNotes, recordedNotes);
+        double correctNormalNoteLength = recordedNotes.Select(it => GetCorrectlySungNormalNoteLength(it)).Sum();
+        double correctGoldenNoteLength = recordedNotes.Select(it => GetCorrectlySungGoldenNoteLength(it)).Sum();
         double correctNotesLength = correctNormalNoteLength + correctGoldenNoteLength;
         double totalNotesLength = GetNormalNoteLength(sentence) + GetGoldenNoteLength(sentence);
         double correctNotesPercentage = correctNotesLength / totalNotesLength;
 
-        // Score for notes
-        double scoreForNormalNotes = correctNormalNoteLength * ScoreForCorrectBeatOfNormalNotes;
-        double scoreForGoldenNotes = correctGoldenNoteLength * ScoreForCorrectBeatOfGoldenNotes;
-        NormalNotesTotalScore += scoreForNormalNotes;
-        GoldenNotesTotalScore += scoreForGoldenNotes;
+        // Sum up correctly sung beats
+        correctNormalNoteLengthTotal += (int)correctNormalNoteLength;
+        correctGoldenNoteLengthTotal += (int)correctGoldenNoteLength;
 
         // Score for a perfect sentence
         if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
         {
-            PerfectSentenceBonusTotalScore = (PerfectSentenceBonusTotalScore + ScoreForPerfectSentence);
-        }
-        // Not all sentences need to be perfect to achieve the maximum perfect sentence bonus score.
-        // Thus, the limit has to be checked that it does not exceed the maximum.
-        if (PerfectSentenceBonusTotalScore > MaxPerfectSentenceBonusScore)
-        {
-            PerfectSentenceBonusTotalScore = MaxPerfectSentenceBonusScore;
+            perfectSentenceCount++;
         }
 
         SentenceRating sentenceRating = GetSentenceRating(sentence, correctNotesPercentage);
         return sentenceRating;
     }
 
-    private double GetCorrectlySungNoteLength(List<Note> notes, List<RecordedNote> recordedNotes)
+    private int GetCorrectlySungNormalNoteLength(RecordedNote recordedNote)
     {
-        double correctlySungOverlap = 0;
-        foreach (Note note in notes)
+        if (recordedNote.TargetNote == null || !recordedNote.TargetNote.IsNormal)
         {
-            foreach (RecordedNote recordedNote in recordedNotes)
-            {
-                double correctlySungOverlapOfNote = GetCorrectlySungOverlap(note, recordedNote);
-                correctlySungOverlap += correctlySungOverlapOfNote;
-            }
+            return 0;
         }
-        return correctlySungOverlap;
+
+        return GetCorrectlySungNoteLength(recordedNote);
     }
 
-    private double GetCorrectlySungOverlap(Note note, RecordedNote recordedNote)
+    private int GetCorrectlySungGoldenNoteLength(RecordedNote recordedNote)
     {
-        if (note.MidiNote != recordedNote.RoundedMidiNote)
+        if (recordedNote.TargetNote == null || !recordedNote.TargetNote.IsGolden)
         {
             return 0;
         }
 
-        return GetOverlap(note, recordedNote);
+        return GetCorrectlySungNoteLength(recordedNote);
     }
 
-    private double GetOverlap(Note note, RecordedNote recordedNote)
+    private int GetCorrectlySungNoteLength(RecordedNote recordedNote)
     {
-        // No width that could overlap
-        if (recordedNote.StartBeat == recordedNote.EndBeat || note.StartBeat == note.EndBeat)
+        if (recordedNote.TargetNote == null)
         {
             return 0;
         }
 
-        // note: |----|               |----|
-        //  rec:         |--|   |--|
-        if (recordedNote.StartBeat >= note.EndBeat || recordedNote.EndBeat <= note.StartBeat)
+        if (MidiUtils.GetRelativePitch(recordedNote.TargetNote.MidiNote) != MidiUtils.GetRelativePitch(recordedNote.RoundedMidiNote))
         {
             return 0;
         }
 
-        // From here on, there must be some overlap, either inside or half outside.
-        // note: |----|
-        //  rec:  |--| 
-        if (recordedNote.StartBeat >= note.StartBeat && recordedNote.EndBeat <= note.EndBeat)
-        {
-            // RecordedNote completely overlaps
-            return recordedNote.LengthInBeats;
-        }
-
-        // note:    |----|
-        //  rec:  |--| 
-        if (recordedNote.StartBeat <= note.StartBeat)
-        {
-            return recordedNote.EndBeat - note.StartBeat;
-        }
-
-        // note:    |----|
-        //  rec:       |--| 
-        if (recordedNote.EndBeat >= note.EndBeat)
-        {
-            return note.EndBeat - recordedNote.StartBeat;
-        }
-
-        // This should never be reached
-        Debug.LogError("Should never get here. " +
-                        "GetOverlap must have a missing case in its definition " +
-                        $"({note.StartBeat}, {note.EndBeat}) ({recordedNote.StartBeat}, {recordedNote.EndBeat}).");
-        return 0;
+        int correctlySungNoteLength = (int)(recordedNote.EndBeat - recordedNote.StartBeat);
+        return correctlySungNoteLength;
     }
 
     private void UpdateMaxScores(List<Sentence> sentences)
     {
         // Calculate the points for a single beat of a normal or golden note
-        double normalNoteLengthTotal = 0;
-        double goldenNoteLengthTotal = 0;
+        normalNoteLengthTotal = 0;
+        goldenNoteLengthTotal = 0;
         foreach (Sentence sentence in sentences)
         {
             normalNoteLengthTotal += GetNormalNoteLength(sentence);
             goldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        ScoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / (normalNoteLengthTotal + (2 * goldenNoteLengthTotal));
-        ScoreForCorrectBeatOfGoldenNotes = 2 * ScoreForCorrectBeatOfNormalNotes;
+        double scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / (normalNoteLengthTotal + (2 * goldenNoteLengthTotal));
+        double scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
+
+        maxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * normalNoteLengthTotal;
+        maxScoreForGoldenNotes = scoreForCorrectBeatOfGoldenNotes * goldenNoteLengthTotal;
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
-        double pointsForAllNotes = ScoreForCorrectBeatOfNormalNotes * normalNoteLengthTotal
-                                 + ScoreForCorrectBeatOfGoldenNotes * goldenNoteLengthTotal;
+        double pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
         bool isSound = (MaxScoreForNotes == pointsForAllNotes);
         if (!isSound)
         {
             Debug.LogWarning("The definition of scores for normal or golden notes is not sound.");
         }
 
-        // Calculate score for a perfect line.
-        // This is a bonus score of which the maximum amount can be achieved without all sentences beeing perfect.
-        // Thus, there is a minimum value given here.
-        // As a result, the score for perfect sentences has to be checked not to exceed the maximum.
-        ScoreForPerfectSentence = (int)Math.Ceiling((double)MaxPerfectSentenceBonusScore / sentences.Count);
-        if (ScoreForPerfectSentence < 50)
-        {
-            ScoreForPerfectSentence = 50;
-        }
+        // Round the values for the max score of normal / golden notes to avoid floating point inaccuracy.
+        maxScoreForNormalNotes = Math.Ceiling(maxScoreForNormalNotes);
+        maxScoreForGoldenNotes = Math.Ceiling(maxScoreForGoldenNotes);
+        // The sum of the rounded points must not exceed the MaxScoreForNotes.
+        // If the definition is sound then the overhang is at most 2 because of the above rounding.
+        int overhang = (int)(maxScoreForNormalNotes + maxScoreForGoldenNotes) - MaxScoreForNotes;
+        maxScoreForNormalNotes -= overhang;
+
+        // Remember the sentence count to calculate the points for a perfect sentence.
+        sentenceCount = sentences.Count;
     }
 
     private int GetNormalNoteLength(Sentence sentence)
