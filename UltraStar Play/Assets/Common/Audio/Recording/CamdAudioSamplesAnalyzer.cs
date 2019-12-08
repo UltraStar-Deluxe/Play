@@ -89,7 +89,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         int halftone = CalculateBestFittingHalftone(correlation);
         if (halftone != -1 && isEnabled)
         {
-            // add C5 (A4 + 3 halftones) as offset to the detected pitch
+            // no idea where the +3 is coming from...
             OnPitchDetected(halftone + BaseToneMidi + 3);
         }
         else
@@ -143,6 +143,8 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
                         audioSamplesBuffer[(index + halftoneDelays[halftone]) & (samplesSinceLastFrame - 1)] -
                         audioSamplesBuffer[index]);
             }
+            // normalize values for future application
+            correlation[halftone] = correlation[halftone] / samplesSinceLastFrame;
         }
         // return circular average magnitude difference
         return correlation;
