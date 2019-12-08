@@ -42,7 +42,7 @@ public class PlayerScoreController : MonoBehaviour
         get
         {
             int targetSentenceCount = (sentenceCount > 20) ? 20 : sentenceCount;
-            double score = MaxPerfectSentenceBonusScore * perfectSentenceCount / targetSentenceCount;
+            double score = (double)MaxPerfectSentenceBonusScore * perfectSentenceCount / targetSentenceCount;
 
             // Round the score up
             score = Math.Ceiling(score);
