@@ -113,13 +113,15 @@ static class SongMetaBuilder
             }
 
 			//Read the song file body
-            string songBodyText = "";
+            StringBuilder songBody = new StringBuilder();
             string bodyLine;
             while ((bodyLine = reader.ReadLine()) != null)
-                songBodyText += bodyLine; //Ignorning the newlines for the hash
+            {
+                songBody.Append(bodyLine); //Ignorning the newlines for the hash
+            }
 
             //Hash the song file body
-            var songHash = Hashing.MD5(Encoding.UTF8.GetBytes(songBodyText));
+            STRING songHash = Hashing.MD5(Encoding.UTF8.GetBytes(songBodyText));
             Debug.Log("Hash for " + requiredFields["title"] + " is " + songHash);
 
 

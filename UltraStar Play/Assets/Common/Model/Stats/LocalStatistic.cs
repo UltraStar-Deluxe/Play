@@ -7,23 +7,23 @@ using UnityEngine;
 [Serializable]
 public class LocalStatistic
 {
-    public UInt32 timesStarted { get; private set; } = 0;
-    public UInt32 timesFinished { get; private set; } = 0;
-    public DateTime lastPlayed { get; private set; } = DateTime.MinValue;
-    public StatisticEntries statsEntries { get; private set; } = new StatisticEntries();
+    public UInt32 TimesStarted { get; private set; }
+    public UInt32 TimesFinished { get; private set; }
+    public DateTime LastPlayed { get; private set; } = DateTime.MinValue;
+    public StatisticEntries StatsEntries { get; private set; } = new StatisticEntries();
 
     //Called whenever a song is started
     public void UpdateSongStarted()
     {
-        ++timesStarted;
-        lastPlayed = DateTime.Now;
+        ++TimesStarted;
+        LastPlayed = DateTime.Now;
     }
 
     //Called whenever a song is finished
     public void UpdateSongFinished(SongStatistic songStatistic)
     {
-        ++timesFinished;
-        lastPlayed = DateTime.Now;
-        statsEntries.AddRecord(songStatistic);
+        ++TimesFinished;
+        LastPlayed = DateTime.Now;
+        StatsEntries.AddRecord(songStatistic);
     }
 }

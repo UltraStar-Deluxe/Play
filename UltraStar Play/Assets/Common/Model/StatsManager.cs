@@ -16,8 +16,9 @@ public class StatsManager : MonoBehaviour
         get
         {
             if (statistics == null)
+            {
                 Reload();
-
+            }
             return statistics;
         }
     }

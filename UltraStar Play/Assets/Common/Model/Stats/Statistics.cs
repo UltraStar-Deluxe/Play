@@ -9,32 +9,28 @@ using UnityEngine;
 public class Statistics
 {
     //Stats entries are static to persist across scenes
-    public float totalPlayTimeSeconds { get; private set; } = 0;
-    public Dictionary<string, LocalStatistic> localStatistics { get; private set; } = new Dictionary<string, LocalStatistic>();
-    public Dictionary<string, WebStatistic> webStatistics { get; private set; } = new Dictionary<string, WebStatistic>();
-    public List<TopEntry> topTenList { get; private set; } = new List<TopEntry>();
-    public TopEntry topScore { get; private set; } = null;
+    public float TotalPlayTimeSeconds { get; private set; }
+    public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new Dictionary<string, LocalStatistic>();
+    public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new Dictionary<string, WebStatistic>();
+    public List<TopEntry> TopTenList { get; private set; } = new List<TopEntry>();
+    public TopEntry TopScore { get; private set; }
 
     public void UpdateTotalPlayTime()
     {
-        totalPlayTimeSeconds += Time.realtimeSinceStartup;
+        TotalPlayTimeSeconds += Time.realtimeSinceStartup;
     }
 
     public void RecordSongStarted(SongMeta songMeta)
     {
-        GetOrInitialize<LocalStatistic>(localStatistics, songMeta.SongHash).UpdateSongStarted();
+        GetOrInitialize<LocalStatistic>(LocalStatistics, songMeta.SongHash).UpdateSongStarted();
         TriggerDatabaseWrite();
     }
 
     public void RecordSongFinished(SongMeta songMeta, string playerName, EDifficulty difficulty, int score)
     {
         Debug.Log("Recording song stats for " + playerName);
-        var statsObject = new SongStatistic(playerName, difficulty, score);
-        GetOrInitialize<LocalStatistic>(localStatistics, songMeta.SongHash).UpdateSongFinished(statsObject);
-
-        //todo: if web scores are enabled
-        //set website here?
-        GetOrInitialize<WebStatistic>(webStatistics, songMeta.SongHash).UpdateSongFinished(statsObject);
+        SongStatistic statsObject = new SongStatistic(playerName, difficulty, score);
+        GetOrInitialize<LocalStatistic>(LocalStatistics, songMeta.SongHash).UpdateSongFinished(statsObject);
 
         UpdateTopScores(songMeta, statsObject);
        
@@ -44,18 +40,20 @@ public class Statistics
     private void UpdateTopScores(SongMeta songMeta, SongStatistic songStatistic)
     {
         Debug.Log("Updating top scores");
-        var topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
+        TopEntry topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
         
         //Update the top score
-        if (topScore == null || songStatistic.score > topScore.songStatistic.score)
-            topScore = topEntry;
+        if (TopScore == null || songStatistic.score > TopScore.songStatistic.score)
+        {
+            TopScore = topEntry;
+        }
 
         //Update the top ten
         //Find where in the current top ten to place the current score
-        var topTenIndex = -1;
-        for (int i = 0; i < topTenList.Count; ++i)
+        INT topTenIndex = -1;
+        for (int i = 0; i < TopTenList.Count; ++i)
         {
-            if (songStatistic.score > topTenList[i].songStatistic.score)
+            if (songStatistic.score > TopTenList[i].songStatistic.score)
             {
                 topTenIndex = i + 1;
                 break;
@@ -63,15 +61,21 @@ public class Statistics
         }
 
         //List isn't full yet, just add the score to the end
-        if (topTenIndex == -1 && topTenList.Count < 10)
-            topTenList.Add(topEntry);
+        if (topTenIndex == -1 && TopTenList.Count < 10)
+        {
+            TopTenList.Add(topEntry);
+        }
         else
+        {
             //Otherwise just insert the top score into its respective place
-            topTenList.Insert(topTenIndex, topEntry);
+            TopTenList.Insert(topTenIndex, topEntry);
+        }
 
         //Remove any scores beyond the top ten in the list
-        if (topTenList.Count > 10)
-            topTenList = topTenList.Take(10).ToList();
+        if (TopTenList.Count > 10)
+        {
+            TopTenList = TopTenList.Take(10).ToList();
+        }
     }
 
     private void TriggerDatabaseWrite()

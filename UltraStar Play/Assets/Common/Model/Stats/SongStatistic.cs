@@ -7,25 +7,25 @@ using UnityEngine;
 [Serializable]
 public class SongStatistic
 {
-    public string playerName { get; private set; } = "";
-    public EDifficulty difficulty { get; private set; } = EDifficulty.Easy;
-    public int score { get; private set; } = 0;
-    public DateTime dateTime { get; private set; } = DateTime.MinValue;
+    public string PlayerName { get; private set; }
+    public EDifficulty Difficulty { get; private set; }
+    public int Score { get; private set; }
+    public DateTime DateTime { get; private set; }
 
     public SongStatistic(string playerName, EDifficulty difficulty, int score)
     {
-        this.playerName = playerName;
-        this.difficulty = difficulty;
-        this.score = score;
-        this.dateTime = DateTime.Now;
+        this.PlayerName = playerName;
+        this.Difficulty = difficulty;
+        this.Score = score;
+        this.DateTime = DateTime.Now;
     }
 }
 
 //Comparer for score sorting
 public class CompareBySongScore : IComparer<SongStatistic>
 {
-    public int Compare(SongStatistic a, SongStatistic b)
+    public int Compare(SongStatistic x, SongStatistic y)
     {
-        return a.score.CompareTo(b.score);
+        return x.Score.CompareTo(y.Score);
     }
 }
