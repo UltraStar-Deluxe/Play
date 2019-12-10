@@ -79,7 +79,7 @@ public class SongMeta
         {
             throw new ArgumentNullException("filename");
         }
-		if (songHash == null)
+        if (songHash == null)
         {
             throw new ArgumentNullException("songHash");
         }

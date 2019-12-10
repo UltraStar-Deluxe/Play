@@ -334,10 +334,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
-		
-		//Get the stats manager and the stats object
+        
+        //Get the stats manager and the stats object
         var stats = StatsManager.Instance.Statistics;
-		
+        
         foreach (PlayerController playerController in PlayerControllers)
         {
             SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();

@@ -7,20 +7,20 @@ using UnityEngine;
 [Serializable]
 public class StatisticEntries
 {
-    public SortedSet<SongStatistic> songStatistics { get; private set; }
+    public SortedSet<SongStatistic> SongStatistics { get; private set; }
 
     public StatisticEntries()
     {
-        songStatistics = new SortedSet<SongStatistic>(new CompareBySongScore());
+        SongStatistics = new SortedSet<SongStatistic>(new CompareBySongScore());
     }
 
     public void AddRecord(SongStatistic record)
     {
-        songStatistics.Add(record);
+        SongStatistics.Add(record);
     }
 
     public void RemoveRecord(SongStatistic record)
     {
-        songStatistics.Remove(record);
+        SongStatistics.Remove(record);
     }
 }

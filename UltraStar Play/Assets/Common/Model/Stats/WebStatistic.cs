@@ -7,16 +7,16 @@ using UnityEngine;
 [Serializable]
 public class WebStatistic
 {
-    public string webSite { get; private set; } = "";
-    public StatisticEntries statsEntries { get; private set; } = new StatisticEntries();
+    public string WebSite { get; private set; }
+    public StatisticEntries StatsEntries { get; private set; } = new StatisticEntries();
 
     public void SetWebSite(string webSite)
     {
-        this.webSite = webSite;
+        this.WebSite = webSite;
     }
 
     public void UpdateSongFinished(SongStatistic songStatistic)
     {
-        statsEntries.AddRecord(songStatistic);
+        StatsEntries.AddRecord(songStatistic);
     }
 }
