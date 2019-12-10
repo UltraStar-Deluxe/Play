@@ -208,6 +208,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
             PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
         }
+		
+		//Save information about the song being started into stats
+        var stats = StatsManager.Instance.Statistics;
+        stats.RecordSongStarted(SongMeta);
 
         StartCoroutine(StartMusicAndVideo());
     }
@@ -330,6 +334,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
+		
+		//Get the stats manager and the stats object
+        var stats = StatsManager.Instance.Statistics;
+		
         foreach (PlayerController playerController in PlayerControllers)
         {
             SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();
@@ -338,6 +346,10 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
             scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
+			
+			//Save to highscore database
+            stats.RecordSongFinished(SongMeta, playerController.PlayerProfile.Name, playerController.PlayerProfile.Difficulty,
+                                Convert.ToInt32(playerController.PlayerScoreController.TotalScore));
         }
         SceneNavigator.Instance.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
