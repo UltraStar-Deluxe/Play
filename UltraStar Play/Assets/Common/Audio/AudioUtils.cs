@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using NLayer;
 
-public class AudioUtils
+public static class AudioUtils
 {
     public static AudioClip GetAudioClip(string path)
     {
@@ -14,7 +14,7 @@ public class AudioUtils
             return null;
         }
         string fileExtension = System.IO.Path.GetExtension(path);
-        if (fileExtension.ToLower().Equals(".mp3"))
+        if (fileExtension.ToLowerInvariant().Equals(".mp3"))
         {
             return LoadMp3(path);
         }
