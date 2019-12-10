@@ -31,7 +31,6 @@ public class AssemblyInjectionDataLoader : MonoBehaviour
 
         // The assembly that holds this class is the one with the relevant types.
         Assembly assembly = Assembly.GetAssembly(this.GetType());
-        // Assembly assembly = Assembly.GetAssembly(this.GetType());
         UniInjectUtils.LoadInjectionDataForTypesInAssembly(assembly);
 
         stopwatch.Stop();

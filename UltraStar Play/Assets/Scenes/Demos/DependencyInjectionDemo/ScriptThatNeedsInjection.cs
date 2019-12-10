@@ -41,9 +41,9 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
     private Text uiText;
 
-    // Inject field using a specific key instead of the type.
+    // Inject property using a specific key instead of the type.
     [Inject(key = "author")]
-    private string nameOfAuthor { get; set; }
+    private string NameOfAuthor { get; set; }
 
     // The instance of this field is created during injection.
     // Depending how the interface is bound (singleton or not),
@@ -76,7 +76,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 
         Debug.Log("Canvas: " + canvas);
 
-        Debug.Log("Author: " + nameOfAuthor);
+        Debug.Log("Author: " + NameOfAuthor);
 
         Debug.Log("Field from method injection:" + methodInjectionField);
 
