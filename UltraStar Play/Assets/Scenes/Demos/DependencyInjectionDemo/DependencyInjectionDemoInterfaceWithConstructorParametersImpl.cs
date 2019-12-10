@@ -3,7 +3,7 @@ using UniInject;
 
 public class DependencyInjectionDemoInterfaceWithConstructorParametersImpl : IDependencyInjectionDemoInterfaceWithConstructorParameters
 {
-    private string name;
+    private readonly string name;
 
     // This constructor should not be used for instantiation during dependency injection, because it is not annotated.
     public DependencyInjectionDemoInterfaceWithConstructorParametersImpl(List<string> names)
