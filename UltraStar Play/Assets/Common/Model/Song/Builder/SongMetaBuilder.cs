@@ -112,12 +112,23 @@ static class SongMetaBuilder
                 }
             }
 
+			//Read the song file body
+            string songBodyText = "";
+            string bodyLine;
+            while ((bodyLine = reader.ReadLine()) != null)
+                songBodyText += bodyLine; //Ignorning the newlines for the hash
+
+            //Hash the song file body
+            var songHash = Hashing.MD5(Encoding.UTF8.GetBytes(songBodyText));
+            Debug.Log("Hash for " + requiredFields["title"] + " is " + songHash);
+
 
             try
             {
                 SongMeta res = new SongMeta(
                     directory,
                     filename,
+                    songHash,
                     requiredFields["artist"],
                     ConvertToFloat(requiredFields["bpm"]),
                     requiredFields["mp3"],
