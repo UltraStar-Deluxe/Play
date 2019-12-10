@@ -84,11 +84,11 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         // get best fitting tone
         double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse);
 
-        // no idea where the +3 is coming from...
-        int halftone = CalculateBestFittingHalftone(correlation) + BaseToneMidi + 3;
+        int halftone = CalculateBestFittingHalftone(correlation);
         if (halftone != -1 && isEnabled)
         {
-            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone);
+            // no idea where the +3 is coming from...
+            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone + BaseToneMidi + 3);
             if (midiNoteMedian > 0)
             {
                 return new PitchEvent(midiNoteMedian);
@@ -144,6 +144,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
                         audioSamplesBuffer[(index + halftoneDelays[halftone]) & (samplesSinceLastFrame - 1)] -
                         audioSamplesBuffer[index]);
             }
+            // normalize values for future application
             correlation[halftone] = correlation[halftone] / samplesSinceLastFrame;
         }
         // return circular average magnitude difference
