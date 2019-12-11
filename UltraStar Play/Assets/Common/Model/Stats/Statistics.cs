@@ -15,6 +15,20 @@ public class Statistics
     public List<TopEntry> TopTenList { get; private set; } = new List<TopEntry>();
     public TopEntry TopScore { get; private set; }
 
+    public LocalStatistic GetLocalStats(SongMeta songMeta)
+    {
+       LocalStatistic result = null;
+       LocalStatistics.TryGetValue(songMeta.SongHash, out result);
+       return result;
+    }
+
+    public WebStatistic GetWebStats(SongMeta songMeta)
+    {
+       WebStatistic result = null;
+       WebStatistics.TryGetValue(songMeta.SongHash, out result);
+       return result;
+    }
+
     public void UpdateTotalPlayTime()
     {
         TotalPlayTimeSeconds += Time.realtimeSinceStartup;
@@ -43,17 +57,17 @@ public class Statistics
         TopEntry topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
         
         //Update the top score
-        if (TopScore == null || songStatistic.score > TopScore.songStatistic.score)
+        if (TopScore == null || songStatistic.Score > TopScore.songStatistic.Score)
         {
             TopScore = topEntry;
         }
 
         //Update the top ten
         //Find where in the current top ten to place the current score
-        INT topTenIndex = -1;
+        int topTenIndex = -1;
         for (int i = 0; i < TopTenList.Count; ++i)
         {
-            if (songStatistic.score > TopTenList[i].songStatistic.score)
+            if (songStatistic.Score > TopTenList[i].songStatistic.Score)
             {
                 topTenIndex = i + 1;
                 break;

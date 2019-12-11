@@ -210,7 +210,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
 		
 		//Save information about the song being started into stats
-        var stats = StatsManager.Instance.Statistics;
+        Statistics stats = StatsManager.Instance.Statistics;
         stats.RecordSongStarted(SongMeta);
 
         StartCoroutine(StartMusicAndVideo());
@@ -336,7 +336,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         singingResultsSceneData.SongMeta = SongMeta;
         
         //Get the stats manager and the stats object
-        var stats = StatsManager.Instance.Statistics;
+        Statistics stats = StatsManager.Instance.Statistics;
         
         foreach (PlayerController playerController in PlayerControllers)
         {
