@@ -159,7 +159,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
 
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
-        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
+        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title} at {sceneData.PositionInSongMillis} ms.");
     }
 
     void Start()
