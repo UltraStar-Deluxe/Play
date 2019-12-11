@@ -18,6 +18,10 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
+    public HighscoreLocalPlayerText highscoreLocalPlayer;
+    public HighscoreLocalScoreText highscoreLocalScore;
+    public HighscoreWebPlayerText highscoreWebPlayer;
+    public HighscoreWebScoreText highscoreWebScore;
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
@@ -29,6 +33,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
+    private Statistics statsManager;
 
     private SongMeta selectedSongBeforeSearch;
 
@@ -48,11 +53,18 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
+        highscoreLocalPlayer = GameObjectUtils.FindObjectOfType<HighscoreLocalPlayerText>(true);
+        highscoreLocalScore = GameObjectUtils.FindObjectOfType<HighscoreLocalScoreText>(true);
+        highscoreWebPlayer = GameObjectUtils.FindObjectOfType<HighscoreWebPlayerText>(true);
+        highscoreWebScore = GameObjectUtils.FindObjectOfType<HighscoreWebScoreText>(true);
+
         songMetas = SongMetaManager.Instance.SongMetas;
         List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
+
+        statsManager = StatsManager.Instance.Statistics;
 
         InitSongRoulette();
 
@@ -88,6 +100,40 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         artistText.SetText(selectedSong.Artist);
         songTitleText.text = selectedSong.Title;
         songCountText.text = (selection.SongIndex + 1) + "/" + selection.SongsCount;
+
+        //Display local highscore
+        highscoreLocalPlayer.SetText("");
+        highscoreLocalScore.SetText("0");
+        LocalStatistic localStats = statsManager.GetLocalStats(selectedSong);
+        SongStatistic localTopScore; 
+        if (localStats != null)
+        {
+            localTopScore = localStats.StatsEntries.TopScore;
+
+            if (localTopScore != null)
+            {
+                Debug.Log("Found local highscore: " + localTopScore.PlayerName + " " + localTopScore.Score.ToString());
+                highscoreLocalPlayer.SetText(localTopScore.PlayerName);
+                highscoreLocalScore.SetText(localTopScore.Score.ToString());
+            }
+        }
+
+        //Display web highscore
+        highscoreWebPlayer.SetText("");
+        highscoreWebScore.SetText("0");
+        WebStatistic webStats = statsManager.GetWebStats(selectedSong);
+        SongStatistic webTopScore;
+        if (webStats != null)
+        {
+            webTopScore = webStats.StatsEntries.TopScore;
+
+            if (webTopScore != null)
+            {
+                Debug.Log("Found web highscore: " + webTopScore.PlayerName + " " + webTopScore.Score.ToString());
+                highscoreWebPlayer.SetText(webTopScore.PlayerName);
+                highscoreWebScore.SetText(webTopScore.Score.ToString());
+            }
+        }
 
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetActive(hasVideo);

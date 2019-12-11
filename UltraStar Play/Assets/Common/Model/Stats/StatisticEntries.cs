@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,15 @@ using UnityEngine;
 public class StatisticEntries
 {
     public SortedSet<SongStatistic> SongStatistics { get; private set; }
+
+    //Returns the top score entry or null if no scores are yet recorded
+    public SongStatistic TopScore
+    {
+        get
+        {
+            return SongStatistics.FirstOrDefault();
+        }
+    }
 
     public StatisticEntries()
     {

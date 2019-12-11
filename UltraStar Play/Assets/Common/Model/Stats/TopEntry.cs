@@ -18,3 +18,17 @@ public class TopEntry
         this.songStatistic = songStatistic;
     }
 }
+
+//Comparer for score sorting
+public class CompareByTopEntryScore : IComparer<TopEntry>
+{
+    public int Compare(TopEntry x, TopEntry y)
+    {
+        if (x.songStatistic == null || y.songStatistic == null)
+        {
+            return 0;
+        }
+
+        return x.songStatistic.Score.CompareTo(y.songStatistic.Score);
+    }
+}
