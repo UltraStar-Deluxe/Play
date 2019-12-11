@@ -47,8 +47,7 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
 
     private void CreateListEntry(MicProfile micProfile)
     {
-        SongSelectMicListEntry listEntry = Instantiate(listEntryPrefab);
-        listEntry.transform.SetParent(scrollViewContent.transform);
+        SongSelectMicListEntry listEntry = Instantiate(listEntryPrefab, scrollViewContent.transform);
         listEntry.Init(micProfile);
     }
 }
