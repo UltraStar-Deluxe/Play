@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 
@@ -60,9 +61,12 @@ public class SettingsManager : MonoBehaviour
 
     public void Reload()
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         if (!File.Exists(settingsPath))
         {
-            Debug.LogWarning("Settings file not found. Creating default settings.");
+            UnityEngine.Debug.LogWarning("Settings file not found. Creating default settings.");
             settings = new Settings();
             Save();
             return;
@@ -70,5 +74,8 @@ public class SettingsManager : MonoBehaviour
         string fileContent = File.ReadAllText(settingsPath);
         settings = JsonConverter.FromJson<Settings>(fileContent);
         nonStaticSettings = settings;
+
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Loading the settings took {stopwatch.ElapsedMilliseconds} ms");
     }
 }

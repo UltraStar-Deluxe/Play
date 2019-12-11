@@ -34,6 +34,10 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
     [Inject]
     private SettingsManager SettingsManager { get; set; }
 
+    // Inject field. Binding the settings is done lazy, so they will not be loaded if not injected here.
+    [Inject]
+    private Settings settings;
+
     // Inject optional
     [Inject(optional = true)]
     private SceneNavigator sceneNavigator;
@@ -68,13 +72,14 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        Debug.Log("SettingsManager: " + SettingsManager);
-
         Debug.Log("Parent: " + Parent);
         Debug.Log("Child: " + child);
         Debug.Log("Sibling Component: " + siblingComponent);
 
         Debug.Log("Canvas: " + canvas);
+
+        Debug.Log("SettingsManager: " + SettingsManager);
+        Debug.Log("Settings: " + settings);
 
         Debug.Log("Author: " + NameOfAuthor);
 
