@@ -4,8 +4,5 @@ using UnityEngine;
 
 public class SongEditorSceneKeyboardController : MonoBehaviour
 {
-    void Update()
-    {
 
-    }
 }

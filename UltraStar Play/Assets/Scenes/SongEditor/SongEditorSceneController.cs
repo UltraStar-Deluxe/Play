@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class SongEditorSceneController : MonoBehaviour
@@ -11,7 +12,7 @@ public class SongEditorSceneController : MonoBehaviour
     public string defaultSongNamePasteBin;
 
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
-    public AudioClip audioClip;
+    private AudioClip audioClip;
 
     private bool audioWaveFormInitialized;
 
@@ -28,6 +29,13 @@ public class SongEditorSceneController : MonoBehaviour
     void Start()
     {
         sceneData = SceneNavigator.Instance.GetSceneData<SongEditorSceneData>(CreateDefaultSceneData());
+
+        SongMeta songMeta = sceneData.SelectedSongMeta;
+        if (sceneData.SelectedSongMeta != null)
+        {
+            string path = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
+            audioClip = AudioUtils.GetAudioClip(path);
+        }
 
         Debug.Log($"Start editing of '{sceneData.SelectedSongMeta.Title}' at {sceneData.PositionInSongMillis} milliseconds.");
     }
