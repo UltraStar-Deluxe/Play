@@ -8,6 +8,7 @@ using UnityEngine.Video;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Threading;
+using NLayer;
 
 public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
@@ -158,7 +159,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
 
         string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
-        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title}.");
+        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title} at {sceneData.PositionInSongMillis} ms.");
     }
 
     void Start()
@@ -561,27 +562,16 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private IEnumerator LoadAudio(string path)
     {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
+        AudioClip clip = AudioUtils.GetAudioClip(path);
+        if (clip == null)
         {
-            yield return www.SendWebRequest();
-
-            if (www.isNetworkError)
-            {
-                Debug.LogError("Error Loading Audio: " + path);
-                Debug.LogError(www.error);
-                SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
-                yield break;
-            }
-            else
-            {
-                audioPlayer.clip = DownloadHandlerAudioClip.GetContent(www);
-
-                // The time bar needs the duration of the song to calculate positions.
-                // The duration of the song should be available now.
-                InitTimeBar();
-            }
+            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            yield break;
         }
-
+        audioPlayer.clip = clip;
+        // The time bar needs the duration of the song to calculate positions.
+        // The duration of the song should be available now.
+        InitTimeBar();
     }
 
     private void UnloadAudio()

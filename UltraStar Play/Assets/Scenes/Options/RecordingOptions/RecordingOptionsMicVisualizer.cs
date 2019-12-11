@@ -2,18 +2,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System;
+using System.Collections;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour
 {
     public Text currentNoteLabel;
-    public FloatArrayVisualizer floatArrayVisualizer;
     public MicrophonePitchTracker microphonePitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
 
-    void Start()
+    private AudioWaveFormVisualizer audioWaveFormVisualizer;
+
+    void Awake()
     {
-        floatArrayVisualizer.Init(microphonePitchTracker.MicData);
+        audioWaveFormVisualizer = GetComponentInChildren<AudioWaveFormVisualizer>();
+    }
+
+    void Update()
+    {
+        UpdateWaveForm();
+    }
+
+    private void UpdateWaveForm()
+    {
+        float[] micData = microphonePitchTracker.MicData;
+        audioWaveFormVisualizer.DrawWaveFormValues(micData, micData.Length - 2048, 2048);
     }
 
     public void SetMicProfile(MicProfile micProfile)
