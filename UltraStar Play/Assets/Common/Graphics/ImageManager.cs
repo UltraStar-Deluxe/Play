@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Handles loading and caching of images.
 public class ImageManager
 {
     // When the cache has reached the critical size, then unused sprites are searched in the scene

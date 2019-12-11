@@ -562,7 +562,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private IEnumerator LoadAudio(string path)
     {
-        AudioClip clip = AudioUtils.GetAudioClip(path);
+        AudioClip clip = AudioManager.GetAudioClip(path);
         if (clip == null)
         {
             SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);

@@ -34,7 +34,7 @@ public class SongEditorSceneController : MonoBehaviour
         if (sceneData.SelectedSongMeta != null)
         {
             string path = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
-            audioClip = AudioUtils.GetAudioClip(path);
+            audioClip = AudioManager.GetAudioClip(path);
         }
 
         Debug.Log($"Start editing of '{sceneData.SelectedSongMeta.Title}' at {sceneData.PositionInSongMillis} milliseconds.");
@@ -44,8 +44,11 @@ public class SongEditorSceneController : MonoBehaviour
     {
         if (!audioWaveFormInitialized && audioClip != null && audioClip.samples > 0)
         {
-            audioWaveFormInitialized = true;
-            audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
+            using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
+            {
+                audioWaveFormInitialized = true;
+                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
+            }
         }
     }
 
