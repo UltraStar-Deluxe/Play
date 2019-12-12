@@ -17,16 +17,16 @@ public class Statistics
 
     public LocalStatistic GetLocalStats(SongMeta songMeta)
     {
-       LocalStatistic result = null;
-       LocalStatistics.TryGetValue(songMeta.SongHash, out result);
-       return result;
+        LocalStatistic result = null;
+        LocalStatistics.TryGetValue(songMeta.SongHash, out result);
+        return result;
     }
 
     public WebStatistic GetWebStats(SongMeta songMeta)
     {
-       WebStatistic result = null;
-       WebStatistics.TryGetValue(songMeta.SongHash, out result);
-       return result;
+        WebStatistic result = null;
+        WebStatistics.TryGetValue(songMeta.SongHash, out result);
+        return result;
     }
 
     public void UpdateTotalPlayTime()
@@ -47,7 +47,7 @@ public class Statistics
         GetOrInitialize<LocalStatistic>(LocalStatistics, songMeta.SongHash).UpdateSongFinished(statsObject);
 
         UpdateTopScores(songMeta, statsObject);
-       
+
         TriggerDatabaseWrite();
     }
 
@@ -55,7 +55,7 @@ public class Statistics
     {
         Debug.Log("Updating top scores");
         TopEntry topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
-        
+
         //Update the top score
         if (TopScore == null || songStatistic.Score > TopScore.SongStatistic.Score)
         {
@@ -75,12 +75,13 @@ public class Statistics
         }
 
         //List isn't full yet, just add the score to the end
-        if (topTenIndex == -1 && TopTenList.Count < 10)
+        if (topTenIndex == -1 || TopTenList.Count < 10)
         {
             TopTenList.Add(topEntry);
         }
         else
         {
+            //should be fine. an oversight
             //Otherwise just insert the top score into its respective place
             TopTenList.Insert(topTenIndex, topEntry);
         }
