@@ -37,7 +37,7 @@ public static class AudioManager
         AudioClip audioClip = AudioUtils.GetAudioClip(path);
         if (audioClip == null)
         {
-            Debug.LogError("Could load AudioClip from path: " + path);
+            Debug.LogError("Could load not AudioClip from path: " + path);
             return null;
         }
 
