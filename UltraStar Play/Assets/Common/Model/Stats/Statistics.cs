@@ -57,7 +57,7 @@ public class Statistics
         TopEntry topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
         
         //Update the top score
-        if (TopScore == null || songStatistic.Score > TopScore.songStatistic.Score)
+        if (TopScore == null || songStatistic.Score > TopScore.SongStatistic.Score)
         {
             TopScore = topEntry;
         }
@@ -67,7 +67,7 @@ public class Statistics
         int topTenIndex = -1;
         for (int i = 0; i < TopTenList.Count; ++i)
         {
-            if (songStatistic.Score > TopTenList[i].songStatistic.Score)
+            if (songStatistic.Score > TopTenList[i].SongStatistic.Score)
             {
                 topTenIndex = i + 1;
                 break;
