@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using UniInject;
 using UnityEngine;
 
-public class SongEditorSceneController : MonoBehaviour
+public class SongEditorSceneController : MonoBehaviour, IBinder
 {
     public string defaultSongName;
 
@@ -12,7 +14,6 @@ public class SongEditorSceneController : MonoBehaviour
     public string defaultSongNamePasteBin;
 
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
-    private AudioClip audioClip;
 
     private bool audioWaveFormInitialized;
 
@@ -20,24 +21,67 @@ public class SongEditorSceneController : MonoBehaviour
     {
         get
         {
-            return sceneData.SelectedSongMeta;
+            return SceneData.SelectedSongMeta;
+        }
+    }
+
+
+    Dictionary<string, Voice> voiceIdToVoiceMap;
+    private Dictionary<string, Voice> VoiceIdToVoiceMap
+    {
+        get
+        {
+            if (voiceIdToVoiceMap == null)
+            {
+                voiceIdToVoiceMap = SongMetaManager.GetVoices(SongMeta);
+            }
+            return voiceIdToVoiceMap;
+        }
+    }
+
+    private AudioClip audioClip;
+    public AudioClip AudioClip
+    {
+        get
+        {
+            if (audioClip == null && SongMeta != null)
+            {
+                string path = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
+                audioClip = AudioManager.GetAudioClip(path);
+            }
+            return audioClip;
         }
     }
 
     private SongEditorSceneData sceneData;
+    public SongEditorSceneData SceneData
+    {
+        get
+        {
+            if (sceneData == null)
+            {
+                sceneData = SceneNavigator.Instance.GetSceneData<SongEditorSceneData>(CreateDefaultSceneData());
+            }
+            return sceneData;
+        }
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        // Note that the SceneData, SongMeta, and AudioClip are loaded on access here if not done yet.
+        bb.BindExistingInstance(SceneData);
+        bb.BindExistingInstance(SongMeta);
+        bb.BindExistingInstance(AudioClip);
+
+        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
+        bb.Bind("voices").ToExistingInstance(voices);
+        return bb.GetBindings();
+    }
 
     void Start()
     {
-        sceneData = SceneNavigator.Instance.GetSceneData<SongEditorSceneData>(CreateDefaultSceneData());
-
-        SongMeta songMeta = sceneData.SelectedSongMeta;
-        if (sceneData.SelectedSongMeta != null)
-        {
-            string path = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
-            audioClip = AudioManager.GetAudioClip(path);
-        }
-
-        Debug.Log($"Start editing of '{sceneData.SelectedSongMeta.Title}' at {sceneData.PositionInSongMillis} milliseconds.");
+        Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongMillis} milliseconds.");
     }
 
     void Update()

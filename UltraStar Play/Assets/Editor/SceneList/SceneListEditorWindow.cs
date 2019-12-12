@@ -9,7 +9,7 @@ public class SceneListEditorWindow : EditorWindow
 {
     private List<string> scenePaths;
 
-    private Vector2 scrollPos;
+    private Vector2 scrollPos = Vector2.zero;
     private bool sortAlphabetically;
 
     [MenuItem("Window/Scene List")]
