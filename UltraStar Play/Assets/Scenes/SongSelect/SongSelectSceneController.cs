@@ -18,10 +18,10 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
-    public HighscoreLocalPlayerText highscoreLocalPlayer;
-    public HighscoreLocalScoreText highscoreLocalScore;
-    public HighscoreWebPlayerText highscoreWebPlayer;
-    public HighscoreWebScoreText highscoreWebScore;
+    public Text highscoreLocalPlayerText;
+    public Text highscoreLocalScoreText;
+    public Text highscoreWebPlayerText;
+    public Text highscoreWebScoreText;
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
@@ -52,11 +52,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
-
-        highscoreLocalPlayer = GameObjectUtils.FindObjectOfType<HighscoreLocalPlayerText>(true);
-        highscoreLocalScore = GameObjectUtils.FindObjectOfType<HighscoreLocalScoreText>(true);
-        highscoreWebPlayer = GameObjectUtils.FindObjectOfType<HighscoreWebPlayerText>(true);
-        highscoreWebScore = GameObjectUtils.FindObjectOfType<HighscoreWebScoreText>(true);
 
         songMetas = SongMetaManager.Instance.SongMetas;
         List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
@@ -102,8 +97,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songCountText.text = (selection.SongIndex + 1) + "/" + selection.SongsCount;
 
         //Display local highscore
-        highscoreLocalPlayer.SetText("");
-        highscoreLocalScore.SetText("0");
+        highscoreLocalPlayerText.text = "";
+        highscoreLocalScoreText.text = "0";
         LocalStatistic localStats = statsManager.GetLocalStats(selectedSong);
         SongStatistic localTopScore; 
         if (localStats != null)
@@ -113,14 +108,14 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
             if (localTopScore != null)
             {
                 Debug.Log("Found local highscore: " + localTopScore.PlayerName + " " + localTopScore.Score.ToString());
-                highscoreLocalPlayer.SetText(localTopScore.PlayerName);
-                highscoreLocalScore.SetText(localTopScore.Score.ToString());
+                highscoreLocalPlayerText.text = localTopScore.PlayerName;
+                highscoreLocalScoreText.text = localTopScore.Score.ToString();
             }
         }
 
         //Display web highscore
-        highscoreWebPlayer.SetText("");
-        highscoreWebScore.SetText("0");
+        highscoreWebPlayerText.text = "";
+        highscoreWebScoreText.text = "0";
         WebStatistic webStats = statsManager.GetWebStats(selectedSong);
         SongStatistic webTopScore;
         if (webStats != null)
@@ -130,8 +125,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
             if (webTopScore != null)
             {
                 Debug.Log("Found web highscore: " + webTopScore.PlayerName + " " + webTopScore.Score.ToString());
-                highscoreWebPlayer.SetText(webTopScore.PlayerName);
-                highscoreWebScore.SetText(webTopScore.Score.ToString());
+                highscoreWebPlayerText.text = webTopScore.PlayerName;
+                highscoreWebScoreText.text = webTopScore.Score.ToString();
             }
         }
 
