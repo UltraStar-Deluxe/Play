@@ -296,7 +296,7 @@ public class MutableSentence
     {
         if (notes.Count == 0)
         {
-            return 0;
+            return int.MinValue;
         }
         Note lastNote = notes[notes.Count - 1];
         return lastNote.StartBeat + lastNote.Length;

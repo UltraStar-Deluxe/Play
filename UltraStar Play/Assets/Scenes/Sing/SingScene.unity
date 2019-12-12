@@ -483,10 +483,9 @@ MonoBehaviour:
   anchorMin: {x: 0.5, y: 0.1}
   anchorMax: {x: 0.5, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0, y: 1.3575974, z: 0}
+  localPosition: {x: 0, y: 1.606885, z: 0}
   sizeDelta: {x: 2, y: 0}
-  size: {x: 2, y: 24.437855}
---- !u!1 &320770002
+  size: {x: 2, y: 28.925032}
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -608,10 +607,9 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 558.5, y: 268.5, z: 0}
-  sizeDelta: {x: 800, y: 384.60162}
-  size: {x: 800, y: 384.60162}
---- !u!1 &475691986
+  localPosition: {x: 515.5, y: 293, z: 0}
+  sizeDelta: {x: 799.99994, y: 454.70416}
+  size: {x: 799.99994, y: 454.70416}
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1579,7 +1577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Summer Wine
+  defaultSongName: EmptyTitle
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
