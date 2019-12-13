@@ -251,7 +251,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
         songEditorSceneData.PreviousSceneData = sceneData;
         songEditorSceneData.PreviousScene = EScene.SingScene;
-        songEditorSceneData.PositionInSongMillis = PositionInSongInMillis;
+        songEditorSceneData.PositionInSongInMillis = PositionInSongInMillis;
         songEditorSceneData.SelectedSongMeta = SongMeta;
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }

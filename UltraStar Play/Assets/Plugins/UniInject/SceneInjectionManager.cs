@@ -39,14 +39,6 @@ namespace UniInject
             StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene took {stopwatch.ElapsedMilliseconds} ms");
         }
 
-        void Update()
-        {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                InjectScriptsThatNeedInjection();
-            }
-        }
-
         void OnDestroy()
         {
             if (UniInjectUtils.SceneInjector == sceneInjector)
