@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public static class MidiUtils
 {
+    /** There are 49 halftones in the singable audio spectrum (C2 (65.41 Hz) to C6 (1046.5023 Hz)). */
+    public static readonly int midiNoteMin = 36;
+    public static readonly int midiNoteMax = 84;
 
     public static int GetOctave(int midiNote)
     {
