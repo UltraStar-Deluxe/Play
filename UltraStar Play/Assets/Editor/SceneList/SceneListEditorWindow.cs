@@ -4,12 +4,13 @@ using UnityEditor;
 using System.IO;
 using UnityEditor.SceneManagement;
 using System.Linq;
+using System;
 
 public class SceneListEditorWindow : EditorWindow
 {
     private List<string> scenePaths;
 
-    private Vector2 scrollPos = Vector2.zero;
+    private Vector2 scrollPos;
     private bool sortAlphabetically;
 
     [MenuItem("Window/Scene List")]
@@ -34,16 +35,25 @@ public class SceneListEditorWindow : EditorWindow
         }
         else
         {
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-            foreach (string scenePath in scenePaths)
+            try
             {
-                string sceneName = Path.GetFileNameWithoutExtension(scenePath);
-                if (GUILayout.Button(sceneName))
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+                foreach (string scenePath in scenePaths)
                 {
-                    EditorSceneManager.OpenScene(scenePath);
+                    string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+                    if (GUILayout.Button(sceneName))
+                    {
+                        EditorSceneManager.OpenScene(scenePath);
+                    }
                 }
+                EditorGUILayout.EndScrollView();
             }
-            EditorGUILayout.EndScrollView();
+            catch (ArgumentException)
+            {
+                // Unity always throws an exception after a restart:
+                // "ArgumentException: Getting control 3's position in a group with only 3 controls when doing repaint"
+                // But it seems to work normally ???
+            }
         }
     }
 
