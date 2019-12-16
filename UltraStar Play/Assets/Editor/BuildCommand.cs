@@ -2,6 +2,7 @@ using UnityEditor;
 using System.Linq;
 using System;
 using System.IO;
+using UnityEngine;
 
 static class BuildCommand
 {
