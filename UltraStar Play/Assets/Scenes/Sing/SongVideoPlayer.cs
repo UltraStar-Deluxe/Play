@@ -93,25 +93,24 @@ public class SongVideoPlayer : MonoBehaviour
         {
             Debug.LogWarning("Setting VideoPlayer URL failed. Showing background image instead.");
             ShowBackgroundImage();
+            return;
+        }
+
+        if (SongMeta.VideoGap > 0)
+        {
+            // Positive VideoGap, thus skip the start of the video
+            videoPlayer.time = SongMeta.VideoGap;
+            videoPlayer.Play();
+        }
+        else if (SongMeta.VideoGap < 0)
+        {
+            // Negative VideoGap, thus wait a little before starting the video
+            videoPlayer.Pause();
         }
         else
         {
-            if (SongMeta.VideoGap > 0)
-            {
-                // Positive VideoGap, thus skip the start of the video
-                videoPlayer.time = SongMeta.VideoGap;
-                videoPlayer.Play();
-            }
-            else if (SongMeta.VideoGap < 0)
-            {
-                // Negative VideoGap, thus wait a little before starting the video
-                videoPlayer.Pause();
-            }
-            else
-            {
-                // No VideoGap, thus start the video immediately
-                videoPlayer.Play();
-            }
+            // No VideoGap, thus start the video immediately
+            videoPlayer.Play();
         }
     }
 
@@ -177,20 +176,19 @@ public class SongVideoPlayer : MonoBehaviour
         if (string.IsNullOrEmpty(SongMeta.Background))
         {
             ShowCoverImageAsBackground();
+            return;
+        }
+
+        string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
+        if (File.Exists(backgroundImagePath))
+        {
+            Sprite backgroundImageSprite = ImageManager.LoadSprite(backgroundImagePath);
+            backgroundImage.sprite = backgroundImageSprite;
         }
         else
         {
-            string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
-            if (File.Exists(backgroundImagePath))
-            {
-                Sprite backgroundImageSprite = ImageManager.LoadSprite(backgroundImagePath);
-                backgroundImage.sprite = backgroundImageSprite;
-            }
-            else
-            {
-                Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
-                ShowCoverImageAsBackground();
-            }
+            Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
+            ShowCoverImageAsBackground();
         }
     }
 
