@@ -8,7 +8,7 @@ public class SingingResultsSceneKeyboardController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.Escape) || Input.GetKeyUp(KeyCode.Space)
-            || Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+            || Input.GetKeyUp(KeyCode.Backspace) || Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
         {
             SingingResultsSceneController.Instance.FinishScene();
         }
