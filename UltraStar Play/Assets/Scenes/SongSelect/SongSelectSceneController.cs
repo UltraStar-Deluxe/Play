@@ -130,6 +130,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         duetIndicator.SetActive(false);
     }
 
+    public void OnRandomSong()
+    {
+        songRouletteController.SelectRandomSong();
+    }
+
     public void OnNextSong()
     {
         songRouletteController.SelectNextSong();
