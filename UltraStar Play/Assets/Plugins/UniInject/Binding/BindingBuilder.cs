@@ -20,7 +20,7 @@ namespace UniInject
         }
 
         // Equivalent to Bind(typeof(T)).ToExistingInstance(instanceGetter);
-        public void BindExistingInstance<T>(Func<T> instanceGetter)
+        public void BindExistingInstanceLazy<T>(Func<T> instanceGetter)
         {
             BindingUnderConstruction b = new BindingUnderConstruction(typeof(T));
             bindingsUnderConstruction.Add(b);
