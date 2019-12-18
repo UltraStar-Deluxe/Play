@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UniInject;
 using UnityEngine;
+using UniRx;
 
 public class SongAudioPlayer : MonoBehaviour
 {
@@ -12,6 +13,15 @@ public class SongAudioPlayer : MonoBehaviour
 
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
+
+    private Subject<double> positionInSongEventStream = new Subject<double>();
+    public ISubject<double> PositionInSongEventStream
+    {
+        get
+        {
+            return positionInSongEventStream;
+        }
+    }
 
     // The current position in the song in milliseconds.
     private double positionInSongInMillis;
@@ -45,8 +55,11 @@ public class SongAudioPlayer : MonoBehaviour
             {
                 throw new UnityException($"new PositionInSongInMillis is out of range ({value}/{DurationOfSongInMillis})");
             }
-            int newTimeSamples = (int)((value / 1000.0) * audioPlayer.clip.frequency);
+            positionInSongInMillis = value;
+            int newTimeSamples = (int)((positionInSongInMillis / 1000.0) * audioPlayer.clip.frequency);
             audioPlayer.timeSamples = newTimeSamples;
+
+            positionInSongEventStream.OnNext(positionInSongInMillis);
         }
     }
 
@@ -103,6 +116,14 @@ public class SongAudioPlayer : MonoBehaviour
     }
 
     private SongMeta SongMeta { get; set; }
+
+    void Update()
+    {
+        if (IsPlaying)
+        {
+            positionInSongEventStream.OnNext(PositionInSongInMillis);
+        }
+    }
 
     public void Init(SongMeta songMeta)
     {

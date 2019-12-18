@@ -25,7 +25,13 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     [InjectedInInspector]
-    public PositionInSongIndicator positionInSongIndicator;
+    public OverviewBar overviewBar;
+
+    [InjectedInInspector]
+    public NoteArea noteArea;
+
+    [InjectedInInspector]
+    public NoteAreaPositionInSongIndicator noteAreaPositionInSongIndicator;
 
     private bool audioWaveFormInitialized;
 
@@ -85,6 +91,10 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(SceneData);
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(AudioClip);
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(noteArea);
+        bb.BindExistingInstance(overviewBar);
         bb.BindExistingInstance(this);
 
         List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
@@ -112,13 +122,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
                 audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
             }
         }
-
-        // Synchronize music and video.
-        if (songAudioPlayer.IsPlaying)
-        {
-            songVideoPlayer.SetPositionInSongInMillis(songAudioPlayer.PositionInSongInMillis);
-            positionInSongIndicator.SetPositionInSongInPercent(songAudioPlayer.PositionInSongInPercent);
-        }
     }
 
     public void TogglePlayPause()
@@ -140,17 +143,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         songAudioPlayer.PositionInSongInMillis = millis;
         songVideoPlayer.SetPositionInSongInMillis(millis);
         songVideoPlayer.SyncVideoWithMusicImmediately(millis);
-        if (songAudioPlayer.DurationOfSongInMillis > 0)
-        {
-            double percent = millis / songAudioPlayer.DurationOfSongInMillis;
-            positionInSongIndicator.SetPositionInSongInPercent(percent);
-        }
-    }
-
-    public void SetPositionInSongInPercent(double percent)
-    {
-        double newPositionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * percent;
-        SetPositionInSongInMillis(newPositionInSongInMillis);
     }
 
     public void OnBackButtonClicked()
