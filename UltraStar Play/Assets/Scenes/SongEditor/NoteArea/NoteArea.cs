@@ -4,57 +4,118 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UniInject;
+using UniRx;
 
 #pragma warning disable CS0649
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler
 {
-    // Zoom of 1 is defined as "all the song is visible", a zoom of 2 would be "half the song is visible".
-    // The zoom factor is given in per mille (i.e. 1/1000).
-    // public int zoomXPerMille = 1000;
-
-    // Zoom of 1 is defined as "all the notes are visible", a zoom of 2 would be "half the notes are visible".
-    // The zoom factor is given in per cent (i.e. 1/100).
-    // public int zoomYPerCent = 100;
-
-    // The first midi note index that is visible in the viewport (index 0 would be midiNoteMin)
-    public int viewportY = (MidiUtils.midiNoteMax - MidiUtils.midiNoteMin) / 4;
-    public float viewportX = 0;
-
+    // The first midi note index that is visible in the viewport (index 0 would be MidiNoteMin)
+    private int viewportY = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 4;
     // The number of midi notes that are visible in the viewport
-    public int viewportHeight = (MidiUtils.midiNoteMax - MidiUtils.midiNoteMin) / 2;
+    private int viewportHeight = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 2;
 
-    public bool isPointerOver;
+    // The viewport left side in the song in milliseconds
+    private int viewportX = 0;
+    // The width of the viewport in milliseconds
+    private int viewportWidth = 3000;
+
+    public bool IsPointerOver { get; private set; }
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private NoteAreaLines noteAreaLines;
+    private NoteAreaRulerVertical noteAreaRulerVertical;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private NoteAreaLineLabels noteAreaLineLabels;
+    private NoteAreaRulerHorizontal noteAreaRulerHorizontal;
 
-    void Update()
+    [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    private Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
+    public ISubject<ViewportEvent> ViewportEventStream
     {
-        // Scroll with mouse wheel
-        if (isPointerOver)
+        get
         {
-            int scroll = Math.Sign(Input.mouseScrollDelta.y);
-            if (scroll > 0 && (viewportY + MidiUtils.midiNoteMin) <= (MidiUtils.midiNoteMax - viewportHeight))
-            {
-                viewportY += scroll;
-                UpdateNoteArea();
-            }
-            else if (scroll < 0 && viewportY > 0)
-            {
-                viewportY += scroll;
-                UpdateNoteArea();
-            }
+            return viewportEventStream;
         }
     }
 
-    private void UpdateNoteArea()
+    void Start()
     {
-        noteAreaLines.UpdateLines();
-        noteAreaLineLabels.UpdateLabels();
+        UpdateNoteArea();
+        ViewportEventStream.Subscribe(_ => UpdateNoteArea());
+        songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
+    }
+
+    public void SetPositionInSongInMillis(double positionInSongInMillis)
+    {
+        float viewportAutomaticScrollingLeft = viewportX + viewportWidth * 0.1f;
+        float viewportAutomaticScrollingRight = viewportX + viewportWidth * 0.9f;
+        if (positionInSongInMillis < viewportX || positionInSongInMillis > (viewportX + viewportWidth))
+        {
+            // Center viewport to position in song
+            double newViewportX = positionInSongInMillis - viewportWidth / 2;
+            SetViewportX((int)newViewportX);
+        }
+        else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
+        {
+            // Scroll left to new position
+            double newViewportX = viewportX - viewportAutomaticScrollingLeft - positionInSongInMillis;
+            SetViewportX((int)newViewportX);
+        }
+        else if (positionInSongInMillis > viewportAutomaticScrollingRight)
+        {
+            // Scroll right to new position
+            double newViewportX = viewportX + positionInSongInMillis - viewportAutomaticScrollingRight;
+            SetViewportX((int)newViewportX);
+        }
+    }
+
+    public void UpdateNoteArea()
+    {
+        noteAreaRulerHorizontal.UpdateBeatLinesAndLabels();
+        noteAreaRulerVertical.UpdatePitchLinesAndLabels();
+    }
+
+    public bool IsNoteVisible(Note note)
+    {
+        // Check y axis, which is the midi note
+        bool isMidiNoteOk = (note.MidiNote >= GetMinMidiNoteInViewport())
+                         && (note.MidiNote <= GetMaxMidiNoteInViewport());
+        if (!isMidiNoteOk)
+        {
+            return false;
+        }
+
+        // Check x axis, which is the position in the song
+        double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+        double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+        bool isMillisecondsOk = (startPosInMillis >= GetMinMillisecondsInViewport())
+                             && (endPosInMillis <= GetMaxMillisecondsInViewport());
+        return isMillisecondsOk;
+    }
+
+    public int GetMinMidiNoteInViewport()
+    {
+        return viewportY + MidiUtils.MidiNoteMin;
+    }
+
+    public int GetMaxMidiNoteInViewport()
+    {
+        return GetMinMidiNoteInViewport() + viewportHeight;
+    }
+
+    public double GetMinMillisecondsInViewport()
+    {
+        return viewportX;
+    }
+
+    public double GetMaxMillisecondsInViewport()
+    {
+        return viewportX + viewportWidth;
     }
 
     public int GetVisibleMidiNoteCount()
@@ -62,28 +123,144 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return viewportHeight;
     }
 
-    public float GetVisibleMidiNotePositionY(int midiNoteIndexInViewport)
+    public float GetVerticalPositionForIndexInViewport(int midiNoteIndexInViewport)
     {
         return (float)midiNoteIndexInViewport / viewportHeight;
     }
 
-    public float GetMidiNotePositionY(int midiNote)
+    public float GetVerticalPositionForGeneralMidiNote(int midiNote)
     {
-        return (float)(midiNote - viewportY) / viewportHeight;
+        int indexInViewport = midiNote - viewportY;
+        return GetVerticalPositionForIndexInViewport(indexInViewport);
+    }
+
+    public float GetHorizontalPositionForMillis(int positionInSongInMillis)
+    {
+        return (float)(positionInSongInMillis - viewportX) / viewportWidth;
+    }
+
+    public float GetHorizontalPositionForBeat(int beat)
+    {
+        double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        return GetHorizontalPositionForMillis((int)positionInSongInMillis);
     }
 
     public int GetMidiNote(int midiNoteIndexInViewport)
     {
-        return MidiUtils.midiNoteMin + viewportY + midiNoteIndexInViewport;
+        return MidiUtils.MidiNoteMin + viewportY + midiNoteIndexInViewport;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        isPointerOver = false;
+        IsPointerOver = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        isPointerOver = true;
+        IsPointerOver = true;
+    }
+
+    public void ScrollHorizontal(int direction)
+    {
+        int newViewportX = viewportX + (int)(viewportWidth * 0.25);
+        SetViewportX(newViewportX);
+    }
+
+    public void ZoomHorizontal(int direction)
+    {
+        double zoomFactor = (direction > 0) ? 0.75 : 1.25;
+        int newViewportWidth = (int)(viewportWidth * zoomFactor);
+        SetViewportWidth(newViewportWidth);
+    }
+
+    public void ScrollVertical(int direction)
+    {
+        int newViewportY = viewportY + direction;
+        SetViewportY(newViewportY);
+    }
+
+    public void ZoomVertical(int direction)
+    {
+        double zoomFactor = (direction > 0) ? 0.75 : 1.25;
+        int newViewportHeight = (int)(viewportHeight * zoomFactor);
+        SetViewportHeight(newViewportHeight);
+    }
+
+    public void SetViewportWidth(int newViewportWidth)
+    {
+        if (newViewportWidth < 1000)
+        {
+            newViewportWidth = 1000;
+        }
+        if (newViewportWidth >= songAudioPlayer.DurationOfSongInMillis)
+        {
+            newViewportWidth = (int)songAudioPlayer.DurationOfSongInMillis;
+        }
+
+        if (newViewportWidth != viewportWidth)
+        {
+            viewportWidth = newViewportWidth;
+            FireViewportChangedEvent();
+        }
+    }
+
+    public void SetViewportX(int newViewportX)
+    {
+        if (newViewportX < 0)
+        {
+            newViewportX = 0;
+        }
+        if (newViewportX >= songAudioPlayer.DurationOfSongInMillis)
+        {
+            newViewportX = (int)songAudioPlayer.DurationOfSongInMillis;
+        }
+
+        if (newViewportX != viewportX)
+        {
+            viewportX = newViewportX;
+            FireViewportChangedEvent();
+        }
+    }
+
+    public void SetViewportY(int newViewportY)
+    {
+        if (newViewportY < 0)
+        {
+            newViewportY = 0;
+        }
+        if (newViewportY > MidiUtils.SingableNoteRange - viewportHeight)
+        {
+            newViewportY = MidiUtils.SingableNoteRange - viewportHeight;
+        }
+
+        if (newViewportY != viewportY)
+        {
+            viewportY = newViewportY;
+            FireViewportChangedEvent();
+        }
+    }
+
+    public void SetViewportHeight(int newViewportHeight)
+    {
+        if (newViewportHeight < 12)
+        {
+            newViewportHeight = 12;
+        }
+        if (newViewportHeight > 30)
+        {
+            newViewportHeight = 30;
+        }
+
+        if (newViewportHeight != viewportHeight)
+        {
+            viewportHeight = newViewportHeight;
+            FireViewportChangedEvent();
+        }
+    }
+
+    private void FireViewportChangedEvent()
+    {
+        ViewportEvent viewportEvent = new ViewportEvent(viewportX, viewportY, viewportWidth, viewportHeight);
+        viewportEventStream.OnNext(viewportEvent);
     }
 }

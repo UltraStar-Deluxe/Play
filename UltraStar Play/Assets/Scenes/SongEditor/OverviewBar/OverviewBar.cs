@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
@@ -11,14 +12,17 @@ public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
-    private float width;
+    private float rectWidth;
+
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
 
     [Inject]
     private SongEditorSceneController songEditorSceneController;
 
     void Start()
     {
-        width = rectTransform.rect.width;
+        rectWidth = rectTransform.rect.width;
     }
 
     // Scroll through the song via click on the overview bar.
@@ -32,7 +36,8 @@ public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
             return;
         }
 
-        double xPercent = (localPoint.x + (width / 2)) / width;
-        songEditorSceneController.SetPositionInSongInPercent(xPercent);
+        double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
+        double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
+        songEditorSceneController.SetPositionInSongInMillis(positionInSongInMillis);
     }
 }
