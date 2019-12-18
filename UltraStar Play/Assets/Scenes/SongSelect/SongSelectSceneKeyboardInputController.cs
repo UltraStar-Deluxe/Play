@@ -8,6 +8,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
+    private const KeyCode RandomSongShortcut = KeyCode.R;
 
     private const KeyCode QuickSearchSong = KeyCode.LeftControl;
     private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
@@ -39,6 +40,11 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             if (Input.GetKeyUp(KeyCode.Escape) || Input.GetKeyUp(KeyCode.Backspace))
             {
                 SceneNavigator.Instance.LoadScene(EScene.MainScene);
+            }
+
+            if (Input.GetKeyUp(RandomSongShortcut))
+            {
+                songSelectSceneController.OnRandomSong();
             }
         }
 
