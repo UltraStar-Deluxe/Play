@@ -25,6 +25,10 @@ public class PlayerScoreController : MonoBehaviour
     {
         get
         {
+            if (normalNoteLengthTotal <= 0)
+            {
+                return 0;
+            }
             return (int)(maxScoreForNormalNotes * correctNormalNoteLengthTotal / normalNoteLengthTotal);
         }
     }
@@ -33,6 +37,10 @@ public class PlayerScoreController : MonoBehaviour
     {
         get
         {
+            if (goldenNoteLengthTotal <= 0)
+            {
+                return 0;
+            }
             return (int)(maxScoreForGoldenNotes * correctGoldenNoteLengthTotal / goldenNoteLengthTotal);
         }
     }
