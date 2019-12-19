@@ -57,20 +57,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         }
     }
 
-    private AudioClip audioClip;
-    public AudioClip AudioClip
-    {
-        get
-        {
-            if (audioClip == null && SongMeta != null)
-            {
-                string path = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
-                audioClip = AudioManager.GetAudioClip(path);
-            }
-            return audioClip;
-        }
-    }
-
     private SongEditorSceneData sceneData;
     public SongEditorSceneData SceneData
     {
@@ -87,10 +73,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
-        // Note that the SceneData, SongMeta, and AudioClip are loaded on access here if not done yet.
+        // Note that the SceneData, SongMeta are loaded on access here if not done yet.
         bb.BindExistingInstance(SceneData);
         bb.BindExistingInstance(SongMeta);
-        bb.BindExistingInstance(AudioClip);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
@@ -102,7 +87,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         return bb.GetBindings();
     }
 
-    void Start()
+    void Awake()
     {
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
         songAudioPlayer.Init(SongMeta);
@@ -114,12 +99,12 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     void Update()
     {
         // Create the audio waveform image if not done yet.
-        if (!audioWaveFormInitialized && audioClip != null && audioClip.samples > 0)
+        if (!audioWaveFormInitialized && songAudioPlayer.HasAudioClip && songAudioPlayer.AudioClip.samples > 0)
         {
             using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
             {
                 audioWaveFormInitialized = true;
-                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
+                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(songAudioPlayer.AudioClip);
             }
         }
     }
