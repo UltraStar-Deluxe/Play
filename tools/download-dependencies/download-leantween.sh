@@ -1,6 +1,6 @@
 #!/bin/sh
 
-old_dir=$(PWD)
+old_dir=$(pwd)
 
 cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old LeanTween folder..."
