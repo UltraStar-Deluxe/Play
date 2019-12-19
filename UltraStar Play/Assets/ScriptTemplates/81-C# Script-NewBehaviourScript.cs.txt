@@ -1,0 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UniInject;
+using UniRx;
+
+public class #SCRIPTNAME# : MonoBehaviour
+{
+	void Start() {
+	
+	}
+	
+	void Update() {
+	
+	}
+}
