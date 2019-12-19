@@ -13,63 +13,26 @@ public class OverviewBarPositionInSongIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject]
-    private NoteArea noteArea;
-
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
-    private double widthInPercent;
-    public double WidthInPercent
-    {
-        get
-        {
-            return widthInPercent;
-        }
-        set
-        {
-            widthInPercent = value;
-            UpdatePositionAndWidth();
-        }
-    }
-
-    private double positionInSongInPercent;
-    public double PositionInSongInPercent
-    {
-        get
-        {
-            return positionInSongInPercent;
-        }
-        set
-        {
-            positionInSongInPercent = value;
-            UpdatePositionAndWidth();
-        }
-    }
-
     void Start()
     {
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
-    }
-
-    private void OnViewportChanged(ViewportEvent viewportEvent)
-    {
-        WidthInPercent = viewportEvent.Width / songAudioPlayer.DurationOfSongInMillis;
     }
 
     private void SetPositionInSongInMillis(double positionInSongInMillis)
     {
-        PositionInSongInPercent = positionInSongInMillis / songAudioPlayer.DurationOfSongInMillis;
+        double positionInSongInPercent = positionInSongInMillis / songAudioPlayer.DurationOfSongInMillis;
+        UpdatePosition(positionInSongInPercent);
     }
 
-    private void UpdatePositionAndWidth()
+    private void UpdatePosition(double positionInSongInPercent)
     {
-        float xMin = (float)(PositionInSongInPercent - WidthInPercent);
-        float xMax = (float)PositionInSongInPercent;
+        float x = (float)positionInSongInPercent;
 
-        rectTransform.anchorMin = new Vector2(xMin, rectTransform.anchorMin.y);
-        rectTransform.anchorMax = new Vector2(xMax, rectTransform.anchorMax.y);
+        rectTransform.anchorMin = new Vector2(x, rectTransform.anchorMin.y);
+        rectTransform.anchorMax = new Vector2(x, rectTransform.anchorMax.y);
         rectTransform.anchoredPosition = Vector2.zero;
     }
 }

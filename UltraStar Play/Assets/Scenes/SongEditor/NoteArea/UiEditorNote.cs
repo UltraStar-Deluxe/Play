@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+using UniInject;
+using UniRx;
+
+#pragma warning disable CS0649
+
+public class UiEditorNote : MonoBehaviour
+{
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private Text uiText;
+
+    public void Init(Note note)
+    {
+        UniInjectUtils.SceneInjector.Inject(this);
+
+        uiText.text = note.Text;
+    }
+}

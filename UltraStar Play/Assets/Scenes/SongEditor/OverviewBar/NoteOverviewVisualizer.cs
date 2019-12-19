@@ -32,7 +32,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     private List<Voice> voices;
 
     [Inject]
-    private AudioClip audioClip;
+    private SongAudioPlayer songAudioPlayer;
 
     void Awake()
     {
@@ -43,7 +43,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        int songDurationInMillis = (int)Math.Ceiling(audioClip.length * 1000);
+        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
         DrawVoices(songDurationInMillis, songMeta, voices);
     }
 

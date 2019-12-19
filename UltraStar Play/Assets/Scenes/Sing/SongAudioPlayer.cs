@@ -107,6 +107,14 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    public AudioClip AudioClip
+    {
+        get
+        {
+            return audioPlayer.clip;
+        }
+    }
+
     public bool HasAudioClip
     {
         get

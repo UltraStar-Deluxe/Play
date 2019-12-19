@@ -62,10 +62,9 @@ public static class GameObjectUtils
     }
 
     // Destroys the direct children of a transform.
-    // Thereby, only the children that match the given type are destroyed.
-    public static void DestroyAllDirectChildren<T>(this Transform transform) where T : Component
+    public static void DestroyAllDirectChildren(this Transform transform)
     {
-        foreach (T child in transform)
+        foreach (Transform child in transform)
         {
             GameObject.Destroy(child.gameObject);
         }

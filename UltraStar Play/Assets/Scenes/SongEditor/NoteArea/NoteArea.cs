@@ -45,9 +45,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     void Start()
     {
-        UpdateNoteArea();
         ViewportEventStream.Subscribe(_ => UpdateNoteArea());
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
+        FireViewportChangedEvent();
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
@@ -76,7 +76,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void UpdateNoteArea()
     {
-        noteAreaRulerHorizontal.UpdateBeatLinesAndLabels();
+        noteAreaRulerHorizontal.UpdateLinesAndLabels();
         noteAreaRulerVertical.UpdatePitchLinesAndLabels();
     }
 
@@ -118,6 +118,20 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return viewportX + viewportWidth;
     }
 
+    public double GetMinBeatInViewport()
+    {
+        double minMillisInViewport = GetMinMillisecondsInViewport();
+        double minBeatInViewport = BpmUtils.MillisecondInSongToBeat(songMeta, minMillisInViewport);
+        return minBeatInViewport;
+    }
+
+    public double GetMaxBeatInViewport()
+    {
+        double maxMillisInViewport = GetMaxMillisecondsInViewport();
+        double maxBeatInViewport = BpmUtils.MillisecondInSongToBeat(songMeta, maxMillisInViewport);
+        return maxBeatInViewport;
+    }
+
     public int GetVisibleMidiNoteCount()
     {
         return viewportHeight;
@@ -130,8 +144,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public float GetVerticalPositionForGeneralMidiNote(int midiNote)
     {
-        int indexInViewport = midiNote - viewportY;
+        int indexInViewport = midiNote - (viewportY + MidiUtils.MidiNoteMin);
         return GetVerticalPositionForIndexInViewport(indexInViewport);
+    }
+
+    public float GetHeightForSingleNote()
+    {
+        return 1f / GetVisibleMidiNoteCount();
     }
 
     public float GetHorizontalPositionForMillis(int positionInSongInMillis)
@@ -162,7 +181,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void ScrollHorizontal(int direction)
     {
-        int newViewportX = viewportX + (int)(viewportWidth * 0.25);
+        int newViewportX = viewportX + direction * (int)(viewportWidth * 0.2);
         SetViewportX(newViewportX);
     }
 

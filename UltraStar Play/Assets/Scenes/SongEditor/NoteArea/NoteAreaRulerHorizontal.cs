@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,12 +9,22 @@ using UnityEngine.UI;
 public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
-    public RectTransform beatLinePrefab;
+    public RectTransform fineLinePrefab;
     [InjectedInInspector]
-    public RectTransform beatLineContainer;
+    public RectTransform roughLinePrefab;
 
+    [InjectedInInspector]
+    public RectTransform lineContainer;
+
+    [InjectedInInspector]
     public Text beatLabelPrefab;
+    [InjectedInInspector]
+    public Text secondLabelPrefab;
+
+    [InjectedInInspector]
     public RectTransform beatLabelContainer;
+    [InjectedInInspector]
+    public RectTransform secondLabelContainer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInParent)]
     private NoteArea noteArea;
@@ -23,42 +34,73 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        UpdateBeatLinesAndLabels();
+        UpdateLinesAndLabels();
     }
 
-    public void UpdateBeatLinesAndLabels()
+    public void UpdateLinesAndLabels()
     {
-        beatLineContainer.DestroyAllDirectChildren<RectTransform>();
-        beatLabelContainer.DestroyAllDirectChildren<RectTransform>();
+        lineContainer.DestroyAllDirectChildren();
+        beatLabelContainer.DestroyAllDirectChildren();
+        secondLabelContainer.DestroyAllDirectChildren();
 
         double viewportStartMillis = noteArea.GetMinMillisecondsInViewport();
         double viewportEndMillis = noteArea.GetMaxMillisecondsInViewport();
         int viewportStartBeat = (int)Math.Floor(BpmUtils.MillisecondInSongToBeat(songMeta, viewportStartMillis));
         int viewportEndBeat = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, viewportEndMillis));
+        int viewportWidthInBeats = viewportEndBeat - viewportStartBeat;
 
-        int drawEveryN = (int)Math.Log10(viewportEndBeat - viewportStartBeat) * 10;
-        if (drawEveryN < 1)
+        double viewportWidthLog10 = Math.Log10(viewportWidthInBeats);
+
+        int drawStepRough = Math.Max(1, (int)viewportWidthLog10 * 8);
+        int drawStepVeryRough = drawStepRough * 2;
+        int drawStepFine = 0;
+
+        if (viewportWidthInBeats <= 128)
         {
-            drawEveryN = 1;
+            drawStepFine = drawStepRough / 2;
         }
+
+        if (viewportWidthInBeats <= 48)
+        {
+            drawStepVeryRough = 6;
+            drawStepRough = 4;
+            drawStepFine = 1;
+        }
+
         double millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
-        double labelWidthInMillis = millisPerBeat * drawEveryN;
+        double labelWidthInMillis = millisPerBeat * drawStepRough;
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            bool hasLine = (beat % drawEveryN == 0);
-            if (hasLine)
+            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+
+            bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
+            if (hasRoughLine)
             {
-                double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-                CreateLineForBeat(beatPosInMillis, viewportStartMillis, viewportEndMillis);
-                CreateLabelForBeat(beat, beatPosInMillis, viewportStartMillis, viewportEndMillis, labelWidthInMillis);
+                CreateLine(beatPosInMillis, viewportStartMillis, viewportEndMillis, roughLinePrefab);
+                Text uiText = CreateLabel(beatPosInMillis, viewportStartMillis, viewportEndMillis, labelWidthInMillis, beatLabelPrefab, beatLabelContainer);
+                uiText.text = beat.ToString();
+            }
+
+            bool hasFineLine = drawStepFine > 0 && (beat % drawStepFine == 0);
+            if (hasFineLine && !hasRoughLine)
+            {
+                CreateLine(beatPosInMillis, viewportStartMillis, viewportEndMillis, fineLinePrefab);
+            }
+
+            bool hasSecondLabel = drawStepVeryRough > 0 && (beat % drawStepVeryRough == 0);
+            if (hasSecondLabel)
+            {
+                double beatPosInSeconds = beatPosInMillis / 1000;
+                Text uiText = CreateLabel(beatPosInMillis, viewportStartMillis, viewportEndMillis, labelWidthInMillis, secondLabelPrefab, secondLabelContainer);
+                uiText.text = beatPosInSeconds.ToString("F3", CultureInfo.InvariantCulture) + " s";
             }
         }
     }
 
-    private void CreateLineForBeat(double beatPosInMillis, double viewportStartMillis, double viewportEndMillis)
+    private void CreateLine(double beatPosInMillis, double viewportStartMillis, double viewportEndMillis, RectTransform linePrefab)
     {
-        RectTransform line = Instantiate(beatLinePrefab, beatLineContainer);
+        RectTransform line = Instantiate(linePrefab, lineContainer);
 
         double viewportWidth = viewportEndMillis - viewportStartMillis;
         float x = (float)((beatPosInMillis - viewportStartMillis) / viewportWidth);
@@ -68,9 +110,9 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
         line.sizeDelta = new Vector2(line.sizeDelta.x, 0);
     }
 
-    private void CreateLabelForBeat(int beat, double beatPosInMillis, double viewportStartMillis, double viewportEndMillis, double labelWidthInMillis)
+    private Text CreateLabel(double beatPosInMillis, double viewportStartMillis, double viewportEndMillis, double labelWidthInMillis, Text uiTextPrefab, RectTransform container)
     {
-        Text uiText = Instantiate(beatLabelPrefab, beatLabelContainer);
+        Text uiText = Instantiate(uiTextPrefab, container);
         RectTransform label = uiText.GetComponent<RectTransform>();
 
         double viewportWidthInMillis = viewportEndMillis - viewportStartMillis;
@@ -81,6 +123,6 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
         label.anchoredPosition = Vector2.zero;
         label.sizeDelta = new Vector2(0, 0);
 
-        uiText.text = beat.ToString();
+        return uiText;
     }
 }
