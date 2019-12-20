@@ -26,6 +26,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private NoteArea noteArea;
 
+    [Inject]
+    private Injector injector;
+
     void Start()
     {
         noteArea.ViewportEventStream.Subscribe(_ => UpdateEditorNotes());
@@ -62,6 +65,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
 
         UiEditorNote uiNote = Instantiate(notePrefab, noteContainer);
+        injector.Inject(uiNote);
         uiNote.Init(note);
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
