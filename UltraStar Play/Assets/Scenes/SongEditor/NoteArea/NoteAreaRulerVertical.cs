@@ -27,41 +27,41 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
         labelContainer.DestroyAllDirectChildren();
         lineContainer.DestroyAllDirectChildren();
 
-        int visibleMidiNoteCount = noteArea.GetVisibleMidiNoteCount();
-        for (int i = 0; i < visibleMidiNoteCount; i++)
+        int minMidiNote = noteArea.GetMinMidiNoteInViewport();
+        int maxMidiNote = noteArea.GetMaxMidiNoteInViewport();
+        for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
-            CreateLabelForMidiNote(i);
+            CreateLabelForMidiNote(midiNote);
             // Notes are drawn on lines and between lines alternatingly.
-            bool hasLine = (i % 2 == 0);
+            bool hasLine = (midiNote % 2 == 0);
             if (hasLine)
             {
-                CreateLineForMidiNote(i);
+                CreateLineForMidiNote(midiNote);
             }
         }
     }
 
-    private void CreateLabelForMidiNote(int midiNoteIndexInViewport)
+    private void CreateLabelForMidiNote(int midiNote)
     {
         Text uiText = Instantiate(labelPrefab, labelContainer);
         RectTransform label = uiText.GetComponent<RectTransform>();
 
-        float y = noteArea.GetVerticalPositionForIndexInViewport(midiNoteIndexInViewport);
+        float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
         float anchorHeight = noteArea.GetHeightForSingleNote();
         label.anchorMin = new Vector2(0, y - (anchorHeight / 2f));
         label.anchorMax = new Vector2(1, y + (anchorHeight / 2f));
         label.anchoredPosition = Vector2.zero;
         label.sizeDelta = new Vector2(0, 0);
 
-        int midiNote = noteArea.GetMidiNote(midiNoteIndexInViewport);
         string midiNoteName = MidiUtils.GetAbsoluteName(midiNote);
         uiText.text = midiNoteName;
     }
 
-    private void CreateLineForMidiNote(int midiNoteIndexInViewport)
+    private void CreateLineForMidiNote(int midiNote)
     {
         RectTransform line = Instantiate(linePrefab, lineContainer);
 
-        float y = noteArea.GetVerticalPositionForIndexInViewport(midiNoteIndexInViewport);
+        float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
         line.anchorMin = new Vector2(0, y);
         line.anchorMax = new Vector2(1, y);
         line.anchoredPosition = Vector2.zero;

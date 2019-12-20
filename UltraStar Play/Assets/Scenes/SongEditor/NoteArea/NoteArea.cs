@@ -12,10 +12,10 @@ using System.Linq;
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    // The first midi note index that is visible in the viewport (index 0 would be MidiNoteMin)
-    public int ViewportY { get; private set; } = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 4;
+    // The first midi note that is visible in the viewport
+    public int ViewportY { get; private set; } = MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4);
     // The number of midi notes that are visible in the viewport
-    public int ViewportHeight { get; private set; } = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 2;
+    public int ViewportHeight { get; private set; } = MidiUtils.SingableNoteRange / 2;
 
     // The viewport left side in the song in milliseconds
     public int ViewportX { get; private set; } = 0;
@@ -32,6 +32,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject(key = "voices")]
+    private List<Voice> voices;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -58,7 +61,22 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         ViewportEventStream.Subscribe(_ => UpdateNoteArea());
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
+
+        FitViewportToVoices();
+
         FireViewportChangedEvent();
+    }
+
+    private void FitViewportToVoices()
+    {
+        List<Note> notes = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        int minMidiNoteInSong = notes.Select(note => note.MidiNote).Min();
+        int maxMidiNoteInSong = notes.Select(note => note.MidiNote).Max();
+        if (minMidiNoteInSong > 0 && maxMidiNoteInSong > 0)
+        {
+            ViewportY = minMidiNoteInSong - 1;
+            ViewportHeight = maxMidiNoteInSong - minMidiNoteInSong + 1;
+        }
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
@@ -111,7 +129,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public int GetMinMidiNoteInViewport()
     {
-        return ViewportY + MidiUtils.MidiNoteMin;
+        return ViewportY;
     }
 
     public int GetMaxMidiNoteInViewport()
@@ -126,7 +144,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public double GetMaxMillisecondsInViewport()
     {
-        return ViewportX + ViewportWidth;
+        return GetMinMillisecondsInViewport() + ViewportWidth;
     }
 
     public double GetMinBeatInViewport()
@@ -143,25 +161,15 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return maxBeatInViewport;
     }
 
-    public int GetVisibleMidiNoteCount()
+    public float GetVerticalPositionForMidiNote(int midiNote)
     {
-        return ViewportHeight;
-    }
-
-    public float GetVerticalPositionForIndexInViewport(int midiNoteIndexInViewport)
-    {
-        return (float)midiNoteIndexInViewport / ViewportHeight;
-    }
-
-    public float GetVerticalPositionForGeneralMidiNote(int midiNote)
-    {
-        int indexInViewport = midiNote - (ViewportY + MidiUtils.MidiNoteMin);
-        return GetVerticalPositionForIndexInViewport(indexInViewport);
+        int indexInViewport = midiNote - ViewportY;
+        return (float)indexInViewport / ViewportHeight;
     }
 
     public float GetHeightForSingleNote()
     {
-        return 1f / GetVisibleMidiNoteCount();
+        return 1f / ViewportHeight;
     }
 
     public float GetHorizontalPositionForMillis(int positionInSongInMillis)
@@ -173,11 +181,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
         return GetHorizontalPositionForMillis((int)positionInSongInMillis);
-    }
-
-    public int GetMidiNote(int midiNoteIndexInViewport)
-    {
-        return MidiUtils.MidiNoteMin + ViewportY + midiNoteIndexInViewport;
     }
 
     public void ScrollHorizontal(int direction)
@@ -248,9 +251,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         {
             newViewportY = 0;
         }
-        if (newViewportY > MidiUtils.SingableNoteRange - ViewportHeight)
+        if (newViewportY > 127)
         {
-            newViewportY = MidiUtils.SingableNoteRange - ViewportHeight;
+            newViewportY = 127;
         }
 
         if (newViewportY != ViewportY)
