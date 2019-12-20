@@ -17,9 +17,6 @@ public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
     void Start()
     {
         rectWidth = rectTransform.rect.width;
@@ -38,6 +35,6 @@ public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
 
         double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
         double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
-        songEditorSceneController.SetPositionInSongInMillis(positionInSongInMillis);
+        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
     }
 }

@@ -91,9 +91,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     {
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
         songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.Init(SongMeta);
+        songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
-        SetPositionInSongInMillis(SceneData.PositionInSongInMillis);
+        songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
     }
 
     void Update()
@@ -114,20 +114,11 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         if (songAudioPlayer.IsPlaying)
         {
             songAudioPlayer.PauseAudio();
-            songVideoPlayer.PauseVideo();
         }
         else
         {
             songAudioPlayer.PlayAudio();
-            songVideoPlayer.PlayVideo();
         }
-    }
-
-    public void SetPositionInSongInMillis(double millis)
-    {
-        songAudioPlayer.PositionInSongInMillis = millis;
-        songVideoPlayer.SetPositionInSongInMillis(millis);
-        songVideoPlayer.SyncVideoWithMusicImmediately(millis);
     }
 
     public void OnBackButtonClicked()

@@ -157,7 +157,7 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
             PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
         }
 
-        songVideoPlayer.Init(SongMeta);
+        songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
         StartCoroutine(StartMusicAndVideo());
     }
@@ -206,8 +206,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
 
-        songVideoPlayer.SetPositionInSongInMillis(PositionInSongInMillis);
-
         // TODO: Updating the pitch detection (including the dummy singers) for this frame must come after updating the current sentence.
         // Otherwise, a pitch event may be fired for a beat of the "previous" sentence where no note is expected,
         // afterwards the sentence changes (the note is expected now), but the pitch event is lost.
@@ -236,7 +234,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             songAudioPlayer.PositionInSongInMillis = targetPositionInMillis;
-            songVideoPlayer.SyncVideoWithMusicImmediately(targetPositionInMillis);
         }
     }
 
@@ -328,13 +325,11 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             pauseOverlay.SetActive(true);
             songAudioPlayer.PauseAudio();
-            songVideoPlayer.PauseVideo();
         }
         else
         {
             pauseOverlay.SetActive(false);
             songAudioPlayer.PlayAudio();
-            songVideoPlayer.PlayVideo();
         }
     }
 
@@ -364,7 +359,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             Debug.Log($"Skipping forward to {sceneData.PositionInSongInMillis} milliseconds");
             songAudioPlayer.PositionInSongInMillis = sceneData.PositionInSongInMillis;
-            songVideoPlayer.SyncVideoWithMusicImmediately(sceneData.PositionInSongInMillis);
         }
     }
 }
