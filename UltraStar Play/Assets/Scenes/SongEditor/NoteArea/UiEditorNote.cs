@@ -15,6 +15,12 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
     [InjectedInInspector]
     public EditorNoteLyricsInputField lyricsInputFieldPrefab;
 
+    [InjectedInInspector]
+    public Image goldenNoteImageOverlay;
+
+    [InjectedInInspector]
+    public Image backgroundImage;
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
@@ -37,7 +43,8 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
     public void Init(Note note)
     {
         this.Note = note;
-        uiText.text = note.Text;
+        SetText(note.Text);
+        goldenNoteImageOverlay.gameObject.SetActive(note.IsGolden);
     }
 
     public void OnPointerClick(PointerEventData ped)
@@ -64,8 +71,14 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
 
     public void SetText(string newText)
     {
-        // TODO: Create a mutable song model for the editor and update it
-        uiText.text = newText;
+        if (Note.IsFreestyle)
+        {
+            uiText.text = $"<i>{newText}</i>";
+        }
+        else
+        {
+            uiText.text = newText;
+        }
     }
 
     private void StartEditingNoteText()
