@@ -79,10 +79,4 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
         injector.Inject(activeLyricsInputField);
         activeLyricsInputField.Init(this, Note.Text);
     }
-
-    public void EndEditingNoteText()
-    {
-        Destroy(activeLyricsInputField.gameObject);
-        activeLyricsInputField = null;
-    }
 }
