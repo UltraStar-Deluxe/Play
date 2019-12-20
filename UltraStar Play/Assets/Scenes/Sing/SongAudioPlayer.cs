@@ -51,11 +51,18 @@ public class SongAudioPlayer : MonoBehaviour
             {
                 return;
             }
-            if (value < 0 || value > DurationOfSongInMillis)
+
+            double newPositionInSongInMillis = value;
+            if (newPositionInSongInMillis < 0)
             {
-                throw new UnityException($"new PositionInSongInMillis is out of range ({value}/{DurationOfSongInMillis})");
+                newPositionInSongInMillis = 0;
             }
-            positionInSongInMillis = value;
+            else if (newPositionInSongInMillis > DurationOfSongInMillis - 1)
+            {
+                newPositionInSongInMillis = DurationOfSongInMillis - 1;
+            }
+
+            positionInSongInMillis = newPositionInSongInMillis;
             int newTimeSamples = (int)((positionInSongInMillis / 1000.0) * audioPlayer.clip.frequency);
             audioPlayer.timeSamples = newTimeSamples;
 
