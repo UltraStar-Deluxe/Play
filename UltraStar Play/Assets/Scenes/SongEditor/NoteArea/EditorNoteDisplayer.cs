@@ -41,6 +41,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         int minBeat = (int)Math.Floor(noteArea.GetMinBeatInViewport());
         int maxBeat = (int)Math.Ceiling(noteArea.GetMaxBeatInViewport());
 
+        int minMidiNote = noteArea.GetMinMidiNoteInViewport();
+        int maxMidiNote = noteArea.GetMaxMidiNoteInViewport();
+
         List<Sentence> sentencesInViewport = voices
             .SelectMany(voice => voice.Sentences)
             .Where(sentence => sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat)
@@ -48,7 +51,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         List<Note> notesInViewport = sentencesInViewport
             .SelectMany(sentence => sentence.Notes)
-            .Where(sentence => sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat)
+            .Where(note => note.StartBeat <= maxBeat && note.EndBeat >= minBeat)
+            .Where(note => note.MidiNote <= maxMidiNote && note.MidiNote >= minMidiNote)
             .ToList();
 
         foreach (Note note in notesInViewport)
@@ -74,7 +78,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void PositionUiNote(RectTransform uiNoteRectTransform, int midiNote, int startBeat, int endBeat)
     {
-        float y = noteArea.GetVerticalPositionForGeneralMidiNote(midiNote);
+        float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
         float xStart = noteArea.GetHorizontalPositionForBeat(startBeat);
         float xEnd = noteArea.GetHorizontalPositionForBeat(endBeat);
         float height = noteArea.GetHeightForSingleNote();
