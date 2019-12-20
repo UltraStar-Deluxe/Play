@@ -5,20 +5,22 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UniInject;
 using UniRx;
+using UnityEngine.UI;
+using System.Linq;
 
 #pragma warning disable CS0649
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     // The first midi note index that is visible in the viewport (index 0 would be MidiNoteMin)
-    private int viewportY = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 4;
+    public int ViewportY { get; private set; } = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 4;
     // The number of midi notes that are visible in the viewport
-    private int viewportHeight = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 2;
+    public int ViewportHeight { get; private set; } = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 2;
 
     // The viewport left side in the song in milliseconds
-    private int viewportX = 0;
+    public int ViewportX { get; private set; } = 0;
     // The width of the viewport in milliseconds
-    private int viewportWidth = 3000;
+    public int ViewportWidth { get; private set; } = 3000;
 
     public bool IsPointerOver { get; private set; }
 
@@ -49,6 +51,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
+    [Inject(searchMethod = SearchMethods.GetComponent)]
+    private GraphicRaycaster graphicRaycaster;
+
     void Start()
     {
         ViewportEventStream.Subscribe(_ => UpdateNoteArea());
@@ -58,24 +63,24 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
     {
-        float viewportAutomaticScrollingLeft = viewportX + viewportWidth * 0.1f;
-        float viewportAutomaticScrollingRight = viewportX + viewportWidth * 0.9f;
-        if (positionInSongInMillis < viewportX || positionInSongInMillis > (viewportX + viewportWidth))
+        float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * 0.1f;
+        float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * 0.9f;
+        if (positionInSongInMillis < ViewportX || positionInSongInMillis > (ViewportX + ViewportWidth))
         {
             // Center viewport to position in song
-            double newViewportX = positionInSongInMillis - viewportWidth / 2;
+            double newViewportX = positionInSongInMillis - ViewportWidth / 2;
             SetViewportX((int)newViewportX);
         }
         else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
         {
             // Scroll left to new position
-            double newViewportX = viewportX - viewportAutomaticScrollingLeft - positionInSongInMillis;
+            double newViewportX = ViewportX - viewportAutomaticScrollingLeft - positionInSongInMillis;
             SetViewportX((int)newViewportX);
         }
         else if (positionInSongInMillis > viewportAutomaticScrollingRight)
         {
             // Scroll right to new position
-            double newViewportX = viewportX + positionInSongInMillis - viewportAutomaticScrollingRight;
+            double newViewportX = ViewportX + positionInSongInMillis - viewportAutomaticScrollingRight;
             SetViewportX((int)newViewportX);
         }
     }
@@ -106,22 +111,22 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public int GetMinMidiNoteInViewport()
     {
-        return viewportY + MidiUtils.MidiNoteMin;
+        return ViewportY + MidiUtils.MidiNoteMin;
     }
 
     public int GetMaxMidiNoteInViewport()
     {
-        return GetMinMidiNoteInViewport() + viewportHeight;
+        return GetMinMidiNoteInViewport() + ViewportHeight;
     }
 
     public double GetMinMillisecondsInViewport()
     {
-        return viewportX;
+        return ViewportX;
     }
 
     public double GetMaxMillisecondsInViewport()
     {
-        return viewportX + viewportWidth;
+        return ViewportX + ViewportWidth;
     }
 
     public double GetMinBeatInViewport()
@@ -140,17 +145,17 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public int GetVisibleMidiNoteCount()
     {
-        return viewportHeight;
+        return ViewportHeight;
     }
 
     public float GetVerticalPositionForIndexInViewport(int midiNoteIndexInViewport)
     {
-        return (float)midiNoteIndexInViewport / viewportHeight;
+        return (float)midiNoteIndexInViewport / ViewportHeight;
     }
 
     public float GetVerticalPositionForGeneralMidiNote(int midiNote)
     {
-        int indexInViewport = midiNote - (viewportY + MidiUtils.MidiNoteMin);
+        int indexInViewport = midiNote - (ViewportY + MidiUtils.MidiNoteMin);
         return GetVerticalPositionForIndexInViewport(indexInViewport);
     }
 
@@ -161,7 +166,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public float GetHorizontalPositionForMillis(int positionInSongInMillis)
     {
-        return (float)(positionInSongInMillis - viewportX) / viewportWidth;
+        return (float)(positionInSongInMillis - ViewportX) / ViewportWidth;
     }
 
     public float GetHorizontalPositionForBeat(int beat)
@@ -172,32 +177,32 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public int GetMidiNote(int midiNoteIndexInViewport)
     {
-        return MidiUtils.MidiNoteMin + viewportY + midiNoteIndexInViewport;
+        return MidiUtils.MidiNoteMin + ViewportY + midiNoteIndexInViewport;
     }
 
     public void ScrollHorizontal(int direction)
     {
-        int newViewportX = viewportX + direction * (int)(viewportWidth * 0.2);
+        int newViewportX = ViewportX + direction * (int)(ViewportWidth * 0.2);
         SetViewportX(newViewportX);
     }
 
     public void ZoomHorizontal(int direction)
     {
         double zoomFactor = (direction > 0) ? 0.75 : 1.25;
-        int newViewportWidth = (int)(viewportWidth * zoomFactor);
+        int newViewportWidth = (int)(ViewportWidth * zoomFactor);
         SetViewportWidth(newViewportWidth);
     }
 
     public void ScrollVertical(int direction)
     {
-        int newViewportY = viewportY + direction;
+        int newViewportY = ViewportY + direction;
         SetViewportY(newViewportY);
     }
 
     public void ZoomVertical(int direction)
     {
         double zoomFactor = (direction > 0) ? 0.75 : 1.25;
-        int newViewportHeight = (int)(viewportHeight * zoomFactor);
+        int newViewportHeight = (int)(ViewportHeight * zoomFactor);
         SetViewportHeight(newViewportHeight);
     }
 
@@ -212,9 +217,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportWidth = (int)songAudioPlayer.DurationOfSongInMillis;
         }
 
-        if (newViewportWidth != viewportWidth)
+        if (newViewportWidth != ViewportWidth)
         {
-            viewportWidth = newViewportWidth;
+            ViewportWidth = newViewportWidth;
             FireViewportChangedEvent();
         }
     }
@@ -230,9 +235,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportX = (int)songAudioPlayer.DurationOfSongInMillis;
         }
 
-        if (newViewportX != viewportX)
+        if (newViewportX != ViewportX)
         {
-            viewportX = newViewportX;
+            ViewportX = newViewportX;
             FireViewportChangedEvent();
         }
     }
@@ -243,14 +248,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         {
             newViewportY = 0;
         }
-        if (newViewportY > MidiUtils.SingableNoteRange - viewportHeight)
+        if (newViewportY > MidiUtils.SingableNoteRange - ViewportHeight)
         {
-            newViewportY = MidiUtils.SingableNoteRange - viewportHeight;
+            newViewportY = MidiUtils.SingableNoteRange - ViewportHeight;
         }
 
-        if (newViewportY != viewportY)
+        if (newViewportY != ViewportY)
         {
-            viewportY = newViewportY;
+            ViewportY = newViewportY;
             FireViewportChangedEvent();
         }
     }
@@ -266,16 +271,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportHeight = 30;
         }
 
-        if (newViewportHeight != viewportHeight)
+        if (newViewportHeight != ViewportHeight)
         {
-            viewportHeight = newViewportHeight;
+            ViewportHeight = newViewportHeight;
             FireViewportChangedEvent();
         }
     }
 
     private void FireViewportChangedEvent()
     {
-        ViewportEvent viewportEvent = new ViewportEvent(viewportX, viewportY, viewportWidth, viewportHeight);
+        ViewportEvent viewportEvent = new ViewportEvent(ViewportX, ViewportY, ViewportWidth, ViewportHeight);
         viewportEventStream.OnNext(viewportEvent);
     }
 
@@ -299,9 +304,17 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             return;
         }
 
+        // Check that only the NoteArea was clicked, and not a note inside of it.
+        List<RaycastResult> results = new List<RaycastResult>();
+        graphicRaycaster.Raycast(ped, results);
+        if (results.Count != 1 || results[0].gameObject != gameObject)
+        {
+            return;
+        }
+
         float rectWidth = rectTransform.rect.width;
         double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
-        double positionInSongInMillis = viewportX + (viewportWidth * xPercent);
+        double positionInSongInMillis = ViewportX + (ViewportWidth * xPercent);
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
     }
 }
