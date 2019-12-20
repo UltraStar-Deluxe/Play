@@ -70,6 +70,11 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
         this.methodInjectionField = $"{personWithAge} is {age} years old";
     }
 
+    // Inject the injector that was used to inject all the fields.
+    // The injector can be used at runtime to inject newly created scripts.
+    [Inject]
+    private Injector injector;
+
     void Start()
     {
         Debug.Log("Parent: " + Parent);
@@ -95,5 +100,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 
         Debug.Log("The bound int: " + SceneInjector.GetValueForInjectionKey<int>());
         Debug.Log("The bound instance of an interface: " + SceneInjector.GetValueForInjectionKey<IDependencyInjectionDemoInterface>());
+
+        Debug.Log("Injector:" + injector);
     }
 }
