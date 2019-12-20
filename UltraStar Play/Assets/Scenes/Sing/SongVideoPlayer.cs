@@ -16,49 +16,33 @@ public class SongVideoPlayer : MonoBehaviour
     [InjectedInInspector]
     public Image backgroundImage;
 
+    // Optional SongAudioPlayer.
+    // If set, then the video playback is synchronized with the position in the SongAudioPlayer.
+    public SongAudioPlayer SongAudioPlayer { get; set; }
+
     private SongMeta SongMeta { get; set; }
 
     private bool hasLoadedVideo;
     private string videoPath;
 
-    private float nextSmoothSyncTimeInSeconds;
+    private float nextSyncTimeInSeconds;
 
-    public void Init(SongMeta songMeta)
+    public void Init(SongMeta songMeta, SongAudioPlayer songAudioPlayer)
     {
         this.SongMeta = songMeta;
+        this.SongAudioPlayer = songAudioPlayer;
         InitVideo(songMeta);
     }
 
-    public void PlayVideo()
+    void Update()
     {
-        if (!hasLoadedVideo)
+        if (SongAudioPlayer != null)
         {
-            return;
+            SynchVideoWithMusic(SongAudioPlayer);
         }
-        videoPlayer.Play();
-    }
-
-    public void PauseVideo()
-    {
-        if (!hasLoadedVideo)
+        else
         {
-            return;
-        }
-        videoPlayer.Pause();
-    }
-
-    public void SetPositionInSongInMillis(double positionInSongInMillis)
-    {
-        if (!hasLoadedVideo)
-        {
-            return;
-        }
-
-        UpdateVideoStart(positionInSongInMillis);
-        if (videoPlayer.isPlaying && nextSmoothSyncTimeInSeconds <= Time.time)
-        {
-            nextSmoothSyncTimeInSeconds = Time.time + 0.5f;
-            SyncVideoWithMusicSmoothly(positionInSongInMillis);
+            Debug.Log("no audio player");
         }
     }
 
@@ -87,6 +71,15 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
+    private void SynchVideoWithMusic(SongAudioPlayer songAudioPlayer)
+    {
+        SyncVideoPlayPause(songAudioPlayer.PositionInSongInMillis);
+        if (videoPlayer.isPlaying)
+        {
+            SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis);
+        }
+    }
+
     private void StartVideoPlayback(string videoPath)
     {
         if (string.IsNullOrEmpty(videoPlayer.url))
@@ -100,74 +93,62 @@ public class SongVideoPlayer : MonoBehaviour
         {
             // Positive VideoGap, thus skip the start of the video
             videoPlayer.time = SongMeta.VideoGap;
+        }
+    }
+
+    private void SyncVideoPlayPause(double positionInSongInMillis)
+    {
+        if (!hasLoadedVideo || !videoPlayer.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        bool songAudioPlayerIsPlaying = (SongAudioPlayer == null || SongAudioPlayer.IsPlaying);
+
+        if (!songAudioPlayerIsPlaying && videoPlayer.isPlaying)
+        {
+            videoPlayer.Pause();
+        }
+        else if (songAudioPlayerIsPlaying && !videoPlayer.isPlaying && !IsWaitingForVideoGap(positionInSongInMillis))
+        {
             videoPlayer.Play();
         }
-        else if (SongMeta.VideoGap < 0)
+    }
+
+    private void SyncVideoWithMusic(double positionInSongInMillis)
+    {
+        if (!hasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis) || nextSyncTimeInSeconds > Time.time)
         {
-            // Negative VideoGap, thus wait a little before starting the video
-            videoPlayer.Pause();
+            return;
+        }
+
+        // Both, the smooth sync and immediate sync need some time.
+        nextSyncTimeInSeconds = Time.time + 0.5f;
+
+        double targetPositionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000;
+        double timeDifferenceInSeconds = targetPositionInVideoInSeconds - videoPlayer.time;
+
+        // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
+        // A big mismatch is corrected immediately.
+        if (Math.Abs(timeDifferenceInSeconds) > 2)
+        {
+            // Correct the mismatch immediately.
+            videoPlayer.time = targetPositionInVideoInSeconds;
+            videoPlayer.playbackSpeed = 1f;
         }
         else
         {
-            // No VideoGap, thus start the video immediately
-            videoPlayer.Play();
+            // Smooth out the time difference over a duration of 2 seconds
+            float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
+            videoPlayer.playbackSpeed = playbackSpeed;
         }
     }
 
-    private void UpdateVideoStart(double positionInSongInMillis)
+    // Returns true if still waiting for the start of the video at the given position in the song.
+    private bool IsWaitingForVideoGap(double positionInSongInMillis)
     {
-        if (!hasLoadedVideo)
-        {
-            return;
-        }
-
-        // Negative VideoGap: Start video after a pause in seconds.
-        if (SongMeta.VideoGap < 0
-            && videoPlayer.gameObject.activeInHierarchy
-            && videoPlayer.isPaused
-            && (positionInSongInMillis >= (-SongMeta.VideoGap * 1000)))
-        {
-            videoPlayer.Play();
-        }
-    }
-
-    public void SyncVideoWithMusicImmediately(double positionInSongInMillis)
-    {
-        if (!hasLoadedVideo)
-        {
-            return;
-        }
-
-        if (SongMeta.VideoGap < 0 && positionInSongInMillis < (-SongMeta.VideoGap * 1000))
-        {
-            // Still waiting for the start of the video
-            return;
-        }
-
-        double targetPositionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000;
-        videoPlayer.time = targetPositionInVideoInSeconds;
-        videoPlayer.playbackSpeed = 1f;
-        nextSmoothSyncTimeInSeconds = Time.time + 0.5f;
-    }
-
-    private void SyncVideoWithMusicSmoothly(double positionInSongInMillis)
-    {
-        if (!hasLoadedVideo)
-        {
-            return;
-        }
-
-        if (SongMeta.VideoGap < 0 && positionInSongInMillis < (-SongMeta.VideoGap * 1000))
-        {
-            // Still waiting for the start of the video
-            return;
-        }
-
-        double positionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000;
-        double timeDifferenceInSeconds = positionInVideoInSeconds - videoPlayer.time;
-        // Smooth out the time difference over a duration of 2 seconds
-        float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
-        videoPlayer.playbackSpeed = playbackSpeed;
+        // A negative video gap means this duration has to be waited before playing the video.
+        return SongMeta.VideoGap < 0 && positionInSongInMillis < (-SongMeta.VideoGap * 1000);
     }
 
     public void ShowBackgroundImage()
