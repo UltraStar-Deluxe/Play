@@ -36,14 +36,8 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     void Start()
     {
         RequestFocus();
-    }
 
-    void Update()
-    {
-        if (!inputField.isFocused)
-        {
-            OnFocusLost();
-        }
+        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
     }
 
     public void Init(UiEditorNote uiEditorNote, string text)
@@ -58,14 +52,14 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         inputField.ActivateInputField();
     }
 
-    private void OnFocusLost()
+    private void OnEndEdit(string newText)
     {
-        string newText = inputField.text;
         if (!IsOnlyWhitespace(newText))
         {
             uiEditorNote.SetText(newText);
         }
-        uiEditorNote.EndEditingNoteText();
+
+        Destroy(gameObject);
     }
 
     private bool IsOnlyWhitespace(string newText)

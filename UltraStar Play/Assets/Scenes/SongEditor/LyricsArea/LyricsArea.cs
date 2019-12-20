@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 #pragma warning disable CS0649
 
@@ -17,21 +19,77 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject(key = "voices")]
     private List<Voice> voices;
 
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    private List<Sentence> sortedSentences;
+
+    private int lastCaretPosition;
+
+    private string lyrics;
+
     void Start()
     {
-        string lyrics = GetLyrics(voices);
+        lyrics = GetLyrics(voices);
         inputField.text = lyrics;
+        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
+    }
+
+    void Update()
+    {
+        if (lastCaretPosition != inputField.caretPosition)
+        {
+            lastCaretPosition = inputField.caretPosition;
+
+            SyncPositionInSongWithSelectedText();
+        }
+    }
+
+    private void OnEndEdit(string newText)
+    {
+        // TODO: Change the lyrics if only the lyrics for a single note changed
+        // Ignore new lyrics for now.
+        inputField.text = lyrics;
+    }
+
+    private void SyncPositionInSongWithSelectedText()
+    {
+        Note note = GetNoteForPositionInLyrics(inputField.caretPosition);
+        if (note != null)
+        {
+            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        }
     }
 
     private string GetLyrics(List<Voice> voices)
     {
         string lyrics = "";
-        List<Sentence> sentences = voices.SelectMany(voice => voice.Sentences).ToList();
-        sentences.Sort((s1, s2) => s1.StartBeat.CompareTo(s2.StartBeat));
-        foreach (Sentence sentence in sentences)
+        sortedSentences = voices.SelectMany(voice => voice.Sentences).ToList();
+        sortedSentences.Sort((s1, s2) => s1.StartBeat.CompareTo(s2.StartBeat));
+        foreach (Sentence sentence in sortedSentences)
         {
             lyrics += sentence.Notes.Select(note => note.Text).ToCsv("", "", "\n");
         }
         return lyrics;
+    }
+
+    private Note GetNoteForPositionInLyrics(int positionInLyrics)
+    {
+        int position = 0;
+        foreach (Sentence sentence in sortedSentences)
+        {
+            foreach (Note note in sentence.Notes)
+            {
+                position += note.Text.Length;
+                if (position >= positionInLyrics)
+                {
+                    return note;
+                }
+            }
+            // +1 because of the line break in the text field to separate sentences.
+            position += 1;
+        }
+        return null;
     }
 }
