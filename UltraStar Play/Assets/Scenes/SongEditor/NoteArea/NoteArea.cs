@@ -8,7 +8,7 @@ using UniRx;
 
 #pragma warning disable CS0649
 
-public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler
+public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     // The first midi note index that is visible in the viewport (index 0 would be MidiNoteMin)
     private int viewportY = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) / 4;
@@ -33,6 +33,12 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private SongEditorSceneController songVideoPlayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponent)]
+    private RectTransform rectTransform;
 
     private Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
@@ -169,16 +175,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return MidiUtils.MidiNoteMin + viewportY + midiNoteIndexInViewport;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        IsPointerOver = false;
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        IsPointerOver = true;
-    }
-
     public void ScrollHorizontal(int direction)
     {
         int newViewportX = viewportX + direction * (int)(viewportWidth * 0.2);
@@ -281,5 +277,31 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         ViewportEvent viewportEvent = new ViewportEvent(viewportX, viewportY, viewportWidth, viewportHeight);
         viewportEventStream.OnNext(viewportEvent);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        IsPointerOver = false;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        IsPointerOver = true;
+    }
+
+    public void OnPointerClick(PointerEventData ped)
+    {
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
+                                                                     ped.position,
+                                                                     ped.pressEventCamera,
+                                                                     out Vector2 localPoint))
+        {
+            return;
+        }
+
+        float rectWidth = rectTransform.rect.width;
+        double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
+        double positionInSongInMillis = viewportX + (viewportWidth * xPercent);
+        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
     }
 }
