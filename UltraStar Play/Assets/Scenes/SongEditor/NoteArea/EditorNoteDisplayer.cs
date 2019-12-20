@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine.UI;
 
 #pragma warning disable CS0649
 
@@ -13,9 +14,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public UiEditorNote notePrefab;
-
     [InjectedInInspector]
     public RectTransform noteContainer;
+
+    [InjectedInInspector]
+    public SentenceMarkerLine sentenceMarkerLinePrefab;
+    [InjectedInInspector]
+    public RectTransform sentenceMarkerLineContainer;
+
+    [InjectedInInspector]
+    public SentenceMarkerRectangle sentenceMarkerRectanglePrefab;
+    [InjectedInInspector]
+    public RectTransform sentenceMarkerRectangleContainer;
 
     [Inject]
     private SongMeta songMeta;
@@ -31,10 +41,36 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        noteArea.ViewportEventStream.Subscribe(_ => UpdateEditorNotes());
+        noteArea.ViewportEventStream.Subscribe(_ =>
+        {
+            UpdateNotes();
+            UpdateSentences();
+        });
     }
 
-    private void UpdateEditorNotes()
+    private void UpdateSentences()
+    {
+        sentenceMarkerLineContainer.DestroyAllDirectChildren();
+        sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+
+        int minBeat = (int)Math.Floor(noteArea.GetMinBeatInViewport());
+        int maxBeat = (int)Math.Ceiling(noteArea.GetMaxBeatInViewport());
+
+        List<Sentence> sentences = voices.SelectMany(voice => voice.Sentences).ToList();
+
+        int sentenceIndex = 0;
+        foreach (Sentence sentence in sentences)
+        {
+            bool isInViewport = (sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat);
+            if (isInViewport)
+            {
+                CreateSentenceMarker(sentence, sentenceIndex + 1);
+            }
+            sentenceIndex++;
+        }
+    }
+
+    private void UpdateNotes()
     {
         noteContainer.DestroyAllDirectChildren();
 
@@ -57,11 +93,47 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Note note in notesInViewport)
         {
-            CreateEditorNote(note);
+            CreateNote(note);
         }
     }
 
-    private void CreateEditorNote(Note note)
+    private void CreateSentenceMarker(Sentence sentence, int sentenceIndex)
+    {
+        CreateSentenceMarkerLine(sentence.StartBeat);
+        CreateSentenceMarkerLine(sentence.EndBeat);
+        CreateSentenceMarkerRectangle(sentence.StartBeat, sentence.EndBeat, sentenceIndex);
+    }
+
+    private void CreateSentenceMarkerRectangle(int startBeat, int endBeat, int sentenceIndex)
+    {
+        SentenceMarkerRectangle sentenceMarkerRectangle = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
+        RectTransform rectTransform = sentenceMarkerRectangle.GetComponent<RectTransform>();
+
+        float xStart = noteArea.GetHorizontalPositionForBeat(startBeat);
+        float xEnd = noteArea.GetHorizontalPositionForBeat(endBeat);
+
+        rectTransform.anchorMin = new Vector2(xStart, 0);
+        rectTransform.anchorMax = new Vector2(xEnd, 1);
+        rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.sizeDelta = Vector2.zero;
+
+        sentenceMarkerRectangle.GetComponentInChildren<Text>().text = sentenceIndex.ToString();
+    }
+
+    private void CreateSentenceMarkerLine(int beat)
+    {
+        SentenceMarkerLine sentenceMarkerLine = Instantiate(sentenceMarkerLinePrefab, sentenceMarkerLineContainer);
+        RectTransform rectTransform = sentenceMarkerLine.GetComponent<RectTransform>();
+
+        float x = noteArea.GetHorizontalPositionForBeat(beat);
+
+        rectTransform.anchorMin = new Vector2(x, 0);
+        rectTransform.anchorMax = new Vector2(x, 1);
+        rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 0);
+    }
+
+    private void CreateNote(Note note)
     {
         if (note.StartBeat == note.EndBeat)
         {
