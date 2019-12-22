@@ -35,25 +35,30 @@ public class SceneListEditorWindow : EditorWindow
         }
         else
         {
-            try
+            DrawSceneButtons();
+        }
+    }
+
+    private void DrawSceneButtons()
+    {
+        try
+        {
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+            foreach (string scenePath in scenePaths)
             {
-                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                foreach (string scenePath in scenePaths)
+                string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+                if (GUILayout.Button(sceneName))
                 {
-                    string sceneName = Path.GetFileNameWithoutExtension(scenePath);
-                    if (GUILayout.Button(sceneName))
-                    {
-                        EditorSceneManager.OpenScene(scenePath);
-                    }
+                    EditorSceneManager.OpenScene(scenePath);
                 }
-                EditorGUILayout.EndScrollView();
             }
-            catch (ArgumentException)
-            {
-                // Unity always throws an exception after a restart:
-                // "ArgumentException: Getting control 3's position in a group with only 3 controls when doing repaint"
-                // But it seems to work normally ???
-            }
+            EditorGUILayout.EndScrollView();
+        }
+        catch (ArgumentException)
+        {
+            // Unity always throws an exception after a restart:
+            // "ArgumentException: Getting control 3's position in a group with only 3 controls when doing repaint"
+            // But it seems to work normally ???
         }
     }
 

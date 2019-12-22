@@ -62,8 +62,12 @@ public static class AudioManager
                 oldest = cachedAudioClip;
             }
         }
-        oldest.AudioClip.UnloadAudioData();
-        audioClipCache.Remove(oldest.Path);
+
+        if (oldest != null)
+        {
+            oldest.AudioClip.UnloadAudioData();
+            audioClipCache.Remove(oldest.Path);
+        }
     }
 
     private class CachedAudioClip

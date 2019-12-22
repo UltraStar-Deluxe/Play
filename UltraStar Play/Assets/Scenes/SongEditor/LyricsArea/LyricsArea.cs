@@ -5,6 +5,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using System.Text;
 
 #pragma warning disable CS0649
 
@@ -64,14 +65,15 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     private string GetLyrics(List<Voice> voices)
     {
-        string lyrics = "";
         sortedSentences = voices.SelectMany(voice => voice.Sentences).ToList();
         sortedSentences.Sort((s1, s2) => s1.StartBeat.CompareTo(s2.StartBeat));
+        StringBuilder stringBuilder = new StringBuilder();
         foreach (Sentence sentence in sortedSentences)
         {
-            lyrics += sentence.Notes.Select(note => note.Text).ToCsv("", "", "\n");
+            string sentenceText = sentence.Notes.Select(note => note.Text).ToCsv("", "", "\n");
+            stringBuilder.Append(sentenceText);
         }
-        return lyrics;
+        return stringBuilder.ToString();
     }
 
     private Note GetNoteForPositionInLyrics(int positionInLyrics)

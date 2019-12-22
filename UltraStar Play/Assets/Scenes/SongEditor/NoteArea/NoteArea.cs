@@ -18,7 +18,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     public int ViewportHeight { get; private set; } = MidiUtils.SingableNoteRange / 2;
 
     // The viewport left side in the song in milliseconds
-    public int ViewportX { get; private set; } = 0;
+    public int ViewportX { get; private set; }
     // The width of the viewport in milliseconds
     public int ViewportWidth { get; private set; } = 3000;
 
@@ -39,13 +39,10 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject]
-    private SongEditorSceneController songVideoPlayer;
-
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
-    private Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
+    private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
         get
