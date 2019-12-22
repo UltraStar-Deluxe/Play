@@ -50,7 +50,7 @@ public class SongVideoPlayer : MonoBehaviour
     {
         if (hasLoadedVideo)
         {
-            StartVideoPlayback(videoPath);
+            StartVideoPlayback();
         }
         else
         {
@@ -80,7 +80,7 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
-    private void StartVideoPlayback(string videoPath)
+    private void StartVideoPlayback()
     {
         if (string.IsNullOrEmpty(videoPlayer.url))
         {

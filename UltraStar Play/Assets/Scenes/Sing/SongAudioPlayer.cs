@@ -14,7 +14,7 @@ public class SongAudioPlayer : MonoBehaviour
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
-    private Subject<double> positionInSongEventStream = new Subject<double>();
+    private readonly Subject<double> positionInSongEventStream = new Subject<double>();
     public ISubject<double> PositionInSongEventStream
     {
         get
@@ -144,10 +144,10 @@ public class SongAudioPlayer : MonoBehaviour
     {
         this.SongMeta = songMeta;
 
-        LoadAudio(songMeta);
+        LoadAudio();
     }
 
-    private void LoadAudio(SongMeta songMeta)
+    private void LoadAudio()
     {
         string songPath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Mp3;
         AudioClip audioClip = AudioManager.GetAudioClip(songPath);
