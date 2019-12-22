@@ -13,7 +13,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
 {
     public Color backgroundColor = new Color(0, 0, 0, 0);
 
-    private Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
+    private readonly Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
                                     Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
 
     private Color[] blank; // blank image array (background color in every pixel)
@@ -86,7 +86,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             int yStart = textureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
             int yLength = textureHeight / midiNoteRange;
             int xStart = (int)(textureWidth * startMillis / songDurationInMillis);
-            int xEnd = (int)(textureWidth * startMillis / songDurationInMillis);
+            int xEnd = (int)(textureWidth * endMillis / songDurationInMillis);
             if (xEnd < xStart)
             {
                 Swap(ref xStart, ref xEnd);
