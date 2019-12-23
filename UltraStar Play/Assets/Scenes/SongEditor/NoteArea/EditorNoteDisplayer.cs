@@ -51,6 +51,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             UpdateNotes();
             UpdateSentences();
         });
+
+        foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
+        {
+            songEditorLayerManager
+                .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
+                .Subscribe(_ => UpdateNotes());
+        }
     }
 
     private void UpdateSentences()
@@ -58,16 +65,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        int minBeat = noteArea.GetMinBeatInViewport();
-        int maxBeat = noteArea.GetMaxBeatInViewport();
-
         List<Sentence> sentences = voices.SelectMany(voice => voice.Sentences).ToList();
 
         int sentenceIndex = 0;
         foreach (Sentence sentence in sentences)
         {
-            bool isInViewport = (sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat);
-            if (isInViewport)
+            if (noteArea.IsInViewport(sentence))
             {
                 CreateSentenceMarker(sentence, sentenceIndex + 1);
             }
@@ -87,7 +90,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         foreach (ESongEditorLayer layerKey in songEditorLayerKeys)
         {
-            DrawNotesInLayer(layerKey);
+            if (songEditorLayerManager.IsLayerEnabled(layerKey))
+            {
+                DrawNotesInLayer(layerKey);
+            }
         }
     }
 
@@ -111,12 +117,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        int minBeat = noteArea.GetMinBeatInViewport();
-        int maxBeat = noteArea.GetMaxBeatInViewport();
-
-        int minMidiNote = noteArea.GetMinMidiNoteInViewport();
-        int maxMidiNote = noteArea.GetMaxMidiNoteInViewport();
-
         List<Sentence> sentencesInViewport = voices
             .SelectMany(voice => voice.Sentences)
             .Where(sentence => noteArea.IsInViewport(sentence))
@@ -191,7 +191,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
         float xStart = noteArea.GetHorizontalPositionForBeat(startBeat);
         float xEnd = noteArea.GetHorizontalPositionForBeat(endBeat);
-        float height = noteArea.GetHeightForSingleNote();
+        float height = noteArea.HeightForSingleNote;
 
         uiNoteRectTransform.anchorMin = new Vector2(xStart, y - height / 2f);
         uiNoteRectTransform.anchorMax = new Vector2(xEnd, y + height / 2f);
