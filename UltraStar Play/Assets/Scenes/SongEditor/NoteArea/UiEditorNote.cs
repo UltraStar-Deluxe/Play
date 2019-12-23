@@ -81,6 +81,11 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void SetColor(Color color)
+    {
+        backgroundImage.color = color;
+    }
+
     private void StartEditingNoteText()
     {
         if (activeLyricsInputField != null)

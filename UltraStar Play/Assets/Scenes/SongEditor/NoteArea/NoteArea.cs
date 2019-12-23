@@ -124,6 +124,11 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return isMillisecondsOk;
     }
 
+    public double GetMillisecondsPerBeat()
+    {
+        return BpmUtils.MillisecondsPerBeat(songMeta);
+    }
+
     public int GetMinMidiNoteInViewport()
     {
         return ViewportY;
@@ -144,18 +149,18 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return GetMinMillisecondsInViewport() + ViewportWidth;
     }
 
-    public double GetMinBeatInViewport()
+    public int GetMinBeatInViewport()
     {
         double minMillisInViewport = GetMinMillisecondsInViewport();
         double minBeatInViewport = BpmUtils.MillisecondInSongToBeat(songMeta, minMillisInViewport);
-        return minBeatInViewport;
+        return (int)Math.Floor(minBeatInViewport);
     }
 
-    public double GetMaxBeatInViewport()
+    public int GetMaxBeatInViewport()
     {
         double maxMillisInViewport = GetMaxMillisecondsInViewport();
         double maxBeatInViewport = BpmUtils.MillisecondInSongToBeat(songMeta, maxMillisInViewport);
-        return maxBeatInViewport;
+        return (int)Math.Ceiling(maxBeatInViewport);
     }
 
     public float GetVerticalPositionForMidiNote(int midiNote)
@@ -178,6 +183,26 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
         return GetHorizontalPositionForMillis((int)positionInSongInMillis);
+    }
+
+    public bool IsInViewport(Note note)
+    {
+        // TODO: These fields should be stored and only updated when the viewport changes.
+        int minBeat = GetMinBeatInViewport();
+        int maxBeat = GetMaxBeatInViewport();
+        int minMidiNote = GetMinMidiNoteInViewport();
+        int maxMidiNote = GetMaxMidiNoteInViewport();
+
+        return note.StartBeat <= maxBeat && note.EndBeat >= minBeat
+            && note.MidiNote <= maxMidiNote && note.MidiNote >= minMidiNote;
+    }
+
+    public bool IsInViewport(Sentence sentence)
+    {
+        int minBeat = GetMinBeatInViewport();
+        int maxBeat = GetMaxBeatInViewport();
+
+        return sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat;
     }
 
     public void ScrollHorizontal(int direction)

@@ -33,6 +33,8 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     [InjectedInInspector]
     public NoteAreaPositionInSongIndicator noteAreaPositionInSongIndicator;
 
+    public SongEditorLayerManager SongEditorLayerManager { get; set; } = new SongEditorLayerManager();
+
     private bool audioWaveFormInitialized;
 
     public SongMeta SongMeta
@@ -80,6 +82,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
         bb.BindExistingInstance(overviewBar);
+        bb.BindExistingInstance(SongEditorLayerManager);
         bb.BindExistingInstance(this);
 
         List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();

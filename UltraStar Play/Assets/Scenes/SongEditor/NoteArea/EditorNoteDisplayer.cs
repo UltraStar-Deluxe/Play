@@ -39,6 +39,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
+    private List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
+
     void Start()
     {
         noteArea.ViewportEventStream.Subscribe(_ =>
@@ -53,8 +58,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        int minBeat = (int)Math.Floor(noteArea.GetMinBeatInViewport());
-        int maxBeat = (int)Math.Ceiling(noteArea.GetMaxBeatInViewport());
+        int minBeat = noteArea.GetMinBeatInViewport();
+        int maxBeat = noteArea.GetMaxBeatInViewport();
 
         List<Sentence> sentences = voices.SelectMany(voice => voice.Sentences).ToList();
 
@@ -74,21 +79,52 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         noteContainer.DestroyAllDirectChildren();
 
-        int minBeat = (int)Math.Floor(noteArea.GetMinBeatInViewport());
-        int maxBeat = (int)Math.Ceiling(noteArea.GetMaxBeatInViewport());
+        DrawNotesInSongFile();
+        DrawNotesInLayers();
+    }
+
+    private void DrawNotesInLayers()
+    {
+        foreach (ESongEditorLayer layerKey in songEditorLayerKeys)
+        {
+            DrawNotesInLayer(layerKey);
+        }
+    }
+
+    private void DrawNotesInLayer(ESongEditorLayer layerKey)
+    {
+        List<Note> notesDetectedInSong = songEditorLayerManager.GetNotes(layerKey);
+        List<Note> notesDetectedInSongInViewport = notesDetectedInSong
+            .Where(note => noteArea.IsInViewport(note))
+            .ToList();
+
+        Color color = songEditorLayerManager.GetColor(layerKey);
+        foreach (Note note in notesDetectedInSongInViewport)
+        {
+            UiEditorNote uiNote = CreateNote(note);
+            if (uiNote != null)
+            {
+                uiNote.SetColor(color);
+            }
+        }
+    }
+
+    private void DrawNotesInSongFile()
+    {
+        int minBeat = noteArea.GetMinBeatInViewport();
+        int maxBeat = noteArea.GetMaxBeatInViewport();
 
         int minMidiNote = noteArea.GetMinMidiNoteInViewport();
         int maxMidiNote = noteArea.GetMaxMidiNoteInViewport();
 
         List<Sentence> sentencesInViewport = voices
             .SelectMany(voice => voice.Sentences)
-            .Where(sentence => sentence.StartBeat <= maxBeat && sentence.EndBeat >= minBeat)
+            .Where(sentence => noteArea.IsInViewport(sentence))
             .ToList();
 
         List<Note> notesInViewport = sentencesInViewport
             .SelectMany(sentence => sentence.Notes)
-            .Where(note => note.StartBeat <= maxBeat && note.EndBeat >= minBeat)
-            .Where(note => note.MidiNote <= maxMidiNote && note.MidiNote >= minMidiNote)
+            .Where(note => noteArea.IsInViewport(note))
             .ToList();
 
         foreach (Note note in notesInViewport)
@@ -133,11 +169,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 0);
     }
 
-    private void CreateNote(Note note)
+    private UiEditorNote CreateNote(Note note)
     {
         if (note.StartBeat == note.EndBeat)
         {
-            return;
+            return null;
         }
 
         UiEditorNote uiNote = Instantiate(notePrefab, noteContainer);
@@ -146,6 +182,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
+
+        return uiNote;
     }
 
     private void PositionUiNote(RectTransform uiNoteRectTransform, int midiNote, int startBeat, int endBeat)
