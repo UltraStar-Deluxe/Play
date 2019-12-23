@@ -15,7 +15,6 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
     private readonly int pitchRecordHistoryLength = 5;
 
     private bool isEnabled;
-    private int lastPitchDetectedFrame;
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz)
     {
@@ -55,11 +54,16 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
     {
-        if (!isEnabled || samplesSinceLastFrame < MinSampleLength || lastPitchDetectedFrame == Time.frameCount)
+        if (!isEnabled)
+        {
+            Debug.LogWarning("AudioSamplesAnalyzer is disabled");
+            return null;
+        }
+
+        if (samplesSinceLastFrame < MinSampleLength)
         {
             return null;
         }
-        lastPitchDetectedFrame = Time.frameCount;
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
         // check if samples is louder than threshhold
