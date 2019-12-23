@@ -24,16 +24,16 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     [InjectedInInspector]
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
-    [InjectedInInspector]
-    public OverviewBar overviewBar;
+    // [InjectedInInspector]
+    // public OverviewBar overviewBar;
 
     [InjectedInInspector]
     public NoteArea noteArea;
 
     [InjectedInInspector]
-    public NoteAreaPositionInSongIndicator noteAreaPositionInSongIndicator;
+    public MicrophonePitchTracker microphonePitchTracker;
 
-    public SongEditorLayerManager SongEditorLayerManager { get; set; } = new SongEditorLayerManager();
+    private SongEditorLayerManager songEditorLayerManager { get; set; } = new SongEditorLayerManager();
 
     private bool audioWaveFormInitialized;
 
@@ -81,8 +81,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
-        bb.BindExistingInstance(overviewBar);
-        bb.BindExistingInstance(SongEditorLayerManager);
+        // bb.BindExistingInstance(overviewBar);
+        bb.BindExistingInstance(songEditorLayerManager);
+        bb.BindExistingInstance(microphonePitchTracker);
         bb.BindExistingInstance(this);
 
         List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();

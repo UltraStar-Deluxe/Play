@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class SongEditorLayer
 {
     public ESongEditorLayer LayerKey { get; private set; }

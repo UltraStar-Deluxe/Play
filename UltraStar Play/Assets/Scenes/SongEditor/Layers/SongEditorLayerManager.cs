@@ -47,6 +47,8 @@ public class SongEditorLayerManager
         {
             result.Add(layerKey, new SongEditorLayer(layerKey));
         }
+        result[ESongEditorLayer.MicRecording].Color = Colors.coral;
+        result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
         return result;
     }
 }

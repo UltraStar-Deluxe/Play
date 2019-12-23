@@ -43,8 +43,8 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
         beatLabelContainer.DestroyAllDirectChildren();
         secondLabelContainer.DestroyAllDirectChildren();
 
-        double viewportStartMillis = noteArea.GetMinMillisecondsInViewport();
-        double viewportEndMillis = noteArea.GetMaxMillisecondsInViewport();
+        double viewportStartMillis = noteArea.MinMillisecondsInViewport;
+        double viewportEndMillis = noteArea.MaxMillisecondsInViewport;
         int viewportStartBeat = (int)Math.Floor(BpmUtils.MillisecondInSongToBeat(songMeta, viewportStartMillis));
         int viewportEndBeat = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, viewportEndMillis));
         int viewportWidthInBeats = viewportEndBeat - viewportStartBeat;

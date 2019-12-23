@@ -27,8 +27,8 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
         labelContainer.DestroyAllDirectChildren();
         lineContainer.DestroyAllDirectChildren();
 
-        int minMidiNote = noteArea.GetMinMidiNoteInViewport();
-        int maxMidiNote = noteArea.GetMaxMidiNoteInViewport();
+        int minMidiNote = noteArea.MinMidiNoteInViewport;
+        int maxMidiNote = noteArea.MaxMidiNoteInViewport;
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
             CreateLabelForMidiNote(midiNote);
@@ -47,7 +47,7 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
         RectTransform label = uiText.GetComponent<RectTransform>();
 
         float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
-        float anchorHeight = noteArea.GetHeightForSingleNote();
+        float anchorHeight = noteArea.HeightForSingleNote;
         label.anchorMin = new Vector2(0, y - (anchorHeight / 2f));
         label.anchorMax = new Vector2(1, y + (anchorHeight / 2f));
         label.anchoredPosition = Vector2.zero;

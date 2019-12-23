@@ -1,12 +1,6 @@
 ﻿public enum ESongEditorLayer
 {
-    MusicPitches,
-    Recording,
-    Paste,
-    P1,
-    P2,
-    P3,
-    P4,
-    P5,
-    P6,
+    MicRecording = 0,
+    ButtonRecording = 1,
+    Paste = 2,
 }
