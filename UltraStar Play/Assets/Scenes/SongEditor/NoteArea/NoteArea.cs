@@ -36,12 +36,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public bool IsPointerOver { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private NoteAreaRulerVertical noteAreaRulerVertical;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private NoteAreaRulerHorizontal noteAreaRulerHorizontal;
-
     [Inject]
     private SongMeta songMeta;
 
@@ -70,12 +64,11 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
 
-        SetViewportX(0);
+        SetViewportX(1);
         SetViewportY(MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4));
         SetViewportWidth(3000);
         SetViewportHeight(MidiUtils.SingableNoteRange / 2);
 
-        ViewportEventStream.Subscribe(_ => UpdateNoteArea());
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
         FitViewportToVoices();
@@ -117,12 +110,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             double newViewportX = ViewportX + positionInSongInMillis - viewportAutomaticScrollingRight;
             SetViewportX((int)newViewportX);
         }
-    }
-
-    public void UpdateNoteArea()
-    {
-        noteAreaRulerHorizontal.UpdateLinesAndLabels();
-        noteAreaRulerVertical.UpdatePitchLinesAndLabels();
     }
 
     public bool IsNoteVisible(Note note)
@@ -265,9 +252,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         {
             newViewportHeight = 12;
         }
-        if (newViewportHeight > 30)
+        if (newViewportHeight > 48)
         {
-            newViewportHeight = 30;
+            newViewportHeight = 48;
         }
 
         if (newViewportHeight != ViewportHeight)

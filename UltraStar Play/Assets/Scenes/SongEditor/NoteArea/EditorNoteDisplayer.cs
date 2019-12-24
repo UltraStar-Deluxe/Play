@@ -62,6 +62,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateSentences()
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
         sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
@@ -80,6 +84,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateNotes()
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
         noteContainer.DestroyAllDirectChildren();
 
         DrawNotesInSongFile();

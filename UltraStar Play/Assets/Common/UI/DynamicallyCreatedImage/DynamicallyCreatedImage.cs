@@ -50,6 +50,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
         // reset the texture to the background color
         ClearTexture();
+        ApplyTexture();
     }
 
     public void ApplyTexture()
@@ -61,6 +62,16 @@ public class DynamicallyCreatedImage : MonoBehaviour
     public void ClearTexture()
     {
         texture.SetPixels(blank);
+    }
+
+    public void ShiftImageHorizontally(float xPercent)
+    {
+        rawImage.uvRect = new Rect(xPercent, rawImage.uvRect.y, rawImage.uvRect.width, rawImage.uvRect.height);
+    }
+
+    public void ShiftImageVertically(float yPercent)
+    {
+        rawImage.uvRect = new Rect(rawImage.uvRect.x, yPercent, rawImage.uvRect.width, rawImage.uvRect.height);
     }
 
     public void SetPixel(int x, int y, Color color)
