@@ -1,29 +1,15 @@
 ﻿using System;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(RawImage))]
 public class AudioWaveFormVisualizer : MonoBehaviour
 {
-    public Color backgroundColor = new Color(0, 0, 0, 0);
     public Color waveformColor = Color.white;
 
-    private Color[] blank; // blank image array (background color in every pixel)
-    private Texture2D texture;
-
-    private RawImage rawImage;
-    private RectTransform rectTransform;
-
-    private int textureWidth = 256;
-    private int textureHeight = 256;
-
-    void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();
-        rawImage = GetComponent<RawImage>();
-        CreateTexture();
-    }
+    [InjectedInInspector]
+    public DynamicallyCreatedImage dynImage;
 
     public void DrawWaveFormMinAndMaxValues(AudioClip audioClip)
     {
@@ -32,7 +18,7 @@ public class AudioWaveFormVisualizer : MonoBehaviour
             return;
         }
 
-        ClearTexture();
+        dynImage.ClearTexture();
 
         Vector2[] minMaxValues = CalculateMinAndMaxValues(audioClip);
         DrawMinAndMaxValuesToTexture(minMaxValues);
@@ -45,12 +31,12 @@ public class AudioWaveFormVisualizer : MonoBehaviour
             return;
         }
 
-        ClearTexture();
+        dynImage.ClearTexture();
 
         // Draw the waveform
-        for (int x = 0; x < textureWidth; x++)
+        for (int x = 0; x < dynImage.TextureWidth; x++)
         {
-            int sampleIndex = offset + length * x / textureWidth;
+            int sampleIndex = offset + length * x / dynImage.TextureWidth;
             if (sampleIndex >= samples.Length)
             {
                 break;
@@ -59,12 +45,12 @@ public class AudioWaveFormVisualizer : MonoBehaviour
             float value = samples[sampleIndex];
 
             // Draw the pixels
-            int y = (int)(textureHeight * (value + 1f) / 2f);
-            texture.SetPixel(x, y, waveformColor);
+            int y = (int)(dynImage.TextureHeight * (value + 1f) / 2f);
+            dynImage.SetPixel(x, y, waveformColor);
         }
 
         // upload to the graphics card 
-        texture.Apply();
+        dynImage.ApplyTexture();
     }
 
     public void DrawWaveFormMinAndMaxValues(float[] samples)
@@ -74,7 +60,7 @@ public class AudioWaveFormVisualizer : MonoBehaviour
             return;
         }
 
-        ClearTexture();
+        dynImage.ClearTexture();
 
         Vector2[] minMaxValues = CalculateMinAndMaxValues(samples);
         DrawMinAndMaxValuesToTexture(minMaxValues);
@@ -87,48 +73,15 @@ public class AudioWaveFormVisualizer : MonoBehaviour
         return samples;
     }
 
-    private void CreateTexture()
-    {
-        // The size of the RectTransform can be zero in the first frame, when inside a layout group.
-        // See https://forum.unity.com/threads/solved-cant-get-the-rect-width-rect-height-of-an-element-when-using-layouts.377953/
-        if (rectTransform.rect.width != 0)
-        {
-            textureWidth = (int)rectTransform.rect.width;
-        }
-        if (rectTransform.rect.height != 0)
-        {
-            textureHeight = (int)rectTransform.rect.height;
-        }
-
-        // create the texture and assign to the guiTexture: 
-        texture = new Texture2D(textureWidth, textureHeight);
-        rawImage.texture = texture;
-
-        // create a 'blank screen' image 
-        blank = new Color[textureWidth * textureHeight];
-        for (int i = 0; i < blank.Length; i++)
-        {
-            blank[i] = backgroundColor;
-        }
-
-        // reset the texture to the background color
-        ClearTexture();
-    }
-
-    private void ClearTexture()
-    {
-        texture.SetPixels(blank, 0);
-    }
-
     private Vector2[] CalculateMinAndMaxValues(float[] samples)
     {
-        Vector2[] minMaxValues = new Vector2[textureWidth];
+        Vector2[] minMaxValues = new Vector2[dynImage.TextureWidth];
 
         // calculate window size to fit all samples in the texture
-        int windowSize = samples.Length / textureWidth;
+        int windowSize = samples.Length / dynImage.TextureWidth;
 
         // move the window over all the samples. For each position, find the min and max value.
-        for (int i = 0; i < textureWidth; i++)
+        for (int i = 0; i < dynImage.TextureWidth; i++)
         {
             int offset = i * windowSize;
             Vector2 minMax = FindMinAndMaxValues(samples, offset, windowSize);
@@ -140,14 +93,14 @@ public class AudioWaveFormVisualizer : MonoBehaviour
 
     private Vector2[] CalculateMinAndMaxValues(AudioClip audioClip)
     {
-        Vector2[] minMaxValues = new Vector2[textureWidth];
+        Vector2[] minMaxValues = new Vector2[dynImage.TextureWidth];
 
         // calculate window size to fit all samples in the texture
-        int windowSize = audioClip.samples / textureWidth;
+        int windowSize = audioClip.samples / dynImage.TextureWidth;
         float[] windowSamples = new float[windowSize];
 
         // move the window over all the samples. For each position, find the min and max value.
-        for (int i = 0; i < textureWidth; i++)
+        for (int i = 0; i < dynImage.TextureWidth; i++)
         {
             int offset = i * windowSize;
             audioClip.GetData(windowSamples, offset);
@@ -187,22 +140,22 @@ public class AudioWaveFormVisualizer : MonoBehaviour
     private void DrawMinAndMaxValuesToTexture(Vector2[] minMaxValues)
     {
         // Draw the waveform
-        for (int x = 0; x < textureWidth; x++)
+        for (int x = 0; x < dynImage.TextureWidth; x++)
         {
             Vector2 minMax = minMaxValues[x];
             float min = minMax.x;
             float max = minMax.y;
 
             // Draw the pixels
-            int yMin = (int)(textureHeight * (min + 1f) / 2f);
-            int yMax = (int)(textureHeight * (max + 1f) / 2f);
+            int yMin = (int)(dynImage.TextureHeight * (min + 1f) / 2f);
+            int yMax = (int)(dynImage.TextureHeight * (max + 1f) / 2f);
             for (int y = yMin; y < yMax; y++)
             {
-                texture.SetPixel(x, y, waveformColor);
+                dynImage.SetPixel(x, y, waveformColor);
             }
         }
 
         // upload to the graphics card 
-        texture.Apply();
+        dynImage.ApplyTexture();
     }
 }
