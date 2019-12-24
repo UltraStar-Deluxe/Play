@@ -5,6 +5,40 @@ using System.Collections.Generic;
 public class MidiUtilsTests
 {
     [Test]
+    public void GetRelativeNameTest()
+    {
+        Dictionary<int, string> midiNoteToRelativeNameMap = new Dictionary<int, string>();
+        midiNoteToRelativeNameMap.Add(36, "C");
+        midiNoteToRelativeNameMap.Add(57, "A");
+        midiNoteToRelativeNameMap.Add(60, "C");
+        midiNoteToRelativeNameMap.Add(69, "A");
+        midiNoteToRelativeNameMap.Add(81, "A");
+        midiNoteToRelativeNameMap.Add(84, "C");
+        foreach (KeyValuePair<int, string> midiNoteAndName in midiNoteToRelativeNameMap)
+        {
+            string noteName = MidiUtils.GetRelativeName(midiNoteAndName.Key);
+            Assert.AreEqual(midiNoteAndName.Value, noteName);
+        }
+    }
+
+    [Test]
+    public void GetAbsoluteNameTest()
+    {
+        Dictionary<int, string> midiNoteToAbsoluteNameMap = new Dictionary<int, string>();
+        midiNoteToAbsoluteNameMap.Add(36, "C2");
+        midiNoteToAbsoluteNameMap.Add(57, "A3");
+        midiNoteToAbsoluteNameMap.Add(60, "C4");
+        midiNoteToAbsoluteNameMap.Add(69, "A4");
+        midiNoteToAbsoluteNameMap.Add(81, "A5");
+        midiNoteToAbsoluteNameMap.Add(84, "C6");
+        foreach (KeyValuePair<int, string> midiNoteAndName in midiNoteToAbsoluteNameMap)
+        {
+            string noteName = MidiUtils.GetAbsoluteName(midiNoteAndName.Key);
+            Assert.AreEqual(midiNoteAndName.Value, noteName);
+        }
+    }
+
+    [Test]
     public void GetRelativePitchDistanceTest()
     {
         // The distance must be computed on relative notes, i.e., the pitch must be taken modulo 12.
