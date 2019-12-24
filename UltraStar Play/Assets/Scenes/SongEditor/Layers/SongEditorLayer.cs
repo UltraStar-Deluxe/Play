@@ -6,7 +6,7 @@ using UnityEngine;
 public class SongEditorLayer
 {
     public ESongEditorLayer LayerKey { get; private set; }
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; } = true;
     public Color Color { get; set; } = Colors.indigo;
 
     private readonly List<Note> notes = new List<Note>();
