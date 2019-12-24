@@ -6,8 +6,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(RawImage))]
 public class AudioWaveFormVisualizer : MonoBehaviour
 {
-    public Color backgroundColor = Color.black;
-    public Color waveformColor = Color.green;
+    public Color backgroundColor = new Color(0, 0, 0, 0);
+    public Color waveformColor = Color.white;
 
     private Color[] blank; // blank image array (background color in every pixel)
     private Texture2D texture;
@@ -15,14 +15,13 @@ public class AudioWaveFormVisualizer : MonoBehaviour
     private RawImage rawImage;
     private RectTransform rectTransform;
 
-    private int textureWidth;
-    private int textureHeight;
+    private int textureWidth = 256;
+    private int textureHeight = 256;
 
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         rawImage = GetComponent<RawImage>();
-
         CreateTexture();
     }
 
@@ -33,8 +32,39 @@ public class AudioWaveFormVisualizer : MonoBehaviour
             return;
         }
 
-        float[] samples = CopyAudioClipSamples(audioClip);
-        DrawWaveFormMinAndMaxValues(samples);
+        ClearTexture();
+
+        Vector2[] minMaxValues = CalculateMinAndMaxValues(audioClip);
+        DrawMinAndMaxValuesToTexture(minMaxValues);
+    }
+
+    public void DrawWaveFormValues(float[] samples, int offset, int length)
+    {
+        if (samples == null || samples.Length == 0)
+        {
+            return;
+        }
+
+        ClearTexture();
+
+        // Draw the waveform
+        for (int x = 0; x < textureWidth; x++)
+        {
+            int sampleIndex = offset + length * x / textureWidth;
+            if (sampleIndex >= samples.Length)
+            {
+                break;
+            }
+
+            float value = samples[sampleIndex];
+
+            // Draw the pixels
+            int y = (int)(textureHeight * (value + 1f) / 2f);
+            texture.SetPixel(x, y, waveformColor);
+        }
+
+        // upload to the graphics card 
+        texture.Apply();
     }
 
     public void DrawWaveFormMinAndMaxValues(float[] samples)
@@ -59,8 +89,16 @@ public class AudioWaveFormVisualizer : MonoBehaviour
 
     private void CreateTexture()
     {
-        textureWidth = (int)rectTransform.rect.width;
-        textureHeight = (int)rectTransform.rect.height;
+        // The size of the RectTransform can be zero in the first frame, when inside a layout group.
+        // See https://forum.unity.com/threads/solved-cant-get-the-rect-width-rect-height-of-an-element-when-using-layouts.377953/
+        if (rectTransform.rect.width != 0)
+        {
+            textureWidth = (int)rectTransform.rect.width;
+        }
+        if (rectTransform.rect.height != 0)
+        {
+            textureHeight = (int)rectTransform.rect.height;
+        }
 
         // create the texture and assign to the guiTexture: 
         texture = new Texture2D(textureWidth, textureHeight);
@@ -94,6 +132,26 @@ public class AudioWaveFormVisualizer : MonoBehaviour
         {
             int offset = i * windowSize;
             Vector2 minMax = FindMinAndMaxValues(samples, offset, windowSize);
+            minMaxValues[i] = minMax;
+        }
+
+        return minMaxValues;
+    }
+
+    private Vector2[] CalculateMinAndMaxValues(AudioClip audioClip)
+    {
+        Vector2[] minMaxValues = new Vector2[textureWidth];
+
+        // calculate window size to fit all samples in the texture
+        int windowSize = audioClip.samples / textureWidth;
+        float[] windowSamples = new float[windowSize];
+
+        // move the window over all the samples. For each position, find the min and max value.
+        for (int i = 0; i < textureWidth; i++)
+        {
+            int offset = i * windowSize;
+            audioClip.GetData(windowSamples, offset);
+            Vector2 minMax = FindMinAndMaxValues(windowSamples, 0, windowSize);
             minMaxValues[i] = minMax;
         }
 

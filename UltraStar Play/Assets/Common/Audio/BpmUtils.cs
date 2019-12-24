@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,5 +29,12 @@ public static class BpmUtils
         double beatsPerMinute = songMeta.Bpm * 4.0;
         double result = beatsPerMinute * millisInSongAfterGap / 1000.0 / 60.0;
         return result;
+    }
+
+    public static double MillisecondsPerBeat(SongMeta songMeta)
+    {
+        double millisOfBeat0 = BeatToMillisecondsInSong(songMeta, 0);
+        double millisOfBeat1 = BeatToMillisecondsInSong(songMeta, 1);
+        return millisOfBeat1 - millisOfBeat0;
     }
 }

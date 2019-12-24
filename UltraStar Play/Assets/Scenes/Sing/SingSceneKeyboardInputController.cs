@@ -35,7 +35,7 @@ public class SingSceneKeyboardInputController : MonoBehaviour
 
         if (Input.GetKeyUp(PauseShortcut))
         {
-            SingSceneController.Instance.TogglePauseSinging();
+            SingSceneController.Instance.TogglePlayPause();
         }
     }
 }

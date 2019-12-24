@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
+using System.IO;
 using UnityEngine;
 
+// Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : MonoBehaviour
 {
     private static readonly object scanLock = new object();
@@ -12,6 +12,8 @@ public class SongMetaManager : MonoBehaviour
     public int SongsFound { get; private set; }
     public int SongsSuccess { get; private set; }
     public int SongsFailed { get; private set; }
+
+    private static Dictionary<string, CachedVoices> voicesCache = new Dictionary<string, CachedVoices>();
 
     public static SongMetaManager Instance
     {
@@ -73,6 +75,21 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
+    public static Dictionary<string, Voice> GetVoices(SongMeta songMeta)
+    {
+        string path = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Filename;
+        if (!voicesCache.TryGetValue(path, out CachedVoices cachedVoices))
+        {
+            using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
+            {
+                Dictionary<string, Voice> voiceIdentifierToVoiceMap = VoicesBuilder.ParseFile(path, songMeta.Encoding, new List<string>());
+                cachedVoices = new CachedVoices(path, voiceIdentifierToVoiceMap);
+                voicesCache.Add(path, cachedVoices);
+            }
+        }
+        return cachedVoices.VoiceIdentifierToVoiceMap;
+    }
+
     public void ScanFiles()
     {
         Debug.Log("Scanning for UltraStar Songs");
@@ -131,5 +148,17 @@ public class SongMetaManager : MonoBehaviour
     public int GetNumberOfSongsFound()
     {
         return SongsFound;
+    }
+
+    private class CachedVoices
+    {
+        public string SongMetaFilePath { get; private set; }
+        public Dictionary<string, Voice> VoiceIdentifierToVoiceMap { get; private set; }
+
+        public CachedVoices(string songMetaFilePath, Dictionary<string, Voice> voiceIdentifierToVoiceMap)
+        {
+            this.SongMetaFilePath = songMetaFilePath;
+            this.VoiceIdentifierToVoiceMap = voiceIdentifierToVoiceMap;
+        }
     }
 }
