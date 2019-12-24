@@ -8,6 +8,6 @@ public class SingSceneData : SceneData
     public SongMeta SelectedSongMeta { get; set; }
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new List<PlayerProfile>();
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
-    public double PositionInSongMillis { get; set; }
+    public double PositionInSongInMillis { get; set; }
     public bool IsRestart { get; set; }
 }

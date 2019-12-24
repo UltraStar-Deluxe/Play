@@ -34,6 +34,10 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
     [Inject]
     private SettingsManager SettingsManager { get; set; }
 
+    // Inject field. Binding the settings is done lazy, so they will not be loaded if not injected here.
+    [Inject]
+    private Settings settings;
+
     // Inject optional
     [Inject(optional = true)]
     private SceneNavigator sceneNavigator;
@@ -66,15 +70,21 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
         this.methodInjectionField = $"{personWithAge} is {age} years old";
     }
 
+    // Inject the injector that was used to inject all the fields.
+    // The injector can be used at runtime to inject newly created scripts.
+    [Inject]
+    private Injector injector;
+
     void Start()
     {
-        Debug.Log("SettingsManager: " + SettingsManager);
-
         Debug.Log("Parent: " + Parent);
         Debug.Log("Child: " + child);
         Debug.Log("Sibling Component: " + siblingComponent);
 
         Debug.Log("Canvas: " + canvas);
+
+        Debug.Log("SettingsManager: " + SettingsManager);
+        Debug.Log("Settings: " + settings);
 
         Debug.Log("Author: " + NameOfAuthor);
 
@@ -90,5 +100,7 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
 
         Debug.Log("The bound int: " + SceneInjector.GetValueForInjectionKey<int>());
         Debug.Log("The bound instance of an interface: " + SceneInjector.GetValueForInjectionKey<IDependencyInjectionDemoInterface>());
+
+        Debug.Log("Injector:" + injector);
     }
 }

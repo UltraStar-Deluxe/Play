@@ -14,13 +14,17 @@ public static class AudioUtils
             return null;
         }
         string fileExtension = System.IO.Path.GetExtension(path);
-        if (fileExtension.ToLowerInvariant().Equals(".mp3"))
+
+        using (new DisposableStopwatch("Loaded audio in <millis> ms"))
         {
-            return LoadMp3(path);
-        }
-        else
-        {
-            return LoadAudio(path);
+            if (fileExtension.ToLowerInvariant().Equals(".mp3"))
+            {
+                return LoadMp3(path);
+            }
+            else
+            {
+                return LoadAudio(path);
+            }
         }
     }
 

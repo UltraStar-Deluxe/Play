@@ -269,8 +269,8 @@ RectTransform:
   m_Father: {fileID: 1401080147}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.16168997, y: 0}
-  m_AnchorMax: {x: 1.0000693, y: 1}
+  m_AnchorMin: {x: 0.22352688, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -287,7 +287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  waveformColor: {r: 0, g: 1, b: 0, a: 1}
+  waveformColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &304889649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -887,11 +887,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3622033095437819812, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3622033095099228108, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
       propertyPath: m_Sprite
@@ -902,6 +897,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: Recording Options
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095437819812, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3622033095437819808, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
@@ -1063,9 +1063,9 @@ MonoBehaviour:
   anchorMin: {x: 0.13727501, y: 0.703167}
   anchorMax: {x: 0.837625, y: 0.76150006}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -12.939026, y: 136.14746, z: 0}
+  localPosition: {x: -12.939026, y: 136.84445, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 722.0609, y: 34.183167}
+  size: {x: 722.0609, y: 34.358154}
 --- !u!114 &1401080150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2953,7 +2953,7 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: -199.93942, y: -0.000032424927, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 322.1875, y: 34.183235}
+  size: {x: 322.1875, y: 34.35824}
 --- !u!224 &5713057083866994671
 RectTransform:
   m_ObjectHideFlags: 0

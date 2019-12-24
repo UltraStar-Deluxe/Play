@@ -25,7 +25,8 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     private void UpdateWaveForm()
     {
-        audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(microphonePitchTracker.MicData);
+        float[] micData = microphonePitchTracker.MicData;
+        audioWaveFormVisualizer.DrawWaveFormValues(micData, micData.Length - 2048, 2048);
     }
 
     public void SetMicProfile(MicProfile micProfile)

@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  waveformColor: {r: 0, g: 1, b: 0, a: 1}
+  waveformColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &4408495301120844640
 GameObject:
   m_ObjectHideFlags: 0

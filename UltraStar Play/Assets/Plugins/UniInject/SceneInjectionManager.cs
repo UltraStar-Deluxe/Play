@@ -25,6 +25,11 @@ namespace UniInject
             sceneInjector = UniInjectUtils.CreateInjector();
             UniInjectUtils.SceneInjector = sceneInjector;
 
+            // Bind the scene injector itself.
+            // This way it can be injected at the scene start
+            // and be used to inject newly created scripts at runtime.
+            sceneInjector.AddBindingForInstance(sceneInjector);
+
             // (1) Iterate over scene hierarchy, thereby
             // (a) find IBinder instances.
             // (b) find scripts that need injection and how their members should be injected.
@@ -37,14 +42,6 @@ namespace UniInject
             InjectScriptsThatNeedInjection();
 
             StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene took {stopwatch.ElapsedMilliseconds} ms");
-        }
-
-        void Update()
-        {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                InjectScriptsThatNeedInjection();
-            }
         }
 
         void OnDestroy()

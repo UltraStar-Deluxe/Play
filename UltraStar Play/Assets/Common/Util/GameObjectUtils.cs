@@ -60,4 +60,13 @@ public static class GameObjectUtils
             return GameObject.FindObjectOfType<T>();
         }
     }
+
+    // Destroys the direct children of a transform.
+    public static void DestroyAllDirectChildren(this Transform transform)
+    {
+        foreach (Transform child in transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
 }

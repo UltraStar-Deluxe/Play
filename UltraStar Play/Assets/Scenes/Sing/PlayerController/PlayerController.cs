@@ -90,9 +90,7 @@ public class PlayerController : MonoBehaviour
 
     private Voice LoadVoice(SongMeta songMeta, string voiceIdentifier)
     {
-        string filePath = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Filename;
-        Debug.Log($"Loading voice of {filePath}");
-        Dictionary<string, Voice> voices = VoicesBuilder.ParseFile(filePath, songMeta.Encoding, new List<string>());
+        Dictionary<string, Voice> voices = SongMetaManager.GetVoices(songMeta);
         if (string.IsNullOrEmpty(voiceIdentifier))
         {
             Voice mergedVoice = CreateMergedVoice(voices);
