@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMicRecorder : MonoBehaviour, INeedInjection
+public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 {
     public int octaveOffset;
     public int delayInMillis;
