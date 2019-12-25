@@ -22,10 +22,10 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public SongVideoPlayer songVideoPlayer;
 
     [InjectedInInspector]
-    public AudioWaveFormVisualizer audioWaveFormVisualizer;
+    public SongEditorNoteRecorder songEditorNoteRecorder;
 
-    // [InjectedInInspector]
-    // public OverviewBar overviewBar;
+    [InjectedInInspector]
+    public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     [InjectedInInspector]
     public NoteArea noteArea;
@@ -75,15 +75,15 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
-        // Note that the SceneData, SongMeta are loaded on access here if not done yet.
+        // Note that the SceneData and SongMeta are loaded on access here if not done yet.
         bb.BindExistingInstance(SceneData);
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
-        // bb.BindExistingInstance(overviewBar);
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(microphonePitchTracker);
+        bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(this);
 
         List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
