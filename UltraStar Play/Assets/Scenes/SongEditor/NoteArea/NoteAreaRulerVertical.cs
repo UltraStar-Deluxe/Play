@@ -37,10 +37,6 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
             UpdateMidiNoteLabels();
             UpdateMidiNoteLines();
         }
-        else
-        {
-            Debug.Log("Not updating");
-        }
         lastViewportEvent = viewportEvent;
     }
 
