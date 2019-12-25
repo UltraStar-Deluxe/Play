@@ -8,7 +8,7 @@ using System;
 
 #pragma warning disable CS0649
 
-public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
+public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     [InjectedInInspector]
     public Text labelPrefab;
@@ -21,9 +21,9 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInParent)]
     private readonly NoteArea noteArea;
 
-    ViewportEvent lastViewportEvent;
+    private ViewportEvent lastViewportEvent;
 
-    void Start()
+    public void OnSceneInjectionFinished()
     {
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
     }
@@ -36,6 +36,10 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection
         {
             UpdateMidiNoteLabels();
             UpdateMidiNoteLines();
+        }
+        else
+        {
+            Debug.Log("Not updating");
         }
         lastViewportEvent = viewportEvent;
     }

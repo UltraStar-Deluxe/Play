@@ -7,7 +7,7 @@ using UniRx;
 
 #pragma warning disable CS0649
 
-public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
+public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     [InjectedInInspector]
     public Text beatLabelPrefab;
@@ -30,11 +30,8 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection
 
     private ViewportEvent lastViewportEvent;
 
-    void Start()
+    public void OnSceneInjectionFinished()
     {
-        UpdateLabels();
-        UpdateLines();
-
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
