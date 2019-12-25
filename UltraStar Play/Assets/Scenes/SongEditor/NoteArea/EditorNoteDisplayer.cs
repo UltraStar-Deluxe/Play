@@ -33,6 +33,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject(key = "voices")]
     private List<Voice> voices;
 
+    private List<Sentence> sentencesOfAllVoices;
+
     [Inject]
     private NoteArea noteArea;
 
@@ -44,8 +46,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
+    private readonly Dictionary<Note, UiEditorNote> noteToEditorUiNoteMap = new Dictionary<Note, UiEditorNote>();
+
     void Start()
     {
+        noteContainer.DestroyAllDirectChildren();
+        sentenceMarkerLineContainer.DestroyAllDirectChildren();
+        sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+
+        sentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+
         noteArea.ViewportEventStream.Subscribe(_ =>
         {
             UpdateNotes();
@@ -69,10 +79,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        List<Sentence> sentences = voices.SelectMany(voice => voice.Sentences).ToList();
-
         int sentenceIndex = 0;
-        foreach (Sentence sentence in sentences)
+        foreach (Sentence sentence in sentencesOfAllVoices)
         {
             if (noteArea.IsInViewport(sentence))
             {
@@ -88,10 +96,24 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         {
             return;
         }
-        noteContainer.DestroyAllDirectChildren();
+        DestroyUiNotesOutsideOfViewport();
 
         DrawNotesInSongFile();
         DrawNotesInLayers();
+    }
+
+    private void DestroyUiNotesOutsideOfViewport()
+    {
+        ICollection<UiEditorNote> editorUiNotes = new List<UiEditorNote>(noteToEditorUiNoteMap.Values);
+        foreach (UiEditorNote editorUiNote in editorUiNotes)
+        {
+            Note note = editorUiNote.Note;
+            if (!noteArea.IsInViewport(note))
+            {
+                Destroy(editorUiNote.gameObject);
+                noteToEditorUiNoteMap.Remove(note);
+            }
+        }
     }
 
     private void DrawNotesInLayers()
@@ -107,37 +129,36 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
     {
-        List<Note> notesDetectedInSong = songEditorLayerManager.GetNotes(layerKey);
-        List<Note> notesDetectedInSongInViewport = notesDetectedInSong
+        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey);
+        List<Note> notesInViewport = notesInLayer
             .Where(note => noteArea.IsInViewport(note))
             .ToList();
 
-        Color color = songEditorLayerManager.GetColor(layerKey);
-        foreach (Note note in notesDetectedInSongInViewport)
+        Color layerColor = songEditorLayerManager.GetColor(layerKey);
+        foreach (Note note in notesInViewport)
         {
-            UiEditorNote uiNote = CreateNote(note);
+            UiEditorNote uiNote = UpdateOrCreateNote(note);
             if (uiNote != null)
             {
-                uiNote.SetColor(color);
+                uiNote.SetColor(layerColor);
             }
         }
     }
 
     private void DrawNotesInSongFile()
     {
-        List<Sentence> sentencesInViewport = voices
-            .SelectMany(voice => voice.Sentences)
-            .Where(sentence => noteArea.IsInViewport(sentence))
-            .ToList();
+        List<Sentence> sentencesInViewport = sentencesOfAllVoices
+        .Where(sentence => noteArea.IsInViewport(sentence))
+        .ToList();
 
         List<Note> notesInViewport = sentencesInViewport
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => noteArea.IsInViewport(note))
-            .ToList();
+                .SelectMany(sentence => sentence.Notes)
+                .Where(note => noteArea.IsInViewport(note))
+                .ToList();
 
         foreach (Note note in notesInViewport)
         {
-            CreateNote(note);
+            UpdateOrCreateNote(note);
         }
     }
 
@@ -177,21 +198,20 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 0);
     }
 
-    private UiEditorNote CreateNote(Note note)
+    private UiEditorNote UpdateOrCreateNote(Note note)
     {
-        if (note.StartBeat == note.EndBeat)
+        if (!noteToEditorUiNoteMap.TryGetValue(note, out UiEditorNote editorUiNote))
         {
-            return null;
+            editorUiNote = Instantiate(notePrefab, noteContainer);
+            injector.Inject(editorUiNote);
+            editorUiNote.Init(note);
+
+            noteToEditorUiNoteMap.Add(note, editorUiNote);
         }
 
-        UiEditorNote uiNote = Instantiate(notePrefab, noteContainer);
-        injector.Inject(uiNote);
-        uiNote.Init(note);
+        PositionUiNote(editorUiNote.RectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
 
-        RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
-        PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
-
-        return uiNote;
+        return editorUiNote;
     }
 
     private void PositionUiNote(RectTransform uiNoteRectTransform, int midiNote, int startBeat, int endBeat)

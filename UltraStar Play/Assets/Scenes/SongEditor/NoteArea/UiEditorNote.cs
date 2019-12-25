@@ -31,7 +31,7 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
     private SongAudioPlayer songAudioPlayer;
 
     [Inject(searchMethod = SearchMethods.GetComponent)]
-    private RectTransform rectTransform;
+    public RectTransform RectTransform { get; private set; }
 
     [Inject]
     private Injector injector;
@@ -49,7 +49,7 @@ public class UiEditorNote : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData ped)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(RectTransform,
                                                                      ped.position,
                                                                      ped.pressEventCamera,
                                                                      out Vector2 localPoint))
