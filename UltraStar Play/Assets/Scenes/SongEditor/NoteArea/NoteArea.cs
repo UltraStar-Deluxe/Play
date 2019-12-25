@@ -64,16 +64,15 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
 
-        SetViewportX(1);
-        SetViewportY(MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4));
-        SetViewportWidth(3000);
-        SetViewportHeight(MidiUtils.SingableNoteRange / 2);
+        // Initialize Viewport
+        SetViewportX(0, true);
+        SetViewportY(MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4), true);
+        SetViewportWidth(3000, true);
+        SetViewportHeight(MidiUtils.SingableNoteRange / 2, true);
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
         FitViewportToVoices();
-
-        FireViewportChangedEvent();
     }
 
     private void FitViewportToVoices()
@@ -184,27 +183,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         SetViewportHeight(newViewportHeight);
     }
 
-    public void SetViewportWidth(int newViewportWidth)
-    {
-        if (newViewportWidth < 1000)
-        {
-            newViewportWidth = 1000;
-        }
-        if (newViewportWidth >= songAudioPlayer.DurationOfSongInMillis)
-        {
-            newViewportWidth = (int)songAudioPlayer.DurationOfSongInMillis;
-        }
-
-        if (newViewportWidth != ViewportWidth)
-        {
-            ViewportWidth = newViewportWidth;
-            MaxMillisecondsInViewport = ViewportX + ViewportWidth;
-            MaxBeatInViewport = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, MaxMillisecondsInViewport));
-            FireViewportChangedEvent();
-        }
-    }
-
-    public void SetViewportX(int newViewportX)
+    public void SetViewportX(int newViewportX, bool force = false)
     {
         if (newViewportX < 0)
         {
@@ -215,7 +194,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportX = (int)songAudioPlayer.DurationOfSongInMillis;
         }
 
-        if (newViewportX != ViewportX)
+        if (force || newViewportX != ViewportX)
         {
             ViewportX = newViewportX;
             MinMillisecondsInViewport = ViewportX;
@@ -226,7 +205,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
-    public void SetViewportY(int newViewportY)
+    public void SetViewportY(int newViewportY, bool force = false)
     {
         if (newViewportY < 0)
         {
@@ -237,7 +216,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportY = 127;
         }
 
-        if (newViewportY != ViewportY)
+        if (force || newViewportY != ViewportY)
         {
             ViewportY = newViewportY;
             MinMidiNoteInViewport = ViewportY;
@@ -246,7 +225,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
-    public void SetViewportHeight(int newViewportHeight)
+    public void SetViewportHeight(int newViewportHeight, bool force = false)
     {
         if (newViewportHeight < 12)
         {
@@ -257,11 +236,31 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             newViewportHeight = 48;
         }
 
-        if (newViewportHeight != ViewportHeight)
+        if (force || newViewportHeight != ViewportHeight)
         {
             ViewportHeight = newViewportHeight;
             MaxMidiNoteInViewport = ViewportY + ViewportHeight;
             HeightForSingleNote = 1f / ViewportHeight;
+            FireViewportChangedEvent();
+        }
+    }
+
+    public void SetViewportWidth(int newViewportWidth, bool force = false)
+    {
+        if (newViewportWidth < 1000)
+        {
+            newViewportWidth = 1000;
+        }
+        if (newViewportWidth >= songAudioPlayer.DurationOfSongInMillis)
+        {
+            newViewportWidth = (int)songAudioPlayer.DurationOfSongInMillis;
+        }
+
+        if (force || newViewportWidth != ViewportWidth)
+        {
+            ViewportWidth = newViewportWidth;
+            MaxMillisecondsInViewport = ViewportX + ViewportWidth;
+            MaxBeatInViewport = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, MaxMillisecondsInViewport));
             FireViewportChangedEvent();
         }
     }
