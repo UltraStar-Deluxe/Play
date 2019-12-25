@@ -11,6 +11,8 @@ namespace UniInject
         private readonly List<IBinder> binders = new List<IBinder>();
         private readonly List<object> scriptsThatNeedInjection = new List<object>();
 
+        private readonly List<ISceneInjectionFinishedListener> sceneInjectionFinishedListeners = new List<ISceneInjectionFinishedListener>();
+
         private Injector sceneInjector;
 
         [Tooltip("Only inject scripts with marker interface INeedInjection")]
@@ -42,6 +44,12 @@ namespace UniInject
             InjectScriptsThatNeedInjection();
 
             StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene took {stopwatch.ElapsedMilliseconds} ms");
+
+            // (4) Notify listeners that scene injection has finished
+            foreach (ISceneInjectionFinishedListener listener in sceneInjectionFinishedListeners)
+            {
+                listener.OnSceneInjectionFinished();
+            }
         }
 
         void OnDestroy()
@@ -133,6 +141,11 @@ namespace UniInject
                 if (script is IBinder)
                 {
                     binders.Add(script as IBinder);
+                }
+
+                if (script is ISceneInjectionFinishedListener)
+                {
+                    sceneInjectionFinishedListeners.Add(script as ISceneInjectionFinishedListener);
                 }
 
                 if (!onlyInjectScriptsWithMarkerInterface || script is INeedInjection)
