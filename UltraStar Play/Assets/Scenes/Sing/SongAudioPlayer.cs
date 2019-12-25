@@ -132,6 +132,36 @@ public class SongAudioPlayer : MonoBehaviour
 
     private SongMeta SongMeta { get; set; }
 
+    public float PlaybackSpeed
+    {
+        get
+        {
+            return audioPlayer.pitch;
+        }
+        set
+        {
+            // Playback speed cannot be set randomly. Allowed (and useful) is a range of 0.5 to 1.5.
+            float newPlaybackSpeed = value;
+            if (newPlaybackSpeed < 0.5f)
+            {
+                newPlaybackSpeed = 0.5f;
+            }
+            else if (newPlaybackSpeed > 1.5f)
+            {
+                newPlaybackSpeed = 1.5f;
+            }
+
+            // Setting the pitch of an AudioPlayer will change tempo and pitch.
+            audioPlayer.pitch = newPlaybackSpeed;
+
+            // A Pitch Shifter effect on an AudioMixerGroup can be used to compensate the pitch change of the AudioPlayer,
+            // such that only the change of the tempo remains.
+            // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
+            // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
+            audioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
+        }
+    }
+
     void Update()
     {
         if (IsPlaying)
