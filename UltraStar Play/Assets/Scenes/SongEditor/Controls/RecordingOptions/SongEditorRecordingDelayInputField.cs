@@ -13,20 +13,20 @@ using UniRx;
 public class SongEditorRecordingDelayInputField : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorNoteRecorder songEditorNoteRecorder;
+    private Settings settings;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     void Start()
     {
-        inputField.text = songEditorNoteRecorder.delayInMillis.ToString();
+        inputField.text = settings.SongEditorSettings.MicDelayInMillis.ToString();
         inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged); ;
     }
 
     private void OnTextChanged(string newText)
     {
-        int newInt = newText.TryParseAsInteger(songEditorNoteRecorder.delayInMillis);
-        songEditorNoteRecorder.delayInMillis = newInt;
+        int newInt = newText.TryParseAsInteger(settings.SongEditorSettings.MicDelayInMillis);
+        settings.SongEditorSettings.MicDelayInMillis = newInt;
     }
 }
