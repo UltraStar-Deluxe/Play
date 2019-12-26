@@ -94,7 +94,7 @@ public class Note
 
     public void SetStartBeat(int newStartBeat)
     {
-        if (newStartBeat < StartBeat)
+        if (newStartBeat > EndBeat)
         {
             throw new UnityException("StartBeat must be less or equal to EndBeat");
         }

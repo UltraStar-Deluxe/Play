@@ -237,7 +237,8 @@ public class MutableVoice
             }
             else if (lastSentence.LinebreakBeat > sentence.MinBeat)
             {
-                throw new VoicesBuilderException("Sentence conflicts with linebreak of previous sentence");
+                // The LinebreakBeat must not extend into the following sentence.
+                lastSentence.SetLinebreakBeat(sentence.MinBeat);
             }
             else
             {

@@ -32,4 +32,25 @@ public class SongDataStructureTests
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
     }
+
+    [Test]
+    public void SentenceMinAndMaxBeatChangeWithNotePositions()
+    {
+        Note note = new Note(ENoteType.Normal, 2, 2, 0, "");
+
+        Sentence s1 = new Sentence(new List<Note>() { note }, 0);
+        Assert.AreEqual(2, s1.MinBeat);
+        Assert.AreEqual(4, s1.MaxBeat);
+        Assert.AreEqual(4, s1.LinebreakBeat);
+
+        note.SetEndBeat(6);
+        Assert.AreEqual(2, s1.MinBeat);
+        Assert.AreEqual(6, s1.MaxBeat);
+        Assert.AreEqual(6, s1.LinebreakBeat);
+
+        note.SetStartBeat(0);
+        Assert.AreEqual(0, s1.MinBeat);
+        Assert.AreEqual(6, s1.MaxBeat);
+        Assert.AreEqual(6, s1.LinebreakBeat);
+    }
 }
