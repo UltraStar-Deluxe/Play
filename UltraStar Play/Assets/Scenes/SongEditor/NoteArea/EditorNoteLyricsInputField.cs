@@ -17,7 +17,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
-    private UiEditorNote uiEditorNote;
+    private EditorUiNote uiEditorNote;
 
     private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -40,7 +40,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
     }
 
-    public void Init(UiEditorNote uiEditorNote, string text)
+    public void Init(EditorUiNote uiEditorNote, string text)
     {
         this.uiEditorNote = uiEditorNote;
         Text = text;

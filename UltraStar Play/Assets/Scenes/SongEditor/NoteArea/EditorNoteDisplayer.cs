@@ -13,7 +13,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 {
 
     [InjectedInInspector]
-    public UiEditorNote notePrefab;
+    public EditorUiNote notePrefab;
     [InjectedInInspector]
     public RectTransform noteContainer;
 
@@ -46,7 +46,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
-    private readonly Dictionary<Note, UiEditorNote> noteToEditorUiNoteMap = new Dictionary<Note, UiEditorNote>();
+    private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
 
     void Start()
     {
@@ -104,8 +104,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DestroyUiNotesOutsideOfViewport()
     {
-        ICollection<UiEditorNote> editorUiNotes = new List<UiEditorNote>(noteToEditorUiNoteMap.Values);
-        foreach (UiEditorNote editorUiNote in editorUiNotes)
+        ICollection<EditorUiNote> editorUiNotes = new List<EditorUiNote>(noteToEditorUiNoteMap.Values);
+        foreach (EditorUiNote editorUiNote in editorUiNotes)
         {
             Note note = editorUiNote.Note;
             if (!noteArea.IsInViewport(note))
@@ -137,7 +137,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         Color layerColor = songEditorLayerManager.GetColor(layerKey);
         foreach (Note note in notesInViewport)
         {
-            UiEditorNote uiNote = UpdateOrCreateNote(note);
+            EditorUiNote uiNote = UpdateOrCreateNote(note);
             if (uiNote != null)
             {
                 uiNote.SetColor(layerColor);
@@ -198,9 +198,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 0);
     }
 
-    private UiEditorNote UpdateOrCreateNote(Note note)
+    private EditorUiNote UpdateOrCreateNote(Note note)
     {
-        if (!noteToEditorUiNoteMap.TryGetValue(note, out UiEditorNote editorUiNote))
+        if (!noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote editorUiNote))
         {
             editorUiNote = Instantiate(notePrefab, noteContainer);
             injector.Inject(editorUiNote);
