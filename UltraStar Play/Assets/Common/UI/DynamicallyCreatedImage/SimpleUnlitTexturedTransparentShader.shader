@@ -18,7 +18,7 @@
     SubShader
     {
         Tags { "Queue"="AlphaTest" "RenderType"="TransparentCutout" "IgnoreProjector"="True" }
-        Blend One One
+        Blend One OneMinusSrcAlpha
         ZWrite Off
         
         Pass
