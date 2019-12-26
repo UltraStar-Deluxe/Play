@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
-public class UiEditorNote : MonoBehaviour, IPointerClickHandler
+public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 {
     [InjectedInInspector]
     public EditorNoteLyricsInputField lyricsInputFieldPrefab;

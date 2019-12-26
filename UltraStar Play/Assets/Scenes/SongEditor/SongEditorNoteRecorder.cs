@@ -35,6 +35,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     void Start()
     {
+        microphonePitchTracker.MicProfile = settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
+
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource)
             .Subscribe(OnNoteRecordingSourceChanged);
         songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying)
