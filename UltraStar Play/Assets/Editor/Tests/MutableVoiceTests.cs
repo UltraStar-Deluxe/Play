@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 public class MutableVoiceTests
 {
@@ -28,9 +29,9 @@ public class MutableVoiceTests
 
         List<Sentence> sentences = mv.GetSentences();
         Assert.AreEqual(1, sentences.Count);
-        List<Note> notes = sentences[0].Notes;
+        IReadOnlyCollection<Note> notes = sentences[0].Notes;
         Assert.AreEqual(1, notes.Count);
-        Assert.AreEqual(testNote, notes[0]);
+        Assert.AreEqual(testNote, notes.FirstOrDefault());
     }
 
     [Test]

@@ -39,7 +39,7 @@ public class CurrentBeatGridDisplayer : MonoBehaviour
         }
 
         double currentBeat = singSceneController.CurrentBeat;
-        CreateLine(currentBeat, currentSentence.StartBeat, currentSentence.EndBeat);
+        CreateLine(currentBeat, currentSentence.MinBeat, currentSentence.MaxBeat);
     }
 
     private void RemoveAllLines()

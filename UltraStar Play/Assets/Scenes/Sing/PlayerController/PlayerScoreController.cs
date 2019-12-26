@@ -148,7 +148,7 @@ public class PlayerScoreController : MonoBehaviour
         return correctlySungNoteLength;
     }
 
-    private void UpdateMaxScores(List<Sentence> sentences)
+    private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
     {
         // Calculate the points for a single beat of a normal or golden note
         normalNoteLengthTotal = 0;

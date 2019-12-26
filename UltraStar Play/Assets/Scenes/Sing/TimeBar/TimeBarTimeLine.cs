@@ -24,8 +24,8 @@ public class TimeBarTimeLine : MonoBehaviour
     {
         foreach (Sentence sentence in playerController.Voice.Sentences)
         {
-            double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.StartBeat);
-            double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.EndBeat);
+            double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
+            double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
             PlayerProfile playerProfile = playerController.PlayerProfile;
             MicProfile micProfile = playerController.MicProfile;
             CreateTimeLineRect(playerProfile, micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis);

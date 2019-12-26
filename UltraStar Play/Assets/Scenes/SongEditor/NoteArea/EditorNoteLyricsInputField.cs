@@ -54,9 +54,9 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 
     private void OnEndEdit(string newText)
     {
-        // TODO: Create a mutable song model for the editor and update it
         if (!IsOnlyWhitespace(newText))
         {
+            uiEditorNote.Note.SetText(newText);
             uiEditorNote.SetText(newText);
         }
 
