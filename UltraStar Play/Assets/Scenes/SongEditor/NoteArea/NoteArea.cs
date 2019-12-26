@@ -154,7 +154,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public bool IsInViewport(Sentence sentence)
     {
-        return sentence.StartBeat <= MaxBeatInViewport && sentence.EndBeat >= MinBeatInViewport;
+        return sentence.MinBeat <= MaxBeatInViewport && sentence.MaxBeat >= MinBeatInViewport;
     }
 
     public void ScrollHorizontal(int direction)

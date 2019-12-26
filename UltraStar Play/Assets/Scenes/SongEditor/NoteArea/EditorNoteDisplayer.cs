@@ -33,7 +33,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject(key = "voices")]
     private List<Voice> voices;
 
-    private List<Sentence> sentencesOfAllVoices;
+    private List<Sentence> sortedSentencesOfAllVoices;
 
     [Inject]
     private NoteArea noteArea;
@@ -54,7 +54,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        sentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        sortedSentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        sortedSentencesOfAllVoices.Sort(Sentence.comparerByStartBeat);
 
         noteArea.ViewportEventStream.Subscribe(_ =>
         {
@@ -80,7 +81,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
         int sentenceIndex = 0;
-        foreach (Sentence sentence in sentencesOfAllVoices)
+        foreach (Sentence sentence in sortedSentencesOfAllVoices)
         {
             if (noteArea.IsInViewport(sentence))
             {
@@ -147,7 +148,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        List<Sentence> sentencesInViewport = sentencesOfAllVoices
+        List<Sentence> sentencesInViewport = sortedSentencesOfAllVoices
         .Where(sentence => noteArea.IsInViewport(sentence))
         .ToList();
 
@@ -164,9 +165,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void CreateSentenceMarker(Sentence sentence, int sentenceIndex)
     {
-        CreateSentenceMarkerLine(sentence.StartBeat);
-        CreateSentenceMarkerLine(sentence.EndBeat);
-        CreateSentenceMarkerRectangle(sentence.StartBeat, sentence.EndBeat, sentenceIndex);
+        CreateSentenceMarkerLine(sentence.MinBeat);
+        CreateSentenceMarkerLine(sentence.MaxBeat);
+        CreateSentenceMarkerRectangle(sentence.MinBeat, sentence.MaxBeat, sentenceIndex);
     }
 
     private void CreateSentenceMarkerRectangle(int startBeat, int endBeat, int sentenceIndex)

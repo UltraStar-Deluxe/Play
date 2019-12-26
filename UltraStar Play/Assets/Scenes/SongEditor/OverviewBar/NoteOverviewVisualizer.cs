@@ -95,8 +95,8 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             bool isDark = (index % 2 == 0);
             Color finalColor = (isDark) ? darkBgColor : bgColor;
 
-            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.StartBeat);
-            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.EndBeat);
+            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
+            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
 
             int xStart = (int)(dynImage.TextureWidth * startMillis / songDurationInMillis);
             int xEnd = (int)(dynImage.TextureWidth * endMillis / songDurationInMillis);

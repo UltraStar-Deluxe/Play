@@ -13,7 +13,22 @@ public class PlayerController : MonoBehaviour
     public SongMeta SongMeta { get; private set; }
     public PlayerProfile PlayerProfile { get; private set; }
     public MicProfile MicProfile { get; private set; }
-    public Voice Voice { get; private set; }
+
+    private Voice voice;
+    public Voice Voice
+    {
+        get
+        {
+            return voice;
+        }
+        private set
+        {
+            voice = value;
+            sortedSentences = voice.Sentences.ToList();
+            sortedSentences.Sort(Sentence.comparerByStartBeat);
+        }
+    }
+    private List<Sentence> sortedSentences = new List<Sentence>();
 
     private PlayerUiArea playerUiArea;
     private PlayerUiController playerUiController;
@@ -82,7 +97,7 @@ public class PlayerController : MonoBehaviour
     public void SetCurrentBeat(double currentBeat)
     {
         // Change the current sentence, when the current beat is over its last note.
-        if (CurrentSentence != null && currentBeat >= (double)CurrentSentence.EndBeat)
+        if (CurrentSentence != null && currentBeat >= (double)CurrentSentence.MaxBeat)
         {
             OnSentenceEnded();
         }
@@ -238,7 +253,7 @@ public class PlayerController : MonoBehaviour
 
     private Sentence GetSentence(int index)
     {
-        Sentence sentence = (index < Voice.Sentences.Count) ? Voice.Sentences[index] : null;
+        Sentence sentence = (index < sortedSentences.Count) ? sortedSentences[index] : null;
         return sentence;
     }
 
@@ -248,6 +263,6 @@ public class PlayerController : MonoBehaviour
         {
             return -1d;
         }
-        return CurrentSentence.StartBeat;
+        return CurrentSentence.MinBeat;
     }
 }
