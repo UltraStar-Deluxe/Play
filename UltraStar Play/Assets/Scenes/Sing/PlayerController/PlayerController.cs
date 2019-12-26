@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         // Therefor, consider the currently finished sentence and its predecessor.
         sentenceRatingStream.Buffer(2, 1)
             // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.All(x => x == SentenceRating.Perfect))
+            .Where(xs => xs.AllMatch(x => x == SentenceRating.Perfect))
             // Create an effect for these.
             .Subscribe(xs => playerUiController.CreatePerfectSentenceEffect());
 

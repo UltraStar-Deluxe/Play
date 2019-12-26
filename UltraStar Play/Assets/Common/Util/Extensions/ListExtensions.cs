@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public static class ListExtensions
@@ -9,7 +10,7 @@ public static class ListExtensions
         return prefix + string.Join(separator, values) + suffix;
     }
 
-    public static void AddIfNotContains<T>(this List<T> list, T item)
+    public static void AddIfNotContains<T>(this ICollection<T> list, T item)
     {
         if (!list.Contains(item))
         {
@@ -24,7 +25,7 @@ public static class ListExtensions
     }
 
     // Returns true if the predicate is true for all elements in the list. Otherwise, returns false.
-    public static bool All<T>(this IList<T> list, Func<T, bool> predicate)
+    public static bool AllMatch<T>(this ICollection<T> list, Func<T, bool> predicate)
     {
         foreach (T t in list)
         {
@@ -37,7 +38,7 @@ public static class ListExtensions
     }
 
     // Returns true if the predicate is true for any element in the list. Otherwise, returns false.
-    public static bool Any<T>(this IList<T> list, Func<T, bool> predicate)
+    public static bool AnyMatch<T>(this ICollection<T> list, Func<T, bool> predicate)
     {
         foreach (T t in list)
         {
@@ -52,7 +53,7 @@ public static class ListExtensions
     /// Returns the element before the given element in the list.
     /// If wrapAround is true and the given element is the first one in the list, then the last element in the list is returned.
     /// Otherwise returns default if already at the first element at the list. Also returns default if the list is empty.
-    public static T ElementBefore<T>(this List<T> list, T element, bool wrapAround)
+    public static T GetElementBefore<T>(this IList<T> list, T element, bool wrapAround)
     {
         if (list.Count == 0)
         {
@@ -79,7 +80,7 @@ public static class ListExtensions
     /// Returns the element after the given element in the list.
     /// If wrapAround is true and the given element is the last one in the list, then the first element in the list is returned.
     /// Otherwise returns default if already at the last element at the list. Also returns default if the list is empty.
-    public static T ElementAfter<T>(this List<T> list, T element, bool wrapAround)
+    public static T GetElementAfter<T>(this IList<T> list, T element, bool wrapAround)
     {
         if (list.Count == 0)
         {
@@ -106,32 +107,49 @@ public static class ListExtensions
     // Returns the elements of the list that are before the given element.
     // Thereby, the given element is included in the result list if inclusive is true.
     // If the given element is not in the list, then an empty list is returned.
-    public static List<T> ElementsBefore<T>(this List<T> list, T element, bool inclusive)
+    public static List<T> GetElementsBefore<T>(this IEnumerable<T> list, T element, bool inclusive)
     {
+        List<T> result = new List<T>();
+
         int indexOfElement = list.IndexOf(element);
         if (indexOfElement < 0)
         {
-            return new List<T>();
-        }
-        else
-        {
-            List<T> result = list.GetRange(0, (inclusive) ? indexOfElement + 1 : indexOfElement);
             return result;
         }
+
+        int index = 0;
+        foreach (T elem in list)
+        {
+            if (index == indexOfElement)
+            {
+                if (inclusive)
+                {
+                    result.Add(elem);
+                }
+                return result;
+            }
+            result.Add(elem);
+            index++;
+        }
+        return result;
     }
 
-    // Returns the element in the list that comes after the given element.
-    // If the given element is not in the list, then null is returned.
-    public static T ElementAfter<T>(this List<T> list, T element)
+    public static int IndexOf<T>(this IEnumerable<T> collection, T element)
     {
-        int indexOfElement = list.IndexOf(element);
-        if (indexOfElement >= 0 && list.Count > indexOfElement + 1)
+        if (collection is IList)
         {
-            return list[indexOfElement + 1];
+            return (collection as IList).IndexOf(element);
         }
-        else
+
+        int index = 0;
+        foreach (T elem in collection)
         {
-            return default(T);
+            if (object.Equals(elem, element))
+            {
+                return index;
+            }
+            index++;
         }
+        return -1;
     }
 }
