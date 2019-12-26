@@ -2,5 +2,5 @@ public enum ESongEditorRecordingSource
 {
     Off,
     Microphone,
-    KeyboardButton
+    KeyboardButton_F8
 }

@@ -57,7 +57,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     private void UpdateRecordingViaButtonClick()
     {
         // Record notes via button click.
-        bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton);
+        bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
         if (keyboardButtonRecordingEnabled && Input.GetKey(KeyCode.F8))
         {
             RecordNote(editorSettings.MidiNoteForButtonRecording, songAudioPlayer.PositionInSongInMillis, ESongEditorLayer.ButtonRecording);
