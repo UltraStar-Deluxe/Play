@@ -24,7 +24,7 @@ public class NoteAreaPositionInSongIndicator : MonoBehaviour, INeedInjection
 
     private void SetPositionInSongInMillis(double positionInSongInMillis)
     {
-        float x = noteArea.GetHorizontalPositionForMillis((int)positionInSongInMillis);
+        float x = (float)noteArea.GetHorizontalPositionForMillis(positionInSongInMillis);
         rectTransform.anchorMin = new Vector2(x, 0);
         rectTransform.anchorMax = new Vector2(x, 1);
         rectTransform.anchoredPosition = Vector2.zero;

@@ -129,21 +129,21 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return isMillisecondsOk;
     }
 
-    public float GetVerticalPositionForMidiNote(int midiNote)
+    public double GetVerticalPositionForMidiNote(int midiNote)
     {
         int indexInViewport = midiNote - ViewportY;
-        return (float)indexInViewport / ViewportHeight;
+        return (double)indexInViewport / ViewportHeight;
     }
 
-    public float GetHorizontalPositionForMillis(int positionInSongInMillis)
+    public double GetHorizontalPositionForMillis(double positionInSongInMillis)
     {
-        return (float)(positionInSongInMillis - ViewportX) / ViewportWidth;
+        return (positionInSongInMillis - ViewportX) / ViewportWidth;
     }
 
-    public float GetHorizontalPositionForBeat(int beat)
+    public double GetHorizontalPositionForBeat(int beat)
     {
         double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        return GetHorizontalPositionForMillis((int)positionInSongInMillis);
+        return GetHorizontalPositionForMillis(positionInSongInMillis);
     }
 
     public bool IsInViewport(Note note)
@@ -154,7 +154,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public bool IsInViewport(Sentence sentence)
     {
-        return sentence.MinBeat <= MaxBeatInViewport && sentence.MaxBeat >= MinBeatInViewport;
+        return sentence.MinBeat <= MaxBeatInViewport && Math.Max(sentence.MaxBeat, sentence.LinebreakBeat) >= MinBeatInViewport;
     }
 
     public void ScrollHorizontal(int direction)

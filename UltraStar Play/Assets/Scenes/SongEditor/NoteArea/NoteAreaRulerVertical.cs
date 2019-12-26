@@ -76,7 +76,7 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
         Text uiText = Instantiate(labelPrefab, labelContainer);
         RectTransform label = uiText.GetComponent<RectTransform>();
 
-        float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
+        float y = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
         float anchorHeight = noteArea.HeightForSingleNote;
         label.anchorMin = new Vector2(0, y - (anchorHeight / 2f));
         label.anchorMax = new Vector2(1, y + (anchorHeight / 2f));
@@ -89,7 +89,7 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
 
     private void DrawHorizontalGridLine(int midiNote, Color color)
     {
-        float yPercent = noteArea.GetVerticalPositionForMidiNote(midiNote);
+        float yPercent = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
         int y = (int)(yPercent * horizontalGridImage.TextureHeight);
         for (int x = 0; x < horizontalGridImage.TextureWidth; x++)
         {
