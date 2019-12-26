@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,6 +13,8 @@ public class Sentence : ISerializationCallbackReceiver
     private Voice voice;
     public Voice Voice { get { return voice; } }
 
+    // LinebreakBeat can be set to extend the duration the sentence is shown.
+    // Must be greater than the MaxBeat and smaller or equal to the MinBeat of the following sentence.
     public int LinebreakBeat { get; private set; }
 
     private readonly NoteHashSet notes = new NoteHashSet();
@@ -112,7 +113,16 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    internal void UpdateMinBeat(IReadOnlyCollection<Note> notes)
+    public void SetLinebreakBeat(int newBeat)
+    {
+        if (newBeat < MaxBeat)
+        {
+            newBeat = MaxBeat;
+        }
+        LinebreakBeat = newBeat;
+    }
+
+    private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
     {
         if (notes.Count > 0)
         {
@@ -120,11 +130,15 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    internal void UpdateMaxBeat(IReadOnlyCollection<Note> notes)
+    private void UpdateMaxBeat(IReadOnlyCollection<Note> notes)
     {
         if (notes.Count > 0)
         {
             MaxBeat = notes.Select(it => it.EndBeat).Max();
+            if (LinebreakBeat < MaxBeat)
+            {
+                LinebreakBeat = MaxBeat;
+            }
         }
     }
 
@@ -138,6 +152,10 @@ public class Sentence : ISerializationCallbackReceiver
         if (MaxBeat < note.EndBeat)
         {
             MaxBeat = note.EndBeat;
+            if (LinebreakBeat < MaxBeat)
+            {
+                LinebreakBeat = MaxBeat;
+            }
         }
     }
 
