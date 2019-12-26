@@ -18,9 +18,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public RectTransform noteContainer;
 
     [InjectedInInspector]
-    public SentenceMarkerLine sentenceMarkerLinePrefab;
-    [InjectedInInspector]
-    public RectTransform sentenceMarkerLineContainer;
+    public DynamicallyCreatedImage sentenceLinesImage;
 
     [InjectedInInspector]
     public SentenceMarkerRectangle sentenceMarkerRectanglePrefab;
@@ -51,7 +49,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     void Start()
     {
         noteContainer.DestroyAllDirectChildren();
-        sentenceMarkerLineContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
         sortedSentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
@@ -77,18 +74,33 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         {
             return;
         }
-        sentenceMarkerLineContainer.DestroyAllDirectChildren();
+        sentenceLinesImage.ClearTexture();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+
+        int viewportWidthInBeats = noteArea.MaxBeatInViewport - noteArea.MinBeatInViewport;
 
         int sentenceIndex = 0;
         foreach (Sentence sentence in sortedSentencesOfAllVoices)
         {
             if (noteArea.IsInViewport(sentence))
             {
-                CreateSentenceMarker(sentence, sentenceIndex + 1);
+                int startBeat = sentence.MinBeat;
+                int endBeat = Math.Max(sentence.MaxBeat, sentence.LinebreakBeat);
+
+                // Do not draw the sentence marker lines, when there are too many beats
+                if (viewportWidthInBeats < 1200)
+                {
+                    CreateSentenceMarkerLine(startBeat, Colors.red, 0);
+                    CreateSentenceMarkerLine(endBeat, Colors.black, 20);
+                }
+
+                string label = (sentenceIndex + 1).ToString();
+                CreateSentenceMarkerRectangle(startBeat, endBeat, label);
             }
             sentenceIndex++;
         }
+
+        sentenceLinesImage.ApplyTexture();
     }
 
     private void UpdateNotes()
@@ -163,40 +175,41 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CreateSentenceMarker(Sentence sentence, int sentenceIndex)
-    {
-        CreateSentenceMarkerLine(sentence.MinBeat);
-        CreateSentenceMarkerLine(sentence.MaxBeat);
-        CreateSentenceMarkerRectangle(sentence.MinBeat, sentence.MaxBeat, sentenceIndex);
-    }
-
-    private void CreateSentenceMarkerRectangle(int startBeat, int endBeat, int sentenceIndex)
+    private void CreateSentenceMarkerRectangle(int startBeat, int endBeat, string label)
     {
         SentenceMarkerRectangle sentenceMarkerRectangle = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
         RectTransform rectTransform = sentenceMarkerRectangle.GetComponent<RectTransform>();
 
-        float xStart = noteArea.GetHorizontalPositionForBeat(startBeat);
-        float xEnd = noteArea.GetHorizontalPositionForBeat(endBeat);
+        float xStart = (float)noteArea.GetHorizontalPositionForBeat(startBeat);
+        float xEnd = (float)noteArea.GetHorizontalPositionForBeat(endBeat);
 
         rectTransform.anchorMin = new Vector2(xStart, 0);
         rectTransform.anchorMax = new Vector2(xEnd, 1);
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = Vector2.zero;
 
-        sentenceMarkerRectangle.GetComponentInChildren<Text>().text = sentenceIndex.ToString();
+        sentenceMarkerRectangle.GetComponentInChildren<Text>().text = label;
     }
 
-    private void CreateSentenceMarkerLine(int beat)
+    private void CreateSentenceMarkerLine(int beat, Color color, int yDashOffset)
     {
-        SentenceMarkerLine sentenceMarkerLine = Instantiate(sentenceMarkerLinePrefab, sentenceMarkerLineContainer);
-        RectTransform rectTransform = sentenceMarkerLine.GetComponent<RectTransform>();
+        double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        if (beatPosInMillis < noteArea.ViewportX || beatPosInMillis > noteArea.MaxMillisecondsInViewport)
+        {
+            return;
+        }
 
-        float x = noteArea.GetHorizontalPositionForBeat(beat);
+        double xPercent = (beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth;
+        int x = (int)(xPercent * sentenceLinesImage.TextureWidth);
 
-        rectTransform.anchorMin = new Vector2(x, 0);
-        rectTransform.anchorMax = new Vector2(x, 1);
-        rectTransform.anchoredPosition = Vector2.zero;
-        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, 0);
+        for (int y = 0; y < sentenceLinesImage.TextureHeight; y++)
+        {
+            // Make it dashed
+            if (((y + yDashOffset) % 40) < 20)
+            {
+                sentenceLinesImage.SetPixel(x, y, color);
+            }
+        }
     }
 
     private EditorUiNote UpdateOrCreateNote(Note note)
@@ -217,9 +230,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void PositionUiNote(RectTransform uiNoteRectTransform, int midiNote, int startBeat, int endBeat)
     {
-        float y = noteArea.GetVerticalPositionForMidiNote(midiNote);
-        float xStart = noteArea.GetHorizontalPositionForBeat(startBeat);
-        float xEnd = noteArea.GetHorizontalPositionForBeat(endBeat);
+        float y = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
+        float xStart = (float)noteArea.GetHorizontalPositionForBeat(startBeat);
+        float xEnd = (float)noteArea.GetHorizontalPositionForBeat(endBeat);
         float height = noteArea.HeightForSingleNote;
 
         uiNoteRectTransform.anchorMin = new Vector2(xStart, y - height / 2f);
