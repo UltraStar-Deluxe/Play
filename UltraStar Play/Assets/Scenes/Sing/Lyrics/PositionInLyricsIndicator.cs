@@ -141,7 +141,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private float GetEndPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        List<Note> noteAndNotesBefore = sentence.Notes.ElementsBefore(note, true);
+        List<Note> noteAndNotesBefore = sentence.Notes.GetElementsBefore(note, true);
         int countNonWhitespaceChars = noteAndNotesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
         Vector3 pos = GetRightPositionOfCharacter(currentSentenceText, countNonWhitespaceChars - 1);
         return pos.x;
@@ -149,7 +149,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private float GetStartPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        List<Note> notesBefore = sentence.Notes.ElementsBefore(note, false);
+        List<Note> notesBefore = sentence.Notes.GetElementsBefore(note, false);
         int countNonWhitespaceChars = notesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
         Vector3 pos = GetLeftPositionOfCharacter(currentSentenceText, countNonWhitespaceChars);
         return pos.x;
