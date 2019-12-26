@@ -12,16 +12,13 @@ using UniRx;
 
 public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 {
-    public int octaveOffset;
-    public int delayInMillis;
-
-    public int midiNoteForButtonRecording;
-
     [Inject]
     private MicrophonePitchTracker microphonePitchTracker;
 
     [Inject]
     private Settings settings;
+
+    private SongEditorSettings editorSettings => settings.SongEditorSettings;
 
     [Inject]
     private SongMeta songMeta;
@@ -44,7 +41,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             .Subscribe(OnSongIsPlayingChanged);
 
         microphonePitchTracker.PitchEventStream
-            .Subscribe(pitchEvent => OnPitchDetected(pitchEvent, ESongEditorLayer.MicRecording));
+            .Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
     }
 
     void Update()
@@ -61,21 +58,26 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton);
         if (keyboardButtonRecordingEnabled && Input.GetKey(KeyCode.F8))
         {
-            OnPitchDetected(new PitchEvent(midiNoteForButtonRecording), ESongEditorLayer.ButtonRecording);
+            RecordNote(editorSettings.MidiNoteForButtonRecording, songAudioPlayer.PositionInSongInMillis, ESongEditorLayer.ButtonRecording);
         }
     }
 
-    private void OnPitchDetected(PitchEvent pitchEvent, ESongEditorLayer targetLayer)
+    private void OnPitchDetected(PitchEvent pitchEvent)
     {
         if (pitchEvent == null || lastPitchDetectedFrame == Time.frameCount)
         {
             return;
         }
 
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - delayInMillis;
+        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - editorSettings.MicDelayInMillis;
+        int midiNote = pitchEvent.MidiNote + (editorSettings.MicOctaveOffset * 12);
+        RecordNote(midiNote, positionInSongInMillis, ESongEditorLayer.MicRecording);
+    }
+
+    private void RecordNote(int midiNote, double positionInSongInMillis, ESongEditorLayer targetLayer)
+    {
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
 
-        int midiNote = pitchEvent.MidiNote + (octaveOffset * 12);
         if (lastRecordedNote != null
             && lastRecordedNote.MidiNote == midiNote
             && lastPitchDetectedFrame == Time.frameCount - 1)

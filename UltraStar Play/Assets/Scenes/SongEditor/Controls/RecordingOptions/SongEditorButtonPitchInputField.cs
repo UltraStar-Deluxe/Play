@@ -13,20 +13,20 @@ using UniRx;
 public class SongEditorButtonPitchInputField : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorNoteRecorder songEditorNoteRecorder;
+    private Settings settings;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     void Start()
     {
-        inputField.text = songEditorNoteRecorder.midiNoteForButtonRecording.ToString();
+        inputField.text = settings.SongEditorSettings.MidiNoteForButtonRecording.ToString();
         inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged);
     }
 
     private void OnTextChanged(string newText)
     {
-        int newInt = newText.TryParseAsInteger(songEditorNoteRecorder.midiNoteForButtonRecording);
-        songEditorNoteRecorder.midiNoteForButtonRecording = newInt;
+        int newInt = newText.TryParseAsInteger(settings.SongEditorSettings.MidiNoteForButtonRecording);
+        settings.SongEditorSettings.MidiNoteForButtonRecording = newInt;
     }
 }

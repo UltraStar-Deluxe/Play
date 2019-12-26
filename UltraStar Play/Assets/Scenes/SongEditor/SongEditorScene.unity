@@ -4659,7 +4659,7 @@ PrefabInstance:
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000019073486
+      value: -0.0000038146973
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -5287,9 +5287,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bc012f15e2e63047869bca666496e0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  octaveOffset: 2
-  delayInMillis: 450
-  midiNoteForButtonRecording: 48
 --- !u!1 &1243198117
 GameObject:
   m_ObjectHideFlags: 0
@@ -5963,7 +5960,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Octave offset:'
+  m_Text: 'Mic octave offset:'
 --- !u!222 &1481262243
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7995,7 +7992,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Delay (ms):'
+  m_Text: 'Mic delay (ms):'
 --- !u!222 &2011887170
 CanvasRenderer:
   m_ObjectHideFlags: 0

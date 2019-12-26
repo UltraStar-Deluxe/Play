@@ -13,20 +13,20 @@ using UniRx;
 public class SongEditorOctaveOffsetInputField : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorNoteRecorder songEditorNoteRecorder;
+    private Settings settings;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     void Start()
     {
-        inputField.text = songEditorNoteRecorder.octaveOffset.ToString();
+        inputField.text = settings.SongEditorSettings.MicOctaveOffset.ToString();
         inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged); ;
     }
 
     private void OnTextChanged(string newText)
     {
-        int newInt = newText.TryParseAsInteger(songEditorNoteRecorder.octaveOffset);
-        songEditorNoteRecorder.octaveOffset = newInt;
+        int newInt = newText.TryParseAsInteger(settings.SongEditorSettings.MicOctaveOffset);
+        settings.SongEditorSettings.MicOctaveOffset = newInt;
     }
 }
