@@ -52,19 +52,19 @@ public class SerializableHashSet<T> : ISerializationCallbackReceiver, ICollectio
         }
     }
 
-    public void Add(T element)
+    public void Add(T item)
     {
-        hashSet.Add(element);
+        hashSet.Add(item);
     }
 
-    public bool Remove(T element)
+    public bool Remove(T item)
     {
-        return hashSet.Remove(element);
+        return hashSet.Remove(item);
     }
 
-    public bool Contains(T element)
+    public bool Contains(T item)
     {
-        return hashSet.Contains(element);
+        return hashSet.Contains(item);
     }
 
     public void Clear()

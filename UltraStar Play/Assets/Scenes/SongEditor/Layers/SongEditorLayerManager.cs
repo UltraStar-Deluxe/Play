@@ -12,7 +12,7 @@ using UniRx;
 
 public class SongEditorLayerManager
 {
-    private Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
+    private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
 
     public void AddNoteToLayer(ESongEditorLayer layer, Note note)
     {

@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class Sentence : ISerializationCallbackReceiver
 {
-    public static IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
+    public readonly static IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
 
     // Breaks the serialization loop with Voice.sentences. The field is restored by the Voice.
     [NonSerialized]
@@ -161,6 +161,7 @@ public class Sentence : ISerializationCallbackReceiver
 
     public void OnBeforeSerialize()
     {
+        // Do nothing. Implementation of ISerializationCallbackReceiver
     }
 
     public void OnAfterDeserialize()

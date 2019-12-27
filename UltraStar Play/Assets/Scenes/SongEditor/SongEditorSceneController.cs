@@ -33,7 +33,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     [InjectedInInspector]
     public MicrophonePitchTracker microphonePitchTracker;
 
-    private SongEditorLayerManager songEditorLayerManager { get; set; } = new SongEditorLayerManager();
+    private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
 
     private bool audioWaveFormInitialized;
 

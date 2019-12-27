@@ -21,7 +21,7 @@ public class SongEditorRecordingDelayInputField : MonoBehaviour, INeedInjection
     void Start()
     {
         inputField.text = settings.SongEditorSettings.MicDelayInMillis.ToString();
-        inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged); ;
+        inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged);
     }
 
     private void OnTextChanged(string newText)

@@ -177,7 +177,7 @@ public class SentenceDisplayer : MonoBehaviour
     {
         // Calculate offset, such that the average note will be on the middle line
         // (thus, middle line has offset of zero).
-        int offset = (noteLineCount / 2) - (((int)avgMidiNote) % noteLineCount);
+        int offset = (noteLineCount / 2) - (avgMidiNote % noteLineCount);
         int noteLine = (offset + midiNote) % noteLineCount;
 
         int sentenceStartBeat = displayedSentence.MinBeat;
