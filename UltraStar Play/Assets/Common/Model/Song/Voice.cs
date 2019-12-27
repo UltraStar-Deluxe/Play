@@ -65,6 +65,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public void OnBeforeSerialize()
     {
+        // Do nothing. Implementation of ISerializationCallbackReceiver
     }
 
     public void OnAfterDeserialize()

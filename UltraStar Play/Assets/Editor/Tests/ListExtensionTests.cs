@@ -9,7 +9,7 @@ public class ListExtensionTests
     [Test]
     public void GetElementBeforeTest()
     {
-        List<string> list = new List<string>() { "a", "b", "c", "d" };
+        List<string> list = new List<string> { "a", "b", "c", "d" };
         string result1 = list.GetElementBefore("c", false);
         Assert.AreEqual("b", result1);
 
@@ -23,7 +23,7 @@ public class ListExtensionTests
     [Test]
     public void GetElementAfterTest()
     {
-        List<string> list = new List<string>() { "a", "b", "c", "d" };
+        List<string> list = new List<string> { "a", "b", "c", "d" };
         string result1 = list.GetElementAfter("c", false);
         Assert.AreEqual("d", result1);
 
@@ -37,12 +37,12 @@ public class ListExtensionTests
     [Test]
     public void GetElementsBeforeTest()
     {
-        List<string> list = new List<string>() { "a", "b", "c", "d" };
+        List<string> list = new List<string> { "a", "b", "c", "d" };
         List<string> result1 = list.GetElementsBefore("c", false);
-        Assert.AreEqual(new List<string>() { "a", "b" }, result1);
+        Assert.AreEqual(new List<string> { "a", "b" }, result1);
 
         List<string> result2 = list.GetElementsBefore("c", true);
-        Assert.AreEqual(new List<string>() { "a", "b", "c" }, result2);
+        Assert.AreEqual(new List<string> { "a", "b", "c" }, result2);
 
         List<string> result3 = list.GetElementsBefore("a", false);
         Assert.AreEqual(new List<string>(), result3);

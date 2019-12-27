@@ -21,7 +21,7 @@ public class SongEditorOctaveOffsetInputField : MonoBehaviour, INeedInjection
     void Start()
     {
         inputField.text = settings.SongEditorSettings.MicOctaveOffset.ToString();
-        inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged); ;
+        inputField.OnValueChangedAsObservable().Subscribe(OnTextChanged);
     }
 
     private void OnTextChanged(string newText)

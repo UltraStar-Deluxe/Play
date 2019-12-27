@@ -18,7 +18,13 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    private SongEditorSettings editorSettings => settings.SongEditorSettings;
+    private SongEditorSettings EditorSettings
+    {
+        get
+        {
+            return settings.SongEditorSettings;
+        }
+    }
 
     [Inject]
     private SongMeta songMeta;
@@ -60,7 +66,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
         if (keyboardButtonRecordingEnabled && Input.GetKey(KeyCode.F8))
         {
-            RecordNote(editorSettings.MidiNoteForButtonRecording, songAudioPlayer.PositionInSongInMillis, ESongEditorLayer.ButtonRecording);
+            RecordNote(EditorSettings.MidiNoteForButtonRecording, songAudioPlayer.PositionInSongInMillis, ESongEditorLayer.ButtonRecording);
         }
     }
 
@@ -71,8 +77,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - editorSettings.MicDelayInMillis;
-        int midiNote = pitchEvent.MidiNote + (editorSettings.MicOctaveOffset * 12);
+        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - EditorSettings.MicDelayInMillis;
+        int midiNote = pitchEvent.MidiNote + (EditorSettings.MicOctaveOffset * 12);
         RecordNote(midiNote, positionInSongInMillis, ESongEditorLayer.MicRecording);
     }
 
@@ -84,7 +90,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             && lastRecordedNote.MidiNote == midiNote
             && lastPitchDetectedFrame == Time.frameCount - 1)
         {
-            ContinueLastRecordedNote(midiNote, currentBeat);
+            ContinueLastRecordedNote(currentBeat);
         }
         else
         {
@@ -100,7 +106,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         songEditorLayerManager.AddNoteToLayer(targetLayer, lastRecordedNote);
     }
 
-    private void ContinueLastRecordedNote(int midiNote, int currentBeat)
+    private void ContinueLastRecordedNote(int currentBeat)
     {
         if (currentBeat > lastRecordedNote.EndBeat)
         {
