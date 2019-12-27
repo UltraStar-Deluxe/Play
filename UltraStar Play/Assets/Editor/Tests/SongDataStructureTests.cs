@@ -10,7 +10,7 @@ public class SongDataStructureTests
         Note n2_4 = new Note(ENoteType.Normal, 2, 2, 0, "");
         Note n4_6 = new Note(ENoteType.Normal, 4, 2, 0, "");
 
-        Sentence s1 = new Sentence(new List<Note>() { n2_4 }, 0);
+        Sentence s1 = new Sentence(new List<Note> { n2_4 }, 0);
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
 
@@ -38,7 +38,7 @@ public class SongDataStructureTests
     {
         Note note = new Note(ENoteType.Normal, 2, 2, 0, "");
 
-        Sentence s1 = new Sentence(new List<Note>() { note }, 0);
+        Sentence s1 = new Sentence(new List<Note> { note }, 0);
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
         Assert.AreEqual(4, s1.LinebreakBeat);

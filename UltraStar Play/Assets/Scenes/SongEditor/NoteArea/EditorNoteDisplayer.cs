@@ -42,7 +42,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
 
-    private List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
+    private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
 

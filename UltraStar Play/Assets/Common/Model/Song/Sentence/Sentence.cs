@@ -115,11 +115,7 @@ public class Sentence : ISerializationCallbackReceiver
 
     public void SetLinebreakBeat(int newBeat)
     {
-        if (newBeat < MaxBeat)
-        {
-            newBeat = MaxBeat;
-        }
-        LinebreakBeat = newBeat;
+        LinebreakBeat = (newBeat < MaxBeat) ? MaxBeat : newBeat;
     }
 
     private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
