@@ -9,6 +9,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
     private const KeyCode RandomSongShortcut = KeyCode.R;
+    private const KeyCode OpenInEditorShortcut = KeyCode.E;
 
     private const KeyCode QuickSearchSong = KeyCode.LeftControl;
     private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
@@ -58,14 +59,21 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(StartSingSceneShortcut))
+        if (Input.GetKeyUp(StartSingSceneShortcut) || Input.GetKeyUp(OpenInEditorShortcut))
         {
             GameObject focusedControl = GameObjectUtils.GetSelectedGameObject();
             bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
             bool focusedControlIsSearchField = (focusedControl != null && focusedControl.GetComponent<SearchInputField>() != null);
             if (focusedControl == null || focusedControlIsSongButton || focusedControlIsSearchField)
             {
-                songSelectSceneController.StartSingScene();
+                if (Input.GetKeyUp(StartSingSceneShortcut))
+                {
+                    songSelectSceneController.StartSingScene();
+                }
+                else if (Input.GetKeyUp(OpenInEditorShortcut))
+                {
+                    songSelectSceneController.StartSongEditorScene();
+                }
             }
         }
     }

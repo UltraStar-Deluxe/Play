@@ -1,79 +1,191 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class Sentence
+public class Sentence : ISerializationCallbackReceiver
 {
-    // this needs to be switched over to IReadOnlyList
-    public List<Note> Notes { get; private set; }
+    public readonly static IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
+
+    // Breaks the serialization loop with Voice.sentences. The field is restored by the Voice.
+    [NonSerialized]
+    private Voice voice;
+    public Voice Voice { get { return voice; } }
+
+    // LinebreakBeat can be set to extend the duration the sentence is shown.
+    // Must be greater than the MaxBeat and smaller or equal to the MinBeat of the following sentence.
     public int LinebreakBeat { get; private set; }
 
-    public List<Note> GoldenNotes
-    {
-        get
-        {
-            return Notes.Where(it => it.IsGolden).ToList();
-        }
-    }
+    private readonly NoteHashSet notes = new NoteHashSet();
+    public IReadOnlyCollection<Note> Notes { get { return notes; } }
 
-    public List<Note> NormalNotes
-    {
-        get
-        {
-            return Notes.Where(it => it.IsNormal).ToList();
-        }
-    }
+    // The following fields are computed from the list of notes.
+    public int MinBeat { get; private set; }
+    public int MaxBeat { get; private set; }
 
-    public List<Note> FreestyleNotes
+    public Sentence()
     {
-        get
-        {
-            return Notes.Where(it => it.IsFreestyle).ToList();
-        }
     }
 
     public Sentence(List<Note> notes, int linebreakBeat)
     {
-        if (notes == null || notes.Count < 1)
-        {
-            throw new UnityException("notes is null or empty!");
-        }
-        Notes = notes;
         LinebreakBeat = linebreakBeat;
-
-        // Calculate values based on note (e.g. min/max pitch, start/end beat)
-        Note firstNote = Notes[0];
-        StartBeat = firstNote.StartBeat;
-
-        Note lastNote = Notes[Notes.Count - 1];
-        EndBeat = lastNote.StartBeat + lastNote.Length;
-
-        MinNote = firstNote;
-        MaxNote = firstNote;
-        foreach (Note note in notes)
-        {
-            if (note.MidiNote < MinNote.MidiNote)
-            {
-                MinNote = note;
-            }
-            if (note.MidiNote > MaxNote.MidiNote)
-            {
-                MaxNote = note;
-            }
-        }
-        AvgMidiNote = Notes.Select(it => it.MidiNote).Average();
+        SetNotes(notes);
     }
 
-    public int StartBeat { get; private set; }
+    public void SetVoice(Voice voice)
+    {
+        if (this.voice == voice)
+        {
+            return;
+        }
 
-    public int EndBeat { get; private set; }
+        if (this.voice != null)
+        {
+            this.voice.RemoveSentence(this);
+        }
+        this.voice = voice;
+        if (this.voice != null)
+        {
+            this.voice.AddSentence(this);
+        }
+    }
 
-    public Note MinNote { get; private set; }
+    public void SetNotes(List<Note> notes)
+    {
+        if (notes == null)
+        {
+            throw new UnityException("Notes cannot be null!");
+        }
 
-    public Note MaxNote { get; private set; }
+        this.notes.Clear();
+        foreach (Note note in notes)
+        {
+            this.notes.Add(note);
+            note.SetSentence(this);
+        }
 
-    public double AvgMidiNote { get; private set; }
+        UpdateMinBeat(notes);
+        UpdateMaxBeat(notes);
+    }
+
+    public void AddNote(Note note)
+    {
+        if (note == null)
+        {
+            throw new UnityException("Note cannot be null");
+        }
+
+        // The check is needed to avoid a recursive loop between Sentence.AddNote and Note.SetSentence.
+        if (notes.Contains(note))
+        {
+            return;
+        }
+        notes.Add(note);
+        note.SetSentence(this);
+
+        ExpandStartAndEndBeat(note);
+    }
+
+    public void RemoveNote(Note note)
+    {
+        if (note == null)
+        {
+            throw new UnityException("Note cannot be null");
+        }
+
+        // The check is needed to avoid a recursive loop between Sentence.RemoveNote and Note.SetSentence.
+        if (!notes.Contains(note))
+        {
+            return;
+        }
+        notes.Remove(note);
+        note.SetSentence(null);
+
+        if (MinBeat == note.StartBeat)
+        {
+            UpdateMinBeat(notes);
+        }
+        if (MaxBeat == note.EndBeat)
+        {
+            UpdateMaxBeat(notes);
+        }
+    }
+
+    public void SetLinebreakBeat(int newBeat)
+    {
+        LinebreakBeat = (newBeat < MaxBeat) ? MaxBeat : newBeat;
+    }
+
+    private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
+    {
+        if (notes.Count > 0)
+        {
+            MinBeat = notes.Select(it => it.StartBeat).Min();
+        }
+    }
+
+    private void UpdateMaxBeat(IReadOnlyCollection<Note> notes)
+    {
+        if (notes.Count > 0)
+        {
+            MaxBeat = notes.Select(it => it.EndBeat).Max();
+            if (LinebreakBeat < MaxBeat)
+            {
+                LinebreakBeat = MaxBeat;
+            }
+        }
+    }
+
+    internal void ExpandStartAndEndBeat(Note note)
+    {
+        if (MinBeat > note.StartBeat)
+        {
+            MinBeat = note.StartBeat;
+        }
+
+        if (MaxBeat < note.EndBeat)
+        {
+            MaxBeat = note.EndBeat;
+            if (LinebreakBeat < MaxBeat)
+            {
+                LinebreakBeat = MaxBeat;
+            }
+        }
+    }
+
+    public void OnBeforeSerialize()
+    {
+        // Do nothing. Implementation of ISerializationCallbackReceiver
+    }
+
+    public void OnAfterDeserialize()
+    {
+        foreach (Note note in notes)
+        {
+            note.SetSentence(this);
+        }
+    }
+
+    private class SentenceComparerByStartBeat : IComparer<Sentence>
+    {
+        public int Compare(Sentence x, Sentence y)
+        {
+            if (x == null && y == null)
+            {
+                return 0;
+            }
+            else if (x == null)
+            {
+                return -1;
+            }
+            else if (y == null)
+            {
+                return 1;
+            }
+
+            return x.MinBeat.CompareTo(y.MinBeat);
+        }
+    }
 }

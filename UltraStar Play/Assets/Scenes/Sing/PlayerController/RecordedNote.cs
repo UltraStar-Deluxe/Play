@@ -8,8 +8,6 @@ public class RecordedNote
     public int RecordedMidiNote { get; set; }
     public int RoundedMidiNote { get; set; }
 
-    public double StartPositionInMilliseconds { get; set; }
-
     public double StartBeat { get; set; }
     public double EndBeat { get; set; }
 
@@ -22,13 +20,5 @@ public class RecordedNote
         this.RoundedMidiNote = midiNote;
         this.StartBeat = startBeat;
         this.EndBeat = endBeat;
-    }
-
-    public double LengthInBeats
-    {
-        get
-        {
-            return EndBeat - StartBeat;
-        }
     }
 }
