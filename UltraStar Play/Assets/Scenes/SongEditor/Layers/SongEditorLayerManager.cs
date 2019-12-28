@@ -51,4 +51,15 @@ public class SongEditorLayerManager
         result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
         return result;
     }
+
+    public List<Note> GetAllNotes()
+    {
+        List<Note> notes = new List<Note>();
+        foreach (ESongEditorLayer layerKey in layerKeyToLayerMap.Keys)
+        {
+            List<Note> notesOfLayer = GetNotes(layerKey);
+            notes.AddRange(notesOfLayer);
+        }
+        return notes;
+    }
 }

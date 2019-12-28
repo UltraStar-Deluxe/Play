@@ -48,6 +48,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
@@ -69,12 +72,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
-        FitViewportToVoices();
+        FitViewportVerticalToNotes();
     }
 
-    private void FitViewportToVoices()
+    public void FitViewportVerticalToNotes()
     {
-        List<Note> notes = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        List<Note> notesInVoices = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notes = new List<Note>();
+        notes.AddRange(notesInLayers);
+        notes.AddRange(notesInVoices);
         int minMidiNoteInSong = notes.Select(note => note.MidiNote).Min();
         int maxMidiNoteInSong = notes.Select(note => note.MidiNote).Max();
         if (minMidiNoteInSong > 0 && maxMidiNoteInSong > 0)
@@ -82,6 +89,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             SetViewportY(minMidiNoteInSong - 1);
             SetViewportHeight(maxMidiNoteInSong - minMidiNoteInSong + 1);
         }
+    }
+
+    public void FitViewportHorizontalToSentence(Sentence currentSentence)
+    {
+        double minPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, currentSentence.MinBeat);
+        double maxPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, currentSentence.MaxBeat);
+        SetViewportX((int)Math.Floor(minPositionInMillis));
+        SetViewportWidth((int)Math.Ceiling(maxPositionInMillis - minPositionInMillis));
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
