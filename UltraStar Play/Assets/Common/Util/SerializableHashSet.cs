@@ -34,8 +34,6 @@ public class SerializableHashSet<T> : ISerializationCallbackReceiver, ICollectio
         }
     }
 
-    //////////////////////////////////////////////
-    // ICollection<T> implementation
     public int Count
     {
         get
@@ -86,9 +84,6 @@ public class SerializableHashSet<T> : ISerializationCallbackReceiver, ICollectio
     {
         return hashSet.GetEnumerator();
     }
-
-    //////////////////////////////////////////////
-    // ISet<T> implementation
 
     bool ISet<T>.Add(T item)
     {
