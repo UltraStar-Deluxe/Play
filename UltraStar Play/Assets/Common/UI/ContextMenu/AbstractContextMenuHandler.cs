@@ -34,39 +34,10 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
         }
     }
 
-    private GraphicRaycaster graphicRaycaster;
-    private GraphicRaycaster GraphicRaycaster
-    {
-        get
-        {
-            if (graphicRaycaster == null)
-            {
-                graphicRaycaster = Canvas.GetComponent<GraphicRaycaster>();
-            }
-            return graphicRaycaster;
-        }
-    }
-
     protected abstract void FillContextMenu(ContextMenu contextMenu);
 
     public void OnPointerClick(PointerEventData ped)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(RectTransform,
-                                                                     ped.position,
-                                                                     ped.pressEventCamera,
-                                                                     out Vector2 localPoint))
-        {
-            return;
-        }
-
-        // Check that this was clicked, and not another element behind or inside of it.
-        List<RaycastResult> results = new List<RaycastResult>();
-        GraphicRaycaster.Raycast(ped, results);
-        if (results.Count == 0 || results[0].gameObject != gameObject)
-        {
-            return;
-        }
-
         if (ped.button == PointerEventData.InputButton.Right)
         {
             ContextMenu contextMenu = OpenContextMenu();
