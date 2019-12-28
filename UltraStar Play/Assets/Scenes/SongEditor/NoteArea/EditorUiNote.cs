@@ -49,10 +49,8 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData ped)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(RectTransform,
-                                                                     ped.position,
-                                                                     ped.pressEventCamera,
-                                                                     out Vector2 localPoint))
+        // Only listen to left mouse button. Right mouse button is for context menu.
+        if (ped.button != PointerEventData.InputButton.Left)
         {
             return;
         }

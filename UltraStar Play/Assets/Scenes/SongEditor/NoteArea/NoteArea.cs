@@ -57,9 +57,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
-    private GraphicRaycaster graphicRaycaster;
-
     void Start()
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
@@ -283,21 +280,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void OnPointerClick(PointerEventData ped)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
-                                                                     ped.position,
-                                                                     ped.pressEventCamera,
-                                                                     out Vector2 localPoint))
+        // Only listen to left mouse button. Right mouse button is for context menu.
+        if (ped.button != PointerEventData.InputButton.Left)
         {
             return;
         }
 
-        // Check that only the NoteArea was clicked, and not a note inside of it.
-        List<RaycastResult> results = new List<RaycastResult>();
-        graphicRaycaster.Raycast(ped, results);
-        if (results.Count != 1 || results[0].gameObject != gameObject)
-        {
-            return;
-        }
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
+                                                                ped.position,
+                                                                ped.pressEventCamera,
+                                                                out Vector2 localPoint);
 
         float rectWidth = rectTransform.rect.width;
         double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
