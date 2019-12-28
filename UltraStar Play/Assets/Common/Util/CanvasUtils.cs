@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-public class CanvasUtils
+public static class CanvasUtils
 {
     public static Canvas FindCanvas()
     {
