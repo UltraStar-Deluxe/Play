@@ -22,6 +22,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     // The width of the viewport in milliseconds
     public int ViewportWidth { get; private set; }
 
+    public int ViewportWidthInBeats
+    {
+        get
+        {
+            return MaxBeatInViewport - MinBeatInViewport;
+        }
+    }
+
     public int MinBeatInViewport { get; private set; }
     public int MaxBeatInViewport { get; private set; }
 
@@ -297,6 +305,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         // Only listen to left mouse button. Right mouse button is for context menu.
         if (ped.button != PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        // Ignore any drag motion. Dragging is used to select notes.
+        float dragDistance = Vector2.Distance(ped.pressPosition, ped.position);
+        bool isDrag = dragDistance > 5f;
+        if (isDrag)
         {
             return;
         }
