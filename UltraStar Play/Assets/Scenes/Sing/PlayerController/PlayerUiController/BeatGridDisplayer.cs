@@ -17,7 +17,7 @@ public class BeatGridDisplayer : MonoBehaviour
 
         RemoveAllLines();
 
-        CreateLines(sentence.StartBeat, sentence.EndBeat);
+        CreateLines(sentence.MinBeat, sentence.MaxBeat);
     }
 
     private void RemoveAllLines()

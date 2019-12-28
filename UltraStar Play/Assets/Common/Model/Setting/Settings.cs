@@ -11,6 +11,8 @@ public class Settings
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
     public List<MicProfile> MicProfiles { get; set; } = new List<MicProfile>();
 
+    public SongEditorSettings SongEditorSettings { get; set; } = new SongEditorSettings();
+
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
         List<PlayerProfile> result = new List<PlayerProfile>();

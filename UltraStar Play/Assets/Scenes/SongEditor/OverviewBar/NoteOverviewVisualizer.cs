@@ -8,22 +8,16 @@ using UnityEngine.UI;
 
 #pragma warning disable CS0649
 
-[RequireComponent(typeof(RawImage))]
 public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
 {
-    public Color backgroundColor = new Color(0, 0, 0, 0);
-
-    private readonly Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
+    private static readonly Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
                                     Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
 
-    private Color[] blank; // blank image array (background color in every pixel)
-    private Texture2D texture;
+    [InjectedInInspector]
+    public DynamicallyCreatedImage dynImage;
 
-    private RawImage rawImage;
+    [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
-
-    private int textureWidth = 256;
-    private int textureHeight = 256;
 
     [Inject]
     private SongMeta songMeta;
@@ -34,13 +28,6 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();
-        rawImage = GetComponent<RawImage>();
-        CreateTexture();
-    }
-
     void Start()
     {
         int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
@@ -49,7 +36,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
 
     public void DrawVoices(int songDurationInMillis, SongMeta songMeta, List<Voice> voices)
     {
-        ClearTexture();
+        dynImage.ClearTexture();
 
         int voiceIndex = 0;
         foreach (Voice voice in voices)
@@ -58,8 +45,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             DrawVoice(songDurationInMillis, songMeta, voice, color);
         }
 
-        // upload to the graphics card 
-        texture.Apply();
+        dynImage.ApplyTexture();
     }
 
     private void DrawVoice(int songDurationInMillis, SongMeta songMeta, Voice voice, Color color)
@@ -83,29 +69,24 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
             double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
 
-            int yStart = textureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
-            int yLength = textureHeight / midiNoteRange;
-            int xStart = (int)(textureWidth * startMillis / songDurationInMillis);
-            int xEnd = (int)(textureWidth * endMillis / songDurationInMillis);
+            int yStart = dynImage.TextureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
+            int yLength = dynImage.TextureHeight / midiNoteRange;
+            int yEnd = yStart + yLength;
+            int xStart = (int)(dynImage.TextureWidth * startMillis / songDurationInMillis);
+            int xEnd = (int)(dynImage.TextureWidth * endMillis / songDurationInMillis);
             if (xEnd < xStart)
             {
                 Swap(ref xStart, ref xEnd);
             }
 
-            for (int x = xStart; x <= xEnd; x++)
-            {
-                for (int y = yStart; y <= yStart + yLength; y++)
-                {
-                    texture.SetPixel(x, y, color);
-                }
-            }
+            dynImage.DrawRectByCorners(xStart, yStart, xEnd, yEnd, color);
         }
     }
 
     private void DrawAlternatingSentenceBackgrounds(int songDurationInMillis, SongMeta songMeta, Voice voice)
     {
         float f = 0.5f;
-        Color bgColor = backgroundColor;
+        Color bgColor = dynImage.backgroundColor;
         Color darkBgColor = new Color(bgColor.r * f, bgColor.g * f, bgColor.b * f, bgColor.a);
 
         int index = 0;
@@ -114,66 +95,27 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             bool isDark = (index % 2 == 0);
             Color finalColor = (isDark) ? darkBgColor : bgColor;
 
-            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.StartBeat);
-            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.EndBeat);
+            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
+            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
 
-            int xStart = (int)(textureWidth * startMillis / songDurationInMillis);
-            int xEnd = (int)(textureWidth * endMillis / songDurationInMillis);
+            int xStart = (int)(dynImage.TextureWidth * startMillis / songDurationInMillis);
+            int xEnd = (int)(dynImage.TextureWidth * endMillis / songDurationInMillis);
 
             if (xEnd < xStart)
             {
                 Swap(ref xStart, ref xEnd);
             }
 
-            for (int y = 0; y < textureHeight; y++)
-            {
-                for (int x = xStart; x <= xEnd; x++)
-                {
-                    texture.SetPixel(x, y, finalColor);
-                }
-            }
+            dynImage.DrawRectByCorners(xStart, 0, xEnd, dynImage.TextureHeight, finalColor);
 
             index++;
         }
     }
 
-    private void Swap(ref int xStart, ref int xEnd)
+    private void Swap(ref int a, ref int b)
     {
-        int tmp = xStart;
-        xStart = xEnd;
-        xEnd = tmp;
-    }
-
-    private void CreateTexture()
-    {
-        // The size of the RectTransform can be zero in the first frame, when inside a layout group.
-        // See https://forum.unity.com/threads/solved-cant-get-the-rect-width-rect-height-of-an-element-when-using-layouts.377953/
-        if (rectTransform.rect.width != 0)
-        {
-            textureWidth = (int)rectTransform.rect.width;
-        }
-        if (rectTransform.rect.height != 0)
-        {
-            textureHeight = (int)rectTransform.rect.height;
-        }
-
-        // create the texture and assign to the rawImage
-        texture = new Texture2D(textureWidth, textureHeight);
-        rawImage.texture = texture;
-
-        // create a 'blank screen' image 
-        blank = new Color[textureWidth * textureHeight];
-        for (int i = 0; i < blank.Length; i++)
-        {
-            blank[i] = backgroundColor;
-        }
-
-        // reset the texture to the background color
-        ClearTexture();
-    }
-
-    private void ClearTexture()
-    {
-        texture.SetPixels(blank);
+        int tmp = a;
+        a = b;
+        b = tmp;
     }
 }

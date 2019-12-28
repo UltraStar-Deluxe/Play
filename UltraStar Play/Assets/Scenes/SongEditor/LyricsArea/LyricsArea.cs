@@ -66,7 +66,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private string GetLyrics(List<Voice> voices)
     {
         sortedSentences = voices.SelectMany(voice => voice.Sentences).ToList();
-        sortedSentences.Sort((s1, s2) => s1.StartBeat.CompareTo(s2.StartBeat));
+        sortedSentences.Sort((s1, s2) => s1.MinBeat.CompareTo(s2.MinBeat));
         StringBuilder stringBuilder = new StringBuilder();
         foreach (Sentence sentence in sortedSentences)
         {

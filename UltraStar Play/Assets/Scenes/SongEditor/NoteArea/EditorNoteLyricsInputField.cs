@@ -17,7 +17,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
-    private UiEditorNote uiEditorNote;
+    private EditorUiNote uiEditorNote;
 
     private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -40,7 +40,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
     }
 
-    public void Init(UiEditorNote uiEditorNote, string text)
+    public void Init(EditorUiNote uiEditorNote, string text)
     {
         this.uiEditorNote = uiEditorNote;
         Text = text;
@@ -54,9 +54,9 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 
     private void OnEndEdit(string newText)
     {
-        // TODO: Create a mutable song model for the editor and update it
         if (!IsOnlyWhitespace(newText))
         {
+            uiEditorNote.Note.SetText(newText);
             uiEditorNote.SetText(newText);
         }
 
