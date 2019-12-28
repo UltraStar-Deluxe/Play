@@ -2,32 +2,32 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public static class ListExtensions
+public static class CollectionExtensions
 {
 
-    public static string ToCsv<T>(this IEnumerable<T> values, string separator = ",", string prefix = "[", string suffix = "]")
+    public static string ToCsv<T>(this IEnumerable<T> enumerable, string separator = ",", string prefix = "[", string suffix = "]")
     {
-        return prefix + string.Join(separator, values) + suffix;
+        return prefix + string.Join(separator, enumerable) + suffix;
     }
 
-    public static void AddIfNotContains<T>(this ICollection<T> list, T item)
+    public static void AddIfNotContains<T>(this ICollection<T> collection, T item)
     {
-        if (!list.Contains(item))
+        if (!collection.Contains(item))
         {
-            list.Add(item);
+            collection.Add(item);
         }
     }
 
     // Returns true if and only if the given collection is null or does not contain any values.
-    public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
+    public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> collection)
     {
         return (collection == null) || (collection.Count == 0);
     }
 
-    // Returns true if the predicate is true for all elements in the list. Otherwise, returns false.
-    public static bool AllMatch<T>(this ICollection<T> list, Func<T, bool> predicate)
+    // Returns true if the predicate is true for all elements in the enumerable. Otherwise, returns false.
+    public static bool AllMatch<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
     {
-        foreach (T t in list)
+        foreach (T t in enumerable)
         {
             if (!predicate(t))
             {
@@ -37,10 +37,10 @@ public static class ListExtensions
         return true;
     }
 
-    // Returns true if the predicate is true for any element in the list. Otherwise, returns false.
-    public static bool AnyMatch<T>(this ICollection<T> list, Func<T, bool> predicate)
+    // Returns true if the predicate is true for any element in the enumerable. Otherwise, returns false.
+    public static bool AnyMatch<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
     {
-        foreach (T t in list)
+        foreach (T t in enumerable)
         {
             if (predicate(t))
             {
@@ -107,18 +107,18 @@ public static class ListExtensions
     // Returns the elements of the list that are before the given element.
     // Thereby, the given element is included in the result list if inclusive is true.
     // If the given element is not in the list, then an empty list is returned.
-    public static List<T> GetElementsBefore<T>(this IEnumerable<T> list, T element, bool inclusive)
+    public static List<T> GetElementsBefore<T>(this IEnumerable<T> enumerable, T element, bool inclusive)
     {
         List<T> result = new List<T>();
 
-        int indexOfElement = list.IndexOf(element);
+        int indexOfElement = enumerable.IndexOf(element);
         if (indexOfElement < 0)
         {
             return result;
         }
 
         int index = 0;
-        foreach (T elem in list)
+        foreach (T elem in enumerable)
         {
             if (index == indexOfElement)
             {
@@ -134,15 +134,15 @@ public static class ListExtensions
         return result;
     }
 
-    public static int IndexOf<T>(this IEnumerable<T> collection, T element)
+    public static int IndexOf<T>(this IEnumerable<T> enumerable, T element)
     {
-        if (collection is IList)
+        if (enumerable is IList)
         {
-            return (collection as IList).IndexOf(element);
+            return (enumerable as IList).IndexOf(element);
         }
 
         int index = 0;
-        foreach (T elem in collection)
+        foreach (T elem in enumerable)
         {
             if (object.Equals(elem, element))
             {
