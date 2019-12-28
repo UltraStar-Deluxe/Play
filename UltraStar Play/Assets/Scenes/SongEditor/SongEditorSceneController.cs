@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UniInject;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SongEditorSceneController : MonoBehaviour, IBinder
 {
@@ -31,7 +32,16 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public NoteArea noteArea;
 
     [InjectedInInspector]
+    public NoteAreaDragHandler noteAreaDragHandler;
+
+    [InjectedInInspector]
     public MicrophonePitchTracker microphonePitchTracker;
+
+    [InjectedInInspector]
+    public Canvas canvas;
+
+    [InjectedInInspector]
+    public GraphicRaycaster graphicRaycaster;
 
     private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
 
@@ -81,9 +91,12 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
+        bb.BindExistingInstance(noteAreaDragHandler);
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(microphonePitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(canvas);
+        bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(this);
 
         List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
