@@ -2,7 +2,7 @@
 {
     Properties
     {
-        [NoScaleOffset] _MainTex ("Texture", 2D) = "white" {}
+        [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         
         // The following six unused properties are required when a shader
         // is used in the UI system. Otherwise there will be a warning.
@@ -17,9 +17,11 @@
     }
     SubShader
     {
-        Tags { "Queue"="AlphaTest" "RenderType"="TransparentCutout" "IgnoreProjector"="True" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "PreviewType"="Plane" "IgnoreProjector"="True" }
         Blend One OneMinusSrcAlpha
         ZWrite Off
+        ZTest [unity_GUIZTestMode]
+        Cull Off
         
         Pass
         {
