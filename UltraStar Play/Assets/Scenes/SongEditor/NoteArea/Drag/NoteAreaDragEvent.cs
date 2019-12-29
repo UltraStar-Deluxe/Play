@@ -17,7 +17,7 @@ public class NoteAreaDragEvent
     public int MillisDistance { get; private set; }
 
     public int PositionInSongInBeatsDragStart { get; private set; }
-    public int BeatsDistance { get; private set; }
+    public int BeatDistance { get; private set; }
 
     public List<RaycastResult> RaycastResultsDragStart { get; private set; }
 
@@ -25,7 +25,7 @@ public class NoteAreaDragEvent
         float xDistanceInPixels, float yDistanceInPixels,
         int midiNoteDragStart, int midiNoteDistance,
         int positionInSongInMillisDragStart, int millisDistance,
-        int positionInSongInBeatsDragStart, int beatsDistance,
+        int positionInSongInBeatsDragStart, int beatDistance,
         List<RaycastResult> raycastResultsDragStart)
     {
         XDragStartInPixels = xDragStartInPixels;
@@ -37,7 +37,7 @@ public class NoteAreaDragEvent
         PositionInSongInMillisDragStart = positionInSongInMillisDragStart;
         MillisDistance = millisDistance;
         PositionInSongInBeatsDragStart = positionInSongInBeatsDragStart;
-        BeatsDistance = beatsDistance;
+        BeatDistance = beatDistance;
         RaycastResultsDragStart = raycastResultsDragStart;
     }
 }

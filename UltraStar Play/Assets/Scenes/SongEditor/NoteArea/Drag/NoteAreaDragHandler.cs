@@ -141,13 +141,13 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
         int millisDistance = (int)(noteArea.ViewportX + xPercent * noteArea.ViewportWidth) - positionInSongInMillisDragStart;
 
         int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
-        int beatsDistance = (int)(noteArea.MinBeatInViewport + xPercent * noteArea.ViewportWidthInBeats) - positionInSongInBeatsDragStart;
+        int beatDistance = (int)(noteArea.MinBeatInViewport + xPercent * noteArea.ViewportWidthInBeats) - positionInSongInBeatsDragStart;
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(xDragStartInPixels, yDragStartInPixels,
             xDistanceInPixels, yDistanceInPixels,
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
-            positionInSongInBeatsDragStart, beatsDistance,
+            positionInSongInBeatsDragStart, beatDistance,
             raycastResults);
         return result;
     }
@@ -178,13 +178,13 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
         int millisDistance = 0;
 
         int positionInSongInBeatsDragStart = (int)(noteArea.MinBeatInViewport + xPercent * noteArea.ViewportWidthInBeats);
-        int beatsDistance = 0;
+        int beatDistance = 0;
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(xDragStartInPixels, yDragStartInPixels,
             xDistanceInPixels, yDistanceInPixels,
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
-            positionInSongInBeatsDragStart, beatsDistance,
+            positionInSongInBeatsDragStart, beatDistance,
             raycastResults);
         return result;
     }

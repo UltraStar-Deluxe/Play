@@ -26,6 +26,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public SongEditorNoteRecorder songEditorNoteRecorder;
 
     [InjectedInInspector]
+    public SongEditorSelectionController selectionController;
+
+    [InjectedInInspector]
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     [InjectedInInspector]
@@ -95,6 +98,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(microphonePitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(selectionController);
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(this);

@@ -15,6 +15,12 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
     [InjectedInInspector]
     public RectTransform selectionFrame;
 
+    [InjectedInInspector]
+    public RectTransform noteContainer;
+
+    [Inject]
+    private SongEditorSelectionController selectionController;
+
     [Inject]
     private NoteArea noteArea;
 
@@ -42,6 +48,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
     public void OnDrag(NoteAreaDragEvent dragEvent)
     {
         UpdateSelectionFrame(dragEvent);
+        UpdateSelection(dragEvent);
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
@@ -58,6 +65,46 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
     public bool IsCanceled()
     {
         return isCanceled;
+    }
+
+    private void UpdateSelection(NoteAreaDragEvent dragEvent)
+    {
+        List<EditorUiNote> selectedUiNotes = new List<EditorUiNote>();
+        foreach (Transform child in noteContainer.transform)
+        {
+            EditorUiNote uiNote = child.GetComponent<EditorUiNote>();
+            if (uiNote != null && IsInSelectionFrame(uiNote, dragEvent))
+            {
+                selectedUiNotes.Add(uiNote);
+            }
+        }
+        selectionController.SetSelection(selectedUiNotes);
+    }
+
+    private bool IsInSelectionFrame(EditorUiNote uiNote, NoteAreaDragEvent dragEvent)
+    {
+        Note note = uiNote.Note;
+        if (note == null)
+        {
+            return false;
+        }
+
+        int startMidiNote = dragEvent.MidiNoteDragStart;
+        int endMidiNote = dragEvent.MidiNoteDragStart + dragEvent.MidiNoteDistance;
+        if (startMidiNote > endMidiNote)
+        {
+            ObjectUtils.Swap(ref startMidiNote, ref endMidiNote);
+        }
+
+        int startBeat = dragEvent.PositionInSongInBeatsDragStart;
+        int endBeat = dragEvent.PositionInSongInBeatsDragStart + dragEvent.BeatDistance;
+        if (startBeat > endBeat)
+        {
+            ObjectUtils.Swap(ref startBeat, ref endBeat);
+        }
+
+        return (startBeat <= note.StartBeat && note.EndBeat <= endBeat)
+            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote);
     }
 
     private void UpdateSelectionFrame(NoteAreaDragEvent dragEvent)
