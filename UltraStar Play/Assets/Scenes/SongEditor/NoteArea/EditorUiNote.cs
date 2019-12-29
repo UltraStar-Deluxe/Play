@@ -21,6 +21,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     [InjectedInInspector]
     public Image backgroundImage;
 
+    [InjectedInInspector]
+    public RectTransform selectionIndicator;
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
@@ -36,6 +39,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongEditorSelectionController selectionController;
+
     private EditorNoteLyricsInputField activeLyricsInputField;
 
     public Note Note { get; private set; }
@@ -45,6 +51,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
         this.Note = note;
         SetText(note.Text);
         goldenNoteImageOverlay.gameObject.SetActive(note.IsGolden);
+
+        bool isSelected = selectionController.IsSelected(note);
+        SetSelected(isSelected);
     }
 
     public void OnPointerClick(PointerEventData ped)
@@ -82,6 +91,11 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     public void SetColor(Color color)
     {
         backgroundImage.color = color;
+    }
+
+    public void SetSelected(bool isSelected)
+    {
+        selectionIndicator.gameObject.SetActive(isSelected);
     }
 
     private void StartEditingNoteText()
