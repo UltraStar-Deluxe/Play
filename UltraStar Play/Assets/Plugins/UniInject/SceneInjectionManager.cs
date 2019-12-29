@@ -9,7 +9,7 @@ namespace UniInject
     public class SceneInjectionManager : MonoBehaviour
     {
         private readonly List<IBinder> binders = new List<IBinder>();
-        private readonly List<object> scriptsThatNeedInjection = new List<object>();
+        private readonly List<UnityEngine.Object> scriptsThatNeedInjection = new List<UnityEngine.Object>();
 
         private readonly List<ISceneInjectionFinishedListener> sceneInjectionFinishedListeners = new List<ISceneInjectionFinishedListener>();
 
@@ -94,9 +94,17 @@ namespace UniInject
         {
             Stopwatch stopwatch = CreateAndStartStopwatch();
 
-            foreach (object script in scriptsThatNeedInjection)
+            foreach (UnityEngine.Object script in scriptsThatNeedInjection)
             {
-                sceneInjector.Inject(script);
+                try
+                {
+                    sceneInjector.Inject(script);
+                }
+                catch (InjectionException e)
+                {
+                    UnityEngine.Debug.LogException(e, script);
+                    // Continue injection of other scripts.
+                }
             }
 
             StopAndLogTime(stopwatch, $"SceneInjectionManager - Injecting scripts took {stopwatch.ElapsedMilliseconds} ms");
