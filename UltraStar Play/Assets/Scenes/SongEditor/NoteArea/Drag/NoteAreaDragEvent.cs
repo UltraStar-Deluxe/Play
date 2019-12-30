@@ -10,6 +10,8 @@ public class NoteAreaDragEvent
     public float YDistanceInPixels { get; private set; }
     public float XDistanceInPixels { get; private set; }
 
+    public Vector2 DragStartPositionInPixels { get; private set; }
+
     public int MidiNoteDragStart { get; private set; }
     public int MidiNoteDistance { get; private set; }
 
@@ -39,5 +41,7 @@ public class NoteAreaDragEvent
         PositionInSongInBeatsDragStart = positionInSongInBeatsDragStart;
         BeatDistance = beatDistance;
         RaycastResultsDragStart = raycastResultsDragStart;
+
+        DragStartPositionInPixels = new Vector2(xDragStartInPixels, yDragStartInPixels);
     }
 }

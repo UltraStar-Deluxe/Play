@@ -56,8 +56,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         noteArea.ViewportEventStream.Subscribe(_ =>
         {
-            UpdateNotes();
-            UpdateSentences();
+            UpdateNotesAndSentences();
         });
 
         foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
@@ -68,7 +67,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateSentences()
+    public void UpdateNotesAndSentences()
+    {
+        UpdateNotes();
+        UpdateSentences();
+    }
+
+    public void UpdateSentences()
     {
         if (!gameObject.activeInHierarchy)
         {
@@ -103,7 +108,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceLinesImage.ApplyTexture();
     }
 
-    private void UpdateNotes()
+    public void UpdateNotes()
     {
         if (!gameObject.activeInHierarchy)
         {
