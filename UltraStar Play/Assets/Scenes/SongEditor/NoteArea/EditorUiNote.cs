@@ -10,8 +10,10 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
-public class EditorUiNote : MonoBehaviour, IPointerClickHandler
+public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
+    public static readonly double handleWidthInPercent = 0.25;
+
     [InjectedInInspector]
     public EditorNoteLyricsInputField lyricsInputFieldPrefab;
 
@@ -23,6 +25,12 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
     [InjectedInInspector]
     public RectTransform selectionIndicator;
+
+    [InjectedInInspector]
+    public RectTransform rightHandle;
+
+    [InjectedInInspector]
+    public RectTransform leftHandle;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
@@ -42,7 +50,15 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     [Inject]
     private SongEditorSelectionController selectionController;
 
+    [Inject]
+    private CursorManager cursorManager;
+
     private EditorNoteLyricsInputField activeLyricsInputField;
+
+    private bool isPointerOver;
+    private bool isPointerOverRightHandle;
+    private bool isPointerOverLeftHandle;
+    private bool isPointerOverCenter;
 
     public Note Note { get; private set; }
 
@@ -54,6 +70,85 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
         bool isSelected = selectionController.IsSelected(note);
         SetSelected(isSelected);
+    }
+
+    void Start()
+    {
+        UpdateHandles();
+    }
+
+    void Update()
+    {
+        if (isPointerOver)
+        {
+            OnPointerOver();
+        }
+
+        if (IsKeyDownOrUp(KeyCode.LeftControl) || IsKeyDownOrUp(KeyCode.LeftAlt) || IsKeyDownOrUp(KeyCode.LeftShift))
+        {
+            UpdateHandles();
+        }
+    }
+
+    private bool IsKeyDownOrUp(KeyCode keyCode)
+    {
+        return Input.GetKeyDown(keyCode) || Input.GetKeyUp(keyCode);
+    }
+
+    private void OnPointerOver()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        Vector2 localPoint = RectTransform.InverseTransformPoint(mousePosition);
+        float width = RectTransform.rect.width;
+        double xPercent = (localPoint.x + (width / 2)) / width;
+        if (xPercent < handleWidthInPercent)
+        {
+            OnPointerOverLeftHandle();
+        }
+        else if (xPercent > (1 - handleWidthInPercent))
+        {
+            OnPointerOverRightHandle();
+        }
+        else
+        {
+            OnPointerOverCenter();
+        }
+        UpdateHandles();
+    }
+
+    private void OnPointerOverCenter()
+    {
+        isPointerOverCenter = true;
+        isPointerOverLeftHandle = false;
+        isPointerOverRightHandle = false;
+        cursorManager.SetCursorGrab();
+    }
+
+    private void OnPointerOverRightHandle()
+    {
+        isPointerOverCenter = false;
+        isPointerOverLeftHandle = false;
+        isPointerOverRightHandle = true;
+        cursorManager.SetCursorHorizontal();
+    }
+
+    private void OnPointerOverLeftHandle()
+    {
+        isPointerOverCenter = false;
+        isPointerOverLeftHandle = true;
+        isPointerOverRightHandle = false;
+        cursorManager.SetCursorHorizontal();
+    }
+
+    private void UpdateHandles()
+    {
+        bool isSelected = (selectionController != null) && selectionController.IsSelected(Note);
+        bool isLeftHandleVisible = isPointerOverLeftHandle
+            || (isSelected && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift)));
+        bool isRightHandleVisible = isPointerOverRightHandle
+            || (isSelected && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftShift)));
+        leftHandle.gameObject.SetActive(isLeftHandleVisible);
+        rightHandle.gameObject.SetActive(isRightHandleVisible);
     }
 
     public void OnPointerClick(PointerEventData ped)
@@ -131,5 +226,20 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
         activeLyricsInputField = Instantiate(lyricsInputFieldPrefab, transform);
         injector.Inject(activeLyricsInputField);
         activeLyricsInputField.Init(this, Note.Text);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        isPointerOver = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isPointerOver = false;
+        isPointerOverCenter = false;
+        isPointerOverLeftHandle = false;
+        isPointerOverRightHandle = false;
+        UpdateHandles();
+        cursorManager.SetDefaultCursor();
     }
 }
