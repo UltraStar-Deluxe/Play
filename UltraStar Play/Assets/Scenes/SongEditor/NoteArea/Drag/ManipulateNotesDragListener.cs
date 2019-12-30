@@ -22,7 +22,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private NoteAreaDragHandler noteAreaDragHandler;
 
     [Inject]
-    private EditorNoteDisplayer editorNoteDisplayer;
+    SongEditorSceneController songEditorSceneController;
 
     private Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
     private bool isCanceled;
@@ -91,7 +91,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
                 StretchNotesRight(dragEvent);
                 break;
         }
-        editorNoteDisplayer.UpdateNotesAndSentences();
+        songEditorSceneController.OnNotesChanged();
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
@@ -113,7 +113,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
             }
         }
         noteToSnapshotOfNoteMap.Clear();
-        editorNoteDisplayer.UpdateNotesAndSentences();
+        songEditorSceneController.OnNotesChanged();
     }
 
     public bool IsCanceled()
