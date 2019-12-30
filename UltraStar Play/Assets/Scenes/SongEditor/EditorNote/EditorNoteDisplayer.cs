@@ -21,7 +21,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public DynamicallyCreatedImage sentenceLinesImage;
 
     [InjectedInInspector]
-    public SentenceMarkerRectangle sentenceMarkerRectanglePrefab;
+    public EditorUiSentence sentenceMarkerRectanglePrefab;
+
     [InjectedInInspector]
     public RectTransform sentenceMarkerRectangleContainer;
 
@@ -51,8 +52,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         noteContainer.DestroyAllDirectChildren();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        sortedSentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
-        sortedSentencesOfAllVoices.Sort(Sentence.comparerByStartBeat);
+        ReloadSentences();
 
         noteArea.ViewportEventStream.Subscribe(_ =>
         {
@@ -65,6 +65,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
                 .Subscribe(_ => UpdateNotes());
         }
+    }
+
+    public void ReloadSentences()
+    {
+        sortedSentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        sortedSentencesOfAllVoices.Sort(Sentence.comparerByStartBeat);
     }
 
     public void UpdateNotesAndSentences()
@@ -100,7 +106,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 }
 
                 string label = (sentenceIndex + 1).ToString();
-                CreateSentenceMarkerRectangle(startBeat, endBeat, label);
+                CreateUiSentence(sentence, startBeat, endBeat, label);
             }
             sentenceIndex++;
         }
@@ -189,10 +195,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CreateSentenceMarkerRectangle(int startBeat, int endBeat, string label)
+    private void CreateUiSentence(Sentence sentence, int startBeat, int endBeat, string label)
     {
-        SentenceMarkerRectangle sentenceMarkerRectangle = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
-        RectTransform rectTransform = sentenceMarkerRectangle.GetComponent<RectTransform>();
+        EditorUiSentence uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
+        RectTransform rectTransform = uiSentence.GetComponent<RectTransform>();
+
+        injector.Inject(uiSentence);
+        injector.Inject(uiSentence.GetComponent<EditorSentenceContextMenuHandler>());
+        uiSentence.Init(sentence);
 
         float xStart = (float)noteArea.GetHorizontalPositionForBeat(startBeat);
         float xEnd = (float)noteArea.GetHorizontalPositionForBeat(endBeat);
@@ -202,7 +212,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = Vector2.zero;
 
-        sentenceMarkerRectangle.GetComponentInChildren<Text>().text = label;
+        uiSentence.GetComponentInChildren<Text>().text = label;
     }
 
     private void CreateSentenceMarkerLine(int beat, Color color, int yDashOffset)

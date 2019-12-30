@@ -37,6 +37,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             songEditorSceneController.TogglePlayPause();
         }
 
+        if (Input.GetKeyUp(KeyCode.Delete))
+        {
+            List<Note> selectedNotes = selectionController.GetSelectedNotes();
+            songEditorSceneController.DeleteNotes(selectedNotes);
+        }
+
         // Move and stretch notes
         Vector2 arrowKeyDirection = GetArrowKeyDirection();
         if (arrowKeyDirection != Vector2.zero)

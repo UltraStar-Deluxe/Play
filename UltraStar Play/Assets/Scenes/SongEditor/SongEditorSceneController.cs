@@ -140,6 +140,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public void OnNotesChanged()
     {
         // TODO: Create history for undo/redo
+        editorNoteDisplayer.ReloadSentences();
         editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
@@ -148,6 +149,21 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         note.SetSentence(null);
         songEditorLayerManager.RemoveNoteFromAllLayers(note);
         editorNoteDisplayer.DeleteNote(note);
+    }
+
+    public void DeleteNotes(IReadOnlyCollection<Note> notes)
+    {
+        foreach (Note note in new List<Note>(notes))
+        {
+            DeleteNote(note);
+        }
+    }
+
+    public void DeleteSentence(Sentence sentence)
+    {
+        DeleteNotes(sentence.Notes);
+        sentence.SetVoice(null);
+        editorNoteDisplayer.ReloadSentences();
     }
 
     public void TogglePlayPause()

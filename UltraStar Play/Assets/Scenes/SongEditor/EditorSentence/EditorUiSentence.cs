@@ -10,6 +10,12 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SentenceMarkerRectangle : MonoBehaviour, INeedInjection
+public class EditorUiSentence : MonoBehaviour, INeedInjection
 {
+    public Sentence Sentence { get; private set; }
+
+    public void Init(Sentence sentence)
+    {
+        this.Sentence = sentence;
+    }
 }
