@@ -120,6 +120,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         DrawNotesInLayers();
     }
 
+    public void DeleteNote(Note note)
+    {
+        if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))
+        {
+            Destroy(uiNote.gameObject);
+            noteToEditorUiNoteMap.Remove(note);
+        }
+    }
+
     private void DestroyUiNotesOutsideOfViewport()
     {
         ICollection<EditorUiNote> editorUiNotes = new List<EditorUiNote>(noteToEditorUiNoteMap.Values);
@@ -223,6 +232,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         {
             editorUiNote = Instantiate(notePrefab, noteContainer);
             injector.Inject(editorUiNote);
+            injector.Inject(editorUiNote.GetComponent<EditorNoteContextMenuHandler>());
             editorUiNote.Init(note);
 
             noteToEditorUiNoteMap.Add(note, editorUiNote);

@@ -62,4 +62,12 @@ public class SongEditorLayerManager
         }
         return notes;
     }
+
+    public void RemoveNoteFromAllLayers(Note note)
+    {
+        foreach (SongEditorLayer layer in layerKeyToLayerMap.Values)
+        {
+            layer.RemoveNote(note);
+        }
+    }
 }

@@ -29,6 +29,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public SongEditorSelectionController selectionController;
 
     [InjectedInInspector]
+    public RectTransform uiNoteContainer;
+
+    [InjectedInInspector]
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     [InjectedInInspector]
@@ -132,6 +135,19 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
                 audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(songAudioPlayer.AudioClip);
             }
         }
+    }
+
+    public void OnNotesChanged()
+    {
+        // TODO: Create history for undo/redo
+        editorNoteDisplayer.UpdateNotesAndSentences();
+    }
+
+    public void DeleteNote(Note note)
+    {
+        note.SetSentence(null);
+        songEditorLayerManager.RemoveNoteFromAllLayers(note);
+        editorNoteDisplayer.DeleteNote(note);
     }
 
     public void TogglePlayPause()
