@@ -14,6 +14,8 @@ TagManager:
   - SettingsManager
   - EventSystem
   - UiManager
+  - Canvas
+  - ContextMenuManager
   layers:
   - Default
   - TransparentFX
