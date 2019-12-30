@@ -29,12 +29,28 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
     public void ClearSelection()
     {
-        EditorUiNote[] selectedUiNotes = uiNoteContainer.GetComponentsInChildren<EditorUiNote>();
-        foreach (EditorUiNote uiNote in selectedUiNotes)
+        EditorUiNote[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorUiNote>();
+        foreach (EditorUiNote uiNote in uiNotes)
         {
             uiNote.SetSelected(false);
         }
         selectedNotes.Clear();
+    }
+
+    public void AddToSelection(List<EditorUiNote> uiNotes)
+    {
+        foreach (EditorUiNote uiNote in uiNotes)
+        {
+            AddToSelection(uiNote);
+        }
+    }
+
+    public void RemoveFromSelection(List<EditorUiNote> uiNotes)
+    {
+        foreach (EditorUiNote uiNote in uiNotes)
+        {
+            RemoveFromSelection(uiNote);
+        }
     }
 
     public void SetSelection(List<EditorUiNote> uiNotes)
@@ -46,9 +62,15 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         }
     }
 
-    private void AddToSelection(EditorUiNote uiNote)
+    public void AddToSelection(EditorUiNote uiNote)
     {
         uiNote.SetSelected(true);
         selectedNotes.Add(uiNote.Note);
+    }
+
+    public void RemoveFromSelection(EditorUiNote uiNote)
+    {
+        uiNote.SetSelected(false);
+        selectedNotes.Remove(uiNote.Note);
     }
 }

@@ -78,7 +78,23 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
                 selectedUiNotes.Add(uiNote);
             }
         }
-        selectionController.SetSelection(selectedUiNotes);
+
+        // Add to selection via Shift. Remove from selection via Ctrl+Shift. Without modifier, set selection.
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                selectionController.RemoveFromSelection(selectedUiNotes);
+            }
+            else
+            {
+                selectionController.AddToSelection(selectedUiNotes);
+            }
+        }
+        else
+        {
+            selectionController.SetSelection(selectedUiNotes);
+        }
     }
 
     private bool IsInSelectionFrame(EditorUiNote uiNote, NoteAreaDragEvent dragEvent)

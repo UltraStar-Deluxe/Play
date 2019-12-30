@@ -58,6 +58,14 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData ped)
     {
+        // Ignore any drag motion. Dragging is used to select notes.
+        float dragDistance = Vector2.Distance(ped.pressPosition, ped.position);
+        bool isDrag = dragDistance > 5f;
+        if (isDrag)
+        {
+            return;
+        }
+
         // Only listen to left mouse button. Right mouse button is for context menu.
         if (ped.button != PointerEventData.InputButton.Left)
         {
@@ -66,9 +74,24 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
         if (ped.clickCount == 1)
         {
-            // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            // Select / deselect notes via Shift.
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                if (selectionController.IsSelected(Note))
+                {
+                    selectionController.RemoveFromSelection(this);
+                }
+                else
+                {
+                    selectionController.AddToSelection(this);
+                }
+            }
+            else
+            {
+                // Move the playback position to the start of the note
+                double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+                songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            }
         }
         else if (ped.clickCount == 2)
         {
