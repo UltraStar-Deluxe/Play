@@ -55,10 +55,10 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     private EditorNoteLyricsInputField activeLyricsInputField;
 
-    private bool isPointerOver;
-    private bool isPointerOverRightHandle;
-    private bool isPointerOverLeftHandle;
-    private bool isPointerOverCenter;
+    public bool IsPointerOver { get; private set; }
+    public bool IsPointerOverRightHandle { get; private set; }
+    public bool IsPointerOverLeftHandle { get; private set; }
+    public bool IsPointerOverCenter { get; private set; }
 
     public Note Note { get; private set; }
 
@@ -79,7 +79,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     void Update()
     {
-        if (isPointerOver)
+        if (IsPointerOver)
         {
             OnPointerOver();
         }
@@ -118,37 +118,53 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     private void OnPointerOverCenter()
     {
-        isPointerOverCenter = true;
-        isPointerOverLeftHandle = false;
-        isPointerOverRightHandle = false;
+        IsPointerOverCenter = true;
+        IsPointerOverLeftHandle = false;
+        IsPointerOverRightHandle = false;
         cursorManager.SetCursorGrab();
     }
 
     private void OnPointerOverRightHandle()
     {
-        isPointerOverCenter = false;
-        isPointerOverLeftHandle = false;
-        isPointerOverRightHandle = true;
+        IsPointerOverCenter = false;
+        IsPointerOverLeftHandle = false;
+        IsPointerOverRightHandle = true;
         cursorManager.SetCursorHorizontal();
     }
 
     private void OnPointerOverLeftHandle()
     {
-        isPointerOverCenter = false;
-        isPointerOverLeftHandle = true;
-        isPointerOverRightHandle = false;
+        IsPointerOverCenter = false;
+        IsPointerOverLeftHandle = true;
+        IsPointerOverRightHandle = false;
         cursorManager.SetCursorHorizontal();
     }
 
     private void UpdateHandles()
     {
         bool isSelected = (selectionController != null) && selectionController.IsSelected(Note);
-        bool isLeftHandleVisible = isPointerOverLeftHandle
+        bool isLeftHandleVisible = IsPointerOverLeftHandle
             || (isSelected && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift)));
-        bool isRightHandleVisible = isPointerOverRightHandle
+        bool isRightHandleVisible = IsPointerOverRightHandle
             || (isSelected && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftShift)));
         leftHandle.gameObject.SetActive(isLeftHandleVisible);
         rightHandle.gameObject.SetActive(isRightHandleVisible);
+    }
+
+    public bool IsPositionOverLeftHandle(Vector2 position)
+    {
+        Vector2 localPoint = RectTransform.InverseTransformPoint(position);
+        float width = RectTransform.rect.width;
+        double xPercent = (localPoint.x + (width / 2)) / width;
+        return (xPercent < handleWidthInPercent);
+    }
+
+    public bool IsPositionOverRightHandle(Vector2 position)
+    {
+        Vector2 localPoint = RectTransform.InverseTransformPoint(position);
+        float width = RectTransform.rect.width;
+        double xPercent = (localPoint.x + (width / 2)) / width;
+        return (xPercent > (1 - handleWidthInPercent));
     }
 
     public void OnPointerClick(PointerEventData ped)
@@ -230,15 +246,15 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        isPointerOver = true;
+        IsPointerOver = true;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        isPointerOver = false;
-        isPointerOverCenter = false;
-        isPointerOverLeftHandle = false;
-        isPointerOverRightHandle = false;
+        IsPointerOver = false;
+        IsPointerOverCenter = false;
+        IsPointerOverLeftHandle = false;
+        IsPointerOverRightHandle = false;
         UpdateHandles();
         cursorManager.SetDefaultCursor();
     }

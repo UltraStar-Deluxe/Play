@@ -49,6 +49,27 @@ public class Note
         EndBeat = StartBeat + Length;
     }
 
+    public Note Clone()
+    {
+        Note clone = new Note();
+        clone.CopyValues(this);
+        return clone;
+    }
+
+    public void CopyValues(Note other)
+    {
+        sentence = other.sentence;
+        Type = other.Type;
+        StartBeat = other.StartBeat;
+        EndBeat = other.EndBeat;
+        Length = other.Length;
+        TxtPitch = other.TxtPitch;
+        MidiNote = other.MidiNote;
+        IsNormal = other.IsNormal;
+        IsGolden = other.IsGolden;
+        IsFreestyle = other.IsFreestyle;
+    }
+
     public void SetSentence(Sentence sentence)
     {
         if (this.sentence == sentence)
@@ -164,5 +185,16 @@ public class Note
 
             return x.StartBeat.CompareTo(y.StartBeat);
         }
+    }
+
+    public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)
+    {
+        if (newStartBeat > newEndBeat)
+        {
+            throw new UnityException("StartBeat cannot be greater than EndBeat");
+        }
+        StartBeat = newStartBeat;
+        EndBeat = newEndBeat;
+        Length = EndBeat - StartBeat;
     }
 }

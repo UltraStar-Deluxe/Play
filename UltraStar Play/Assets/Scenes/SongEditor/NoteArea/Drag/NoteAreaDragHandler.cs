@@ -160,7 +160,9 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
         float yDistanceInPixels = 0;
 
         List<RaycastResult> raycastResults = new List<RaycastResult>();
-        graphicRaycaster.Raycast(eventData, raycastResults);
+        PointerEventData eventDataForRaycast = new PointerEventData(EventSystem.current);
+        eventDataForRaycast.position = eventData.pressPosition;
+        graphicRaycaster.Raycast(eventDataForRaycast, raycastResults);
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(noteAreaRectTransform,
                                                                 eventData.pressPosition,
