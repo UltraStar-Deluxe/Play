@@ -48,6 +48,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
@@ -56,9 +59,6 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             return viewportEventStream;
         }
     }
-
-    [Inject(searchMethod = SearchMethods.GetComponent)]
-    private GraphicRaycaster graphicRaycaster;
 
     void Start()
     {
@@ -72,12 +72,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
-        FitViewportToVoices();
+        FitViewportVerticalToNotes();
     }
 
-    private void FitViewportToVoices()
+    public void FitViewportVerticalToNotes()
     {
-        List<Note> notes = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        List<Note> notesInVoices = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notes = new List<Note>();
+        notes.AddRange(notesInLayers);
+        notes.AddRange(notesInVoices);
         int minMidiNoteInSong = notes.Select(note => note.MidiNote).Min();
         int maxMidiNoteInSong = notes.Select(note => note.MidiNote).Max();
         if (minMidiNoteInSong > 0 && maxMidiNoteInSong > 0)
@@ -85,6 +89,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             SetViewportY(minMidiNoteInSong - 1);
             SetViewportHeight(maxMidiNoteInSong - minMidiNoteInSong + 1);
         }
+    }
+
+    public void FitViewportHorizontalToSentence(Sentence currentSentence)
+    {
+        double minPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, currentSentence.MinBeat);
+        double maxPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, currentSentence.MaxBeat);
+        SetViewportX((int)Math.Floor(minPositionInMillis));
+        SetViewportWidth((int)Math.Ceiling(maxPositionInMillis - minPositionInMillis));
     }
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
@@ -283,21 +295,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void OnPointerClick(PointerEventData ped)
     {
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
-                                                                     ped.position,
-                                                                     ped.pressEventCamera,
-                                                                     out Vector2 localPoint))
+        // Only listen to left mouse button. Right mouse button is for context menu.
+        if (ped.button != PointerEventData.InputButton.Left)
         {
             return;
         }
 
-        // Check that only the NoteArea was clicked, and not a note inside of it.
-        List<RaycastResult> results = new List<RaycastResult>();
-        graphicRaycaster.Raycast(ped, results);
-        if (results.Count != 1 || results[0].gameObject != gameObject)
-        {
-            return;
-        }
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
+                                                                ped.position,
+                                                                ped.pressEventCamera,
+                                                                out Vector2 localPoint);
 
         float rectWidth = rectTransform.rect.width;
         double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
