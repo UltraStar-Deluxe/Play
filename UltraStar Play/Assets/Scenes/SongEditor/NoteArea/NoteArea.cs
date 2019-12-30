@@ -183,6 +183,29 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         SetViewportX(newViewportX);
     }
 
+    public int GetHorizontalMousePositionInMillis()
+    {
+        Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
+        float width = rectTransform.rect.width;
+        double xPercent = (mouseLocalPosition.x + (width / 2)) / width;
+        return ViewportX + (int)(xPercent * ViewportWidth);
+    }
+
+    public double GetHorizontalMousePositionInBeats()
+    {
+        int millis = GetHorizontalMousePositionInMillis();
+        double beat = BpmUtils.MillisecondInSongToBeat(songMeta, millis);
+        return beat;
+    }
+
+    public int GetVerticalMousePositionInMidiNote()
+    {
+        Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
+        float height = rectTransform.rect.height;
+        double yPercent = (mouseLocalPosition.y + (height / 2)) / height;
+        return ViewportY + (int)Math.Round(yPercent * ViewportHeight);
+    }
+
     public void ZoomHorizontal(int direction)
     {
         double viewportChangeInPercent = 0.25;

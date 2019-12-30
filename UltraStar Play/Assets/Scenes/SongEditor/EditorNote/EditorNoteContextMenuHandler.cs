@@ -19,9 +19,6 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     [Inject]
     SongEditorSelectionController selectionController;
 
-    [Inject]
-    SongEditorLayerManager layerManager;
-
     private EditorUiNote uiNote;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
@@ -37,6 +34,8 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
         contextMenu.AddItem("Split Notes", () => OnSplitNotes());
         contextMenu.AddItem("Merge Notes", () => OnMergeNotes());
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Delete", () => OnDelete());
     }
 
     private void OnSplitNotes()
@@ -79,5 +78,15 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
             songEditorSceneController.DeleteNote(note);
         }
         songEditorSceneController.OnNotesChanged();
+    }
+
+    private void OnDelete()
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        foreach (Note note in selectedNotes)
+        {
+            songEditorSceneController.DeleteNote(note);
+            songEditorSceneController.OnNotesChanged();
+        }
     }
 }

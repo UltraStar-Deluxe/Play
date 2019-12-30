@@ -52,6 +52,12 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
+    public void UpdateMinAndMaxBeat()
+    {
+        UpdateMinBeat(notes);
+        UpdateMaxBeat(notes);
+    }
+
     public void SetNotes(List<Note> notes)
     {
         if (notes == null)
@@ -66,8 +72,7 @@ public class Sentence : ISerializationCallbackReceiver
             note.SetSentence(this);
         }
 
-        UpdateMinBeat(notes);
-        UpdateMaxBeat(notes);
+        UpdateMinAndMaxBeat();
     }
 
     public void AddNote(Note note)

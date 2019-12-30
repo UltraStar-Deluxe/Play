@@ -193,8 +193,12 @@ public class Note
         {
             throw new UnityException("StartBeat cannot be greater than EndBeat");
         }
-        StartBeat = newStartBeat;
-        EndBeat = newEndBeat;
-        Length = EndBeat - StartBeat;
+        if (StartBeat != newStartBeat || EndBeat != newEndBeat)
+        {
+            StartBeat = newStartBeat;
+            EndBeat = newEndBeat;
+            Length = EndBeat - StartBeat;
+            OnNotePositionChanged();
+        }
     }
 }

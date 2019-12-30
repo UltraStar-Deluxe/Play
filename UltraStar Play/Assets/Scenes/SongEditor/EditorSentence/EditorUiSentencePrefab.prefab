@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 300791945676296085}
   - component: {fileID: 300791945676296084}
   m_Layer: 0
-  m_Name: Image
+  m_Name: BackgroundImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,9 +85,11 @@ GameObject:
   m_Component:
   - component: {fileID: 300791945687194180}
   - component: {fileID: 7810012307759586679}
+  - component: {fileID: 6034520682356049529}
   - component: {fileID: 559402014943236854}
+  - component: {fileID: 3718104915973145978}
   m_Layer: 0
-  m_Name: SentenceMarkerRectanglePrefab
+  m_Name: EditorUiSentencePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,6 +124,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 300791945687194183}
   m_CullTransparentMesh: 0
+--- !u!114 &6034520682356049529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300791945687194183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &559402014943236854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +164,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 877802659910022468c8defa3f446f72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3718104915973145978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300791945687194183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 567df374721b8844da0ef0756135c6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6163720296226052486
