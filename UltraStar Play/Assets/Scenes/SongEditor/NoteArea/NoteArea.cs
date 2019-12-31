@@ -185,9 +185,25 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void ZoomHorizontal(int direction)
     {
-        double zoomFactor = (direction > 0) ? 0.75 : 1.25;
+        double viewportChangeInPercent = 0.25;
+
+        Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
+        float width = rectTransform.rect.width;
+        double xPercent = (mouseLocalPosition.x + (width / 2)) / width;
+
+        double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportWidth = (int)(ViewportWidth * zoomFactor);
+
+        int viewportChange = ViewportWidth - newViewportWidth;
+        int viewportChangeLeftSide = (int)(viewportChange * xPercent);
+        int newViewportX = ViewportX + viewportChangeLeftSide;
+
+        int oldViewportWidth = ViewportWidth;
         SetViewportWidth(newViewportWidth);
+        if (oldViewportWidth != ViewportWidth)
+        {
+            SetViewportX(newViewportX);
+        }
     }
 
     public void ScrollVertical(int direction)
@@ -198,9 +214,25 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void ZoomVertical(int direction)
     {
-        double zoomFactor = (direction > 0) ? 0.75 : 1.25;
+        double viewportChangeInPercent = 0.25;
+
+        Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
+        float height = rectTransform.rect.height;
+        double yPercent = (mouseLocalPosition.y + (height / 2)) / height;
+
+        double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportHeight = (int)(ViewportHeight * zoomFactor);
+
+        int viewportChange = ViewportHeight - newViewportHeight;
+        int viewportChangeBottomSide = (int)(viewportChange * yPercent);
+        int newViewportY = ViewportY + viewportChangeBottomSide;
+
+        int oldViewportHeight = ViewportHeight;
         SetViewportHeight(newViewportHeight);
+        if (oldViewportHeight != ViewportHeight)
+        {
+            SetViewportY(newViewportY);
+        }
     }
 
     public void SetViewportX(int newViewportX, bool force = false)
