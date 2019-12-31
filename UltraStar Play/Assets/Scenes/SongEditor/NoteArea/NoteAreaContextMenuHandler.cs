@@ -27,23 +27,6 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
         int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
         contextMenu.AddItem("Fit vertical", () => noteArea.FitViewportVerticalToNotes());
         contextMenu.AddItem($"Add note", () => OnAddNote(midiNote, beat));
-        contextMenu.AddItem("Add sentence", () => OnAddSentence(midiNote, beat));
-    }
-
-    private void OnAddSentence(int midiNote, int beat)
-    {
-        List<Sentence> sentencesAtBeat = GetSentencesAtBeat(beat);
-        if (!(sentencesAtBeat.Count == 0))
-        {
-            return;
-        }
-
-        Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
-        newNote.SetMidiNote(midiNote);
-        Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
-        newSentence.SetVoice(voices[0]);
-
-        songEditorSceneController.OnNotesChanged();
     }
 
     private void OnAddNote(int midiNote, int beat)
@@ -51,10 +34,17 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
         List<Sentence> sentencesAtBeat = GetSentencesAtBeat(beat);
         if (sentencesAtBeat.Count == 0)
         {
-            OnAddSentence(midiNote, beat);
+            // Add sentence with note
+            Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
+            newNote.SetMidiNote(midiNote);
+            Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
+            newSentence.SetVoice(voices[0]);
+
+            songEditorSceneController.OnNotesChanged();
         }
         else
         {
+            // Add note to existing sentence
             Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
             newNote.SetSentence(sentencesAtBeat[0]);
