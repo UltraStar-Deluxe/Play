@@ -141,12 +141,55 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public List<Note> GetAllNotes()
     {
         List<Note> result = new List<Note>();
-        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
-        List<Note> notesInVoices = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notesInVoices = GetAllSentences().SelectMany(sentence => sentence.Notes).ToList();
         List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
         result.AddRange(notesInVoices);
         result.AddRange(notesInLayers);
         return result;
+    }
+
+    public List<Sentence> GetAllSentences()
+    {
+        List<Sentence> result = new List<Sentence>();
+        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
+        List<Sentence> sentencesInVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        result.AddRange(sentencesInVoices);
+        return result;
+    }
+
+    public Sentence GetNextSentence(Sentence sentence)
+    {
+        List<Sentence> sentencesOfVoice = voiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+            .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
+        sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
+        Sentence lastSentence = null;
+        foreach (Sentence s in sentencesOfVoice)
+        {
+            if (lastSentence == sentence)
+            {
+                return s;
+            }
+            lastSentence = s;
+        }
+        return null;
+    }
+
+    public Sentence GetPreviousSentence(Sentence sentence)
+    {
+        List<Sentence> sentencesOfVoice = voiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+            .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
+        sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
+        Sentence lastSentence = null;
+        foreach (Sentence s in sentencesOfVoice)
+        {
+            if (s == sentence)
+            {
+                return lastSentence;
+            }
+            lastSentence = s;
+        }
+        return null;
     }
 
     public void OnNotesChanged()
