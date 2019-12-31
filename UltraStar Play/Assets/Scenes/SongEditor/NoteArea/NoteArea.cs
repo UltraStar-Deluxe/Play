@@ -120,13 +120,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
         {
             // Scroll left to new position
-            double newViewportX = ViewportX - viewportAutomaticScrollingLeft - positionInSongInMillis;
+            double newViewportX = ViewportX - (viewportAutomaticScrollingLeft - positionInSongInMillis);
             SetViewportX((int)newViewportX);
         }
         else if (positionInSongInMillis > viewportAutomaticScrollingRight)
         {
             // Scroll right to new position
-            double newViewportX = ViewportX + positionInSongInMillis - viewportAutomaticScrollingRight;
+            double newViewportX = ViewportX + (positionInSongInMillis - viewportAutomaticScrollingRight);
             SetViewportX((int)newViewportX);
         }
     }
