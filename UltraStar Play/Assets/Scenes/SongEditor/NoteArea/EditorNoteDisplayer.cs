@@ -90,7 +90,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 // Do not draw the sentence marker lines, when there are too many beats
                 if (viewportWidthInBeats < 1200)
                 {
-                    CreateSentenceMarkerLine(startBeat, Colors.red, 0);
+                    CreateSentenceMarkerLine(startBeat, Colors.saddleBrown, 0);
                     CreateSentenceMarkerLine(endBeat, Colors.black, 20);
                 }
 
@@ -208,6 +208,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             if (((y + yDashOffset) % 40) < 20)
             {
                 sentenceLinesImage.SetPixel(x, y, color);
+                // Make it 2 pixels wide
+                if (x < sentenceLinesImage.TextureWidth - 1)
+                {
+                    sentenceLinesImage.SetPixel(x + 1, y, color);
+                }
             }
         }
     }
