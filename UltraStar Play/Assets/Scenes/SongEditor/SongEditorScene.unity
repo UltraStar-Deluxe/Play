@@ -2214,6 +2214,7 @@ MonoBehaviour:
   songVideoPlayer: {fileID: 8406949}
   songEditorNoteRecorder: {fileID: 1231934095}
   selectionController: {fileID: 1965697893}
+  uiNoteContainer: {fileID: 1865879047}
   audioWaveFormVisualizer: {fileID: 1604233039}
   noteArea: {fileID: 1582763823}
   noteAreaDragHandler: {fileID: 1582763827}
@@ -8994,10 +8995,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1865879047}
     m_Modifications:
-    - target: {fileID: 7650775801855129022, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+    - target: {fileID: 7027480441284345784, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
-      propertyPath: m_Name
-      value: EditorNotePrefab
+      propertyPath: m_Type
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7650775801855129021, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
@@ -9104,10 +9105,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 7027480441284345784, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+    - target: {fileID: 7650775801855129022, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
-      propertyPath: m_Type
-      value: 2
+      propertyPath: m_Name
+      value: EditorNotePrefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ddb7c352ea45e748a0d4df3143043fe, type: 3}

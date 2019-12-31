@@ -126,6 +126,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         DrawNotesInLayers();
     }
 
+    public EditorUiNote GetUiNoteForNote(Note note)
+    {
+        if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))
+        {
+            return uiNote;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void DeleteNote(Note note)
     {
         if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))

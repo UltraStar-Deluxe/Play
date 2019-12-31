@@ -158,6 +158,21 @@ public class Note
         }
     }
 
+    public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)
+    {
+        if (newStartBeat > newEndBeat)
+        {
+            throw new UnityException("StartBeat cannot be greater than EndBeat");
+        }
+        if (StartBeat != newStartBeat || EndBeat != newEndBeat)
+        {
+            StartBeat = newStartBeat;
+            EndBeat = newEndBeat;
+            Length = EndBeat - StartBeat;
+            OnNotePositionChanged();
+        }
+    }
+
     private void OnNotePositionChanged()
     {
         if (Sentence != null)
@@ -184,21 +199,6 @@ public class Note
             }
 
             return x.StartBeat.CompareTo(y.StartBeat);
-        }
-    }
-
-    public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)
-    {
-        if (newStartBeat > newEndBeat)
-        {
-            throw new UnityException("StartBeat cannot be greater than EndBeat");
-        }
-        if (StartBeat != newStartBeat || EndBeat != newEndBeat)
-        {
-            StartBeat = newStartBeat;
-            EndBeat = newEndBeat;
-            Length = EndBeat - StartBeat;
-            OnNotePositionChanged();
         }
     }
 }
