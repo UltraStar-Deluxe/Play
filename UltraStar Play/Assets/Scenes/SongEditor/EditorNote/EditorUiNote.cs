@@ -12,7 +12,9 @@ using UnityEngine.EventSystems;
 
 public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    public static readonly double handleWidthInPercent = 0.25;
+    public static readonly IComparer<EditorUiNote> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
+
+    private static readonly double handleWidthInPercent = 0.25;
 
     [InjectedInInspector]
     public EditorNoteLyricsInputField lyricsInputFieldPrefab;
@@ -257,5 +259,13 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         IsPointerOverRightHandle = false;
         UpdateHandles();
         cursorManager.SetDefaultCursor();
+    }
+
+    private class EditorUiNoteComparerByStartBeat : IComparer<EditorUiNote>
+    {
+        public int Compare(EditorUiNote x, EditorUiNote y)
+        {
+            return Note.comparerByStartBeat.Compare(x.Note, y.Note);
+        }
     }
 }

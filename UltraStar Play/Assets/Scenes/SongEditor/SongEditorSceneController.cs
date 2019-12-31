@@ -137,6 +137,18 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         }
     }
 
+    // Returns the notes in the song as well as the notes in the layers in no particular order.
+    public List<Note> GetAllNotes()
+    {
+        List<Note> result = new List<Note>();
+        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
+        List<Note> notesInVoices = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        result.AddRange(notesInVoices);
+        result.AddRange(notesInLayers);
+        return result;
+    }
+
     public void OnNotesChanged()
     {
         // TODO: Create history for undo/redo

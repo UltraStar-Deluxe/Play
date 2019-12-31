@@ -43,6 +43,19 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             songEditorSceneController.DeleteNotes(selectedNotes);
         }
 
+        // Tab to select next note, Shift+Tab to select previous note
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            if (noModifier)
+            {
+                selectionController.SelectNextNote();
+            }
+            else if (shiftExclusive)
+            {
+                selectionController.SelectPreviousNote();
+            }
+        }
+
         // Move and stretch notes
         Vector2 arrowKeyDirection = GetArrowKeyDirection();
         if (arrowKeyDirection != Vector2.zero)
