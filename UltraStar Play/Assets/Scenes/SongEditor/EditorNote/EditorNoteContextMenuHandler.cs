@@ -34,8 +34,88 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
         contextMenu.AddItem("Split Notes", () => OnSplitNotes());
         contextMenu.AddItem("Merge Notes", () => OnMergeNotes());
+
+        if (CanMoveToPreviousSentence())
+        {
+            contextMenu.AddSeparator();
+            contextMenu.AddItem("Move to previous line", () => OnMoveToPreviousSentence());
+        }
+        if (CanMoveToNextSentence())
+        {
+            contextMenu.AddSeparator();
+            contextMenu.AddItem("Move to next line", () => OnMoveToNextSentence());
+        }
+
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => OnDelete());
+    }
+
+    private void OnMoveToNextSentence()
+    {
+        Sentence nextSentence = songEditorSceneController.GetNextSentence(uiNote.Note.Sentence);
+        uiNote.Note.SetSentence(nextSentence);
+        songEditorSceneController.OnNotesChanged();
+    }
+
+    private void OnMoveToPreviousSentence()
+    {
+        Sentence previousSentence = songEditorSceneController.GetPreviousSentence(uiNote.Note.Sentence);
+        uiNote.Note.SetSentence(previousSentence);
+        songEditorSceneController.OnNotesChanged();
+    }
+
+    private bool CanMoveToNextSentence()
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        if (selectedNotes.Count != 1)
+        {
+            return false;
+        }
+
+        Note selectedNote = selectedNotes[0];
+        if (selectedNote != uiNote.Note || selectedNote.Sentence == null)
+        {
+            return false;
+        }
+
+        // Check that the selected note is the last note in the sentence.
+        List<Note> notesInSentence = new List<Note>(selectedNote.Sentence.Notes);
+        notesInSentence.Sort(Note.comparerByStartBeat);
+        if (notesInSentence.Last() != selectedNote)
+        {
+            return false;
+        }
+
+        // Check that there exists a following sentence
+        Sentence nextSentence = songEditorSceneController.GetNextSentence(selectedNote.Sentence);
+        return (nextSentence != null);
+    }
+
+    private bool CanMoveToPreviousSentence()
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        if (selectedNotes.Count != 1)
+        {
+            return false;
+        }
+
+        Note selectedNote = selectedNotes[0];
+        if (selectedNote != uiNote.Note || selectedNote.Sentence == null)
+        {
+            return false;
+        }
+
+        // Check that the selected note is the first note in the sentence.
+        List<Note> notesInSentence = new List<Note>(selectedNote.Sentence.Notes);
+        notesInSentence.Sort(Note.comparerByStartBeat);
+        if (notesInSentence.First() != selectedNote)
+        {
+            return false;
+        }
+
+        // Check that there exists a following sentence
+        Sentence previousSentence = songEditorSceneController.GetPreviousSentence(selectedNote.Sentence);
+        return (previousSentence != null);
     }
 
     private void OnSplitNotes()
