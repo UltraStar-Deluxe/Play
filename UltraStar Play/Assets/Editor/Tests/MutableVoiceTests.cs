@@ -10,7 +10,7 @@ public class MutableVoiceTests
     [SetUp]
     public void TestInit()
     {
-        mv = new MutableVoice();
+        mv = new MutableVoice("");
     }
 
     [Test]

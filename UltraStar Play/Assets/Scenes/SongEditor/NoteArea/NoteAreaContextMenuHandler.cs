@@ -18,8 +18,13 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     [Inject]
     private NoteArea noteArea;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    private List<Voice> Voices
+    {
+        get
+        {
+            return songEditorSceneController.Voices;
+        }
+    }
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
@@ -38,7 +43,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
             Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
             Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
-            newSentence.SetVoice(voices[0]);
+            newSentence.SetVoice(Voices[0]);
 
             songEditorSceneController.OnNotesChanged();
         }
@@ -55,7 +60,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
 
     private List<Sentence> GetSentencesAtBeat(int beat)
     {
-        return voices.SelectMany(voice => voice.Sentences)
+        return Voices.SelectMany(voice => voice.Sentences)
             .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
     }
 

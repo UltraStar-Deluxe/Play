@@ -131,7 +131,7 @@ public class PlayerController : MonoBehaviour
             return voices.Values.First();
         }
 
-        MutableVoice mergedVoice = new MutableVoice();
+        MutableVoice mergedVoice = new MutableVoice("");
         List<Sentence> allSentences = voices.Values.SelectMany(voice => voice.Sentences).ToList();
         List<Note> allNotes = allSentences.SelectMany(sentence => sentence.Notes).ToList();
         // Sort notes by start beat

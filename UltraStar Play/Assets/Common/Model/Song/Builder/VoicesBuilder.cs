@@ -12,7 +12,7 @@ static class VoicesBuilder
         Dictionary<string, MutableVoice> res = new Dictionary<string, MutableVoice>();
         foreach (string voiceIdentifier in voiceIdentifiers)
         {
-            res.Add(voiceIdentifier, new MutableVoice());
+            res.Add(voiceIdentifier, new MutableVoice(voiceIdentifier));
         }
         MutableVoice currentVoice = null;
         MutableSentence currentSentence = null;
@@ -22,7 +22,7 @@ static class VoicesBuilder
         string soloVoiceIdentifier = "";
         if (res.Count == 0)
         {
-            res.Add(soloVoiceIdentifier, new MutableVoice());
+            res.Add(soloVoiceIdentifier, new MutableVoice(soloVoiceIdentifier));
             currentVoice = res[""];
         }
 
@@ -57,7 +57,7 @@ static class VoicesBuilder
                         if (!res.TryGetValue(line, out MutableVoice nextVoice))
                         {
                             // Voice has not been found, so create new one.
-                            nextVoice = new MutableVoice();
+                            nextVoice = new MutableVoice(line);
                             res.Add(line, nextVoice);
                         }
                         currentVoice = nextVoice;
@@ -223,7 +223,14 @@ public class VoicesBuilderException : Exception
 // this should be internal but tests become impossible
 public class MutableVoice
 {
+    public string Name { get; private set; }
+
     private readonly List<Sentence> sentences = new List<Sentence>();
+
+    public MutableVoice(string name)
+    {
+        this.Name = name;
+    }
 
     public void Add(Sentence sentence)
     {
@@ -263,7 +270,7 @@ public class MutableVoice
         {
             throw new ArgumentNullException("mv");
         }
-        return new Voice(mv.GetSentences());
+        return new Voice(mv.GetSentences(), mv.Name);
     }
 }
 

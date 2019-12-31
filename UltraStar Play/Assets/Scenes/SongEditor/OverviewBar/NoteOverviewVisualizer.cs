@@ -22,8 +22,8 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -31,7 +31,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     void Start()
     {
         int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
-        DrawVoices(songDurationInMillis, songMeta, voices);
+        DrawVoices(songDurationInMillis, songMeta, songEditorSceneController.Voices);
     }
 
     public void DrawVoices(int songDurationInMillis, SongMeta songMeta, List<Voice> voices)

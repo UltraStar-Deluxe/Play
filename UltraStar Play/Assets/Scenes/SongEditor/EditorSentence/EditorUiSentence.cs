@@ -12,10 +12,27 @@ using UniRx;
 
 public class EditorUiSentence : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
+    public Image backgroundImage;
+
     public Sentence Sentence { get; private set; }
+
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
     public void Init(Sentence sentence)
     {
         this.Sentence = sentence;
+
+        if (sentence.Voice != null)
+        {
+            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
+            SetColor(color);
+        }
+    }
+
+    private void SetColor(Color color)
+    {
+        backgroundImage.color = color;
     }
 }

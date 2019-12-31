@@ -47,8 +47,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -86,7 +86,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     public void FitViewportVerticalToNotes()
     {
         List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
-        List<Note> notesInVoices = voices.SelectMany(voice => voice.Sentences).SelectMany(sentence => sentence.Notes).ToList();
+        List<Note> notesInVoices = songEditorSceneController.Voices.SelectMany(voice => voice.Sentences)
+            .SelectMany(sentence => sentence.Notes).ToList();
         List<Note> notes = new List<Note>();
         notes.AddRange(notesInLayers);
         notes.AddRange(notesInVoices);
