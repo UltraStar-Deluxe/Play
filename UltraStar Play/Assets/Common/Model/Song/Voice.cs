@@ -5,6 +5,10 @@ using UnityEngine;
 [Serializable]
 public class Voice : ISerializationCallbackReceiver
 {
+    public static readonly IComparer<Voice> comparerByName = new VoiceComparerByName();
+
+    public string Name { get; private set; }
+
     private readonly SentenceHashSet sentences = new SentenceHashSet();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
@@ -12,8 +16,9 @@ public class Voice : ISerializationCallbackReceiver
     {
     }
 
-    public Voice(List<Sentence> sentences)
+    public Voice(List<Sentence> sentences, string name)
     {
+        SetName(name);
         SetSentences(sentences);
     }
 
@@ -63,6 +68,11 @@ public class Voice : ISerializationCallbackReceiver
         sentence.SetVoice(null);
     }
 
+    public void SetName(string name)
+    {
+        this.Name = name;
+    }
+
     public void OnBeforeSerialize()
     {
         // Do nothing. Implementation of ISerializationCallbackReceiver
@@ -73,6 +83,26 @@ public class Voice : ISerializationCallbackReceiver
         foreach (Sentence sentence in sentences)
         {
             sentence.SetVoice(this);
+        }
+    }
+
+    public class VoiceComparerByName : IComparer<Voice>
+    {
+        public int Compare(Voice x, Voice y)
+        {
+            if (x == null && y == null)
+            {
+                return 0;
+            }
+            else if (x == null)
+            {
+                return -1;
+            }
+            else if (y == null)
+            {
+                return 1;
+            }
+            return x.Name.CompareTo(y.Name);
         }
     }
 }

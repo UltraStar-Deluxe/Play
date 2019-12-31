@@ -17,6 +17,9 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     SongEditorSceneController songEditorSceneController;
 
     [Inject]
+    SongEditorLayerManager layerManager;
+
+    [Inject]
     SongEditorSelectionController selectionController;
 
     private EditorUiNote uiNote;
@@ -35,19 +38,132 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         contextMenu.AddItem("Split Notes", () => OnSplitNotes());
         contextMenu.AddItem("Merge Notes", () => OnMergeNotes());
 
-        if (CanMoveToPreviousSentence())
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Make golden", () => OnSetNoteType(ENoteType.Golden));
+        contextMenu.AddItem("Make freestyle", () => OnSetNoteType(ENoteType.Freestyle));
+        contextMenu.AddItem("Make normal", () => OnSetNoteType(ENoteType.Normal));
+
+        FillContextMenuToMoveToOtherSentence(contextMenu);
+        FillContextMenuToMoveToOtherVoice(contextMenu);
+
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Delete", () => OnDelete());
+    }
+
+    private void OnSetNoteType(ENoteType type)
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        foreach (Note note in selectedNotes)
+        {
+            note.SetType(type);
+        }
+        songEditorSceneController.OnNotesChanged();
+    }
+
+    private void FillContextMenuToMoveToOtherVoice(ContextMenu contextMenu)
+    {
+        bool canMoveToVoice1 = CanMoveToVoice(0);
+        bool canMoveToVoice2 = CanMoveToVoice(1);
+        if (canMoveToVoice1)
+        {
+            contextMenu.AddSeparator();
+            contextMenu.AddItem("Move to player 1", () => OnMoveToVoice(0));
+        }
+        if (!canMoveToVoice1 && canMoveToVoice2)
+        {
+            contextMenu.AddSeparator();
+        }
+        if (canMoveToVoice2)
+        {
+            contextMenu.AddItem("Move to player 2", () => OnMoveToVoice(1));
+        }
+    }
+
+    private bool CanMoveToVoice(int index)
+    {
+        Voice voice = songEditorSceneController.GetOrCreateVoice(index);
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        return selectedNotes.AnyMatch(note => note.Sentence == null || note.Sentence.Voice != voice);
+    }
+
+    private void OnMoveToVoice(int index)
+    {
+        Voice voice = songEditorSceneController.GetOrCreateVoice(index);
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+
+        List<Sentence> changedSentences = new List<Sentence>();
+
+        foreach (Note note in selectedNotes)
+        {
+            Sentence lastSentence = note.Sentence;
+            // Find a sentence in the new voice for the note
+            Sentence sentenceForNote = voice.Sentences
+                .Where(sentence => (sentence.MinBeat <= note.StartBeat)
+                    && note.EndBeat <= Math.Max(sentence.MaxBeat, sentence.LinebreakBeat)).FirstOrDefault();
+            if (sentenceForNote == null)
+            {
+                // Create new sentence in the voice.
+                // Use the min and max value from the sentence of the original note if possible.
+                if (note.Sentence != null)
+                {
+                    sentenceForNote = new Sentence(note.Sentence.MinBeat, note.Sentence.MaxBeat);
+                }
+                else
+                {
+                    sentenceForNote = new Sentence();
+                }
+                sentenceForNote.SetVoice(voice);
+                sentenceForNote.AddNote(note);
+            }
+            else
+            {
+                note.SetSentence(sentenceForNote);
+            }
+
+            changedSentences.Add(sentenceForNote);
+            if (lastSentence != null)
+            {
+                // Remove old sentence if empty now
+                if (lastSentence.Notes.Count == 0 && lastSentence.Voice != null)
+                {
+                    lastSentence.SetVoice(null);
+                }
+                else
+                {
+                    changedSentences.Add(lastSentence);
+                }
+            }
+
+            layerManager.RemoveNoteFromAllLayers(note);
+        }
+
+        // Fit changed sentences to their notes (make them as small as possible)
+        foreach (Sentence sentence in changedSentences)
+        {
+            sentence.UpdateMinAndMaxBeat();
+            sentence.SetLinebreakBeat(sentence.MaxBeat);
+        }
+
+        songEditorSceneController.OnNotesChanged();
+    }
+
+    private void FillContextMenuToMoveToOtherSentence(ContextMenu contextMenu)
+    {
+        bool canMoveToPreviousSentence = CanMoveToPreviousSentence();
+        bool canMoveToNextSentence = CanMoveToNextSentence();
+        if (canMoveToPreviousSentence)
         {
             contextMenu.AddSeparator();
             contextMenu.AddItem("Move to previous line", () => OnMoveToPreviousSentence());
         }
-        if (CanMoveToNextSentence())
+        if (!canMoveToPreviousSentence && canMoveToNextSentence)
         {
             contextMenu.AddSeparator();
+        }
+        if (canMoveToNextSentence)
+        {
             contextMenu.AddItem("Move to next line", () => OnMoveToNextSentence());
         }
-
-        contextMenu.AddSeparator();
-        contextMenu.AddItem("Delete", () => OnDelete());
     }
 
     private void OnMoveToNextSentence()

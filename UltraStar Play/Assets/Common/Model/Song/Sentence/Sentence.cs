@@ -28,7 +28,14 @@ public class Sentence : ISerializationCallbackReceiver
     {
     }
 
-    public Sentence(List<Note> notes, int linebreakBeat)
+    public Sentence(int minBeat, int maxBeat)
+    {
+        MinBeat = minBeat;
+        MaxBeat = maxBeat;
+        LinebreakBeat = maxBeat;
+    }
+
+    public Sentence(List<Note> notes, int linebreakBeat = 0)
     {
         LinebreakBeat = linebreakBeat;
         SetNotes(notes);

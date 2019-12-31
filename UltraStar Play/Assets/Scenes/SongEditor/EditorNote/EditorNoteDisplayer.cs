@@ -29,10 +29,20 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
-    private List<Sentence> sortedSentencesOfAllVoices;
+    private List<Voice> Voices
+    {
+        get
+        {
+            return songEditorSceneController.Voices;
+        }
+    }
+
+    private List<Sentence> sortedSentencesOfAllVoices = new List<Sentence>();
+
+    private Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
     [Inject]
     private NoteArea noteArea;
@@ -69,8 +79,19 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     public void ReloadSentences()
     {
-        sortedSentencesOfAllVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        voiceToSortedSentencesMap.Clear();
+        sortedSentencesOfAllVoices.Clear();
+        foreach (Voice voice in Voices)
+        {
+            sortedSentencesOfAllVoices.AddRange(voice.Sentences);
+            voiceToSortedSentencesMap.Add(voice, new List<Sentence>(voice.Sentences));
+        }
+
         sortedSentencesOfAllVoices.Sort(Sentence.comparerByStartBeat);
+        foreach (List<Sentence> sentences in voiceToSortedSentencesMap.Values)
+        {
+            sentences.Sort(Sentence.comparerByStartBeat);
+        }
     }
 
     public void UpdateNotesAndSentences()
@@ -88,10 +109,20 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceLinesImage.ClearTexture();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        int viewportWidthInBeats = noteArea.MaxBeatInViewport - noteArea.MinBeatInViewport;
+        foreach (Voice voice in Voices)
+        {
+            DrawSentences(voice);
+        }
 
+        sentenceLinesImage.ApplyTexture();
+    }
+
+    private void DrawSentences(Voice voice)
+    {
+        string voiceNamePrefix = (!voice.Name.IsNullOrEmpty()) ? voice.Name + " - " : "";
+        int viewportWidthInBeats = noteArea.MaxBeatInViewport - noteArea.MinBeatInViewport;
         int sentenceIndex = 0;
-        foreach (Sentence sentence in sortedSentencesOfAllVoices)
+        foreach (Sentence sentence in voiceToSortedSentencesMap[voice])
         {
             if (noteArea.IsInViewport(sentence))
             {
@@ -105,13 +136,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                     CreateSentenceMarkerLine(endBeat, Colors.black, 20);
                 }
 
-                string label = (sentenceIndex + 1).ToString();
+                string label = voiceNamePrefix + (sentenceIndex + 1).ToString();
                 CreateUiSentence(sentence, startBeat, endBeat, label);
             }
             sentenceIndex++;
         }
-
-        sentenceLinesImage.ApplyTexture();
     }
 
     public void UpdateNotes()
@@ -203,7 +232,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Note note in notesInViewport)
         {
-            UpdateOrCreateNote(note);
+            EditorUiNote uiNote = UpdateOrCreateNote(note);
         }
     }
 
@@ -263,6 +292,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorUiNote.Init(note);
 
             noteToEditorUiNoteMap.Add(note, editorUiNote);
+        }
+        else
+        {
+            editorUiNote.SyncWithNote();
         }
 
         PositionUiNote(editorUiNote.RectTransform, note.MidiNote, note.StartBeat, note.EndBeat);

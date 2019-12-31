@@ -7,7 +7,10 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SongEditorSceneController : MonoBehaviour, IBinder
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 {
     [InjectedInInspector]
     public string defaultSongName;
@@ -52,6 +55,14 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     [InjectedInInspector]
     public GraphicRaycaster graphicRaycaster;
 
+    [Inject]
+    private Injector injector;
+
+    private bool lastIsPlaying;
+    private double positionInSongInMillisWhenPlaybackStarted;
+
+    private Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
+
     private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
 
     private bool audioWaveFormInitialized;
@@ -64,8 +75,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         }
     }
 
-    Dictionary<string, Voice> voiceIdToVoiceMap;
-
+    private Dictionary<string, Voice> voiceIdToVoiceMap;
     private Dictionary<string, Voice> VoiceIdToVoiceMap
     {
         get
@@ -75,6 +85,14 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
                 voiceIdToVoiceMap = SongMetaManager.GetVoices(SongMeta);
             }
             return voiceIdToVoiceMap;
+        }
+    }
+
+    public List<Voice> Voices
+    {
+        get
+        {
+            return VoiceIdToVoiceMap.Values.ToList();
         }
     }
 
@@ -109,9 +127,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(this);
-
-        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
-        bb.Bind("voices").ToExistingInstance(voices);
         return bb.GetBindings();
     }
 
@@ -126,6 +141,23 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
 
     void Update()
     {
+        // Jump to last position in song when playback stops
+        if (songAudioPlayer.IsPlaying)
+        {
+            if (!lastIsPlaying)
+            {
+                positionInSongInMillisWhenPlaybackStarted = songAudioPlayer.PositionInSongInMillis;
+            }
+        }
+        else
+        {
+            if (lastIsPlaying)
+            {
+                songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+            }
+        }
+        lastIsPlaying = songAudioPlayer.IsPlaying;
+
         // Create the audio waveform image if not done yet.
         if (!audioWaveFormInitialized && songAudioPlayer.HasAudioClip && songAudioPlayer.AudioClip.samples > 0)
         {
@@ -134,6 +166,34 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
                 audioWaveFormInitialized = true;
                 audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(songAudioPlayer.AudioClip);
             }
+        }
+    }
+
+    public Color GetColorForVoice(Voice voice)
+    {
+        if (voiceToColorMap.TryGetValue(voice, out Color color))
+        {
+            return color;
+        }
+        else
+        {
+            // Define colors for the voices.
+            CreateVoiceToColorMap();
+            return voiceToColorMap[voice];
+        }
+    }
+
+    private void CreateVoiceToColorMap()
+    {
+        List<Color> colors = new List<Color> { Colors.beige, Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
+                Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
+        List<Voice> sortedVoices = new List<Voice>(Voices);
+        sortedVoices.Sort(Voice.comparerByName);
+        int index = 0;
+        foreach (Voice v in sortedVoices)
+        {
+            voiceToColorMap[v] = colors[index];
+            index++;
         }
     }
 
@@ -160,7 +220,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
 
     public Sentence GetNextSentence(Sentence sentence)
     {
-        List<Sentence> sentencesOfVoice = voiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+        List<Sentence> sentencesOfVoice = VoiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
             .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
         sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
@@ -177,7 +237,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
 
     public Sentence GetPreviousSentence(Sentence sentence)
     {
-        List<Sentence> sentencesOfVoice = voiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+        List<Sentence> sentencesOfVoice = VoiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
             .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
         sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
@@ -190,6 +250,33 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
             lastSentence = s;
         }
         return null;
+    }
+
+    public Voice GetOrCreateVoice(int index)
+    {
+        List<Voice> sortedVoices = new List<Voice>(Voices);
+        sortedVoices.Sort(Voice.comparerByName);
+        if (sortedVoices.Count <= index)
+        {
+            // Set voice identifier for solo voice because this is not a solo song anymore.
+            if (sortedVoices.Count > 0 && sortedVoices[0].Name.IsNullOrEmpty())
+            {
+                sortedVoices[0].SetName("P1");
+            }
+
+            // Create all missing voices up to the index
+            for (int i = sortedVoices.Count; i <= index; i++)
+            {
+                string voiceIdentifier = "P" + (i + 1);
+                Voice newVoice = new Voice(new List<Sentence>(), voiceIdentifier);
+                VoiceIdToVoiceMap.Add(voiceIdentifier, newVoice);
+                sortedVoices.Add(newVoice);
+
+                Debug.Log($"Created new voice: {voiceIdentifier}");
+            }
+            OnNotesChanged();
+        }
+        return sortedVoices[index];
     }
 
     public void OnNotesChanged()

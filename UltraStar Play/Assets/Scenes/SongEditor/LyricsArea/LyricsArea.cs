@@ -17,8 +17,8 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -31,7 +31,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        lyrics = GetLyrics(voices);
+        lyrics = GetLyrics(songEditorSceneController.Voices);
         inputField.text = lyrics;
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
     }

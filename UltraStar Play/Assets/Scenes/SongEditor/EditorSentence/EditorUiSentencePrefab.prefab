@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877802659910022468c8defa3f446f72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundImage: {fileID: 300791945676296084}
 --- !u!114 &3718104915973145978
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -53,6 +53,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     private SongEditorSelectionController selectionController;
 
     [Inject]
+    private SongEditorSceneController songEditorSceneController;
+
+    [Inject]
     private CursorManager cursorManager;
 
     private EditorNoteLyricsInputField activeLyricsInputField;
@@ -67,11 +70,20 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     public void Init(Note note)
     {
         this.Note = note;
-        SetText(note.Text);
-        goldenNoteImageOverlay.gameObject.SetActive(note.IsGolden);
+        SyncWithNote();
+    }
 
-        bool isSelected = selectionController.IsSelected(note);
+    public void SyncWithNote()
+    {
+        bool isSelected = selectionController.IsSelected(Note);
+        goldenNoteImageOverlay.gameObject.SetActive(Note.IsGolden);
+        SetText(Note.Text);
         SetSelected(isSelected);
+        if (Note.Sentence != null && Note.Sentence.Voice != null)
+        {
+            Color color = songEditorSceneController.GetColorForVoice(Note.Sentence.Voice);
+            SetColor(color);
+        }
     }
 
     void Start()
