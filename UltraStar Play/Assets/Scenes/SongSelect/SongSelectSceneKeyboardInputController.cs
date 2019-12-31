@@ -59,7 +59,8 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(StartSingSceneShortcut) || Input.GetKeyUp(OpenInEditorShortcut))
+        if (Input.GetKeyUp(StartSingSceneShortcut)
+            || (Input.GetKeyUp(OpenInEditorShortcut) && !songSelectSceneController.IsSearchEnabled()))
         {
             GameObject focusedControl = GameObjectUtils.GetSelectedGameObject();
             bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
