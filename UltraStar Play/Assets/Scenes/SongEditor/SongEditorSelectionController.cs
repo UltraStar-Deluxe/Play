@@ -83,10 +83,30 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         }
     }
 
+    public void AddToSelection(Note note)
+    {
+        selectedNotes.Add(note);
+        EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
+        if (uiNote != null)
+        {
+            uiNote.SetSelected(true);
+        }
+    }
+
     public void AddToSelection(EditorUiNote uiNote)
     {
         uiNote.SetSelected(true);
         selectedNotes.Add(uiNote.Note);
+    }
+
+    public void RemoveFromSelection(Note note)
+    {
+        selectedNotes.Remove(note);
+        EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
+        if (uiNote != null)
+        {
+            uiNote.SetSelected(false);
+        }
     }
 
     public void RemoveFromSelection(EditorUiNote uiNote)

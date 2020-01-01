@@ -70,15 +70,19 @@ public class Sentence : ISerializationCallbackReceiver
         UpdateMaxBeat(notes);
     }
 
-    public void SetNotes(List<Note> notes)
+    public void SetNotes(List<Note> newNotes)
     {
-        if (notes == null)
+        if (newNotes == null)
         {
             throw new UnityException("Notes cannot be null!");
         }
 
-        this.notes.Clear();
-        foreach (Note note in notes)
+        foreach (Note note in new List<Note>(notes))
+        {
+            RemoveNote(note);
+        }
+
+        foreach (Note note in newNotes)
         {
             this.notes.Add(note);
             note.SetSentence(this);
@@ -163,7 +167,7 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    internal void ExpandStartAndEndBeat(Note note)
+    public void ExpandStartAndEndBeat(Note note)
     {
         if (MinBeat > note.StartBeat)
         {
@@ -192,6 +196,19 @@ public class Sentence : ISerializationCallbackReceiver
         {
             note.SetSentence(this);
         }
+    }
+
+    public Sentence CloneDeep()
+    {
+        List<Note> notesCopy = new List<Note>();
+        foreach (Note note in notes)
+        {
+            Note noteCopy = note.Clone();
+            notesCopy.Add(noteCopy);
+        }
+
+        Sentence clone = new Sentence(notesCopy, LinebreakBeat);
+        return clone;
     }
 
     private class SentenceComparerByStartBeat : IComparer<Sentence>

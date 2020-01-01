@@ -108,6 +108,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         return !isHidden;
     }
 
+    public void ClearUiNotes()
+    {
+        noteContainer.DestroyAllDirectChildren();
+        noteToEditorUiNoteMap.Clear();
+    }
+
     public void ReloadSentences()
     {
         voiceToSortedSentencesMap.Clear();

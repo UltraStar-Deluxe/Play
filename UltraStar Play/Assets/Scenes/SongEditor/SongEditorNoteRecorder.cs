@@ -38,9 +38,14 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
-    private int lastPitchDetectedFrame;
+    [Inject]
+    private SongEditorHistoryManager historyManager;
 
+    private int lastPitchDetectedFrame;
     private Note lastRecordedNote;
+
+    private bool hasRecordedNotes;
+    private bool lastIsPlaying;
 
     void Start()
     {
@@ -59,8 +64,21 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         if (songAudioPlayer.IsPlaying)
         {
+            if (!lastIsPlaying)
+            {
+                hasRecordedNotes = false;
+            }
+
             UpdateRecordingViaButtonClick();
         }
+        else if (lastIsPlaying)
+        {
+            if (hasRecordedNotes)
+            {
+                historyManager.AddUndoState();
+            }
+        }
+        lastIsPlaying = songAudioPlayer.IsPlaying;
     }
 
     private void UpdateRecordingViaButtonClick()
@@ -103,6 +121,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         editorNoteDisplayer.UpdateNotes();
 
         lastPitchDetectedFrame = Time.frameCount;
+
+        hasRecordedNotes = true;
     }
 
     private void CreateNewRecordedNote(int midiNote, int currentBeat, ESongEditorLayer targetLayer)

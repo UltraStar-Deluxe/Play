@@ -55,6 +55,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public GraphicRaycaster graphicRaycaster;
 
+    [InjectedInInspector]
+    public SongEditorHistoryManager historyManager;
+
     [Inject]
     private Injector injector;
 
@@ -126,6 +129,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
+        bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }
@@ -287,8 +291,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
                 Voice newVoice = new Voice(new List<Sentence>(), voiceIdentifier);
                 VoiceIdToVoiceMap.Add(voiceIdentifier, newVoice);
                 sortedVoices.Add(newVoice);
-
-                Debug.Log($"Created new voice: {voiceIdentifier}");
             }
             OnNotesChanged();
         }
@@ -320,9 +322,10 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public void OnNotesChanged()
     {
-        // TODO: Create history for undo/redo
         editorNoteDisplayer.ReloadSentences();
         editorNoteDisplayer.UpdateNotesAndSentences();
+
+        historyManager.AddUndoState();
     }
 
     public void DeleteNote(Note note)

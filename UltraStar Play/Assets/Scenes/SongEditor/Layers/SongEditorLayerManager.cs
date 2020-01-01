@@ -44,6 +44,11 @@ public class SongEditorLayerManager
         layerKeyToLayerMap[layerKey].IsEnabled = newValue;
     }
 
+    public List<SongEditorLayer> GetLayers()
+    {
+        return new List<SongEditorLayer>(layerKeyToLayerMap.Values);
+    }
+
     private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerKeyToLayerMap()
     {
         Dictionary<ESongEditorLayer, SongEditorLayer> result = new Dictionary<ESongEditorLayer, SongEditorLayer>();

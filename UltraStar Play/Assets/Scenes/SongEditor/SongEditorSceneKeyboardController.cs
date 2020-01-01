@@ -23,23 +23,39 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
+    private SongEditorHistoryManager historyManager;
+
+    [Inject]
     private Settings settings;
 
     public void Update()
     {
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
-        int scrollDirection = Math.Sign(Input.mouseScrollDelta.y);
-
+        // Play / pause via Space
         if (Input.GetKeyUp(KeyCode.Space))
         {
             songEditorSceneController.TogglePlayPause();
         }
 
+        // Delete notes
         if (Input.GetKeyUp(KeyCode.Delete))
         {
             List<Note> selectedNotes = selectionController.GetSelectedNotes();
             songEditorSceneController.DeleteNotes(selectedNotes);
+            songEditorSceneController.OnNotesChanged();
+        }
+
+        // Undo via Ctrl+Z
+        if (Input.GetKeyUp(KeyCode.Z) && modifier == EKeyboardModifier.Ctrl)
+        {
+            historyManager.Undo();
+        }
+
+        // Redo via Ctrl+Y
+        if (Input.GetKeyUp(KeyCode.Y) && modifier == EKeyboardModifier.Ctrl)
+        {
+            historyManager.Redo();
         }
 
         // Tab to select next note, Shift+Tab to select previous note
@@ -59,6 +75,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         UpdateInputToMoveAndStretchNotes(modifier);
 
         // Scroll and zoom in NoteArea
+        UpdateInputToScrollAndZoom(modifier);
+    }
+
+    private void UpdateInputToScrollAndZoom(EKeyboardModifier modifier)
+    {
+        int scrollDirection = Math.Sign(Input.mouseScrollDelta.y);
         if (scrollDirection != 0 && noteArea.IsPointerOver)
         {
             // Scroll horizontal in NoteArea with mouse wheel
