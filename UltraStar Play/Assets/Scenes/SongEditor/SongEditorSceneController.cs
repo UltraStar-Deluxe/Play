@@ -185,14 +185,20 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private void CreateVoiceToColorMap()
     {
-        List<Color> colors = new List<Color> { Colors.beige, Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
-                Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
+        List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
         List<Voice> sortedVoices = new List<Voice>(Voices);
         sortedVoices.Sort(Voice.comparerByName);
         int index = 0;
         foreach (Voice v in sortedVoices)
         {
-            voiceToColorMap[v] = colors[index];
+            if (colors.Count > index)
+            {
+                voiceToColorMap[v] = colors[index];
+            }
+            else
+            {
+                voiceToColorMap[v] = Colors.beige;
+            }
             index++;
         }
     }
