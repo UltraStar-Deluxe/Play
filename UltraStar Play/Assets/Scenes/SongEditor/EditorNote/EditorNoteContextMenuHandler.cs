@@ -349,20 +349,14 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         mergedNote.SetSentence(targetNote.Sentence);
 
         // Remove old notes
-        foreach (Note note in selectedNotes)
-        {
-            songEditorSceneController.DeleteNote(note);
-        }
+        songEditorSceneController.DeleteNotes(selectedNotes);
         songEditorSceneController.OnNotesChanged();
     }
 
     private void OnDelete()
     {
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
-        {
-            songEditorSceneController.DeleteNote(note);
-            songEditorSceneController.OnNotesChanged();
-        }
+        songEditorSceneController.DeleteNotes(selectedNotes);
+        songEditorSceneController.OnNotesChanged();
     }
 }

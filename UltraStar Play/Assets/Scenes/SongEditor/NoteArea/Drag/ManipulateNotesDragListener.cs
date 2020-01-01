@@ -23,13 +23,16 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private NoteAreaDragHandler noteAreaDragHandler;
 
     [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
+    [Inject]
     private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private Settings settings;
 
-    private List<Note> selectedNotes;
-    private List<Note> followingNotes;
+    private List<Note> selectedNotes = new List<Note>();
+    private List<Note> followingNotes = new List<Note>();
 
     private Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
     private bool isCanceled;
@@ -114,29 +117,32 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
                 StretchNotesRight(dragEvent, selectedNotes, true);
                 break;
         }
-        songEditorSceneController.OnNotesChanged();
+
+        editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
     {
-        // Values have been directly applied to the notes. The snapshot can be cleared.
-        noteToSnapshotOfNoteMap.Clear();
+        if (noteToSnapshotOfNoteMap.Count > 0)
+        {
+            // Values have been directly applied to the notes. The snapshot can be cleared.
+            noteToSnapshotOfNoteMap.Clear();
+            songEditorSceneController.OnNotesChanged();
+        }
     }
 
     public void CancelDrag()
     {
         isCanceled = true;
-        // Reset notes to snapshot
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
+        foreach (KeyValuePair<Note, Note> noteAndSnapshotOfNote in noteToSnapshotOfNoteMap)
         {
-            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
-            {
-                note.CopyValues(noteSnapshot);
-            }
+            Note note = noteAndSnapshotOfNote.Key;
+            Note snapshotOfNote = noteAndSnapshotOfNote.Value;
+            note.CopyValues(snapshotOfNote);
         }
         noteToSnapshotOfNoteMap.Clear();
-        songEditorSceneController.OnNotesChanged();
+
+        editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
     public bool IsCanceled()

@@ -57,6 +57,7 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        ignoreDrag = false;
         isDragging = true;
         dragStartEvent = CreateNoteAreaBeginDragEvent(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);

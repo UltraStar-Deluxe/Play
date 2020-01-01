@@ -31,6 +31,19 @@ public class SongEditorLayer
         return new List<Note>(notes);
     }
 
+    public SongEditorLayer CloneDeep()
+    {
+        SongEditorLayer clone = new SongEditorLayer(LayerKey);
+        clone.Color = Color;
+        clone.IsEnabled = IsEnabled;
+        foreach (Note note in notes)
+        {
+            Note noteCopy = note.Clone();
+            clone.AddNote(noteCopy);
+        }
+        return clone;
+    }
+
     public void ClearNotes()
     {
         notes.Clear();

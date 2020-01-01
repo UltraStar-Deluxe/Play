@@ -22,17 +22,20 @@ public class Voice : ISerializationCallbackReceiver
         SetSentences(sentences);
     }
 
-    public void SetSentences(List<Sentence> sentences)
+    public void SetSentences(IEnumerable<Sentence> newSentences)
     {
-        if (sentences == null)
+        if (newSentences == null)
         {
             throw new UnityException("Sentences cannot be null!");
         }
-        this.sentences.Clear();
-        foreach (Sentence sentence in sentences)
+
+        foreach (Sentence sentence in new List<Sentence>(sentences))
         {
-            this.sentences.Add(sentence);
-            sentence.SetVoice(this);
+            RemoveSentence(sentence);
+        }
+        foreach (Sentence sentence in newSentences)
+        {
+            AddSentence(sentence);
         }
     }
 
@@ -84,6 +87,18 @@ public class Voice : ISerializationCallbackReceiver
         {
             sentence.SetVoice(this);
         }
+    }
+
+    public Voice CloneDeep()
+    {
+        Voice clone = new Voice();
+        clone.SetName(Name);
+        foreach (Sentence sentence in Sentences)
+        {
+            Sentence sentenceCopy = sentence.CloneDeep();
+            clone.AddSentence(sentenceCopy);
+        }
+        return clone;
     }
 
     public class VoiceComparerByName : IComparer<Voice>
