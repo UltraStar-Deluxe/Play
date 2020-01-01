@@ -203,6 +203,16 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         }
     }
 
+    public List<Note> GetFollowingNotes(List<Note> notes)
+    {
+        int maxBeat = notes.Select(it => it.EndBeat).Max();
+        List<Note> result = GetAllSentences()
+            .SelectMany(sentence => sentence.Notes)
+            .Where(note => note.StartBeat >= maxBeat)
+            .ToList();
+        return result;
+    }
+
     // Returns the notes in the song as well as the notes in the layers in no particular order.
     public List<Note> GetAllNotes()
     {
