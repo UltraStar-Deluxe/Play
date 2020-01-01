@@ -162,9 +162,9 @@ static class SongMetaBuilder
                         case "year":
                             res.Year = ConvertToUInt32(item.Value);
                             break;
-                        // unknown or unimplemented fields just get ignored completely
                         default:
-                            continue;
+                            res.AddUnkownHeaderEntry(item.Key, item.Value);
+                            break;
                     }
                 }
                 return res;

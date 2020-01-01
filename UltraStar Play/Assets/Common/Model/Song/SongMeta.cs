@@ -54,6 +54,15 @@ public class SongMeta
 
     private Dictionary<string, Voice> voices;
 
+    private readonly Dictionary<string, string> unkownHeaderEntries = new Dictionary<string, string>();
+    public IReadOnlyDictionary<string, string> UnkownHeaderEntries
+    {
+        get
+        {
+            return unkownHeaderEntries;
+        }
+    }
+
     public SongMeta(
         // required helper fields
         string directory,
@@ -122,5 +131,10 @@ public class SongMeta
             voices = VoicesBuilder.ParseFile(Directory + Path.DirectorySeparatorChar + Filename, Encoding, voiceNames.Keys);
         }
         return voices;
+    }
+
+    public void AddUnkownHeaderEntry(string key, string value)
+    {
+        unkownHeaderEntries.Add(key, value);
     }
 }
