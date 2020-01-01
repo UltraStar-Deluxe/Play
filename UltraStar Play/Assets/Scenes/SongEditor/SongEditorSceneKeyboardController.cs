@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UnityEngine;
 
@@ -20,6 +21,9 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
+
+    [Inject]
+    private Settings settings;
 
     public void Update()
     {
@@ -52,45 +56,7 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         }
 
         // Move and stretch notes
-        Vector2 arrowKeyDirection = GetArrowKeyDirection();
-        if (arrowKeyDirection != Vector2.zero)
-        {
-            List<Note> selectedNotes = selectionController.GetSelectedNotes();
-            foreach (Note note in selectedNotes)
-            {
-                // Move with Shift
-                if (modifier == EKeyboardModifier.Shift)
-                {
-                    int newStartBeat = note.StartBeat + (int)arrowKeyDirection.x;
-                    int newEndBeat = note.EndBeat + (int)arrowKeyDirection.x;
-                    note.SetStartAndEndBeat(newStartBeat, newEndBeat);
-
-                    int newMidiNote = note.MidiNote + (int)arrowKeyDirection.y;
-                    note.SetMidiNote(newMidiNote);
-                }
-
-                // Extend right side with Alt
-                if (modifier == EKeyboardModifier.Alt)
-                {
-                    int newEndBeat = note.EndBeat + (int)arrowKeyDirection.x;
-                    if (newEndBeat > note.StartBeat)
-                    {
-                        note.SetEndBeat(newEndBeat);
-                    }
-                }
-
-                // Extend left side with Ctrl
-                if (modifier == EKeyboardModifier.Ctrl)
-                {
-                    int newStartBeat = note.StartBeat + (int)arrowKeyDirection.x;
-                    if (newStartBeat < note.EndBeat)
-                    {
-                        note.SetStartBeat(newStartBeat);
-                    }
-                }
-            }
-            editorNoteDisplayer.UpdateNotesAndSentences();
-        }
+        UpdateInputToMoveAndStretchNotes(modifier);
 
         // Scroll and zoom in NoteArea
         if (scrollDirection != 0 && noteArea.IsPointerOver)
@@ -117,6 +83,80 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             if (modifier == EKeyboardModifier.CtrlShift)
             {
                 noteArea.ZoomVertical(scrollDirection);
+            }
+        }
+    }
+
+    private void UpdateInputToMoveAndStretchNotes(EKeyboardModifier modifier)
+    {
+        Vector2 arrowKeyDirection = GetArrowKeyDirection();
+        if (arrowKeyDirection == Vector2.zero)
+        {
+            return;
+        }
+
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        foreach (Note note in selectedNotes)
+        {
+            // Move with Shift
+            if (modifier == EKeyboardModifier.Shift)
+            {
+                note.MoveHorizontal((int)arrowKeyDirection.x);
+                note.MoveVertical((int)arrowKeyDirection.y);
+            }
+
+            // Extend right side with Alt
+            if (modifier == EKeyboardModifier.Alt)
+            {
+                int newEndBeat = note.EndBeat + (int)arrowKeyDirection.x;
+                if (newEndBeat > note.StartBeat)
+                {
+                    note.SetEndBeat(newEndBeat);
+                }
+            }
+
+            // Extend left side with Ctrl
+            if (modifier == EKeyboardModifier.Ctrl)
+            {
+                int newStartBeat = note.StartBeat + (int)arrowKeyDirection.x;
+                if (newStartBeat < note.EndBeat)
+                {
+                    note.SetStartBeat(newStartBeat);
+                }
+            }
+
+            // Adjust following notes.
+            if (settings.SongEditorSettings.AdjustFollowingNotes)
+            {
+                AdjustFollowingNotes(modifier, arrowKeyDirection, selectedNotes);
+            }
+        }
+        editorNoteDisplayer.UpdateNotesAndSentences();
+    }
+
+    private void AdjustFollowingNotes(EKeyboardModifier modifier, Vector2 arrowKeyDirection, List<Note> selectedNotes)
+    {
+        // Moving is applied to following notes as well.
+        // When extending / shrinking the right side, then the following notes are move to compensate.
+        List<Note> followingNotes = songEditorSceneController.GetFollowingNotes(selectedNotes);
+        foreach (Note note in followingNotes)
+        {
+            // Moved with Shift. The following notes are moved as well.
+            if (modifier == EKeyboardModifier.Shift)
+            {
+                note.MoveHorizontal((int)arrowKeyDirection.x);
+                note.MoveVertical((int)arrowKeyDirection.y);
+            }
+
+            // Extended right side with Alt. The following notes must be moved to compensate.
+            if (modifier == EKeyboardModifier.Alt)
+            {
+                note.MoveHorizontal((int)arrowKeyDirection.x);
             }
         }
     }

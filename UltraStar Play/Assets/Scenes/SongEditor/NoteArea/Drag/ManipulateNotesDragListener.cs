@@ -22,7 +22,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private NoteAreaDragHandler noteAreaDragHandler;
 
     [Inject]
-    SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneController songEditorSceneController;
+
+    [Inject]
+    private Settings settings;
+
+    private List<Note> selectedNotes;
+    private List<Note> followingNotes;
 
     private Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
     private bool isCanceled;
@@ -64,7 +70,17 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
 
         dragAction = GetDragAction(dragStartUiNote, dragEvent);
 
-        CreateSnapshot(selectionController.GetSelectedNotes());
+        selectedNotes = selectionController.GetSelectedNotes();
+        if (settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            followingNotes = songEditorSceneController.GetFollowingNotes(selectedNotes);
+        }
+        else
+        {
+            followingNotes.Clear();
+        }
+
+        CreateSnapshot(selectedNotes.Union(followingNotes));
     }
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
@@ -75,20 +91,20 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
                 DragDirection dragDirection = GetDragDirection(dragEvent);
                 if (dragDirection == DragDirection.Horizontal)
                 {
-                    MoveNotesHorizontal(dragEvent);
+                    MoveNotesHorizontal(dragEvent, selectedNotes, true);
                 }
                 else
                 {
-                    MoveNotesVertical(dragEvent);
+                    MoveNotesVertical(dragEvent, selectedNotes, true);
                 }
                 break;
 
             case DragAction.StretchLeft:
-                StretchNotesLeft(dragEvent);
+                StretchNotesLeft(dragEvent, selectedNotes);
                 break;
 
             case DragAction.StretchRight:
-                StretchNotesRight(dragEvent);
+                StretchNotesRight(dragEvent, selectedNotes, true);
                 break;
         }
         songEditorSceneController.OnNotesChanged();
@@ -121,7 +137,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
         return isCanceled;
     }
 
-    private void CreateSnapshot(List<Note> notes)
+    private void CreateSnapshot(IEnumerable<Note> notes)
     {
         noteToSnapshotOfNoteMap.Clear();
         foreach (Note note in notes)
@@ -153,10 +169,42 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
         return DragDirection.Horizontal;
     }
 
-    private void StretchNotesRight(NoteAreaDragEvent dragEvent)
+    private void MoveNotesVertical(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
+        foreach (Note note in notes)
+        {
+            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            int newMidiNote = noteSnapshot.MidiNote + dragEvent.MidiNoteDistance;
+            note.SetMidiNote(newMidiNote);
+            note.SetStartAndEndBeat(noteSnapshot.StartBeat, noteSnapshot.EndBeat);
+        }
+
+        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            MoveNotesVertical(dragEvent, followingNotes, false);
+        }
+    }
+
+    private void MoveNotesHorizontal(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
+    {
+        foreach (Note note in notes)
+        {
+            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
+            int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
+            note.SetMidiNote(noteSnapshot.MidiNote);
+            note.SetStartAndEndBeat(newStartBeat, newEndBeat);
+        }
+
+        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            MoveNotesHorizontal(dragEvent, followingNotes, false);
+        }
+    }
+
+    private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
+    {
+        foreach (Note note in notes)
         {
             Note noteSnapshot = noteToSnapshotOfNoteMap[note];
             int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
@@ -165,12 +213,16 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
                 note.SetEndBeat(newEndBeat);
             }
         }
+
+        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            MoveNotesHorizontal(dragEvent, followingNotes, false);
+        }
     }
 
-    private void StretchNotesLeft(NoteAreaDragEvent dragEvent)
+    private void StretchNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
     {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
+        foreach (Note note in notes)
         {
             Note noteSnapshot = noteToSnapshotOfNoteMap[note];
             int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
@@ -178,31 +230,6 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
             {
                 note.SetStartBeat(newStartBeat);
             }
-        }
-    }
-
-    private void MoveNotesVertical(NoteAreaDragEvent dragEvent)
-    {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
-        {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            int newMidiNote = noteSnapshot.MidiNote + dragEvent.MidiNoteDistance;
-            note.SetMidiNote(newMidiNote);
-            note.SetStartAndEndBeat(noteSnapshot.StartBeat, noteSnapshot.EndBeat);
-        }
-    }
-
-    private void MoveNotesHorizontal(NoteAreaDragEvent dragEvent)
-    {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
-        {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
-            int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
-            note.SetMidiNote(noteSnapshot.MidiNote);
-            note.SetStartAndEndBeat(newStartBeat, newEndBeat);
         }
     }
 }
