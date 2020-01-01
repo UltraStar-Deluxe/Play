@@ -75,7 +75,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         // Initialize Viewport
         SetViewportX(0, true);
         SetViewportY(MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4), true);
-        SetViewportWidth(3000, true);
+        SetViewportWidth(5000, true);
         SetViewportHeight(MidiUtils.SingableNoteRange / 2, true);
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);

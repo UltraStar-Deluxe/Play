@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.EventSystems;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -54,6 +55,12 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
+        if (dragEvent.InputButton != PointerEventData.InputButton.Left)
+        {
+            CancelDrag();
+            return;
+        }
+
         isCanceled = false;
         GameObject raycastTarget = dragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
         EditorUiNote dragStartUiNote = raycastTarget.GetComponent<EditorUiNote>();
