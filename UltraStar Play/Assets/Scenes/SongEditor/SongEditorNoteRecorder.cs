@@ -35,6 +35,9 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
 
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
     private int lastPitchDetectedFrame;
 
     private Note lastRecordedNote;
@@ -96,6 +99,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         {
             CreateNewRecordedNote(midiNote, currentBeat, targetLayer);
         }
+
+        editorNoteDisplayer.UpdateNotes();
 
         lastPitchDetectedFrame = Time.frameCount;
     }
