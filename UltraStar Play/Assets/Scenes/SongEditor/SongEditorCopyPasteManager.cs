@@ -30,6 +30,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorLayerManager layerManager;
 
+    private Voice copiedVoice;
+
     private List<Note> CopiedNotes
     {
         get
@@ -92,8 +94,14 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
         Sentence sentenceAtBeatWithVoice = songEditorSceneController.GetSentencesAtBeat(minBeat)
             .Where(it => it.Voice != null).FirstOrDefault();
+
+        // Find voice to insert the notes into
         Voice voice;
-        if (sentenceAtBeatWithVoice != null)
+        if (copiedVoice != null)
+        {
+            voice = copiedVoice;
+        }
+        else if (sentenceAtBeatWithVoice != null)
         {
             voice = sentenceAtBeatWithVoice.Voice;
         }
@@ -142,6 +150,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
         foreach (Note note in selectedNotes)
         {
+            copiedVoice = note.Sentence?.Voice;
             Note noteCopy = note.Clone();
             noteCopy.SetSentence(null);
             CopiedNotes.Add(noteCopy);
