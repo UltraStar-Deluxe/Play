@@ -68,6 +68,7 @@ public class Note
         IsNormal = other.IsNormal;
         IsGolden = other.IsGolden;
         IsFreestyle = other.IsFreestyle;
+        Text = other.Text;
     }
 
     public void SetSentence(Sentence sentence)
@@ -156,6 +157,16 @@ public class Note
             EndBeat = StartBeat + Length;
             OnNotePositionChanged();
         }
+    }
+
+    public void MoveHorizontal(int distanceInBeats)
+    {
+        SetStartAndEndBeat(StartBeat + distanceInBeats, EndBeat + distanceInBeats);
+    }
+
+    public void MoveVertical(int distanceInMidiNotes)
+    {
+        SetMidiNote(MidiNote + distanceInMidiNotes);
     }
 
     public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)

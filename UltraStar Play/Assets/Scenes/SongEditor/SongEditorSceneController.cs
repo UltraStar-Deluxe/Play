@@ -279,6 +279,29 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         return sortedVoices[index];
     }
 
+    public Sentence GetSentenceForNote(Note note, Voice voice)
+    {
+        foreach (Sentence sentence in voice.Sentences)
+        {
+            if (sentence.MinBeat <= note.StartBeat && note.EndBeat <= sentence.ExtendedMaxBeat)
+            {
+                return sentence;
+            };
+        }
+        return null;
+    }
+
+    public List<Sentence> GetSentencesAtBeat(int beat)
+    {
+        return Voices.SelectMany(voice => voice.Sentences)
+            .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
+    }
+
+    public bool IsBeatInSentence(Sentence sentence, int beat)
+    {
+        return sentence.MinBeat <= beat && beat <= Math.Max(sentence.MaxBeat, sentence.LinebreakBeat);
+    }
+
     public void OnNotesChanged()
     {
         // TODO: Create history for undo/redo

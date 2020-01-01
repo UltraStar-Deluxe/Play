@@ -24,6 +24,9 @@ public class Sentence : ISerializationCallbackReceiver
     public int MinBeat { get; private set; }
     public int MaxBeat { get; private set; }
 
+    // ExtendedMaxBeat is equal to Math.Max(MaxBeat, LinebreakBeat)
+    public int ExtendedMaxBeat { get; private set; }
+
     public Sentence()
     {
     }
@@ -33,11 +36,13 @@ public class Sentence : ISerializationCallbackReceiver
         MinBeat = minBeat;
         MaxBeat = maxBeat;
         LinebreakBeat = maxBeat;
+        ExtendedMaxBeat = maxBeat;
     }
 
     public Sentence(List<Note> notes, int linebreakBeat = 0)
     {
         LinebreakBeat = linebreakBeat;
+        ExtendedMaxBeat = linebreakBeat;
         SetNotes(notes);
     }
 
@@ -125,9 +130,16 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
+    public void FitToNotes()
+    {
+        UpdateMinAndMaxBeat();
+        SetLinebreakBeat(MaxBeat);
+    }
+
     public void SetLinebreakBeat(int newBeat)
     {
         LinebreakBeat = (newBeat < MaxBeat) ? MaxBeat : newBeat;
+        ExtendedMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
     }
 
     private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
@@ -146,6 +158,7 @@ public class Sentence : ISerializationCallbackReceiver
             if (LinebreakBeat < MaxBeat)
             {
                 LinebreakBeat = MaxBeat;
+                ExtendedMaxBeat = MaxBeat;
             }
         }
     }
@@ -163,6 +176,7 @@ public class Sentence : ISerializationCallbackReceiver
             if (LinebreakBeat < MaxBeat)
             {
                 LinebreakBeat = MaxBeat;
+                ExtendedMaxBeat = MaxBeat;
             }
         }
     }

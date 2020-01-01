@@ -11,6 +11,11 @@ public class SongEditorLayer
 
     private readonly List<Note> notes = new List<Note>();
 
+    public SongEditorLayer(ESongEditorLayer layerKey)
+    {
+        this.LayerKey = layerKey;
+    }
+
     public void AddNote(Note note)
     {
         notes.Add(note);
@@ -23,12 +28,11 @@ public class SongEditorLayer
 
     public List<Note> GetNotes()
     {
-        List<Note> notesCopy = new List<Note>(notes);
-        return notesCopy;
+        return new List<Note>(notes);
     }
 
-    public SongEditorLayer(ESongEditorLayer layerKey)
+    public void ClearNotes()
     {
-        this.LayerKey = layerKey;
+        notes.Clear();
     }
 }

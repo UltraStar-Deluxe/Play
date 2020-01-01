@@ -4923,6 +4923,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ada3691b0478384d91807538dca679d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1171513816
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1171513818}
+  - component: {fileID: 1171513817}
+  m_Layer: 0
+  m_Name: SongEditorCopyPasteManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1171513817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171513816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c5e407ce767b2146b0f02663b99bda2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1171513818
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171513816}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 457.99368, y: 298.31155, z: -487.375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1175056229
 GameObject:
   m_ObjectHideFlags: 0
@@ -8995,10 +9038,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1865879047}
     m_Modifications:
-    - target: {fileID: 7027480441284345784, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+    - target: {fileID: 7650775801855129022, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
-      propertyPath: m_Type
-      value: 2
+      propertyPath: m_Name
+      value: EditorNotePrefab
       objectReference: {fileID: 0}
     - target: {fileID: 7650775801855129021, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
@@ -9105,10 +9148,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 7650775801855129022, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+    - target: {fileID: 7027480441284345784, guid: 1ddb7c352ea45e748a0d4df3143043fe,
         type: 3}
-      propertyPath: m_Name
-      value: EditorNotePrefab
+      propertyPath: m_Type
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ddb7c352ea45e748a0d4df3143043fe, type: 3}
