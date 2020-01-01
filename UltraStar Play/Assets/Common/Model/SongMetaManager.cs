@@ -82,7 +82,7 @@ public class SongMetaManager : MonoBehaviour
         {
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
-                Dictionary<string, Voice> voiceIdentifierToVoiceMap = VoicesBuilder.ParseFile(path, songMeta.Encoding, new List<string>());
+                Dictionary<string, Voice> voiceIdentifierToVoiceMap = songMeta.GetVoices();
                 cachedVoices = new CachedVoices(path, voiceIdentifierToVoiceMap);
                 voicesCache.Add(path, cachedVoices);
             }

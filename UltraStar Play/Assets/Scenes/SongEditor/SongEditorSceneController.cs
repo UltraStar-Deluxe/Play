@@ -374,10 +374,15 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private void SaveSong()
     {
-        // TODO: Implement saving the song file.
-        // TODO: A backup of the original file should be created (copy original txt file, but only once),
-        // to avoid breaking songs because of issues in loading / saving the song data.
-        // (This project is still in early development and untested and should not break songs of the users.)
+        // Create backup of original file if not done yet.
+        string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
+        string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
+        if (!File.Exists(backupFile))
+        {
+            File.Copy(songFile, backupFile);
+        }
+        // Write the song data structure to the file.
+        new UltraStarSongFileWriter(SongMeta).WriteFile(songFile);
     }
 
     private void ContinueToSingScene()
