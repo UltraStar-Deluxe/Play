@@ -53,6 +53,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
 
+    [Inject]
+    private Settings settings;
+
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
@@ -75,6 +78,34 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
                 .Subscribe(_ => UpdateNotes());
         }
+
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.HideVoices.Count).Subscribe(_ => OnHideVoicesChanged());
+    }
+
+    private void OnHideVoicesChanged()
+    {
+        // Remove notes of hidden voices
+        foreach (EditorUiNote uiNote in new List<EditorUiNote>(noteToEditorUiNoteMap.Values))
+        {
+            if (!IsVoiceVisible(uiNote.Note.Sentence?.Voice))
+            {
+                DeleteUiNote(uiNote);
+            }
+        }
+
+        // Draw any notes that are now (again) visible.
+        UpdateNotesAndSentences();
+    }
+
+    public bool IsVoiceVisible(Voice voice)
+    {
+        if (voice == null)
+        {
+            return true;
+        }
+        bool isHidden = settings.SongEditorSettings.HideVoices.Contains(voice.Name)
+            || voice.Name.IsNullOrEmpty() && settings.SongEditorSettings.HideVoices.Contains("P1");
+        return !isHidden;
     }
 
     public void ReloadSentences()
@@ -111,7 +142,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Voice voice in Voices)
         {
-            DrawSentences(voice);
+            bool isVisible = IsVoiceVisible(voice);
+            if (isVisible)
+            {
+                DrawSentences(voice);
+            }
         }
 
         sentenceLinesImage.ApplyTexture();
@@ -167,12 +202,17 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
+    public void DeleteUiNote(EditorUiNote uiNote)
+    {
+        noteToEditorUiNoteMap.Remove(uiNote.Note);
+        Destroy(uiNote.gameObject);
+    }
+
     public void DeleteNote(Note note)
     {
         if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))
         {
-            Destroy(uiNote.gameObject);
-            noteToEditorUiNoteMap.Remove(note);
+            DeleteUiNote(uiNote);
         }
     }
 
@@ -222,6 +262,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private void DrawNotesInSongFile()
     {
         List<Sentence> sentencesInViewport = sortedSentencesOfAllVoices
+        .Where(sentence => IsVoiceVisible(sentence.Voice))
         .Where(sentence => noteArea.IsInViewport(sentence))
         .ToList();
 
@@ -232,7 +273,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Note note in notesInViewport)
         {
-            EditorUiNote uiNote = UpdateOrCreateNote(note);
+            UpdateOrCreateNote(note);
         }
     }
 
