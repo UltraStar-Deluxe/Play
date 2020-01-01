@@ -36,7 +36,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
 
     private void OnAddNote(int midiNote, int beat)
     {
-        List<Sentence> sentencesAtBeat = GetSentencesAtBeat(beat);
+        List<Sentence> sentencesAtBeat = songEditorSceneController.GetSentencesAtBeat(beat);
         if (sentencesAtBeat.Count == 0)
         {
             // Add sentence with note
@@ -56,16 +56,5 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
 
             songEditorSceneController.OnNotesChanged();
         }
-    }
-
-    private List<Sentence> GetSentencesAtBeat(int beat)
-    {
-        return Voices.SelectMany(voice => voice.Sentences)
-            .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
-    }
-
-    private bool IsBeatInSentence(Sentence sentence, int beat)
-    {
-        return sentence.MinBeat <= beat && beat <= Math.Max(sentence.MaxBeat, sentence.LinebreakBeat);
     }
 }

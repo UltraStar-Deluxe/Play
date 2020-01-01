@@ -14,9 +14,14 @@ public class SongEditorLayerManager
 {
     private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
 
-    public void AddNoteToLayer(ESongEditorLayer layer, Note note)
+    public void AddNoteToLayer(ESongEditorLayer layerKey, Note note)
     {
-        layerKeyToLayerMap[layer].AddNote(note);
+        layerKeyToLayerMap[layerKey].AddNote(note);
+    }
+
+    public void ClearLayer(ESongEditorLayer layerKey)
+    {
+        layerKeyToLayerMap[layerKey].ClearNotes();
     }
 
     public List<Note> GetNotes(ESongEditorLayer layerKey)
@@ -49,6 +54,7 @@ public class SongEditorLayerManager
         }
         result[ESongEditorLayer.MicRecording].Color = Colors.coral;
         result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
+        result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 0.8f);
         return result;
     }
 
