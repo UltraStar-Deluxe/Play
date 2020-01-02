@@ -21,10 +21,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
     private SongEditorLayerManager layerManager;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
-
-    [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongMeta songMeta;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -112,7 +109,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
 
     private void SaveVoices(SongEditorMemento memento)
     {
-        List<Voice> voices = songEditorSceneController.Voices;
+        IEnumerable<Voice> voices = songMeta.GetVoices();
         foreach (Voice voice in voices)
         {
             Voice voiceCopy = voice.CloneDeep();
@@ -134,7 +131,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
     {
         foreach (Voice voice in undoState.Voices)
         {
-            Voice matchingVoice = songEditorSceneController.Voices
+            Voice matchingVoice = songMeta.GetVoices()
                 .Where(it => it.Name == voice.Name).FirstOrDefault();
             if (matchingVoice != null)
             {

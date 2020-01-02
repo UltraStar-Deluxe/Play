@@ -17,10 +17,19 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     SongEditorSceneController songEditorSceneController;
 
     [Inject]
+    SongMeta songMeta;
+
+    [Inject]
     SongEditorLayerManager layerManager;
 
     [Inject]
     SongEditorSelectionController selectionController;
+
+    private enum EVoices
+    {
+        Voice0,
+        Voice1,
+    }
 
     private EditorUiNote uiNote;
 
@@ -123,12 +132,12 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
     private void FillContextMenuToMoveToOtherVoice(ContextMenu contextMenu)
     {
-        bool canMoveToVoice1 = CanMoveToVoice(0);
-        bool canMoveToVoice2 = CanMoveToVoice(1);
+        bool canMoveToVoice1 = CanMoveToVoice(Voice.soloVoiceName, Voice.firstVoiceName);
+        bool canMoveToVoice2 = CanMoveToVoice(Voice.secondVoiceName);
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddItem("Move to player 1", () => OnMoveToVoice(0));
+            contextMenu.AddItem("Move to player 1", () => OnMoveToVoice(Voice.firstVoiceName));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
         {
@@ -136,20 +145,27 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         }
         if (canMoveToVoice2)
         {
-            contextMenu.AddItem("Move to player 2", () => OnMoveToVoice(1));
+            contextMenu.AddItem("Move to player 2", () => OnMoveToVoice(Voice.secondVoiceName));
         }
     }
 
-    private bool CanMoveToVoice(int index)
+    private bool CanMoveToVoice(params string[] voiceNames)
     {
-        Voice voice = songEditorSceneController.GetOrCreateVoice(index);
+        IReadOnlyList<Voice> voices = songMeta.GetVoices();
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        return selectedNotes.AnyMatch(note => note.Sentence == null || note.Sentence.Voice != voice);
+        // The notes can be moved if there is any note
+        // that is not yet inside the voice with one of the given voice names.
+        return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
     }
 
-    private void OnMoveToVoice(int index)
+    private bool HasVoice(Note note, string[] voiceNames)
     {
-        Voice voice = songEditorSceneController.GetOrCreateVoice(index);
+        return note.Sentence != null && voiceNames.Contains(note.Sentence.Voice.Name);
+    }
+
+    private void OnMoveToVoice(string voiceName)
+    {
+        Voice voice = songEditorSceneController.GetOrCreateVoice(voiceName);
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
 
         List<Sentence> changedSentences = new List<Sentence>();

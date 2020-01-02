@@ -23,22 +23,20 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
-    [Inject]
     private SongAudioPlayer songAudioPlayer;
 
     void Start()
     {
         int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
-        DrawVoices(songDurationInMillis, songMeta, songEditorSceneController.Voices);
+        DrawVoices(songDurationInMillis, songMeta);
     }
 
-    public void DrawVoices(int songDurationInMillis, SongMeta songMeta, List<Voice> voices)
+    public void DrawVoices(int songDurationInMillis, SongMeta songMeta)
     {
         dynImage.ClearTexture();
 
         int voiceIndex = 0;
+        IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
         foreach (Voice voice in voices)
         {
             Color color = voiceColors[voiceIndex];

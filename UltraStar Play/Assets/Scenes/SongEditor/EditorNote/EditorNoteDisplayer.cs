@@ -29,19 +29,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
-    private List<Voice> Voices
-    {
-        get
-        {
-            return songEditorSceneController.Voices;
-        }
-    }
-
-    private List<Sentence> sortedSentencesOfAllVoices = new List<Sentence>();
-
     private Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
     [Inject]
@@ -103,8 +90,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         {
             return true;
         }
+
         bool isHidden = settings.SongEditorSettings.HideVoices.Contains(voice.Name)
-            || voice.Name.IsNullOrEmpty() && settings.SongEditorSettings.HideVoices.Contains("P1");
+            || (voice.Name == Voice.soloVoiceName
+                && settings.SongEditorSettings.HideVoices.Contains(Voice.firstVoiceName));
         return !isHidden;
     }
 
@@ -117,17 +106,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public void ReloadSentences()
     {
         voiceToSortedSentencesMap.Clear();
-        sortedSentencesOfAllVoices.Clear();
-        foreach (Voice voice in Voices)
+        IEnumerable<Voice> voices = songMeta.GetVoices();
+        foreach (Voice voice in voices)
         {
-            sortedSentencesOfAllVoices.AddRange(voice.Sentences);
-            voiceToSortedSentencesMap.Add(voice, new List<Sentence>(voice.Sentences));
-        }
-
-        sortedSentencesOfAllVoices.Sort(Sentence.comparerByStartBeat);
-        foreach (List<Sentence> sentences in voiceToSortedSentencesMap.Values)
-        {
-            sentences.Sort(Sentence.comparerByStartBeat);
+            List<Sentence> sortedSentences = new List<Sentence>(voice.Sentences);
+            voiceToSortedSentencesMap.Add(voice, sortedSentences);
         }
     }
 
@@ -146,39 +129,40 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceLinesImage.ClearTexture();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
-        foreach (Voice voice in Voices)
+        IEnumerable<Voice> voices = songMeta.GetVoices();
+
+        foreach (Voice voice in voices)
         {
-            bool isVisible = IsVoiceVisible(voice);
-            if (isVisible)
+            if (IsVoiceVisible(voice))
             {
-                DrawSentences(voice);
+                DrawSentencesInVoice(voice);
             }
         }
-
         sentenceLinesImage.ApplyTexture();
     }
 
-    private void DrawSentences(Voice voice)
+    private void DrawSentencesInVoice(Voice voice)
     {
-        string voiceNamePrefix = (!voice.Name.IsNullOrEmpty()) ? voice.Name + " - " : "";
         int viewportWidthInBeats = noteArea.MaxBeatInViewport - noteArea.MinBeatInViewport;
+        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+
         int sentenceIndex = 0;
-        foreach (Sentence sentence in voiceToSortedSentencesMap[voice])
+        foreach (Sentence sentence in sortedSentencesOfVoice)
         {
             if (noteArea.IsInViewport(sentence))
             {
-                int startBeat = sentence.MinBeat;
-                int endBeat = Math.Max(sentence.MaxBeat, sentence.LinebreakBeat);
+                float xStartPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.MinBeat);
+                float xEndPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
+                string label = (sentenceIndex + 1).ToString();
 
                 // Do not draw the sentence marker lines, when there are too many beats
                 if (viewportWidthInBeats < 1200)
                 {
-                    CreateSentenceMarkerLine(startBeat, Colors.saddleBrown, 0);
-                    CreateSentenceMarkerLine(endBeat, Colors.black, 20);
+                    CreateSentenceMarkerLine(xStartPercent, Colors.saddleBrown, 0);
+                    CreateSentenceMarkerLine(xEndPercent, Colors.black, 20);
                 }
 
-                string label = voiceNamePrefix + (sentenceIndex + 1).ToString();
-                CreateUiSentence(sentence, startBeat, endBeat, label);
+                CreateUiSentence(sentence, xStartPercent, xEndPercent, label);
             }
             sentenceIndex++;
         }
@@ -267,10 +251,22 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        List<Sentence> sentencesInViewport = sortedSentencesOfAllVoices
-        .Where(sentence => IsVoiceVisible(sentence.Voice))
-        .Where(sentence => noteArea.IsInViewport(sentence))
-        .ToList();
+        IEnumerable<Voice> voices = songMeta.GetVoices();
+        foreach (Voice voice in voices)
+        {
+            if (IsVoiceVisible(voice))
+            {
+                DrawNotesInVoice(voice);
+            }
+        }
+    }
+
+    private void DrawNotesInVoice(Voice voice)
+    {
+        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sentencesInViewport = sortedSentencesOfVoice
+            .Where(sentence => noteArea.IsInViewport(sentence))
+            .ToList();
 
         List<Note> notesInViewport = sentencesInViewport
                 .SelectMany(sentence => sentence.Notes)
@@ -283,35 +279,30 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CreateUiSentence(Sentence sentence, int startBeat, int endBeat, string label)
+    private EditorUiSentence CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, string label)
     {
         EditorUiSentence uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
-        RectTransform rectTransform = uiSentence.GetComponent<RectTransform>();
 
         injector.Inject(uiSentence);
         injector.Inject(uiSentence.GetComponent<EditorSentenceContextMenuHandler>());
         uiSentence.Init(sentence);
+        uiSentence.SetText(label);
 
-        float xStart = (float)noteArea.GetHorizontalPositionForBeat(startBeat);
-        float xEnd = (float)noteArea.GetHorizontalPositionForBeat(endBeat);
+        PositionUiSentence(uiSentence.RectTransform, xStartPercent, xEndPercent);
 
-        rectTransform.anchorMin = new Vector2(xStart, 0);
-        rectTransform.anchorMax = new Vector2(xEnd, 1);
-        rectTransform.anchoredPosition = Vector2.zero;
-        rectTransform.sizeDelta = Vector2.zero;
-
-        uiSentence.GetComponentInChildren<Text>().text = label;
+        return uiSentence;
     }
 
-    private void CreateSentenceMarkerLine(int beat, Color color, int yDashOffset)
+    private void PositionUiSentence(RectTransform uiSentenceRectTransform, float xStartPercent, float xEndPercent)
     {
-        double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        if (beatPosInMillis < noteArea.ViewportX || beatPosInMillis > noteArea.MaxMillisecondsInViewport)
-        {
-            return;
-        }
+        uiSentenceRectTransform.anchorMin = new Vector2(xStartPercent, 0);
+        uiSentenceRectTransform.anchorMax = new Vector2(xEndPercent, 1);
+        uiSentenceRectTransform.anchoredPosition = Vector2.zero;
+        uiSentenceRectTransform.sizeDelta = Vector2.zero;
+    }
 
-        double xPercent = (beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth;
+    private void CreateSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
+    {
         int x = (int)(xPercent * sentenceLinesImage.TextureWidth);
 
         for (int y = 0; y < sentenceLinesImage.TextureHeight; y++)

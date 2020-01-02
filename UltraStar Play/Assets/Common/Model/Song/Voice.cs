@@ -5,9 +5,13 @@ using UnityEngine;
 [Serializable]
 public class Voice : ISerializationCallbackReceiver
 {
+    public static readonly string soloVoiceName = "";
+    public static readonly string firstVoiceName = "P1";
+    public static readonly string secondVoiceName = "P2";
+
     public static readonly IComparer<Voice> comparerByName = new VoiceComparerByName();
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = soloVoiceName;
 
     private readonly SentenceHashSet sentences = new SentenceHashSet();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
@@ -16,7 +20,12 @@ public class Voice : ISerializationCallbackReceiver
     {
     }
 
-    public Voice(List<Sentence> sentences, string name)
+    public Voice(string name)
+    {
+        SetName(name);
+    }
+
+    public Voice(IEnumerable<Sentence> sentences, string name)
     {
         SetName(name);
         SetSentences(sentences);
@@ -73,7 +82,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public void SetName(string name)
     {
-        this.Name = name;
+        Name = name ?? throw new ArgumentNullException("Voice name cannot be null");
     }
 
     public void OnBeforeSerialize()
@@ -91,8 +100,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public Voice CloneDeep()
     {
-        Voice clone = new Voice();
-        clone.SetName(Name);
+        Voice clone = new Voice(Name);
         foreach (Sentence sentence in Sentences)
         {
             Sentence sentenceCopy = sentence.CloneDeep();

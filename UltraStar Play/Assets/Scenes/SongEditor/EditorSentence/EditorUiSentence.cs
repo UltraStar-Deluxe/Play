@@ -17,6 +17,12 @@ public class EditorUiSentence : MonoBehaviour, INeedInjection
 
     public Sentence Sentence { get; private set; }
 
+    [Inject(searchMethod = SearchMethods.GetComponent)]
+    public RectTransform RectTransform { get; private set; }
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    public Text uiText;
+
     [Inject]
     private SongEditorSceneController songEditorSceneController;
 
@@ -31,8 +37,13 @@ public class EditorUiSentence : MonoBehaviour, INeedInjection
         }
     }
 
-    private void SetColor(Color color)
+    public void SetColor(Color color)
     {
         backgroundImage.color = color;
+    }
+
+    public void SetText(string label)
+    {
+        uiText.text = label;
     }
 }

@@ -2425,8 +2425,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Summer Wine
-  defaultSongNamePasteBin: 
+  defaultSongName: EmptyTitle
+  defaultSongNamePasteBin: Summer Wine
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 8406949}
   songEditorNoteRecorder: {fileID: 1231934095}
@@ -8520,7 +8520,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef88a60247c891f47ba932bc3f015cac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionInHistory: 0
 --- !u!4 &1903150257
 Transform:
   m_ObjectHideFlags: 0

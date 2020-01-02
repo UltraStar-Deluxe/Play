@@ -31,7 +31,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        lyrics = GetLyrics(songEditorSceneController.Voices);
+        lyrics = GetLyrics(songMeta);
         inputField.text = lyrics;
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
     }
@@ -63,8 +63,9 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         }
     }
 
-    private string GetLyrics(List<Voice> voices)
+    private string GetLyrics(SongMeta songMeta)
     {
+        IEnumerable<Voice> voices = songMeta.GetVoices();
         sortedSentences = voices.SelectMany(voice => voice.Sentences).ToList();
         sortedSentences.Sort((s1, s2) => s1.MinBeat.CompareTo(s2.MinBeat));
         StringBuilder stringBuilder = new StringBuilder();
