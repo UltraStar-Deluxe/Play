@@ -66,15 +66,15 @@ public class Sentence : ISerializationCallbackReceiver
 
     public void UpdateMinAndMaxBeat()
     {
-        UpdateMinBeat(notes);
-        UpdateMaxBeat(notes);
+        UpdateMinBeat();
+        UpdateMaxBeat();
     }
 
     public void SetNotes(List<Note> newNotes)
     {
         if (newNotes == null)
         {
-            throw new UnityException("Notes cannot be null!");
+            throw new ArgumentNullException("Notes cannot be null!");
         }
 
         foreach (Note note in new List<Note>(notes))
@@ -95,7 +95,7 @@ public class Sentence : ISerializationCallbackReceiver
     {
         if (note == null)
         {
-            throw new UnityException("Note cannot be null");
+            throw new ArgumentNullException("Note cannot be null");
         }
 
         // The check is needed to avoid a recursive loop between Sentence.AddNote and Note.SetSentence.
@@ -106,7 +106,7 @@ public class Sentence : ISerializationCallbackReceiver
         notes.Add(note);
         note.SetSentence(this);
 
-        ExpandStartAndEndBeat(note);
+        UpdateMinAndMaxBeat();
     }
 
     public void RemoveNote(Note note)
@@ -126,11 +126,11 @@ public class Sentence : ISerializationCallbackReceiver
 
         if (MinBeat == note.StartBeat)
         {
-            UpdateMinBeat(notes);
+            UpdateMinBeat();
         }
         if (MaxBeat == note.EndBeat)
         {
-            UpdateMaxBeat(notes);
+            UpdateMaxBeat();
         }
     }
 
@@ -142,11 +142,11 @@ public class Sentence : ISerializationCallbackReceiver
 
     public void SetLinebreakBeat(int newBeat)
     {
-        LinebreakBeat = (newBeat < MaxBeat) ? MaxBeat : newBeat;
+        LinebreakBeat = Math.Max(MaxBeat, newBeat);
         ExtendedMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
     }
 
-    private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
+    public void UpdateMinBeat()
     {
         if (notes.Count > 0)
         {
@@ -154,29 +154,11 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    private void UpdateMaxBeat(IReadOnlyCollection<Note> notes)
+    public void UpdateMaxBeat()
     {
         if (notes.Count > 0)
         {
             MaxBeat = notes.Select(it => it.EndBeat).Max();
-            if (LinebreakBeat < MaxBeat)
-            {
-                LinebreakBeat = MaxBeat;
-                ExtendedMaxBeat = MaxBeat;
-            }
-        }
-    }
-
-    public void ExpandStartAndEndBeat(Note note)
-    {
-        if (MinBeat > note.StartBeat)
-        {
-            MinBeat = note.StartBeat;
-        }
-
-        if (MaxBeat < note.EndBeat)
-        {
-            MaxBeat = note.EndBeat;
             if (LinebreakBeat < MaxBeat)
             {
                 LinebreakBeat = MaxBeat;
