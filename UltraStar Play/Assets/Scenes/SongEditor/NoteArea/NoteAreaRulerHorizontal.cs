@@ -30,6 +30,8 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
 
     private ViewportEvent lastViewportEvent;
 
+    private float lastSongMetaBpm;
+
     public void OnSceneInjectionFinished()
     {
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
@@ -39,8 +41,10 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
     {
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
-            || lastViewportEvent.Width != viewportEvent.Width)
+            || lastViewportEvent.Width != viewportEvent.Width
+            || songMeta.Bpm != lastSongMetaBpm)
         {
+            lastSongMetaBpm = songMeta.Bpm;
             UpdateLines();
             UpdateLabels();
         }

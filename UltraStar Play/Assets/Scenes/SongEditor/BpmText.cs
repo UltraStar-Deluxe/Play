@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,6 @@ public class BpmText : MonoBehaviour, INeedInjection
     public void SetBpm(float bpm)
     {
         int bpmInt = (int)bpm;
-        uiText.text = bpmInt + " BPM\n";
+        uiText.text = $"BPM: {bpmInt.ToString("F2", CultureInfo.InvariantCulture)}";
     }
 }
