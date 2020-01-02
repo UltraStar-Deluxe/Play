@@ -1,59 +1,45 @@
 ﻿using System;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 public class MutableSentenceTests
 {
-    private MutableSentence ms;
+    private Sentence ms;
 
     [SetUp]
     public void TestInit()
     {
-        ms = new MutableSentence();
+        ms = new Sentence();
     }
 
     [Test]
     public void TestCreation()
     {
-        Assert.AreEqual(0, ms.GetNotes().Count);
-        Assert.AreEqual(0, ms.GetLinebreakBeat());
+        Assert.AreEqual(0, ms.Notes.Count);
+        Assert.AreEqual(0, ms.LinebreakBeat);
     }
 
     [Test]
     public void TestNullNoteThrowsException()
     {
-        Assert.Throws<ArgumentNullException>(delegate { ms.Add(null); });
+        Assert.Throws<ArgumentNullException>(delegate { ms.AddNote(null); });
     }
 
     [Test]
     public void TestLinebreakBeat()
     {
         ms.SetLinebreakBeat(2);
-        Assert.AreEqual(2, ms.GetLinebreakBeat());
+        Assert.AreEqual(2, ms.LinebreakBeat);
     }
 
-    [Test]
-    public void TestAddingNotesAfterLinebreakBeatThrowsException()
-    {
-        ms.SetLinebreakBeat(2);
-        VoicesBuilderException vbe = Assert.Throws<VoicesBuilderException>(delegate { ms.Add(new Note(ENoteType.Normal, 0, 1, 0, "")); });
-        Assert.AreEqual("Adding more notes after the linebreak has already been set is not allowed", vbe.Message);
-    }
-
-    [Test]
-    public void TestOverlappingNoteThrowsException()
-    {
-        ms.Add(new Note(ENoteType.Normal, 0, 2, 0, ""));
-        VoicesBuilderException vbe = Assert.Throws<VoicesBuilderException>(delegate { ms.Add(new Note(ENoteType.Normal, 1, 1, 0, "")); });
-        Assert.AreEqual("New note overlaps with existing sentence", vbe.Message);
-    }
     [Test]
     public void TestNotes()
     {
         Note testNote = new Note(ENoteType.Normal, 0, 2, 0, "");
-        ms.Add(testNote);
-        List<Note> notes = ms.GetNotes();
+        ms.AddNote(testNote);
+        IReadOnlyCollection<Note> notes = ms.Notes;
         Assert.AreEqual(1, notes.Count);
-        Assert.AreEqual(testNote, notes[0]);
+        Assert.AreEqual(testNote, notes.FirstOrDefault());
     }
 }

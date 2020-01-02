@@ -272,24 +272,30 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
-        string voiceIdentifier = GetVoiceIdentifier(playerProfile);
+        string voiceName = GetVoiceName(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
-        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceIdentifier, micProfile);
+        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceName, micProfile);
 
         PlayerControllers.Add(playerController);
     }
 
-    private string GetVoiceIdentifier(PlayerProfile playerProfile)
+    private string GetVoiceName(PlayerProfile playerProfile)
     {
-        bool isDuett = SongMeta.VoiceNames.Count > 1;
-        if (isDuett && sceneData.SelectedPlayerProfiles.Count == 2)
+        if (sceneData.SelectedPlayerProfiles.Count == 1)
         {
-            int voiceIndex = (sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % 2) + 1;
-            return "P" + voiceIndex;
+            return Voice.soloVoiceName;
+        }
+
+        List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Values);
+        int voiceNameCount = voiceNames.Count;
+        if (voiceNameCount > 1)
+        {
+            int voiceIndex = (sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNameCount);
+            return voiceNames[voiceIndex];
         }
         else
         {
-            return null;
+            return Voice.soloVoiceName;
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 public static class UltraStarSongFileWriter
 {
@@ -16,18 +17,22 @@ public static class UltraStarSongFileWriter
     {
         StringBuilder sb = new StringBuilder();
         AppendHeader(sb, songMeta);
-        List<Voice> sortedVoices = new List<Voice>(songMeta.GetVoices().Values);
-        sortedVoices.Sort(Voice.comparerByName);
-        foreach (Voice voice in sortedVoices)
+        List<Voice> nonEmptyVoices = songMeta.GetVoices().Where(voice => IsNotEmpty(voice)).ToList();
+        if (nonEmptyVoices.Count == 0)
+        {
+            throw new UltraStarSongFileWriterException("The song does not contain any notes");
+        }
+        nonEmptyVoices.Sort(Voice.comparerByName);
+        foreach (Voice voice in nonEmptyVoices)
         {
             string voiceName = voice.Name;
-            if (voiceName.IsNullOrEmpty() && sortedVoices.Count > 1)
+            if (nonEmptyVoices.Count == 1)
             {
-                voiceName = "P1";
+                voiceName = Voice.soloVoiceName;
             }
-            if (!voiceName.IsNullOrEmpty() && sortedVoices.Count == 1)
+            else if (voiceName == Voice.soloVoiceName)
             {
-                voiceName = "";
+                voiceName = Voice.firstVoiceName;
             }
 
             AppendVoice(sb, voice, voiceName);
@@ -38,16 +43,13 @@ public static class UltraStarSongFileWriter
 
     private static void AppendVoice(StringBuilder sb, Voice voice, string voiceName)
     {
-        bool isEmpty = voice.Sentences.SelectMany(it => it.Notes).Any();
-        if (!isEmpty)
-        {
-            return;
-        }
         if (!voiceName.IsNullOrEmpty())
         {
             sb.AppendLine(voiceName);
         }
-        foreach (Sentence sentence in voice.Sentences)
+        List<Sentence> sortedSentences = new List<Sentence>(voice.Sentences);
+        sortedSentences.Sort(Sentence.comparerByStartBeat);
+        foreach (Sentence sentence in sortedSentences)
         {
             AppendSentence(sb, sentence);
         }
@@ -61,29 +63,37 @@ public static class UltraStarSongFileWriter
             return;
         }
 
-        foreach (Note note in sentence.Notes)
+        List<Note> sortedNotes = new List<Note>(sentence.Notes);
+        sortedNotes.Sort(Note.comparerByStartBeat);
+        foreach (Note note in sortedNotes)
         {
             AppendNote(sb, note);
         }
         sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
     }
 
-    private static void AppendNote(StringBuilder sb, Note note)
+    private static bool IsNotEmpty(Voice voice)
     {
-        sb.AppendLine($"{GetNotePrefix(note)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
+        return voice.Sentences.SelectMany(sentence => sentence.Notes).Any();
     }
 
-    private static string GetNotePrefix(Note note)
+    private static void AppendNote(StringBuilder sb, Note note)
     {
-        if (note.IsGolden)
+        sb.AppendLine($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
+    }
+
+    private static string GetNoteTypePrefix(ENoteType noteType)
+    {
+        switch (noteType)
         {
-            return "*";
+            case ENoteType.Normal: return ":";
+            case ENoteType.Golden: return "*";
+            case ENoteType.Freestyle: return "F";
+            case ENoteType.Rap: return "R";
+            case ENoteType.RapGolden: return "G";
+            default:
+                throw new UltraStarSongFileWriterException("Unkown note type '" + noteType + "'.");
         }
-        if (note.IsFreestyle)
-        {
-            return "F";
-        }
-        return ":";
     }
 
     private static void AppendHeader(StringBuilder sb, SongMeta songMeta)

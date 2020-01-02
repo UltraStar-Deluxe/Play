@@ -107,7 +107,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            voice = songEditorSceneController.GetOrCreateVoice(0);
+            voice = songMeta.GetVoices().FirstOrDefault();
         }
 
         // Add the notes to the voice

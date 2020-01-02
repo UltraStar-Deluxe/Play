@@ -77,13 +77,13 @@ public class PlayerController : MonoBehaviour
         UpdateSentences(sentenceIndex);
     }
 
-    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceIdentifier, MicProfile micProfile)
+    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
     {
         this.SongMeta = songMeta;
         this.PlayerProfile = playerProfile;
         this.MicProfile = micProfile;
 
-        Voice = LoadVoice(songMeta, voiceIdentifier);
+        Voice = GetVoice(songMeta, voiceName);
         PlayerScoreController.Init(Voice);
         PlayerNoteRecorder.Init(this, playerProfile, micProfile);
     }
@@ -103,36 +103,39 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private Voice LoadVoice(SongMeta songMeta, string voiceIdentifier)
+    private Voice GetVoice(SongMeta songMeta, string voiceName)
     {
-        Dictionary<string, Voice> voices = SongMetaManager.GetVoices(songMeta);
-        if (string.IsNullOrEmpty(voiceIdentifier))
+        IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
+        if (string.IsNullOrEmpty(voiceName) || voiceName == Voice.soloVoiceName)
         {
             Voice mergedVoice = CreateMergedVoice(voices);
             return mergedVoice;
         }
         else
         {
-            if (voices.TryGetValue(voiceIdentifier, out Voice loadedVoice))
+            Voice voice = voices.Where(it => it.Name == voiceName).FirstOrDefault();
+            if (voice != null)
             {
-                return loadedVoice;
+                return voice;
             }
             else
             {
-                throw new Exception($"The song does not contain a voice for {voiceIdentifier}");
+                string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
+                throw new UnityException($"The song data does not contain a voice with name {voiceName}."
+                    + $" Available voices: {voiceNameCsv}");
             }
         }
     }
 
-    private Voice CreateMergedVoice(Dictionary<string, Voice> voices)
+    private Voice CreateMergedVoice(IReadOnlyCollection<Voice> voices)
     {
         if (voices.Count == 1)
         {
-            return voices.Values.First();
+            return voices.First();
         }
 
-        MutableVoice mergedVoice = new MutableVoice("");
-        List<Sentence> allSentences = voices.Values.SelectMany(voice => voice.Sentences).ToList();
+        Voice mergedVoice = new Voice("");
+        List<Sentence> allSentences = voices.SelectMany(voice => voice.Sentences).ToList();
         List<Note> allNotes = allSentences.SelectMany(sentence => sentence.Notes).ToList();
         // Sort notes by start beat
         allNotes.Sort((note1, note2) => note1.StartBeat.CompareTo(note2.StartBeat));
@@ -142,16 +145,16 @@ public class PlayerController : MonoBehaviour
         int lineBreakIndex = 0;
         int nextLineBreakBeat = lineBreaks[lineBreakIndex];
         // Create sentences
-        MutableSentence mutableSentence = new MutableSentence();
+        Sentence mutableSentence = new Sentence();
         foreach (Note note in allNotes)
         {
-            if (!mutableSentence.GetNotes().IsNullOrEmpty()
+            if (!mutableSentence.Notes.IsNullOrEmpty()
                 && (nextLineBreakBeat >= 0 && note.StartBeat > nextLineBreakBeat))
             {
                 // Finish the last sentence
                 mutableSentence.SetLinebreakBeat(nextLineBreakBeat);
-                mergedVoice.Add((Sentence)mutableSentence);
-                mutableSentence = new MutableSentence();
+                mergedVoice.AddSentence(mutableSentence);
+                mutableSentence = new Sentence();
 
                 lineBreakIndex++;
                 if (lineBreakIndex < lineBreaks.Count)
@@ -163,12 +166,12 @@ public class PlayerController : MonoBehaviour
                     lineBreakIndex = -1;
                 }
             }
-            mutableSentence.Add(note);
+            mutableSentence.AddNote(note);
         }
 
         // Finish the last sentence
-        mergedVoice.Add((Sentence)mutableSentence);
-        return (Voice)mergedVoice;
+        mergedVoice.AddSentence(mutableSentence);
+        return mergedVoice;
     }
 
     public void OnRecordedNoteEnded(RecordedNote recordedNote)

@@ -13,18 +13,13 @@ using UniRx;
 public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjection
 {
     [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
     private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private NoteArea noteArea;
-
-    private List<Voice> Voices
-    {
-        get
-        {
-            return songEditorSceneController.Voices;
-        }
-    }
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
@@ -43,7 +38,8 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
             Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
             Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
-            newSentence.SetVoice(Voices[0]);
+            IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
+            newSentence.SetVoice(voices.FirstOrDefault());
 
             songEditorSceneController.OnNotesChanged();
         }

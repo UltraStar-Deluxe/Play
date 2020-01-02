@@ -58,13 +58,10 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
 
-    [Inject]
-    private Injector injector;
-
     private bool lastIsPlaying;
     private double positionInSongInMillisWhenPlaybackStarted;
 
-    private Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
+    private readonly Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
 
     private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
 
@@ -75,27 +72,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         get
         {
             return SceneData.SelectedSongMeta;
-        }
-    }
-
-    private Dictionary<string, Voice> voiceIdToVoiceMap;
-    private Dictionary<string, Voice> VoiceIdToVoiceMap
-    {
-        get
-        {
-            if (voiceIdToVoiceMap == null)
-            {
-                voiceIdToVoiceMap = SongMetaManager.GetVoices(SongMeta);
-            }
-            return voiceIdToVoiceMap;
-        }
-    }
-
-    public List<Voice> Voices
-    {
-        get
-        {
-            return VoiceIdToVoiceMap.Values.ToList();
         }
     }
 
@@ -190,17 +166,16 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     private void CreateVoiceToColorMap()
     {
         List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
-        List<Voice> sortedVoices = new List<Voice>(Voices);
-        sortedVoices.Sort(Voice.comparerByName);
         int index = 0;
-        foreach (Voice v in sortedVoices)
+        foreach (Voice v in SongMeta.GetVoices())
         {
-            if (colors.Count > index)
+            if (index < colors.Count)
             {
                 voiceToColorMap[v] = colors[index];
             }
             else
             {
+                // fallback color
                 voiceToColorMap[v] = Colors.beige;
             }
             index++;
@@ -231,8 +206,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     public List<Sentence> GetAllSentences()
     {
         List<Sentence> result = new List<Sentence>();
-        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
-        List<Sentence> sentencesInVoices = voices.SelectMany(voice => voice.Sentences).ToList();
+        List<Sentence> sentencesInVoices = SongMeta.GetVoices().SelectMany(voice => voice.Sentences).ToList();
         List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
         result.AddRange(sentencesInVoices);
         return result;
@@ -240,7 +214,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public Sentence GetNextSentence(Sentence sentence)
     {
-        List<Sentence> sentencesOfVoice = VoiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+        List<Sentence> sentencesOfVoice = SongMeta.GetVoices().Where(voice => voice == sentence.Voice)
             .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
         sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
@@ -257,7 +231,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public Sentence GetPreviousSentence(Sentence sentence)
     {
-        List<Sentence> sentencesOfVoice = VoiceIdToVoiceMap.Values.Where(voice => voice == sentence.Voice)
+        List<Sentence> sentencesOfVoice = SongMeta.GetVoices().Where(voice => voice == sentence.Voice)
             .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
         sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
@@ -272,29 +246,28 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         return null;
     }
 
-    public Voice GetOrCreateVoice(int index)
+    public Voice GetOrCreateVoice(string voiceName)
     {
-        List<Voice> sortedVoices = new List<Voice>(Voices);
-        sortedVoices.Sort(Voice.comparerByName);
-        if (sortedVoices.Count <= index)
+        Voice matchingVoice = SongMeta.GetVoices()
+            .Where(it => it.Name == voiceName || (voiceName.IsNullOrEmpty() && it.Name == Voice.soloVoiceName))
+            .FirstOrDefault();
+        if (matchingVoice != null)
         {
-            // Set voice identifier for solo voice because this is not a solo song anymore.
-            if (sortedVoices.Count > 0 && sortedVoices[0].Name.IsNullOrEmpty())
-            {
-                sortedVoices[0].SetName("P1");
-            }
-
-            // Create all missing voices up to the index
-            for (int i = sortedVoices.Count; i <= index; i++)
-            {
-                string voiceIdentifier = "P" + (i + 1);
-                Voice newVoice = new Voice(new List<Sentence>(), voiceIdentifier);
-                VoiceIdToVoiceMap.Add(voiceIdentifier, newVoice);
-                sortedVoices.Add(newVoice);
-            }
-            OnNotesChanged();
+            return matchingVoice;
         }
-        return sortedVoices[index];
+
+        // Create new voice.
+        // Set voice identifier for solo voice because this is not a solo song anymore.
+        Voice soloVoice = SongMeta.GetVoices().Where(it => it.Name == Voice.soloVoiceName).FirstOrDefault();
+        if (soloVoice != null)
+        {
+            soloVoice.SetName(Voice.firstVoiceName);
+        }
+
+        Voice newVoice = new Voice(voiceName);
+        SongMeta.AddVoice(newVoice);
+
+        return newVoice;
     }
 
     public Sentence GetSentenceForNote(Note note, Voice voice)
@@ -311,7 +284,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public List<Sentence> GetSentencesAtBeat(int beat)
     {
-        return Voices.SelectMany(voice => voice.Sentences)
+        return SongMeta.GetVoices().SelectMany(voice => voice.Sentences)
             .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
     }
 
@@ -405,7 +378,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         defaultSceneData.PreviousScene = EScene.SingScene;
 
         SingSceneData singSceneData = new SingSceneData();
-
+        singSceneData.SelectedSongMeta = defaultSceneData.SelectedSongMeta;
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
         List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
         playerProfiles.Add(playerProfile);
