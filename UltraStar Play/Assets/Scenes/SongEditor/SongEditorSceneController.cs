@@ -345,7 +345,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         SaveSong();
     }
 
-    private void SaveSong()
+    public void SaveSong()
     {
         // Create backup of original file if not done yet.
         string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;

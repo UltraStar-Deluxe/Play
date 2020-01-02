@@ -58,6 +58,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             historyManager.Redo();
         }
 
+        // Save via Ctrl+S
+        if (Input.GetKeyUp(KeyCode.S) && modifier == EKeyboardModifier.Ctrl)
+        {
+            songEditorSceneController.SaveSong();
+        }
+
         // Tab to select next note, Shift+Tab to select previous note
         if (Input.GetKeyUp(KeyCode.Tab))
         {
