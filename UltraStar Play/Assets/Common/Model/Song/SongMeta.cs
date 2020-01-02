@@ -8,14 +8,14 @@ using System.Linq;
 public class SongMeta
 {
     // required helper fields
-    public string Directory { get; private set; }
-    public string Filename { get; private set; }
+    public string Directory { get; set; }
+    public string Filename { get; set; }
 
     // required fields
-    public string Artist { get; private set; }
-    public float Bpm { get; private set; }
-    public string Mp3 { get; private set; }
-    public string Title { get; private set; }
+    public string Artist { get; set; }
+    public float Bpm { get; set; }
+    public string Mp3 { get; set; }
+    public string Title { get; set; }
 
     // required special fields
     private Dictionary<string, string> voiceNames;
