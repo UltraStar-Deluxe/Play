@@ -76,7 +76,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
             int xEnd = (int)(dynImage.TextureWidth * endMillis / songDurationInMillis);
             if (xEnd < xStart)
             {
-                Swap(ref xStart, ref xEnd);
+                ObjectUtils.Swap(ref xStart, ref xEnd);
             }
 
             dynImage.DrawRectByCorners(xStart, yStart, xEnd, yEnd, color);
@@ -103,19 +103,12 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
 
             if (xEnd < xStart)
             {
-                Swap(ref xStart, ref xEnd);
+                ObjectUtils.Swap(ref xStart, ref xEnd);
             }
 
             dynImage.DrawRectByCorners(xStart, 0, xEnd, dynImage.TextureHeight, finalColor);
 
             index++;
         }
-    }
-
-    private void Swap(ref int a, ref int b)
-    {
-        int tmp = a;
-        a = b;
-        b = tmp;
     }
 }
