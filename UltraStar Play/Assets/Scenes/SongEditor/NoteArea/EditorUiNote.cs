@@ -21,6 +21,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     [InjectedInInspector]
     public Image backgroundImage;
 
+    [InjectedInInspector]
+    public RectTransform selectionIndicator;
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
@@ -36,6 +39,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongEditorSelectionController selectionController;
+
     private EditorNoteLyricsInputField activeLyricsInputField;
 
     public Note Note { get; private set; }
@@ -45,10 +51,21 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
         this.Note = note;
         SetText(note.Text);
         goldenNoteImageOverlay.gameObject.SetActive(note.IsGolden);
+
+        bool isSelected = selectionController.IsSelected(note);
+        SetSelected(isSelected);
     }
 
     public void OnPointerClick(PointerEventData ped)
     {
+        // Ignore any drag motion. Dragging is used to select notes.
+        float dragDistance = Vector2.Distance(ped.pressPosition, ped.position);
+        bool isDrag = dragDistance > 5f;
+        if (isDrag)
+        {
+            return;
+        }
+
         // Only listen to left mouse button. Right mouse button is for context menu.
         if (ped.button != PointerEventData.InputButton.Left)
         {
@@ -57,9 +74,24 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
 
         if (ped.clickCount == 1)
         {
-            // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
-            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            // Select / deselect notes via Shift.
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                if (selectionController.IsSelected(Note))
+                {
+                    selectionController.RemoveFromSelection(this);
+                }
+                else
+                {
+                    selectionController.AddToSelection(this);
+                }
+            }
+            else
+            {
+                // Move the playback position to the start of the note
+                double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+                songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+            }
         }
         else if (ped.clickCount == 2)
         {
@@ -82,6 +114,11 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler
     public void SetColor(Color color)
     {
         backgroundImage.color = color;
+    }
+
+    public void SetSelected(bool isSelected)
+    {
+        selectionIndicator.gameObject.SetActive(isSelected);
     }
 
     private void StartEditingNoteText()
