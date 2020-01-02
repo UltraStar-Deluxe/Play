@@ -14,6 +14,10 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
 {
     private static readonly int maxHistoryLength = 3;
 
+    // Static reference to last state to load it when opening the song editor scene
+    // (e.g. after switching editor > sing > editor).
+    public static Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
+
     private int indexInHistory = -1;
     private readonly List<SongEditorMemento> history = new List<SongEditorMemento>();
 
@@ -25,6 +29,17 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
+
+    void Start()
+    {
+        // Restore the last state of the editor for this song.
+        if (songMetaToSongEditorMementoMap.TryGetValue(songMeta, out SongEditorMemento memento))
+        {
+            LoadUndoState(memento);
+        }
+
+        AddUndoState();
+    }
 
     public void Undo()
     {
@@ -50,11 +65,6 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
         LoadUndoState(undoState);
     }
 
-    void Start()
-    {
-        AddUndoState();
-    }
-
     public void AddUndoState()
     {
         // Discard undone history
@@ -65,6 +75,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
         }
 
         SongEditorMemento undoState = CreateUndoState();
+        songMetaToSongEditorMementoMap[songMeta] = undoState;
         history.Add(undoState);
         for (int i = history.Count - 1; i > maxHistoryLength; i--)
         {
@@ -125,6 +136,8 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
         editorNoteDisplayer.ClearUiNotes();
         editorNoteDisplayer.ReloadSentences();
         editorNoteDisplayer.UpdateNotesAndSentences();
+
+        songMetaToSongEditorMementoMap[songMeta] = undoState;
     }
 
     private void LoadVoices(SongEditorMemento undoState)
