@@ -4,25 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-public class UltraStarSongFileWriter
+public static class UltraStarSongFileWriter
 {
-    private readonly SongMeta songMeta;
-
-    public UltraStarSongFileWriter(SongMeta songMeta)
+    public static void WriteFile(string absolutePath, SongMeta songMeta)
     {
-        this.songMeta = songMeta;
-    }
-
-    public void WriteFile(string absolutePath)
-    {
-        string txtFileContent = GetTxtFileContent();
+        string txtFileContent = GetTxtFileContent(songMeta);
         File.WriteAllText(absolutePath, txtFileContent, Encoding.UTF8);
     }
 
-    private string GetTxtFileContent()
+    private static string GetTxtFileContent(SongMeta songMeta)
     {
         StringBuilder sb = new StringBuilder();
-        AppendHeader(sb);
+        AppendHeader(sb, songMeta);
         List<Voice> sortedVoices = new List<Voice>(songMeta.GetVoices().Values);
         sortedVoices.Sort(Voice.comparerByName);
         foreach (Voice voice in sortedVoices)
@@ -43,7 +36,7 @@ public class UltraStarSongFileWriter
         return sb.ToString();
     }
 
-    private void AppendVoice(StringBuilder sb, Voice voice, string voiceName)
+    private static void AppendVoice(StringBuilder sb, Voice voice, string voiceName)
     {
         bool isEmpty = voice.Sentences.SelectMany(it => it.Notes).Any();
         if (!isEmpty)
@@ -60,7 +53,7 @@ public class UltraStarSongFileWriter
         }
     }
 
-    private void AppendSentence(StringBuilder sb, Sentence sentence)
+    private static void AppendSentence(StringBuilder sb, Sentence sentence)
     {
         bool isEmpty = sentence.Notes.Count == 0;
         if (isEmpty)
@@ -75,12 +68,12 @@ public class UltraStarSongFileWriter
         sb.AppendLine($"- {sentence.ExtendedMaxBeat}");
     }
 
-    private void AppendNote(StringBuilder sb, Note note)
+    private static void AppendNote(StringBuilder sb, Note note)
     {
         sb.AppendLine($"{GetNotePrefix(note)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
     }
 
-    private string GetNotePrefix(Note note)
+    private static string GetNotePrefix(Note note)
     {
         if (note.IsGolden)
         {
@@ -93,7 +86,7 @@ public class UltraStarSongFileWriter
         return ":";
     }
 
-    private void AppendHeader(StringBuilder sb)
+    private static void AppendHeader(StringBuilder sb, SongMeta songMeta)
     {
         AppendHeaderField(sb, "encoding", "UTF8");
 

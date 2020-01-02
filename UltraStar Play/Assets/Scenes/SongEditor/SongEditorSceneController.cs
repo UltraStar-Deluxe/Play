@@ -382,7 +382,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             File.Copy(songFile, backupFile);
         }
         // Write the song data structure to the file.
-        new UltraStarSongFileWriter(SongMeta).WriteFile(songFile);
+        UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
     }
 
     private void ContinueToSingScene()
