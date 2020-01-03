@@ -226,22 +226,49 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     public void SaveSong()
     {
         string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
+
         // Create backup of original file if not done yet.
         if (SettingsManager.Instance.Settings.SongEditorSettings.SaveCopyOfOriginalFile)
         {
             CreateCopyOfFile(songFile);
         }
-        // Write the song data structure to the file.
-        UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
+
+        try
+        {
+            // Write the song data structure to the file.
+            UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.Instance.CreateWarningDialog("File operation failed",
+                "Saving the file failed: " + e.Message);
+            return;
+        }
+
+        UiManager.Instance.CreateNotification("Saved file");
     }
 
     private void CreateCopyOfFile(string filePath)
     {
-        string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
-        if (!File.Exists(backupFile))
+        try
         {
+            string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
+            if (File.Exists(backupFile))
+            {
+                return;
+            }
             File.Copy(filePath, backupFile);
         }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.Instance.CreateWarningDialog("File operation failed",
+                "Creating a copy of the original file failed: " + e.Message);
+            return;
+        }
+
+        UiManager.Instance.CreateNotification("Created copy of original file");
     }
 
     private void ContinueToSingScene()
