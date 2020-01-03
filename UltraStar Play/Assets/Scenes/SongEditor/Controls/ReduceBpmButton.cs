@@ -22,7 +22,7 @@ public class ReduceBpmButton : MonoBehaviour, INeedInjection
     private NoteArea noteArea;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     void Start()
     {
@@ -32,8 +32,7 @@ public class ReduceBpmButton : MonoBehaviour, INeedInjection
     private void OnButtonClicked()
     {
         ChangeBpmAction.ReduceBpm(songMeta);
-        // songEditorSceneController.OnNotesChanged();
         noteArea.SetViewportHorizontal(noteArea.ViewportX, noteArea.ViewportWidth);
-        FindObjectOfType<BpmText>()?.SetBpm(songMeta.Bpm);
+        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
     }
 }

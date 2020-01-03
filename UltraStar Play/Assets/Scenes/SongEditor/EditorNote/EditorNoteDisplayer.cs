@@ -319,6 +319,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
 
     private void CreateSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
     {
+        if (xPercent < 0 || xPercent > 1)
+        {
+            return;
+        }
+
         int x = (int)(xPercent * sentenceLinesImage.TextureWidth);
 
         for (int y = 0; y < sentenceLinesImage.TextureHeight; y++)

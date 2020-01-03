@@ -132,4 +132,11 @@ public static class SongMetaUtils
         result.Sort(Sentence.comparerByStartBeat);
         return result;
     }
+
+    public static List<Sentence> GetSortedSentences(Voice voice)
+    {
+        List<Sentence> result = new List<Sentence>(voice.Sentences);
+        result.Sort(Sentence.comparerByStartBeat);
+        return result;
+    }
 }
