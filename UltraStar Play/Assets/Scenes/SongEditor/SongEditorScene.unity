@@ -1359,7 +1359,7 @@ VideoPlayer:
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
-  m_TargetTexture: {fileID: 8400000, guid: d8b963bb121871f40acbd4b66020fbc2, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: bf60a74eb1fe6674da4c7faa6c1099a8, type: 2}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: _MainTex
@@ -2688,8 +2688,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: EmptyTitle
-  defaultSongNamePasteBin: Summer Wine
+  defaultSongName: Summer Wine
+  defaultSongNamePasteBin: 'Summer Wine
+
+    EmptyTitle'
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 8406949}
   songEditorNoteRecorder: {fileID: 1231934095}
@@ -4529,7 +4531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 0b90225a8d7299543a2c6fb3284ebd37, type: 2}
+  m_Material: {fileID: 2100000, guid: f3b261e4d2ef19a48b3966fd78189c6e, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
