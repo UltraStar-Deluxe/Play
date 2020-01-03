@@ -58,12 +58,15 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
 
+    [InjectedInInspector]
+    public SongEditorLayerManager songEditorLayerManager;
+
+    private SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
+
     private bool lastIsPlaying;
     private double positionInSongInMillisWhenPlaybackStarted;
 
     private readonly Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
-
-    private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
 
     private bool audioWaveFormInitialized;
 
@@ -106,6 +109,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(historyManager);
+        bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }
@@ -163,6 +167,17 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         }
     }
 
+    // Returns the notes in the song as well as the notes in the layers in no particular order.
+    public List<Note> GetAllNotes()
+    {
+        List<Note> result = new List<Note>();
+        List<Note> notesInVoices = SongMetaUtils.GetAllNotes(SongMeta);
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        result.AddRange(notesInVoices);
+        result.AddRange(notesInLayers);
+        return result;
+    }
+
     private void CreateVoiceToColorMap()
     {
         List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
@@ -180,147 +195,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             }
             index++;
         }
-    }
-
-    public List<Note> GetFollowingNotes(List<Note> notes)
-    {
-        int maxBeat = notes.Select(it => it.EndBeat).Max();
-        List<Note> result = GetAllSentences()
-            .SelectMany(sentence => sentence.Notes)
-            .Where(note => note.StartBeat >= maxBeat)
-            .ToList();
-        return result;
-    }
-
-    // Returns the notes in the song as well as the notes in the layers in no particular order.
-    public List<Note> GetAllNotes()
-    {
-        List<Note> result = new List<Note>();
-        List<Note> notesInVoices = GetAllSentences().SelectMany(sentence => sentence.Notes).ToList();
-        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
-        result.AddRange(notesInVoices);
-        result.AddRange(notesInLayers);
-        return result;
-    }
-
-    public List<Sentence> GetAllSentences()
-    {
-        List<Sentence> result = new List<Sentence>();
-        List<Sentence> sentencesInVoices = SongMeta.GetVoices().SelectMany(voice => voice.Sentences).ToList();
-        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
-        result.AddRange(sentencesInVoices);
-        return result;
-    }
-
-    public Sentence GetNextSentence(Sentence sentence)
-    {
-        List<Sentence> sentencesOfVoice = SongMeta.GetVoices().Where(voice => voice == sentence.Voice)
-            .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
-        sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
-        Sentence lastSentence = null;
-        foreach (Sentence s in sentencesOfVoice)
-        {
-            if (lastSentence == sentence)
-            {
-                return s;
-            }
-            lastSentence = s;
-        }
-        return null;
-    }
-
-    public Sentence GetPreviousSentence(Sentence sentence)
-    {
-        List<Sentence> sentencesOfVoice = SongMeta.GetVoices().Where(voice => voice == sentence.Voice)
-            .SelectMany(voiceIdToVoiceMap => voiceIdToVoiceMap.Sentences).ToList();
-        sentencesOfVoice.Sort(Sentence.comparerByStartBeat);
-        Sentence lastSentence = null;
-        foreach (Sentence s in sentencesOfVoice)
-        {
-            if (s == sentence)
-            {
-                return lastSentence;
-            }
-            lastSentence = s;
-        }
-        return null;
-    }
-
-    public Voice GetOrCreateVoice(string voiceName)
-    {
-        Voice matchingVoice = SongMeta.GetVoices()
-            .Where(it => it.Name == voiceName || (voiceName.IsNullOrEmpty() && it.Name == Voice.soloVoiceName))
-            .FirstOrDefault();
-        if (matchingVoice != null)
-        {
-            return matchingVoice;
-        }
-
-        // Create new voice.
-        // Set voice identifier for solo voice because this is not a solo song anymore.
-        Voice soloVoice = SongMeta.GetVoices().Where(it => it.Name == Voice.soloVoiceName).FirstOrDefault();
-        if (soloVoice != null)
-        {
-            soloVoice.SetName(Voice.firstVoiceName);
-        }
-
-        Voice newVoice = new Voice(voiceName);
-        SongMeta.AddVoice(newVoice);
-
-        return newVoice;
-    }
-
-    public Sentence GetSentenceForNote(Note note, Voice voice)
-    {
-        foreach (Sentence sentence in voice.Sentences)
-        {
-            if (sentence.MinBeat <= note.StartBeat && note.EndBeat <= sentence.ExtendedMaxBeat)
-            {
-                return sentence;
-            };
-        }
-        return null;
-    }
-
-    public List<Sentence> GetSentencesAtBeat(int beat)
-    {
-        return SongMeta.GetVoices().SelectMany(voice => voice.Sentences)
-            .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
-    }
-
-    public bool IsBeatInSentence(Sentence sentence, int beat)
-    {
-        return sentence.MinBeat <= beat && beat <= Math.Max(sentence.MaxBeat, sentence.LinebreakBeat);
-    }
-
-    public void OnNotesChanged()
-    {
-        editorNoteDisplayer.ReloadSentences();
-        editorNoteDisplayer.UpdateNotesAndSentences();
-
-        historyManager.AddUndoState();
-    }
-
-    public void DeleteNote(Note note)
-    {
-        note.SetSentence(null);
-        songEditorLayerManager.RemoveNoteFromAllLayers(note);
-        editorNoteDisplayer.DeleteNote(note);
-    }
-
-    public void DeleteNotes(IReadOnlyCollection<Note> notes)
-    {
-        foreach (Note note in new List<Note>(notes))
-        {
-            DeleteNote(note);
-        }
-    }
-
-    public void DeleteSentence(Sentence sentence)
-    {
-        DeleteNotes(sentence.Notes);
-        sentence.SetVoice(null);
-        editorNoteDisplayer.ReloadSentences();
     }
 
     public void TogglePlayPause()

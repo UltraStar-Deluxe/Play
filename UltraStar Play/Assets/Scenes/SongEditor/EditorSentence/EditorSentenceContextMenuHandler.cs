@@ -13,7 +13,10 @@ using UniRx;
 public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INeedInjection
 {
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private DeleteSentencesAction deleteSentencesAction;
+
+    [Inject]
+    private SentenceFitToNoteAction sentenceFitToNoteAction;
 
     private EditorUiSentence uiSentence;
 
@@ -24,21 +27,10 @@ public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INee
             uiSentence = GetComponent<EditorUiSentence>();
         }
 
-        contextMenu.AddItem("Fit to notes", () => OnFitToNotes());
+        List<Sentence> selectedSentences = new List<Sentence> { uiSentence.Sentence };
+
+        contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Delete", () => OnDelete());
-    }
-
-    private void OnDelete()
-    {
-        songEditorSceneController.DeleteSentence(uiSentence.Sentence);
-        songEditorSceneController.OnNotesChanged();
-    }
-
-    private void OnFitToNotes()
-    {
-        uiSentence.Sentence.UpdateMinAndMaxBeat();
-        uiSentence.Sentence.SetLinebreakBeat(uiSentence.Sentence.MaxBeat);
-        songEditorSceneController.OnNotesChanged();
+        contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
 }

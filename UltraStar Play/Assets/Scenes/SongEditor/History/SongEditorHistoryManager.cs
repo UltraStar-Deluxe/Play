@@ -10,16 +10,19 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
+public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private static readonly int maxHistoryLength = 3;
+    private static readonly int maxHistoryLength = 20;
 
     // Static reference to last state to load it when opening the song editor scene
     // (e.g. after switching editor > sing > editor).
-    public static Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
+    private static Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
 
     private int indexInHistory = -1;
     private readonly List<SongEditorMemento> history = new List<SongEditorMemento>();
+
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -29,6 +32,19 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
+
+    public void OnSceneInjectionFinished()
+    {
+        songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
+    }
+
+    private void OnSongMetaChangeEvent(ISongMetaChangeEvent changeEvent)
+    {
+        if (!(changeEvent is LoadedMementoEvent))
+        {
+            AddUndoState();
+        }
+    }
 
     void Start()
     {
@@ -134,27 +150,47 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection
         LoadVoices(undoState);
 
         editorNoteDisplayer.ClearUiNotes();
-        editorNoteDisplayer.ReloadSentences();
-        editorNoteDisplayer.UpdateNotesAndSentences();
+
+        songMetaChangeEventStream.OnNext(new LoadedMementoEvent());
 
         songMetaToSongEditorMementoMap[songMeta] = undoState;
     }
 
     private void LoadVoices(SongEditorMemento undoState)
     {
-        foreach (Voice voice in undoState.Voices)
+        IReadOnlyCollection<Voice> voicesInSongMeta = songMeta.GetVoices();
+        // Add / update voices from memento
+        foreach (Voice voiceMemento in undoState.Voices)
         {
-            Voice matchingVoice = songMeta.GetVoices()
-                .Where(it => it.Name == voice.Name).FirstOrDefault();
-            if (matchingVoice != null)
+            Voice matchingVoiceInSongMeta = voicesInSongMeta
+                .Where(it => it.Name == voiceMemento.Name).FirstOrDefault();
+            if (matchingVoiceInSongMeta == null)
             {
+                // Create new voice
+                Voice voiceMementoClone = voiceMemento.CloneDeep();
+                songMeta.AddVoice(voiceMementoClone);
+            }
+            else
+            {
+                // Update existing voice
                 List<Sentence> sentencesCopy = new List<Sentence>();
-                foreach (Sentence sentence in voice.Sentences)
+                foreach (Sentence sentence in voiceMemento.Sentences)
                 {
                     Sentence sentenceCopy = sentence.CloneDeep();
                     sentencesCopy.Add(sentenceCopy);
                 }
-                matchingVoice.SetSentences(sentencesCopy);
+                matchingVoiceInSongMeta.SetSentences(sentencesCopy);
+            }
+        }
+
+        // Remove voices that do not exist in memento
+        foreach (Voice voiceInSongMeta in new List<Voice>(voicesInSongMeta))
+        {
+            Voice matchingVoiceMemento = undoState.Voices
+                .Where(it => it.Name == voiceInSongMeta.Name).FirstOrDefault();
+            if (matchingVoiceMemento == null)
+            {
+                songMeta.RemoveVoice(voiceInSongMeta);
             }
         }
     }

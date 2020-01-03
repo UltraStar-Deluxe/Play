@@ -35,7 +35,7 @@ public class MultiplyBpmButton : MonoBehaviour, INeedInjection
     private void OnButtonClicked()
     {
         ChangeBpmAction.MultiplyBpm(songMeta, factor);
-        songEditorSceneController.OnNotesChanged();
+        // songEditorSceneController.OnNotesChanged();
         noteArea.SetViewportHorizontal(noteArea.ViewportX, noteArea.ViewportWidth);
         FindObjectOfType<BpmText>()?.SetBpm(songMeta.Bpm);
     }

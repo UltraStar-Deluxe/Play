@@ -19,38 +19,19 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     private SongEditorSceneController songEditorSceneController;
 
     [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    [Inject]
     private NoteArea noteArea;
+
+    [Inject]
+    private AddNoteAction addNoteAction;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        int midiNote = noteArea.GetVerticalMousePositionInMidiNote();
         int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
+        int midiNote = noteArea.GetVerticalMousePositionInMidiNote();
         contextMenu.AddItem("Fit vertical", () => noteArea.FitViewportVerticalToNotes());
-        contextMenu.AddItem($"Add note", () => OnAddNote(midiNote, beat));
-    }
-
-    private void OnAddNote(int midiNote, int beat)
-    {
-        List<Sentence> sentencesAtBeat = songEditorSceneController.GetSentencesAtBeat(beat);
-        if (sentencesAtBeat.Count == 0)
-        {
-            // Add sentence with note
-            Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
-            newNote.SetMidiNote(midiNote);
-            Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
-            IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
-            newSentence.SetVoice(voices.FirstOrDefault());
-
-            songEditorSceneController.OnNotesChanged();
-        }
-        else
-        {
-            // Add note to existing sentence
-            Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
-            newNote.SetMidiNote(midiNote);
-            newNote.SetSentence(sentencesAtBeat[0]);
-
-            songEditorSceneController.OnNotesChanged();
-        }
+        contextMenu.AddItem("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
     }
 }

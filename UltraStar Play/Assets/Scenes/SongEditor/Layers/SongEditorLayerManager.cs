@@ -10,9 +10,34 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorLayerManager
+public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
+
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    public void OnSceneInjectionFinished()
+    {
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+    }
+
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (!(changeEvent is MovedNotesToVoiceEvent))
+        {
+            return;
+        }
+
+        IReadOnlyCollection<Note> notes = (changeEvent as MovedNotesToVoiceEvent).notes;
+        foreach (Note note in notes)
+        {
+            if (note.Sentence != null)
+            {
+                RemoveNoteFromAllLayers(note);
+            }
+        }
+    }
 
     public void AddNoteToLayer(ESongEditorLayer layerKey, Note note)
     {

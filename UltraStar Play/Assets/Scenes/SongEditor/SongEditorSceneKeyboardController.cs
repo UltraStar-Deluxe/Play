@@ -28,6 +28,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
+    private DeleteNotesAction deleteNotesAction;
+
     public void Update()
     {
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
@@ -42,8 +48,7 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         if (Input.GetKeyUp(KeyCode.Delete))
         {
             List<Note> selectedNotes = selectionController.GetSelectedNotes();
-            songEditorSceneController.DeleteNotes(selectedNotes);
-            songEditorSceneController.OnNotesChanged();
+            deleteNotesAction.ExecuteAndNotify(selectedNotes);
         }
 
         // Undo via Ctrl+Z
@@ -171,7 +176,7 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     {
         // Moving is applied to following notes as well.
         // When extending / shrinking the right side, then the following notes are move to compensate.
-        List<Note> followingNotes = songEditorSceneController.GetFollowingNotes(selectedNotes);
+        List<Note> followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         foreach (Note note in followingNotes)
         {
             // Moved with Shift. The following notes are moved as well.
