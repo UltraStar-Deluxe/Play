@@ -52,7 +52,7 @@ public class SongMeta
     public float VideoGap { get; set; }
     public uint Year { get; set; }
 
-    private List<Voice> voices;
+    private List<Voice> voices = new List<Voice>();
 
     private readonly Dictionary<string, string> unkownHeaderEntries = new Dictionary<string, string>();
     public IReadOnlyDictionary<string, string> UnkownHeaderEntries
@@ -147,6 +147,17 @@ public class SongMeta
 
         voices.Add(newVoice);
         voiceNames.Add(newVoice.Name, newVoice.Name);
+    }
+
+    public void RemoveVoice(Voice voice)
+    {
+        if (!voices.Contains(voice))
+        {
+            return;
+        }
+
+        voices.Remove(voice);
+        voiceNames.Remove(voice.Name);
     }
 
     public void AddUnkownHeaderEntry(string key, string value)
