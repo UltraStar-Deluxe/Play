@@ -5,14 +5,12 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 #pragma warning disable CS0649
 
-public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
+public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private static readonly Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
-                                    Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
-
     [InjectedInInspector]
     public DynamicallyCreatedImage dynImage;
 
@@ -23,9 +21,35 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
+
+    [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    public void OnSceneInjectionFinished()
+    {
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+    }
+
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (changeEvent is LyricsChangedEvent)
+        {
+            return;
+        }
+
+        UpdateNoteOverviewImage();
+    }
+
     void Start()
+    {
+        UpdateNoteOverviewImage();
+    }
+
+    private void UpdateNoteOverviewImage()
     {
         int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
         DrawVoices(songDurationInMillis, songMeta);
@@ -35,11 +59,9 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     {
         dynImage.ClearTexture();
 
-        int voiceIndex = 0;
-        IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
-        foreach (Voice voice in voices)
+        foreach (Voice voice in songMeta.GetVoices())
         {
-            Color color = voiceColors[voiceIndex];
+            Color color = songEditorSceneController.GetColorForVoice(voice);
             DrawVoice(songDurationInMillis, songMeta, voice, color);
         }
 
