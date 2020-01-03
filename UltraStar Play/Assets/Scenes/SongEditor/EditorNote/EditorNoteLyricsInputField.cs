@@ -14,12 +14,15 @@ using System.Text.RegularExpressions;
 
 public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 {
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     private EditorUiNote uiEditorNote;
 
-    private static readonly Regex whitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex whitespaceRegex = new Regex(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public string Text
     {
@@ -58,6 +61,8 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         {
             uiEditorNote.Note.SetText(newText);
             uiEditorNote.SetText(newText);
+
+            songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
         }
 
         Destroy(gameObject);

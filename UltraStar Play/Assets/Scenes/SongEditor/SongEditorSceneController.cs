@@ -61,6 +61,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public SongEditorLayerManager songEditorLayerManager;
 
+    [InjectedInInspector]
+    public LyricsArea lyricsArea;
+
     private SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
     private bool lastIsPlaying;
@@ -110,6 +113,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
+        bb.BindExistingInstance(lyricsArea);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }
