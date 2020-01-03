@@ -221,15 +221,23 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public void SaveSong()
     {
-        // Create backup of original file if not done yet.
         string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
-        string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
-        if (!File.Exists(backupFile))
+        // Create backup of original file if not done yet.
+        if (SettingsManager.Instance.Settings.SongEditorSettings.SaveCopyOfOriginalFile)
         {
-            File.Copy(songFile, backupFile);
+            CreateCopyOfFile(songFile);
         }
         // Write the song data structure to the file.
         UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
+    }
+
+    private void CreateCopyOfFile(string filePath)
+    {
+        string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
+        if (!File.Exists(backupFile))
+        {
+            File.Copy(filePath, backupFile);
+        }
     }
 
     private void ContinueToSingScene()
