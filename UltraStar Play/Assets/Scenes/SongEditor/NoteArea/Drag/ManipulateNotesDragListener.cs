@@ -17,9 +17,6 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private SongEditorSelectionController selectionController;
 
     [Inject]
-    private NoteArea noteArea;
-
-    [Inject]
     private NoteAreaDragHandler noteAreaDragHandler;
 
     [Inject]
@@ -29,7 +26,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private SongEditorSceneController songEditorSceneController;
 
     [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    [Inject]
     private Settings settings;
+
+    [Inject]
+    private SongMeta songMeta;
 
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
@@ -83,7 +86,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
         selectedNotes = selectionController.GetSelectedNotes();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
-            followingNotes = songEditorSceneController.GetFollowingNotes(selectedNotes);
+            followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
         }
         else
         {
@@ -127,7 +130,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
         {
             // Values have been directly applied to the notes. The snapshot can be cleared.
             noteToSnapshotOfNoteMap.Clear();
-            songEditorSceneController.OnNotesChanged();
+            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
     }
 

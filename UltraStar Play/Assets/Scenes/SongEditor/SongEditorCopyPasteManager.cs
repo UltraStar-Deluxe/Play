@@ -13,9 +13,6 @@ using UniRx;
 public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
-    [Inject]
     private SongMeta songMeta;
 
     [Inject]
@@ -29,6 +26,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
+
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     private Voice copiedVoice;
 
@@ -92,7 +92,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     private void PasteCopiedNotes()
     {
         int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
-        Sentence sentenceAtBeatWithVoice = songEditorSceneController.GetSentencesAtBeat(minBeat)
+        Sentence sentenceAtBeatWithVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, minBeat)
             .Where(it => it.Voice != null).FirstOrDefault();
 
         // Find voice to insert the notes into
@@ -117,12 +117,12 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
         ClearCopiedNotes();
 
-        songEditorSceneController.OnNotesChanged();
+        songMetaChangeEventStream.OnNext(new NotesAddedEvent());
     }
 
     private void InsertNote(Note note, Voice voice)
     {
-        Sentence sentenceAtBeatOfVoice = songEditorSceneController.GetSentencesAtBeat(note.StartBeat)
+        Sentence sentenceAtBeatOfVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, note.StartBeat)
             .Where(sentence => sentence.Voice == voice).FirstOrDefault();
         if (sentenceAtBeatOfVoice == null)
         {

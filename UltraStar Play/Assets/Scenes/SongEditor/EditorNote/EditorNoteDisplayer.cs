@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 #pragma warning disable CS0649
 
-public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
+public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
 
     [InjectedInInspector]
@@ -29,7 +29,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    private Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
     private NoteArea noteArea;
@@ -43,9 +44,22 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    private Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
+
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
+
+    public void OnSceneInjectionFinished()
+    {
+        songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
+    }
+
+    private void OnSongMetaChangeEvent(ISongMetaChangeEvent changeEvent)
+    {
+        ReloadSentences();
+        UpdateNotesAndSentences();
+    }
 
     void Start()
     {
@@ -110,6 +124,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         foreach (Voice voice in voices)
         {
             List<Sentence> sortedSentences = new List<Sentence>(voice.Sentences);
+            sortedSentences.Sort(Sentence.comparerByStartBeat);
             voiceToSortedSentencesMap.Add(voice, sortedSentences);
         }
     }
@@ -233,7 +248,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
     {
-        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey);
+        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
+            .Where(note => note.Sentence == null).ToList();
         List<Note> notesInViewport = notesInLayer
             .Where(note => noteArea.IsInViewport(note))
             .ToList();
