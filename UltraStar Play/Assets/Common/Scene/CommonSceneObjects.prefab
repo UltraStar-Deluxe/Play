@@ -137,6 +137,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   warningDialogPrefab: {fileID: 6090808193284951113, guid: 26a11ce5964394349a3e18d9ffccf003,
     type: 3}
+  notificationPrefab: {fileID: 24204236167550392, guid: 69a3dd5155fb1874a9e3ed373ca4d931,
+    type: 3}
 --- !u!1 &384182729201870260
 GameObject:
   m_ObjectHideFlags: 0
