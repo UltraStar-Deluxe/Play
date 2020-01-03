@@ -2704,6 +2704,7 @@ MonoBehaviour:
   graphicRaycaster: {fileID: 1225693713}
   historyManager: {fileID: 1903150256}
   songEditorLayerManager: {fileID: 29095450}
+  lyricsArea: {fileID: 1170985176}
 --- !u!4 &524897707
 Transform:
   m_ObjectHideFlags: 0
@@ -10273,6 +10274,7 @@ GameObject:
   - component: {fileID: 1915175285}
   - component: {fileID: 1915175284}
   - component: {fileID: 1915175283}
+  - component: {fileID: 1915175286}
   m_Layer: 5
   m_Name: InputField
   m_TagString: Untagged
@@ -10406,6 +10408,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915175281}
   m_CullTransparentMesh: 0
+--- !u!114 &1915175286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915175281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c58e7be063eba944f9d915befabe1f4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1934314220
 PrefabInstance:
   m_ObjectHideFlags: 0

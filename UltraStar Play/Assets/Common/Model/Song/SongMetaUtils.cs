@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 public static class SongMetaUtils
 {
@@ -109,5 +110,26 @@ public static class SongMetaUtils
             lastSentence = s;
         }
         return null;
+    }
+
+    public static List<Note> GetSortedNotes(Sentence sentence)
+    {
+        List<Note> result = new List<Note>(sentence.Notes);
+        result.Sort(Note.comparerByStartBeat);
+        return result;
+    }
+
+    public static List<Note> GetSortedNotes(SongMeta songMeta)
+    {
+        List<Note> result = GetAllNotes(songMeta);
+        result.Sort(Note.comparerByStartBeat);
+        return result;
+    }
+
+    public static List<Sentence> GetSortedSentences(SongMeta songMeta)
+    {
+        List<Sentence> result = GetAllSentences(songMeta);
+        result.Sort(Sentence.comparerByStartBeat);
+        return result;
     }
 }
