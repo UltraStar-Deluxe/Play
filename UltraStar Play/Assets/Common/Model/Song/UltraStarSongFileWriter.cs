@@ -79,6 +79,11 @@ public static class UltraStarSongFileWriter
 
     private static void AppendNote(StringBuilder sb, Note note)
     {
+        if (note.Length == 0)
+        {
+            return;
+        }
+
         sb.AppendLine($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
     }
 

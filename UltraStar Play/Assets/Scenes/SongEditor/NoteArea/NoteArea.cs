@@ -181,6 +181,11 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         return MinBeatInViewport <= sentence.ExtendedMaxBeat && sentence.MinBeat <= MaxBeatInViewport;
     }
 
+    public bool IsBeatInViewport(int beat)
+    {
+        return MinBeatInViewport <= beat && beat <= MaxBeatInViewport;
+    }
+
     public void ScrollHorizontal(int direction)
     {
         int newViewportX = ViewportX + direction * (int)(ViewportWidth * 0.2);

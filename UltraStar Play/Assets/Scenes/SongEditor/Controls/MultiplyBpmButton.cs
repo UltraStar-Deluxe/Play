@@ -25,7 +25,7 @@ public class MultiplyBpmButton : MonoBehaviour, INeedInjection
     private NoteArea noteArea;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     void Start()
     {
@@ -35,8 +35,7 @@ public class MultiplyBpmButton : MonoBehaviour, INeedInjection
     private void OnButtonClicked()
     {
         ChangeBpmAction.MultiplyBpm(songMeta, factor);
-        // songEditorSceneController.OnNotesChanged();
         noteArea.SetViewportHorizontal(noteArea.ViewportX, noteArea.ViewportWidth);
-        FindObjectOfType<BpmText>()?.SetBpm(songMeta.Bpm);
+        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
     }
 }
