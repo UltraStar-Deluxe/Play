@@ -13,6 +13,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SongMetaManager.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
+        bb.BindExistingInstance(UiManager.Instance);
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
