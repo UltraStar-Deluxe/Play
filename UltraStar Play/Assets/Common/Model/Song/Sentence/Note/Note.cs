@@ -196,7 +196,7 @@ public class Note
         if (StartBeat != newStartBeat || EndBeat != newEndBeat)
         {
             int oldStartBeat = StartBeat;
-            int oldEndBeat = StartBeat;
+            int oldEndBeat = EndBeat;
 
             StartBeat = newStartBeat;
             EndBeat = newEndBeat;
