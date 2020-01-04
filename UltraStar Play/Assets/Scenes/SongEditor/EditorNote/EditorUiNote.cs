@@ -256,6 +256,15 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         activeLyricsInputField = Instantiate(lyricsInputFieldPrefab, transform);
         injector.Inject(activeLyricsInputField);
         activeLyricsInputField.Init(this, Note.Text);
+
+        // Set min width of input field
+        RectTransform inputFieldRectTransform = activeLyricsInputField.GetComponent<RectTransform>();
+        Canvas canvas = CanvasUtils.FindCanvas();
+        float canvasWidth = canvas.GetComponent<RectTransform>().rect.width;
+        if ((inputFieldRectTransform.rect.width / canvasWidth) < 0.1)
+        {
+            inputFieldRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvasWidth * 0.1f);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
