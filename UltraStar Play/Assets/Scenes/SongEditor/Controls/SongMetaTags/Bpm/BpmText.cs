@@ -37,7 +37,7 @@ public class BpmText : MonoBehaviour, INeedInjection, ISceneInjectionFinishedLis
 
     private void OnSongChanged(ISongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is BpmChangeEvent)
+        if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
         {
             SetBpm(songMeta.Bpm);
         }

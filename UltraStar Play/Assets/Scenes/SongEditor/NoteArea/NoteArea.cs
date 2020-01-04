@@ -59,6 +59,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
 
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
@@ -81,7 +84,17 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+
         FitViewportVerticalToNotes();
+    }
+
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
+        {
+            SetViewportHorizontal(ViewportX, ViewportWidth);
+        }
     }
 
     public void FitViewportVerticalToNotes()

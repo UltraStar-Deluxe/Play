@@ -10,11 +10,8 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MultiplyBpmButton : MonoBehaviour, INeedInjection
+public class ReduceBpmButton : MonoBehaviour, INeedInjection
 {
-    [Range(2, 3)]
-    public int factor = 2;
-
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
@@ -25,17 +22,10 @@ public class MultiplyBpmButton : MonoBehaviour, INeedInjection
     private NoteArea noteArea;
 
     [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
+    private ChangeBpmAction changeBpmAction;
 
     void Start()
     {
-        button.OnClickAsObservable().Subscribe(_ => OnButtonClicked());
-    }
-
-    private void OnButtonClicked()
-    {
-        ChangeBpmAction.MultiplyBpm(songMeta, factor);
-        noteArea.SetViewportHorizontal(noteArea.ViewportX, noteArea.ViewportWidth);
-        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
+        button.OnClickAsObservable().Subscribe(_ => changeBpmAction.ReduceBpmAndNotify(songMeta));
     }
 }
