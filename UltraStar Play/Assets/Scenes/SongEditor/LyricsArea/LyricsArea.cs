@@ -34,14 +34,13 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     void Start()
     {
         UpdateLyrics();
-        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
-
+        inputField.OnEndEditAsObservable().Subscribe(OnEndEdit);
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
     void Update()
     {
-        if (lastCaretPosition != inputField.caretPosition)
+        if (inputField.isFocused && lastCaretPosition != inputField.caretPosition)
         {
             lastCaretPosition = inputField.caretPosition;
 
