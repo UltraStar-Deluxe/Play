@@ -121,6 +121,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         SongEditorMemento memento = new SongEditorMemento();
         SaveVoices(memento);
         SaveLayers(memento);
+        SaveSongMetaTags(memento);
         return memento;
     }
 
@@ -144,16 +145,29 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         }
     }
 
+    private void SaveSongMetaTags(SongEditorMemento memento)
+    {
+        memento.Bpm = songMeta.Bpm;
+        memento.MusicGap = songMeta.Gap;
+    }
+
     private void LoadUndoState(SongEditorMemento undoState)
     {
         LoadLayers(undoState);
         LoadVoices(undoState);
+        LoadSongMetaTags(undoState);
 
         editorNoteDisplayer.ClearUiNotes();
 
         songMetaChangeEventStream.OnNext(new LoadedMementoEvent());
 
         songMetaToSongEditorMementoMap[songMeta] = undoState;
+    }
+
+    private void LoadSongMetaTags(SongEditorMemento memento)
+    {
+        songMeta.Bpm = memento.Bpm;
+        songMeta.Gap = memento.MusicGap;
     }
 
     private void LoadVoices(SongEditorMemento undoState)

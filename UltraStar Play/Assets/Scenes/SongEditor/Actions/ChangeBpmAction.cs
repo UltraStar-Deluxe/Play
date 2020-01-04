@@ -1,8 +1,26 @@
 ﻿using System;
 using System.Linq;
+using UniInject;
 
-public class ChangeBpmAction
+#pragma warning disable CS0649
+
+public class ChangeBpmAction : INeedInjection
 {
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    public void ReduceBpmAndNotify(SongMeta songMeta)
+    {
+        ReduceBpm(songMeta);
+        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
+    }
+
+    public void MultiplyBpmAndNotify(SongMeta songMeta, int factor)
+    {
+        MultiplyBpm(songMeta, factor);
+        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
+    }
+
     public static void ReduceBpm(SongMeta songMeta)
     {
         int greatestCommonDivisor = songMeta.GetVoices()
