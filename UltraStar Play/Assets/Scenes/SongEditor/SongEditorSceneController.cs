@@ -201,18 +201,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         }
     }
 
-    public void TogglePlayPause()
-    {
-        if (songAudioPlayer.IsPlaying)
-        {
-            songAudioPlayer.PauseAudio();
-        }
-        else
-        {
-            songAudioPlayer.PlayAudio();
-        }
-    }
-
     public void OnBackButtonClicked()
     {
         ContinueToSingScene();

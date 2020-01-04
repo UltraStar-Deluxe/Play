@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
+using UnityEngine.UI;
 
 #pragma warning disable CS0649
 
@@ -34,6 +35,9 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     [Inject]
     private DeleteNotesAction deleteNotesAction;
 
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
     public void Update()
     {
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
@@ -41,7 +45,18 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         // Play / pause via Space
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            songEditorSceneController.TogglePlayPause();
+            // Do not toggle play pause / when there is an active input field
+            GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
+            if (selectedGameObject == null || selectedGameObject.GetComponentInChildren<InputField>() == null)
+            {
+                ToggleAudioPlayPause();
+            }
+        }
+
+        // Stop via Escape
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            songAudioPlayer.PauseAudio();
         }
 
         // Delete notes
@@ -82,6 +97,19 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             }
         }
 
+        // Change position in song with Ctrl+ArrowKey
+        if (!songAudioPlayer.IsPlaying)
+        {
+            if (Input.GetKey(KeyCode.LeftArrow) && modifier == EKeyboardModifier.Ctrl)
+            {
+                songAudioPlayer.PositionInSongInMillis -= 1;
+            }
+            if (Input.GetKey(KeyCode.RightArrow) && modifier == EKeyboardModifier.Ctrl)
+            {
+                songAudioPlayer.PositionInSongInMillis += 1;
+            }
+        }
+
         // Move and stretch notes
         UpdateInputToMoveAndStretchNotes(modifier);
 
@@ -89,8 +117,31 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         UpdateInputToScrollAndZoom(modifier);
     }
 
+    private void ToggleAudioPlayPause()
+    {
+        if (songAudioPlayer.IsPlaying)
+        {
+            songAudioPlayer.PauseAudio();
+        }
+        else
+        {
+            songAudioPlayer.PlayAudio();
+        }
+    }
+
     private void UpdateInputToScrollAndZoom(EKeyboardModifier modifier)
     {
+        // Scroll with arroy keys
+        if (Input.GetKeyUp(KeyCode.LeftArrow) && modifier == EKeyboardModifier.None)
+        {
+            noteArea.ScrollHorizontal(-1);
+        }
+        if (Input.GetKeyUp(KeyCode.RightArrow) && modifier == EKeyboardModifier.None)
+        {
+            noteArea.ScrollHorizontal(1);
+        }
+
+        // Zoom and scroll with mouse wheel
         int scrollDirection = Math.Sign(Input.mouseScrollDelta.y);
         if (scrollDirection != 0 && noteArea.IsPointerOver)
         {
