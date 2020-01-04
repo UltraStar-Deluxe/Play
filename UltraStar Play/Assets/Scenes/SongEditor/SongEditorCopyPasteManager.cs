@@ -50,15 +50,21 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
         if (modifier == EKeyboardModifier.Ctrl)
         {
-            if (Input.GetKeyUp(KeyCode.C))
+            if (Input.GetKeyUp(KeyCode.C) && !InputFieldHasFocus())
             {
                 CopySelectedNotes();
             }
-            else if (Input.GetKeyUp(KeyCode.V))
+            else if (Input.GetKeyUp(KeyCode.V) && !InputFieldHasFocus())
             {
                 PasteCopiedNotes();
             }
         }
+    }
+
+    private bool InputFieldHasFocus()
+    {
+        GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
+        return selectedGameObject != null && selectedGameObject.GetComponentInChildren<InputField>() != null;
     }
 
     private void MoveCopiedNotesToMillisInSong(double newMillis)

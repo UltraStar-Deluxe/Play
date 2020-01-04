@@ -246,7 +246,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         selectionIndicator.gameObject.SetActive(isSelected);
     }
 
-    private void StartEditingNoteText()
+    public void StartEditingNoteText()
     {
         if (activeLyricsInputField != null)
         {

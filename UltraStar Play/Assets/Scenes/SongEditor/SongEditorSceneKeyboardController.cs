@@ -43,14 +43,9 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
         // Play / pause via Space
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space) && !InputFieldHasFocus())
         {
-            // Do not toggle play pause / when there is an active input field
-            GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
-            if (selectedGameObject == null || selectedGameObject.GetComponentInChildren<InputField>() == null)
-            {
-                ToggleAudioPlayPause();
-            }
+            ToggleAudioPlayPause();
         }
 
         // Stop via Escape
@@ -97,14 +92,29 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             }
         }
 
+        // Start editing of lyrics with F2
+        if (Input.GetKeyUp(KeyCode.F2))
+        {
+            List<Note> selectedNotes = selectionController.GetSelectedNotes();
+            if (selectedNotes.Count == 1)
+            {
+                Note selectedNote = selectedNotes.FirstOrDefault();
+                EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(selectedNote);
+                if (uiNote != null)
+                {
+                    uiNote.StartEditingNoteText();
+                }
+            }
+        }
+
         // Change position in song with Ctrl+ArrowKey
         if (!songAudioPlayer.IsPlaying)
         {
-            if (Input.GetKey(KeyCode.LeftArrow) && modifier == EKeyboardModifier.Ctrl)
+            if (Input.GetKey(KeyCode.LeftArrow) && modifier == EKeyboardModifier.Ctrl && !InputFieldHasFocus())
             {
                 songAudioPlayer.PositionInSongInMillis -= 1;
             }
-            if (Input.GetKey(KeyCode.RightArrow) && modifier == EKeyboardModifier.Ctrl)
+            if (Input.GetKey(KeyCode.RightArrow) && modifier == EKeyboardModifier.Ctrl && !InputFieldHasFocus())
             {
                 songAudioPlayer.PositionInSongInMillis += 1;
             }
@@ -115,6 +125,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         // Scroll and zoom in NoteArea
         UpdateInputToScrollAndZoom(modifier);
+    }
+
+    private bool InputFieldHasFocus()
+    {
+        GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
+        return selectedGameObject != null && selectedGameObject.GetComponentInChildren<InputField>() != null;
     }
 
     private void ToggleAudioPlayPause()
@@ -132,11 +148,11 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     private void UpdateInputToScrollAndZoom(EKeyboardModifier modifier)
     {
         // Scroll with arroy keys
-        if (Input.GetKeyUp(KeyCode.LeftArrow) && modifier == EKeyboardModifier.None)
+        if (Input.GetKeyUp(KeyCode.LeftArrow) && modifier == EKeyboardModifier.None && !InputFieldHasFocus())
         {
             noteArea.ScrollHorizontal(-1);
         }
-        if (Input.GetKeyUp(KeyCode.RightArrow) && modifier == EKeyboardModifier.None)
+        if (Input.GetKeyUp(KeyCode.RightArrow) && modifier == EKeyboardModifier.None && !InputFieldHasFocus())
         {
             noteArea.ScrollHorizontal(1);
         }
