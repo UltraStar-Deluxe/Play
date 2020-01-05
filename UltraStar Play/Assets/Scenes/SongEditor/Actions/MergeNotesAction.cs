@@ -19,7 +19,7 @@ public class MergeNotesAction : INeedInjection
         return selectedNotes.Count > 1;
     }
 
-    public Note Execute(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
+    public void Execute(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
         List<Note> sortedNotes = new List<Note>(selectedNotes);
         sortedNotes.Sort(Note.comparerByStartBeat);
@@ -38,13 +38,11 @@ public class MergeNotesAction : INeedInjection
 
         // Remove old notes
         deleteNotesAction.Execute(sortedNotes);
-
-        return mergedNote;
     }
 
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
-        Note mergedNote = Execute(selectedNotes, targetNote);
+        Execute(selectedNotes, targetNote);
         songMetaChangeEventStream.OnNext(new NotesMergedEvent());
     }
 }
