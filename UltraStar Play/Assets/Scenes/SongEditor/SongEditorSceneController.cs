@@ -64,7 +64,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public LyricsArea lyricsArea;
 
-    private SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
+    private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
     private bool lastIsPlaying;
     private double positionInSongInMillisWhenPlaybackStarted;

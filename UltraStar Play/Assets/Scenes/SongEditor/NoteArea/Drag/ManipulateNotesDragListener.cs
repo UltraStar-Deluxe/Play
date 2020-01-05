@@ -23,9 +23,6 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
-    [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
@@ -37,7 +34,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
 
-    private Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
+    private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
     private bool isCanceled;
 
     private DragAction dragAction;
@@ -119,6 +116,8 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
             case DragAction.StretchRight:
                 StretchNotesRight(dragEvent, selectedNotes, true);
                 break;
+            default:
+                throw new UnityException("Unkown drag action: " + dragAction);
         }
 
         editorNoteDisplayer.UpdateNotesAndSentences();

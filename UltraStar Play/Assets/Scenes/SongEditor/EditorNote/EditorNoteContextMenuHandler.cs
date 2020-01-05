@@ -125,8 +125,8 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
     private void FillContextMenuToMoveToOtherVoice(ContextMenu contextMenu, List<Note> selectedNotes)
     {
-        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(songMeta, selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
-        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(songMeta, selectedNotes, Voice.secondVoiceName);
+        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
+        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceName);
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();

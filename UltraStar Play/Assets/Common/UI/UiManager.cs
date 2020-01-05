@@ -28,7 +28,7 @@ public class UiManager : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
-    private List<Notification> notifications = new List<Notification>();
+    private readonly List<Notification> notifications = new List<Notification>();
 
     void Start()
     {

@@ -28,6 +28,6 @@ public class DeleteNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes)
     {
         Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesDeletedEvent(selectedNotes));
+        songMetaChangeEventStream.OnNext(new NotesDeletedEvent());
     }
 }

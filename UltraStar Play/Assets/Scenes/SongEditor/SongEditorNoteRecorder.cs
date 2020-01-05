@@ -71,12 +71,9 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
             UpdateRecordingViaButtonClick();
         }
-        else if (lastIsPlaying)
+        else if (lastIsPlaying && hasRecordedNotes)
         {
-            if (hasRecordedNotes)
-            {
-                historyManager.AddUndoState();
-            }
+            historyManager.AddUndoState();
         }
         lastIsPlaying = songAudioPlayer.IsPlaying;
     }

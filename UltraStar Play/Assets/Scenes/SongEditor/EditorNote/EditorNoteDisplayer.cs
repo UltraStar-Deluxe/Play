@@ -44,7 +44,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     [Inject]
     private Settings settings;
 
-    private Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
+    private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
@@ -295,7 +295,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         }
     }
 
-    private EditorUiSentence CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, string label)
+    private void CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, string label)
     {
         EditorUiSentence uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
 
@@ -305,8 +305,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         uiSentence.SetText(label);
 
         PositionUiSentence(uiSentence.RectTransform, xStartPercent, xEndPercent);
-
-        return uiSentence;
     }
 
     private void PositionUiSentence(RectTransform uiSentenceRectTransform, float xStartPercent, float xEndPercent)

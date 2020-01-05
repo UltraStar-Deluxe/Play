@@ -13,9 +13,8 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     // The notes can be moved if there exists a note
     // that is not yet inside a voice with one of the given voice names.
-    public bool CanMoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, params string[] voiceNames)
+    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params string[] voiceNames)
     {
-        IReadOnlyList<Voice> voices = songMeta.GetVoices();
         return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
     }
 

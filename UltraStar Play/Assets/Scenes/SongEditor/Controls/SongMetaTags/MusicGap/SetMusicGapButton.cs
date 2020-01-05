@@ -23,9 +23,4 @@ public class SetMusicGapButton : MonoBehaviour, INeedInjection
     {
         button.OnClickAsObservable().Subscribe(_ => setMusicGapAction.ExecuteAndNotify());
     }
-
-    void Update()
-    {
-
-    }
 }

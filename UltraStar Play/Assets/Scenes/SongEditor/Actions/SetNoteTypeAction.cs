@@ -31,6 +31,6 @@ public class SetNoteTypeAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, ENoteType type)
     {
         Execute(selectedNotes, type);
-        songMetaChangeEventStream.OnNext(new NoteTypeChangeEvent(selectedNotes, type));
+        songMetaChangeEventStream.OnNext(new NoteTypeChangeEvent());
     }
 }
