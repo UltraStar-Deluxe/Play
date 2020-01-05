@@ -48,7 +48,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, INot
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
     {
-
+        // Do nothing, scrolling was done already in OnDrag.
     }
 
     public void CancelDrag()

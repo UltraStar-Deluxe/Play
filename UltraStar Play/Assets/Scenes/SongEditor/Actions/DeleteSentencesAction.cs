@@ -28,6 +28,6 @@ public class DeleteSentencesAction : INeedInjection
     public void ExecuteAndNotify(List<Sentence> selectedSentences)
     {
         Execute(selectedSentences);
-        songMetaChangeEventStream.OnNext(new SentencesDeletedEvent(selectedSentences));
+        songMetaChangeEventStream.OnNext(new SentencesDeletedEvent());
     }
 }

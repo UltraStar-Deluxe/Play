@@ -32,6 +32,6 @@ public class SplitNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes)
     {
         Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesSplitEvent(selectedNotes));
+        songMetaChangeEventStream.OnNext(new NotesSplitEvent());
     }
 }

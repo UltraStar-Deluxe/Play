@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -151,7 +152,7 @@ public static class UltraStarSongFileWriter
     {
         if (!value.IsNullOrEmpty())
         {
-            sb.AppendLine($"#{key.ToUpper()}:{value}");
+            sb.AppendLine($"#{key.ToUpper(CultureInfo.InvariantCulture)}:{value}");
         }
     }
 }

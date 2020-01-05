@@ -113,10 +113,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Voice voice = voices.Where(it => it.Name == voiceName).FirstOrDefault();
-            if (voice != null)
+            Voice matchingVoice = voices.Where(it => it.Name == voiceName).FirstOrDefault();
+            if (matchingVoice != null)
             {
-                return voice;
+                return matchingVoice;
             }
             else
             {

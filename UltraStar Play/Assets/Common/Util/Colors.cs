@@ -176,7 +176,7 @@ public static class Colors
         }
         catch (Exception e)
         {
-            Debug.Log($"Cannot create Color for {hexColor}: " + e.ToString());
+            Debug.Log($"Cannot create Color for {hexColor}: " + e);
         }
         return Color.white;
     }

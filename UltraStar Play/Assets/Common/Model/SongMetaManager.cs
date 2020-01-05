@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -83,7 +84,7 @@ public class SongMetaManager : MonoBehaviour
     private void SortSongMetas()
     {
         // Sort by artist
-        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true));
+        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
     }
 
     private void ScanFilesSynchronously()

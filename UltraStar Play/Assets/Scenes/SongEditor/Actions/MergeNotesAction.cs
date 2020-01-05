@@ -45,6 +45,6 @@ public class MergeNotesAction : INeedInjection
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
         Note mergedNote = Execute(selectedNotes, targetNote);
-        songMetaChangeEventStream.OnNext(new NotesMergedEvent(selectedNotes, mergedNote));
+        songMetaChangeEventStream.OnNext(new NotesMergedEvent());
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using UnityEditor.SceneManagement;
 using System.Linq;
 using System;
+using System.Globalization;
 
 public class SceneListEditorWindow : EditorWindow
 {
@@ -71,7 +72,7 @@ public class SceneListEditorWindow : EditorWindow
         {
             string s1Name = Path.GetFileNameWithoutExtension(s1);
             string s2Name = Path.GetFileNameWithoutExtension(s2);
-            return string.Compare(s1Name, s2Name);
+            return string.Compare(s1Name, s2Name, true, CultureInfo.InvariantCulture);
         }
     }
 }

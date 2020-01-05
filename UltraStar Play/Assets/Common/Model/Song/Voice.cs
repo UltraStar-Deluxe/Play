@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 [Serializable]
@@ -125,7 +126,7 @@ public class Voice : ISerializationCallbackReceiver
             {
                 return 1;
             }
-            return x.Name.CompareTo(y.Name);
+            return string.Compare(x.Name, y.Name, true, CultureInfo.InvariantCulture);
         }
     }
 }

@@ -4,11 +4,13 @@ public static class SongIssueUtils
 {
     public static Color GetColorForIssue(SongIssue issue)
     {
-        switch (issue.Severity)
+        if (issue.Severity == ESongIssueSeverity.Warning)
         {
-            case ESongIssueSeverity.Warning: return Colors.yellow;
-            case ESongIssueSeverity.Error: return Colors.red;
+            return Colors.yellow;
         }
-        return Color.black;
+        else
+        {
+            return Colors.red;
+        }
     }
 }

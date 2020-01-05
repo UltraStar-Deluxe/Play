@@ -23,9 +23,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    private List<Sentence> sortedSentences = new List<Sentence>();
-
-    private Dictionary<int, Note> positionInLyricsToNoteMap = new Dictionary<int, Note>();
+    private readonly Dictionary<int, Note> positionInLyricsToNoteMap = new Dictionary<int, Note>();
 
     private int lastCaretPosition;
 

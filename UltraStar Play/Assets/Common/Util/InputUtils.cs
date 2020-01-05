@@ -28,10 +28,6 @@ public static class InputUtils
         {
             return EKeyboardModifier.CtrlAlt;
         }
-        else if (ctrl && !shift && alt)
-        {
-            return EKeyboardModifier.CtrlAlt;
-        }
         else if (!ctrl && shift && alt)
         {
             return EKeyboardModifier.ShiftAlt;
