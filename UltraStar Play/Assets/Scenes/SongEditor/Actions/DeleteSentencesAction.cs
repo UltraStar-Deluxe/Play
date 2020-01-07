@@ -20,7 +20,7 @@ public class DeleteSentencesAction : INeedInjection
     {
         foreach (Sentence sentence in selectedSentences)
         {
-            deleteNotesAction.Execute(sentence.Notes);
+            deleteNotesAction.Execute(new List<Note>(sentence.Notes));
             sentence.SetVoice(null);
         }
     }
