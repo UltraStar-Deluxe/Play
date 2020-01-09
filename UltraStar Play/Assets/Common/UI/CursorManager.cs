@@ -16,30 +16,33 @@ public class CursorManager : MonoBehaviour, INeedInjection
         }
     }
 
+    private static readonly int cursorWidth = 64;
+    // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
+    // Upper-left corner in the texture is coordinate (0,0).
+    private static readonly Vector2 cursorTopLeftCorner = Vector2.zero;
+    private static readonly Vector2 cursorCenter = new Vector2(cursorWidth / 2f, cursorWidth / 2f);
+
     [Inject]
     private SettingsManager settingsManager;
 
-    // The texture must have type "Cursor" in Unity 3D import settings. The size should be 32x32 pixel.
+    // The texture must have type "Cursor" in Unity 3D import settings.
     public Texture2D cursorTexture;
     public Texture2D horizontalCursorTexture;
     public Texture2D verticalCursorTexture;
     public Texture2D grabCursorTexture;
 
-    // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
-    // Upper-left corner in the texture is coordinate (0,0).
-    public Vector2 defaultHotSpot = Vector2.zero;
-
     void Start()
     {
         settingsManager.Settings.GraphicSettings
             .ObserveEveryValueChanged(it => it.useImageAsCursor).Subscribe(newValue => SetDefaultCursor());
+        SetDefaultCursor();
     }
 
     public void SetDefaultCursor()
     {
         if (UseImageAsCursor())
         {
-            Cursor.SetCursor(cursorTexture, defaultHotSpot, CursorMode.Auto);
+            Cursor.SetCursor(cursorTexture, cursorTopLeftCorner, CursorMode.Auto);
         }
         else
         {
@@ -54,7 +57,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        Cursor.SetCursor(horizontalCursorTexture, new Vector2(32, 32), CursorMode.Auto);
+        Cursor.SetCursor(horizontalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorVertical()
@@ -64,7 +67,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        Cursor.SetCursor(verticalCursorTexture, new Vector2(32, 32), CursorMode.Auto);
+        Cursor.SetCursor(verticalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorGrab()
@@ -74,7 +77,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        Cursor.SetCursor(grabCursorTexture, new Vector2(32, 32), CursorMode.Auto);
+        Cursor.SetCursor(grabCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     private bool UseImageAsCursor()
