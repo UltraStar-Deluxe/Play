@@ -137,6 +137,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   warningDialogPrefab: {fileID: 6090808193284951113, guid: 26a11ce5964394349a3e18d9ffccf003,
     type: 3}
+  notificationPrefab: {fileID: 24204236167550392, guid: 69a3dd5155fb1874a9e3ed373ca4d931,
+    type: 3}
 --- !u!1 &384182729201870260
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,8 +694,8 @@ GameObject:
   - component: {fileID: 5789367646844391807}
   - component: {fileID: 1404843766538612946}
   m_Layer: 5
-  m_Name: CursorHandler
-  m_TagString: Untagged
+  m_Name: CursorManager
+  m_TagString: CursorManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -734,11 +736,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 3312558049815969777}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffecc741166d7ae4a9208684e3936890, type: 3}
+  m_Script: {fileID: 11500000, guid: 3e93c0dde7c57c84e83e94fbbc59270d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cursorTexture: {fileID: 2800000, guid: 21b89c5b005b2324d96976212a0b264d, type: 3}
-  hotSpot: {x: 0, y: 0}
+  horizontalCursorTexture: {fileID: 2800000, guid: d9dca9853288ebd47a8a128193d2e8d6,
+    type: 3}
+  verticalCursorTexture: {fileID: 2800000, guid: 545d8db5414f6d6448fc47349d599a76,
+    type: 3}
+  grabCursorTexture: {fileID: 2800000, guid: 428256a582aeb554e980f46c5db242f3, type: 3}
+  defaultHotSpot: {x: 0, y: 0}
 --- !u!1 &3340714701814108809
 GameObject:
   m_ObjectHideFlags: 0

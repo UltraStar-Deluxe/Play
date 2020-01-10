@@ -11,6 +11,11 @@ public class SongEditorLayer
 
     private readonly List<Note> notes = new List<Note>();
 
+    public SongEditorLayer(ESongEditorLayer layerKey)
+    {
+        this.LayerKey = layerKey;
+    }
+
     public void AddNote(Note note)
     {
         notes.Add(note);
@@ -23,12 +28,24 @@ public class SongEditorLayer
 
     public List<Note> GetNotes()
     {
-        List<Note> notesCopy = new List<Note>(notes);
-        return notesCopy;
+        return new List<Note>(notes);
     }
 
-    public SongEditorLayer(ESongEditorLayer layerKey)
+    public SongEditorLayer CloneDeep()
     {
-        this.LayerKey = layerKey;
+        SongEditorLayer clone = new SongEditorLayer(LayerKey);
+        clone.Color = Color;
+        clone.IsEnabled = IsEnabled;
+        foreach (Note note in notes)
+        {
+            Note noteCopy = note.Clone();
+            clone.AddNote(noteCopy);
+        }
+        return clone;
+    }
+
+    public void ClearNotes()
+    {
+        notes.Clear();
     }
 }

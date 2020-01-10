@@ -38,7 +38,7 @@ public class Note
     {
         if (length < 0)
         {
-            throw new UnityException($"Illegal note length {length} for note starting at beat {startBeat}");
+            throw new ArgumentException($"Illegal note length {length} for note starting at beat {startBeat}");
         }
         SetType(type);
         SetText(text);
@@ -47,6 +47,28 @@ public class Note
         StartBeat = startBeat;
         Length = length;
         EndBeat = StartBeat + Length;
+    }
+
+    public Note Clone()
+    {
+        Note clone = new Note();
+        clone.CopyValues(this);
+        return clone;
+    }
+
+    public void CopyValues(Note other)
+    {
+        sentence = other.sentence;
+        Type = other.Type;
+        StartBeat = other.StartBeat;
+        EndBeat = other.EndBeat;
+        Length = other.Length;
+        TxtPitch = other.TxtPitch;
+        MidiNote = other.MidiNote;
+        IsNormal = other.IsNormal;
+        IsGolden = other.IsGolden;
+        IsFreestyle = other.IsFreestyle;
+        Text = other.Text;
     }
 
     public void SetSentence(Sentence sentence)
@@ -101,9 +123,15 @@ public class Note
 
         if (StartBeat != newStartBeat)
         {
+            int oldStartBeat = StartBeat;
             StartBeat = newStartBeat;
             Length = EndBeat - StartBeat;
-            OnNotePositionChanged();
+
+            // Update the sentence's min beat
+            if (Sentence != null && Sentence.MinBeat == oldStartBeat)
+            {
+                Sentence.UpdateMinBeat();
+            }
         }
     }
 
@@ -116,9 +144,15 @@ public class Note
 
         if (EndBeat != newEndBeat)
         {
+            int oldEndBeat = EndBeat;
             EndBeat = newEndBeat;
             Length = EndBeat - StartBeat;
-            OnNotePositionChanged();
+
+            // Update the sentence's max beat
+            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            {
+                Sentence.UpdateMaxBeat();
+            }
         }
     }
 
@@ -131,17 +165,55 @@ public class Note
 
         if (Length != newLength)
         {
+            int oldEndBeat = EndBeat;
             Length = newLength;
             EndBeat = StartBeat + Length;
-            OnNotePositionChanged();
+
+            // Update the sentence's max beat
+            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            {
+                Sentence.UpdateMaxBeat();
+            }
         }
     }
 
-    private void OnNotePositionChanged()
+    public void MoveHorizontal(int distanceInBeats)
     {
-        if (Sentence != null)
+        SetStartAndEndBeat(StartBeat + distanceInBeats, EndBeat + distanceInBeats);
+    }
+
+    public void MoveVertical(int distanceInMidiNotes)
+    {
+        SetMidiNote(MidiNote + distanceInMidiNotes);
+    }
+
+    public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)
+    {
+        if (newStartBeat > newEndBeat)
         {
-            Sentence.ExpandStartAndEndBeat(this);
+            throw new UnityException("StartBeat cannot be greater than EndBeat");
+        }
+        if (StartBeat != newStartBeat || EndBeat != newEndBeat)
+        {
+            int oldStartBeat = StartBeat;
+            int oldEndBeat = EndBeat;
+
+            StartBeat = newStartBeat;
+            EndBeat = newEndBeat;
+            Length = EndBeat - StartBeat;
+
+            // Update the sentence's min and max beat
+            if (Sentence != null)
+            {
+                if (Sentence.MinBeat == oldStartBeat)
+                {
+                    Sentence.UpdateMinBeat();
+                }
+                if (Sentence.MaxBeat == oldEndBeat)
+                {
+                    Sentence.UpdateMaxBeat();
+                }
+            }
         }
     }
 

@@ -7,7 +7,10 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SongEditorSceneController : MonoBehaviour, IBinder
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 {
     [InjectedInInspector]
     public string defaultSongName;
@@ -29,6 +32,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     public SongEditorSelectionController selectionController;
 
     [InjectedInInspector]
+    public RectTransform uiNoteContainer;
+
+    [InjectedInInspector]
     public AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     [InjectedInInspector]
@@ -36,6 +42,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
 
     [InjectedInInspector]
     public NoteAreaDragHandler noteAreaDragHandler;
+
+    [InjectedInInspector]
+    public EditorNoteDisplayer editorNoteDisplayer;
 
     [InjectedInInspector]
     public MicrophonePitchTracker microphonePitchTracker;
@@ -46,7 +55,21 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
     [InjectedInInspector]
     public GraphicRaycaster graphicRaycaster;
 
-    private readonly SongEditorLayerManager songEditorLayerManager = new SongEditorLayerManager();
+    [InjectedInInspector]
+    public SongEditorHistoryManager historyManager;
+
+    [InjectedInInspector]
+    public SongEditorLayerManager songEditorLayerManager;
+
+    [InjectedInInspector]
+    public LyricsArea lyricsArea;
+
+    private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
+
+    private bool lastIsPlaying;
+    private double positionInSongInMillisWhenPlaybackStarted;
+
+    private readonly Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
 
     private bool audioWaveFormInitialized;
 
@@ -55,20 +78,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         get
         {
             return SceneData.SelectedSongMeta;
-        }
-    }
-
-    Dictionary<string, Voice> voiceIdToVoiceMap;
-
-    private Dictionary<string, Voice> VoiceIdToVoiceMap
-    {
-        get
-        {
-            if (voiceIdToVoiceMap == null)
-            {
-                voiceIdToVoiceMap = SongMetaManager.GetVoices(SongMeta);
-            }
-            return voiceIdToVoiceMap;
         }
     }
 
@@ -99,12 +108,13 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         bb.BindExistingInstance(microphonePitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(selectionController);
+        bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
+        bb.BindExistingInstance(historyManager);
+        bb.BindExistingInstance(songMetaChangeEventStream);
+        bb.BindExistingInstance(lyricsArea);
         bb.BindExistingInstance(this);
-
-        List<Voice> voices = VoiceIdToVoiceMap.Values.ToList();
-        bb.Bind("voices").ToExistingInstance(voices);
         return bb.GetBindings();
     }
 
@@ -119,6 +129,23 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
 
     void Update()
     {
+        // Jump to last position in song when playback stops
+        if (songAudioPlayer.IsPlaying)
+        {
+            if (!lastIsPlaying)
+            {
+                positionInSongInMillisWhenPlaybackStarted = songAudioPlayer.PositionInSongInMillis;
+            }
+        }
+        else
+        {
+            if (lastIsPlaying)
+            {
+                songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+            }
+        }
+        lastIsPlaying = songAudioPlayer.IsPlaying;
+
         // Create the audio waveform image if not done yet.
         if (!audioWaveFormInitialized && songAudioPlayer.HasAudioClip && songAudioPlayer.AudioClip.samples > 0)
         {
@@ -130,15 +157,47 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         }
     }
 
-    public void TogglePlayPause()
+    public Color GetColorForVoice(Voice voice)
     {
-        if (songAudioPlayer.IsPlaying)
+        if (voiceToColorMap.TryGetValue(voice, out Color color))
         {
-            songAudioPlayer.PauseAudio();
+            return color;
         }
         else
         {
-            songAudioPlayer.PlayAudio();
+            // Define colors for the voices.
+            CreateVoiceToColorMap();
+            return voiceToColorMap[voice];
+        }
+    }
+
+    // Returns the notes in the song as well as the notes in the layers in no particular order.
+    public List<Note> GetAllNotes()
+    {
+        List<Note> result = new List<Note>();
+        List<Note> notesInVoices = SongMetaUtils.GetAllNotes(SongMeta);
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        result.AddRange(notesInVoices);
+        result.AddRange(notesInLayers);
+        return result;
+    }
+
+    private void CreateVoiceToColorMap()
+    {
+        List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
+        int index = 0;
+        foreach (Voice v in SongMeta.GetVoices())
+        {
+            if (index < colors.Count)
+            {
+                voiceToColorMap[v] = colors[index];
+            }
+            else
+            {
+                // fallback color
+                voiceToColorMap[v] = Colors.beige;
+            }
+            index++;
         }
     }
 
@@ -152,12 +211,52 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         SaveSong();
     }
 
-    private void SaveSong()
+    public void SaveSong()
     {
-        // TODO: Implement saving the song file.
-        // TODO: A backup of the original file should be created (copy original txt file, but only once),
-        // to avoid breaking songs because of issues in loading / saving the song data.
-        // (This project is still in early development and untested and should not break songs of the users.)
+        string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
+
+        // Create backup of original file if not done yet.
+        if (SettingsManager.Instance.Settings.SongEditorSettings.SaveCopyOfOriginalFile)
+        {
+            CreateCopyOfFile(songFile);
+        }
+
+        try
+        {
+            // Write the song data structure to the file.
+            UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.Instance.CreateWarningDialog("File operation failed",
+                "Saving the file failed: " + e.Message);
+            return;
+        }
+
+        UiManager.Instance.CreateNotification("Saved file");
+    }
+
+    private void CreateCopyOfFile(string filePath)
+    {
+        try
+        {
+            string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
+            if (File.Exists(backupFile))
+            {
+                return;
+            }
+            File.Copy(filePath, backupFile);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.Instance.CreateWarningDialog("File operation failed",
+                "Creating a copy of the original file failed: " + e.Message);
+            return;
+        }
+
+        UiManager.Instance.CreateNotification("Created copy of original file");
     }
 
     private void ContinueToSingScene()
@@ -180,7 +279,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder
         defaultSceneData.PreviousScene = EScene.SingScene;
 
         SingSceneData singSceneData = new SingSceneData();
-
+        singSceneData.SelectedSongMeta = defaultSceneData.SelectedSongMeta;
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
         List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
         playerProfiles.Add(playerProfile);

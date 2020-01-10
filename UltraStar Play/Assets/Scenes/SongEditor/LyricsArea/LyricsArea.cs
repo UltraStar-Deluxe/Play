@@ -17,13 +17,13 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    private List<Sentence> sortedSentences;
+    private readonly Dictionary<int, Note> positionInLyricsToNoteMap = new Dictionary<int, Note>();
 
     private int lastCaretPosition;
 
@@ -31,19 +31,33 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        lyrics = GetLyrics(voices);
-        inputField.text = lyrics;
-        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
+        UpdateLyrics();
+        inputField.OnEndEditAsObservable().Subscribe(OnEndEdit);
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
     void Update()
     {
-        if (lastCaretPosition != inputField.caretPosition)
+        if (inputField.isFocused && lastCaretPosition != inputField.caretPosition)
         {
             lastCaretPosition = inputField.caretPosition;
 
             SyncPositionInSongWithSelectedText();
         }
+    }
+
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (changeEvent is LyricsChangedEvent)
+        {
+            UpdateLyrics();
+        }
+    }
+
+    public void UpdateLyrics()
+    {
+        lyrics = GetLyrics();
+        inputField.text = lyrics;
     }
 
     private void OnEndEdit(string newText)
@@ -63,35 +77,43 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         }
     }
 
-    private string GetLyrics(List<Voice> voices)
+    public string GetLyrics()
     {
-        sortedSentences = voices.SelectMany(voice => voice.Sentences).ToList();
-        sortedSentences.Sort((s1, s2) => s1.MinBeat.CompareTo(s2.MinBeat));
+        positionInLyricsToNoteMap.Clear();
+
         StringBuilder stringBuilder = new StringBuilder();
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        Note lastNote = null;
         foreach (Sentence sentence in sortedSentences)
         {
-            string sentenceText = sentence.Notes.Select(note => note.Text).ToCsv("", "", "\n");
-            stringBuilder.Append(sentenceText);
+            List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
+            foreach (Note note in sortedNotes)
+            {
+                foreach (char c in note.Text)
+                {
+                    positionInLyricsToNoteMap[stringBuilder.Length] = note;
+                    stringBuilder.Append(c);
+                }
+                lastNote = note;
+            }
+            stringBuilder.Append("\n");
+        }
+        if (lastNote != null)
+        {
+            positionInLyricsToNoteMap[stringBuilder.Length] = lastNote;
         }
         return stringBuilder.ToString();
     }
 
-    private Note GetNoteForPositionInLyrics(int positionInLyrics)
+    public Note GetNoteForPositionInLyrics(int positionInLyrics)
     {
-        int position = 0;
-        foreach (Sentence sentence in sortedSentences)
+        if (positionInLyricsToNoteMap.TryGetValue(positionInLyrics, out Note note))
         {
-            foreach (Note note in sentence.Notes)
-            {
-                position += note.Text.Length;
-                if (position >= positionInLyrics)
-                {
-                    return note;
-                }
-            }
-            // +1 because of the line break in the text field to separate sentences.
-            position += 1;
+            return note;
         }
-        return null;
+        else
+        {
+            return null;
+        }
     }
 }

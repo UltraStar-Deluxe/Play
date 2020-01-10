@@ -57,13 +57,7 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Only consider drag motions with the left button.
-        ignoreDrag = eventData.button != PointerEventData.InputButton.Left;
-        if (ignoreDrag)
-        {
-            return;
-        }
-
+        ignoreDrag = false;
         isDragging = true;
         dragStartEvent = CreateNoteAreaBeginDragEvent(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
@@ -124,31 +118,27 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
 
         List<RaycastResult> raycastResults = dragStartEvent.RaycastResultsDragStart;
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(noteAreaRectTransform,
-                                                                eventData.position,
-                                                                eventData.pressEventCamera,
-                                                                out Vector2 localPoint);
-
         float noteAreaWidthInPixels = noteAreaRectTransform.rect.width;
         float noteAreaHeightInPixels = noteAreaRectTransform.rect.height;
-        double xPercent = (localPoint.x + (noteAreaWidthInPixels / 2)) / noteAreaWidthInPixels;
-        double yPercent = (localPoint.y + (noteAreaHeightInPixels / 2)) / noteAreaHeightInPixels;
+        double xDistancePercent = xDistanceInPixels / noteAreaWidthInPixels;
+        double yDistancePercent = yDistanceInPixels / noteAreaHeightInPixels;
 
         int midiNoteDragStart = dragStartEvent.MidiNoteDragStart;
-        int midiNoteDistance = (int)(noteArea.ViewportY + yPercent * noteArea.ViewportHeight) - midiNoteDragStart;
+        int midiNoteDistance = (int)(yDistancePercent * noteArea.ViewportHeight);
 
         int positionInSongInMillisDragStart = dragStartEvent.PositionInSongInMillisDragStart;
-        int millisDistance = (int)(noteArea.ViewportX + xPercent * noteArea.ViewportWidth) - positionInSongInMillisDragStart;
+        int millisDistance = (int)(xDistancePercent * noteArea.ViewportWidth);
 
         int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
-        int beatDistance = (int)(noteArea.MinBeatInViewport + xPercent * noteArea.ViewportWidthInBeats) - positionInSongInBeatsDragStart;
+        int beatDistance = (int)(xDistancePercent * noteArea.ViewportWidthInBeats);
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(xDragStartInPixels, yDragStartInPixels,
             xDistanceInPixels, yDistanceInPixels,
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
             positionInSongInBeatsDragStart, beatDistance,
-            raycastResults);
+            raycastResults,
+            eventData.button);
         return result;
     }
 
@@ -160,12 +150,15 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
         float yDistanceInPixels = 0;
 
         List<RaycastResult> raycastResults = new List<RaycastResult>();
-        graphicRaycaster.Raycast(eventData, raycastResults);
+        PointerEventData eventDataForRaycast = new PointerEventData(EventSystem.current);
+        eventDataForRaycast.position = eventData.pressPosition;
+        graphicRaycaster.Raycast(eventDataForRaycast, raycastResults);
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(noteAreaRectTransform,
                                                                 eventData.pressPosition,
                                                                 eventData.pressEventCamera,
                                                                 out Vector2 localPoint);
+
         float noteAreaWidthInPixels = noteAreaRectTransform.rect.width;
         float noteAreaHeightInPixels = noteAreaRectTransform.rect.height;
         double xPercent = (localPoint.x + (noteAreaWidthInPixels / 2)) / noteAreaWidthInPixels;
@@ -185,7 +178,8 @@ public class NoteAreaDragHandler : MonoBehaviour, INeedInjection, IBeginDragHand
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
             positionInSongInBeatsDragStart, beatDistance,
-            raycastResults);
+            raycastResults,
+            eventData.button);
         return result;
     }
 }

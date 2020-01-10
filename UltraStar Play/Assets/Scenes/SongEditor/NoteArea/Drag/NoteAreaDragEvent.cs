@@ -4,11 +4,15 @@ using UnityEngine.EventSystems;
 
 public class NoteAreaDragEvent
 {
+    public PointerEventData.InputButton InputButton { get; private set; }
+
     public float XDragStartInPixels { get; private set; }
     public float YDragStartInPixels { get; private set; }
 
     public float YDistanceInPixels { get; private set; }
     public float XDistanceInPixels { get; private set; }
+
+    public Vector2 DragStartPositionInPixels { get; private set; }
 
     public int MidiNoteDragStart { get; private set; }
     public int MidiNoteDistance { get; private set; }
@@ -26,7 +30,8 @@ public class NoteAreaDragEvent
         int midiNoteDragStart, int midiNoteDistance,
         int positionInSongInMillisDragStart, int millisDistance,
         int positionInSongInBeatsDragStart, int beatDistance,
-        List<RaycastResult> raycastResultsDragStart)
+        List<RaycastResult> raycastResultsDragStart,
+        PointerEventData.InputButton inputButton)
     {
         XDragStartInPixels = xDragStartInPixels;
         YDragStartInPixels = yDragStartInPixels;
@@ -39,5 +44,9 @@ public class NoteAreaDragEvent
         PositionInSongInBeatsDragStart = positionInSongInBeatsDragStart;
         BeatDistance = beatDistance;
         RaycastResultsDragStart = raycastResultsDragStart;
+
+        DragStartPositionInPixels = new Vector2(xDragStartInPixels, yDragStartInPixels);
+
+        InputButton = inputButton;
     }
 }

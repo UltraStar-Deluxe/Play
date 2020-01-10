@@ -55,15 +55,13 @@ public class SentenceDisplayer : MonoBehaviour
     public void DisplaySentence(Sentence sentence)
     {
         displayedSentence = sentence;
-        avgMidiNote = (int)displayedSentence.Notes.Select(it => it.MidiNote).Average();
-
         RemoveAllDisplayedNotes();
-
         if (sentence == null)
         {
             return;
         }
 
+        avgMidiNote = (int)displayedSentence.Notes.Select(it => it.MidiNote).Average();
         foreach (Note note in sentence.Notes)
         {
             CreateUiNote(note);
