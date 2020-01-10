@@ -5,143 +5,173 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-static class VoicesBuilder
+public class VoicesBuilder
 {
-    public static Dictionary<string, Voice> ParseFile(string path, Encoding enc, IEnumerable<string> voiceIdentifiers)
-    {
-        Dictionary<string, MutableVoice> res = new Dictionary<string, MutableVoice>();
-        foreach (string voiceIdentifier in voiceIdentifiers)
-        {
-            res.Add(voiceIdentifier, new MutableVoice());
-        }
-        MutableVoice currentVoice = null;
-        MutableSentence currentSentence = null;
-        bool endFound = false;
+    private Voice currentVoice;
+    private Sentence currentSentence;
+    private bool endFound;
 
-        // if this is a solo song (without a named voice) then just add one with identifier "" (empty string)
-        string soloVoiceIdentifier = "";
-        if (res.Count == 0)
-        {
-            res.Add(soloVoiceIdentifier, new MutableVoice());
-            currentVoice = res[""];
-        }
+    private readonly Dictionary<string, Voice> voiceNameToVoiceMap = new Dictionary<string, Voice>();
+
+    private readonly bool isRelativeSongFile;
+    // The last beat is only relevant for relative song files. Any beat will be relative to this.
+    private int lastBeat;
+
+    public VoicesBuilder(string path, Encoding enc, bool isRelativeSongFile)
+    {
+        this.isRelativeSongFile = isRelativeSongFile;
+        currentVoice = new Voice(Voice.soloVoiceName);
+        voiceNameToVoiceMap.Add(Voice.soloVoiceName, currentVoice);
 
         using (StreamReader reader = TxtReader.GetFileStreamReader(path, enc))
         {
-            uint lineNumber = 0;
-            while (!endFound && !reader.EndOfStream)
-            {
-                ++lineNumber;
-                string line = reader.ReadLine();
-                switch (line[0])
-                {
-                    case '#':
-                        // headers are ignored at this stage
-                        break;
-                    case 'E':
-                        // finish any current open sentence
-                        if (currentVoice != null && currentSentence != null)
-                        {
-                            currentVoice.Add((Sentence)currentSentence);
-                        }
-                        // now we are done
-                        endFound = true;
-                        break;
-                    case 'P':
-                        // save the current sentence, if any
-                        if (currentVoice != null && currentSentence != null)
-                        {
-                            currentVoice.Add((Sentence)currentSentence);
-                        }
-                        // switch to or create new voice
-                        if (!res.TryGetValue(line, out MutableVoice nextVoice))
-                        {
-                            // Voice has not been found, so create new one.
-                            nextVoice = new MutableVoice();
-                            res.Add(line, nextVoice);
-                        }
-                        currentVoice = nextVoice;
-                        currentSentence = null;
-                        // Remove the default voice for solo songs.
-                        res.Remove(soloVoiceIdentifier);
-                        break;
-                    case '-':
-                        if (currentVoice == null)
-                        {
-                            ThrowLineError(lineNumber, "Linebreak encountered but no voice is active");
-                        }
-                        else if (currentSentence == null)
-                        {
-                            ThrowLineError(lineNumber, "Linebreak encountered without preceding notes");
-                        }
-                        try
-                        {
-                            currentSentence.SetLinebreakBeat(ParseLinebreak(line.Substring(2)));
-                            currentVoice.Add((Sentence)currentSentence);
-                            currentSentence = null;
-                        }
-                        catch (VoicesBuilderException e)
-                        {
-                            ThrowLineError(lineNumber, e.Message);
-                        }
-                        break;
-                    case ':':
-                    case '*':
-                    case 'F':
-                    case 'R':
-                    case 'G':
-                        if (currentVoice == null)
-                        {
-                            ThrowLineError(lineNumber, "Note encountered but no voice is active");
-                        }
-                        else if (currentSentence == null)
-                        {
-                            currentSentence = new MutableSentence();
-                        }
-                        try
-                        {
-                            currentSentence.Add(ParseNote(line));
-                        }
-                        catch (VoicesBuilderException e)
-                        {
-                            ThrowLineError(lineNumber, e.Message);
-                        }
-                        break;
-                    default:
-                        ThrowLineError(lineNumber, "Invalid instruction: " + line);
-                        break;
-                }
-            }
+            ParseStreamReader(reader);
         }
-
-        Dictionary<string, Voice> actualRes = new Dictionary<string, Voice>();
-        foreach (var item in res)
-        {
-            actualRes.Add(item.Key, (Voice)item.Value);
-        }
-        return actualRes;
     }
 
-    private static int ParseLinebreak(string line)
+    public IReadOnlyList<Voice> GetVoices()
+    {
+        return new List<Voice>(voiceNameToVoiceMap.Values);
+    }
+
+    private void ParseStreamReader(StreamReader reader)
+    {
+        uint lineNumber = 0;
+        while (!endFound && !reader.EndOfStream)
+        {
+            lineNumber++;
+            string line = reader.ReadLine();
+            ParseLine(line, lineNumber);
+        }
+    }
+
+    private void ParseLine(string line, uint lineNumber)
+    {
+        switch (line[0])
+        {
+            case '#':
+                // headers are ignored at this stage
+                break;
+            case 'E':
+                // now we are done
+                endFound = true;
+                break;
+            case 'P':
+                // Switch to voice with that name
+                ParseVoiceStart(line, lineNumber);
+                break;
+            case '-':
+                ParseSentenceEnd(line, lineNumber);
+                break;
+            case ':': // Normal note
+            case '*': // Golden note
+            case 'F': // Freestyle note
+            case 'R': // Rap note
+            case 'G': // RapGolden note
+                ParseNote(line, lineNumber);
+                break;
+            default:
+                ThrowLineError(lineNumber, "Invalid instruction: " + line);
+                break;
+        }
+    }
+
+    private void ParseNote(string line, uint lineNumber)
+    {
+        // Create sentence if needed.
+        if (currentVoice == null)
+        {
+            ThrowLineError(lineNumber, "Note encountered but no voice is active");
+        }
+        else if (currentSentence == null)
+        {
+            currentSentence = new Sentence();
+            currentSentence.SetVoice(currentVoice);
+        }
+
+        // Add new note to current sentence.
+        try
+        {
+            Note note = CreateNote(line);
+            currentSentence.AddNote(note);
+        }
+        catch (VoicesBuilderException e)
+        {
+            ThrowLineError(lineNumber, e.Message);
+        }
+    }
+
+    private void ParseSentenceEnd(string line, uint lineNumber)
+    {
+        if (currentSentence == null)
+        {
+            ThrowLineError(lineNumber, "Linebreak encountered without preceding notes");
+        }
+
+        try
+        {
+            ParseSentenceStartBeatAndEndBeat(line, out int startBeat, out int endBeat);
+            currentSentence.SetLinebreakBeat(startBeat);
+            currentSentence = null;
+        }
+        catch (VoicesBuilderException e)
+        {
+            ThrowLineError(lineNumber, e.Message);
+        }
+    }
+
+    private void ParseSentenceStartBeatAndEndBeat(string line, out int startBeat, out int endBeat)
     {
         // Format of line breaks: - STARTBEAT ENDBEAT
         // Thereby, ENDBEAT is optional.
-        int indexOfSpace = line.IndexOf(" ", StringComparison.InvariantCulture);
-        if (indexOfSpace >= 0)
+        char[] splitChars = { ' ' };
+        string[] data = line.Split(splitChars);
+
+        startBeat = 0;
+        endBeat = 0;
+        if (data.Length == 3)
         {
-            string startBeatText = line.Substring(0, indexOfSpace + 1);
+            string startBeatText = data[1];
+            startBeat = ConvertToBeat(startBeatText);
             // TODO: Store endBeatText in SongMeta.
-            // string endBeatText = line.Substring(indexOfSpace + 1, line.Length - (indexOfSpace + 1));
-            return ConvertToInt32(startBeatText);
+            string endBeatText = data[2];
+            endBeat = ConvertToBeat(endBeatText);
+            lastBeat = endBeat;
+        }
+        else if (data.Length == 2)
+        {
+            string startBeatText = data[1];
+            startBeat = ConvertToBeat(startBeatText);
+            lastBeat = startBeat;
         }
         else
         {
-            return ConvertToInt32(line);
+            throw new VoicesBuilderException("Invalid instruction: " + line);
         }
-
     }
 
-    private static Note ParseNote(string line)
+    private void ParseVoiceStart(string voiceName, uint lineNumber)
+    {
+        if (voiceName.IsNullOrEmpty())
+        {
+            ThrowLineError(lineNumber, "Voice name is empty");
+        }
+
+        // Remove the default voice for solo songs.
+        voiceNameToVoiceMap.Remove(Voice.soloVoiceName);
+
+        // switch to or create new voice
+        if (!voiceNameToVoiceMap.TryGetValue(voiceName, out Voice nextVoice))
+        {
+            // Voice has not been found, so create new one.
+            nextVoice = new Voice(voiceName);
+            voiceNameToVoiceMap.Add(voiceName, nextVoice);
+        }
+        currentVoice = nextVoice;
+        currentSentence = null;
+    }
+
+    private Note CreateNote(string line)
     {
         char[] splitChars = { ' ' };
         string[] data = line.Split(splitChars, 5);
@@ -149,13 +179,29 @@ static class VoicesBuilder
         {
             throw new VoicesBuilderException("Incomplete note");
         }
+        ENoteType noteType = GetNoteType(data[0]);
+        int startBeat = ConvertToBeat(data[1]);
+        lastBeat = startBeat;
+        int length = ConvertToInt32(data[2]);
+        int txtPitch = ConvertToInt32(data[3]);
+        string lyrics = data[4];
         return new Note(
-            GetNoteType(data[0]),
-            ConvertToInt32(data[1]),
-            ConvertToInt32(data[2]),
-            ConvertToInt32(data[3]),
-            data[4]
+            noteType,
+            startBeat,
+            length,
+            txtPitch,
+            lyrics
         );
+    }
+
+    private int ConvertToBeat(string s)
+    {
+        int beat = ConvertToInt32(s);
+        if (isRelativeSongFile)
+        {
+            beat += lastBeat;
+        }
+        return beat;
     }
 
     private static ENoteType GetNoteType(string s)
@@ -217,120 +263,5 @@ public class VoicesBuilderException : Exception
     public VoicesBuilderException(string message, Exception innerException)
         : base(message, innerException)
     {
-    }
-}
-
-// this should be internal but tests become impossible
-public class MutableVoice
-{
-    private readonly List<Sentence> sentences = new List<Sentence>();
-
-    public void Add(Sentence sentence)
-    {
-        if (sentences.Count > 0)
-        {
-            Sentence lastSentence = sentences[sentences.Count - 1];
-            if (lastSentence.MaxBeat > sentence.MinBeat)
-            {
-                Debug.LogWarning($"Sentence starts before previous sentence is over. Skipping this sentence."
-                + $" (last sentence ended on beat {lastSentence.MaxBeat}, current sentence starts on beat {sentence.MinBeat})");
-            }
-            else if (lastSentence.LinebreakBeat > sentence.MinBeat)
-            {
-                // The LinebreakBeat must not extend into the following sentence.
-                lastSentence.SetLinebreakBeat(sentence.MinBeat);
-            }
-            else
-            {
-                sentences.Add(sentence);
-            }
-        }
-        else
-        {
-            sentences.Add(sentence);
-        }
-    }
-
-    // this needs to be switched over to IReadOnlyList
-    public List<Sentence> GetSentences()
-    {
-        return sentences;
-    }
-
-    public static explicit operator Voice(MutableVoice mv)
-    {
-        if (mv == null)
-        {
-            throw new ArgumentNullException("mv");
-        }
-        return new Voice(mv.GetSentences());
-    }
-}
-
-// this should be internal but tests become impossible
-public class MutableSentence
-{
-    private readonly List<Note> notes = new List<Note>();
-    private int linebreakBeat;
-
-    public void Add(Note note)
-    {
-        if (note == null)
-        {
-            throw new ArgumentNullException("note");
-        }
-        if (linebreakBeat != 0)
-        {
-            throw new VoicesBuilderException("Adding more notes after the linebreak has already been set is not allowed");
-        }
-        else if (GetUntilBeat() > note.StartBeat)
-        {
-            throw new VoicesBuilderException("New note overlaps with existing sentence");
-        }
-        else
-        {
-            notes.Add(note);
-        }
-    }
-
-    private int GetUntilBeat()
-    {
-        if (notes.Count == 0)
-        {
-            return int.MinValue;
-        }
-        Note lastNote = notes[notes.Count - 1];
-        return lastNote.StartBeat + lastNote.Length;
-    }
-
-    // this needs to be switched over to IReadOnlyList
-    public List<Note> GetNotes()
-    {
-        return notes;
-    }
-
-    public void SetLinebreakBeat(int beat)
-    {
-        int untilBeat = GetUntilBeat();
-        if (beat < untilBeat)
-        {
-            Debug.LogWarning($"Linebreak on beat {beat} conflicts with existing sentence. Using the beat {untilBeat + 1} instead");
-            beat = untilBeat + 1;
-        }
-        linebreakBeat = beat;
-    }
-
-    public int GetLinebreakBeat()
-    {
-        return linebreakBeat;
-    }
-
-    public static explicit operator Sentence(MutableSentence ms)
-    {
-        if (ms == null)
-        {
-            throw new ArgumentNullException("ms");
-        }
-        return new Sentence(ms.GetNotes(), ms.GetLinebreakBeat());
     }
 }

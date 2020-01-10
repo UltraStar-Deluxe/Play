@@ -8,14 +8,14 @@ using System.Linq;
 public class SongMeta
 {
     // required helper fields
-    public string Directory { get; private set; }
-    public string Filename { get; private set; }
+    public string Directory { get; set; }
+    public string Filename { get; set; }
 
     // required fields
-    public string Artist { get; private set; }
-    public float Bpm { get; private set; }
-    public string Mp3 { get; private set; }
-    public string Title { get; private set; }
+    public string Artist { get; set; }
+    public float Bpm { get; set; }
+    public string Mp3 { get; set; }
+    public string Title { get; set; }
 
     // required special fields
     private Dictionary<string, string> voiceNames;
@@ -28,9 +28,9 @@ public class SongMeta
             if (voiceNames.IsNullOrEmpty())
             {
                 voiceNames = new Dictionary<string, string>();
-                foreach (KeyValuePair<string, Voice> voiceNameAndVoicePair in GetVoices())
+                foreach (Voice voice in GetVoices())
                 {
-                    voiceNames.Add(voiceNameAndVoicePair.Key, voiceNameAndVoicePair.Key);
+                    voiceNames.Add(voice.Name, voice.Name);
                 }
             }
             return voiceNames;
@@ -46,13 +46,22 @@ public class SongMeta
     public float Gap { get; set; }
     public string Genre { get; set; }
     public string Language { get; set; }
-    public bool Relative { get; set; }// = false; // setting default values here does not work in C# 4.0
-    public float Start { get; set; }// = 0; // setting default values here does not work in C# 4.0
+    public bool Relative { get; set; }
+    public float Start { get; set; }
     public string Video { get; set; }
     public float VideoGap { get; set; }
     public uint Year { get; set; }
 
-    private Dictionary<string, Voice> voices;
+    private List<Voice> voices = new List<Voice>();
+
+    private readonly Dictionary<string, string> unkownHeaderEntries = new Dictionary<string, string>();
+    public IReadOnlyDictionary<string, string> UnkownHeaderEntries
+    {
+        get
+        {
+            return unkownHeaderEntries;
+        }
+    }
 
     public SongMeta(
         // required helper fields
@@ -115,12 +124,44 @@ public class SongMeta
         Start = 0;
     }
 
-    public Dictionary<string, Voice> GetVoices()
+    public IReadOnlyList<Voice> GetVoices()
     {
         if (voices.IsNullOrEmpty())
         {
-            voices = VoicesBuilder.ParseFile(Directory + Path.DirectorySeparatorChar + Filename, Encoding, voiceNames.Keys);
+            string path = Directory + Path.DirectorySeparatorChar + Filename;
+            using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
+            {
+                VoicesBuilder voicesBuilder = new VoicesBuilder(path, Encoding, Relative);
+                voices = new List<Voice>(voicesBuilder.GetVoices());
+            }
         }
         return voices;
+    }
+
+    public void AddVoice(Voice newVoice)
+    {
+        if (voices.Contains(newVoice))
+        {
+            return;
+        }
+
+        voices.Add(newVoice);
+        voiceNames.Add(newVoice.Name, newVoice.Name);
+    }
+
+    public void RemoveVoice(Voice voice)
+    {
+        if (!voices.Contains(voice))
+        {
+            return;
+        }
+
+        voices.Remove(voice);
+        voiceNames.Remove(voice.Name);
+    }
+
+    public void AddUnkownHeaderEntry(string key, string value)
+    {
+        unkownHeaderEntries.Add(key, value);
     }
 }

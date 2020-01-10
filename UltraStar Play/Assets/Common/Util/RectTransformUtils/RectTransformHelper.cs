@@ -21,6 +21,9 @@ public class RectTransformHelper : MonoBehaviour
     public Vector3 localPosition;
     private Vector3 localPositionOld;
 
+    public Vector2 anchoredPosition;
+    private Vector2 anchoredPositionOld;
+
     public Vector2 sizeDelta;
     private Vector2 sizeDeltaOld;
 
@@ -47,6 +50,9 @@ public class RectTransformHelper : MonoBehaviour
         localPosition = rectTransform.localPosition;
         localPositionOld = localPosition;
 
+        anchoredPosition = rectTransform.anchoredPosition;
+        anchoredPositionOld = anchoredPosition;
+
         sizeDelta = rectTransform.sizeDelta;
         sizeDeltaOld = sizeDelta;
 
@@ -63,7 +69,8 @@ public class RectTransformHelper : MonoBehaviour
         UpdateAnchorMax();
         UpdateAnchorMin();
         UpdatePivot();
-        UpdateLocalScale();
+        UpdateAnchoredPosition();
+        UpdateLocalPosition();
         UpdateSizeDelta();
         UpdateSize();
     }
@@ -95,15 +102,28 @@ public class RectTransformHelper : MonoBehaviour
         sizeDeltaOld = sizeDelta;
     }
 
-    private void UpdateLocalScale()
+    private void UpdateLocalPosition()
     {
-        if (localPositionOld != localPosition)
+        if (rectTransform.localPosition != localPosition)
+        {
+            localPosition = rectTransform.localPosition;
+        }
+        else if (localPositionOld != localPosition)
         {
             rectTransform.localPosition = localPosition;
         }
-        else if (rectTransform.localPosition != localPosition)
+        localPositionOld = localPosition;
+    }
+
+    private void UpdateAnchoredPosition()
+    {
+        if (rectTransform.anchoredPosition != anchoredPosition)
         {
-            localPosition = rectTransform.localPosition;
+            anchoredPosition = rectTransform.anchoredPosition;
+        }
+        else if (anchoredPositionOld != anchoredPosition)
+        {
+            rectTransform.anchoredPosition = anchoredPosition;
         }
         localPositionOld = localPosition;
     }

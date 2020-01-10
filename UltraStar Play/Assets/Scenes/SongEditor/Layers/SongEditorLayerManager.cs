@@ -10,13 +10,43 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorLayerManager
+public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
 
-    public void AddNoteToLayer(ESongEditorLayer layer, Note note)
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    public void OnSceneInjectionFinished()
     {
-        layerKeyToLayerMap[layer].AddNote(note);
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+    }
+
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (!(changeEvent is MovedNotesToVoiceEvent))
+        {
+            return;
+        }
+
+        IReadOnlyCollection<Note> notes = (changeEvent as MovedNotesToVoiceEvent).notes;
+        foreach (Note note in notes)
+        {
+            if (note.Sentence != null)
+            {
+                RemoveNoteFromAllLayers(note);
+            }
+        }
+    }
+
+    public void AddNoteToLayer(ESongEditorLayer layerKey, Note note)
+    {
+        layerKeyToLayerMap[layerKey].AddNote(note);
+    }
+
+    public void ClearLayer(ESongEditorLayer layerKey)
+    {
+        layerKeyToLayerMap[layerKey].ClearNotes();
     }
 
     public List<Note> GetNotes(ESongEditorLayer layerKey)
@@ -39,6 +69,11 @@ public class SongEditorLayerManager
         layerKeyToLayerMap[layerKey].IsEnabled = newValue;
     }
 
+    public List<SongEditorLayer> GetLayers()
+    {
+        return new List<SongEditorLayer>(layerKeyToLayerMap.Values);
+    }
+
     private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerKeyToLayerMap()
     {
         Dictionary<ESongEditorLayer, SongEditorLayer> result = new Dictionary<ESongEditorLayer, SongEditorLayer>();
@@ -49,6 +84,7 @@ public class SongEditorLayerManager
         }
         result[ESongEditorLayer.MicRecording].Color = Colors.coral;
         result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
+        result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 0.8f);
         return result;
     }
 
@@ -61,5 +97,13 @@ public class SongEditorLayerManager
             notes.AddRange(notesOfLayer);
         }
         return notes;
+    }
+
+    public void RemoveNoteFromAllLayers(Note note)
+    {
+        foreach (SongEditorLayer layer in layerKeyToLayerMap.Values)
+        {
+            layer.RemoveNote(note);
+        }
     }
 }

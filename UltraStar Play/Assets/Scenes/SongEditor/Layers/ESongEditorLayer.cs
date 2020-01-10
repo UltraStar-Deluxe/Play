@@ -2,5 +2,5 @@
 {
     MicRecording = 0,
     ButtonRecording = 1,
-    Paste = 2,
+    CopyPaste = 2,
 }

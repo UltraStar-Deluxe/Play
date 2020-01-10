@@ -24,13 +24,25 @@ public class Sentence : ISerializationCallbackReceiver
     public int MinBeat { get; private set; }
     public int MaxBeat { get; private set; }
 
+    // ExtendedMaxBeat is equal to Math.Max(MaxBeat, LinebreakBeat)
+    public int ExtendedMaxBeat { get; private set; }
+
     public Sentence()
     {
     }
 
-    public Sentence(List<Note> notes, int linebreakBeat)
+    public Sentence(int minBeat, int maxBeat)
+    {
+        MinBeat = minBeat;
+        MaxBeat = maxBeat;
+        LinebreakBeat = maxBeat;
+        ExtendedMaxBeat = maxBeat;
+    }
+
+    public Sentence(List<Note> notes, int linebreakBeat = 0)
     {
         LinebreakBeat = linebreakBeat;
+        ExtendedMaxBeat = linebreakBeat;
         SetNotes(notes);
     }
 
@@ -52,29 +64,38 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    public void SetNotes(List<Note> notes)
+    public void UpdateMinAndMaxBeat()
     {
-        if (notes == null)
+        UpdateMinBeat();
+        UpdateMaxBeat();
+    }
+
+    public void SetNotes(List<Note> newNotes)
+    {
+        if (newNotes == null)
         {
-            throw new UnityException("Notes cannot be null!");
+            throw new ArgumentNullException("Notes cannot be null!");
         }
 
-        this.notes.Clear();
-        foreach (Note note in notes)
+        foreach (Note note in new List<Note>(notes))
+        {
+            RemoveNote(note);
+        }
+
+        foreach (Note note in newNotes)
         {
             this.notes.Add(note);
             note.SetSentence(this);
         }
 
-        UpdateMinBeat(notes);
-        UpdateMaxBeat(notes);
+        UpdateMinAndMaxBeat();
     }
 
     public void AddNote(Note note)
     {
         if (note == null)
         {
-            throw new UnityException("Note cannot be null");
+            throw new ArgumentNullException("Note cannot be null");
         }
 
         // The check is needed to avoid a recursive loop between Sentence.AddNote and Note.SetSentence.
@@ -85,7 +106,7 @@ public class Sentence : ISerializationCallbackReceiver
         notes.Add(note);
         note.SetSentence(this);
 
-        ExpandStartAndEndBeat(note);
+        UpdateMinAndMaxBeat();
     }
 
     public void RemoveNote(Note note)
@@ -105,20 +126,27 @@ public class Sentence : ISerializationCallbackReceiver
 
         if (MinBeat == note.StartBeat)
         {
-            UpdateMinBeat(notes);
+            UpdateMinBeat();
         }
         if (MaxBeat == note.EndBeat)
         {
-            UpdateMaxBeat(notes);
+            UpdateMaxBeat();
         }
+    }
+
+    public void FitToNotes()
+    {
+        UpdateMinAndMaxBeat();
+        SetLinebreakBeat(MaxBeat);
     }
 
     public void SetLinebreakBeat(int newBeat)
     {
-        LinebreakBeat = (newBeat < MaxBeat) ? MaxBeat : newBeat;
+        LinebreakBeat = Math.Max(MaxBeat, newBeat);
+        ExtendedMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
     }
 
-    private void UpdateMinBeat(IReadOnlyCollection<Note> notes)
+    public void UpdateMinBeat()
     {
         if (notes.Count > 0)
         {
@@ -126,7 +154,7 @@ public class Sentence : ISerializationCallbackReceiver
         }
     }
 
-    private void UpdateMaxBeat(IReadOnlyCollection<Note> notes)
+    public void UpdateMaxBeat()
     {
         if (notes.Count > 0)
         {
@@ -134,23 +162,7 @@ public class Sentence : ISerializationCallbackReceiver
             if (LinebreakBeat < MaxBeat)
             {
                 LinebreakBeat = MaxBeat;
-            }
-        }
-    }
-
-    internal void ExpandStartAndEndBeat(Note note)
-    {
-        if (MinBeat > note.StartBeat)
-        {
-            MinBeat = note.StartBeat;
-        }
-
-        if (MaxBeat < note.EndBeat)
-        {
-            MaxBeat = note.EndBeat;
-            if (LinebreakBeat < MaxBeat)
-            {
-                LinebreakBeat = MaxBeat;
+                ExtendedMaxBeat = MaxBeat;
             }
         }
     }
@@ -166,6 +178,19 @@ public class Sentence : ISerializationCallbackReceiver
         {
             note.SetSentence(this);
         }
+    }
+
+    public Sentence CloneDeep()
+    {
+        List<Note> notesCopy = new List<Note>();
+        foreach (Note note in notes)
+        {
+            Note noteCopy = note.Clone();
+            notesCopy.Add(noteCopy);
+        }
+
+        Sentence clone = new Sentence(notesCopy, LinebreakBeat);
+        return clone;
     }
 
     private class SentenceComparerByStartBeat : IComparer<Sentence>

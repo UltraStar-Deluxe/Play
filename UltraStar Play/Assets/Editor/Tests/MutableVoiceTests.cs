@@ -5,31 +5,31 @@ using System.Linq;
 
 public class MutableVoiceTests
 {
-    private MutableVoice mv;
+    private Voice mv;
 
     [SetUp]
     public void TestInit()
     {
-        mv = new MutableVoice();
+        mv = new Voice("");
     }
 
     [Test]
     public void TestCreation()
     {
-        Assert.AreEqual(0, mv.GetSentences().Count);
+        Assert.AreEqual(0, mv.Sentences.Count);
     }
 
     [Test]
     public void TestOneSentence()
     {
         Note testNote = new Note(ENoteType.Normal, 0, 2, 0, "");
-        MutableSentence ms = new MutableSentence();
-        ms.Add(testNote);
-        mv.Add((Sentence)ms);
+        Sentence ms = new Sentence();
+        ms.AddNote(testNote);
+        mv.AddSentence(ms);
 
-        List<Sentence> sentences = mv.GetSentences();
+        IReadOnlyCollection<Sentence> sentences = mv.Sentences;
         Assert.AreEqual(1, sentences.Count);
-        IReadOnlyCollection<Note> notes = sentences[0].Notes;
+        IReadOnlyCollection<Note> notes = sentences.FirstOrDefault().Notes;
         Assert.AreEqual(1, notes.Count);
         Assert.AreEqual(testNote, notes.FirstOrDefault());
     }

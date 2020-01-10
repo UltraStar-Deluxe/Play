@@ -5,14 +5,12 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 #pragma warning disable CS0649
 
-public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
+public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private static readonly Color[] voiceColors = { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
-                                    Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
-
     [InjectedInInspector]
     public DynamicallyCreatedImage dynImage;
 
@@ -22,26 +20,48 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(key = "voices")]
-    private List<Voice> voices;
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    void Start()
+    public void OnSceneInjectionFinished()
     {
-        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
-        DrawVoices(songDurationInMillis, songMeta, voices);
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
-    public void DrawVoices(int songDurationInMillis, SongMeta songMeta, List<Voice> voices)
+    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    {
+        if (changeEvent is LyricsChangedEvent)
+        {
+            return;
+        }
+
+        UpdateNoteOverviewImage();
+    }
+
+    void Start()
+    {
+        UpdateNoteOverviewImage();
+    }
+
+    private void UpdateNoteOverviewImage()
+    {
+        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
+        DrawVoices(songDurationInMillis, songMeta);
+    }
+
+    public void DrawVoices(int songDurationInMillis, SongMeta songMeta)
     {
         dynImage.ClearTexture();
 
-        int voiceIndex = 0;
-        foreach (Voice voice in voices)
+        foreach (Voice voice in songMeta.GetVoices())
         {
-            Color color = voiceColors[voiceIndex];
+            Color color = songEditorSceneController.GetColorForVoice(voice);
             DrawVoice(songDurationInMillis, songMeta, voice, color);
         }
 
