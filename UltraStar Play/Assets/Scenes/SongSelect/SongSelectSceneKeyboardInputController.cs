@@ -8,6 +8,8 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
     private const KeyCode StartSingSceneShortcut = KeyCode.Return;
+    private const KeyCode RandomSongShortcut = KeyCode.R;
+    private const KeyCode OpenInEditorShortcut = KeyCode.E;
 
     private const KeyCode QuickSearchSong = KeyCode.LeftControl;
     private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
@@ -40,6 +42,11 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             {
                 SceneNavigator.Instance.LoadScene(EScene.MainScene);
             }
+
+            if (Input.GetKeyUp(RandomSongShortcut))
+            {
+                songSelectSceneController.OnRandomSong();
+            }
         }
 
         if (Input.GetKeyUp(NextSongShortcut))
@@ -52,14 +59,22 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(StartSingSceneShortcut))
+        if (Input.GetKeyUp(StartSingSceneShortcut)
+            || (Input.GetKeyUp(OpenInEditorShortcut) && !songSelectSceneController.IsSearchEnabled()))
         {
             GameObject focusedControl = GameObjectUtils.GetSelectedGameObject();
             bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
             bool focusedControlIsSearchField = (focusedControl != null && focusedControl.GetComponent<SearchInputField>() != null);
             if (focusedControl == null || focusedControlIsSongButton || focusedControlIsSearchField)
             {
-                songSelectSceneController.StartSingScene();
+                if (Input.GetKeyUp(StartSingSceneShortcut))
+                {
+                    songSelectSceneController.StartSingScene();
+                }
+                else if (Input.GetKeyUp(OpenInEditorShortcut))
+                {
+                    songSelectSceneController.StartSongEditorScene();
+                }
             }
         }
     }

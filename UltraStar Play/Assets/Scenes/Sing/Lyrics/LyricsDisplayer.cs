@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,11 +9,22 @@ public class LyricsDisplayer : MonoBehaviour
     public Text nextSentenceText;
 
     public Sentence CurrentSentence { get; private set; }
+    public List<Note> SortedNotes { get; private set; } = new List<Note>();
 
     public void SetCurrentSentence(Sentence sentence)
     {
         CurrentSentence = sentence;
-        currentSentenceText.text = CreateStringFromSentence(sentence);
+        if (CurrentSentence != null)
+        {
+            SortedNotes = new List<Note>(sentence.Notes);
+            SortedNotes.Sort(Note.comparerByStartBeat);
+            currentSentenceText.text = CreateStringFromSentence(sentence);
+        }
+        else
+        {
+            SortedNotes = new List<Note>();
+            currentSentenceText.text = "";
+        }
     }
 
     public void SetNextSentence(Sentence sentence)

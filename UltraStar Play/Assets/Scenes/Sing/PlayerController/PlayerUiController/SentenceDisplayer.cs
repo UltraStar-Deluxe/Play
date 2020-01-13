@@ -38,6 +38,8 @@ public class SentenceDisplayer : MonoBehaviour
 
     private MicProfile micProfile;
 
+    private int avgMidiNote;
+
     public void Init(int noteLineCount, MicProfile micProfile)
     {
         this.micProfile = micProfile;
@@ -53,14 +55,13 @@ public class SentenceDisplayer : MonoBehaviour
     public void DisplaySentence(Sentence sentence)
     {
         displayedSentence = sentence;
-
         RemoveAllDisplayedNotes();
-
         if (sentence == null)
         {
             return;
         }
 
+        avgMidiNote = (int)displayedSentence.Notes.Select(it => it.MidiNote).Average();
         foreach (Note note in sentence.Notes)
         {
             CreateUiNote(note);
@@ -174,11 +175,11 @@ public class SentenceDisplayer : MonoBehaviour
     {
         // Calculate offset, such that the average note will be on the middle line
         // (thus, middle line has offset of zero).
-        int offset = (noteLineCount / 2) - (((int)displayedSentence.AvgMidiNote) % noteLineCount);
+        int offset = (noteLineCount / 2) - (avgMidiNote % noteLineCount);
         int noteLine = (offset + midiNote) % noteLineCount;
 
-        int sentenceStartBeat = displayedSentence.StartBeat;
-        int sentenceEndBeat = displayedSentence.EndBeat;
+        int sentenceStartBeat = displayedSentence.MinBeat;
+        int sentenceEndBeat = displayedSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
         float anchorY = (float)noteLine / noteLineCount;

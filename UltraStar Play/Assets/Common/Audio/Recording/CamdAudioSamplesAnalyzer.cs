@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UniRx;
 using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
-    /** There are 49 halftones in the singable audio spectrum (C2 to C6 (1046.5023 Hz)). */
-    private const int NumHalftones = 49;
-    /** A4 concert pitch of 440 Hz. */
-    private const float BaseToneFreq = 440f;
-    private const int BaseToneMidi = 33;
+    // The singable spectrum of a human voice has about 4 octaves (C2 to C6).
+    // +1 here, because if min and max are equal, then you are still able to sing one note.
+    private const int NumHalftones = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) + 1;
     private const int MinSampleLength = 256;
     private static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
 
@@ -18,7 +15,6 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
     private readonly int pitchRecordHistoryLength = 5;
 
     private bool isEnabled;
-    private int lastPitchDetectedFrame;
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz)
     {
@@ -30,7 +26,8 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         double[] noteFrequencies = new double[NumHalftones];
         for (int index = 0; index < NumHalftones; index++)
         {
-            noteFrequencies[index] = BaseToneFreq * Math.Pow(2f, (index - BaseToneMidi) / 12f);
+            float concertPitchOctaveOffset = ((MidiUtils.MidiNoteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
+            noteFrequencies[index] = MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset);
         }
         return noteFrequencies;
     }
@@ -57,11 +54,16 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
     {
-        if (!isEnabled || samplesSinceLastFrame < MinSampleLength || lastPitchDetectedFrame == Time.frameCount)
+        if (!isEnabled)
+        {
+            Debug.LogWarning("AudioSamplesAnalyzer is disabled");
+            return null;
+        }
+
+        if (samplesSinceLastFrame < MinSampleLength)
         {
             return null;
         }
-        lastPitchDetectedFrame = Time.frameCount;
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
         // check if samples is louder than threshhold
@@ -87,8 +89,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         int halftone = CalculateBestFittingHalftone(correlation);
         if (halftone != -1 && isEnabled)
         {
-            // no idea where the +3 is coming from...
-            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone + BaseToneMidi + 3);
+            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone + MidiUtils.MidiNoteMin);
             if (midiNoteMedian > 0)
             {
                 return new PitchEvent(midiNoteMedian);

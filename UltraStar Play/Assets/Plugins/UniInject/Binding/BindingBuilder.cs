@@ -19,6 +19,14 @@ namespace UniInject
             b.ToExistingInstance(instance);
         }
 
+        // Equivalent to Bind(typeof(T)).ToExistingInstance(instanceGetter);
+        public void BindExistingInstanceLazy<T>(Func<T> instanceGetter)
+        {
+            BindingUnderConstruction b = new BindingUnderConstruction(typeof(T));
+            bindingsUnderConstruction.Add(b);
+            b.ToExistingInstance(instanceGetter);
+        }
+
         // Equivalent to Bind(type).ToNewInstancesOfType(type);
         public void BindTypeToNewInstances(Type type)
         {
@@ -83,6 +91,14 @@ namespace UniInject
             public BindingUnderConstruction(object key)
             {
                 this.key = key;
+            }
+
+            // Lazy binding of an instance.
+            public void ToExistingInstance<T>(Func<T> instanceGetter)
+            {
+                IProvider provider = new ExistingInstanceProvider<T>(instanceGetter);
+                IBinding binding = new Binding(key, provider);
+                this.binding = binding;
             }
 
             public void ToExistingInstance<T>(T instance)

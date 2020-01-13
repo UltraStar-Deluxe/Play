@@ -137,7 +137,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         duetIndicator.SetActive(isDuet);
     }
 
-    private void StartSingScene(SongMeta songMeta)
+    private SingSceneData CreateSingSceneData(SongMeta songMeta)
     {
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
@@ -146,14 +146,42 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
             UiManager.Instance.CreateWarningDialog("No player selected", "Select a player profile for singing.\n New player profiles can be create in the settings.");
-            return;
+            return null;
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
         PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
         singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
+        return singSceneData;
+    }
 
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
+    private void StartSingScene(SongMeta songMeta)
+    {
+        SingSceneData singSceneData = CreateSingSceneData(songMeta);
+        if (singSceneData != null)
+        {
+            SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
+        }
+    }
+
+    private void StartSongEditorScene(SongMeta songMeta)
+    {
+        SongEditorSceneData editorSceneData = new SongEditorSceneData();
+        editorSceneData.SelectedSongMeta = songMeta;
+
+        SingSceneData singSceneData = CreateSingSceneData(songMeta);
+        if (singSceneData != null)
+        {
+            editorSceneData.PreviousSceneData = singSceneData;
+            editorSceneData.PreviousScene = EScene.SingScene;
+        }
+        else
+        {
+            editorSceneData.PreviousSceneData = sceneData;
+            editorSceneData.PreviousScene = EScene.SongSelectScene;
+        }
+
+        SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, editorSceneData);
     }
 
     private SongSelectSceneData CreateDefaultSceneData()
@@ -171,6 +199,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         duetIndicator.SetActive(false);
     }
 
+    public void OnRandomSong()
+    {
+        songRouletteController.SelectRandomSong();
+    }
+
     public void OnNextSong()
     {
         songRouletteController.SelectNextSong();
@@ -186,6 +219,14 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         if (SelectedSong != null)
         {
             StartSingScene(SelectedSong);
+        }
+    }
+
+    public void StartSongEditorScene()
+    {
+        if (SelectedSong != null)
+        {
+            StartSongEditorScene(SelectedSong);
         }
     }
 

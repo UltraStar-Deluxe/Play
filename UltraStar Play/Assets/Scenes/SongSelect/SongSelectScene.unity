@@ -3838,7 +3838,7 @@ PrefabInstance:
     - target: {fileID: 4408495303239637784, guid: b6505b8c22170f843ae5035fdf38f492,
         type: 3}
       propertyPath: localPosition.y
-      value: -26.769615
+      value: -26.083855
       objectReference: {fileID: 0}
     - target: {fileID: 4408495303239637784, guid: b6505b8c22170f843ae5035fdf38f492,
         type: 3}
@@ -3868,6 +3868,11 @@ PrefabInstance:
     - target: {fileID: 4408495303239637784, guid: b6505b8c22170f843ae5035fdf38f492,
         type: 3}
       propertyPath: size.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8428066467363301943, guid: b6505b8c22170f843ae5035fdf38f492,
+        type: 3}
+      propertyPath: backgroundColor.a
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:

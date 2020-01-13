@@ -24,6 +24,14 @@ public class PositionInLyricsIndicator : MonoBehaviour
         }
     }
 
+    private List<Note> SortedNotes
+    {
+        get
+        {
+            return lyricsDisplayer.SortedNotes;
+        }
+    }
+
     private Text CurrentSentenceText
     {
         get
@@ -90,12 +98,12 @@ public class PositionInLyricsIndicator : MonoBehaviour
         double positionInSongInMillis = singSceneController.PositionInSongInMillis;
 
         double currentBeat = singSceneController.CurrentBeat;
-        double sentenceStartBeat = CurrentSentence.StartBeat;
-        double sentenceEndBeat = CurrentSentence.EndBeat;
+        double sentenceMinBeat = CurrentSentence.MinBeat;
+        double sentenceMaxBeat = CurrentSentence.MaxBeat;
 
         double positionInSentenceInMillis = positionInSongInMillis - SongMeta.Gap;
-        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceStartBeat);
-        double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceEndBeat);
+        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceMinBeat);
+        double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, sentenceMaxBeat);
 
         double positionIndicatorStartInMillis = sentenceStartInMillis - 2000;
 
@@ -107,7 +115,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
             if (positionInSentenceInMillis <= sentenceStartInMillis)
             {
                 // Range before first note of sentence.
-                double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, CurrentSentence.Notes[0]);
+                double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, SortedNotes[0]);
                 endPos = sentenceFirstCharacterPosition;
                 endTimeInMillis = sentenceStartInMillis;
             }
@@ -141,7 +149,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private float GetEndPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        List<Note> noteAndNotesBefore = sentence.Notes.ElementsBefore(note, true);
+        List<Note> noteAndNotesBefore = sentence.Notes.GetElementsBefore(note, true);
         int countNonWhitespaceChars = noteAndNotesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
         Vector3 pos = GetRightPositionOfCharacter(currentSentenceText, countNonWhitespaceChars - 1);
         return pos.x;
@@ -149,7 +157,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private float GetStartPositionOfNote(Text currentSentenceText, Sentence sentence, Note note)
     {
-        List<Note> notesBefore = sentence.Notes.ElementsBefore(note, false);
+        List<Note> notesBefore = sentence.Notes.GetElementsBefore(note, false);
         int countNonWhitespaceChars = notesBefore.Select(it => it.Text.Replace(" ", "").Length).Sum();
         Vector3 pos = GetLeftPositionOfCharacter(currentSentenceText, countNonWhitespaceChars);
         return pos.x;

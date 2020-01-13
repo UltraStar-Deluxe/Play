@@ -25,6 +25,10 @@ public class PlayerScoreController : MonoBehaviour
     {
         get
         {
+            if (normalNoteLengthTotal <= 0)
+            {
+                return 0;
+            }
             return (int)(maxScoreForNormalNotes * correctNormalNoteLengthTotal / normalNoteLengthTotal);
         }
     }
@@ -33,6 +37,10 @@ public class PlayerScoreController : MonoBehaviour
     {
         get
         {
+            if (goldenNoteLengthTotal <= 0)
+            {
+                return 0;
+            }
             return (int)(maxScoreForGoldenNotes * correctGoldenNoteLengthTotal / goldenNoteLengthTotal);
         }
     }
@@ -140,7 +148,7 @@ public class PlayerScoreController : MonoBehaviour
         return correctlySungNoteLength;
     }
 
-    private void UpdateMaxScores(List<Sentence> sentences)
+    private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
     {
         // Calculate the points for a single beat of a normal or golden note
         normalNoteLengthTotal = 0;

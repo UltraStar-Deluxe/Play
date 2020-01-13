@@ -154,7 +154,7 @@ public static class Colors
     public static readonly Color yellow = CreateColor("#FFFF00");
     public static readonly Color yellowGreen = CreateColor("#9ACD32");
 
-    public static Color CreateColor(string hexColor)
+    public static Color CreateColor(string hexColor, float alpha = 1f)
     {
         // ColorUtility.TryParseHtmlString cannot be called during serialization.
         // But this function can...
@@ -172,11 +172,11 @@ public static class Colors
             float floatG = (float)intG / 255.0f;
             float floatB = (float)intB / 255.0f;
 
-            return new Color(floatR, floatG, floatB);
+            return new Color(floatR, floatG, floatB, alpha);
         }
         catch (Exception e)
         {
-            Debug.Log($"Cannot create Color for {hexColor}: " + e.ToString());
+            Debug.Log($"Cannot create Color for {hexColor}: " + e);
         }
         return Color.white;
     }
