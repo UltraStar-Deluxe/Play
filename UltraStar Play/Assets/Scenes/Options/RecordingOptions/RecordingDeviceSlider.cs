@@ -34,7 +34,7 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
         {
-            bool alreadyInList = micProfiles.Any(it => it.Name == connectedMicName);
+            bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName);
             if (!alreadyInList)
             {
                 MicProfile micProfile = new MicProfile(connectedMicName);

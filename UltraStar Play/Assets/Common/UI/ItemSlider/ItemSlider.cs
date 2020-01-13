@@ -94,7 +94,7 @@ abstract public class ItemSlider<T> : MonoBehaviour
         {
             if (wrapAround || SelectedItemIndex > 0)
             {
-                Selection.Value = Items.ElementBefore(SelectedItem, wrapAround);
+                Selection.Value = Items.GetElementBefore(SelectedItem, wrapAround);
             }
         }
         else
@@ -110,7 +110,7 @@ abstract public class ItemSlider<T> : MonoBehaviour
         {
             if (wrapAround || SelectedItemIndex < Items.Count - 1)
             {
-                Selection.Value = Items.ElementAfter(SelectedItem, wrapAround);
+                Selection.Value = Items.GetElementAfter(SelectedItem, wrapAround);
             }
         }
         else

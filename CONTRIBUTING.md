@@ -103,6 +103,11 @@ As a result, assets that are used in only one scene are placed in the folder of 
 
 ## Project Insights
 
+### Tests
+
+The tests can be run via Unity's [Test Runner](https://docs.unity3d.com/2019.1/Documentation/Manual/testing-editortestsrunner.html). Open it via **Window > General > Test Runner**.
+At the moment, most of the tests are made to be run in EditMode. Thus, the tests can be found in `Assets/Editor/Tests`.
+
 ### CommonSceneObjects
 
 There is a prefab called `CommonSceneObjects`, which should be placed in every scene.
@@ -127,6 +132,24 @@ public class SceneNavigator
 }
 ```
 
+The CommonSceneObjectsBinder binds these instances such that they can be used via dependency injection (see [wiki page on UniInject](https://github.com/UltraStar-Deluxe/Play/wiki/Dependency-Injection-and-UniInject)).
+Example:
+
+```
+...
+using UniInject;
+
+public class MyCoolScript : INeedInjection
+{
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
+    void Start() {
+        // Do something with the sceneNavigator instance.
+    }
+}
+```
+
 ### Loading a Scene with Parameters
 
 The SceneNavigator class holds a static collection of SceneData objects, which is used to temporarily hold SceneData objects. The Controller class of the newly opened scene can query this data and store it in a non-static field, such that it will be available also after Hotswap.
@@ -139,6 +162,7 @@ Example:
 SongSelectSceneController.cs:
 
 private void OpenSingSceneWithSelectedSong() {
+    SingSceneData singSceneData = ...
     SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
 }
 ```
@@ -148,12 +172,13 @@ SingSceneController.cs:
 
 void Start() {
     // Load scene data from static reference, or use default if none
+    SingSceneData defaultSingSceneData = ...
     singSceneData = SceneNavigator.Instance.GetSceneData(defaultSingSceneData);
 }
 ```
 
 ### Serializable
-Model classes should have the `[Serializable]` annotation and use serializable fields if possible. The annotation will make these classes visible to Unity's serialization system. This means their instances will be visible in the inspector. Furthermore, serializable instance are stored / reloaded on Hotswap (but only their serializable fields).
+Model classes should have the `[Serializable]` annotation and use serializable fields if possible. The annotation will make these classes visible to Unity's [serialization system](https://docs.unity3d.com/Manual/script-Serialization.html). This means their instances will be visible in the inspector. Furthermore, serializable instance are stored / reloaded on Hotswap (but only their serializable fields).
 
 Properties with a backing field are serialized. Such a property requires a get **and** set method.
 Example:
@@ -174,22 +199,29 @@ public class Bla
 
 You can see all serializable fields in the Inspector in [Debug mode](https://docs.unity3d.com/Manual/InspectorOptions.html).
 
-
 ### Internationalization (I18N)
-Internationalization has been prepared using '.properties' files, which are often used in Java projects.
 
-Properties files contain key-value pairs (e.g. `main_scene.button.hello = Hello world!`)
+See the [wiki page for translations](https://github.com/UltraStar-Deluxe/Play/wiki/Translations,-Internationalization-(I18N)).
 
-Properties files are named by convention without additional suffix for the default properties file (typically with English translation).
-For other languages, a suffix with a [two letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) is added to the file name. For example, there is `messages.properties` for the (default) English texts and `messages_de.properties` for the German texts.
+### Unity Callback Function Guidelines
 
-If a translation for a key is missing or there is no properties file for the current language, then the default from the properties file without two letter language code suffix is used.
+Some methods of a MonoBehaviour such as Awake and Start are called by the Unity platform. See the manual for an [overview of the execution order of these methods](https://docs.unity3d.com/Manual/ExecutionOrder.html).
 
-Take a look at the `I18N-README.txt` file in the repository if you want to edit or contribute translations.
+A detail is the execution order when instantiating a MonoBehaviour at runtime. In this case, Awake and OnEnable will be called before the call to Instantiate(...) returns. But Start will be called normally.
 
-Using translations in the Unity Editor is demonstrated in the I18NDemoScene.
-- Add the I18NText script to a GameObject with a Text component and specify the key for the text that should be displayed.
-- If the string has parameters, then create a script that extends I18NText and overwrite `GetTranslationArguments`.
-- An I18NText has a button in the Inspector to reload its translation.
-- The I18NManager has a button in the Inspector to reload all translations of I18NText instances in the current scene.
-- For debugging, the I18NManager has a checkbox in the Inspector to use a different langauge than the system language (this option is only respected when running the game inside the Unity Editor).
+In addition to this, a MonoBehaviour can implement some interfaces to receive further callbacks. For example, ISerializationCallbackReceiver has methods that are called before and after serialization.
+
+UltraStar Play uses a similar approach to notify scripts about certain events:
+
+- IOnHotSwapFinishedListener are notified after hotswap finished.
+    - The script OnHotSwapFinishedNotifier is taking care of calling the methods of this interface.
+- ISceneInjectionFinishedListener will be notified when scene injection has been finished. This is done in the Awake method of the SceneInjectionManager and before any Start method is called.
+
+As rule of thumb the methods should be used for the following:
+- Awake: resolve references, e.g. call GetComponent or GetComponentInChildren. Do not assume that other references have been resolved yet.
+- Start: perform setup code. You can assume that injected fields have been resolved.
+- OnEnable: perform setup code that needs to be undone later in OnDisable. Note that OnEnable is called directly by Unity when a script is instantiated at runtime. Thus, you cannot assume that injection of fields has been done yet in this method.
+- OnDisable: undo stuff that has been set up in OnEnable
+- OnSceneInjectionFinished: do setup stuff on values that have been injected.
+    - For example, consider you want to be notified by SenderScript about an event that is issued in SenderScript's Start method. To handle this, you can inject SenderScript and subscribe to its event stream in OnSceneInjectionFinished. Note that subscribing to the event in Start might be too late, because when SenderScript's Start method has been called before your script, then you lost the initial event.
+- OnHotSwapFinished: restore stuff that is lost on hotswap. For example subscription to reactive streams are lost in hotswap. Also, methods that were triggered by InvokeRepeating are not called anymore after hotswap.

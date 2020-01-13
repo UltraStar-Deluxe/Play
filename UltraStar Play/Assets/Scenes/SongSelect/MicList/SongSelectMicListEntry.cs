@@ -22,7 +22,8 @@ public class SongSelectMicListEntry : MonoBehaviour
     {
         if (audioWaveFormVisualizer != null && microphonePitchTracker != null)
         {
-            audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(microphonePitchTracker.MicData);
+            float[] micData = microphonePitchTracker.MicData;
+            audioWaveFormVisualizer.DrawWaveFormValues(micData, micData.Length - 1024, 1024);
         }
     }
 

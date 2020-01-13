@@ -97,6 +97,11 @@ public class MicrophonePitchTracker : MonoBehaviour
         UpdatePitchDetection();
     }
 
+    public bool IsPitchDetectionRunning()
+    {
+        return startedPitchDetection;
+    }
+
     public void StartPitchDetection()
     {
         if (startedPitchDetection)

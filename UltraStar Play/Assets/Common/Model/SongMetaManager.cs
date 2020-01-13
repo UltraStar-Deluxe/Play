@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
+using System.Globalization;
+using System.IO;
 using UnityEngine;
 
+// Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : MonoBehaviour
 {
     private static readonly object scanLock = new object();
@@ -83,7 +84,7 @@ public class SongMetaManager : MonoBehaviour
     private void SortSongMetas()
     {
         // Sort by artist
-        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true));
+        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
     }
 
     private void ScanFilesSynchronously()
