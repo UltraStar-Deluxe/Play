@@ -54,7 +54,7 @@ public class YinAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 
         YinResult yinResult = GetYinResult(audioSamplesBuffer);
         lastResult = yinResult;
-        if (yinResult.probability == 0)
+        if (yinResult.probability <= 0)
         {
             return null;
         }
@@ -199,17 +199,15 @@ public class YinAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         {
             isRising = (cmnDiff[i] < cmnDiff[i + 1]);
             // A minimum is found when the curve was falling and now begins to rise again
-            if (previousWasFalling && isRising)
+            if (previousWasFalling && isRising
+                && cmnDiff[i] < minValue)
             {
-                if (cmnDiff[i] < minValue)
+                foundMinimum = true;
+                minValue = cmnDiff[i];
+                minIndex = i;
+                if (minValue < threshold)
                 {
-                    foundMinimum = true;
-                    minValue = cmnDiff[i];
-                    minIndex = i;
-                    if (minValue < threshold)
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
 
@@ -288,6 +286,6 @@ public class YinAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 
         // Propability that the found pitch is correct.
         // 0 means the found pitch is certainly wrong, 1 means the found pitch is certainly correct.
-        public float probability = 0;
+        public float probability;
     }
 }
