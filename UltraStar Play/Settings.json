@@ -8,9 +8,9 @@
     },
     "GraphicSettings":{
         "resolution":{
-            "Width":1031,
-            "Height":619,
-            "RefreshRate":59
+            "Width":819,
+            "Height":453,
+            "RefreshRate":60
         },
         "fullScreenMode":"Windowed",
         "useImageAsCursor":true
@@ -18,7 +18,7 @@
     "PlayerProfiles":[
         {
             "Name":"Player01",
-            "Difficulty":"Easy",
+            "Difficulty":"Medium",
             "Avatar":"GenericPlayer01",
             "IsEnabled":true
         },
@@ -32,7 +32,7 @@
             "Name":"Player03",
             "Difficulty":"Easy",
             "Avatar":"GenericPlayer01",
-            "IsEnabled":true
+            "IsEnabled":false
         }
     ],
     "MicProfiles":[
@@ -46,7 +46,8 @@
             },
             "Amplification":12,
             "NoiseSuppression":10,
-            "IsEnabled":true
+            "IsEnabled":true,
+            "DelayInMillis":200
         },
         {
             "Name":"Mikrofon (Realtek High Definition Audio)",
@@ -58,7 +59,19 @@
             },
             "Amplification":0,
             "NoiseSuppression":5,
-            "IsEnabled":true
+            "IsEnabled":true,
+            "DelayInMillis":140
         }
-    ]
+    ],
+    "SongEditorSettings":{
+        "RecordingSource":"Off",
+        "MicOctaveOffset":0,
+        "MicDelayInMillis":450,
+        "MidiNoteForButtonRecording":69,
+        "AdjustFollowingNotes":false,
+        "HideVoices":[
+            
+        ],
+        "SaveCopyOfOriginalFile":true
+    }
 }
