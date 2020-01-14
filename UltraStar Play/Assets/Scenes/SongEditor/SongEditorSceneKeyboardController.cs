@@ -157,6 +157,29 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             noteArea.ScrollHorizontal(1);
         }
 
+        // Zoom horizontal with Ctrl+'+' and Ctrl+'-'
+        // Note: On my keyboard, the plus button has KeyCode.Equals but I don't know why.
+        bool isPlusKeyUp = Input.GetKeyUp(KeyCode.Plus) || Input.GetKeyUp(KeyCode.KeypadPlus) || Input.GetKeyUp(KeyCode.Equals);
+        bool isMinusKeyUp = Input.GetKeyUp(KeyCode.Minus) || Input.GetKeyUp(KeyCode.KeypadMinus);
+        if (isPlusKeyUp && modifier == EKeyboardModifier.Ctrl)
+        {
+            noteArea.ZoomHorizontal(1);
+        }
+        if (isMinusKeyUp && modifier == EKeyboardModifier.Ctrl)
+        {
+            noteArea.ZoomHorizontal(-1);
+        }
+
+        // Zoom vertical with Ctrl+Shift+'+' and Ctrl+Shift+'-'
+        if (isPlusKeyUp && modifier == EKeyboardModifier.CtrlShift)
+        {
+            noteArea.ZoomVertical(1);
+        }
+        if (isMinusKeyUp && modifier == EKeyboardModifier.CtrlShift)
+        {
+            noteArea.ZoomVertical(-1);
+        }
+
         // Zoom and scroll with mouse wheel
         int scrollDirection = Math.Sign(Input.mouseScrollDelta.y);
         if (scrollDirection != 0 && noteArea.IsPointerOver)
