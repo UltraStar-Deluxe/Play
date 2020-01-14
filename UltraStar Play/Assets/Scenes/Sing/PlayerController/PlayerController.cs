@@ -3,16 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class PlayerController : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
     public PlayerUiController playerUiControllerPrefab;
 
-    public SongMeta SongMeta { get; private set; }
     public PlayerProfile PlayerProfile { get; private set; }
     public MicProfile MicProfile { get; private set; }
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    public PlayerNoteRecorder PlayerNoteRecorder { get; private set; }
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    public PlayerScoreController PlayerScoreController { get; private set; }
 
     private Voice voice;
     public Voice Voice
@@ -28,12 +38,24 @@ public class PlayerController : MonoBehaviour
             sortedSentences.Sort(Sentence.comparerByStartBeat);
         }
     }
+
+    // The sorted sentences of the Voice
     private List<Sentence> sortedSentences = new List<Sentence>();
 
+    [Inject]
+    private Injector injector;
+
+    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
+    private Injector childrenInjector;
+
+    [Inject]
     private PlayerUiArea playerUiArea;
+
+    // The PlayerUiController is instantiated by the PlayerController as a child of the PlayerUiArea.
     private PlayerUiController playerUiController;
-    public PlayerNoteRecorder PlayerNoteRecorder { get; set; }
-    public PlayerScoreController PlayerScoreController { get; set; }
+
+    [Inject]
+    private SongMeta songMeta;
 
     private int sentenceIndex;
     public Sentence CurrentSentence { get; set; }
@@ -55,16 +77,8 @@ public class PlayerController : MonoBehaviour
 
     private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
 
-    void Awake()
-    {
-        playerUiArea = FindObjectOfType<PlayerUiArea>();
-        PlayerScoreController = GetComponentInChildren<PlayerScoreController>();
-        PlayerNoteRecorder = GetComponentInChildren<PlayerNoteRecorder>();
-    }
-
     void Start()
     {
-        CreatePlayerUi();
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         sentenceRatingStream.Buffer(2, 1)
@@ -77,21 +91,36 @@ public class PlayerController : MonoBehaviour
         UpdateSentences(sentenceIndex);
     }
 
-    public void Init(SongMeta songMeta, PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
+    public void Init(PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
     {
-        this.SongMeta = songMeta;
         this.PlayerProfile = playerProfile;
         this.MicProfile = micProfile;
+        this.Voice = GetVoice(songMeta, voiceName);
+        this.playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
+        this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
-        Voice = GetVoice(songMeta, voiceName);
+        // Inject all
+        foreach (INeedInjection childThatNeedsInjection in GetComponentsInChildren<INeedInjection>())
+        {
+            childrenInjector.Inject(childThatNeedsInjection);
+        }
+        childrenInjector.Inject(playerUiController);
+
+        // Init instances
+        playerUiController.Init(PlayerProfile, MicProfile);
         PlayerScoreController.Init(Voice);
-        PlayerNoteRecorder.Init(this, playerProfile, micProfile);
     }
 
-    private void CreatePlayerUi()
+    private Injector CreateChildrenInjectorWithAdditionalBindings()
     {
-        playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
-        playerUiController.Init(PlayerProfile, MicProfile);
+        Injector newInjector = UniInjectUtils.CreateInjector(injector);
+        newInjector.AddBindingForInstance(PlayerProfile);
+        newInjector.AddBindingForInstance(MicProfile);
+        newInjector.AddBindingForInstance(PlayerNoteRecorder);
+        newInjector.AddBindingForInstance(PlayerScoreController);
+        newInjector.AddBindingForInstance(playerUiController);
+        newInjector.AddBindingForInstance(this);
+        return newInjector;
     }
 
     public void SetCurrentBeat(double currentBeat)
