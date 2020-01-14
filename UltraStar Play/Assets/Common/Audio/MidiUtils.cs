@@ -12,6 +12,11 @@ public static class MidiUtils
     public const int MidiNoteConcertPitch = 69;
     public const int MidiNoteConcertPitchFrequency = 440;
 
+    public static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
+
+    public static readonly double MaxHalftoneFrequency = halftoneFrequencies[halftoneFrequencies.Length - 1];
+    public static readonly double MinHalftoneFrequency = halftoneFrequencies[0];
+
     public static int GetOctave(int midiNote)
     {
         // 12: "C0"
@@ -79,5 +84,26 @@ public static class MidiUtils
 
         // Distance in shortest direction is result distance
         return Math.Min(distanceUnwrapped, distanceWrapped);
+    }
+
+    public static double[] PrecalculateHalftoneFrequencies()
+    {
+        double[] noteFrequencies = new double[SingableNoteRange];
+        for (int index = 0; index < SingableNoteRange; index++)
+        {
+            float concertPitchOctaveOffset = ((MidiUtils.MidiNoteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
+            noteFrequencies[index] = MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset);
+        }
+        return noteFrequencies;
+    }
+
+    public static int[] PrecalculateHalftoneDelays(double sampleRateHz)
+    {
+        int[] noteDelays = new int[SingableNoteRange];
+        for (int index = 0; index < SingableNoteRange; index++)
+        {
+            noteDelays[index] = Convert.ToInt32(sampleRateHz / halftoneFrequencies[index]);
+        }
+        return noteDelays;
     }
 }

@@ -82,6 +82,8 @@ public class MicrophonePitchTracker : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
         audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
+        // TODO: Test if YIN gives better results when singing.
+        // audioSamplesAnalyzer = new YinAudioSamplesAnalyzer(SampleRateHz, 1024);
         audioSamplesAnalyzer.Enable();
     }
 

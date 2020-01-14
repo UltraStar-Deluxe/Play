@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
+public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {
     // The singable spectrum of a human voice has about 4 octaves (C2 to C6).
     // +1 here, because if min and max are equal, then you are still able to sing one note.
@@ -13,8 +13,6 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
     private readonly int[] halftoneDelays;
     private readonly List<int> pitchRecordHistory = new List<int>();
     private readonly int pitchRecordHistoryLength = 5;
-
-    private bool isEnabled;
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz)
     {
@@ -42,17 +40,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         return noteDelays;
     }
 
-    public void Enable()
-    {
-        isEnabled = true;
-    }
-
-    public void Disable()
-    {
-        isEnabled = false;
-    }
-
-    public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
+    public override PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile micProfile)
     {
         if (!isEnabled)
         {
@@ -67,16 +55,7 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
         // check if samples is louder than threshhold
-        bool passesThreshold = false;
-        float minThreshold = mic.NoiseSuppression / 100f;
-        for (int index = 0; index < sampleCountToUse; index++)
-        {
-            if (Math.Abs(audioSamplesBuffer[index]) >= minThreshold)
-            {
-                passesThreshold = true;
-                break;
-            }
-        }
+        bool passesThreshold = IsAboveNoiseSuppressionThreshold(audioSamplesBuffer, micProfile);
         if (!passesThreshold)
         {
             OnNoPitchDetected();

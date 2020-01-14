@@ -4,6 +4,37 @@ using System.Collections.Generic;
 
 public class MidiUtilsTests
 {
+
+    [Test]
+    public void HalftoneFrequenciesTest()
+    {
+        // C2, 65.41 Hz
+        Assert.True(DoubleEquals(MidiUtils.halftoneFrequencies[0], 65.41, 0.1), "Frequency of C2 is wrong");
+        // C6, 1046.50 Hz
+        Assert.True(DoubleEquals(MidiUtils.halftoneFrequencies[MidiUtils.halftoneFrequencies.Length - 1], 1046.50, 0.1), "Frequency of C6 is wrong");
+        // A4, 440 Hz
+        Assert.True(DoubleEquals(MidiUtils.halftoneFrequencies[33], 440, 0.1), "Frequency of A4 is wrong");
+    }
+
+    [Test]
+    public void HalftoneDelaysTest()
+    {
+        // C2, 65.41 Hz
+        int[] halftoneDelays44100 = MidiUtils.PrecalculateHalftoneDelays(44100);
+        int[] halftoneDelays22050 = MidiUtils.PrecalculateHalftoneDelays(22050);
+        // At 44100 samples per second, this has a duration of 44100 [sample/second] * (1/65.41) [second] == 674.20 [sample]
+        Assert.True(halftoneDelays44100[0] == 674, "Period in samples of C2 is wrong (44100 samples per second)");
+        Assert.True(halftoneDelays22050[0] == 337, "Period in samples of C2 is wrong (22050 samples per second)");
+
+        Assert.True(halftoneDelays44100[halftoneDelays44100.Length - 1] == 42, "Period in samples of C6 is wrong (44100 samples per second)");
+        Assert.True(halftoneDelays22050[halftoneDelays22050.Length - 1] == 21, "Period in samples of C6 is wrong (22050 samples per second)");
+    }
+
+    private bool DoubleEquals(double a, double b, double range)
+    {
+        return Math.Abs(a - b) < range;
+    }
+
     [Test]
     public void GetRelativeNameTest()
     {
