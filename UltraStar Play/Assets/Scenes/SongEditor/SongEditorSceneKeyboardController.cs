@@ -54,6 +54,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             songAudioPlayer.PauseAudio();
         }
 
+        // Select all notes via Ctrl+A
+        if (Input.GetKeyUp(KeyCode.A) && modifier == EKeyboardModifier.Ctrl)
+        {
+            selectionController.SelectAll();
+        }
+
         // Delete notes
         if (Input.GetKeyUp(KeyCode.Delete))
         {
