@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.EventSystems;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -30,6 +31,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
+    [Inject]
+    private EventSystem eventSystem;
+
     private Voice copiedVoice;
 
     private List<Note> CopiedNotes
@@ -47,24 +51,23 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     void Update()
     {
+        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        {
+            return;
+        }
+
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
         if (modifier == EKeyboardModifier.Ctrl)
         {
-            if (Input.GetKeyUp(KeyCode.C) && !InputFieldHasFocus())
+            if (Input.GetKeyUp(KeyCode.C))
             {
                 CopySelectedNotes();
             }
-            else if (Input.GetKeyUp(KeyCode.V) && !InputFieldHasFocus())
+            else if (Input.GetKeyUp(KeyCode.V))
             {
                 PasteCopiedNotes();
             }
         }
-    }
-
-    private bool InputFieldHasFocus()
-    {
-        GameObject selectedGameObject = GameObjectUtils.GetSelectedGameObject();
-        return selectedGameObject != null && selectedGameObject.GetComponentInChildren<InputField>() != null;
     }
 
     private void MoveCopiedNotesToMillisInSong(double newMillis)
