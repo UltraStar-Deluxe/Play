@@ -27,11 +27,23 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     [Inject]
     private AddNoteAction addNoteAction;
 
+    [Inject]
+    private SongEditorSelectionController selectionController;
+
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
         int midiNote = noteArea.GetVerticalMousePositionInMidiNote();
+
         contextMenu.AddItem("Fit vertical", () => noteArea.FitViewportVerticalToNotes());
+
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        if (selectedNotes.Count > 0)
+        {
+            contextMenu.AddItem("Fit horizontal to selection", () => noteArea.FitViewportHorizontalToNotes(selectedNotes));
+        }
+
+        contextMenu.AddSeparator();
         contextMenu.AddItem("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
     }
 }
