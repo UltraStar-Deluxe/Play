@@ -14,7 +14,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: Karaoke
   productName: UltraStar Play
-  defaultCursor: {fileID: 0}
+  defaultCursor: {fileID: 2800000, guid: 21b89c5b005b2324d96976212a0b264d, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_ShowUnitySplashScreen: 1
@@ -277,7 +277,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: bd070e4dc88fb224d9a3485487c05f69, type: 3}
+      m_Icon: {fileID: 2800000, guid: f5743370fbf53b942b175ab203eb579e, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
