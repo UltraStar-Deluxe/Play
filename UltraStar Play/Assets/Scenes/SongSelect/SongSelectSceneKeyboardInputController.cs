@@ -2,8 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniInject;
+using UnityEngine.EventSystems;
 
-public class SongSelectSceneKeyboardInputController : MonoBehaviour
+#pragma warning disable CS0649
+
+public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInjection
 {
     private const KeyCode NextSongShortcut = KeyCode.RightArrow;
     private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
@@ -13,6 +17,9 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
 
     private const KeyCode QuickSearchSong = KeyCode.LeftControl;
     private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
+
+    [Inject]
+    private EventSystem eventSystem;
 
     void Update()
     {
@@ -62,7 +69,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour
         if (Input.GetKeyUp(StartSingSceneShortcut)
             || (Input.GetKeyUp(OpenInEditorShortcut) && !songSelectSceneController.IsSearchEnabled()))
         {
-            GameObject focusedControl = GameObjectUtils.GetSelectedGameObject();
+            GameObject focusedControl = eventSystem.currentSelectedGameObject;
             bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
             bool focusedControlIsSearchField = (focusedControl != null && focusedControl.GetComponent<SearchInputField>() != null);
             if (focusedControl == null || focusedControlIsSongButton || focusedControlIsSearchField)

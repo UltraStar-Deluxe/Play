@@ -4,17 +4,16 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public static class GameObjectUtils
 {
-
-    /// Returns the currentSelectedGameObject from the EventSystem.
-    /// Normally, this is the UI control that has the focus (e.g. a Button, InputField or Toggle).
-    public static GameObject GetSelectedGameObject()
+    /// Returns true if there is a selected GameObject and it has a Component of type InputField
+    /// The EventSystem is one of the CommonSceneObjects that can be injected.
+    public static bool InputFieldHasFocus(EventSystem eventSystem)
     {
-        EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
-        GameObject result = eventSystem.currentSelectedGameObject;
-        return result;
+        GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
+        return selectedGameObject != null && selectedGameObject.GetComponentInChildren<InputField>() != null;
     }
 
     /// Looks in the GameObject with the given tag
