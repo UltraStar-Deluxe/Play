@@ -103,6 +103,12 @@ namespace UniInject
             }
 
             injectionKeyToObjectWithOngoingInjectionMap.Remove(injectionKey);
+
+            // Notify target that its injection is now finished.
+            if (target is IInjectionFinishedListener)
+            {
+                (target as IInjectionFinishedListener).OnInjectionFinished();
+            }
         }
 
         public void Inject(object target, InjectionData injectionData)

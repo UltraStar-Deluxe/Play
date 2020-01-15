@@ -1,47 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Video;
 using UnityEngine.UI;
-using UnityEngine.Networking;
-using System.Threading;
-using NLayer;
 using UniInject;
 
-public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHotSwapFinishedListener
 {
-    // Constant delay when querying the position in the song.
-    // Its source could be that calculating the position in the song takes some time for itself.
-    // After a change of the audio library this may or may not be needed anymore.
-    // public double positionInSongDelayInMillis = 150;
-
-    public SingSceneData sceneData;
-
-    public string defaultSongName;
-
-    [TextArea(3, 8)]
-    [Tooltip("Convenience text field to paste and copy song names when debugging.")]
-    public string defaultSongNamePasteBin;
-
-    public GameObject pauseOverlay;
-
-    public PlayerController playerControllerPrefab;
-
-    public Image backgroundImage;
-
-    public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
-
-    public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
-
-    [InjectedInInspector]
-    public SongAudioPlayer songAudioPlayer;
-
-    [InjectedInInspector]
-    public SongVideoPlayer songVideoPlayer;
-
     private static SingSceneController instance;
     public static SingSceneController Instance
     {
@@ -55,11 +24,56 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
+    [InjectedInInspector]
+    public string defaultSongName;
+
+    [TextArea(3, 8)]
+    [Tooltip("Convenience text field to paste and copy song names when debugging.")]
+    public string defaultSongNamePasteBin;
+
+    [InjectedInInspector]
+    public GameObject pauseOverlay;
+
+    [InjectedInInspector]
+    public PlayerController playerControllerPrefab;
+
+    [InjectedInInspector]
+    public Image backgroundImage;
+
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+
+    [InjectedInInspector]
+    public SongVideoPlayer songVideoPlayer;
+
+    [InjectedInInspector]
+    public PlayerUiArea playerUiArea;
+
+    [Inject]
+    private Injector sceneInjector;
+
+    public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
+
+    public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
+
+    private SingSceneData sceneData;
+    public SingSceneData SceneData
+    {
+        get
+        {
+            if (sceneData == null)
+            {
+                sceneData = SceneNavigator.Instance.GetSceneData<SingSceneData>(CreateDefaultSceneData());
+            }
+            return sceneData;
+        }
+    }
+
     public SongMeta SongMeta
     {
         get
         {
-            return sceneData.SelectedSongMeta;
+            return SceneData.SelectedSongMeta;
         }
     }
 
@@ -87,37 +101,16 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         }
     }
 
-    private void LoadSceneData()
-    {
-        // Load scene data from static reference, if any
-        sceneData = SceneNavigator.Instance.GetSceneData(sceneData);
-
-        // Fill scene data with default values
-        if (sceneData.SelectedSongMeta == null)
-        {
-            sceneData.SelectedSongMeta = GetDefaultSongMeta();
-        }
-
-        if (sceneData.SelectedPlayerProfiles.IsNullOrEmpty())
-        {
-            PlayerProfile playerProfile = GetDefaultPlayerProfile();
-            sceneData.SelectedPlayerProfiles.Add(playerProfile);
-            sceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
-        }
-
-        string playerProfilesCsv = string.Join(",", sceneData.SelectedPlayerProfiles.Select(it => it.Name));
-        Debug.Log($"[{playerProfilesCsv}] start (or continue) singing of {SongMeta.Title} at {sceneData.PositionInSongInMillis} ms.");
-    }
-
     void Start()
     {
-        LoadSceneData();
+        string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
+        Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
         // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
-        foreach (PlayerProfile playerProfile in sceneData.SelectedPlayerProfiles)
+        foreach (PlayerProfile playerProfile in SceneData.SelectedPlayerProfiles)
         {
-            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            SceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             if (micProfile == null)
             {
                 playerProfilesWithoutMic.Add(playerProfile);
@@ -195,14 +188,14 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     void OnDisable()
     {
-        if (sceneData.IsRestart)
+        if (SceneData.IsRestart)
         {
-            sceneData.IsRestart = false;
-            sceneData.PositionInSongInMillis = 0;
+            SceneData.IsRestart = false;
+            SceneData.PositionInSongInMillis = 0;
         }
         else
         {
-            sceneData.PositionInSongInMillis = PositionInSongInMillis;
+            SceneData.PositionInSongInMillis = PositionInSongInMillis;
         }
     }
 
@@ -218,12 +211,6 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         {
             DummySingers.ForEach(it => it.UpdateSinging(CurrentBeat));
         }
-    }
-
-    public MicProfile GetMicProfile(PlayerProfile playerProfile)
-    {
-        sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-        return micProfile;
     }
 
     public void SkipToNextSentence()
@@ -243,14 +230,14 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 
     public void Restart()
     {
-        sceneData.IsRestart = true;
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, sceneData);
+        SceneData.IsRestart = true;
+        SceneNavigator.Instance.LoadScene(EScene.SingScene, SceneData);
     }
 
-    public void OnOpenInEditorClicked()
+    public void OpenSongInEditor()
     {
         SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
-        songEditorSceneData.PreviousSceneData = sceneData;
+        songEditorSceneData.PreviousSceneData = SceneData;
         songEditorSceneData.PreviousScene = EScene.SingScene;
         songEditorSceneData.PositionInSongInMillis = PositionInSongInMillis;
         songEditorSceneData.SelectedSongMeta = SongMeta;
@@ -286,14 +273,15 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
     {
         string voiceName = GetVoiceName(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
-        playerController.Init(sceneData.SelectedSongMeta, playerProfile, voiceName, micProfile);
+        sceneInjector.Inject(playerController);
+        playerController.Init(playerProfile, voiceName, micProfile);
 
         PlayerControllers.Add(playerController);
     }
 
     private string GetVoiceName(PlayerProfile playerProfile)
     {
-        if (sceneData.SelectedPlayerProfiles.Count == 1)
+        if (SceneData.SelectedPlayerProfiles.Count == 1)
         {
             return Voice.soloVoiceName;
         }
@@ -302,13 +290,25 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         int voiceNameCount = voiceNames.Count;
         if (voiceNameCount > 1)
         {
-            int voiceIndex = (sceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNameCount);
+            int voiceIndex = (SceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNameCount);
             return voiceNames[voiceIndex];
         }
         else
         {
             return Voice.soloVoiceName;
         }
+    }
+
+    private SingSceneData CreateDefaultSceneData()
+    {
+        SingSceneData defaultSceneData = new SingSceneData();
+        defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
+
+        PlayerProfile playerProfile = GetDefaultPlayerProfile();
+        defaultSceneData.SelectedPlayerProfiles.Add(playerProfile);
+        defaultSceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
+
+        return defaultSceneData;
     }
 
     private PlayerProfile GetDefaultPlayerProfile()
@@ -373,10 +373,22 @@ public class SingSceneController : MonoBehaviour, IOnHotSwapFinishedListener
         InitTimeBar();
 
         songAudioPlayer.PlayAudio();
-        if (sceneData.PositionInSongInMillis > 0)
+        if (SceneData.PositionInSongInMillis > 0)
         {
-            Debug.Log($"Skipping forward to {sceneData.PositionInSongInMillis} milliseconds");
-            songAudioPlayer.PositionInSongInMillis = sceneData.PositionInSongInMillis;
+            Debug.Log($"Skipping forward to {SceneData.PositionInSongInMillis} milliseconds");
+            songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
         }
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        // Binding happens before the injection finished. Thus, no fields can be used here that have been injected.
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(SongMeta);
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(playerUiArea);
+        return bb.GetBindings();
     }
 }
