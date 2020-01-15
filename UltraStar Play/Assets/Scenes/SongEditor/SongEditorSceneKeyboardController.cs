@@ -51,10 +51,18 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
-        // Play / pause via Space
-        if (Input.GetKeyUp(KeyCode.Space))
+        // Play / pause via Space or P
+        bool isPlayPauseButtonUp = Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.P);
+        if (isPlayPauseButtonUp && modifier == EKeyboardModifier.None)
         {
             ToggleAudioPlayPause();
+        }
+
+        // Play only the selected notes via Ctrl+Space or Ctrl+P
+        if (isPlayPauseButtonUp && modifier == EKeyboardModifier.Ctrl)
+        {
+            List<Note> selectedNotes = selectionController.GetSelectedNotes();
+            PlayAudioInRangeOfNotes(selectedNotes);
         }
 
         // Stop via Escape
@@ -140,6 +148,22 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         // Scroll and zoom in NoteArea
         UpdateInputToScrollAndZoom(modifier);
+    }
+
+    private void PlayAudioInRangeOfNotes(List<Note> notes)
+    {
+        if (songAudioPlayer.IsPlaying)
+        {
+            return;
+        }
+
+        int minBeat = notes.Select(it => it.StartBeat).Min();
+        int maxBeat = notes.Select(it => it.EndBeat).Max();
+        double maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
+        double minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
+        songEditorSceneController.StopPlaybackAfterPositionInSongInMillis = maxMillis;
+        songAudioPlayer.PositionInSongInMillis = minMillis;
+        songAudioPlayer.PlayAudio();
     }
 
     private void ToggleAudioPlayPause()
