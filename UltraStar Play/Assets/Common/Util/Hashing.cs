@@ -4,7 +4,7 @@ using System.Text;
 public static class Hashing
 {
     //Very fast but collision-prone hashing
-    public static uint Fnv1a(byte[] input)
+    public static uint Fnv1A(byte[] input)
     {
         const uint FNV32_PRIME = 16777619;
         const uint FNV32_OFFSETBASIS = 2166136261;
