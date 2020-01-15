@@ -4,7 +4,7 @@ using System.Text;
 public static class Hashing
 {
     //Very fast but collision-prone hashing
-    public static uint FNV1a(byte[] input)
+    public static uint Fnv1a(byte[] input)
     {
         const uint FNV32_PRIME = 16777619;
         const uint FNV32_OFFSETBASIS = 2166136261;
@@ -13,18 +13,18 @@ public static class Hashing
         {
             hash = (hash * FNV32_PRIME) ^ input[i];
         }
-        
+
         return hash;
     }
 
     //Standard MD5 hashing
-    public static string MD5(byte[] input)
+    public static string Md5(byte[] input)
     {
         MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
         byte[] hashBytes = md5.ComputeHash(input);
 
         StringBuilder sb = new StringBuilder(hashBytes.Length * 2);
-        for(int i = 0; i < hashBytes.Length; ++i)
+        for (int i = 0; i < hashBytes.Length; ++i)
         {
             sb.Append(hashBytes[i].ToString("x2"));
         }
