@@ -47,6 +47,11 @@ public static class SongMetaUtils
 
     public static List<Note> GetFollowingNotes(SongMeta songMeta, List<Note> notes)
     {
+        if (notes.IsNullOrEmpty())
+        {
+            return new List<Note>();
+        }
+
         int maxBeat = notes.Select(it => it.EndBeat).Max();
         List<Note> result = GetAllSentences(songMeta)
             .SelectMany(sentence => sentence.Notes)
