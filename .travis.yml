@@ -26,6 +26,7 @@ before_install:
   - chmod +x ./tools/travis/before_script.sh
   - chmod +x ./tools/travis/test.sh
   - chmod +x ./tools/download-dependencies/*.sh
+  - export -f travis_fold
   - (cd tools/download-dependencies/; sh download-dependencies.sh)
   - export UNITY_LICENSE_CONTENT=`cat tools/travis/activat.ion`
   - rm tools/travis/activat.ion
