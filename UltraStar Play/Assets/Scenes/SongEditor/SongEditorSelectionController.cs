@@ -43,6 +43,12 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         selectedNotes.Clear();
     }
 
+    public void SelectAll()
+    {
+        List<Note> allNotes = songEditorSceneController.GetAllNotes();
+        SetSelection(allNotes);
+    }
+
     public void AddToSelection(List<EditorUiNote> uiNotes)
     {
         foreach (EditorUiNote uiNote in uiNotes)
