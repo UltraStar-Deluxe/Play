@@ -21,6 +21,12 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private SongMeta songMeta;
+
     private readonly NoteHashSet selectedNotes = new NoteHashSet();
 
     public List<Note> GetSelectedNotes()
@@ -121,7 +127,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         selectedNotes.Remove(uiNote.Note);
     }
 
-    public void SelectNextNote()
+    public void SelectNextNote(bool updatePositionInSong = true)
     {
         if (selectedNotes.Count == 0)
         {
@@ -151,10 +157,16 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         if (nextNote != null)
         {
             SetSelection(new List<Note> { nextNote });
+
+            if (updatePositionInSong)
+            {
+                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
+                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+            }
         }
     }
 
-    public void SelectPreviousNote()
+    public void SelectPreviousNote(bool updatePositionInSong = true)
     {
         if (selectedNotes.Count == 0)
         {
@@ -184,6 +196,12 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         if (previousNote != null)
         {
             SetSelection(new List<Note> { previousNote });
+
+            if (updatePositionInSong)
+            {
+                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
+                songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+            }
         }
     }
 
