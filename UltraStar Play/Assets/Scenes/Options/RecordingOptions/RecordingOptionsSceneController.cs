@@ -10,6 +10,7 @@ public class RecordingOptionsSceneController : MonoBehaviour
     public RecordingDeviceSlider recordingDeviceSlider;
     public AmplificationSlider amplificationSlider;
     public NoiseSuppressionSlider noiseSuppressionSlider;
+    public MicDelaySlider delaySlider;
     public RecordingDeviceColorSlider colorSlider;
     public Toggle enabledToggle;
     public Button deleteButton;
@@ -48,6 +49,7 @@ public class RecordingOptionsSceneController : MonoBehaviour
         }
         amplificationSlider.SetMicProfile(micProfile);
         noiseSuppressionSlider.SetMicProfile(micProfile);
+        delaySlider.SetMicProfile(micProfile);
         colorSlider.SetMicProfile(micProfile);
         enabledToggle.isOn = micProfile.IsEnabled;
 

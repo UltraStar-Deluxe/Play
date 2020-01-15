@@ -1,8 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UniInject;
 using UnityEngine;
 
-public class SingSceneKeyboardInputController : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SingSceneKeyboardInputController : MonoBehaviour, INeedInjection
 {
     private const KeyCode SkipShortcut = KeyCode.S;
     private const KeyCode OpenInEditorShortcut = KeyCode.E;
@@ -11,31 +13,34 @@ public class SingSceneKeyboardInputController : MonoBehaviour
     private const KeyCode BackToSongSelectShortcut2 = KeyCode.Escape;
     private const KeyCode PauseShortcut = KeyCode.Space;
 
+    [Inject]
+    private SingSceneController singSceneController;
+
     void Update()
     {
         if (Input.GetKeyUp(SkipShortcut))
         {
-            SingSceneController.Instance.SkipToNextSentence();
+            singSceneController.SkipToNextSentence();
         }
 
         if (Input.GetKeyUp(OpenInEditorShortcut))
         {
-            SingSceneController.Instance.OnOpenInEditorClicked();
+            singSceneController.OpenSongInEditor();
         }
 
         if (Input.GetKeyUp(RestartShortcut))
         {
-            SingSceneController.Instance.Restart();
+            singSceneController.Restart();
         }
 
         if (Input.GetKeyUp(BackToSongSelectShortcut) || Input.GetKeyUp(BackToSongSelectShortcut2))
         {
-            SingSceneController.Instance.FinishScene();
+            singSceneController.FinishScene();
         }
 
         if (Input.GetKeyUp(PauseShortcut))
         {
-            SingSceneController.Instance.TogglePlayPause();
+            singSceneController.TogglePlayPause();
         }
     }
 }

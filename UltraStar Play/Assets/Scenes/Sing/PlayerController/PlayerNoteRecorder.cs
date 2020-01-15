@@ -2,65 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using UniInject;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 [RequireComponent(typeof(MicrophonePitchTracker))]
-public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
+public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IOnHotSwapFinishedListener
 {
     public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
 
-    private SingSceneController singSceneController;
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
 
+    [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
     private PlayerController playerController;
 
-    private int RoundingDistance { get; set; }
+    [Inject]
+    private PlayerProfile playerProfile;
+
+    [Inject]
+    private MicProfile micProfile;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private MicrophonePitchTracker microphonePitchTracker;
+
+    // The rounding distance of the PlayerProfile's difficulty.
+    private int roundingDistance;
 
     private RecordedNote lastRecordedNote;
     private RecordedNote lastEndedNote;
     private int nextNoteStartBeat;
 
-    private PlayerProfile playerProfile;
-    private MicProfile micProfile;
+    private double lastBeatWithPitchEvent;
 
-    private double lastBeat;
-
-    private MicrophonePitchTracker MicrophonePitchTracker
+    public void OnInjectionFinished()
     {
-        get
-        {
-            return GetComponent<MicrophonePitchTracker>();
-        }
-    }
-
-    public void Init(PlayerController playerController, PlayerProfile playerProfile, MicProfile micProfile)
-    {
-        this.playerController = playerController;
-        this.playerProfile = playerProfile;
-        this.micProfile = micProfile;
-
-        RoundingDistance = playerProfile.Difficulty.GetRoundingDistance();
+        roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
 
         if (micProfile != null)
         {
-            MicrophonePitchTracker.MicProfile = micProfile;
+            microphonePitchTracker.MicProfile = micProfile;
         }
     }
 
     public void SetMicrophonePitchTrackerEnabled(bool newValue)
     {
-        MicrophonePitchTracker.enabled = newValue;
-    }
-
-    void Awake()
-    {
-        singSceneController = GameObject.FindObjectOfType<SingSceneController>();
+        microphonePitchTracker.enabled = newValue;
     }
 
     void Start()
     {
         if (micProfile != null)
         {
-            MicrophonePitchTracker.StartPitchDetection();
-            MicrophonePitchTracker.PitchEventStream.Subscribe(HandlePitchEvent);
+            microphonePitchTracker.StartPitchDetection();
+            microphonePitchTracker.PitchEventStream.Subscribe(HandlePitchEvent);
         }
         else
         {
@@ -77,7 +76,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
     {
         if (micProfile != null)
         {
-            MicrophonePitchTracker.StopPitchDetection();
+            microphonePitchTracker.StopPitchDetection();
         }
     }
 
@@ -92,31 +91,28 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         // Finish the last note.
         if (lastRecordedNote != null)
         {
-            double currentBeat = singSceneController.CurrentBeat;
+            double currentBeat = GetCurrentBeat();
             HandleRecordedNoteEnded(currentBeat);
         }
     }
 
     public void HandlePitchEvent(PitchEvent pitchEvent)
     {
-        double currentBeat = singSceneController.CurrentBeat;
+        double currentBeat = GetCurrentBeat();
 
         // It could be that some beats have been missed, for example because the frame rate was too low.
         // In this case, the pitch event is fired here also for the missed beats.
-        if (lastBeat < currentBeat)
+        if (lastBeatWithPitchEvent < currentBeat)
         {
-            int missedBeats = (int)(currentBeat - lastBeat);
-            if (missedBeats > 0)
+            int missedBeats = (int)(currentBeat - lastBeatWithPitchEvent);
+            for (int i = 1; i <= missedBeats; i++)
             {
-                for (int i = 1; i <= missedBeats; i++)
-                {
-                    HandlePitchEvent(pitchEvent, lastBeat + i);
-                }
+                HandlePitchEvent(pitchEvent, lastBeatWithPitchEvent + i);
             }
         }
         HandlePitchEvent(pitchEvent, currentBeat);
 
-        lastBeat = currentBeat;
+        lastBeatWithPitchEvent = currentBeat;
     }
 
     private void HandlePitchEvent(PitchEvent pitchEvent, double currentBeat)
@@ -132,7 +128,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         {
             if (lastRecordedNote != null)
             {
-                if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= RoundingDistance)
+                if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
                 {
                     // Continue singing on same pitch
                     HandleRecordedNoteContinued(currentBeat);
@@ -232,7 +228,7 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
         else
         {
             // Round recorded note if it is close to the target note.
-            return GetRoundedMidiNote(recordedMidiNote, targetNote.MidiNote, RoundingDistance);
+            return GetRoundedMidiNote(recordedMidiNote, targetNote.MidiNote, roundingDistance);
         }
     }
 
@@ -280,5 +276,16 @@ public class PlayerNoteRecorder : MonoBehaviour, IOnHotSwapFinishedListener
             recordedNotes.Add(recordedNote);
             sentenceToRecordedNotesMap.Add(currentSentence, recordedNotes);
         }
+    }
+
+    private double GetCurrentBeat()
+    {
+        double positionInMillis = songAudioPlayer.PositionInSongInMillis;
+        if (micProfile != null)
+        {
+            positionInMillis -= micProfile.DelayInMillis;
+        }
+        double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, positionInMillis);
+        return currentBeat;
     }
 }

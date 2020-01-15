@@ -499,10 +499,10 @@ MonoBehaviour:
   anchorMin: {x: 0.5, y: 0.1}
   anchorMax: {x: 0.5, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0, y: 1.3638353, z: 0}
+  localPosition: {x: 0, y: 1.5634546, z: 0}
   anchoredPosition: {x: 0, y: -0.000061035156}
   sizeDelta: {x: 2, y: 0}
-  size: {x: 2, y: 24.550125}
+  size: {x: 2, y: 28.143278}
 --- !u!1 &320770002
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,10 +625,10 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 557, y: 269, z: 0}
-  anchoredPosition: {x: 557, y: 269}
-  sizeDelta: {x: 800, y: 386.35547}
-  size: {x: 800, y: 386.35547}
+  localPosition: {x: 409.5, y: 226.5, z: 0}
+  anchoredPosition: {x: 409.5, y: 226.5}
+  sizeDelta: {x: 800.00006, y: 442.49088}
+  size: {x: 800.00006, y: 442.49088}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1627,6 +1627,7 @@ MonoBehaviour:
   backgroundImage: {fileID: 242843843}
   songAudioPlayer: {fileID: 1098468898}
   songVideoPlayer: {fileID: 227833046}
+  playerUiArea: {fileID: 245391955}
 --- !u!4 &1427931089
 Transform:
   m_ObjectHideFlags: 0
