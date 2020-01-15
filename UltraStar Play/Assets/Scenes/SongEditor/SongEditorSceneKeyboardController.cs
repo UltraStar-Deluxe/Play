@@ -42,8 +42,24 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     [Inject]
     private EventSystem eventSystem;
 
+    // Unity does not provide Input.anyKeyUp, only Input.anyKey, and Input.anyKeyDown.
+    private bool isAnyKey;
+    private bool isAnyKeyUp;
+
     public void Update()
     {
+        // Detect isAnyKeyUp
+        isAnyKeyUp = false;
+        if (Input.anyKey)
+        {
+            isAnyKey = true;
+        }
+        else if (isAnyKey)
+        {
+            isAnyKey = false;
+            isAnyKeyUp = true;
+        }
+
         if (GameObjectUtils.InputFieldHasFocus(eventSystem))
         {
             return;
@@ -51,10 +67,18 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
-        // Play / pause via Space
-        if (Input.GetKeyUp(KeyCode.Space))
+        // Play / pause via Space or P
+        bool isPlayPauseButtonUp = Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.P);
+        if (isPlayPauseButtonUp && modifier == EKeyboardModifier.None)
         {
             ToggleAudioPlayPause();
+        }
+
+        // Play only the selected notes via Ctrl+Space or Ctrl+P
+        if (isPlayPauseButtonUp && modifier == EKeyboardModifier.Ctrl)
+        {
+            List<Note> selectedNotes = selectionController.GetSelectedNotes();
+            PlayAudioInRangeOfNotes(selectedNotes);
         }
 
         // Stop via Escape
@@ -140,6 +164,99 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         // Scroll and zoom in NoteArea
         UpdateInputToScrollAndZoom(modifier);
+
+        // Use the shortcuts that are also used in the YASS song editor.
+        UpdateInputForYassShortcuts(modifier);
+    }
+
+    // Implements keyboard shortcuts similar to Yass.
+    // See: https://github.com/UltraStar-Deluxe/Play/issues/111
+    private void UpdateInputForYassShortcuts(EKeyboardModifier modifier)
+    {
+        if (modifier != EKeyboardModifier.None)
+        {
+            return;
+        }
+
+        if (!isAnyKeyUp)
+        {
+            return;
+        }
+
+        // 4 and 6 on keypad to move to the previous/next note
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> followingNotes = GetFollowingNotesOrEmptyListIfDeactivated(selectedNotes);
+        if (Input.GetKeyUp(KeyCode.Keypad4))
+        {
+            selectionController.SelectPreviousNote();
+        }
+        if (Input.GetKeyUp(KeyCode.Keypad6))
+        {
+            selectionController.SelectNextNote();
+        }
+
+        // 1 and 3 moves the note left and right (by one beat, length unchanged)
+        if (Input.GetKeyUp(KeyCode.Keypad1))
+        {
+            MoveNotesHorizontal(-1, selectedNotes, followingNotes);
+        }
+        if (Input.GetKeyUp(KeyCode.Keypad3))
+        {
+            MoveNotesHorizontal(1, selectedNotes, followingNotes);
+        }
+
+        // 7 and 9 shortens/lengthens the note (by one beat, on the right side)
+        if (Input.GetKeyUp(KeyCode.Keypad7))
+        {
+            ExtendNotesRight(-1, selectedNotes, followingNotes);
+        }
+        if (Input.GetKeyUp(KeyCode.Keypad9))
+        {
+            ExtendNotesRight(1, selectedNotes, followingNotes);
+        }
+
+        // Minus sign moves a note up a half-tone (due to the key's physical location, this makes sense)
+        // Plus sign moves a note down a half-tone
+        if (Input.GetKeyUp(KeyCode.KeypadMinus))
+        {
+            MoveNotesVertical(1, selectedNotes, followingNotes);
+        }
+        if (Input.GetKeyUp(KeyCode.KeypadPlus))
+        {
+            MoveNotesVertical(-1, selectedNotes, followingNotes);
+        }
+
+        // 5 plays the current selected note
+        if (Input.GetKeyUp(KeyCode.Keypad5))
+        {
+            PlayAudioInRangeOfNotes(selectedNotes);
+        }
+
+        // scroll left with h, scroll right with j
+        if (Input.GetKeyUp(KeyCode.H))
+        {
+            noteArea.ScrollHorizontal(-1);
+        }
+        if (Input.GetKeyUp(KeyCode.J))
+        {
+            noteArea.ScrollHorizontal(1);
+        }
+    }
+
+    private void PlayAudioInRangeOfNotes(List<Note> notes)
+    {
+        if (songAudioPlayer.IsPlaying)
+        {
+            return;
+        }
+
+        int minBeat = notes.Select(it => it.StartBeat).Min();
+        int maxBeat = notes.Select(it => it.EndBeat).Max();
+        double maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
+        double minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
+        songEditorSceneController.StopPlaybackAfterPositionInSongInMillis = maxMillis;
+        songAudioPlayer.PositionInSongInMillis = minMillis;
+        songAudioPlayer.PlayAudio();
     }
 
     private void ToggleAudioPlayPause()
@@ -238,69 +355,90 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             return;
         }
 
-        foreach (Note note in selectedNotes)
+        List<Note> followingNotes = GetFollowingNotesOrEmptyListIfDeactivated(selectedNotes);
+
+        // Move with Shift
+        if (modifier == EKeyboardModifier.Shift)
         {
-            // Move with Shift
-            if (modifier == EKeyboardModifier.Shift)
-            {
-                note.MoveHorizontal((int)arrowKeyDirection.x);
-                note.MoveVertical((int)arrowKeyDirection.y);
-            }
-
-            // Move notes one octave up / down via Ctrl+Shift
-            if (modifier == EKeyboardModifier.CtrlShift)
-            {
-                note.MoveVertical((int)arrowKeyDirection.y * 12);
-            }
-
-            // Extend right side with Alt
-            if (modifier == EKeyboardModifier.Alt)
-            {
-                int newEndBeat = note.EndBeat + (int)arrowKeyDirection.x;
-                if (newEndBeat > note.StartBeat)
-                {
-                    note.SetEndBeat(newEndBeat);
-                }
-            }
-
-            // Extend left side with Ctrl
-            if (modifier == EKeyboardModifier.Ctrl)
-            {
-                int newStartBeat = note.StartBeat + (int)arrowKeyDirection.x;
-                if (newStartBeat < note.EndBeat)
-                {
-                    note.SetStartBeat(newStartBeat);
-                }
-            }
-
-            // Adjust following notes.
-            if (settings.SongEditorSettings.AdjustFollowingNotes)
-            {
-                AdjustFollowingNotes(modifier, arrowKeyDirection, selectedNotes);
-            }
+            MoveNotesHorizontal((int)arrowKeyDirection.x, selectedNotes, followingNotes);
+            MoveNotesVertical((int)arrowKeyDirection.y, selectedNotes, followingNotes);
         }
+
+        // Move notes one octave up / down via Ctrl+Shift
+        if (modifier == EKeyboardModifier.CtrlShift)
+        {
+            MoveNotesVertical((int)arrowKeyDirection.y * 12, selectedNotes, followingNotes);
+        }
+
+        // Extend right side with Alt
+        if (modifier == EKeyboardModifier.Alt)
+        {
+            ExtendNotesRight((int)arrowKeyDirection.x, selectedNotes, followingNotes);
+        }
+
+        // Extend left side with Ctrl
+        if (modifier == EKeyboardModifier.Ctrl)
+        {
+            ExtendNotesLeft((int)arrowKeyDirection.x, selectedNotes);
+        }
+
         editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
-    private void AdjustFollowingNotes(EKeyboardModifier modifier, Vector2 arrowKeyDirection, List<Note> selectedNotes)
+    private void ExtendNotesLeft(int distanceInBeats, List<Note> selectedNotes)
     {
-        // Moving is applied to following notes as well.
-        // When extending / shrinking the right side, then the following notes are move to compensate.
-        List<Note> followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+        foreach (Note note in selectedNotes)
+        {
+            int newStartBeat = note.StartBeat + distanceInBeats;
+            if (newStartBeat < note.EndBeat)
+            {
+                note.SetStartBeat(newStartBeat);
+            }
+        }
+    }
+
+    private void ExtendNotesRight(int distanceInBeats, List<Note> selectedNotes, List<Note> followingNotes)
+    {
+        foreach (Note note in selectedNotes)
+        {
+            int newEndBeat = note.EndBeat + distanceInBeats;
+            if (newEndBeat > note.StartBeat)
+            {
+                note.SetEndBeat(newEndBeat);
+            }
+        }
         foreach (Note note in followingNotes)
         {
-            // Moved with Shift. The following notes are moved as well.
-            if (modifier == EKeyboardModifier.Shift)
-            {
-                note.MoveHorizontal((int)arrowKeyDirection.x);
-                note.MoveVertical((int)arrowKeyDirection.y);
-            }
+            note.MoveHorizontal(distanceInBeats);
+        }
+    }
 
-            // Extended right side with Alt. The following notes must be moved to compensate.
-            if (modifier == EKeyboardModifier.Alt)
-            {
-                note.MoveHorizontal((int)arrowKeyDirection.x);
-            }
+    private void MoveNotesVertical(int distanceInMidiNotes, List<Note> selectedNotes, List<Note> followingNotes)
+    {
+        foreach (Note note in selectedNotes.Union(followingNotes))
+        {
+            note.MoveVertical(distanceInMidiNotes);
+        }
+    }
+
+    private void MoveNotesHorizontal(int distanceInBeats, List<Note> selectedNotes, List<Note> followingNotes)
+    {
+        foreach (Note note in selectedNotes.Union(followingNotes))
+        {
+            note.MoveHorizontal(distanceInBeats);
+        }
+    }
+
+    private List<Note> GetFollowingNotesOrEmptyListIfDeactivated(List<Note> selectedNotes)
+    {
+
+        if (settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            return SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
+        }
+        else
+        {
+            return new List<Note>();
         }
     }
 
