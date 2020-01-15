@@ -73,6 +73,8 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private bool audioWaveFormInitialized;
 
+    public double StopPlaybackAfterPositionInSongInMillis { get; set; }
+
     public SongMeta SongMeta
     {
         get
@@ -145,6 +147,15 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             }
         }
         lastIsPlaying = songAudioPlayer.IsPlaying;
+
+        // Automatically stop playback after a given threshold (e.g. only play the selected notes)
+        if (songAudioPlayer.IsPlaying
+            && StopPlaybackAfterPositionInSongInMillis > 0
+            && songAudioPlayer.PositionInSongInMillis > StopPlaybackAfterPositionInSongInMillis)
+        {
+            songAudioPlayer.PauseAudio();
+            StopPlaybackAfterPositionInSongInMillis = 0;
+        }
 
         // Create the audio waveform image if not done yet.
         if (!audioWaveFormInitialized && songAudioPlayer.HasAudioClip && songAudioPlayer.AudioClip.samples > 0)
