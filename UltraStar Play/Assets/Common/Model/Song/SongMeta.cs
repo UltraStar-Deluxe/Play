@@ -10,6 +10,7 @@ public class SongMeta
     // required helper fields
     public string Directory { get; set; }
     public string Filename { get; set; }
+    public string SongHash { get; private set; }
 
     // required fields
     public string Artist { get; set; }
@@ -67,6 +68,7 @@ public class SongMeta
         // required helper fields
         string directory,
         string filename,
+        string songHash,
         // required fields
         string artist,
         float bpm,
@@ -85,6 +87,10 @@ public class SongMeta
         if (filename == null)
         {
             throw new ArgumentNullException("filename");
+        }
+        if (songHash == null)
+        {
+            throw new ArgumentNullException("songHash");
         }
         if (artist == null)
         {
@@ -109,7 +115,8 @@ public class SongMeta
 
         Directory = directory;
         Filename = filename;
-
+        SongHash = songHash;
+		
         Artist = artist;
         Bpm = bpm;
         Mp3 = mp3;
