@@ -12,15 +12,12 @@ For support questions, please use our chat at https://gitter.im/UltraStar-Deluxe
 -->
 
 ### Actual behaviour
-
 Tell us what happens
 
 ### Expected behaviour
-
 Tell us what should actually happen
 
 ### Steps to reproduce
-
 Please supply step-by-step instructions so that anyone with the same environment can reproduce the issue. Whenever you offer a description, imagine
 yourself in the shoes of someone who has never encountered this problem before and would like to know exactly how to observe it under a given set of conditions.
 Here is an example:
@@ -31,14 +28,8 @@ Here is an example:
 
 
 ### Details
-
 Provide some additional information:
 
 - UltraStar Play version:
-- Operating System + version:
-
-### If applicable, please paste the log output
-
-```
-(paste your output here)
-```
+- Operating System + version
+- if applicable, add a log file
