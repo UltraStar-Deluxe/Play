@@ -45,6 +45,12 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     [Inject]
     private ToggleNoteTypeAction toggleNoteTypeAction;
 
+    [Inject]
+    private MoveNotesAction moveNotesAction;
+
+    [Inject]
+    private ExtendNotesAction extendNotesAction;
+
     // Unity does not provide Input.anyKeyUp, only Input.anyKey, and Input.anyKeyDown.
     private bool isAnyKey;
     private bool isAnyKeyUp;
@@ -225,32 +231,32 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         // 1 and 3 moves the note left and right (by one beat, length unchanged)
         if (Input.GetKeyUp(KeyCode.Keypad1))
         {
-            MoveNotesHorizontal(-1, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesHorizontalAndNotify(-1, selectedNotes, followingNotes);
         }
         if (Input.GetKeyUp(KeyCode.Keypad3))
         {
-            MoveNotesHorizontal(1, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesHorizontalAndNotify(1, selectedNotes, followingNotes);
         }
 
         // 7 and 9 shortens/lengthens the note (by one beat, on the right side)
         if (Input.GetKeyUp(KeyCode.Keypad7))
         {
-            ExtendNotesRight(-1, selectedNotes, followingNotes);
+            extendNotesAction.ExtendNotesRightAndNotify(-1, selectedNotes, followingNotes);
         }
         if (Input.GetKeyUp(KeyCode.Keypad9))
         {
-            ExtendNotesRight(1, selectedNotes, followingNotes);
+            extendNotesAction.ExtendNotesRightAndNotify(1, selectedNotes, followingNotes);
         }
 
         // Minus sign moves a note up a half-tone (due to the key's physical location, this makes sense)
         // Plus sign moves a note down a half-tone
         if (Input.GetKeyUp(KeyCode.KeypadMinus))
         {
-            MoveNotesVertical(1, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesVerticalAndNotify(1, selectedNotes, followingNotes);
         }
         if (Input.GetKeyUp(KeyCode.KeypadPlus))
         {
-            MoveNotesVertical(-1, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesVerticalAndNotify(-1, selectedNotes, followingNotes);
         }
 
         // 5 plays the current selected note
@@ -365,7 +371,7 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
     private void UpdateInputToMoveAndStretchNotes(EKeyboardModifier modifier)
     {
-        Vector2 arrowKeyDirection = GetArrowKeyDirection();
+        Vector2 arrowKeyDirection = InputUtils.GetArrowKeyDirection();
         if (arrowKeyDirection == Vector2.zero)
         {
             return;
@@ -385,74 +391,31 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         List<Note> followingNotes = GetFollowingNotesOrEmptyListIfDeactivated(selectedNotes);
 
         // Move with Shift
-        if (modifier == EKeyboardModifier.Shift)
+        if (modifier == EKeyboardModifier.Shift && arrowKeyDirection.x != 0)
         {
-            MoveNotesHorizontal((int)arrowKeyDirection.x, selectedNotes, followingNotes);
-            MoveNotesVertical((int)arrowKeyDirection.y, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesHorizontalAndNotify((int)arrowKeyDirection.x, selectedNotes, followingNotes);
+        }
+        if (modifier == EKeyboardModifier.Shift && arrowKeyDirection.y != 0)
+        {
+            moveNotesAction.MoveNotesVerticalAndNotify((int)arrowKeyDirection.y, selectedNotes, followingNotes);
         }
 
         // Move notes one octave up / down via Ctrl+Shift
         if (modifier == EKeyboardModifier.CtrlShift)
         {
-            MoveNotesVertical((int)arrowKeyDirection.y * 12, selectedNotes, followingNotes);
+            moveNotesAction.MoveNotesVerticalAndNotify((int)arrowKeyDirection.y * 12, selectedNotes, followingNotes);
         }
 
         // Extend right side with Alt
         if (modifier == EKeyboardModifier.Alt)
         {
-            ExtendNotesRight((int)arrowKeyDirection.x, selectedNotes, followingNotes);
+            extendNotesAction.ExtendNotesRightAndNotify((int)arrowKeyDirection.x, selectedNotes, followingNotes);
         }
 
         // Extend left side with Ctrl
         if (modifier == EKeyboardModifier.Ctrl)
         {
-            ExtendNotesLeft((int)arrowKeyDirection.x, selectedNotes);
-        }
-
-        editorNoteDisplayer.UpdateNotesAndSentences();
-    }
-
-    private void ExtendNotesLeft(int distanceInBeats, List<Note> selectedNotes)
-    {
-        foreach (Note note in selectedNotes)
-        {
-            int newStartBeat = note.StartBeat + distanceInBeats;
-            if (newStartBeat < note.EndBeat)
-            {
-                note.SetStartBeat(newStartBeat);
-            }
-        }
-    }
-
-    private void ExtendNotesRight(int distanceInBeats, List<Note> selectedNotes, List<Note> followingNotes)
-    {
-        foreach (Note note in selectedNotes)
-        {
-            int newEndBeat = note.EndBeat + distanceInBeats;
-            if (newEndBeat > note.StartBeat)
-            {
-                note.SetEndBeat(newEndBeat);
-            }
-        }
-        foreach (Note note in followingNotes)
-        {
-            note.MoveHorizontal(distanceInBeats);
-        }
-    }
-
-    private void MoveNotesVertical(int distanceInMidiNotes, List<Note> selectedNotes, List<Note> followingNotes)
-    {
-        foreach (Note note in selectedNotes.Union(followingNotes))
-        {
-            note.MoveVertical(distanceInMidiNotes);
-        }
-    }
-
-    private void MoveNotesHorizontal(int distanceInBeats, List<Note> selectedNotes, List<Note> followingNotes)
-    {
-        foreach (Note note in selectedNotes.Union(followingNotes))
-        {
-            note.MoveHorizontal(distanceInBeats);
+            extendNotesAction.ExtendNotesLeftAndNotify((int)arrowKeyDirection.x, selectedNotes);
         }
     }
 
@@ -467,27 +430,5 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         {
             return new List<Note>();
         }
-    }
-
-    private Vector2 GetArrowKeyDirection()
-    {
-        Vector2 result = Vector2.zero;
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
-        {
-            result += new Vector2(-1, 0);
-        }
-        if (Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            result += new Vector2(1, 0);
-        }
-        if (Input.GetKeyUp(KeyCode.UpArrow))
-        {
-            result += new Vector2(0, 1);
-        }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
-        {
-            result += new Vector2(0, -1);
-        }
-        return result;
     }
 }

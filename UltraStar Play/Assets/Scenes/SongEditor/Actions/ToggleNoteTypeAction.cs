@@ -9,7 +9,7 @@ public class ToggleNoteTypeAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    public void Execute(IReadOnlyCollection<Note> selectedNotes, ENoteType noteType)
+    public void Execute(IEnumerable<Note> selectedNotes, ENoteType noteType)
     {
         bool allHaveNoteType = selectedNotes.AllMatch(it => it.Type == noteType);
         ENoteType targetNoteType = (allHaveNoteType) ? ENoteType.Normal : noteType;
@@ -19,7 +19,7 @@ public class ToggleNoteTypeAction : INeedInjection
         }
     }
 
-    public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, ENoteType noteType)
+    public void ExecuteAndNotify(IEnumerable<Note> selectedNotes, ENoteType noteType)
     {
         Execute(selectedNotes, noteType);
         songMetaChangeEventStream.OnNext(new NoteTypeChangeEvent());

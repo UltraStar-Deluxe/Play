@@ -38,4 +38,26 @@ public static class InputUtils
         }
         return EKeyboardModifier.None;
     }
+
+    public static Vector2 GetArrowKeyDirection()
+    {
+        Vector2 result = Vector2.zero;
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            result += new Vector2(-1, 0);
+        }
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            result += new Vector2(1, 0);
+        }
+        if (Input.GetKeyUp(KeyCode.UpArrow))
+        {
+            result += new Vector2(0, 1);
+        }
+        if (Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            result += new Vector2(0, -1);
+        }
+        return result;
+    }
 }
