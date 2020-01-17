@@ -42,6 +42,9 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     [Inject]
     private EventSystem eventSystem;
 
+    [Inject]
+    private ToggleNoteTypeAction toggleNoteTypeAction;
+
     // Unity does not provide Input.anyKeyUp, only Input.anyKey, and Input.anyKeyDown.
     private bool isAnyKey;
     private bool isAnyKeyUp;
@@ -181,29 +184,16 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         if (Input.GetKeyUp(KeyCode.G))
         {
-            ToggleNoteType(ENoteType.Golden);
+            toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Golden);
         }
         if (Input.GetKeyUp(KeyCode.F))
         {
-            ToggleNoteType(ENoteType.Freestyle);
+            toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Freestyle);
         }
         if (Input.GetKeyUp(KeyCode.N))
         {
-            ToggleNoteType(ENoteType.Normal);
+            toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Normal);
         }
-    }
-
-    private void ToggleNoteType(ENoteType noteType)
-    {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        bool allHaveNoteType = selectedNotes.AllMatch(it => it.Type == noteType);
-        ENoteType targetNoteType = (allHaveNoteType) ? ENoteType.Normal : noteType;
-        foreach (Note note in selectedNotes)
-        {
-            note.SetType(targetNoteType);
-        }
-
-        editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
     // Implements keyboard shortcuts similar to Yass.
