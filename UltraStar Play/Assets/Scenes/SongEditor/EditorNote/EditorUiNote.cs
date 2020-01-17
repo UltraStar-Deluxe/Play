@@ -228,7 +228,11 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     {
         if (Note.IsFreestyle)
         {
-            uiText.text = $"<i>{newText}</i>";
+            uiText.text = $"<i><b><color=#800000>{newText}</color></b></i>";
+        }
+        else if (Note.IsGolden)
+        {
+            uiText.text = $"<b>{newText}</b>";
         }
         else
         {
