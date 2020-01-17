@@ -159,6 +159,9 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             }
         }
 
+        // Make golden / freestyle / normal
+        UpdateInputToChangeNoteType(modifier);
+
         // Move and stretch notes
         UpdateInputToMoveAndStretchNotes(modifier);
 
@@ -167,6 +170,40 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         // Use the shortcuts that are also used in the YASS song editor.
         UpdateInputForYassShortcuts(modifier);
+    }
+
+    private void UpdateInputToChangeNoteType(EKeyboardModifier modifier)
+    {
+        if (modifier != EKeyboardModifier.None)
+        {
+            return;
+        }
+
+        if (Input.GetKeyUp(KeyCode.G))
+        {
+            ToggleNoteType(ENoteType.Golden);
+        }
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            ToggleNoteType(ENoteType.Freestyle);
+        }
+        if (Input.GetKeyUp(KeyCode.N))
+        {
+            ToggleNoteType(ENoteType.Normal);
+        }
+    }
+
+    private void ToggleNoteType(ENoteType noteType)
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        bool allHaveNoteType = selectedNotes.AllMatch(it => it.Type == noteType);
+        ENoteType targetNoteType = (allHaveNoteType) ? ENoteType.Normal : noteType;
+        foreach (Note note in selectedNotes)
+        {
+            note.SetType(targetNoteType);
+        }
+
+        editorNoteDisplayer.UpdateNotesAndSentences();
     }
 
     // Implements keyboard shortcuts similar to Yass.
