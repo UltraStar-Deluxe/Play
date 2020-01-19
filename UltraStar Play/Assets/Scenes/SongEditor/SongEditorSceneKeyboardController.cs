@@ -200,6 +200,14 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         {
             toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Normal);
         }
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Rap);
+        }
+        if (Input.GetKeyUp(KeyCode.T))
+        {
+            toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.RapGolden);
+        }
     }
 
     // Implements keyboard shortcuts similar to Yass.
