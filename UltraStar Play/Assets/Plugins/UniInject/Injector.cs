@@ -266,7 +266,7 @@ namespace UniInject
                     valueToBeInjected = GetValueForInjectionKey(injectionKey);
                 }
 
-                valuesToBeInjected[index] = valueToBeInjected ?? throw new InjectionException($"Value to be injected for key {injectionKey} is null");
+                valuesToBeInjected[index] = valueToBeInjected ?? throw new MissingBindingException($"Value to be injected for key {injectionKey} is null");
                 index++;
             }
             return valuesToBeInjected;
