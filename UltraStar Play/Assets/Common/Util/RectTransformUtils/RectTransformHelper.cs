@@ -24,6 +24,9 @@ public class RectTransformHelper : MonoBehaviour
     public Vector2 anchoredPosition;
     private Vector2 anchoredPositionOld;
 
+    public Vector3 position;
+    private Vector3 positionOld;
+
     public Vector2 sizeDelta;
     private Vector2 sizeDeltaOld;
 
@@ -53,6 +56,9 @@ public class RectTransformHelper : MonoBehaviour
         anchoredPosition = rectTransform.anchoredPosition;
         anchoredPositionOld = anchoredPosition;
 
+        position = rectTransform.position;
+        positionOld = position;
+
         sizeDelta = rectTransform.sizeDelta;
         sizeDeltaOld = sizeDelta;
 
@@ -71,6 +77,7 @@ public class RectTransformHelper : MonoBehaviour
         UpdatePivot();
         UpdateAnchoredPosition();
         UpdateLocalPosition();
+        UpdatePosition();
         UpdateSizeDelta();
         UpdateSize();
     }
@@ -102,30 +109,43 @@ public class RectTransformHelper : MonoBehaviour
         sizeDeltaOld = sizeDelta;
     }
 
+    private void UpdatePosition()
+    {
+        if (positionOld != position)
+        {
+            rectTransform.position = position;
+        }
+        else if (rectTransform.position != position)
+        {
+            position = rectTransform.position;
+        }
+        positionOld = position;
+    }
+
     private void UpdateLocalPosition()
     {
-        if (rectTransform.localPosition != localPosition)
-        {
-            localPosition = rectTransform.localPosition;
-        }
-        else if (localPositionOld != localPosition)
+        if (localPositionOld != localPosition)
         {
             rectTransform.localPosition = localPosition;
+        }
+        else if (rectTransform.localPosition != localPosition)
+        {
+            localPosition = rectTransform.localPosition;
         }
         localPositionOld = localPosition;
     }
 
     private void UpdateAnchoredPosition()
     {
-        if (rectTransform.anchoredPosition != anchoredPosition)
-        {
-            anchoredPosition = rectTransform.anchoredPosition;
-        }
-        else if (anchoredPositionOld != anchoredPosition)
+        if (anchoredPositionOld != anchoredPosition)
         {
             rectTransform.anchoredPosition = anchoredPosition;
         }
-        localPositionOld = localPosition;
+        else if (rectTransform.anchoredPosition != anchoredPosition)
+        {
+            anchoredPosition = rectTransform.anchoredPosition;
+        }
+        anchoredPositionOld = anchoredPosition;
     }
 
     private void UpdatePivot()
