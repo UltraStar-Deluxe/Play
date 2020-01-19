@@ -1,0 +1,157 @@
+{
+    "TotalPlayTimeSeconds":761.7778,
+    "LocalStatistics":{
+        "49cfe06c329de20a805d6f7dba6d1c4a":{
+            "TimesStarted":29,
+            "TimesFinished":10,
+            "LastPlayed":"2020-01-19T13:09:45.0738665+01:00",
+            "StatsEntries":{
+                "SongStatistics":[
+                    {
+                        "PlayerName":"Player01",
+                        "Difficulty":"Medium",
+                        "Score":0,
+                        "DateTime":"2020-01-17T13:21:10.7987801+01:00",
+                        "$id":"5"
+                    },
+                    {
+                        "PlayerName":"Player01",
+                        "Difficulty":"Medium",
+                        "Score":8,
+                        "DateTime":"2020-01-17T13:19:18.6304987+01:00",
+                        "$id":"6"
+                    }
+                ]
+            }
+        },
+        "0ad8cf87b359941debde9826585f8d3c":{
+            "TimesStarted":61,
+            "TimesFinished":3,
+            "LastPlayed":"2020-01-19T16:21:15.6933012+01:00",
+            "StatsEntries":{
+                "SongStatistics":[
+                    {
+                        "PlayerName":"Player01",
+                        "Difficulty":"Medium",
+                        "Score":0,
+                        "DateTime":"2020-01-17T13:21:33.8237631+01:00",
+                        "$id":"10"
+                    }
+                ]
+            }
+        },
+        "c82a941fa62ea3dee0a611f96429fa0a":{
+            "TimesStarted":2,
+            "TimesFinished":1,
+            "LastPlayed":"2020-01-17T13:22:50.5327690+01:00",
+            "StatsEntries":{
+                "SongStatistics":[
+                    {
+                        "PlayerName":"Player01",
+                        "Difficulty":"Medium",
+                        "Score":16,
+                        "DateTime":"2020-01-17T13:22:50.5327690+01:00",
+                        "$id":"14"
+                    }
+                ]
+            }
+        }
+    },
+    "WebStatistics":{
+        
+    },
+    "TopTenList":[
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "$ref":"6"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "$ref":"5"
+            }
+        },
+        {
+            "SongName":"Me And My Broken Heart",
+            "SongArtist":"Rixton",
+            "SongStatistic":{
+                "$ref":"10"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-17T13:22:24.5038101+01:00"
+            }
+        },
+        {
+            "SongName":"Money Money Money",
+            "SongArtist":"ABBA",
+            "SongStatistic":{
+                "$ref":"14"
+            },
+            "$id":"22"
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-19T11:53:23.4506963+01:00"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-19T12:35:25.2598860+01:00"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-19T12:36:55.7719650+01:00"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-19T12:37:36.1054358+01:00"
+            }
+        },
+        {
+            "SongName":"Summer Wine",
+            "SongArtist":"Ville Valo & Natalia Avelon",
+            "SongStatistic":{
+                "PlayerName":"Player01",
+                "Difficulty":"Medium",
+                "Score":0,
+                "DateTime":"2020-01-19T12:38:14.0428292+01:00"
+            }
+        }
+    ],
+    "TopScore":{
+        "$ref":"22"
+    }
+}
