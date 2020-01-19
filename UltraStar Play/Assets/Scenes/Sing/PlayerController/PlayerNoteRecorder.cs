@@ -24,7 +24,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject]
+    [Inject(optional = true)]
     private MicProfile micProfile;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]

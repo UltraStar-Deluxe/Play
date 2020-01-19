@@ -83,6 +83,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         SetViewport(x, y, width, height);
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
+        SetPositionInSongInMillis(songAudioPlayer.PositionInSongInMillis);
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
