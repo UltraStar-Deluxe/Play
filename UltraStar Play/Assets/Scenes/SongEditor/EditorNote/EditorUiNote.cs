@@ -226,17 +226,21 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     public void SetText(string newText)
     {
-        if (Note.IsFreestyle)
+        switch (Note.Type)
         {
-            uiText.text = $"<i><b><color=#800000>{newText}</color></b></i>";
-        }
-        else if (Note.IsGolden)
-        {
-            uiText.text = $"<b>{newText}</b>";
-        }
-        else
-        {
-            uiText.text = newText;
+            case ENoteType.Freestyle:
+                uiText.text = $"<i><b><color=#c00000>{newText}</color></b></i>";
+                break;
+            case ENoteType.Golden:
+                uiText.text = $"<b>{newText}</b>";
+                break;
+            case ENoteType.Rap:
+            case ENoteType.RapGolden:
+                uiText.text = $"<i><b><color=#ffa500ff>{newText}</color></b></i>";
+                break;
+            default:
+                uiText.text = newText;
+                break;
         }
     }
 

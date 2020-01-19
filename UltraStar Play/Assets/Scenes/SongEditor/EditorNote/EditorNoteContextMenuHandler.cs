@@ -106,6 +106,16 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
             contextMenu.AddItem("Make freestyle",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Freestyle));
         }
+        if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Rap))
+        {
+            contextMenu.AddItem("Make rap",
+                () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Rap));
+        }
+        if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.RapGolden))
+        {
+            contextMenu.AddItem("Make rap-golden",
+                () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.RapGolden));
+        }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Normal))
         {
             contextMenu.AddItem("Make normal",
