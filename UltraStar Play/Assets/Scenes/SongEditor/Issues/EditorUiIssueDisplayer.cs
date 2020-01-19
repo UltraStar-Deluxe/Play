@@ -37,9 +37,15 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
     private ViewportEvent lastViewportEvent;
     private float lastSongMetaBpm;
 
+    public void OnSceneInjectionFinished()
+    {
+        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+    }
+
     void Start()
     {
         issuePrefabWidthInPixels = issuePrefab.GetComponent<RectTransform>().rect.width;
+
         UpdateIssues();
 
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
@@ -58,11 +64,6 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
         lastViewportEvent = viewportEvent;
     }
 
-    public void OnSceneInjectionFinished()
-    {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
-    }
-
     private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
     {
         if (changeEvent is LyricsChangedEvent)
@@ -70,11 +71,16 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
             return;
         }
 
-        issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
         UpdateIssues();
     }
 
     private void UpdateIssues()
+    {
+        issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
+        DrawIssues();
+    }
+
+    private void DrawIssues()
     {
         uiIssueContainer.DestroyAllDirectChildren();
 
