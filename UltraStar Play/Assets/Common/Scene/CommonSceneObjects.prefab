@@ -139,6 +139,8 @@ MonoBehaviour:
     type: 3}
   notificationPrefab: {fileID: 24204236167550392, guid: 69a3dd5155fb1874a9e3ed373ca4d931,
     type: 3}
+  debugPositionIndicatorPrefab: {fileID: 3821327966907172590, guid: 8230a724372023348b8b6ef0be366ac3,
+    type: 3}
 --- !u!1 &384182729201870260
 GameObject:
   m_ObjectHideFlags: 0
@@ -745,7 +747,6 @@ MonoBehaviour:
   verticalCursorTexture: {fileID: 2800000, guid: 545d8db5414f6d6448fc47349d599a76,
     type: 3}
   grabCursorTexture: {fileID: 2800000, guid: 428256a582aeb554e980f46c5db242f3, type: 3}
-  defaultHotSpot: {x: 0, y: 0}
 --- !u!1 &3340714701814108809
 GameObject:
   m_ObjectHideFlags: 0
