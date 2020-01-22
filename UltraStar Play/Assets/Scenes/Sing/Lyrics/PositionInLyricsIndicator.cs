@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class PositionInLyricsIndicator : MonoBehaviour
 {
+    // The reference size of the canvas
     private float canvasWidth;
 
     public LyricsDisplayer lyricsDisplayer;
@@ -56,7 +57,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
         singSceneController = FindObjectOfType<SingSceneController>();
 
         // Get the canvas width.
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Canvas canvas = CanvasUtils.FindCanvas();
         RectTransform canvasRectTransform = canvas.GetComponent<RectTransform>();
         canvasWidth = canvasRectTransform.rect.width;
     }
@@ -71,7 +72,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
         else
         {
             float step = (float)velocityPerSecond * Time.deltaTime;
-            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x + step, rectTransform.anchoredPosition.y);
+            rectTransform.position = new Vector3(rectTransform.position.x + step, rectTransform.position.y, rectTransform.position.z);
         }
         CalculateVelocity();
     }
@@ -84,7 +85,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private void MoveToLeftSideOfScreen()
     {
-        rectTransform.anchoredPosition = new Vector2(-canvasWidth / 2.0f, rectTransform.anchoredPosition.y);
+        rectTransform.position = new Vector3(0, rectTransform.position.y, rectTransform.position.z);
     }
 
     private void CalculateVelocity()
@@ -131,17 +132,22 @@ public class PositionInLyricsIndicator : MonoBehaviour
                 }
             }
 
-            double remainingTimeInMillis = endTimeInMillis - positionInSentenceInMillis;
             if (endPos > double.MinValue)
             {
-                if (remainingTimeInMillis > 0 && endPos > rectTransform.anchoredPosition.x)
+                // The position of the character is returned in absolute pixels,
+                // where the left side is (-Screen.width/2) and the right side is (+Screen.width/2).
+                // But, the world position of the RectTransform is ranging from 0 to Screen.width
+                double endPosForRectTransform = endPos + Screen.width / 2.0;
+                double remainingTimeInMillis = endTimeInMillis - positionInSentenceInMillis;
+                if (remainingTimeInMillis > 0 && endPosForRectTransform > rectTransform.position.x)
                 {
                     double remainingTimeInSeconds = remainingTimeInMillis / 1000;
-                    velocityPerSecond = (endPos - rectTransform.anchoredPosition.x) / remainingTimeInSeconds;
+                    velocityPerSecond = (endPosForRectTransform - rectTransform.position.x) / remainingTimeInSeconds;
                 }
                 else
                 {
-                    rectTransform.anchoredPosition = new Vector2((float)endPos, rectTransform.anchoredPosition.y);
+                    velocityPerSecond = 0;
+                    rectTransform.position = new Vector3((float)endPosForRectTransform, rectTransform.position.y, rectTransform.position.z);
                 }
             }
         }

@@ -17,8 +17,16 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
+    private List<RectTransform> debugPoints = new List<RectTransform>();
+
+    [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
+
+    [InjectedInInspector]
     public Notification notificationPrefab;
+
+    [InjectedInInspector]
+    public RectTransform debugPositionIndicatorPrefab;
 
     private Canvas canvas;
     private RectTransform canvasRectTransform;
@@ -97,5 +105,25 @@ public class UiManager : MonoBehaviour, INeedInjection
             PositionNotification(n, index);
             index++;
         }
+    }
+
+    public void DestroyAllDebugPoints()
+    {
+        foreach (RectTransform debugPoint in debugPoints)
+        {
+            GameObject.Destroy(debugPoint.gameObject);
+        }
+        debugPoints.Clear();
+    }
+
+    public RectTransform CreateDebugPoint(RectTransform parent = null)
+    {
+        if (parent == null)
+        {
+            parent = CanvasUtils.FindCanvas().GetComponent<RectTransform>();
+        }
+        RectTransform debugPoint = GameObject.Instantiate(debugPositionIndicatorPrefab, parent);
+        debugPoints.Add(debugPoint);
+        return debugPoint;
     }
 }
