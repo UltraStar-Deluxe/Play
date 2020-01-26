@@ -241,9 +241,9 @@ public class VoicesBuilder
         {
             return Convert.ToInt32(s.Trim(), 10);
         }
-        catch (FormatException e)
+        catch (Exception e)
         {
-            throw new VoicesBuilderException("Could not convert " + s + " to an int. Reason: " + e.Message);
+            throw new VoicesBuilderException("Could not convert '" + s + "' to an int. Reason: " + e.Message, e);
         }
     }
 }
