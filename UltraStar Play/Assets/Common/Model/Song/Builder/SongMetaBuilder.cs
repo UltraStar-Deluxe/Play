@@ -74,7 +74,9 @@ static class SongMetaBuilder
                 {
                     otherFields[tag] = val;
                 }
-                else if (tag.StartsWith("p", StringComparison.Ordinal) && tag.Length > 1)
+                else if (tag.StartsWith("p", StringComparison.Ordinal)
+                    && tag.Length == 2
+                    && Char.IsDigit(tag, 1))
                 {
                     if (!voiceNames.ContainsKey(tag.ToUpperInvariant()))
                     {
@@ -82,7 +84,9 @@ static class SongMetaBuilder
                     }
                     // silently ignore already set voiceNames
                 }
-                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal) && tag.Length > 11)
+                else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal)
+                    && tag.Length == 12
+                    && Char.IsDigit(tag, 11))
                 {
                     string shorttag = tag.Substring(10).ToUpperInvariant();
                     if (!voiceNames.ContainsKey(shorttag))
