@@ -168,7 +168,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             {
                 float xStartPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.MinBeat);
                 float xEndPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
-                string label = (sentenceIndex + 1).ToString();
 
                 // Do not draw the sentence marker lines, when there are too many beats
                 if (viewportWidthInBeats < 1200)
@@ -177,7 +176,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
                     CreateSentenceMarkerLine(xEndPercent, Colors.black, 20);
                 }
 
-                CreateUiSentence(sentence, xStartPercent, xEndPercent, label);
+                CreateUiSentence(sentence, xStartPercent, xEndPercent, sentenceIndex);
             }
             sentenceIndex++;
         }
@@ -295,14 +294,22 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         }
     }
 
-    private void CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, string label)
+    private void CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, int sentenceIndex)
     {
         EditorUiSentence uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
 
         injector.Inject(uiSentence);
         injector.Inject(uiSentence.GetComponent<EditorSentenceContextMenuHandler>());
         uiSentence.Init(sentence);
+        string label = (sentenceIndex + 1).ToString();
         uiSentence.SetText(label);
+
+        // Make sentence rectangles alternating light/dark
+        bool isDark = (sentenceIndex % 2) == 0;
+        if (isDark)
+        {
+            uiSentence.backgroundImage.MultiplyColor(0.66f);
+        }
 
         PositionUiSentence(uiSentence.RectTransform, xStartPercent, xEndPercent);
     }
