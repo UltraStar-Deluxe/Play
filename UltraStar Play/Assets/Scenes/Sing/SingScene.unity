@@ -2050,11 +2050,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lyrics
       objectReference: {fileID: 0}
-    - target: {fileID: 6263258894705517097, guid: 5ca122de3e6e3e046b5afdf99555504c,
-        type: 3}
-      propertyPath: m_Name
-      value: PositionInLyricsIndicator
-      objectReference: {fileID: 0}
     - target: {fileID: 1570843823581990794, guid: 5ca122de3e6e3e046b5afdf99555504c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2164,6 +2159,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FontData.m_Alignment
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263258894705517097, guid: 5ca122de3e6e3e046b5afdf99555504c,
+        type: 3}
+      propertyPath: m_Name
+      value: PositionInLyricsIndicator
       objectReference: {fileID: 0}
     - target: {fileID: 1570843823581990805, guid: 5ca122de3e6e3e046b5afdf99555504c,
         type: 3}
