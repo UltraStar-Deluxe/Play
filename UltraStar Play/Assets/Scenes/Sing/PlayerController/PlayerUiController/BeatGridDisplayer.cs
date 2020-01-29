@@ -31,6 +31,13 @@ public class BeatGridDisplayer : MonoBehaviour
 
     private void CreateLines(int StartBeat, int EndBeat)
     {
+        // This script is only for debugging
+        if (!Application.isEditor)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         int lengthInBeats = EndBeat - StartBeat;
 
         for (int i = 0; i <= lengthInBeats; i++)
