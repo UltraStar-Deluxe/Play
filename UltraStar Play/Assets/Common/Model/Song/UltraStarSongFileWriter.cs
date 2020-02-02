@@ -110,7 +110,7 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "artist", songMeta.Artist);
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
         AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString());
-        if (songMeta.Gap > 0)
+        if (songMeta.Gap != 0)
         {
             AppendHeaderField(sb, "gap", songMeta.Gap.ToString());
         }
@@ -119,7 +119,7 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "background", songMeta.Background);
 
         AppendHeaderField(sb, "video", songMeta.Video);
-        if (songMeta.VideoGap > 0)
+        if (songMeta.VideoGap != 0)
         {
             AppendHeaderField(sb, "videogap", songMeta.VideoGap.ToString());
         }
@@ -133,11 +133,11 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "language", songMeta.Language);
         AppendHeaderField(sb, "edition", songMeta.Edition);
 
-        if (songMeta.Start > 0)
+        if (songMeta.Start != 0)
         {
             AppendHeaderField(sb, "start", songMeta.Start.ToString());
         }
-        if (songMeta.End > 0)
+        if (songMeta.End != 0)
         {
             AppendHeaderField(sb, "end", songMeta.End.ToString());
         }
