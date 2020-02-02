@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INoteAreaDragListener
+public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
     [InjectedInInspector]
     public RectTransform selectionFrame;
@@ -38,13 +38,13 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
         isCanceled = false;
-        if (dragEvent.InputButton != PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;
         }
 
-        GameObject raycastTarget = dragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
+        GameObject raycastTarget = dragEvent.GeneralDragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
         if (raycastTarget != noteArea.gameObject)
         {
             CancelDrag();
@@ -134,10 +134,10 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, INot
 
     private void UpdateSelectionFrame(NoteAreaDragEvent dragEvent)
     {
-        float x = dragEvent.XDragStartInPixels;
-        float y = dragEvent.YDragStartInPixels;
-        float width = dragEvent.XDistanceInPixels;
-        float height = -dragEvent.YDistanceInPixels;
+        float x = dragEvent.GeneralDragEvent.StartPositionInPixels.x;
+        float y = dragEvent.GeneralDragEvent.StartPositionInPixels.y;
+        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x;
+        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y;
 
         if (width < 0)
         {

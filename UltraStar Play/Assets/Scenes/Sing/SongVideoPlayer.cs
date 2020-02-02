@@ -115,7 +115,7 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
-    private void SyncVideoWithMusic(double positionInSongInMillis)
+    public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync = false)
     {
         if (!hasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis) || nextSyncTimeInSeconds > Time.time)
         {
@@ -130,7 +130,7 @@ public class SongVideoPlayer : MonoBehaviour
 
         // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
         // A big mismatch is corrected immediately.
-        if (Math.Abs(timeDifferenceInSeconds) > 2)
+        if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 2)
         {
             // Correct the mismatch immediately.
             videoPlayer.time = targetPositionInVideoInSeconds;

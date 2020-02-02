@@ -741,6 +741,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e93c0dde7c57c84e83e94fbbc59270d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cursorUiTextPrefab: {fileID: 8535854030440949839, guid: 3b9040440d5af904191b4d0192896345,
+    type: 3}
   cursorTexture: {fileID: 2800000, guid: 21b89c5b005b2324d96976212a0b264d, type: 3}
   horizontalCursorTexture: {fileID: 2800000, guid: d9dca9853288ebd47a8a128193d2e8d6,
     type: 3}
