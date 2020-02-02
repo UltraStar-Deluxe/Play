@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, INoteAreaDragListener
+public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
     private NoteArea noteArea;
@@ -31,7 +31,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, INot
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
         isCanceled = false;
-        if (dragEvent.InputButton != PointerEventData.InputButton.Middle)
+        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Middle)
         {
             CancelDrag();
             return;

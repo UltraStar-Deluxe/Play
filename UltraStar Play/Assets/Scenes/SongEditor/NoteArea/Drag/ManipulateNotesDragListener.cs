@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteAreaDragListener
+public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
     private SongEditorSelectionController selectionController;
@@ -58,14 +58,14 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
-        if (dragEvent.InputButton != PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;
         }
 
         isCanceled = false;
-        GameObject raycastTarget = dragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
+        GameObject raycastTarget = dragEvent.GeneralDragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
         EditorUiNote dragStartUiNote = raycastTarget.GetComponent<EditorUiNote>();
         if (dragStartUiNote == null)
         {
@@ -164,11 +164,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
 
     private DragAction GetDragAction(EditorUiNote dragStartUiNote, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.DragStartPositionInPixels))
+        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.StartPositionInPixels))
         {
             return DragAction.StretchLeft;
         }
-        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.DragStartPositionInPixels))
+        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.StartPositionInPixels))
         {
             return DragAction.StretchRight;
         }
@@ -177,7 +177,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, INoteA
 
     private DragDirection GetDragDirection(NoteAreaDragEvent dragEvent)
     {
-        if (Math.Abs(dragEvent.YDistanceInPixels) > Math.Abs(dragEvent.XDistanceInPixels))
+        if (Math.Abs(dragEvent.GeneralDragEvent.DistanceInPixels.y) > Math.Abs(dragEvent.GeneralDragEvent.DistanceInPixels.x))
         {
             return DragDirection.Vertical;
         }
