@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 public static class MidiUtils
 {
@@ -11,6 +12,11 @@ public static class MidiUtils
     // Concert pitch A4 (440 Hz)
     public const int MidiNoteConcertPitch = 69;
     public const int MidiNoteConcertPitchFrequency = 440;
+
+    // White keys: C = 0, D = 2, E = 4, F = 5, G = 7, A = 9, B = 11
+    private static readonly int[] whiteKeyRelativeMidiNotes = { 0, 2, 4, 5, 7, 9, 11 };
+    // Black keys: C# = 1, D# = 3, F# = 6, G# = 8, A# = 10
+    private static readonly int[] blackKeyRelativeMidiNotes = { 1, 3, 6, 8, 10 };
 
     public static int GetOctave(int midiNote)
     {
@@ -79,5 +85,15 @@ public static class MidiUtils
 
         // Distance in shortest direction is result distance
         return Math.Min(distanceUnwrapped, distanceWrapped);
+    }
+
+    public static bool IsBlackPianoKey(int midiNote)
+    {
+        return blackKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
+    }
+
+    public static bool IsWhitePianoKey(int midiNote)
+    {
+        return whiteKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
     }
 }
