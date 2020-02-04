@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
+using UniRx;
 using CSharpSynth.Effects;
 using CSharpSynth.Sequencer;
 using CSharpSynth.Synthesis;
@@ -24,7 +25,6 @@ public class MidiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public int MidiNoteVolume { get; set; } = 250;
     public int MidiInstrument { get; set; }
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
@@ -32,11 +32,24 @@ public class MidiManager : MonoBehaviour, INeedInjection
     private readonly int bufferSize = 1024;
     private readonly float gain = 1f;
 
+    private int midiNoteVolume { get; set; }
+
     private float[] sampleBuffer;
     private MidiSequencer midiSequencer;
     private StreamSynthesizer midiStreamSynthesizer;
 
     private bool isInitialized;
+
+    [Inject]
+    private Settings settings;
+
+    void Start()
+    {
+        // Synchronize with settings
+        midiNoteVolume = settings.SongEditorSettings.MidiNoteVolume;
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiNoteVolume)
+            .Subscribe(newValue => midiNoteVolume = newValue);
+    }
 
     private void InitIfNotDoneYet()
     {
@@ -57,13 +70,33 @@ public class MidiManager : MonoBehaviour, INeedInjection
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, MidiNoteVolume, MidiInstrument);
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, MidiInstrument);
+    }
+
+    public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
+    {
+        InitIfNotDoneYet();
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, MidiInstrument);
+        StartCoroutine(ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
     public void StopMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
         midiStreamSynthesizer.NoteOff(0, midiNote);
+    }
+
+    public void StopAllMidiNotes(bool immediate = true)
+    {
+        InitIfNotDoneYet();
+        midiStreamSynthesizer.NoteOffAll(immediate);
+    }
+
+    private IEnumerator ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
+    {
+        yield return new WaitForSeconds(delayInSeconds);
+        // Code to execute after the delay
+        action();
     }
 
     // See http://unity3d.com/support/documentation/ScriptReference/MonoBehaviour.OnAudioFilterRead.html for reference code

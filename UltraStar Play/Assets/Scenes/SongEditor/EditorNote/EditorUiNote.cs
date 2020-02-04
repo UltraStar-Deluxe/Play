@@ -41,6 +41,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     private SongMeta songMeta;
 
     [Inject]
+    private MidiManager midiManager;
+
+    [Inject]
     private SongAudioPlayer songAudioPlayer;
 
     [Inject(searchMethod = SearchMethods.GetComponent)]
@@ -210,6 +213,11 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
                 {
                     selectionController.AddToSelection(this);
                 }
+            }
+            else if (Input.GetKey(KeyCode.LeftControl))
+            {
+                // Play a midi sound for that note
+                midiManager.PlayMidiNoteForDuration(Note.MidiNote, 0.5f);
             }
             else
             {
