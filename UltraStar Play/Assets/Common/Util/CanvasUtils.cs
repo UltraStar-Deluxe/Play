@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public static class CanvasUtils
@@ -8,7 +7,7 @@ public static class CanvasUtils
         Canvas canvas = GameObjectUtils.FindComponentWithTag<Canvas>("Canvas");
         if (canvas == null)
         {
-            throw new SystemException("FindCanvas failed! Check tag of scene Canvas.");
+            throw new UnityException("FindCanvas failed! Check tag of scene Canvas.");
         }
         return canvas;
     }
