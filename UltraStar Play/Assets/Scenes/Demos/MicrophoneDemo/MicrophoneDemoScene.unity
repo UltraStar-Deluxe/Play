@@ -156,8 +156,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 32
@@ -255,8 +253,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 2facc55ac7ad81241ae66e751bd16e6a, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
@@ -304,7 +300,7 @@ GameObject:
   - component: {fileID: 1032696877}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: Canvas
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -449,8 +445,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 2facc55ac7ad81241ae66e751bd16e6a, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
@@ -539,8 +533,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
@@ -669,8 +661,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: f6ec85d3f9f6fbe42a6be324acac5126, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
@@ -835,14 +825,9 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
+    - target: {fileID: 6082356490043053460, guid: dca6af5cdc2880d4a90d299ff4951525,
         type: 3}
-      propertyPath: m_Name
-      value: MicrophonePitchTracker
-      objectReference: {fileID: 0}
-    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
-        type: 3}
-      propertyPath: m_IsActive
+      propertyPath: playRecordedAudio
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6082356490043053461, guid: dca6af5cdc2880d4a90d299ff4951525,
@@ -900,9 +885,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6082356490043053460, guid: dca6af5cdc2880d4a90d299ff4951525,
+    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
         type: 3}
-      propertyPath: playRecordedAudio
+      propertyPath: m_Name
+      value: MicrophonePitchTracker
+      objectReference: {fileID: 0}
+    - target: {fileID: 6082356490043053462, guid: dca6af5cdc2880d4a90d299ff4951525,
+        type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
