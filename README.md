@@ -17,7 +17,8 @@ The game uses the Unity 2D framework and mostly c# (mono/.Net) as software devel
 - Speakers, USB microphones (or similar)
 
 ### 3. Development Requirements
-- See [Unity system requirements](https://unity3d.com/unity/system-requirements)
+- [Unity 2019.2.x ](https://unity3d.com/de/get-unity/download/archive)
+- run the `download-dependencies.sh` shell script in the tools folder (see [Compiling the game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game))
 - Plenty of free time
 
 ### 4. Documentation
