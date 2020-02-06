@@ -149,8 +149,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
             PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
         }
-		
-		//Save information about the song being started into stats
+
+        //Save information about the song being started into stats
         Statistics stats = StatsManager.Instance.Statistics;
         stats.RecordSongStarted(SongMeta);
 
@@ -249,10 +249,10 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
-        
+
         //Get the stats manager and the stats object
         Statistics stats = StatsManager.Instance.Statistics;
-        
+
         foreach (PlayerController playerController in PlayerControllers)
         {
             SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();
@@ -261,8 +261,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
             scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
-			
-			//Save to highscore database
+
+            //Save to highscore database
             stats.RecordSongFinished(SongMeta, playerController.PlayerProfile.Name, playerController.PlayerProfile.Difficulty,
                                 Convert.ToInt32(playerController.PlayerScoreController.TotalScore));
         }
@@ -329,12 +329,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     private SongMeta GetDefaultSongMeta()
     {
-        IEnumerable<SongMeta> defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == defaultSongName);
-        if (defaultSongMetas.Count() == 0)
-        {
-            throw new UnityException("The default song was not found.");
-        }
-        return defaultSongMetas.First();
+        return SongMetaManager.Instance.SongMetas.First();
     }
 
     public void TogglePlayPause()
