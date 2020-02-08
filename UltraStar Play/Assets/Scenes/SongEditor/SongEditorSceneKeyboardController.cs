@@ -103,7 +103,14 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
         // Stop via Escape
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            songAudioPlayer.PauseAudio();
+            if (songAudioPlayer.IsPlaying)
+            {
+                songAudioPlayer.PauseAudio();
+            }
+            else
+            {
+                songEditorSceneController.ContinueToSingScene();
+            }
         }
 
         // Select all notes via Ctrl+A

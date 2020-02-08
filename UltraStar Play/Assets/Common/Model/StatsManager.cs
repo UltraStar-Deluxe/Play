@@ -8,8 +8,6 @@ using UnityEngine;
 [Serializable]
 public class StatsManager : MonoBehaviour
 {
-    private readonly string databasePath = "Database.json";
-
     private static Statistics statistics;
     public Statistics Statistics
     {
@@ -33,20 +31,21 @@ public class StatsManager : MonoBehaviour
 
     public void Save()
     {
-         Debug.Log("Writing database");
+        Debug.Log("Writing database");
         //Update the total play time before saving
         statistics.UpdateTotalPlayTime();
 
         string json = JsonConverter.ToJson(Statistics, true);
-        File.WriteAllText(databasePath, json);
+        File.WriteAllText(DatabasePath(), json);
     }
 
     public void Reload()
     {
+        string databasePath = DatabasePath();
         Debug.Log("Reloading StatsManager");
         if (!File.Exists(databasePath))
         {
-            Debug.LogWarning("Database file not found. Initializing new database.");
+            Debug.LogWarning($"Database file not found. Creating new database at {databasePath}.");
             statistics = new Statistics();
             Save();
             return;
@@ -54,5 +53,10 @@ public class StatsManager : MonoBehaviour
 
         string fileContent = File.ReadAllText(databasePath);
         statistics = JsonConverter.FromJson<Statistics>(fileContent);
+    }
+
+    public string DatabasePath()
+    {
+        return Path.Combine(Application.persistentDataPath, "Database.json");
     }
 }

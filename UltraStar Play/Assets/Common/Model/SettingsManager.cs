@@ -14,8 +14,6 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    private readonly string settingsPath = "Settings.json";
-
     // The settings field is static to persist it across scene changes.
     // The SettingsManager is meant to be used as a singleton, such that this static field should not be a problem.
     private static Settings settings;
@@ -56,16 +54,17 @@ public class SettingsManager : MonoBehaviour
     public void Save()
     {
         string json = JsonConverter.ToJson(Settings, true);
-        File.WriteAllText(settingsPath, json);
+        File.WriteAllText(SettingsPath(), json);
     }
 
     public void Reload()
     {
         using (new DisposableStopwatch("Loading the settings took <millis> ms"))
         {
+            string settingsPath = SettingsPath();
             if (!File.Exists(settingsPath))
             {
-                UnityEngine.Debug.LogWarning("Settings file not found. Creating default settings.");
+                UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {settingsPath}.");
                 settings = new Settings();
                 Save();
                 return;
@@ -74,5 +73,10 @@ public class SettingsManager : MonoBehaviour
             settings = JsonConverter.FromJson<Settings>(fileContent);
             nonStaticSettings = settings;
         }
+    }
+
+    public string SettingsPath()
+    {
+        return Path.Combine(Application.persistentDataPath, "Settings.json");
     }
 }
