@@ -55,6 +55,8 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
     private bool isAnyKey;
     private bool isAnyKeyUp;
 
+    private bool inputFieldHasFocusOld;
+
     public void Update()
     {
         // Detect isAnyKeyUp
@@ -69,8 +71,10 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             isAnyKeyUp = true;
         }
 
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        bool inputFieldHasFocus = GameObjectUtils.InputFieldHasFocus(eventSystem);
+        if (inputFieldHasFocus)
         {
+            inputFieldHasFocusOld = true;
             return;
         }
 
@@ -100,15 +104,17 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
             PlayAudioInRangeOfNotes(selectedNotes);
         }
 
-        // Stop via Escape
-        if (Input.GetKeyUp(KeyCode.Escape))
+        // Stop playback or return to SingScene via Escape
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (songAudioPlayer.IsPlaying)
             {
                 songAudioPlayer.PauseAudio();
             }
-            else
+            else if (!inputFieldHasFocusOld)
             {
+                // Special case: the Escape key in an InputField removes its focus on key down.
+                // Thus also check that in the previous frame no InputField was focused.
                 songEditorSceneController.ContinueToSingScene();
             }
         }
@@ -196,6 +202,8 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         // Use the shortcuts that are also used in the YASS song editor.
         UpdateInputForYassShortcuts(modifier);
+
+        inputFieldHasFocusOld = inputFieldHasFocus;
     }
 
     private void UpdateInputToChangeNoteType(EKeyboardModifier modifier)
