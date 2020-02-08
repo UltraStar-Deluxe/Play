@@ -27,6 +27,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
 
     public static readonly int midiStreamSampleRateHz = 44100;
 
+    [Range(0, 2)] // Piano 0, 1 or 2
     public int midiInstrument;
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
