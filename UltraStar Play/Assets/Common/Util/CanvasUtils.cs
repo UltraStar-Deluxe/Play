@@ -4,6 +4,11 @@ public static class CanvasUtils
 {
     public static Canvas FindCanvas()
     {
-        return GameObjectUtils.FindComponentWithTag<Canvas>("Canvas");
+        Canvas canvas = GameObjectUtils.FindComponentWithTag<Canvas>("Canvas");
+        if (canvas == null)
+        {
+            throw new UnityException("FindCanvas failed! Check tag of scene Canvas.");
+        }
+        return canvas;
     }
 }
