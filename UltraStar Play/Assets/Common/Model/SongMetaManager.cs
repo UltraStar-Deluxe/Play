@@ -101,8 +101,15 @@ public class SongMetaManager : MonoBehaviour
             List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
             foreach (string songDir in songDirs)
             {
-                List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
-                txtFiles.AddRange(txtFilesInSongDir);
+                try
+                {
+                    List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
+                    txtFiles.AddRange(txtFilesInSongDir);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
             SongsFound = txtFiles.Count;
             Debug.Log($"Found {SongsFound} songs in {songDirs.Count} configured song directories");
