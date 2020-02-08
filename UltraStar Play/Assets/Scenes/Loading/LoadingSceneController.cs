@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class LoadingSceneController : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class LoadingSceneController : MonoBehaviour
         // it might be useful to continue via button.
         if (Input.anyKeyDown)
         {
-            FinishScene();
+            StartCoroutine(FinishAfterDelay(2));
         }
     }
 
@@ -35,4 +36,10 @@ public class LoadingSceneController : MonoBehaviour
         SceneNavigator.Instance.LoadScene(EScene.MainScene);
     }
 
+    private IEnumerator FinishAfterDelay(float delay)
+    {
+        // Wait delay in case loading just didn't finish yet.
+        yield return new WaitForSeconds(delay);
+        FinishScene();
+    }
 }
