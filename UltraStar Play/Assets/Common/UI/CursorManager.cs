@@ -49,6 +49,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
     public Texture2D horizontalCursorTexture;
     public Texture2D verticalCursorTexture;
     public Texture2D grabCursorTexture;
+    public Texture2D musicNoteCursorTexture;
 
     void Start()
     {
@@ -60,6 +61,31 @@ public class CursorManager : MonoBehaviour, INeedInjection
     void Update()
     {
         UpdateCursorText();
+    }
+
+    public void SetCursor(ECursor cursor)
+    {
+        switch (cursor)
+        {
+            case ECursor.Default:
+                SetDefaultCursor();
+                break;
+            case ECursor.Grab:
+                SetCursorGrab();
+                break;
+            case ECursor.ArrowsLeftRight:
+                SetCursorHorizontal();
+                break;
+            case ECursor.ArrowsUpDown:
+                SetCursorVertical();
+                break;
+            case ECursor.MusicNote:
+                SetCursorMusicNote();
+                break;
+            default:
+                Debug.LogWarning("Unkown cursor: " + cursor);
+                break;
+        }
     }
 
     public void SetDefaultCursor()
@@ -82,6 +108,16 @@ public class CursorManager : MonoBehaviour, INeedInjection
         }
 
         Cursor.SetCursor(horizontalCursorTexture, cursorCenter, CursorMode.Auto);
+    }
+
+    public void SetCursorMusicNote()
+    {
+        if (!UseImageAsCursor())
+        {
+            return;
+        }
+
+        Cursor.SetCursor(musicNoteCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorVertical()

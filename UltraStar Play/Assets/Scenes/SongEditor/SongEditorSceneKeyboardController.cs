@@ -76,6 +76,16 @@ public class SongEditorSceneKeyboardController : MonoBehaviour, INeedInjection
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
 
+        // Jump to start / end of song, via Home (Pos1 on German keyboard) / End
+        if (Input.GetKeyUp(KeyCode.Home))
+        {
+            songAudioPlayer.PositionInSongInMillis = 0;
+        }
+        if (Input.GetKeyUp(KeyCode.End))
+        {
+            songAudioPlayer.PositionInSongInMillis = songAudioPlayer.DurationOfSongInMillis - 1;
+        }
+
         // Play / pause via Space or P
         bool isPlayPauseButtonUp = Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.P);
         if (isPlayPauseButtonUp && modifier == EKeyboardModifier.None)

@@ -14,6 +14,7 @@ public class SongEditorSettings
 
     public int MidiNoteVolume { get; set; } = 250;
     public bool MidiSoundPlayAlongEnabled { get; set; } = true;
+    public string MidiFilePath { get; set; } = "";
 
     // Option to show / hide voices.
     // Contains the names of the voices that should be hidden.
