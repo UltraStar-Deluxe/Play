@@ -79,51 +79,17 @@ public class SongMeta
         Encoding encoding
     )
     {
-        // C# 4.0 does not support the 'nameof' keyword, hence the strings
-        if (directory == null)
-        {
-            throw new ArgumentNullException("directory");
-        }
-        if (filename == null)
-        {
-            throw new ArgumentNullException("filename");
-        }
-        if (songHash == null)
-        {
-            throw new ArgumentNullException("songHash");
-        }
-        if (artist == null)
-        {
-            throw new ArgumentNullException("artist");
-        }
-        if (mp3 == null)
-        {
-            throw new ArgumentNullException("mp3");
-        }
-        if (title == null)
-        {
-            throw new ArgumentNullException("title");
-        }
-        if (voiceNames == null)
-        {
-            throw new ArgumentNullException("voiceNames");
-        }
-        if (encoding == null)
-        {
-            throw new ArgumentNullException("encoding");
-        }
+        Directory = directory ?? throw new ArgumentNullException("directory");
+        Filename = filename ?? throw new ArgumentNullException("filename");
+        SongHash = songHash ?? throw new ArgumentNullException("songHash");
 
-        Directory = directory;
-        Filename = filename;
-        SongHash = songHash;
-		
-        Artist = artist;
+        Artist = artist ?? throw new ArgumentNullException("artist");
         Bpm = bpm;
-        Mp3 = mp3;
-        Title = title;
+        Mp3 = mp3 ?? throw new ArgumentNullException("mp3");
+        Title = title ?? throw new ArgumentNullException("title");
 
-        this.voiceNames = voiceNames;
-        Encoding = encoding;
+        this.voiceNames = voiceNames ?? throw new ArgumentNullException("voiceNames");
+        Encoding = encoding ?? throw new ArgumentNullException("encoding");
 
         // set some defaults that we could not set otherwise
         Gap = 0;
