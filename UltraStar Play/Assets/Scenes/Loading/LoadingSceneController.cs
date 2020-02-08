@@ -5,6 +5,9 @@ public class LoadingSceneController : MonoBehaviour
 
     void Start()
     {
+        // Keep mobile devices from turning off the screen while the game is running.
+        Screen.sleepTimeout = (int)0f;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         // The settings are loaded on access.
         string jsonSettings = JsonConverter.ToJson(SettingsManager.Instance.Settings, true);
         Debug.Log("loaded settings:" + jsonSettings);
