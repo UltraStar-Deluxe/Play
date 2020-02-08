@@ -604,11 +604,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 472, y: 285.5, z: 0}
-  anchoredPosition: {x: 472, y: 285.5}
-  position: {x: 472, y: 285.5, z: 0}
-  sizeDelta: {x: 800.00006, y: 483.89832}
-  size: {x: 800.00006, y: 483.89832}
+  localPosition: {x: 472.5, y: 285, z: 0}
+  anchoredPosition: {x: 472.5, y: 285}
+  position: {x: 472.5, y: 285, z: 0}
+  sizeDelta: {x: 800, y: 482.5397}
+  size: {x: 800, y: 482.5397}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,7 +1603,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Me And My Broken Heart
+  defaultSongName: Summer Wine
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
@@ -1872,6 +1872,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8992703894111156196, guid: 526f667f64d4f6949a1aa2bbba7ef376,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}
