@@ -750,6 +750,8 @@ MonoBehaviour:
   verticalCursorTexture: {fileID: 2800000, guid: 545d8db5414f6d6448fc47349d599a76,
     type: 3}
   grabCursorTexture: {fileID: 2800000, guid: 428256a582aeb554e980f46c5db242f3, type: 3}
+  musicNoteCursorTexture: {fileID: 2800000, guid: a96fe1e3491d4304bbf63ba28e72caa6,
+    type: 3}
 --- !u!1 &3340714701814108809
 GameObject:
   m_ObjectHideFlags: 0
@@ -1680,6 +1682,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d973b629cee9ea644a4ec87bd50e2aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  midiInstrument: 1
+  gain: 1
 --- !u!82 &8801158838415278696
 AudioSource:
   m_ObjectHideFlags: 0

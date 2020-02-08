@@ -25,12 +25,14 @@ public class MidiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public int MidiInstrument { get; set; }
+    public static readonly int midiStreamSampleRateHz = 44100;
+
+    public int midiInstrument;
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
     private readonly string bankFilePath = "GM Bank - Piano/GM Bank - Piano";
     private readonly int bufferSize = 1024;
-    private readonly float gain = 1f;
+    public float gain = 1f;
 
     private int midiNoteVolume { get; set; }
 
@@ -58,7 +60,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        midiStreamSynthesizer = new StreamSynthesizer(44100, 2, bufferSize, 16);
+        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, 2, bufferSize, 16);
         sampleBuffer = new float[midiStreamSynthesizer.BufferSize];
 
         midiStreamSynthesizer.LoadBank(bankFilePath);
@@ -70,13 +72,13 @@ public class MidiManager : MonoBehaviour, INeedInjection
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, MidiInstrument);
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
     }
 
     public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, MidiInstrument);
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
         StartCoroutine(ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
@@ -90,6 +92,13 @@ public class MidiManager : MonoBehaviour, INeedInjection
     {
         InitIfNotDoneYet();
         midiStreamSynthesizer.NoteOffAll(immediate);
+    }
+
+    public MidiFile LoadMidiFile(string path)
+    {
+        InitIfNotDoneYet();
+        MidiFile midiFile = midiSequencer.LoadMidi(path, false);
+        return midiFile;
     }
 
     private IEnumerator ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
