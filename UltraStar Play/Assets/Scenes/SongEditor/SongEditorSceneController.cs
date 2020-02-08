@@ -274,7 +274,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         UiManager.Instance.CreateNotification("Created copy of original file");
     }
 
-    private void ContinueToSingScene()
+    public void ContinueToSingScene()
     {
         if (sceneData.PreviousSceneData is SingSceneData)
         {
