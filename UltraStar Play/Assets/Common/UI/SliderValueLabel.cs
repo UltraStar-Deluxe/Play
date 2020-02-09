@@ -6,6 +6,7 @@ using UniRx;
 public class SliderValueLabel : MonoBehaviour
 {
     public Slider slider;
+    public string formatString = "F2";
 
     private Text text;
 
@@ -16,7 +17,8 @@ public class SliderValueLabel : MonoBehaviour
 
     void Start()
     {
-        slider.OnValueChangedAsObservable().Subscribe(newValue => text.text = newValue.ToString("F2"));
+        slider.OnValueChangedAsObservable()
+            .Subscribe(newValue => text.text = newValue.ToString(formatString));
     }
 
 }
