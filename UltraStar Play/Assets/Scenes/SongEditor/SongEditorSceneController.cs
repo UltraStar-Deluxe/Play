@@ -62,6 +62,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     public SongEditorLayerManager songEditorLayerManager;
 
     [InjectedInInspector]
+    public SongEditorMidiFileImporter midiFileImporter;
+
+    [InjectedInInspector]
     public LyricsArea lyricsArea;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
@@ -116,6 +119,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(lyricsArea);
+        bb.BindExistingInstance(midiFileImporter);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }

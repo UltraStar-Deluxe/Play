@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
-public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public static readonly IComparer<EditorUiNote> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
@@ -34,11 +34,17 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     [InjectedInInspector]
     public RectTransform leftHandle;
 
+    [InjectedInInspector]
+    public Text pitchLabel;
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject]
+    private MidiManager midiManager;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -60,6 +66,8 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
 
     private EditorNoteLyricsInputField activeLyricsInputField;
 
+    private bool isPlayingMidiSound;
+
     public bool IsPointerOver { get; private set; }
     public bool IsPointerOverRightHandle { get; private set; }
     public bool IsPointerOverLeftHandle { get; private set; }
@@ -77,8 +85,9 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     {
         bool isSelected = selectionController.IsSelected(Note);
         goldenNoteImageOverlay.gameObject.SetActive(Note.IsGolden);
-        SetText(Note.Text);
+        SetLyrics(Note.Text);
         SetSelected(isSelected);
+        pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
             Color color = songEditorSceneController.GetColorForVoice(Note.Sentence.Voice);
@@ -127,6 +136,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         {
             OnPointerOverCenter();
         }
+
         UpdateHandles();
     }
 
@@ -135,7 +145,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         IsPointerOverCenter = true;
         IsPointerOverLeftHandle = false;
         IsPointerOverRightHandle = false;
-        cursorManager.SetCursorGrab();
+        SetCursorForGestureOrMusicNoteCursor(ECursor.Grab);
     }
 
     private void OnPointerOverRightHandle()
@@ -143,7 +153,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         IsPointerOverCenter = false;
         IsPointerOverLeftHandle = false;
         IsPointerOverRightHandle = true;
-        cursorManager.SetCursorHorizontal();
+        SetCursorForGestureOrMusicNoteCursor(ECursor.ArrowsLeftRight);
     }
 
     private void OnPointerOverLeftHandle()
@@ -151,7 +161,19 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         IsPointerOverCenter = false;
         IsPointerOverLeftHandle = true;
         IsPointerOverRightHandle = false;
-        cursorManager.SetCursorHorizontal();
+        SetCursorForGestureOrMusicNoteCursor(ECursor.ArrowsLeftRight);
+    }
+
+    private void SetCursorForGestureOrMusicNoteCursor(ECursor cursor)
+    {
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            // LeftControl is used to play midi sound, indicate this via a custom cursor.
+            cursorManager.SetCursorMusicNote();
+            return;
+        }
+
+        cursorManager.SetCursor(cursor);
     }
 
     private void UpdateHandles()
@@ -211,7 +233,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
                     selectionController.AddToSelection(this);
                 }
             }
-            else
+            else if (!Input.GetKey(KeyCode.LeftControl))
             {
                 // Move the playback position to the start of the note
                 double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
@@ -224,7 +246,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         }
     }
 
-    public void SetText(string newText)
+    public void SetLyrics(string newText)
     {
         switch (Note.Type)
         {
@@ -247,6 +269,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
     public void SetColor(Color color)
     {
         backgroundImage.color = color;
+        pitchLabel.color = color;
     }
 
     public void SetSelected(bool isSelected)
@@ -288,6 +311,25 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         IsPointerOverRightHandle = false;
         UpdateHandles();
         cursorManager.SetDefaultCursor();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        // Play midi sound via Ctrl
+        if (!isPlayingMidiSound && Input.GetKey(KeyCode.LeftControl))
+        {
+            isPlayingMidiSound = true;
+            midiManager.PlayMidiNote(Note.MidiNote);
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (isPlayingMidiSound)
+        {
+            midiManager.StopMidiNote(Note.MidiNote);
+            isPlayingMidiSound = false;
+        }
     }
 
     private class EditorUiNoteComparerByStartBeat : IComparer<EditorUiNote>
