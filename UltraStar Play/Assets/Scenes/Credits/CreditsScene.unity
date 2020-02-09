@@ -385,32 +385,32 @@ PrefabInstance:
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -1.9000001
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: -1.8000002
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.76943743
+      value: 0.7667002
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.118416645
+      value: 0.056896277
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -420,7 +420,7 @@ PrefabInstance:
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.21841665
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -436,6 +436,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: Back
+      objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -614,23 +619,32 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 10
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 25
+    m_MaxSize: 250
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'This project is developed as community effort on GitHub.
-
-
-    https://usplay.net
-
-    https://github.com/UltraStar-Deluxe/Play'
+  m_Text: "This project is developed as community effort on GitHub.\n\nhttps://usplay.net\nhttps://github.com/UltraStar-Deluxe/Play\n\nMIT
+    License\r\n\rCopyright (c) 2018 UltraStar Play contributors\r\r Permission is
+    hereby granted, free of charge, to any person obtaining a copy\r of this software
+    and associated documentation files (the \"Software\"), to deal\r in the Software
+    without restriction, including without limitation the rights\r to use, copy, modify,
+    merge, publish, distribute, sublicense, and/or sell\r copies of the Software,
+    and to permit persons to whom the Software is\r furnished to do so, subject to
+    the following conditions:\r The above copyright notice and this permission notice
+    shall be included in all\r copies or substantial portions of the Software.\r THE
+    SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\r IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\r FITNESS FOR
+    A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\r AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\r LIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\r SOFTWARE."
 --- !u!222 &699323124
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -807,10 +821,10 @@ RectTransform:
   m_Father: {fileID: 42735236}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.04031254, y: 0.29283333}
-  m_AnchorMax: {x: 0.9694374, y: 0.76383334}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.04031254, y: 0.18089628}
+  m_AnchorMax: {x: 0.9694374, y: 0.8107583}
+  m_AnchoredPosition: {x: 0, y: 0.5369997}
+  m_SizeDelta: {x: 0, y: -0.5249996}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &3622033094599101101
 PrefabInstance:
