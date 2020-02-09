@@ -242,6 +242,16 @@ PrefabInstance:
       propertyPath: manualRefresh
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 25.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 50.6
+      objectReference: {fileID: 0}
     - target: {fileID: 3741094789097670527, guid: 944788f8bb28747409508086974dbc8d,
         type: 3}
       propertyPath: renderOrder
@@ -525,8 +535,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.36841667}
   m_AnchorMax: {x: 1, y: 0.7889167}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 22.5}
+  m_SizeDelta: {x: 0, y: 45.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &261392374
 MonoBehaviour:
@@ -870,6 +880,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Center
       objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 33.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 66.6
+      objectReference: {fileID: 0}
     - target: {fileID: 3741094789097670527, guid: 944788f8bb28747409508086974dbc8d,
         type: 3}
       propertyPath: renderOrder
@@ -1081,8 +1101,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 308872951}
   m_HandleRect: {fileID: 308872950}
   m_Direction: 2
-  m_Value: 0.9999392
-  m_Size: 0.99815524
+  m_Value: 0.99990636
+  m_Size: 0.9981551
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1407,6 +1427,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RightRight
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 22.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 45.6
       objectReference: {fileID: 0}
     - target: {fileID: 3741094789097670527, guid: 944788f8bb28747409508086974dbc8d,
         type: 3}
@@ -1910,8 +1940,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 449308829}
   m_HandleRect: {fileID: 449308828}
   m_Direction: 2
-  m_Value: 0.9999392
-  m_Size: 0.99815524
+  m_Value: 0.99990636
+  m_Size: 0.9981551
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4783,6 +4813,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Right
       objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 48.1
+      objectReference: {fileID: 0}
     - target: {fileID: 3741094789097670527, guid: 944788f8bb28747409508086974dbc8d,
         type: 3}
       propertyPath: renderOrder
@@ -4961,6 +5001,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LeftLeft
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 25.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3296845390651403592, guid: 944788f8bb28747409508086974dbc8d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 50.6
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3296845389576685943, guid: 944788f8bb28747409508086974dbc8d, type: 3}
