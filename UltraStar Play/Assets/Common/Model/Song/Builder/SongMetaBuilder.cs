@@ -126,8 +126,6 @@ static class SongMetaBuilder
 
             //Hash the song file body
             string songHash = Hashing.Md5(Encoding.UTF8.GetBytes(songBody.ToString()));
-            // Debug.Log("Hash for " + requiredFields["title"] + " is " + songHash);
-
 
             try
             {

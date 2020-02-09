@@ -12,7 +12,6 @@ using UniRx;
 
 public class SongEditorMidiVolumeSlider : MonoBehaviour, INeedInjection
 {
-
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Slider slider;
 
