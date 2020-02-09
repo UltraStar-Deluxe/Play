@@ -35,7 +35,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
     private readonly int bufferSize = 1024;
     public float gain = 1f;
 
-    private int midiNoteVolume { get; set; }
+    private int midiNoteVolume;
 
     private float[] sampleBuffer;
     private MidiSequencer midiSequencer;
@@ -98,7 +98,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
     public MidiFile LoadMidiFile(string path)
     {
         InitIfNotDoneYet();
-        MidiFile midiFile = midiSequencer.LoadMidi(path, false);
+        MidiFile midiFile = midiSequencer.LoadMidiFromFile(path, false);
         return midiFile;
     }
 
