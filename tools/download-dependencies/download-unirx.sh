@@ -4,7 +4,7 @@ old_dir=$(pwd)
 
 cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old UniRx folder..."
-rm --recursive --force UniRx
+rm -rf UniRx
 mkdir UniRx
 cd UniRx
 
@@ -19,8 +19,8 @@ git pull --depth=100 origin master
 git checkout 66205df49631860dd8f7c3314cb518b54c944d30
 
 echo "Moving downloaded files to correct position for this project..."
-mv --verbose Assets/Plugins/UniRx/* ./
-rm --recursive ./Assets
+mv -v Assets/Plugins/UniRx/* ./
+rm -rf ./Assets
 
 cd "$old_dir"
 echo "Downloading UniRx done"

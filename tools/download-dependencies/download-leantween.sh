@@ -4,7 +4,7 @@ old_dir=$(pwd)
 
 cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old LeanTween folder..."
-rm --recursive --force LeanTween
+rm -rf LeanTween
 mkdir LeanTween
 cd LeanTween
 
@@ -22,8 +22,8 @@ git pull --depth=100 origin master
 git checkout f387a18039f1eae62ab3e0a706c3e1002a4dcb22
 
 echo "Moving downloaded files to correct position for this project..."
-mv --verbose ./Assets/LeanTween/* ./
-rm --recursive ./Assets
+mv -v ./Assets/LeanTween/* ./
+rm -rf ./Assets
 
 cd "$old_dir"
 echo "Downloading LeanTween done"
