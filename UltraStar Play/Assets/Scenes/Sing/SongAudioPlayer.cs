@@ -14,6 +14,24 @@ public class SongAudioPlayer : MonoBehaviour
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
+    private readonly Subject<double> playbackStoppedEventStream = new Subject<double>();
+    public ISubject<double> PlaybackStoppedEventStream
+    {
+        get
+        {
+            return playbackStoppedEventStream;
+        }
+    }
+
+    private readonly Subject<double> playbackStartedEventStream = new Subject<double>();
+    public ISubject<double> PlaybackStartedEventStream
+    {
+        get
+        {
+            return playbackStartedEventStream;
+        }
+    }
+
     private readonly Subject<double> positionInSongEventStream = new Subject<double>();
     public ISubject<double> PositionInSongEventStream
     {
@@ -210,11 +228,19 @@ public class SongAudioPlayer : MonoBehaviour
 
     public void PauseAudio()
     {
-        audioPlayer.Pause();
+        if (audioPlayer.isPlaying)
+        {
+            audioPlayer.Pause();
+            playbackStoppedEventStream.OnNext(PositionInSongInMillis);
+        }
     }
 
     public void PlayAudio()
     {
-        audioPlayer.Play();
+        if (!audioPlayer.isPlaying)
+        {
+            audioPlayer.Play();
+            playbackStartedEventStream.OnNext(PositionInSongInMillis);
+        }
     }
 }
