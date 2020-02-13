@@ -3318,6 +3318,8 @@ MonoBehaviour:
   beatLabelContainer: {fileID: 733958123}
   secondLabelContainer: {fileID: 1480703286}
   verticalGridImage: {fileID: 100813849}
+  lineNormalColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  lineHighlightColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &488892132
 GameObject:
   m_ObjectHideFlags: 0
@@ -14182,6 +14184,8 @@ MonoBehaviour:
     type: 3}
   labelContainer: {fileID: 1852141735}
   horizontalGridImage: {fileID: 1222784604}
+  lineNormalColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  lineHighlightColor: {r: 1, g: 1, b: 1, a: 0.75}
 --- !u!1 &1965697891
 GameObject:
   m_ObjectHideFlags: 0
