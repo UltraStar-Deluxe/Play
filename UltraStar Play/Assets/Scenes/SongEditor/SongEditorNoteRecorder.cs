@@ -48,41 +48,42 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     private Note lastRecordedNote;
 
     private bool hasRecordedNotes;
-    private bool lastIsPlaying;
 
     void Start()
     {
         microphonePitchTracker.MicProfile = settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
 
-        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource)
-            .Subscribe(OnNoteRecordingSourceChanged);
-        songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying)
-            .Subscribe(OnSongIsPlayingChanged);
-        songAudioPlayer.JumpBackInSongEventStream
-            .Subscribe(OnJumpedBackInSong);
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource).Subscribe(OnNoteRecordingSourceChanged);
+        songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying).Subscribe(OnSongIsPlayingChanged);
+        songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
+        songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
         microphonePitchTracker.PitchEventStream
             .Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
+    }
+
+    private void OnPlaybackStopped(double positionInSongInMillis)
+    {
+        if (hasRecordedNotes)
+        {
+            historyManager.AddUndoState();
+        }
+    }
+
+    private void OnPlaybackStarted(double positionInSongInMillis)
+    {
+        hasRecordedNotes = false;
+        lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
+        upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
     }
 
     void Update()
     {
         if (songAudioPlayer.IsPlaying)
         {
-            if (!lastIsPlaying)
-            {
-                hasRecordedNotes = false;
-                lastPitchDetectedBeat = GetCurrentBeat(songAudioPlayer.PositionInSongInMillis);
-                upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
-            }
-
             UpdateRecordingViaButtonClick();
         }
-        else if (lastIsPlaying && hasRecordedNotes)
-        {
-            historyManager.AddUndoState();
-        }
-        lastIsPlaying = songAudioPlayer.IsPlaying;
     }
 
     private void OnJumpedBackInSong(Pair<double> previousAndNewPositionInMillis)
