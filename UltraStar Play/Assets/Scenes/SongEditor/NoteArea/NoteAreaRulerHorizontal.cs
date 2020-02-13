@@ -22,6 +22,9 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
     [InjectedInInspector]
     public DynamicallyCreatedImage verticalGridImage;
 
+    public Color lineNormalColor = Color.gray;
+    public Color lineHighlightColor = Color.white;
+
     [Inject(searchMethod = SearchMethods.GetComponentInParent)]
     private NoteArea noteArea;
 
@@ -87,13 +90,13 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
             {
-                DrawVerticalGridLine(beatPosInMillis, Color.white);
+                DrawVerticalGridLine(beatPosInMillis, lineHighlightColor);
             }
 
             bool hasFineLine = drawStepFine > 0 && (beat % drawStepFine == 0);
             if (hasFineLine && !hasRoughLine)
             {
-                DrawVerticalGridLine(beatPosInMillis, Color.gray);
+                DrawVerticalGridLine(beatPosInMillis, lineNormalColor);
             }
         }
 
