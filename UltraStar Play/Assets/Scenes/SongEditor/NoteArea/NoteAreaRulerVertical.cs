@@ -18,6 +18,9 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
     [InjectedInInspector]
     public DynamicallyCreatedImage horizontalGridImage;
 
+    public Color lineNormalColor = Color.gray;
+    public Color lineHighlightColor = Color.white;
+
     [Inject(searchMethod = SearchMethods.GetComponentInParent)]
     private readonly NoteArea noteArea;
 
@@ -52,7 +55,8 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
             bool hasLine = (midiNote % 2 == 0);
             if (hasLine)
             {
-                DrawHorizontalGridLine(midiNote, Color.white);
+                Color color = (MidiUtils.GetRelativePitch(midiNote) == 0) ? lineHighlightColor : lineNormalColor;
+                DrawHorizontalGridLine(midiNote, color);
             }
         }
 
