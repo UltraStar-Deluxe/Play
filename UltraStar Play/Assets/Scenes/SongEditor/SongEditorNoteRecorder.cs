@@ -41,7 +41,10 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
+    private List<Note> upcomingSortedRecordedNotes = new List<Note>();
+
     private int lastPitchDetectedFrame;
+    private int lastPitchDetectedBeat;
     private Note lastRecordedNote;
 
     private bool hasRecordedNotes;
@@ -55,6 +58,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             .Subscribe(OnNoteRecordingSourceChanged);
         songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying)
             .Subscribe(OnSongIsPlayingChanged);
+        songAudioPlayer.JumpBackInSongEventStream
+            .Subscribe(OnJumpedBackInSong);
 
         microphonePitchTracker.PitchEventStream
             .Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
@@ -67,6 +72,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             if (!lastIsPlaying)
             {
                 hasRecordedNotes = false;
+                lastPitchDetectedBeat = GetCurrentBeat(songAudioPlayer.PositionInSongInMillis);
+                upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
             }
 
             UpdateRecordingViaButtonClick();
@@ -78,20 +85,43 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         lastIsPlaying = songAudioPlayer.IsPlaying;
     }
 
+    private void OnJumpedBackInSong(Pair<double> previousAndNewPositionInMillis)
+    {
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, previousAndNewPositionInMillis.Current);
+        lastPitchDetectedBeat = currentBeat;
+        upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
+    }
+
     private void UpdateRecordingViaButtonClick()
     {
         // Record notes via button click.
         bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
-        if (keyboardButtonRecordingEnabled && Input.GetKey(KeyCode.F8))
+        if (keyboardButtonRecordingEnabled)
         {
-            RecordNote(EditorSettings.MidiNoteForButtonRecording, songAudioPlayer.PositionInSongInMillis, ESongEditorLayer.ButtonRecording);
+            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+            if (Input.GetKey(KeyCode.F8))
+            {
+                RecordNote(EditorSettings.MidiNoteForButtonRecording, positionInSongInMillis, ESongEditorLayer.ButtonRecording);
+            }
+            else
+            {
+                lastRecordedNote = null;
+                // The pitch is always detected (either the keyboard is down or not).
+                lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
+            }
         }
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
-        if (pitchEvent == null || lastPitchDetectedFrame == Time.frameCount)
+        if (lastPitchDetectedFrame == Time.frameCount)
         {
+            return;
+        }
+
+        if (pitchEvent == null)
+        {
+            lastRecordedNote = null;
             return;
         }
 
@@ -102,13 +132,20 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void RecordNote(int midiNote, double positionInSongInMillis, ESongEditorLayer targetLayer)
     {
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        int currentBeat = GetCurrentBeat(positionInSongInMillis);
+        if (currentBeat <= lastPitchDetectedBeat)
+        {
+            return;
+        }
 
         if (lastRecordedNote != null
-            && lastRecordedNote.MidiNote == midiNote
-            && lastPitchDetectedFrame == Time.frameCount - 1)
+            && lastRecordedNote.MidiNote == midiNote)
         {
-            ContinueLastRecordedNote(currentBeat);
+            // Also fire the event for any skipped beats (e.g. because of low frame-rate)
+            for (int beat = lastPitchDetectedBeat; beat <= currentBeat; beat++)
+            {
+                ContinueLastRecordedNote(beat, targetLayer);
+            }
         }
         else
         {
@@ -118,7 +155,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         editorNoteDisplayer.UpdateNotes();
 
         lastPitchDetectedFrame = Time.frameCount;
-
+        lastPitchDetectedBeat = currentBeat;
         hasRecordedNotes = true;
     }
 
@@ -126,13 +163,67 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         lastRecordedNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, " ");
         songEditorLayerManager.AddNoteToLayer(targetLayer, lastRecordedNote);
+
+        // EndBeat of new note is currentBeat + 1. Overwrite notes that start before this beat.
+        OverwriteExistingNotes(currentBeat + 1, targetLayer);
     }
 
-    private void ContinueLastRecordedNote(int currentBeat)
+    private void ContinueLastRecordedNote(int currentBeat, ESongEditorLayer targetLayer)
     {
         if (currentBeat > lastRecordedNote.EndBeat)
         {
             lastRecordedNote.SetEndBeat(currentBeat);
+
+            // EndBeat of extended note is currentBeat. Overwrite notes that start before this beat.
+            OverwriteExistingNotes(currentBeat, targetLayer);
+        }
+    }
+
+    private void OverwriteExistingNotes(int currentBeat, ESongEditorLayer targetLayer)
+    {
+        // Move the start beat of existing notes behind the given beat.
+        // If afterwards no length would be left (or negative), then remove the note completely.
+        List<Note> overlappingNotes = new List<Note>();
+        int behindNoteCount = 0;
+        foreach (Note upcomingNote in upcomingSortedRecordedNotes)
+        {
+            // Do not shorten the note that is currently beeing recorded.
+            if (upcomingNote == lastRecordedNote)
+            {
+                continue;
+            }
+
+            if (upcomingNote.StartBeat < currentBeat && currentBeat <= upcomingNote.EndBeat)
+            {
+                overlappingNotes.Add(upcomingNote);
+            }
+            else if (upcomingNote.EndBeat < currentBeat)
+            {
+                // The position is behind the note, thus this note is not 'upcoming' anymore.
+                behindNoteCount++;
+            }
+            else if (upcomingNote.EndBeat > currentBeat)
+            {
+                // The list is sorted, thus the other notes in the list will also not overlap with the currentBeat.
+                break;
+            }
+        }
+        if (behindNoteCount > 0)
+        {
+            upcomingSortedRecordedNotes.RemoveRange(0, behindNoteCount);
+        }
+
+        foreach (Note note in overlappingNotes)
+        {
+            if (note.EndBeat > currentBeat)
+            {
+                note.SetStartBeat(currentBeat);
+            }
+            else
+            {
+                songEditorLayerManager.RemoveNoteFromAllLayers(note);
+                editorNoteDisplayer.DeleteNote(note);
+            }
         }
     }
 
@@ -160,5 +251,33 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         {
             microphonePitchTracker.StartPitchDetection();
         }
+    }
+
+    private List<Note> GetUpcomingSortedRecordedNotes()
+    {
+        int currentBeat = GetCurrentBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
+        ESongEditorLayer targetLayer = GetRecordingTargetLayer();
+        List<Note> result = songEditorLayerManager.GetNotes(targetLayer).Where(note => (note.StartBeat >= currentBeat)).ToList();
+        result.Sort(Note.comparerByStartBeat);
+        return result;
+    }
+
+    private ESongEditorLayer GetRecordingTargetLayer()
+    {
+        switch (settings.SongEditorSettings.RecordingSource)
+        {
+            case ESongEditorRecordingSource.KeyboardButton_F8:
+                return ESongEditorLayer.ButtonRecording;
+            case ESongEditorRecordingSource.Microphone:
+                return ESongEditorLayer.MicRecording;
+            default:
+                return ESongEditorLayer.ButtonRecording;
+        }
+    }
+
+    private int GetCurrentBeat(double positionInSongInMillis)
+    {
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        return currentBeat;
     }
 }

@@ -23,6 +23,22 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    public IObservable<Pair<double>> JumpBackInSongEventStream
+    {
+        get
+        {
+            return positionInSongEventStream.Pairwise().Where(pair => pair.Previous > pair.Current);
+        }
+    }
+
+    public IObservable<Pair<double>> JumpForwardInSongEventStream
+    {
+        get
+        {
+            return positionInSongEventStream.Pairwise().Where(pair => pair.Previous < pair.Current);
+        }
+    }
+
     // The current position in the song in milliseconds.
     private double positionInSongInMillis;
     public double PositionInSongInMillis
