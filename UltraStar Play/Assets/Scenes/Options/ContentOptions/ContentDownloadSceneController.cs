@@ -22,16 +22,6 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
     public Text downloadPath;
     public Text fileSize;
 
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
-
     public void StartDownload()
     {
         StartCoroutine(DownloadFile(downloadPath.text, PersistentTempPath()));
@@ -92,7 +82,6 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private IEnumerator TrackProgress(UnityWebRequest req, string tarPath)
     {
-        string url = req.uri.ToString();
         while (true)
         {
             try
@@ -111,7 +100,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
             yield return new WaitForSeconds(0.1f);
         }
         statusLabel.text = "100%";
-        unpackTar(tarPath, url);
+        UnpackTar(tarPath);
     }
 
     private void AddToLog(string message)
@@ -145,7 +134,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
         yield return null;
     }
 
-    private void unpackTar(string tarPath, string uri)
+    private void UnpackTar(string tarPath)
     {
         if (!File.Exists(tarPath))
         {
