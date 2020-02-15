@@ -75,6 +75,12 @@ public class UiManager : MonoBehaviour, INeedInjection
         return notification;
     }
 
+    public Notification CreateNotification(string message, Color color)
+    {
+        string hexColor = ColorUtility.ToHtmlStringRGB(color);
+        return CreateNotification($"<color=\"#{hexColor}\">{message}</color>");
+    }
+
     private void FindCanvas()
     {
         if (canvas == null)

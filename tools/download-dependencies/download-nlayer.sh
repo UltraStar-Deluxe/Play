@@ -4,7 +4,7 @@ old_dir=$(pwd)
 
 cd "../../UltraStar Play/Assets/Plugins"
 echo "Removing old NLayer folder..."
-rm --recursive --force NLayer
+rm -rf NLayer
 mkdir NLayer
 cd NLayer
 
@@ -18,8 +18,8 @@ git pull --depth=100 origin master
 git checkout 51ca3ec1304f0e2bbaa3cadca69013f4af8ae6f1
 
 echo "Moving downloaded files to correct position for this project..."
-mv --verbose NLayer/* ./
-rm --recursive ./NLayer
+mv -v NLayer/* ./
+rm -rf ./NLayer
 
 cd "$old_dir"
 echo "Downloading NLayer done"

@@ -60,7 +60,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         if (!IsOnlyWhitespace(newText))
         {
             uiEditorNote.Note.SetText(newText);
-            uiEditorNote.SetText(newText);
+            uiEditorNote.SetLyrics(newText);
 
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
         }
