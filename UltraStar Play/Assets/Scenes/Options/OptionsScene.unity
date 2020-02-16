@@ -277,6 +277,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Game
       objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: manualRefresh
@@ -816,6 +821,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Player Profiles
       objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: manualRefresh
@@ -993,6 +1003,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Sound
       objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: manualRefresh
@@ -1169,6 +1184,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: Recording
+      objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -1453,6 +1473,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Graphics
       objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: manualRefresh
@@ -1736,17 +1761,17 @@ PrefabInstance:
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 2.9
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0.000061035156
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 5.7
       objectReference: {fileID: 0}
     - target: {fileID: 5124115183525111805, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -1782,6 +1807,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: Back
+      objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
