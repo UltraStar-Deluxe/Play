@@ -39,8 +39,30 @@ public class LyricsDisplayer : MonoBehaviour
             return "";
         }
 
-        IEnumerable<string> noteTexts = sentence.Notes.Select(it => it.Text);
-        string joinedNoteTexts = string.Join("", noteTexts);
-        return joinedNoteTexts;
+        string result = "";
+        foreach (Note note in sentence.Notes)
+        {
+            if (IsItalicDisplayText(note.Type))
+            {
+                result += $"<i>{note.Text}</i>";
+            }
+            else
+            {
+                result += note.Text;
+            }
+        }
+        return result;
+    }
+
+    private bool IsItalicDisplayText(ENoteType type)
+    {
+        switch (type)
+        {
+            case ENoteType.Freestyle:
+            case ENoteType.Rap:
+            case ENoteType.RapGolden:
+                return true;
+        }
+        return false;
     }
 }

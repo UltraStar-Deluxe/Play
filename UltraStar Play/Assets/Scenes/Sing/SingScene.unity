@@ -604,11 +604,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 472.5, y: 285, z: 0}
-  anchoredPosition: {x: 472.5, y: 285}
-  position: {x: 472.5, y: 285, z: 0}
-  sizeDelta: {x: 800, y: 482.5397}
-  size: {x: 800, y: 482.5397}
+  localPosition: {x: 475, y: 274, z: 0}
+  anchoredPosition: {x: 475, y: 274}
+  position: {x: 475, y: 274, z: 0}
+  sizeDelta: {x: 800, y: 461.4737}
+  size: {x: 800, y: 461.4737}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,7 +1603,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c11810cb9527c047beda7fd4b488be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Summer Wine
+  defaultSongName: Hakuna matata
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
@@ -1612,7 +1612,9 @@ MonoBehaviour:
 
     Somewhere Over The Rainbow (Wonderful World)
 
-    Marry You'
+    Marry You
+
+    Hakuna matata'
   pauseOverlay: {fileID: 1219814411}
   playerControllerPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
