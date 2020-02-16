@@ -2,27 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
 
 public class UiNote : MonoBehaviour
 {
+    [InjectedInInspector]
     public StarParticle goldenStarPrefab;
+
+    [InjectedInInspector]
     public StarParticle perfectStarPrefab;
 
-    private RectTransform rectTransform;
+    [InjectedInInspector]
+    public Image image;
 
     public Note Note { get; set; }
     public bool isGolden;
 
     private RectTransform uiEffectsContainer;
 
-    private readonly List<StarParticle> stars = new List<StarParticle>();
+    private RectTransform rectTransform;
 
-    private Image image;
+    private readonly List<StarParticle> stars = new List<StarParticle>();
 
     public void Init(Note note, RectTransform uiEffectsContainer)
     {
-        image = GetComponentInChildren<Image>();
-
         this.Note = note;
         this.isGolden = note.IsGolden;
         this.uiEffectsContainer = uiEffectsContainer;
