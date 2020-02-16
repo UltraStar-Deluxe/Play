@@ -73,7 +73,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
             else
             {
                 statusLabel.text = "100%";
-                AddToLog($"Download saved to: {targetPath}\r\n{request.error}");
+                AddToLog($"Download saved to {targetPath}. {request.error}");
             }
         }
 
@@ -105,7 +105,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private void AddToLog(string message)
     {
-        logText.text = message + "\r\n" + logText.text;
+        logText.text = message + "\n" + logText.text;
     }
 
     public void UpdateFileSize()
