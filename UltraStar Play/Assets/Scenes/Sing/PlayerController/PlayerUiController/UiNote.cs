@@ -54,6 +54,16 @@ public class UiNote : MonoBehaviour
     public void SetColorOfMicProfile(MicProfile micProfile)
     {
         image.color = micProfile.Color;
+
+        // Make freestyle and rap notes transparent
+        switch (Note.Type)
+        {
+            case ENoteType.Freestyle:
+            case ENoteType.Rap:
+            case ENoteType.RapGolden:
+                image.SetAlpha(0.3f);
+                break;
+        }
     }
 
     private void RemoveDestroyedStarsFromList()
