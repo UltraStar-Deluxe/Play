@@ -53,7 +53,9 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            return positionInSongEventStream.Pairwise().Where(pair => pair.Previous < pair.Current);
+            // The position will increase in normal playback. A big increase however, can be considered as "jump".
+            int minOffsetInMillis = 200;
+            return positionInSongEventStream.Pairwise().Where(pair => (pair.Previous + minOffsetInMillis) < pair.Current);
         }
     }
 
