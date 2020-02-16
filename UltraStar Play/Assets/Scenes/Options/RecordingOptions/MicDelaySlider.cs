@@ -12,7 +12,7 @@ public class MicDelaySlider : TextItemSlider<int>
         base.Awake();
 
         List<int> values = new List<int>();
-        for (int value = 0; value <= 500; value += 10)
+        for (int value = 0; value <= 500; value += 1)
         {
             values.Add(value);
         }
