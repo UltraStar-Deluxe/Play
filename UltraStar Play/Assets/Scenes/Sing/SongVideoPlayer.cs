@@ -4,6 +4,7 @@ using UniInject;
 using UnityEngine.Video;
 using System.IO;
 using UnityEngine.UI;
+using UniRx;
 
 public class SongVideoPlayer : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class SongVideoPlayer : MonoBehaviour
     {
         this.SongMeta = songMeta;
         this.SongAudioPlayer = songAudioPlayer;
+        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
+        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
         InitVideo(songMeta);
     }
 
@@ -38,7 +41,7 @@ public class SongVideoPlayer : MonoBehaviour
     {
         if (SongAudioPlayer != null)
         {
-            SynchVideoWithMusic(SongAudioPlayer);
+            SyncVideoWithMusic(false);
         }
         else
         {
@@ -71,12 +74,12 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
-    private void SynchVideoWithMusic(SongAudioPlayer songAudioPlayer)
+    private void SyncVideoWithMusic(bool forceImmediateSync)
     {
-        SyncVideoPlayPause(songAudioPlayer.PositionInSongInMillis);
-        if (videoPlayer.isPlaying)
+        SyncVideoPlayPause(SongAudioPlayer.PositionInSongInMillis);
+        if (videoPlayer.isPlaying || forceImmediateSync)
         {
-            SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis);
+            SyncVideoWithMusic(SongAudioPlayer.PositionInSongInMillis, forceImmediateSync);
         }
     }
 
@@ -115,9 +118,10 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
-    public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync = false)
+    public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync)
     {
-        if (!hasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis) || nextSyncTimeInSeconds > Time.time)
+        if (!hasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis)
+            || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time))
         {
             return;
         }

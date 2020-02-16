@@ -3795,10 +3795,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Summer Wine
+  defaultSongName: My Immortal
   defaultSongNamePasteBin: 'Summer Wine
 
-    EmptyTitle'
+    EmptyTitle
+
+    My Immortal'
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 8406949}
   songEditorNoteRecorder: {fileID: 1231934095}
