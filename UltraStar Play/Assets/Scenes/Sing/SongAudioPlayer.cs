@@ -99,7 +99,7 @@ public class SongAudioPlayer : MonoBehaviour
             }
 
             positionInSongInMillis = newPositionInSongInMillis;
-            int newTimeSamples = (int)((positionInSongInMillis / 1000.0) * audioPlayer.clip.frequency);
+            int newTimeSamples = (int)(audioPlayer.clip.frequency * positionInSongInMillis / 1000.0);
             audioPlayer.timeSamples = newTimeSamples;
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
