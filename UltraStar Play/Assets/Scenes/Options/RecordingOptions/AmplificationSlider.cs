@@ -22,7 +22,7 @@ public class AmplificationSlider : TextItemSlider<int>
             disposable.Dispose();
         }
 
-        Selection.Value = Items.Where(it => it == micProfile.Amplification).First();
+        Selection.Value = Items.Where(it => it == micProfile.Amplification).FirstOrDefault().OrIfNull(0);
         disposable = Selection.Subscribe(newValue => micProfile.Amplification = newValue);
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniInject;
+using System.Linq;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -151,7 +152,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void HandleRecordedNoteStarted(int midiNote, double currentBeat)
     {
-        Sentence currentSentence = playerController.CurrentSentence;
+        Sentence currentSentence = playerController.GetSentenceForBeat(currentBeat);
 
         // Only accept recorded notes where a note is expected in the song
         Note noteAtCurrentBeat = GetNoteAtBeat(currentSentence, currentBeat);
