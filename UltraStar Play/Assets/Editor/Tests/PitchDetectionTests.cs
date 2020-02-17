@@ -11,7 +11,7 @@ public class PitchDetectionTests
         MicProfile micProfile = CreateDummyMicProfile();
 
         string assetsPath = Application.dataPath;
-        string sineWaveToneDir = assetsPath + "/Editor/Tests/SineWaveTones/";
+        string sineWaveToneDir = assetsPath + "/Common/Audio/SineWaveTones/";
         Dictionary<string, string> pathToExpectedMidiNoteNameMap = new Dictionary<string, string>();
         pathToExpectedMidiNoteNameMap.Add(sineWaveToneDir + "sine-wave-a3-220hz.ogg", "A3");
         pathToExpectedMidiNoteNameMap.Add(sineWaveToneDir + "sine-wave-a4-440hz.ogg", "A4");
