@@ -13,23 +13,10 @@ public static class ImageExtensions
     public static void MultiplyColor(this Image image, float factor, bool includeAlpha = false)
     {
         Color lastColor = image.color;
-        float newR = Limit(lastColor.r * factor, 0, 1);
-        float newG = Limit(lastColor.g * factor, 0, 1);
-        float newB = Limit(lastColor.b * factor, 0, 1);
-        float newAlpha = includeAlpha ? Limit(lastColor.a * factor, 0, 1) : lastColor.a;
+        float newR = NumberUtils.Limit(lastColor.r * factor, 0, 1);
+        float newG = NumberUtils.Limit(lastColor.g * factor, 0, 1);
+        float newB = NumberUtils.Limit(lastColor.b * factor, 0, 1);
+        float newAlpha = includeAlpha ? NumberUtils.Limit(lastColor.a * factor, 0, 1) : lastColor.a;
         image.color = new Color(newR, newG, newB, newAlpha);
-    }
-
-    private static float Limit(float value, float min, float max)
-    {
-        if (value < min)
-        {
-            return min;
-        }
-        if (value > max)
-        {
-            return max;
-        }
-        return value;
     }
 }
