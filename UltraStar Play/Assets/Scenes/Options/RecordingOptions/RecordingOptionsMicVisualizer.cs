@@ -13,6 +13,10 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
 
+    private float micAmplifyMultiplier = 1;
+
+    private IDisposable disposable;
+
     void Awake()
     {
         audioWaveFormVisualizer = GetComponentInChildren<AudioWaveFormVisualizer>();
@@ -25,8 +29,26 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     private void UpdateWaveForm()
     {
+        MicProfile micProfile = microphonePitchTracker.MicProfile;
+        if (micProfile == null)
+        {
+            return;
+        }
+
         float[] micData = microphonePitchTracker.MicData;
-        audioWaveFormVisualizer.DrawWaveFormValues(micData, micData.Length - 2048, 2048);
+
+        // Apply noise suppression and amplification to the buffer
+        float[] displayData = new float[micData.Length];
+        float noiseThreshold = micProfile.NoiseSuppression / 100f;
+        if (micData.AnyMatch(sample => sample >= noiseThreshold))
+        {
+            for (int i = 0; i < micData.Length; i++)
+            {
+                displayData[i] = NumberUtils.Limit(micData[i] * micAmplifyMultiplier, -1, 1);
+            }
+        }
+
+        audioWaveFormVisualizer.DrawWaveFormValues(displayData, micData.Length - 4048, 4048);
     }
 
     public void SetMicProfile(MicProfile micProfile)
@@ -36,6 +58,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         {
             microphonePitchTracker.StartPitchDetection();
         }
+        micAmplifyMultiplier = micProfile.AmplificationMultiplier();
+
+        if (disposable != null)
+        {
+            disposable.Dispose();
+        }
+        disposable = micProfile.ObserveEveryValueChanged(it => it.Amplification)
+            .Subscribe(newAmplification => micAmplifyMultiplier = micProfile.AmplificationMultiplier());
     }
 
     void OnEnable()
