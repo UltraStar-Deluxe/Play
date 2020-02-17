@@ -15,17 +15,21 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public MicrophonePitchTracker micPitchTracker;
 
+    [InjectedInInspector]
+    public MicDelayNumberSpinner micDelaySpinner;
+
     [Inject]
-    private MidiManager midiManager;
+    private UiManager uiManager;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
-    [Inject(searchMethod = SearchMethods.FindObjectOfType)]
-    private MicDelaySlider micDelaySlider;
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private AudioSource audioSource;
 
-    // C3 = 48, C4 = 60, C5 = 72
-    private int[] midiNotes = new int[] { 48, 60, 72 };
+    // The audio clips and midi notes that are played for calibration.
+    public List<AudioClip> audioClips;
+    public List<string> midiNoteNames;
 
     private bool isCalibrationInProgress;
 
@@ -37,6 +41,23 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
     private int currentIteration;
 
     public MicProfile MicProfile { get; set; }
+
+    void Awake()
+    {
+        // Sanity check
+        if (midiNoteNames.Count == 0)
+        {
+            throw new UnityException("midiNoteNames not set");
+        }
+        if (audioClips.Count == 0)
+        {
+            throw new UnityException("audioClips not set");
+        }
+        if (audioClips.Count != midiNoteNames.Count)
+        {
+            throw new UnityException("audioClips and midiNotes must have same length");
+        }
+    }
 
     void Start()
     {
@@ -82,28 +103,30 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
 
     private void OnCalibrationTimedOut()
     {
-        Debug.Log("Mic delay calibration timed out");
-        midiManager.StopAllMidiNotes();
+        Debug.Log("Mic delay calibration - timeout");
+        uiManager.CreateNotification("Calibration timed out", Colors.red);
+        audioSource.Stop();
         isCalibrationInProgress = false;
     }
 
     private void OnEndCalibration()
     {
-        Debug.Log($"avg delay of {delaysInMillis.Count} values: {delaysInMillis.Average()}");
-        midiManager.StopAllMidiNotes();
+        Debug.Log($"Mic delay calibration - avg delay of {delaysInMillis.Count} values: {delaysInMillis.Average()}");
+        audioSource.Stop();
         isCalibrationInProgress = false;
 
         if (MicProfile != null)
         {
             MicProfile.DelayInMillis = (int)delaysInMillis.Average();
-            micDelaySlider.SetMicProfile(MicProfile);
+            micDelaySpinner.SetMicProfile(MicProfile);
         }
     }
 
     private void StartIteration()
     {
         startTimeInSeconds = Time.time;
-        midiManager.PlayMidiNote(midiNotes[currentIteration]);
+        audioSource.clip = audioClips[currentIteration];
+        audioSource.Play();
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
@@ -113,17 +136,17 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (Math.Abs(pitchEvent.MidiNote - midiNotes[currentIteration]) < 4)
+        string targetMidiNoteName = midiNoteNames[currentIteration];
+        if (MidiUtils.GetAbsoluteName(pitchEvent.MidiNote) == targetMidiNoteName)
         {
-            midiManager.StopAllMidiNotes();
+            audioSource.Stop();
             float delayInSeconds = Time.time - startTimeInSeconds;
             int delayInMillis = (int)(delayInSeconds * 1000);
             delaysInMillis.Add(delayInMillis);
-            Debug.Log($"delay of iteration {currentIteration}: {delayInMillis}");
+            Debug.Log($"Mic delay calibration - delay of iteration {currentIteration}: {delayInMillis}");
 
             currentIteration++;
-            Debug.Log($"iter: {currentIteration}, length: {midiNotes.Length}");
-            if (currentIteration >= midiNotes.Length)
+            if (currentIteration >= midiNoteNames.Count)
             {
                 OnEndCalibration();
             }
@@ -135,7 +158,7 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.Log("Wrong pitch: " + pitchEvent.MidiNote);
+            Debug.Log("Mic delay calibration - wrong pitch: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
         }
     }
 }

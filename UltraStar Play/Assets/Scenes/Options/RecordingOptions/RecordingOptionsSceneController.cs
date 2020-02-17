@@ -10,7 +10,7 @@ public class RecordingOptionsSceneController : MonoBehaviour
     public RecordingDeviceSlider recordingDeviceSlider;
     public AmplificationSlider amplificationSlider;
     public NoiseSuppressionSlider noiseSuppressionSlider;
-    public MicDelaySlider delaySlider;
+    public MicDelayNumberSpinner delaySpinner;
     public CalibrateMicDelayButton calibrateMicDelayButton;
     public RecordingDeviceColorSlider colorSlider;
     public Toggle enabledToggle;
@@ -50,7 +50,7 @@ public class RecordingOptionsSceneController : MonoBehaviour
         }
         amplificationSlider.SetMicProfile(micProfile);
         noiseSuppressionSlider.SetMicProfile(micProfile);
-        delaySlider.SetMicProfile(micProfile);
+        delaySpinner.SetMicProfile(micProfile);
         colorSlider.SetMicProfile(micProfile);
         calibrateMicDelayButton.MicProfile = micProfile;
         enabledToggle.isOn = micProfile.IsEnabled;
