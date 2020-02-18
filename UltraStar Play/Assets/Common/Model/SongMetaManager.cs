@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using static ThreadPool;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : MonoBehaviour
@@ -77,8 +78,7 @@ public class SongMetaManager : MonoBehaviour
     public void ScanFiles()
     {
         Debug.Log("Scanning for UltraStar Songs");
-        ScanFilesSynchronously();
-        SortSongMetas();
+        ScanFilesAsynchronously();
     }
 
     private void SortSongMetas()
@@ -87,53 +87,74 @@ public class SongMetaManager : MonoBehaviour
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
     }
 
-    private void ScanFilesSynchronously()
+    private void ScanFilesAsynchronously()
     {
+        List<string> txtFiles;
         lock (scanLock)
         {
             SongsFound = 0;
             SongsSuccess = 0;
             SongsFailed = 0;
+
             FolderScanner scannerTxt = new FolderScanner("*.txt");
 
             // Find all txt files in the song directories
-            List<string> txtFiles = new List<string>();
-            List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
-            foreach (string songDir in songDirs)
-            {
-                try
-                {
-                    List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
-                    txtFiles.AddRange(txtFilesInSongDir);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
-            }
-            SongsFound = txtFiles.Count;
-            Debug.Log($"Found {SongsFound} songs in {songDirs.Count} configured song directories");
-
-            txtFiles.ForEach(delegate (string path)
-            {
-                try
-                {
-                    Add(SongMetaBuilder.ParseFile(path));
-                    SongsSuccess++;
-                }
-                catch (SongMetaBuilderException e)
-                {
-                    Debug.LogWarning(path + "\n" + e.Message);
-                    SongsFailed++;
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError(path);
-                    SongsFailed++;
-                }
-            });
+            txtFiles = ScanForTxtFiles(scannerTxt);
         }
+
+        // Load the txt files in a background thread
+        ThreadPool.QueueUserWorkItem(poolHandle =>
+        {
+            lock (scanLock)
+            {
+                LoadTxtFiles(txtFiles);
+                SortSongMetas();
+            }
+        });
+    }
+
+    private void LoadTxtFiles(List<string> txtFiles)
+    {
+        txtFiles.ForEach(delegate (string path)
+        {
+            try
+            {
+                Add(SongMetaBuilder.ParseFile(path));
+                SongsSuccess++;
+            }
+            catch (SongMetaBuilderException e)
+            {
+                Debug.LogWarning(path + "\n" + e.Message);
+                SongsFailed++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError(path);
+                SongsFailed++;
+            }
+        });
+    }
+
+    private List<string> ScanForTxtFiles(FolderScanner scannerTxt)
+    {
+        List<string> txtFiles = new List<string>();
+        List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
+        foreach (string songDir in songDirs)
+        {
+            try
+            {
+                List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
+                txtFiles.AddRange(txtFilesInSongDir);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
+        SongsFound = txtFiles.Count;
+        Debug.Log($"Found {SongsFound} songs in {songDirs.Count} configured song directories");
+        return txtFiles;
     }
 
     public int GetNumberOfSongsFound()
