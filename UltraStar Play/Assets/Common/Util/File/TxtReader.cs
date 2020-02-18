@@ -41,7 +41,7 @@ public static class TxtReader
     {
         if (path == null || !File.Exists(path))
         {
-            throw new UnityException("Can not read file. No file exists in specified path!");
+            throw new UnityException($"Can not read file. No file exists in specified path: {path}!");
         }
         Encoding guessedEncoding = (enc ?? GuessFileEncoding(path));
         StreamReader reader = new StreamReader(path, guessedEncoding, true);
