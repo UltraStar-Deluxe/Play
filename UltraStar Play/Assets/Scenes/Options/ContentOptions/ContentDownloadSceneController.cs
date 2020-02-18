@@ -21,6 +21,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
     public Text logText;
     public Text downloadPath;
     public Text fileSize;
+    public SettingsManager settingsManager;
 
     public void StartDownload()
     {
@@ -154,10 +155,10 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
                 }
             }
         });
-        StartCoroutine(TrackUnpack(handle, tarPath));
+        StartCoroutine(TrackUnpack(handle, tarPath, songsPath));
     }
 
-    private IEnumerator TrackUnpack(PoolHandle handle, string tarPath)
+    private IEnumerator TrackUnpack(PoolHandle handle, string tarPath, string songsPath)
     {
         string progress1 = "unpacking file.  ";
         string progress2 = "unpacking file.. ";
@@ -192,6 +193,12 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
             AddToLog($"Unpacking the song package finished for {tarPath}.");
             statusLabel.text = "Finished.";
             downloadPath.text = "";
+            List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
+            if (!songDirs.Contains(songsPath))
+            {
+                songDirs.Add(songsPath);
+                SettingsManager.Instance.Save();
+            }
         }
         else
         {
