@@ -14,7 +14,8 @@ public class LoadingSceneController : MonoBehaviour
         Debug.Log("loaded settings:" + jsonSettings);
 
         // The SongMetas are loaded on access.
-        Debug.Log("loaded songs: " + SongMetaManager.Instance.SongMetas.Count);
+
+        Debug.Log("started loading songs: " + SongMetaManager.Instance.SongMetas != null);
 
         // Loading completed, continue with next scene
         FinishScene();
