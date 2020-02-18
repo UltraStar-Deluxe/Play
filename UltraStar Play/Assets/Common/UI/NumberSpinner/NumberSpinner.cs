@@ -13,7 +13,7 @@ using UniRx;
 public class NumberSpinner : MonoBehaviour, INeedInjection
 {
     public bool hasMin;
-    public double minValue = 0;
+    public double minValue;
 
     public bool hasMax;
     public double maxValue = 1;
@@ -33,7 +33,7 @@ public class NumberSpinner : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Text uiText;
 
-    private Subject<double> selectedValueStream = new Subject<double>();
+    private readonly Subject<double> selectedValueStream = new Subject<double>();
     public IObservable<double> SelectedValueStream
     {
         get
@@ -81,13 +81,13 @@ public class NumberSpinner : MonoBehaviour, INeedInjection
     private void SetNewValueWithinLimits(double newValue)
     {
         // Wrap around
-        if (hasMin && hasMax)
+        if (wrapAround && hasMin && hasMax)
         {
-            if (selectedValue == minValue && selectedValue < minValue)
+            if (selectedValue == minValue && newValue < minValue)
             {
                 newValue = maxValue;
             }
-            if (selectedValue == maxValue && selectedValue > maxValue)
+            if (selectedValue == maxValue && newValue > maxValue)
             {
                 newValue = minValue;
             }
