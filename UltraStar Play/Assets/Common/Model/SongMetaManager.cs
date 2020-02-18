@@ -63,8 +63,12 @@ public class SongMetaManager : MonoBehaviour
 
     public SongMeta FindSongMeta(string songTitle)
     {
-        SongMeta songMeta = SongMetas.Find(it => it.Title == songTitle);
-        return songMeta;
+        List<SongMeta> songs = SongMetas;
+        lock (songMetas)
+        {
+            SongMeta songMeta = songs.Find(it => it.Title == songTitle);
+            return songMeta;
+        }
     }
 
     public ReadOnlyCollection<SongMeta> GetSongMetas()
