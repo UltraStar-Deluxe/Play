@@ -12,7 +12,7 @@ public class AmplificationSlider : TextItemSlider<int>
     protected override void Awake()
     {
         base.Awake();
-        Items = new List<int> { 0, 6, 12, 18 };
+        Items = new List<int> { 0, 3, 6, 9, 12, 15, 18 };
     }
 
     public void SetMicProfile(MicProfile micProfile)

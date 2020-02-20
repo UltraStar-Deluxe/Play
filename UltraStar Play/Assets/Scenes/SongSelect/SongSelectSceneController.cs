@@ -33,6 +33,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
+    private int lastSongMetasCount = -1;
+    private int lastSongMetasReloadFrame = -1;
     private Statistics statsManager;
 
     private SongMeta selectedSongBeforeSearch;
@@ -67,6 +69,19 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
     }
 
+    void Update()
+    {
+        // Check if new songs were loaded in background. Update scene if necessary.
+        if (lastSongMetasCount != songMetas.Count
+            && !IsSearchEnabled()
+            && lastSongMetasReloadFrame + 10 < Time.frameCount)
+        {
+            SongMeta selectedSong = songRouletteController.Selection.Value.SongMeta;
+            InitSongRoulette();
+            songRouletteController.SelectSong(selectedSong);
+        }
+    }
+
     public void OnHotSwapFinished()
     {
         InitSongRoulette();
@@ -74,6 +89,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     private void InitSongRoulette()
     {
+        lastSongMetasReloadFrame = Time.frameCount;
+        lastSongMetasCount = songMetas.Count;
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
@@ -100,7 +117,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         highscoreLocalPlayerText.text = "";
         highscoreLocalScoreText.text = "0";
         LocalStatistic localStats = statsManager.GetLocalStats(selectedSong);
-        SongStatistic localTopScore; 
+        SongStatistic localTopScore;
         if (localStats != null)
         {
             localTopScore = localStats.StatsEntries.TopScore;
