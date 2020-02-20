@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class UiRecordedNote : MonoBehaviour
 {
-    public float colorFactor = 0.6f;
-
     private Image image;
 
     void Awake()
@@ -16,9 +14,9 @@ public class UiRecordedNote : MonoBehaviour
 
     public void SetColorOfMicProfile(MicProfile micProfile)
     {
-        float r = micProfile.Color.r * colorFactor;
-        float g = micProfile.Color.g * colorFactor;
-        float b = micProfile.Color.b * colorFactor;
-        image.color = new Color(r, g, b, 1);
+        // Set hue of HSV shader to the hue of the color from the MicProfile.
+        HsvColor hsvColor = new HsvColor(micProfile.Color);
+        // In the shader, the red channel of the color is interpreted as hue.
+        image.color = new Color(hsvColor.H, 0, 0);
     }
 }
