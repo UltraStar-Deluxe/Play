@@ -40,7 +40,10 @@ public class FolderScanner
         {
             foreach (FileInfo file in dirInfo.GetFiles(fileExtensionPattern))
             {
-                result.Add(file.FullName);
+                if (!file.Name.ToLowerInvariant().Equals("license.txt"))
+                {
+                    result.Add(file.FullName);
+                }
             }
 
             if (recursive)
