@@ -57,9 +57,8 @@ public class PlayerController : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    private int sentenceIndex;
-    public Sentence CurrentSentence { get; set; }
-    public Sentence NextSentence { get; set; }
+    private int displaySentenceIndex;
+    private int recordingSentenceIndex;
 
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
@@ -71,7 +70,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         set
         {
             lyricsDisplayer = value;
-            UpdateLyricsDisplayer();
+            UpdateLyricsDisplayer(GetSentence(displaySentenceIndex), GetSentence(displaySentenceIndex + 1));
         }
     }
 
@@ -86,9 +85,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
             .Where(xs => xs.AllMatch(x => x == SentenceRating.Perfect))
             // Create an effect for these.
             .Subscribe(xs => playerUiController.CreatePerfectSentenceEffect());
-
-        sentenceIndex = 0;
-        UpdateSentences(sentenceIndex);
     }
 
     public void Init(PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
@@ -109,6 +105,9 @@ public class PlayerController : MonoBehaviour, INeedInjection
         // Init instances
         playerUiController.Init(PlayerProfile, MicProfile);
         PlayerScoreController.Init(Voice);
+
+        SetDisplaySentenceIndex(0);
+        recordingSentenceIndex = 0;
     }
 
     private Injector CreateChildrenInjectorWithAdditionalBindings()
@@ -125,10 +124,28 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
     public void SetCurrentBeat(double currentBeat)
     {
-        // Change the current sentence, when the current beat is over its last note.
-        if (CurrentSentence != null && currentBeat >= (double)CurrentSentence.MaxBeat)
+        // Change the current display sentence, when the current beat is over its last note.
+        if (displaySentenceIndex < sortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
         {
-            OnSentenceEnded();
+            Sentence nextDisplaySentence = GetUpcomingSentenceForBeat(currentBeat);
+            int nextDisplaySentenceIndex = sortedSentences.IndexOf(nextDisplaySentence);
+            if (nextDisplaySentenceIndex >= 0)
+            {
+                SetDisplaySentenceIndex(nextDisplaySentenceIndex);
+            }
+        }
+
+        // Score a sentence, when the current beat minus the mic delay is over its last note.
+        double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, MicProfile.DelayInMillis);
+        double currentBeatConsideringMicDelay = (micDelayInBeats > 0) ? currentBeat - micDelayInBeats : currentBeat;
+        if (recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat)
+        {
+            Sentence nextRecordingSentence = GetUpcomingSentenceForBeat(currentBeatConsideringMicDelay);
+            int nextRecordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
+            if (nextRecordingSentenceIndex >= 0)
+            {
+                SetRecordingSentenceIndex(nextRecordingSentenceIndex);
+            }
         }
     }
 
@@ -233,40 +250,42 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnSentenceEnded()
+    private void SetRecordingSentenceIndex(int newValue)
+    {
+        FinishRecordingSentence(recordingSentenceIndex);
+        recordingSentenceIndex = newValue;
+    }
+
+    private void FinishRecordingSentence(int sentenceIndex)
     {
         PlayerNoteRecorder.OnSentenceEnded();
-        List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(CurrentSentence);
-        SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(CurrentSentence, recordedNotes);
+
+        Sentence recordingSentence = GetSentence(sentenceIndex);
+        if (recordingSentence == null)
+        {
+            return;
+        }
+
+        List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(recordingSentence);
+        SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(recordingSentence, recordedNotes);
         playerUiController.ShowTotalScore(PlayerScoreController.TotalScore);
         if (sentenceRating != null)
         {
             playerUiController.ShowSentenceRating(sentenceRating);
             sentenceRatingStream.OnNext(sentenceRating);
         }
-
-        sentenceIndex++;
-        UpdateSentences(sentenceIndex);
     }
 
-    private void UpdateSentences(int currentSentenceIndex)
+    private void SetDisplaySentenceIndex(int newValue)
     {
-        Sentence lastSentence = CurrentSentence;
-        CurrentSentence = GetSentence(currentSentenceIndex);
-        NextSentence = GetSentence(currentSentenceIndex + 1);
+        displaySentenceIndex = newValue;
 
-        if (lastSentence != CurrentSentence && CurrentSentence == null)
-        {
-            Debug.Log("Finished last sentence");
-        }
-        if (lastSentence == null && CurrentSentence == null)
-        {
-            Debug.Log("Song contains no sentences");
-        }
+        Sentence current = GetSentence(displaySentenceIndex);
+        Sentence next = GetSentence(displaySentenceIndex + 1);
 
         // Update the UI
-        playerUiController.DisplaySentence(CurrentSentence);
-        UpdateLyricsDisplayer();
+        playerUiController.DisplaySentence(current);
+        UpdateLyricsDisplayer(current, next);
     }
 
     public void DisplayRecordedNote(RecordedNote recordedNote)
@@ -274,13 +293,15 @@ public class PlayerController : MonoBehaviour, INeedInjection
         playerUiController.DisplayRecordedNote(recordedNote);
     }
 
-    private void UpdateLyricsDisplayer()
+    private void UpdateLyricsDisplayer(Sentence current, Sentence next)
     {
-        if (lyricsDisplayer != null)
+        if (lyricsDisplayer == null)
         {
-            lyricsDisplayer.SetCurrentSentence(CurrentSentence);
-            lyricsDisplayer.SetNextSentence(NextSentence);
+            return;
         }
+
+        lyricsDisplayer.SetCurrentSentence(current);
+        lyricsDisplayer.SetNextSentence(next);
     }
 
     private Sentence GetSentence(int index)
@@ -291,10 +312,36 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
     public double GetNextStartBeat()
     {
-        if (CurrentSentence == null)
+        if (GetDisplaySentence() == null)
         {
             return -1d;
         }
-        return CurrentSentence.MinBeat;
+        return GetDisplaySentence().MinBeat;
+    }
+
+    public Sentence GetUpcomingSentenceForBeat(double currentBeat)
+    {
+        Sentence result = Voice.Sentences
+            .Where(sentence => currentBeat < sentence.LinebreakBeat)
+            .FirstOrDefault();
+        return result;
+    }
+
+    public Sentence GetSentenceForBeat(double currentBeat)
+    {
+        Sentence result = Voice.Sentences
+            .Where(sentence => sentence.MinBeat <= currentBeat && currentBeat <= sentence.MaxBeat)
+            .FirstOrDefault();
+        return result;
+    }
+
+    public Sentence GetDisplaySentence()
+    {
+        return GetSentence(displaySentenceIndex);
+    }
+
+    public Sentence GetRecordingSentence()
+    {
+        return GetSentence(recordingSentenceIndex);
     }
 }

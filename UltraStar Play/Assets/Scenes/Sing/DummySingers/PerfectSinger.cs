@@ -10,7 +10,7 @@ public class PerfectSinger : AbstractDummySinger
 
     public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController?.CurrentSentence;
+        Sentence currentSentence = playerController?.GetDisplaySentence();
         if (currentSentence == null)
         {
             return;
