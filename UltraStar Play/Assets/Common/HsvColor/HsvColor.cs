@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[Serializable]
 // HSV / HSB Color
+[Serializable]
 public struct HsvColor
 {
     // Hue

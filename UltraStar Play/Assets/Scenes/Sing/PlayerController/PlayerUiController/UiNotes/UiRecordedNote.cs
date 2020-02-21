@@ -5,18 +5,18 @@ using UnityEngine.UI;
 
 public class UiRecordedNote : MonoBehaviour
 {
-    private Image image;
+    private ImageHueHelper imageHueHelper;
 
     void Awake()
     {
-        image = GetComponentInChildren<Image>();
+        imageHueHelper = GetComponentInChildren<ImageHueHelper>();
     }
 
     public void SetColorOfMicProfile(MicProfile micProfile)
     {
-        // Set hue of HSV shader to the hue of the color from the MicProfile.
-        HsvColor hsvColor = new HsvColor(micProfile.Color);
-        // In the shader, the red channel of the color is interpreted as hue.
-        image.color = new Color(hsvColor.H, 0, 0);
+        if (micProfile != null)
+        {
+            imageHueHelper.SetHueByColor(micProfile.Color);
+        }
     }
 }
