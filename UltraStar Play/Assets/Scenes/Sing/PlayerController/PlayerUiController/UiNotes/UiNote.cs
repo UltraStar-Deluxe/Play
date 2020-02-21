@@ -15,6 +15,9 @@ public class UiNote : MonoBehaviour
     [InjectedInInspector]
     public Image image;
 
+    [InjectedInInspector]
+    public ImageHueHelper imageHueHelper;
+
     public Note Note { get; set; }
     public bool isGolden;
 
@@ -56,10 +59,10 @@ public class UiNote : MonoBehaviour
 
     public void SetColorOfMicProfile(MicProfile micProfile)
     {
-        // Set hue of HSV shader to the hue of the color from the MicProfile.
-        HsvColor hsvColor = new HsvColor(micProfile.Color);
-        // In the shader, the red channel of the color is interpreted as hue.
-        image.color = new Color(hsvColor.H, 0, 0);
+        if (micProfile != null)
+        {
+            imageHueHelper.SetHueByColor(micProfile.Color);
+        }
 
         // Make freestyle and rap notes transparent
         switch (Note.Type)
