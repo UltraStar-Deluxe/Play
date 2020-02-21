@@ -23,11 +23,15 @@ public static class BpmUtils
 
     public static double MillisecondInSongToBeat(SongMeta songMeta, double millisInSong)
     {
-        double millisInSongAfterGap = millisInSong - songMeta.Gap;
+        return MillisecondInSongToBeatWithoutGap(songMeta, millisInSong - songMeta.Gap);
+    }
+
+    public static double MillisecondInSongToBeatWithoutGap(SongMeta songMeta, double millisInSong)
+    {
         // Ultrastar BPM is not "beats per minute" but "bars per minute" in four-four-time.
         // To get the common "beats per minute", one has to multiply with 4.
         double beatsPerMinute = songMeta.Bpm * 4.0;
-        double result = beatsPerMinute * millisInSongAfterGap / 1000.0 / 60.0;
+        double result = beatsPerMinute * millisInSong / 1000.0 / 60.0;
         return result;
     }
 
