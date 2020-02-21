@@ -53,6 +53,8 @@ MonoBehaviour:
     type: 3}
   perfectStarPrefab: {fileID: 3432090795416568970, guid: b1c90144fedb745429b21b08991253ac,
     type: 3}
+  image: {fileID: 8590359238081736741}
+  imageHueHelper: {fileID: 3889450297425548421}
   isGolden: 0
 --- !u!1 &8590359238081736743
 GameObject:
@@ -65,6 +67,7 @@ GameObject:
   - component: {fileID: 8590359238081736742}
   - component: {fileID: 8590359238081736740}
   - component: {fileID: 8590359238081736741}
+  - component: {fileID: 3889450297425548421}
   m_Layer: 0
   m_Name: NoteImage
   m_TagString: Untagged
@@ -112,16 +115,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Material: {fileID: 2100000, guid: 6d7290ea574ff4d48bad8d35bfec9213, type: 2}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 55f3e2c7b25af03468f72991504fb124, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: caa92ed4b08666749a91f4258c0e22ec, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -130,6 +133,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3889450297425548421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8590359238081736743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hue: 0
+  hueAsColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &8590359238897754699
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,7 +182,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -10, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8590359238897754696
 CanvasRenderer:
@@ -200,7 +217,7 @@ MonoBehaviour:
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0

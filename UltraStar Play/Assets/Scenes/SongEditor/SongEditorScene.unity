@@ -3798,7 +3798,11 @@ MonoBehaviour:
   defaultSongName: Summer Wine
   defaultSongNamePasteBin: 'Summer Wine
 
-    EmptyTitle'
+    EmptyTitle
+
+    My Immortal
+
+    Somewhere Over The Rainbow (Wonderful World)'
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 8406949}
   songEditorNoteRecorder: {fileID: 1231934095}
@@ -9608,7 +9612,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -7.5000305, y: -0.5}
+  m_AnchoredPosition: {x: -7.5000305, y: -0.50000095}
   m_SizeDelta: {x: -35, y: -13}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1243198119
@@ -12401,8 +12405,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 71010841}
   m_HandleRect: {fileID: 71010840}
   m_Direction: 2
-  m_Value: 0.9999904
-  m_Size: 0.98005676
+  m_Value: 0.9999984
+  m_Size: 0.9401706
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
