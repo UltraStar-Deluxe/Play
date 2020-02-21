@@ -6,6 +6,7 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -69,7 +70,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
-    private bool lastIsPlaying;
     private double positionInSongInMillisWhenPlaybackStarted;
 
     private readonly Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
@@ -133,25 +133,25 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
     }
 
-    void Update()
+    void Start()
+    {
+        songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
+    }
+
+    private void OnAudioPlaybackStopped(double positionInSongInMillis)
     {
         // Jump to last position in song when playback stops
-        if (songAudioPlayer.IsPlaying)
-        {
-            if (!lastIsPlaying)
-            {
-                positionInSongInMillisWhenPlaybackStarted = songAudioPlayer.PositionInSongInMillis;
-            }
-        }
-        else
-        {
-            if (lastIsPlaying)
-            {
-                songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
-            }
-        }
-        lastIsPlaying = songAudioPlayer.IsPlaying;
+        songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+    }
 
+    private void OnAudioPlaybackStarted(double positionInSongInMillis)
+    {
+        positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
+    }
+
+    void Update()
+    {
         // Automatically stop playback after a given threshold (e.g. only play the selected notes)
         if (songAudioPlayer.IsPlaying
             && StopPlaybackAfterPositionInSongInMillis > 0

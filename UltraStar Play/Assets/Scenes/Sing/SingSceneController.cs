@@ -221,7 +221,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             return;
         }
 
-        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - 500;
+        // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
+        double offsetInMillis = Application.isEditor ? 500 : 1500;
+        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             songAudioPlayer.PositionInSongInMillis = targetPositionInMillis;

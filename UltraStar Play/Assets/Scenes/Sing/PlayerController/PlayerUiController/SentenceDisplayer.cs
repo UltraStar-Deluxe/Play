@@ -112,11 +112,11 @@ public class SentenceDisplayer : MonoBehaviour
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
         if (showLyricsOfNotes && showPitchOfNotes)
         {
-            uiNoteText.text = note.Text + " (" + pitchName + ")";
+            uiNoteText.text = GetDisplayText(note) + " (" + pitchName + ")";
         }
         else if (showLyricsOfNotes)
         {
-            uiNoteText.text = note.Text;
+            uiNoteText.text = GetDisplayText(note);
         }
         else if (showPitchOfNotes)
         {
@@ -129,6 +129,22 @@ public class SentenceDisplayer : MonoBehaviour
 
         RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
+    }
+
+    public string GetDisplayText(Note note)
+    {
+        switch (note.Type)
+        {
+            case ENoteType.Freestyle:
+                return $"<i><b><color=#c00000>{note.Text}</color></b></i>";
+            case ENoteType.Golden:
+                return $"<b>{note.Text}</b>";
+            case ENoteType.Rap:
+            case ENoteType.RapGolden:
+                return $"<i><b><color=#ffa500ff>{note.Text}</color></b></i>";
+            default:
+                return note.Text;
+        }
     }
 
     private void RemoveUiRecordedNotes()
