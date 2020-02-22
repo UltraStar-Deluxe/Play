@@ -331,13 +331,16 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     private SongMeta GetDefaultSongMeta()
     {
-        IEnumerable<SongMeta> defaultSongMetas = SongMetaManager.Instance.SongMetas.Where(it => it.Title == defaultSongName);
-        if (defaultSongMetas.Count() == 0)
+        // The default song meta is for debugging in the Unity editor.
+        // A specific song is searched, so first wait for the scan to complete.
+        SongMetaManager.Instance.WaitUntilSongScanFinished();
+        SongMeta defaultSongMeta = SongMetaManager.Instance.FindSongMeta(it => it.Title == defaultSongName);
+        if (defaultSongMeta == null)
         {
             Debug.LogWarning($"No song with title {defaultSongName} was found. Using the first found song instead.");
-            return SongMetaManager.Instance.SongMetas.First();
+            return SongMetaManager.Instance.GetFirstSongMeta();
         }
-        return defaultSongMetas.First();
+        return defaultSongMeta;
     }
 
     public void TogglePlayPause()
