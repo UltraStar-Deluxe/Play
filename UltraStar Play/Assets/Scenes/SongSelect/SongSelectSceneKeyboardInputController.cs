@@ -15,9 +15,6 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
     private const KeyCode RandomSongShortcut = KeyCode.R;
     private const KeyCode OpenInEditorShortcut = KeyCode.E;
 
-    private const KeyCode QuickSearchSong = KeyCode.LeftControl;
-    private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
-
     [Inject]
     private EventSystem eventSystem;
 
@@ -25,13 +22,9 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
     {
         SongSelectSceneController songSelectSceneController = SongSelectSceneController.Instance;
         // Open / close search
-        if (Input.GetKeyDown(QuickSearchArtist))
+        if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByArtist);
-        }
-        if (Input.GetKeyDown(QuickSearchSong))
-        {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.BySongTitle);
+            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByTitleOrArtist);
         }
 
         if (songSelectSceneController.IsSearchEnabled())

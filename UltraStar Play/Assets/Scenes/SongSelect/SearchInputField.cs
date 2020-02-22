@@ -13,11 +13,10 @@ public class SearchInputField : MonoBehaviour
 
     public enum ESearchMode
     {
-        BySongTitle,
-        ByArtist
+        ByTitleOrArtist
     }
 
-    private ESearchMode searchMode = ESearchMode.BySongTitle;
+    private ESearchMode searchMode = ESearchMode.ByTitleOrArtist;
     public ESearchMode SearchMode
     {
         get
@@ -78,18 +77,7 @@ public class SearchInputField : MonoBehaviour
 
     private void UpdatePlaceholderText()
     {
-        switch (searchMode)
-        {
-            case ESearchMode.BySongTitle:
-                placeholderText.text = "Search song title...";
-                break;
-            case ESearchMode.ByArtist:
-                placeholderText.text = "Search artist...";
-                break;
-            default:
-                // Do nothing
-                break;
-        }
+        placeholderText.text = "Search...";
     }
 
     public void SetSearchText(string text)

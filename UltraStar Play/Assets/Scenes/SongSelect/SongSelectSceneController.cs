@@ -266,15 +266,12 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         }
         else
         {
-            switch (searchTextInputField.SearchMode)
+            DoSearch((songMeta) =>
             {
-                case SearchInputField.ESearchMode.BySongTitle:
-                    DoSearch((songMeta) => songMeta.Title.ToLower().Contains(searchText));
-                    break;
-                case SearchInputField.ESearchMode.ByArtist:
-                    DoSearch((songMeta) => songMeta.Artist.ToLower().Contains(searchText));
-                    break;
-            }
+                bool titleMatches = songMeta.Title.ToLower().Contains(searchText);
+                bool artistMatches = songMeta.Artist.ToLower().Contains(searchText);
+                return titleMatches || artistMatches;
+            });
         }
     }
 
