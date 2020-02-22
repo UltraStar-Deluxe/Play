@@ -77,7 +77,8 @@ public class SingingResultsSceneController : MonoBehaviour
     private SingingResultsSceneData CreateDefaultSceneData()
     {
         SingingResultsSceneData data = new SingingResultsSceneData();
-        data.SongMeta = SongMetaManager.Instance.SongMetas[0];
+        SongMetaManager.Instance.WaitUntilSongScanFinished();
+        data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
 
         SingingResultsSceneData.PlayerScoreData playerScoreData = new SingingResultsSceneData.PlayerScoreData();
         playerScoreData.TotalScore = 6500;

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.IO;
+using System.Linq;
+using System.Threading;
 using UnityEngine;
-using static ThreadPool;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : MonoBehaviour
@@ -23,19 +22,12 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
-    // The list of songs is static to be persisted across scenes.
-    private static readonly List<SongMeta> songMetas = new List<SongMeta>();
-    public List<SongMeta> SongMetas
-    {
-        get
-        {
-            if (songMetas.IsNullOrEmpty())
-            {
-                ScanFiles();
-            }
-            return songMetas;
-        }
-    }
+    // The collection of songs is static to be persisted across scenes.
+    // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
+    private static readonly SynchronizedList<SongMeta> songMetas = new SynchronizedList<SongMeta>();
+
+    private static bool isSongScanStarted;
+    private static bool isSongScanFinished;
 
     public void Add(SongMeta songMeta)
     {
@@ -43,10 +35,8 @@ public class SongMetaManager : MonoBehaviour
         {
             throw new ArgumentNullException("songMeta");
         }
-        lock (songMetas)
-        {
-            songMetas.Add(songMeta);
-        }
+
+        songMetas.Add(songMeta);
     }
 
     public void Remove(SongMeta songMeta)
@@ -55,34 +45,46 @@ public class SongMetaManager : MonoBehaviour
         {
             throw new ArgumentNullException("songMeta");
         }
-        lock (songMetas)
-        {
-            songMetas.Remove(songMeta);
-        }
+
+        songMetas.Remove(songMeta);
     }
 
-    public SongMeta FindSongMeta(string songTitle)
+    public SongMeta FindSongMeta(Predicate<SongMeta> predicate)
     {
-        List<SongMeta> songs = SongMetas;
-        lock (songMetas)
-        {
-            SongMeta songMeta = songs.Find(it => it.Title == songTitle);
-            return songMeta;
-        }
+        SongMeta songMeta = songMetas.Find(predicate);
+        return songMeta;
     }
 
-    public ReadOnlyCollection<SongMeta> GetSongMetas()
+    public SongMeta GetFirstSongMeta()
     {
-        lock (songMetas)
-        {
-            return songMetas.AsReadOnly();
-        }
+        return GetSongMetas().FirstOrDefault();
     }
 
-    public void ScanFiles()
+    public IReadOnlyCollection<SongMeta> GetSongMetas()
     {
-        Debug.Log("Scanning for UltraStar Songs");
-        ScanFilesAsynchronously();
+        return songMetas;
+    }
+
+    public void ScanFilesIfNotDoneYet()
+    {
+        // First check. If the songs have been scanned already,
+        // then this will quickly return and allows multiple threads access.
+        if (!isSongScanStarted)
+        {
+            // The songs have not been scanned. Only one thread must perform the scan action.
+            lock (scanLock)
+            {
+                // From here on, reading and writing the isInitialized flag can be considered atomic.
+                // Second check. If multiple threads attempted to scan for songs (they passed the first check),
+                // then only the first of these threads will start the scan.
+                if (!isSongScanStarted)
+                {
+                    isSongScanStarted = true;
+                    isSongScanFinished = false;
+                    ScanFilesAsynchronously();
+                }
+            }
+        }
     }
 
     private void SortSongMetas()
@@ -93,6 +95,8 @@ public class SongMetaManager : MonoBehaviour
 
     private void ScanFilesAsynchronously()
     {
+        Debug.Log("ScanFilesAsynchronously");
+
         List<string> txtFiles;
         lock (scanLock)
         {
@@ -109,11 +113,18 @@ public class SongMetaManager : MonoBehaviour
         // Load the txt files in a background thread
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
+            Debug.Log("Started song-scan-thread.");
             lock (scanLock)
             {
                 LoadTxtFiles(txtFiles);
                 SortSongMetas();
+                isSongScanFinished = true;
             }
+            stopwatch.Stop();
+            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms.");
         });
     }
 
@@ -164,5 +175,21 @@ public class SongMetaManager : MonoBehaviour
     public int GetNumberOfSongsFound()
     {
         return SongsFound;
+    }
+
+    public void WaitUntilSongScanFinished()
+    {
+        ScanFilesIfNotDoneYet();
+        float startTimeInSeconds = Time.time;
+        float timeoutInSeconds = 2;
+        while ((startTimeInSeconds + timeoutInSeconds) > Time.time)
+        {
+            if (isSongScanFinished)
+            {
+                return;
+            }
+            Thread.Sleep(100);
+        }
+        Debug.LogError("Song scan did not finish - timeout reached.");
     }
 }

@@ -32,7 +32,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private SongRouletteController songRouletteController;
 
     private SongSelectSceneData sceneData;
-    private List<SongMeta> songMetas;
+    private IReadOnlyCollection<SongMeta> songMetas;
     private int lastSongMetasCount = -1;
     private int lastSongMetasReloadFrame = -1;
     private Statistics statsManager;
@@ -51,12 +51,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     void Start()
     {
+        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
+
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
-        songMetas = SongMetaManager.Instance.SongMetas;
-        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
+        songMetas = SongMetaManager.Instance.GetSongMetas();
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
