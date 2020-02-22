@@ -56,12 +56,13 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
             }
         }
 
-        if (Input.GetKeyUp(NextSongShortcut))
+        // Select next / previous song 
+        if (Input.GetKeyUp(NextSongShortcut) || Input.mouseScrollDelta.y > 0)
         {
             songSelectSceneController.OnNextSong();
         }
 
-        if (Input.GetKeyUp(PreviousSongShortcut))
+        if (Input.GetKeyUp(PreviousSongShortcut) || Input.mouseScrollDelta.y < 0)
         {
             songSelectSceneController.OnPreviousSong();
         }
