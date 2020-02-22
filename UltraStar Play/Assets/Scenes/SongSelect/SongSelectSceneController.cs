@@ -4,8 +4,10 @@ using System;
 using UnityEngine.UI;
 using System.Linq;
 using UniRx;
+using UniInject;
+using UnityEngine.EventSystems;
 
-public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener
+public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder
 {
     public static SongSelectSceneController Instance
     {
@@ -38,6 +40,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private Statistics statsManager;
 
     private SongMeta selectedSongBeforeSearch;
+
+    [Inject]
+    private EventSystem eventSystem;
 
     public GameObject noSongsFoundMessage;
 
@@ -153,6 +158,16 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         bool isDuet = selectedSong.VoiceNames.Count > 1;
         duetIndicator.SetActive(isDuet);
+    }
+
+    public void JumpToSongWhereTitleStartsWith(string text)
+    {
+        string textToLower = text.ToLowerInvariant();
+        SongMeta match = songRouletteController.Find(it => it.Title.ToLowerInvariant().StartsWith(textToLower));
+        if (match != null)
+        {
+            songRouletteController.SelectSong(match);
+        }
     }
 
     private SingSceneData CreateSingSceneData(SongMeta songMeta)
@@ -300,5 +315,17 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public bool IsSearchEnabled()
     {
         return searchTextInputField.isActiveAndEnabled;
+    }
+
+    public bool IsSearchTextInputHasFocus()
+    {
+        return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }

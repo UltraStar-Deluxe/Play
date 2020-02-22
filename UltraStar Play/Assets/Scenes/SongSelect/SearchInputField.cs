@@ -84,4 +84,9 @@ public class SearchInputField : MonoBehaviour
     {
         inputField.text = text;
     }
+
+    public InputField GetInputField()
+    {
+        return inputField;
+    }
 }
