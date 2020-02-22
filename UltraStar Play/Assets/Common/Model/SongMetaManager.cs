@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -24,10 +25,17 @@ public class SongMetaManager : MonoBehaviour
 
     // The collection of songs is static to be persisted across scenes.
     // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
-    private static readonly SynchronizedList<SongMeta> songMetas = new SynchronizedList<SongMeta>();
+    private static readonly ConcurrentBag<SongMeta> songMetas = new ConcurrentBag<SongMeta>();
 
     private static bool isSongScanStarted;
     private static bool isSongScanFinished;
+    public static bool IsSongScanFinished
+    {
+        get
+        {
+            return isSongScanFinished;
+        }
+    }
 
     public void Add(SongMeta songMeta)
     {
@@ -39,19 +47,9 @@ public class SongMetaManager : MonoBehaviour
         songMetas.Add(songMeta);
     }
 
-    public void Remove(SongMeta songMeta)
+    public SongMeta FindSongMeta(Func<SongMeta, bool> predicate)
     {
-        if (songMeta == null)
-        {
-            throw new ArgumentNullException("songMeta");
-        }
-
-        songMetas.Remove(songMeta);
-    }
-
-    public SongMeta FindSongMeta(Predicate<SongMeta> predicate)
-    {
-        SongMeta songMeta = songMetas.Find(predicate);
+        SongMeta songMeta = songMetas.Where(predicate).FirstOrDefault();
         return songMeta;
     }
 
@@ -87,12 +85,6 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
-    private void SortSongMetas()
-    {
-        // Sort by artist
-        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-    }
-
     private void ScanFilesAsynchronously()
     {
         Debug.Log("ScanFilesAsynchronously");
@@ -120,7 +112,6 @@ public class SongMetaManager : MonoBehaviour
             lock (scanLock)
             {
                 LoadTxtFiles(txtFiles);
-                SortSongMetas();
                 isSongScanFinished = true;
             }
             stopwatch.Stop();
