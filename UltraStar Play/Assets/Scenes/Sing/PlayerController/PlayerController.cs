@@ -136,7 +136,8 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
 
         // Score a sentence, when the current beat minus the mic delay is over its last note.
-        double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, MicProfile.DelayInMillis);
+        int micDelayInMillis = (MicProfile == null) ? 0 : MicProfile.DelayInMillis;
+        double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, micDelayInMillis);
         double currentBeatConsideringMicDelay = (micDelayInBeats > 0) ? currentBeat - micDelayInBeats : currentBeat;
         if (recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat)
         {
