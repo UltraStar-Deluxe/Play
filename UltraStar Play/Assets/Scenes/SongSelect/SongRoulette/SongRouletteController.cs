@@ -174,7 +174,7 @@ public class SongRouletteController : MonoBehaviour
         }
     }
 
-    public void SetSongs(List<SongMeta> songMetas)
+    public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
         songs = new List<SongMeta>(songMetas);
         if (songs.Count > 0)
