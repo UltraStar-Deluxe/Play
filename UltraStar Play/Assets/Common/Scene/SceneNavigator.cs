@@ -43,6 +43,16 @@ public class SceneNavigator : MonoBehaviour
         LoadScene(scene);
     }
 
+    public T GetSceneDataOrThrow<T>() where T : SceneData
+    {
+        T sceneData = GetSceneData<T>(null);
+        if (sceneData == null)
+        {
+            throw new SceneDataException("No SceneData found for type " + typeof(T));
+        }
+        return GetSceneData<T>(null);
+    }
+
     public T GetSceneData<T>(T defaultValue) where T : SceneData
     {
         if (staticSceneDatas.TryGetValue(typeof(T), out SceneData sceneData))
@@ -59,7 +69,27 @@ public class SceneNavigator : MonoBehaviour
         }
         else
         {
+            // Try to load default SceneData from a provider in the scene.
+            // This is only for starting a scene directly inside the Unity editor with sensible defaults.
+            if (Application.isEditor)
+            {
+                sceneData = GetDefaultSceneDataFromProvider<T>();
+                if (sceneData != null)
+                {
+                    return sceneData as T;
+                }
+            }
             return defaultValue;
         }
+    }
+
+    private T GetDefaultSceneDataFromProvider<T>() where T : SceneData
+    {
+        IDefaultSceneDataProvider sceneDataProvider = GameObjectUtils.FindObjectOfType<IDefaultSceneDataProvider>(false);
+        if (sceneDataProvider != null)
+        {
+            return sceneDataProvider.GetDefaultSceneData() as T;
+        }
+        return null;
     }
 }
