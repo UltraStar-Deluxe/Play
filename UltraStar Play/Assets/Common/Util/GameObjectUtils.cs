@@ -39,7 +39,7 @@ public static class GameObjectUtils
     // This method also accepts interfaces as type (in contrast to GameObject.FindObjectOfType).
     // Note that this is a costly method (it searches through all Transforms and their components)
     // that should not be called frequently.
-    public static T FindObjectOfType<T>(bool includeInactive)
+    public static T FindObjectOfType<T>(bool includeInactive) where T : class
     {
         GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
         // Search the type in all components of all GameObjects.
@@ -52,7 +52,7 @@ public static class GameObjectUtils
             }
         }
         Debug.LogWarning("No object of Type " + typeof(T) + " has been found in the scene.");
-        return default(T);
+        return null;
     }
 
     // Destroys the direct children of a transform.
