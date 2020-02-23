@@ -288,7 +288,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     {
         SongEditorSceneData defaultSceneData = new SongEditorSceneData();
         defaultSceneData.PositionInSongInMillis = 0;
-        defaultSceneData.SelectedSongMeta = SongMetaManager.Instance.FindSongMeta(defaultSongName);
+        defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
 
         // Set up PreviousSceneData to directly start the SingScene.
         defaultSceneData.PreviousScene = EScene.SingScene;
@@ -303,5 +303,19 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         defaultSceneData.PreviousSceneData = singSceneData;
 
         return defaultSceneData;
+    }
+
+    private SongMeta GetDefaultSongMeta()
+    {
+        // The default song meta is for debugging in the Unity editor.
+        // A specific song is searched, so first wait for the scan to complete.
+        SongMetaManager.Instance.WaitUntilSongScanFinished();
+        SongMeta defaultSongMeta = SongMetaManager.Instance.FindSongMeta(it => it.Title == defaultSongName);
+        if (defaultSongMeta == null)
+        {
+            Debug.LogWarning($"No song with title {defaultSongName} was found. Using the first found song instead.");
+            return SongMetaManager.Instance.GetFirstSongMeta();
+        }
+        return defaultSongMeta;
     }
 }

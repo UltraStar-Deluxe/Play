@@ -4,6 +4,8 @@ using System;
 using UnityEngine.UI;
 using System.Linq;
 using UniRx;
+using System.Globalization;
+using System.Threading;
 
 public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener
 {
@@ -33,7 +35,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
-    private int lastSongMetasCount = -1;
     private int lastSongMetasReloadFrame = -1;
     private Statistics statsManager;
 
@@ -51,12 +52,18 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     void Start()
     {
+        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
+        // Give the song search some time, otherwise the "no songs found" label flickers once.
+        if (!SongMetaManager.IsSongScanFinished)
+        {
+            Thread.Sleep(100);
+        }
+
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
-        songMetas = SongMetaManager.Instance.SongMetas;
-        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
+        GetSongMetasFromManager();
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
@@ -69,13 +76,21 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
     }
 
+    private void GetSongMetasFromManager()
+    {
+        songMetas = new List<SongMeta>(SongMetaManager.Instance.GetSongMetas());
+        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
+        noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
+    }
+
     void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
-        if (lastSongMetasCount != songMetas.Count
+        if (songMetas.Count != SongMetaManager.Instance.GetSongMetas().Count
             && !IsSearchEnabled()
             && lastSongMetasReloadFrame + 10 < Time.frameCount)
         {
+            GetSongMetasFromManager();
             SongMeta selectedSong = songRouletteController.Selection.Value.SongMeta;
             InitSongRoulette();
             songRouletteController.SelectSong(selectedSong);
@@ -90,7 +105,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private void InitSongRoulette()
     {
         lastSongMetasReloadFrame = Time.frameCount;
-        lastSongMetasCount = songMetas.Count;
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
