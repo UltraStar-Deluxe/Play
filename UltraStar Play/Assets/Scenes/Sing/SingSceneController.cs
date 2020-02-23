@@ -25,13 +25,6 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     }
 
     [InjectedInInspector]
-    public string defaultSongName;
-
-    [TextArea(3, 8)]
-    [Tooltip("Convenience text field to paste and copy song names when debugging.")]
-    public string defaultSongNamePasteBin;
-
-    [InjectedInInspector]
     public GameObject pauseOverlay;
 
     [InjectedInInspector]
@@ -63,7 +56,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         {
             if (sceneData == null)
             {
-                sceneData = SceneNavigator.Instance.GetSceneData<SingSceneData>(CreateDefaultSceneData());
+                sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingSceneData>();
             }
             return sceneData;
         }
@@ -299,48 +292,6 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         {
             return Voice.soloVoiceName;
         }
-    }
-
-    private SingSceneData CreateDefaultSceneData()
-    {
-        SingSceneData defaultSceneData = new SingSceneData();
-        defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
-
-        PlayerProfile playerProfile = GetDefaultPlayerProfile();
-        defaultSceneData.SelectedPlayerProfiles.Add(playerProfile);
-        defaultSceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
-
-        return defaultSceneData;
-    }
-
-    private PlayerProfile GetDefaultPlayerProfile()
-    {
-        List<PlayerProfile> allPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
-        if (allPlayerProfiles.IsNullOrEmpty())
-        {
-            throw new UnityException("No player profiles found.");
-        }
-        PlayerProfile result = allPlayerProfiles[0];
-        return result;
-    }
-
-    private MicProfile GetDefaultMicProfile()
-    {
-        return SettingsManager.Instance.Settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
-    }
-
-    private SongMeta GetDefaultSongMeta()
-    {
-        // The default song meta is for debugging in the Unity editor.
-        // A specific song is searched, so first wait for the scan to complete.
-        SongMetaManager.Instance.WaitUntilSongScanFinished();
-        SongMeta defaultSongMeta = SongMetaManager.Instance.FindSongMeta(it => it.Title == defaultSongName);
-        if (defaultSongMeta == null)
-        {
-            Debug.LogWarning($"No song with title {defaultSongName} was found. Using the first found song instead.");
-            return SongMetaManager.Instance.GetFirstSongMeta();
-        }
-        return defaultSongMeta;
     }
 
     public void TogglePlayPause()

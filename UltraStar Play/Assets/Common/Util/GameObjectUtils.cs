@@ -36,28 +36,23 @@ public static class GameObjectUtils
     }
 
     // Looks for a GameObject with the given component, optionally including inactive components.
+    // This method also accepts interfaces as type (in contrast to GameObject.FindObjectOfType).
     // Note that this is a costly method (it searches through all Transforms and their components)
     // that should not be called frequently.
-    public static T FindObjectOfType<T>(bool includeInactive) where T : MonoBehaviour
+    public static T FindObjectOfType<T>(bool includeInactive)
     {
         GameObject[] rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-        if (includeInactive)
+        // Search the type in all components of all GameObjects.
+        foreach (GameObject rootObject in rootObjects)
         {
-            foreach (GameObject rootObject in rootObjects)
+            T obj = rootObject.GetComponentInChildren<T>(includeInactive);
+            if (obj != null)
             {
-                T obj = rootObject.GetComponentInChildren<T>(includeInactive);
-                if (obj != null)
-                {
-                    return obj;
-                }
+                return obj;
             }
-            Debug.LogWarning("No object of Type " + typeof(T) + " has been found in the scene.");
-            return null;
         }
-        else
-        {
-            return GameObject.FindObjectOfType<T>();
-        }
+        Debug.LogWarning("No object of Type " + typeof(T) + " has been found in the scene.");
+        return default(T);
     }
 
     // Destroys the direct children of a transform.
