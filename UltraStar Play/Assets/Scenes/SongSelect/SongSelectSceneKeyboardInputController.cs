@@ -9,80 +9,128 @@ using UnityEngine.EventSystems;
 
 public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInjection
 {
-    private const KeyCode NextSongShortcut = KeyCode.RightArrow;
-    private const KeyCode PreviousSongShortcut = KeyCode.LeftArrow;
-    private const KeyCode StartSingSceneShortcut = KeyCode.Return;
-    private const KeyCode RandomSongShortcut = KeyCode.R;
-    private const KeyCode OpenInEditorShortcut = KeyCode.E;
-
-    private const KeyCode QuickSearchSong = KeyCode.LeftControl;
-    private const KeyCode QuickSearchArtist = KeyCode.LeftAlt;
-
     [Inject]
     private EventSystem eventSystem;
 
+    [Inject]
+    private SongSelectSceneController songSelectSceneController;
+
+    private float fuzzySearchLastInputTimeInSeconds;
+    private string fuzzySearchText = "";
+    private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
+
     void Update()
     {
-        SongSelectSceneController songSelectSceneController = SongSelectSceneController.Instance;
-        // Open / close search
-        if (Input.GetKeyDown(QuickSearchArtist))
+        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
+
+        // Open / close search via Ctrl
+        if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByArtist);
+            if (songSelectSceneController.IsSearchEnabled())
+            {
+                songSelectSceneController.DisableSearch();
+            }
+            else
+            {
+                songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByTitleOrArtist);
+            }
         }
-        if (Input.GetKeyDown(QuickSearchSong))
+
+        // Fuzzy search. Do not handle other input in this case.
+        if (IsFuzzySearchActive())
         {
-            songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.BySongTitle);
+            UpdateFuzzySearchInput();
+            return;
+        }
+
+        if (modifier != EKeyboardModifier.None)
+        {
+            return;
         }
 
         if (songSelectSceneController.IsSearchEnabled())
         {
-            // When the search is enabled, then close it via Escape
-            if (Input.GetKeyUp(KeyCode.Escape))
+            // Close search via Escape or Return / Enter
+            if (Input.GetKeyUp(KeyCode.Escape)
+                || (Input.GetKeyUp(KeyCode.Return) && songSelectSceneController.IsSearchTextInputHasFocus()))
             {
                 songSelectSceneController.DisableSearch();
             }
         }
         else
         {
-            // When the search is not enabled, then open the main menu via Escape or Backspace
+            // Open the main menu via Escape or Backspace
             if (Input.GetKeyUp(KeyCode.Escape) || Input.GetKeyUp(KeyCode.Backspace))
             {
                 SceneNavigator.Instance.LoadScene(EScene.MainScene);
             }
 
-            if (Input.GetKeyUp(RandomSongShortcut))
+            // Random song select via R
+            if (Input.GetKeyUp(KeyCode.R) && IsNoControlOrSongButtonFocused())
             {
                 songSelectSceneController.OnRandomSong();
             }
+
+            // Open the song editor via E
+            if (Input.GetKeyUp(KeyCode.E) && IsNoControlOrSongButtonFocused())
+            {
+                songSelectSceneController.StartSongEditorScene();
+            }
         }
 
-        if (Input.GetKeyUp(NextSongShortcut))
+        // Select next / previous song with arrow keys or mouse wheel
+        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.mouseScrollDelta.y > 0)
         {
             songSelectSceneController.OnNextSong();
         }
 
-        if (Input.GetKeyUp(PreviousSongShortcut))
+        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.mouseScrollDelta.y < 0)
         {
             songSelectSceneController.OnPreviousSong();
         }
 
-        if (Input.GetKeyUp(StartSingSceneShortcut)
-            || (Input.GetKeyUp(OpenInEditorShortcut) && !songSelectSceneController.IsSearchEnabled()))
+        // Open the sing scene via Return / Enter
+        if (Input.GetKeyUp(KeyCode.Return) && IsNoControlOrSongButtonFocused())
         {
-            GameObject focusedControl = eventSystem.currentSelectedGameObject;
-            bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
-            bool focusedControlIsSearchField = (focusedControl != null && focusedControl.GetComponent<SearchInputField>() != null);
-            if (focusedControl == null || focusedControlIsSongButton || focusedControlIsSearchField)
-            {
-                if (Input.GetKeyUp(StartSingSceneShortcut))
-                {
-                    songSelectSceneController.StartSingScene();
-                }
-                else if (Input.GetKeyUp(OpenInEditorShortcut))
-                {
-                    songSelectSceneController.StartSongEditorScene();
-                }
-            }
+            songSelectSceneController.StartSingScene();
         }
+
+        // Toggle active players with Tab
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            songSelectSceneController.ToggleSelectedPlayers();
+        }
+    }
+
+    // Directly jump to song with the title that starts with the letters hit on the keyboard
+    private void UpdateFuzzySearchInput()
+    {
+        // When there is no keyboard input for a while, then reset the search term.
+        if (fuzzySearchLastInputTimeInSeconds + fuzzySearchResetTimeInSeconds < Time.time)
+        {
+            fuzzySearchText = "";
+        }
+
+        if (!Input.inputString.IsNullOrEmpty())
+        {
+            fuzzySearchLastInputTimeInSeconds = Time.time;
+            fuzzySearchText += Input.inputString;
+            songSelectSceneController.JumpToSongWhereTitleStartsWith(fuzzySearchText);
+        }
+    }
+
+    // Check that no other control has the focus, such as a checkbox of a player profile.
+    // In such a case, keyboard input could be intended to change the controls state, e.g., (de)select the checkbox.
+    private bool IsNoControlOrSongButtonFocused()
+    {
+        GameObject focusedControl = eventSystem.currentSelectedGameObject;
+        bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
+        return focusedControl == null || focusedControlIsSongButton;
+    }
+
+    private bool IsFuzzySearchActive()
+    {
+        // In the Unity editor, the Alt key is not sent to the game. So use F1 as alternative.
+        return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.F1);
     }
 }
