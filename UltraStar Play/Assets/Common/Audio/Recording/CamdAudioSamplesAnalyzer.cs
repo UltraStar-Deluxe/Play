@@ -1,58 +1,42 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using CircularBuffer;
 using UnityEngine;
 
-public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
+public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {
-    // The singable spectrum of a human voice has about 4 octaves (C2 to C6).
-    // +1 here, because if min and max are equal, then you are still able to sing one note.
-    private const int NumHalftones = (MidiUtils.MidiNoteMax - MidiUtils.MidiNoteMin) + 1;
+    private const int NumHalftones = MidiUtils.SingableNoteRange;
     private const int MinSampleLength = 256;
-    private static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
 
     private readonly int[] halftoneDelays;
-    private readonly List<int> pitchRecordHistory = new List<int>();
-    private readonly int pitchRecordHistoryLength = 5;
+    private readonly double[] correlation = new double[NumHalftones];
 
-    private bool isEnabled;
+    private readonly CamdPitchCandidate[] currentCandidates = new CamdPitchCandidate[3];
+    private readonly CircularBuffer<CamdPitchCandidate> candidateHistory = new CircularBuffer<CamdPitchCandidate>(3);
+
+    // The best candidate from the currentCandidates and candidateHistory
+    private CamdPitchCandidate bestCandidate;
+    // The best candidate from the currentCandidates only
+    private CamdPitchCandidate bestCurrentCandidate;
+
+    // Factor in range 0 to 1, where 0 means "no bias" and 1 means "full bias".
+    // The factor is used to reduce the normalizedError of a current candidate
+    // when there is a candadite with the same halftone in the history.
+    // This is when a halftone from the history will be continued by the current candidate.
+    public float HalftoneContinuationBias { get; set; } = 0;
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz)
     {
-        halftoneDelays = PrecalculateHalftoneDelays(halftoneFrequencies, sampleRateHz);
-    }
-
-    private static double[] PrecalculateHalftoneFrequencies()
-    {
-        double[] noteFrequencies = new double[NumHalftones];
-        for (int index = 0; index < NumHalftones; index++)
+        halftoneDelays = MidiUtils.PrecalculateHalftoneDelays(sampleRateHz);
+        for (int i = 0; i < currentCandidates.Length; i++)
         {
-            float concertPitchOctaveOffset = ((MidiUtils.MidiNoteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
-            noteFrequencies[index] = MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset);
+            currentCandidates[i] = new CamdPitchCandidate();
         }
-        return noteFrequencies;
     }
 
-    private static int[] PrecalculateHalftoneDelays(double[] halftoneFrequencies, double sampleRateHz)
-    {
-        int[] noteDelays = new int[NumHalftones];
-        for (int index = 0; index < NumHalftones; index++)
-        {
-            noteDelays[index] = Convert.ToInt32((sampleRateHz) / halftoneFrequencies[index]);
-        }
-        return noteDelays;
-    }
-
-    public void Enable()
-    {
-        isEnabled = true;
-    }
-
-    public void Disable()
-    {
-        isEnabled = false;
-    }
-
-    public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic)
+    public override PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile micProfile)
     {
         if (!isEnabled)
         {
@@ -66,38 +50,150 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         }
         int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
 
-        // check if samples is louder than threshhold
-        bool passesThreshold = false;
-        float minThreshold = mic.NoiseSuppression / 100f;
-        for (int index = 0; index < sampleCountToUse; index++)
-        {
-            if (Math.Abs(audioSamplesBuffer[index]) >= minThreshold)
-            {
-                passesThreshold = true;
-                break;
-            }
-        }
-        if (!passesThreshold)
+        // Check if samples is louder than threshhold
+        if (!IsAboveNoiseSuppressionThreshold(audioSamplesBuffer, micProfile))
         {
             OnNoPitchDetected();
             return null;
         }
 
-        // get best fitting tone
-        double[] correlation = CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse);
+        // Get best fitting tone
+        CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse, correlation);
 
-        int halftone = CalculateBestFittingHalftone(correlation);
-        if (halftone != -1 && isEnabled)
+        FindCurrentCandidates(correlation, currentCandidates);
+        CalculateNormalizedError(currentCandidates, candidateHistory);
+        FindBestCandidate(currentCandidates, candidateHistory);
+
+        // Fill history with best of the current candidates.
+        // But do not re-insert candidates from the history back to the history.
+        // Otherwise a candidate with 0 error could dominate forever.
+        candidateHistory.PushFront(new CamdPitchCandidate(bestCurrentCandidate));
+
+        int midiNote = bestCandidate.halftone + MidiUtils.MidiNoteMin;
+        return new PitchEvent(midiNote);
+    }
+
+    private void FindBestCandidate(CamdPitchCandidate[] currentCandidates, CircularBuffer<CamdPitchCandidate> bestCandidateHistory)
+    {
+        bestCurrentCandidate = null;
+        currentCandidates.ForEach((currentCandidate) =>
         {
-            int midiNoteMedian = GetMidiNoteAverageFromHistory(halftone + MidiUtils.MidiNoteMin);
-            if (midiNoteMedian > 0)
+            // Bias towards recently detected pitches.
+            // For candidates with similar normalizedError,
+            // this will prefer a candidate that has been detected before, which reduces the "jitter" of the pitch detection.
+            // However, if a new pitch has been clearly identified with significantly less normalizedError,
+            // then an old detected pitch from the history will not be used instead because its normalizedError will still be less - even without bias.
+            currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError;
+            if (HalftoneContinuationBias >= 0 && HalftoneContinuationBias <= 1)
             {
-                return new PitchEvent(midiNoteMedian);
+                for (int historyIndex = 0; historyIndex < bestCandidateHistory.Size; historyIndex++)
+                {
+                    if (bestCandidateHistory[historyIndex].halftone == currentCandidate.halftone)
+                    {
+                        // The further away in the history the halftone was before, the less the bias will impact the current candidate.
+                        double biasConsideringHistoryDistance = HalftoneContinuationBias - (HalftoneContinuationBias * (historyIndex / bestCandidateHistory.Size));
+                        currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError * (1 - biasConsideringHistoryDistance);
+                        // Do not apply bias multiple times.
+                        break;
+                    }
+                }
             }
+
+            if (currentCandidate.halftone >= 0
+                && (bestCurrentCandidate == null
+                    || bestCurrentCandidate.halftone < 0
+                    || currentCandidate.normalizedErrorWithBias < bestCurrentCandidate.normalizedErrorWithBias))
+            {
+                bestCurrentCandidate = currentCandidate;
+            }
+        });
+
+        CamdPitchCandidate bestHistoryCandidate = null;
+        for (int i = 0; i < bestCandidateHistory.Size; i++)
+        {
+            // Do not consider the biased error when comparing best candidate from history.
+            CamdPitchCandidate historyCandidate = bestCandidateHistory[i];
+            if (historyCandidate.halftone >= 0
+                && (bestHistoryCandidate == null
+                    || bestHistoryCandidate.halftone < 0
+                    || historyCandidate.normalizedError < bestHistoryCandidate.normalizedError))
+            {
+                bestHistoryCandidate = historyCandidate;
+            }
+        };
+
+        // Do not consider the biased error when comparing best candidate from history.
+        bestCandidate = (bestHistoryCandidate == null || bestCurrentCandidate.normalizedErrorWithBias < bestHistoryCandidate.normalizedError)
+            ? bestCurrentCandidate
+            : bestHistoryCandidate;
+    }
+
+    private void CalculateNormalizedError(CamdPitchCandidate[] currentCandidates, CircularBuffer<CamdPitchCandidate> bestCandidateHistory)
+    {
+        // Correlation is the error. For a perfect match of the frequency it would be 0.
+        // NormalizedError is the percentage of the error for this candidate
+        // compared to other current candidates as well as history candidates.
+        // Thus, normalizedError is smaller if the candidate has a significantly smaller error than the rest,
+        // and it is relatively bigger when all candidates have similar error values.
+        double errorSum = 0;
+        currentCandidates.ForEach(candidate => errorSum += candidate.error);
+        bestCandidateHistory.ForEach(candidate => errorSum += candidate.error);
+
+        currentCandidates.ForEach(candidate => candidate.normalizedError = candidate.error / errorSum);
+        bestCandidateHistory.ForEach(candidate => candidate.normalizedError = candidate.error / errorSum);
+    }
+
+    private void FindCurrentCandidates(double[] correlation, CamdPitchCandidate[] candidates)
+    {
+        // Find the halftones with the least error.
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            candidates[i].halftone = 0;
+            candidates[i].error = correlation[0];
         }
 
-        OnNoPitchDetected();
-        return null;
+        for (int halftone = 1; halftone < NumHalftones; halftone++)
+        {
+            // Index 0: first best candidate, index 1: second best candidate, ...
+            for (int candidateIndex = 0; candidateIndex < candidates.Length; candidateIndex++)
+            {
+                if (candidates[candidateIndex].error > correlation[halftone])
+                {
+                    candidates[candidateIndex].halftone = halftone;
+                    candidates[candidateIndex].error = correlation[halftone];
+                    break;
+                }
+            }
+        }
+    }
+
+    // Circular Average Magnitude Difference Function (CAMDF) is defined as
+    //   D_C(\tau)=\sum_{n=0}^{N-1}|x(mod(n+\tau, N)) - x(n)|
+    // where \tau = halftoneDelay, n = index, N = samplesSinceLastFrame, x = sampleCountToUse
+    // See: Equation (4) in http://www.utdallas.edu/~hxb076000/citing_papers/Muhammad%20Extended%20Average%20Magnitude%20Difference.pdf
+    private double[] CircularAverageMagnitudeDifference(float[] audioSamplesBuffer, int sampleCountToUse, double[] correlation)
+    {
+        // accumulate the magnitude differences for samples in AnalysisBuffer
+        for (int halftone = 0; halftone < NumHalftones; halftone++)
+        {
+            correlation[halftone] = 0;
+            for (int index = 0; index < sampleCountToUse; index++)
+            {
+                correlation[halftone] +=
+                    Math.Abs(
+                        audioSamplesBuffer[(index + halftoneDelays[halftone]) & (sampleCountToUse - 1)] -
+                        audioSamplesBuffer[index]);
+            }
+            // normalize values for future application
+            correlation[halftone] = correlation[halftone] / sampleCountToUse;
+        }
+        // return circular average magnitude difference
+        return correlation;
+    }
+
+    private void OnNoPitchDetected()
+    {
+        candidateHistory.Clear();
     }
 
     private static int PreviousPowerOfTwo(int x)
@@ -110,73 +206,41 @@ public class CamdAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         return x - (x >> 1);
     }
 
-    private static int CalculateBestFittingHalftone(double[] correlation)
+    private class CamdPitchCandidate
     {
-        if (correlation.Length == 0)
+        public int halftone = -1;
+        public double error = -1;
+        public double normalizedError = -1;
+        public double normalizedErrorWithBias = -1;
+
+        public CamdPitchCandidate()
         {
-            return -1;
         }
-        int bestFittingHalftone = 0;
-        for (int index = 1; index < NumHalftones; index++)
+
+        public CamdPitchCandidate(CamdPitchCandidate other)
         {
-            if (correlation[index] <= correlation[bestFittingHalftone])
-            {
-                bestFittingHalftone = index;
-            }
+            CopyValues(other);
         }
-        return bestFittingHalftone;
-    }
 
-    // Circular Average Magnitude Difference Function (CAMDF) is defined as
-    //   D_C(\tau)=\sum_{n=0}^{N-1}|x(mod(n+\tau, N)) - x(n)|
-    // where \tau = halftoneDelay, n = index, N = samplesSinceLastFrame, x = audioSamplesBuffer
-    // See: Equation (4) in http://www.utdallas.edu/~hxb076000/citing_papers/Muhammad%20Extended%20Average%20Magnitude%20Difference.pdf
-    private double[] CircularAverageMagnitudeDifference(float[] audioSamplesBuffer, int samplesSinceLastFrame)
-    {
-        double[] correlation = new double[NumHalftones];
-        // accumulate the magnitude differences for samples in AnalysisBuffer
-        for (int halftone = 0; halftone < NumHalftones; halftone++)
+        public void Reset()
         {
-            correlation[halftone] = 0;
-            for (int index = 0; index < samplesSinceLastFrame; index++)
-            {
-                correlation[halftone] = correlation[halftone] +
-                    Math.Abs(
-                        audioSamplesBuffer[(index + halftoneDelays[halftone]) & (samplesSinceLastFrame - 1)] -
-                        audioSamplesBuffer[index]);
-            }
-            // normalize values for future application
-            correlation[halftone] = correlation[halftone] / samplesSinceLastFrame;
+            halftone = -1;
+            error = -1;
+            normalizedError = -1;
+            normalizedErrorWithBias = -1;
         }
-        // return circular average magnitude difference
-        return correlation;
-    }
 
-    private int GetMidiNoteAverageFromHistory(int midiNote)
-    {
-        // Create history of PitchRecord events
-        AddMidiNoteToHistory(midiNote);
-
-        // Calculate median of recorded midi note values.
-        // This is done to make the pitch detection more stable, but it increases the latency.
-        List<int> sortedPitchRecordHistory = new List<int>(pitchRecordHistory);
-        int midiNoteMedian = sortedPitchRecordHistory[sortedPitchRecordHistory.Count / 2];
-
-        return midiNoteMedian;
-    }
-
-    private void AddMidiNoteToHistory(int midiNote)
-    {
-        pitchRecordHistory.Add(midiNote);
-        while (pitchRecordHistoryLength > 0 && pitchRecordHistory.Count > pitchRecordHistoryLength)
+        public void CopyValues(CamdPitchCandidate other)
         {
-            pitchRecordHistory.RemoveAt(0);
+            halftone = other.halftone;
+            error = other.error;
+            normalizedError = other.normalizedError;
+            normalizedErrorWithBias = other.normalizedErrorWithBias;
         }
-    }
 
-    private void OnNoPitchDetected()
-    {
-        // No tone detected.
-        pitchRecordHistory.Clear();
+        public override string ToString()
+        {
+            return $"(halftone:{halftone};error:{error};normalizedError:{normalizedError})";
+        }
     }
 }
