@@ -94,6 +94,12 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
         {
             songSelectSceneController.StartSingScene();
         }
+
+        // Toggle active players with Tab
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            songSelectSceneController.ToggleSelectedPlayers();
+        }
     }
 
     // Directly jump to song with the title that starts with the letters hit on the keyboard
