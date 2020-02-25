@@ -6,6 +6,8 @@ using System.Linq;
 using UniRx;
 using UniInject;
 using UnityEngine.EventSystems;
+using System.Globalization;
+using System.Threading;
 
 public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder
 {
@@ -34,8 +36,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private SongRouletteController songRouletteController;
 
     private SongSelectSceneData sceneData;
-    private IReadOnlyCollection<SongMeta> songMetas;
-    private int lastSongMetasCount = -1;
+    private List<SongMeta> songMetas;
     private int lastSongMetasReloadFrame = -1;
     private Statistics statsManager;
 
@@ -57,12 +58,17 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     void Start()
     {
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
+        // Give the song search some time, otherwise the "no songs found" label flickers once.
+        if (!SongMetaManager.IsSongScanFinished)
+        {
+            Thread.Sleep(100);
+        }
 
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
         searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
 
-        songMetas = SongMetaManager.Instance.GetSongMetas();
+        GetSongMetasFromManager();
 
         songRouletteController = FindObjectOfType<SongRouletteController>();
         songRouletteController.SongSelectSceneController = this;
@@ -75,13 +81,21 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
     }
 
+    private void GetSongMetasFromManager()
+    {
+        songMetas = new List<SongMeta>(SongMetaManager.Instance.GetSongMetas());
+        songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
+        noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
+    }
+
     void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
-        if (lastSongMetasCount != songMetas.Count
+        if (songMetas.Count != SongMetaManager.Instance.GetSongMetas().Count
             && !IsSearchEnabled()
             && lastSongMetasReloadFrame + 10 < Time.frameCount)
         {
+            GetSongMetasFromManager();
             SongMeta selectedSong = songRouletteController.Selection.Value.SongMeta;
             InitSongRoulette();
             songRouletteController.SelectSong(selectedSong);
@@ -96,7 +110,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private void InitSongRoulette()
     {
         lastSongMetasReloadFrame = Time.frameCount;
-        lastSongMetasCount = songMetas.Count;
         songRouletteController.SetSongs(songMetas);
         if (sceneData.SongMeta != null)
         {
@@ -320,6 +333,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public bool IsSearchTextInputHasFocus()
     {
         return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
+    }
+
+    public void ToggleSelectedPlayers()
+    {
+        playerProfileListController.ToggleSelectedPlayers();
     }
 
     public List<IBinding> GetBindings()
