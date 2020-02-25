@@ -90,4 +90,28 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
         }
         return result;
     }
+
+    public void ToggleSelectedPlayers()
+    {
+        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
+        List<SongSelectPlayerProfileListEntry> deselectedEntries = new List<SongSelectPlayerProfileListEntry>();
+        // First deactivate the selected ones to make their mics available for others.
+        foreach (SongSelectPlayerProfileListEntry entry in listEntriesInScrollView)
+        {
+            if (entry.IsSelected)
+            {
+                entry.SetSelected(false);
+            }
+            else
+            {
+                deselectedEntries.Add(entry);
+            }
+        }
+        // Second activate the ones that were deselected.
+        // Because others have been deselected, they will be assigned free mics if any.
+        foreach (SongSelectPlayerProfileListEntry entry in deselectedEntries)
+        {
+            entry.SetSelected(true);
+        }
+    }
 }
