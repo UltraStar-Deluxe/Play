@@ -11,6 +11,9 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     public bool playRecordedAudio;
 
+    [Range(0, 1)]
+    public float halftoneContinuationBias = 0.2f;
+
     [ReadOnly]
     public string lastMidiNoteName;
     [ReadOnly]
@@ -81,8 +84,16 @@ public class MicrophonePitchTracker : MonoBehaviour
     void OnEnable()
     {
         audioSource = GetComponent<AudioSource>();
-        audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
+
+        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer();
         audioSamplesAnalyzer.Enable();
+    }
+
+    private IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer()
+    {
+        CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
+        camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
+        return camdAudioSamplesAnalyzer;
     }
 
     void OnDisable()
@@ -93,6 +104,11 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     void Update()
     {
+        if (audioSamplesAnalyzer is CamdAudioSamplesAnalyzer)
+        {
+            (audioSamplesAnalyzer as CamdAudioSamplesAnalyzer).HalftoneContinuationBias = halftoneContinuationBias;
+        }
+
         UpdateMicrophoneAudioPlayback();
         UpdatePitchDetection();
     }

@@ -18,6 +18,11 @@ public static class MidiUtils
     // Black keys: C# = 1, D# = 3, F# = 6, G# = 8, A# = 10
     private static readonly int[] blackKeyRelativeMidiNotes = { 1, 3, 6, 8, 10 };
 
+    public static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
+
+    public static readonly double MaxHalftoneFrequency = halftoneFrequencies[halftoneFrequencies.Length - 1];
+    public static readonly double MinHalftoneFrequency = halftoneFrequencies[0];
+
     public static int GetOctave(int midiNote)
     {
         // 12: "C0"
@@ -95,5 +100,26 @@ public static class MidiUtils
     public static bool IsWhitePianoKey(int midiNote)
     {
         return whiteKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
+    }
+
+    public static double[] PrecalculateHalftoneFrequencies()
+    {
+        double[] noteFrequencies = new double[SingableNoteRange];
+        for (int index = 0; index < SingableNoteRange; index++)
+        {
+            float concertPitchOctaveOffset = ((MidiUtils.MidiNoteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
+            noteFrequencies[index] = MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset);
+        }
+        return noteFrequencies;
+    }
+
+    public static int[] PrecalculateHalftoneDelays(double sampleRateHz)
+    {
+        int[] noteDelays = new int[SingableNoteRange];
+        for (int index = 0; index < SingableNoteRange; index++)
+        {
+            noteDelays[index] = Convert.ToInt32(sampleRateHz / halftoneFrequencies[index]);
+        }
+        return noteDelays;
     }
 }
