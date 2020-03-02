@@ -41,6 +41,11 @@ public class SongSelectPlayerProfileListEntry : MonoBehaviour
         }
     }
 
+    public void SetSelected(bool newIsSelected)
+    {
+        isSelectedToggle.isOn = newIsSelected;
+    }
+
     public void Init(PlayerProfile playerProfile)
     {
         this.PlayerProfile = playerProfile;

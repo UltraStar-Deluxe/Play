@@ -6,7 +6,7 @@ public class SingingResultsSceneData : SceneData
 {
     public SongMeta SongMeta { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new List<PlayerProfile>();
-    private Dictionary<PlayerProfile, PlayerScoreData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreData>();
+    private readonly Dictionary<PlayerProfile, PlayerScoreData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreData>();
 
     public void AddPlayerScores(PlayerProfile profile, PlayerScoreData scoreData)
     {
@@ -14,7 +14,7 @@ public class SingingResultsSceneData : SceneData
         {
             PlayerProfiles.Add(profile);
         }
-        playerScoreMap.Add(profile, scoreData);
+        playerScoreMap[profile] = scoreData;
     }
 
     public PlayerScoreData GetPlayerScores(PlayerProfile playerProfile)

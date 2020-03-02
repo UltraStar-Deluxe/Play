@@ -209,6 +209,11 @@ public class SongRouletteController : MonoBehaviour
         Selection.Value = new SongSelection(songMeta, songs.IndexOf(songMeta), songs.Count);
     }
 
+    public SongMeta Find(Predicate<SongMeta> predicate)
+    {
+        return songs.Find(predicate);
+    }
+
     public void SelectNextSong()
     {
         int nextIndex;
