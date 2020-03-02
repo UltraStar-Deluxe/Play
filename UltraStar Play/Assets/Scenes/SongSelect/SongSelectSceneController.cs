@@ -4,10 +4,12 @@ using System;
 using UnityEngine.UI;
 using System.Linq;
 using UniRx;
+using UniInject;
+using UnityEngine.EventSystems;
 using System.Globalization;
 using System.Threading;
 
-public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener
+public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder
 {
     public static SongSelectSceneController Instance
     {
@@ -39,6 +41,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private Statistics statsManager;
 
     private SongMeta selectedSongBeforeSearch;
+
+    [Inject]
+    private EventSystem eventSystem;
 
     public GameObject noSongsFoundMessage;
 
@@ -168,6 +173,16 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         duetIndicator.SetActive(isDuet);
     }
 
+    public void JumpToSongWhereTitleStartsWith(string text)
+    {
+        string textToLower = text.ToLowerInvariant();
+        SongMeta match = songRouletteController.Find(it => it.Title.ToLowerInvariant().StartsWith(textToLower));
+        if (match != null)
+        {
+            songRouletteController.SelectSong(match);
+        }
+    }
+
     private SingSceneData CreateSingSceneData(SongMeta songMeta)
     {
         SingSceneData singSceneData = new SingSceneData();
@@ -279,15 +294,12 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         }
         else
         {
-            switch (searchTextInputField.SearchMode)
+            DoSearch((songMeta) =>
             {
-                case SearchInputField.ESearchMode.BySongTitle:
-                    DoSearch((songMeta) => songMeta.Title.ToLower().Contains(searchText));
-                    break;
-                case SearchInputField.ESearchMode.ByArtist:
-                    DoSearch((songMeta) => songMeta.Artist.ToLower().Contains(searchText));
-                    break;
-            }
+                bool titleMatches = songMeta.Title.ToLower().Contains(searchText);
+                bool artistMatches = songMeta.Artist.ToLower().Contains(searchText);
+                return titleMatches || artistMatches;
+            });
         }
     }
 
@@ -316,5 +328,22 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public bool IsSearchEnabled()
     {
         return searchTextInputField.isActiveAndEnabled;
+    }
+
+    public bool IsSearchTextInputHasFocus()
+    {
+        return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
+    }
+
+    public void ToggleSelectedPlayers()
+    {
+        playerProfileListController.ToggleSelectedPlayers();
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }
