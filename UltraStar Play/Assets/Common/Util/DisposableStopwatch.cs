@@ -15,9 +15,9 @@ public class DisposableStopwatch : IDisposable
 
     // Logs the given text when the stopwatch is disposed.
     // Thereby, the placeholder <millis> will be replaced with the elapsed milliseconds.
-    public DisposableStopwatch(string textWithPlaceholders, bool startStopwatch = true)
+    public DisposableStopwatch(string textWithPlaceholders, bool startStopwatch = true, float logPeriodInSeconds = 0)
     {
-        action = (sw) => LogTextWithPlaceholders(sw, textWithPlaceholders);
+        action = (sw) => LogTextWithPlaceholders(sw, textWithPlaceholders, logPeriodInSeconds);
         CreateStopwatch(startStopwatch);
     }
 
@@ -36,10 +36,19 @@ public class DisposableStopwatch : IDisposable
         }
     }
 
-    private void LogTextWithPlaceholders(Stopwatch sw, string textWithPlaceholders)
+    private void LogTextWithPlaceholders(Stopwatch sw, string textWithPlaceholders, float logPeriodInSeconds)
     {
         string millis = sw.ElapsedMilliseconds.ToString();
         string logText = textWithPlaceholders.Replace("<millis>", millis);
-        UnityEngine.Debug.Log(logText);
+        if (logPeriodInSeconds <= 0)
+        {
+            // Log immediately
+            UnityEngine.Debug.Log(logText);
+        }
+        else
+        {
+            // Log every now and then the measured durations
+            LogUtils.LogFreqeuently(textWithPlaceholders, millis, logPeriodInSeconds);
+        }
     }
 }
