@@ -29,6 +29,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 730526333788458355}
+  - {fileID: 2040862828101374607}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -49,6 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d41efd84c6371e442bc11a68ccfcc4a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lyricsUiText: {fileID: 2846181495390017783}
+  imageHueHelper: {fileID: 996218955787764137}
 --- !u!1 &1473120825482942063
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,8 +81,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 2040862828101374607}
+  m_Children: []
   m_Father: {fileID: 9030090544604440398}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -109,7 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 6d7290ea574ff4d48bad8d35bfec9213, type: 2}
-  m_Color: {r: 1, g: 0.613512, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -138,6 +140,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hue: 0
+  hueAsColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &7220638728962363615
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +154,7 @@ GameObject:
   - component: {fileID: 2511693166792069900}
   - component: {fileID: 2846181495390017783}
   m_Layer: 0
-  m_Name: NoteName
+  m_Name: LyricsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,12 +167,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7220638728962363615}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 730526333788458355}
-  m_RootOrder: 0
+  m_Father: {fileID: 9030090544604440398}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

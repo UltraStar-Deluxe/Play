@@ -49,11 +49,6 @@ public class PlayerUiController : MonoBehaviour
         currentBeatGridDisplayer?.DisplaySentence(currentSentence);
     }
 
-    public void RemoveAllDisplayedNotes()
-    {
-        sentenceDisplayer.RemoveAllDisplayedNotes();
-    }
-
     public void ShowSentenceRating(SentenceRating sentenceRating)
     {
         sentenceRatingDisplayer.ShowSentenceRating(sentenceRating);
@@ -76,10 +71,6 @@ public class PlayerUiController : MonoBehaviour
 
     public void CreatePerfectNoteEffect(Note perfectNote)
     {
-        UiNote uiNote = GetComponentsInChildren<UiNote>().Where(it => it.Note == perfectNote).FirstOrDefault();
-        if (uiNote != null)
-        {
-            uiNote.CreatePerfectNoteEffect();
-        }
+        sentenceDisplayer.CreatePerfectNoteEffect(perfectNote);
     }
 }
