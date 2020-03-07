@@ -31,7 +31,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     // The factor is used to reduce the normalizedError of a current candidate
     // when there is a candadite with the same halftone in the history.
     // This creates a tendency towards previously detected pitches.
-    public float HalftoneContinuationBias { get; set; } = 0;
+    public float HalftoneContinuationBias { get; set; }
 
     public CamdAudioSamplesAnalyzer(int sampleRateHz, int maxSampleLength)
     {
@@ -157,7 +157,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             {
                 bestHistoryCandidate = historyCandidate;
             }
-        };
+        }
 
         // Do not consider the biased error when comparing best candidate from history.
         bestCandidate = (bestHistoryCandidate == null || bestCurrentCandidate.normalizedErrorWithBias < bestHistoryCandidate.normalizedError)
@@ -208,7 +208,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     //   D_C(\tau)=\sum_{n=0}^{N-1}|x(mod(n+\tau, N)) - x(n)|
     // where \tau = halftoneDelay, n = index, N = samplesSinceLastFrame, x = sampleCountToUse
     // See: Equation (4) in http://www.utdallas.edu/~hxb076000/citing_papers/Muhammad%20Extended%20Average%20Magnitude%20Difference.pdf
-    private float[] CircularAverageMagnitudeDifference(float[] audioSamplesBuffer, int sampleCountToUse, float[] correlation)
+    private void CircularAverageMagnitudeDifference(float[] audioSamplesBuffer, int sampleCountToUse, float[] correlation)
     {
         // accumulate the magnitude differences for samples in AnalysisBuffer
         for (int halftone = 0; halftone < NumHalftones; halftone++)
@@ -220,8 +220,6 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
                 correlation[halftone] += (diff < 0) ? -diff : diff;
             }
         }
-        // return circular average magnitude difference
-        return correlation;
     }
 
     private void OnNoPitchDetected()
