@@ -165,6 +165,12 @@ static class SongMetaBuilder
                         case "language":
                             res.Language = item.Value;
                             break;
+                        case "previewstart":
+                            res.PreviewStart = ConvertToFloat(item.Value);
+                            break;
+                        case "previewend":
+                            res.PreviewEnd = ConvertToFloat(item.Value);
+                            break;
                         case "start":
                             res.Start = ConvertToFloat(item.Value);
                             break;
