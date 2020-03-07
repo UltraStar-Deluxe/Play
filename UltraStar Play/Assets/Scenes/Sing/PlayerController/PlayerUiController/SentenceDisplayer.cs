@@ -5,10 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SentenceDisplayer : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SentenceDisplayer : MonoBehaviour, INeedInjection
 {
     // The number of lines on which notes can be placed.
     // One can imagine that notes can be placed not only on the drawn lines,
@@ -30,7 +34,9 @@ public class SentenceDisplayer : MonoBehaviour
 
     public bool displayRoundedAndActualRecordedNotes;
     public bool showPitchOfNotes;
-    public bool showLyricsOfNotes;
+
+    [Inject]
+    private Settings settings;
 
     private readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
     private readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
@@ -123,11 +129,11 @@ public class SentenceDisplayer : MonoBehaviour
 
         Text uiNoteText = uiNote.lyricsUiText;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
-        if (showLyricsOfNotes && showPitchOfNotes)
+        if (settings.GraphicSettings.showLyricsOnNotes && showPitchOfNotes)
         {
             uiNoteText.text = GetDisplayText(note) + " (" + pitchName + ")";
         }
-        else if (showLyricsOfNotes)
+        else if (settings.GraphicSettings.showLyricsOnNotes)
         {
             uiNoteText.text = GetDisplayText(note);
         }
