@@ -10,6 +10,7 @@ public class PlayerProfile : IEquatable<PlayerProfile>
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
     public bool IsEnabled { get; set; } = true;
+    public bool IsSelected { get; set; } = true;
 
     public PlayerProfile()
     {
