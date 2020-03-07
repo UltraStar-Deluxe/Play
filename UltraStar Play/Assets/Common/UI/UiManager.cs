@@ -38,6 +38,11 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private readonly List<Notification> notifications = new List<Notification>();
 
+    void Awake()
+    {
+        LeanTween.init(800);
+    }
+
     void Start()
     {
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
