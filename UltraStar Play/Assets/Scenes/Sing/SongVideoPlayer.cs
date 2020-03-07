@@ -17,6 +17,8 @@ public class SongVideoPlayer : MonoBehaviour
     [InjectedInInspector]
     public Image backgroundImage;
 
+    public bool forceSyncOnForwardJumpInTheSong;
+
     // Optional SongAudioPlayer.
     // If set, then the video playback is synchronized with the position in the SongAudioPlayer.
     public SongAudioPlayer SongAudioPlayer { get; set; }
@@ -33,7 +35,10 @@ public class SongVideoPlayer : MonoBehaviour
         this.SongMeta = songMeta;
         this.SongAudioPlayer = songAudioPlayer;
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
+        if (forceSyncOnForwardJumpInTheSong)
+        {
+            songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
+        }
         InitVideo(songMeta);
     }
 
