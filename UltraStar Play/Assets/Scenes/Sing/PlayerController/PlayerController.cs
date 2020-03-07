@@ -227,9 +227,12 @@ public class PlayerController : MonoBehaviour, INeedInjection
         DisplayRecordedNote(recordedNote);
     }
 
-    public void OnRecordedNoteContinued(RecordedNote recordedNote)
+    public void OnRecordedNoteContinued(RecordedNote recordedNote, bool updateUi)
     {
-        DisplayRecordedNote(recordedNote);
+        if (updateUi)
+        {
+            DisplayRecordedNote(recordedNote);
+        }
     }
 
     private void CheckPerfectlySungNote(RecordedNote lastRecordedNote)
@@ -268,6 +271,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
 
         List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(recordingSentence);
+        PlayerNoteRecorder.RemoveRecordedNotes(recordingSentence);
         SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(recordingSentence, recordedNotes);
         playerUiController.ShowTotalScore(PlayerScoreController.TotalScore);
         if (sentenceRating != null)
@@ -324,14 +328,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
     {
         Sentence result = Voice.Sentences
             .Where(sentence => currentBeat < sentence.LinebreakBeat)
-            .FirstOrDefault();
-        return result;
-    }
-
-    public Sentence GetSentenceForBeat(double currentBeat)
-    {
-        Sentence result = Voice.Sentences
-            .Where(sentence => sentence.MinBeat <= currentBeat && currentBeat <= sentence.MaxBeat)
             .FirstOrDefault();
         return result;
     }
