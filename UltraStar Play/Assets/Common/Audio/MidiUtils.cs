@@ -5,8 +5,8 @@ public static class MidiUtils
 {
     // There are 49 halftones in the singable audio spectrum,
     // namely C2 (midi note 36, which is 65.41 Hz) to C6 (midi note 84, which is 1046.5023 Hz).
-    public const int MidiNoteMin = 36;
-    public const int MidiNoteMax = 84;
+    public const int SingableNoteMin = 36;
+    public const int SingableNoteMax = 84;
     public const int SingableNoteRange = 49;
 
     // Concert pitch A4 (440 Hz)
@@ -95,5 +95,26 @@ public static class MidiUtils
     public static bool IsWhitePianoKey(int midiNote)
     {
         return whiteKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
+    }
+
+    public static float[] PrecalculateHalftoneFrequencies(int noteMin, int noteRange)
+    {
+        float[] frequencies = new float[noteRange];
+        for (int index = 0; index < frequencies.Length; index++)
+        {
+            float concertPitchOctaveOffset = ((noteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
+            frequencies[index] = (float)(MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset));
+        }
+        return frequencies;
+    }
+
+    public static int[] PrecalculateHalftoneDelays(int sampleRateHz, float[] halftoneFrequencies)
+    {
+        int[] noteDelays = new int[halftoneFrequencies.Length];
+        for (int index = 0; index < halftoneFrequencies.Length; index++)
+        {
+            noteDelays[index] = Convert.ToInt32(sampleRateHz / halftoneFrequencies[index]);
+        }
+        return noteDelays;
     }
 }

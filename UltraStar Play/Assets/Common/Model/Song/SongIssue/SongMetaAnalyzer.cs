@@ -45,7 +45,7 @@ public static class SongMetaAnalyzer
             }
 
             // Find pitches outside of the singable range
-            if (note.MidiNote < MidiUtils.MidiNoteMin || note.MidiNote > MidiUtils.MidiNoteMax)
+            if (note.MidiNote < MidiUtils.SingableNoteMin || note.MidiNote > MidiUtils.SingableNoteMax)
             {
                 SongIssue issue = SongIssue.CreateWarning("Unusual pitch (human range is roughly from C2 to C6).", note.StartBeat, note.EndBeat);
                 result.Add(issue);
