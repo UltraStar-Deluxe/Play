@@ -2,21 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
 
 public class UiRecordedNote : MonoBehaviour
 {
-    private ImageHueHelper imageHueHelper;
+    [InjectedInInspector]
+    public Text lyricsUiText;
+    [InjectedInInspector]
+    public ImageHueHelper imageHueHelper;
+
+    public RectTransform RectTransform { get; private set; }
+    public int MidiNote { get; set; }
 
     void Awake()
     {
-        imageHueHelper = GetComponentInChildren<ImageHueHelper>();
+        RectTransform = GetComponent<RectTransform>();
     }
 
     public void SetColorOfMicProfile(MicProfile micProfile)
     {
         if (micProfile != null)
         {
-            imageHueHelper.SetHueByColor(micProfile.Color);
+            SetColor(micProfile.Color);
         }
+    }
+
+    public void SetColor(Color color)
+    {
+        imageHueHelper.SetHueByColor(color);
     }
 }
