@@ -8,7 +8,7 @@ using UnityEngine;
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
 public static class AudioManager
 {
-    private static readonly int criticalCacheSize = 3;
+    private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
 
     public static AudioClip GetAudioClip(string path)
