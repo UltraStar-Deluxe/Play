@@ -8,6 +8,10 @@ using UniRx;
 
 public class SongAudioPlayer : MonoBehaviour
 {
+    // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
+    // An event is fired when jumping forward in the song.
+    private const int MinForwardJumpOffsetInMillis = 500;
+
     [InjectedInInspector]
     public AudioSource audioPlayer;
 
@@ -53,9 +57,13 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            // The position will increase in normal playback. A big increase however, can be considered as "jump".
-            int minOffsetInMillis = 200;
-            return positionInSongEventStream.Pairwise().Where(pair => (pair.Previous + minOffsetInMillis) < pair.Current);
+            // The position will increase in normal playback. A big increase however, can always be considered as "jump".
+            // Furthermore, when not currently playing, then every forward change can be considered as "jump".
+            return positionInSongEventStream.Pairwise().Where(pair =>
+            {
+                return (pair.Previous + MinForwardJumpOffsetInMillis) < pair.Current
+                    || (!IsPlaying && pair.Previous < pair.Current);
+            });
         }
     }
 
