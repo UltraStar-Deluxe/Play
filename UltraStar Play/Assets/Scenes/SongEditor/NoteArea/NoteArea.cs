@@ -78,7 +78,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         // Initialize Viewport
         int x = 0;
         int width = 5000;
-        int y = MidiUtils.MidiNoteMin + (MidiUtils.SingableNoteRange / 4);
+        int y = MidiUtils.SingableNoteMin + (MidiUtils.SingableNoteRange / 4);
         int height = MidiUtils.SingableNoteRange / 2;
         SetViewport(x, y, width, height);
 

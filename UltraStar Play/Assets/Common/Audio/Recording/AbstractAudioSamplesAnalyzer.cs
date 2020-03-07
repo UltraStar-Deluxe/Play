@@ -14,10 +14,10 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         isEnabled = false;
     }
 
-    protected static bool IsAboveNoiseSuppressionThreshold(float[] audioSamplesBuffer, MicProfile micProfile)
+    protected static bool IsAboveNoiseSuppressionThreshold(float[] audioSamplesBuffer, int sampleCountToUse, MicProfile micProfile)
     {
         float minThreshold = micProfile.NoiseSuppression / 100f;
-        for (int index = 0; index < audioSamplesBuffer.Length; index++)
+        for (int index = 0; index < sampleCountToUse; index++)
         {
             if (Math.Abs(audioSamplesBuffer[index]) >= minThreshold)
             {

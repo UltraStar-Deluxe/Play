@@ -9,10 +9,14 @@ public class MicrophonePitchTracker : MonoBehaviour
     // TODO: use 44100Hz (if supported) or fallback to default microphone sample rate
     private const int SampleRateHz = 44100;
 
+    // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
+    // Thus, 1024 samples should be sufficient.
+    private const int MaxSampleCountToUse = 1024;
+
     public bool playRecordedAudio;
 
     [Range(0, 1)]
-    public float halftoneContinuationBias = 0.2f;
+    public float halftoneContinuationBias = 0.1f;
 
     [ReadOnly]
     public string lastMidiNoteName;
@@ -91,7 +95,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     private IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer()
     {
-        CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz);
+        CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz, MaxSampleCountToUse);
         camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
         return camdAudioSamplesAnalyzer;
     }
@@ -187,19 +191,18 @@ public class MicrophonePitchTracker : MonoBehaviour
         // In every frame, the mic buffer (which has a length of 1 second)
         // that was generated since the last frame has to be analyzed.
         int samplesSinceLastFrame = (int)(SampleRateHz * Time.deltaTime);
+        // Do not analyze more than necessary.
+        if (samplesSinceLastFrame > MaxSampleCountToUse)
+        {
+            samplesSinceLastFrame = MaxSampleCountToUse;
+        }
 
         // The new samples are coming in from the "right side" by Unity, i.e. the newest sample is at MicData.Length-1
         // The pitch detection lib analyzes its buffer from 0 to a given length (without the option for an offset).
         // Thus, we have to move the new samples in the mic buffer to the beginning of the buffer-to-be-analyzed.
         Array.Copy(MicData, SampleRateHz - samplesSinceLastFrame, PitchDetectionBuffer, 0, samplesSinceLastFrame);
 
-        // Clear the PitchDetection buffer that is not analyzed in this frame (this is not really needed).
-        for (int i = samplesSinceLastFrame; i < SampleRateHz; i++)
-        {
-            PitchDetectionBuffer[i] = 0;
-        }
-
-        ApplyMicAmplification(samplesSinceLastFrame);
+        ApplyMicAmplification(PitchDetectionBuffer, samplesSinceLastFrame);
 
         // Detect the pitch of the sample.
         PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(PitchDetectionBuffer, samplesSinceLastFrame, micProfile);
@@ -208,7 +211,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         pitchEventStream.OnNext(pitchEvent);
     }
 
-    private void ApplyMicAmplification(int samplesSinceLastFrame)
+    private void ApplyMicAmplification(float[] buffer, int samplesSinceLastFrame)
     {
         if (micAmplifyMultiplier == 0)
         {
@@ -217,7 +220,7 @@ public class MicrophonePitchTracker : MonoBehaviour
         float newSample;
         for (int index = 0; index < samplesSinceLastFrame - 1; index++)
         {
-            newSample = PitchDetectionBuffer[index] * micAmplifyMultiplier;
+            newSample = buffer[index] * micAmplifyMultiplier;
             if (newSample > 1)
             {
                 newSample = 1;
@@ -226,7 +229,7 @@ public class MicrophonePitchTracker : MonoBehaviour
             {
                 newSample = -1;
             }
-            PitchDetectionBuffer[index] = newSample;
+            buffer[index] = newSample;
         }
     }
 
