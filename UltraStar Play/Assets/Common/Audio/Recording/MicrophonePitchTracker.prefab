@@ -44,8 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2308ba4a559d3488166d7bdad4d41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  micDeviceName: Mikrofon (2- USB Microphone)
   playRecordedAudio: 1
+  halftoneContinuationBias: 0.1
+  lastMidiNoteName: 
+  lastMidiNote: 0
 --- !u!82 &6082356490043053463
 AudioSource:
   m_ObjectHideFlags: 0

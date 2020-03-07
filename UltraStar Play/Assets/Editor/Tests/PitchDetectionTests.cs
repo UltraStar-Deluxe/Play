@@ -29,7 +29,7 @@ public class PitchDetectionTests
             audioClip.GetData(samples, 0);
 
             // Analyze the samples
-            IAudioSamplesAnalyzer audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(audioClip.frequency);
+            IAudioSamplesAnalyzer audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(audioClip.frequency, 2048);
             audioSamplesAnalyzer.Enable();
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, samples.Length, micProfile);
 
