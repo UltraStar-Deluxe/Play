@@ -9,4 +9,5 @@ public class GraphicSettings
     public ScreenResolution resolution = new ScreenResolution(800, 600, 60);
     public FullScreenMode fullScreenMode = FullScreenMode.Windowed;
     public bool useImageAsCursor = true;
+    public bool showLyricsOnNotes = true;
 }

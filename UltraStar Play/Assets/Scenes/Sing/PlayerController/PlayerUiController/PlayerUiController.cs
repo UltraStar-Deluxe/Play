@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UniInject;
 
 public class PlayerUiController : MonoBehaviour
 {
+    [Inject]
+    private Injector injector;
+
     private LineDisplayer lineDisplayer;
     private SentenceDisplayer sentenceDisplayer;
     private TotalScoreDisplayer totalScoreDisplayer;
@@ -39,6 +43,12 @@ public class PlayerUiController : MonoBehaviour
         {
             totalScoreDisplayer.SetColorOfMicProfile(micProfile);
             avatarImage.SetColorOfMicProfile(micProfile);
+        }
+
+        // Inject all children
+        foreach (INeedInjection childThatNeedsInjection in GetComponentsInChildren<INeedInjection>())
+        {
+            injector.Inject(childThatNeedsInjection);
         }
     }
 
