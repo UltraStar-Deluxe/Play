@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UniInject;
 
 public class SongRouletteController : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class SongRouletteController : MonoBehaviour
 
     public IReactiveProperty<SongSelection> Selection { get; private set; } = new ReactiveProperty<SongSelection>();
 
+    private Subject<SongSelection> selectionClickedEventStream = new Subject<SongSelection>();
+    public IObservable<SongSelection> SelectionClickedEventStream => selectionClickedEventStream;
+
     private readonly Dictionary<SongMeta, Button> songMetaToButtonMap = new Dictionary<SongMeta, Button>();
 
     private int SelectedSongIndex
@@ -29,11 +33,9 @@ public class SongRouletteController : MonoBehaviour
         }
     }
 
-    private List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
+    private readonly List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
 
     public bool showRouletteItemPlaceholders;
-
-    public SongSelectSceneController SongSelectSceneController { get; set; }
 
     private bool isInitialized;
 
@@ -267,7 +269,7 @@ public class SongRouletteController : MonoBehaviour
     {
         if (Selection.Value.SongMeta != null && Selection.Value.SongMeta == songMeta)
         {
-            SongSelectSceneController.Instance.StartSingScene();
+            selectionClickedEventStream.OnNext(Selection.Value);
         }
         else
         {

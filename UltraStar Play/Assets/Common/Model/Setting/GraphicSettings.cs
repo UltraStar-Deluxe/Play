@@ -10,4 +10,5 @@ public class GraphicSettings
     public FullScreenMode fullScreenMode = FullScreenMode.Windowed;
     public bool useImageAsCursor = true;
     public bool showLyricsOnNotes = true;
+    public bool previewInSongSelectScene = true;
 }
