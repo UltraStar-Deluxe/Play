@@ -5,8 +5,8 @@ public static class MidiUtils
 {
     // There are 49 halftones in the singable audio spectrum,
     // namely C2 (midi note 36, which is 65.41 Hz) to C6 (midi note 84, which is 1046.5023 Hz).
-    public const int MidiNoteMin = 36;
-    public const int MidiNoteMax = 84;
+    public const int SingableNoteMin = 36;
+    public const int SingableNoteMax = 84;
     public const int SingableNoteRange = 49;
 
     // Concert pitch A4 (440 Hz)
@@ -17,11 +17,6 @@ public static class MidiUtils
     private static readonly int[] whiteKeyRelativeMidiNotes = { 0, 2, 4, 5, 7, 9, 11 };
     // Black keys: C# = 1, D# = 3, F# = 6, G# = 8, A# = 10
     private static readonly int[] blackKeyRelativeMidiNotes = { 1, 3, 6, 8, 10 };
-
-    public static readonly double[] halftoneFrequencies = PrecalculateHalftoneFrequencies();
-
-    public static readonly double MaxHalftoneFrequency = halftoneFrequencies[halftoneFrequencies.Length - 1];
-    public static readonly double MinHalftoneFrequency = halftoneFrequencies[0];
 
     public static int GetOctave(int midiNote)
     {
@@ -102,21 +97,21 @@ public static class MidiUtils
         return whiteKeyRelativeMidiNotes.Contains(GetRelativePitch(midiNote));
     }
 
-    public static double[] PrecalculateHalftoneFrequencies()
+    public static float[] PrecalculateHalftoneFrequencies(int noteMin, int noteRange)
     {
-        double[] noteFrequencies = new double[SingableNoteRange];
-        for (int index = 0; index < SingableNoteRange; index++)
+        float[] frequencies = new float[noteRange];
+        for (int index = 0; index < frequencies.Length; index++)
         {
-            float concertPitchOctaveOffset = ((MidiUtils.MidiNoteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
-            noteFrequencies[index] = MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset);
+            float concertPitchOctaveOffset = ((noteMin + index) - MidiUtils.MidiNoteConcertPitch) / 12f;
+            frequencies[index] = (float)(MidiUtils.MidiNoteConcertPitchFrequency * Math.Pow(2f, concertPitchOctaveOffset));
         }
-        return noteFrequencies;
+        return frequencies;
     }
 
-    public static int[] PrecalculateHalftoneDelays(double sampleRateHz)
+    public static int[] PrecalculateHalftoneDelays(int sampleRateHz, float[] halftoneFrequencies)
     {
-        int[] noteDelays = new int[SingableNoteRange];
-        for (int index = 0; index < SingableNoteRange; index++)
+        int[] noteDelays = new int[halftoneFrequencies.Length];
+        for (int index = 0; index < halftoneFrequencies.Length; index++)
         {
             noteDelays[index] = Convert.ToInt32(sampleRateHz / halftoneFrequencies[index]);
         }
