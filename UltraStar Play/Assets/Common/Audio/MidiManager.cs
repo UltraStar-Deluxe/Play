@@ -80,7 +80,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
     {
         InitIfNotDoneYet();
         midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
-        StartCoroutine(ConcurrencyUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
     public void StopMidiNote(int midiNote)

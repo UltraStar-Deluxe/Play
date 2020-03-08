@@ -89,7 +89,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         if (songMeta != null)
         {
             int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-            StartCoroutine(ConcurrencyUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => StartSongPreview(songMeta, previewStartInMillis)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => StartSongPreview(songMeta, previewStartInMillis)));
         }
         currentPreviewSongMeta = songMeta;
     }
