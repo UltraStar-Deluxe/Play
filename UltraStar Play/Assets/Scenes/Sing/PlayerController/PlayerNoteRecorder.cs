@@ -132,59 +132,59 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void HandlePitchEvent(PitchEvent pitchEvent, double currentBeat, bool updateUi)
     {
+        // Stop recording
         if (pitchEvent == null || pitchEvent.MidiNote <= 0)
         {
             if (lastRecordedNote != null)
             {
                 HandleRecordedNoteEnded(currentBeat);
             }
+            return;
+        }
+
+        // Start new recorded note
+        if(lastRecordedNote == null) {
+            HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
+            return;
+        }
+
+        // Continue or finish existing recorded note. Possibly starting new note to change pitch.
+        bool isTargetNoteHit = MidiUtils.GetRelativePitchDistance(lastRecordedNote.TargetNote.MidiNote, pitchEvent.MidiNote) <= roundingDistance;
+        if (isTargetNoteHit && !lastRecordedNote.IsTargetNoteHit)
+        {
+            // Jump from a wrong pitch to correct pitch.
+            // Otherwise, the rounding could tend towards the wrong pitch
+            // when the player starts a note with the wrong pitch.
+            HandleRecordedNoteEnded(currentBeat);
+            HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
+        }
+        else if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
+        {
+            // Earned a joker for continued correct singing.
+            if (lastRecordedNote.IsTargetNoteHit && availableJokerCount < MaxJokerCount)
+            {
+                availableJokerCount++;
+            }
+
+            // Continue singing on same pitch
+            HandleRecordedNoteContinued(pitchEvent.MidiNote, currentBeat, updateUi);
         }
         else
         {
-            if (lastRecordedNote != null)
+            // Changed pitch while singing.
+            if (!isTargetNoteHit
+                && lastRecordedNote.IsTargetNoteHit
+                && availableJokerCount > 0)
             {
-                bool isTargetNoteHit = MidiUtils.GetRelativePitchDistance(lastRecordedNote.TargetNote.MidiNote, pitchEvent.MidiNote) <= roundingDistance;
-                if (isTargetNoteHit && !lastRecordedNote.IsTargetNoteHit)
-                {
-                    // Jump from a wrong pitch to correct pitch.
-                    // Otherwise, the rounding could tend towards the wrong pitch instead of the correct pitch
-                    // when the player starts a note with the wrong pitch.
-                    HandleRecordedNoteEnded(currentBeat);
-                    HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
-                }
-                else if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
-                {
-                    // Earned a joker for continued correct singing.
-                    if (lastRecordedNote.IsTargetNoteHit && availableJokerCount < MaxJokerCount)
-                    {
-                        availableJokerCount++;
-                    }
-
-                    // Continue singing on same pitch
-                    HandleRecordedNoteContinued(pitchEvent.MidiNote, currentBeat, updateUi);
-                }
-                else
-                {
-                    // Changed pitch while singing.
-                    if (!isTargetNoteHit
-                        && lastRecordedNote.IsTargetNoteHit
-                        && availableJokerCount > 0)
-                    {
-                        // Because of the joker, this beat is still counted as correct although it is not. The joker is gone.
-                        availableJokerCount--;
-                        usedJokerCount++;
-                        HandleRecordedNoteContinued(lastRecordedNote.RecordedMidiNote, currentBeat, updateUi);
-                    }
-                    else
-                    {
-                        // Continue singing on different pitch.
-                        HandleRecordedNoteEnded(currentBeat);
-                        HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
-                    }
-                }
+                // Because of the joker, this beat is still counted as correct although it is not. The joker is gone.
+                availableJokerCount--;
+                usedJokerCount++;
+                HandleRecordedNoteContinued(lastRecordedNote.RecordedMidiNote, currentBeat, updateUi);
             }
             else
             {
+                // Continue singing on different pitch.
+                HandleRecordedNoteEnded(currentBeat);
                 HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
             }
         }
