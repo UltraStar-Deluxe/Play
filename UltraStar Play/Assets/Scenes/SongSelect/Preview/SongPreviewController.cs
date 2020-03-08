@@ -37,18 +37,16 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
     // The song is selected when opening the scene.
     private bool skipNextSelection = true;
 
-    void Awake()
+    void Start()
     {
         if (!settings.GraphicSettings.previewInSongSelectScene)
         {
             songVideoPlayer.gameObject.SetActive(false);
             songAudioPlayer.gameObject.SetActive(false);
             gameObject.SetActive(false);
+            return;
         }
-    }
 
-    void Start()
-    {
         songRouletteController.Selection.Subscribe(OnSelectedSongChanged);
     }
 
