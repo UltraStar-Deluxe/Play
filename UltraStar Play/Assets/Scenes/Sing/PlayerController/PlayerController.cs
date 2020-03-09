@@ -140,14 +140,14 @@ public class PlayerController : MonoBehaviour, INeedInjection
         int micDelayInMillis = (MicProfile == null) ? 0 : MicProfile.DelayInMillis;
         double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, micDelayInMillis);
         double currentBeatConsideringMicDelay = (micDelayInBeats > 0) ? currentBeat - micDelayInBeats : currentBeat;
-        if (recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat)
+        // The last sentence in the song should be scored as soon as possible such that one can continue to the next scene without waiting for the song to end.
+        bool isOverLastRecordingSentence = (recordingSentenceIndex == sortedSentences.Count - 1) && currentBeatConsideringMicDelay >= GetRecordingSentence().MaxBeat;
+        if (isOverLastRecordingSentence
+            || (recordingSentenceIndex >= 0 && recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat))
         {
+            FinishRecordingSentence(recordingSentenceIndex);
             Sentence nextRecordingSentence = GetUpcomingSentenceForBeat(currentBeatConsideringMicDelay);
-            int nextRecordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
-            if (nextRecordingSentenceIndex >= 0)
-            {
-                SetRecordingSentenceIndex(nextRecordingSentenceIndex);
-            }
+            recordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
         }
     }
 
@@ -255,12 +255,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
     }
 
-    private void SetRecordingSentenceIndex(int newValue)
-    {
-        FinishRecordingSentence(recordingSentenceIndex);
-        recordingSentenceIndex = newValue;
-    }
-
     private void FinishRecordingSentence(int sentenceIndex)
     {
         PlayerNoteRecorder.OnSentenceEnded();
@@ -312,7 +306,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
     private Sentence GetSentence(int index)
     {
-        Sentence sentence = (index < sortedSentences.Count) ? sortedSentences[index] : null;
+        Sentence sentence = (index >= 0 && index < sortedSentences.Count) ? sortedSentences[index] : null;
         return sentence;
     }
 
