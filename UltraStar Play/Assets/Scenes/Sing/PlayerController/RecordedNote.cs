@@ -14,14 +14,6 @@ public class RecordedNote
     public Sentence Sentence { get; set; }
     public Note TargetNote { get; set; }
 
-    public bool IsTargetNoteHit
-    {
-        get
-        {
-            return TargetNote != null && TargetNote.MidiNote == RoundedMidiNote;
-        }
-    }
-
     public RecordedNote(int midiNote, double startBeat, double endBeat)
     {
         this.RecordedMidiNote = midiNote;
