@@ -6,22 +6,12 @@ public class StutterSinger : AbstractDummySinger
 {
     public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController?.GetDisplaySentence();
-        if (currentSentence == null)
+        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
+        PitchEvent pitchEvent = null;
+        if (noteAtCurrentBeat != null && Random.Range(0, 5) != 0)
         {
-            return;
+            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + Random.Range(-3, 3));
         }
-
-        int currentMidiNote = Random.Range(33, 70);
-        Note noteAtCurrentBeat = PlayerNoteRecorder.GetNoteAtBeat(currentSentence, currentBeat);
-        if (noteAtCurrentBeat != null)
-        {
-            currentMidiNote = noteAtCurrentBeat.MidiNote + Random.Range(-3, 3);
-        }
-        if (Random.Range(0, 5) == 0)
-        {
-            currentMidiNote = 0;
-        }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
     }
 }

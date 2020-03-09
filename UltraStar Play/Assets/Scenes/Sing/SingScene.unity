@@ -1537,7 +1537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6be2f30665fd64c47bd168248d708334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndexToSimulate: 1
+  playerIndexToSimulate: 0
   maxOffset: 5
 --- !u!4 &1343358236
 Transform:
