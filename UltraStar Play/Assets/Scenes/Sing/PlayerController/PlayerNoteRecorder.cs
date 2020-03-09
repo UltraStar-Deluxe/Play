@@ -40,6 +40,15 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private double lastBeatWithPitchEvent;
 
+    // The joker is used to cancel a mistake in continued singing.
+    // The joker is earned for continued singing of the correct pitch.
+    private int availableJokerCount;
+    private const int MaxJokerCount = 1;
+
+    // For debugging only: see how many jokers have been used in the inspector
+    [ReadOnly]
+    public int usedJokerCount;
+
     public void OnInjectionFinished()
     {
         roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
@@ -87,6 +96,11 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         return recordedNotes;
     }
 
+    public void RemoveRecordedNotes(Sentence sentence)
+    {
+        sentenceToRecordedNotesMap.Remove(sentence);
+    }
+
     public void OnSentenceEnded()
     {
         // Finish the last note.
@@ -108,51 +122,83 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             int missedBeats = (int)(currentBeat - lastBeatWithPitchEvent);
             for (int i = 1; i <= missedBeats; i++)
             {
-                HandlePitchEvent(pitchEvent, lastBeatWithPitchEvent + i);
+                HandlePitchEvent(pitchEvent, lastBeatWithPitchEvent + i, false);
             }
         }
-        HandlePitchEvent(pitchEvent, currentBeat);
+        HandlePitchEvent(pitchEvent, currentBeat, true);
 
         lastBeatWithPitchEvent = currentBeat;
     }
 
-    private void HandlePitchEvent(PitchEvent pitchEvent, double currentBeat)
+    private void HandlePitchEvent(PitchEvent pitchEvent, double currentBeat, bool updateUi)
     {
+        // Stop recording
         if (pitchEvent == null || pitchEvent.MidiNote <= 0)
         {
             if (lastRecordedNote != null)
             {
                 HandleRecordedNoteEnded(currentBeat);
             }
+            return;
+        }
+
+        // Start new recorded note
+        if (lastRecordedNote == null)
+        {
+            HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
+            return;
+        }
+
+        // Continue or finish existing recorded note. Possibly starting new note to change pitch.
+        bool isTargetNoteHitNow = MidiUtils.GetRelativePitchDistance(lastRecordedNote.TargetNote.MidiNote, pitchEvent.MidiNote) <= roundingDistance;
+        if (isTargetNoteHitNow && !IsTargetNoteHit(lastRecordedNote))
+        {
+            // Jump from a wrong pitch to correct pitch.
+            // Otherwise, the rounding could tend towards the wrong pitch
+            // when the player starts a note with the wrong pitch.
+            HandleRecordedNoteEnded(currentBeat);
+            HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
+        }
+        else if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
+        {
+            // Earned a joker for continued correct singing.
+            if (IsTargetNoteHit(lastRecordedNote) && availableJokerCount < MaxJokerCount)
+            {
+                availableJokerCount++;
+            }
+
+            // Continue singing on same pitch
+            HandleRecordedNoteContinued(pitchEvent.MidiNote, currentBeat, updateUi);
         }
         else
         {
-            if (lastRecordedNote != null)
+            // Changed pitch while singing.
+            if (!isTargetNoteHitNow
+                && IsTargetNoteHit(lastRecordedNote)
+                && availableJokerCount > 0)
             {
-                if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
-                {
-                    // Continue singing on same pitch
-                    HandleRecordedNoteContinued(currentBeat);
-                }
-                else
-                {
-                    // Continue singing on different pitch. Finish the last recorded note.
-                    HandleRecordedNoteEnded(currentBeat);
-                }
+                // Because of the joker, this beat is still counted as correct although it is not. The joker is gone.
+                availableJokerCount--;
+                usedJokerCount++;
+                HandleRecordedNoteContinued(lastRecordedNote.RecordedMidiNote, currentBeat, updateUi);
             }
-
-            // The lastRecordedNote could be ended above, so the following null check is not redundant.
-            if (lastRecordedNote == null && currentBeat >= nextNoteStartBeat)
+            else
             {
-                // Start singing of a new note
-                HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat);
+                // Continue singing on different pitch.
+                HandleRecordedNoteEnded(currentBeat);
+                HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
             }
         }
     }
 
-    private void HandleRecordedNoteStarted(int midiNote, double currentBeat)
+    private void HandleRecordedNoteStarted(int midiNote, double currentBeat, bool updateUi)
     {
-        Sentence currentSentence = playerController.GetSentenceForBeat(currentBeat);
+        if (currentBeat < nextNoteStartBeat)
+        {
+            return;
+        }
+
+        Sentence currentSentence = playerController.GetRecordingSentence();
 
         // Only accept recorded notes where a note is expected in the song
         Note noteAtCurrentBeat = GetNoteAtBeat(currentSentence, currentBeat);
@@ -161,16 +207,18 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        // If the last note ended at the start of the new note, then continue using the last ended note.
+        // If the last note ended at the start of the new note and can be further extended,
+        // then continue using the last ended note.
         int roundedMidiNote = GetRoundedMidiNoteForRecordedNote(noteAtCurrentBeat, midiNote);
         double startBeat = Math.Floor(currentBeat);
         if (lastEndedNote != null
             && lastEndedNote.Sentence == currentSentence
             && lastEndedNote.EndBeat == startBeat
-            && lastEndedNote.RoundedMidiNote == roundedMidiNote)
+            && lastEndedNote.RoundedMidiNote == roundedMidiNote
+            && lastEndedNote.TargetNote.EndBeat > lastEndedNote.EndBeat)
         {
             lastRecordedNote = lastEndedNote;
-            HandleRecordedNoteContinued(currentBeat);
+            HandleRecordedNoteContinued(midiNote, currentBeat, updateUi);
             return;
         }
 
@@ -184,7 +232,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         AddRecordedNote(lastRecordedNote, currentSentence);
     }
 
-    private void HandleRecordedNoteContinued(double currentBeat)
+    private void HandleRecordedNoteContinued(int midiNote, double currentBeat, bool updateUi)
     {
         lastRecordedNote.EndBeat = currentBeat;
 
@@ -194,10 +242,12 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             lastRecordedNote.EndBeat = lastRecordedNote.TargetNote.EndBeat;
             playerController.OnRecordedNoteEnded(lastRecordedNote);
             lastRecordedNote = null;
+
+            HandleRecordedNoteStarted(midiNote, currentBeat, updateUi);
         }
         else
         {
-            playerController.OnRecordedNoteContinued(lastRecordedNote);
+            playerController.OnRecordedNoteContinued(lastRecordedNote, updateUi);
         }
     }
 
@@ -217,6 +267,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         playerController.OnRecordedNoteEnded(lastRecordedNote);
         lastEndedNote = lastRecordedNote;
         lastRecordedNote = null;
+        availableJokerCount = 0;
     }
 
     private int GetRoundedMidiNoteForRecordedNote(Note targetNote, int recordedMidiNote)
@@ -288,5 +339,10 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
         double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, positionInMillis);
         return currentBeat;
+    }
+
+    private bool IsTargetNoteHit(RecordedNote recordedNote)
+    {
+        return recordedNote.TargetNote != null && recordedNote.TargetNote.MidiNote == recordedNote.RoundedMidiNote;
     }
 }

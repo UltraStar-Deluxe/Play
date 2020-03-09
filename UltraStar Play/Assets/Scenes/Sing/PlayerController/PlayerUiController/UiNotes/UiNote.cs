@@ -18,12 +18,15 @@ public class UiNote : MonoBehaviour
     [InjectedInInspector]
     public ImageHueHelper imageHueHelper;
 
+    [InjectedInInspector]
+    public Text lyricsUiText;
+
     public Note Note { get; set; }
     public bool isGolden;
 
-    private RectTransform uiEffectsContainer;
+    public RectTransform RectTransform { get; private set; }
 
-    private RectTransform rectTransform;
+    private RectTransform uiEffectsContainer;
 
     private readonly List<StarParticle> stars = new List<StarParticle>();
 
@@ -34,9 +37,9 @@ public class UiNote : MonoBehaviour
         this.uiEffectsContainer = uiEffectsContainer;
     }
 
-    void Start()
+    void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
+        RectTransform = GetComponent<RectTransform>();
     }
 
     void Update()
@@ -102,7 +105,7 @@ public class UiNote : MonoBehaviour
     {
         // Create several particles. Longer notes require more particles because they have more space to fill.
         int starCount = stars.Count;
-        int targetStarCount = Mathf.Max(6, (int)rectTransform.rect.width / 10);
+        int targetStarCount = Mathf.Max(6, (int)RectTransform.rect.width / 10);
         if (starCount < targetStarCount)
         {
             CreateGoldenStar();
@@ -112,7 +115,7 @@ public class UiNote : MonoBehaviour
     private void CreateGoldenStar()
     {
         StarParticle star = Instantiate(goldenStarPrefab);
-        star.transform.SetParent(rectTransform);
+        star.transform.SetParent(RectTransform);
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
         float anchorX = Random.Range(0f, 1f);
         float anchorY = Random.Range(0f, 1f);
