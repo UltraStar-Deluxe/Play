@@ -143,14 +143,15 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         // Start new recorded note
-        if(lastRecordedNote == null) {
+        if (lastRecordedNote == null)
+        {
             HandleRecordedNoteStarted(pitchEvent.MidiNote, currentBeat, updateUi);
             return;
         }
 
         // Continue or finish existing recorded note. Possibly starting new note to change pitch.
-        bool isTargetNoteHit = MidiUtils.GetRelativePitchDistance(lastRecordedNote.TargetNote.MidiNote, pitchEvent.MidiNote) <= roundingDistance;
-        if (isTargetNoteHit && !lastRecordedNote.IsTargetNoteHit)
+        bool isTargetNoteHitNow = MidiUtils.GetRelativePitchDistance(lastRecordedNote.TargetNote.MidiNote, pitchEvent.MidiNote) <= roundingDistance;
+        if (isTargetNoteHitNow && !IsTargetNoteHit(lastRecordedNote))
         {
             // Jump from a wrong pitch to correct pitch.
             // Otherwise, the rounding could tend towards the wrong pitch
@@ -161,7 +162,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         else if (MidiUtils.GetRelativePitchDistance(lastRecordedNote.RoundedMidiNote, pitchEvent.MidiNote) <= roundingDistance)
         {
             // Earned a joker for continued correct singing.
-            if (lastRecordedNote.IsTargetNoteHit && availableJokerCount < MaxJokerCount)
+            if (IsTargetNoteHit(lastRecordedNote) && availableJokerCount < MaxJokerCount)
             {
                 availableJokerCount++;
             }
@@ -172,8 +173,8 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         else
         {
             // Changed pitch while singing.
-            if (!isTargetNoteHit
-                && lastRecordedNote.IsTargetNoteHit
+            if (!isTargetNoteHitNow
+                && IsTargetNoteHit(lastRecordedNote)
                 && availableJokerCount > 0)
             {
                 // Because of the joker, this beat is still counted as correct although it is not. The joker is gone.
@@ -338,5 +339,10 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
         double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, positionInMillis);
         return currentBeat;
+    }
+
+    private bool IsTargetNoteHit(RecordedNote recordedNote)
+    {
+        return recordedNote.TargetNote != null && recordedNote.TargetNote.MidiNote == recordedNote.RoundedMidiNote;
     }
 }
