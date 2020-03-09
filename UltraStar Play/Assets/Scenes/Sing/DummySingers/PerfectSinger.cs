@@ -10,18 +10,12 @@ public class PerfectSinger : AbstractDummySinger
 
     public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController?.GetDisplaySentence();
-        if (currentSentence == null)
-        {
-            return;
-        }
-
-        int currentMidiNote = 0;
-        Note noteAtCurrentBeat = PlayerNoteRecorder.GetNoteAtBeat(currentSentence, currentBeat);
+        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
+        PitchEvent pitchEvent = null;
         if (noteAtCurrentBeat != null)
         {
-            currentMidiNote = noteAtCurrentBeat.MidiNote + offset;
+            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + offset);
         }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
     }
 }

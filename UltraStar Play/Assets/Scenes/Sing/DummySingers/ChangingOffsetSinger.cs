@@ -10,17 +10,11 @@ public class ChangingOffsetSinger : AbstractDummySinger
 
     public override void UpdateSinging(double currentBeat)
     {
-        Sentence currentSentence = playerController?.GetDisplaySentence();
-        if (currentSentence == null)
-        {
-            return;
-        }
-
-        int currentMidiNote = 0;
-        Note noteAtCurrentBeat = PlayerNoteRecorder.GetNoteAtBeat(currentSentence, currentBeat);
+        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
+        PitchEvent pitchEvent = null;
         if (noteAtCurrentBeat != null)
         {
-            currentMidiNote = noteAtCurrentBeat.MidiNote + noteOffset;
+            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + noteOffset);
         }
         else if (lastNote != null)
         {
@@ -28,7 +22,7 @@ public class ChangingOffsetSinger : AbstractDummySinger
             // (falling flank: now there is no note, but in last frame there was one)
             noteOffset = (noteOffset + 1) % 5;
         }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(new PitchEvent(currentMidiNote));
+        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
 
         lastNote = noteAtCurrentBeat;
     }
