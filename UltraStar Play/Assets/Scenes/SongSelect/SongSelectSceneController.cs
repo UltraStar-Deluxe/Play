@@ -9,6 +9,9 @@ using UnityEngine.EventSystems;
 using System.Globalization;
 using System.Threading;
 
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
 public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder
 {
     public static SongSelectSceneController Instance

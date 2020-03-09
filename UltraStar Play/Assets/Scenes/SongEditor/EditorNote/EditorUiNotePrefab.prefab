@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 7650775801032438272}
   - component: {fileID: 7650775801032438273}
   m_Layer: 0
-  m_Name: NoteName
+  m_Name: LyricsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

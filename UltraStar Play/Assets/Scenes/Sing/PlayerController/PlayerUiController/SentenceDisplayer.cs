@@ -32,7 +32,8 @@ public class SentenceDisplayer : MonoBehaviour
     public bool showPitchOfNotes;
     public bool showLyricsOfNotes;
 
-    private readonly Dictionary<RecordedNote, UiRecordedNote> recordedNoteToUiRecordedNoteMap = new Dictionary<RecordedNote, UiRecordedNote>();
+    private readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
+    private readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
     private Sentence displayedSentence;
 
@@ -70,11 +71,21 @@ public class SentenceDisplayer : MonoBehaviour
 
     public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        // Remove any existing UiRecordedNote that has been drawn before for this RecordedNote.
-        if (recordedNoteToUiRecordedNoteMap.TryGetValue(recordedNote, out UiRecordedNote uiRecordedNote))
+        if (recordedNote.TargetNote.Sentence != displayedSentence)
         {
-            recordedNoteToUiRecordedNoteMap.Remove(recordedNote);
-            Destroy(uiRecordedNote.gameObject);
+            // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
+            // Do not draw the recorded note, it is not in the displayed sentence.
+            return;
+        }
+
+        // Try to update existing recorded notes.
+        if (recordedNoteToUiRecordedNotesMap.TryGetValue(recordedNote, out List<UiRecordedNote> uiRecordedNotes))
+        {
+            foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
+            {
+                PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, recordedNote.StartBeat, recordedNote.EndBeat);
+            }
+            return;
         }
 
         // Draw the bar for the rounded note
@@ -86,12 +97,21 @@ public class SentenceDisplayer : MonoBehaviour
         }
     }
 
+    public void CreatePerfectNoteEffect(Note perfectNote)
+    {
+        if (noteToUiNoteMap.TryGetValue(perfectNote, out UiNote uiNote))
+        {
+            uiNote.CreatePerfectNoteEffect();
+        }
+    }
+
     private void RemoveUiNotes()
     {
-        foreach (UiNote uiNote in uiNotesContainer.GetComponentsInChildren<UiNote>())
+        foreach (Transform child in uiNotesContainer.transform)
         {
-            Destroy(uiNote.gameObject);
+            Destroy(child.gameObject);
         }
+        noteToUiNoteMap.Clear();
     }
 
     private void CreateUiNote(Note note)
@@ -108,7 +128,7 @@ public class SentenceDisplayer : MonoBehaviour
             uiNote.SetColorOfMicProfile(micProfile);
         }
 
-        Text uiNoteText = uiNote.GetComponentInChildren<Text>();
+        Text uiNoteText = uiNote.lyricsUiText;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
         if (showLyricsOfNotes && showPitchOfNotes)
         {
@@ -127,8 +147,10 @@ public class SentenceDisplayer : MonoBehaviour
             uiNoteText.text = "";
         }
 
-        RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
+        RectTransform uiNoteRectTransform = uiNote.RectTransform;
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
+
+        noteToUiNoteMap[note] = uiNote;
     }
 
     public string GetDisplayText(Note note)
@@ -149,11 +171,11 @@ public class SentenceDisplayer : MonoBehaviour
 
     private void RemoveUiRecordedNotes()
     {
-        foreach (UiRecordedNote uiNote in uiRecordedNotesContainer.GetComponentsInChildren<UiRecordedNote>())
+        foreach (Transform child in uiRecordedNotesContainer.transform)
         {
-            Destroy(uiNote.gameObject);
+            Destroy(child.gameObject);
         }
-        recordedNoteToUiRecordedNoteMap.Clear();
+        recordedNoteToUiRecordedNotesMap.Clear();
     }
 
     private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
@@ -166,12 +188,13 @@ public class SentenceDisplayer : MonoBehaviour
         int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
+        uiNote.MidiNote = midiNote;
         if (micProfile != null)
         {
             uiNote.SetColorOfMicProfile(micProfile);
         }
 
-        Text uiNoteText = uiNote.GetComponentInChildren<Text>();
+        Text uiNoteText = uiNote.lyricsUiText;
         if (showPitchOfNotes)
         {
             string pitchName = MidiUtils.GetAbsoluteName(midiNote);
@@ -182,9 +205,10 @@ public class SentenceDisplayer : MonoBehaviour
             uiNoteText.text = "";
         }
 
-        RectTransform uiNoteRectTransform = uiNote.GetComponent<RectTransform>();
+        RectTransform uiNoteRectTransform = uiNote.RectTransform;
         PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
-        recordedNoteToUiRecordedNoteMap[recordedNote] = uiNote;
+
+        recordedNoteToUiRecordedNotesMap.AddInsideList(recordedNote, uiNote);
     }
 
     private void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)

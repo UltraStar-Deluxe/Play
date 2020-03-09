@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Hakuna matata
+  defaultSongName: Summer Wine (short)
   defaultSongNamePasteBin: "Summer Wine\r\nEmptyTitle\r\nMe And My Broken Heart\r\nSomewhere
     Over The Rainbow (Wonderful World)\r\nMarry You\r\nHakuna matata"
 --- !u!4 &242235910
@@ -656,11 +656,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 493.5, y: 274, z: 0}
-  anchoredPosition: {x: 493.5, y: 274}
-  position: {x: 493.5, y: 274, z: 0}
-  sizeDelta: {x: 800, y: 444.17426}
-  size: {x: 800, y: 444.17426}
+  localPosition: {x: 494.5, y: 294.5, z: 0}
+  anchoredPosition: {x: 494.5, y: 294.5}
+  position: {x: 494.5, y: 294.5, z: 0}
+  sizeDelta: {x: 800, y: 476.44083}
+  size: {x: 800, y: 476.44083}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,7 +1051,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1832391155}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &857926566
 MonoBehaviour:
@@ -1817,7 +1817,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6be2f30665fd64c47bd168248d708334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndexToSimulate: 1
+  playerIndexToSimulate: 0
   maxOffset: 5
 --- !u!4 &1343358236
 Transform:
@@ -2208,6 +2208,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1133568350397856062, guid: 526f667f64d4f6949a1aa2bbba7ef376,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 8992703894111156196, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
