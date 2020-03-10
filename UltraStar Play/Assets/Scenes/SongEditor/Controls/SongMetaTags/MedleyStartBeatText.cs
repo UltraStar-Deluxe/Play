@@ -20,6 +20,6 @@ public class MedleyStartBeatText : AbstractSongMetaTagText
 
     protected override string GetUiTextPrefix()
     {
-        return "Medleay start beat: ";
+        return "Medley start beat: ";
     }
 }
