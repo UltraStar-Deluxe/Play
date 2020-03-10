@@ -69,6 +69,11 @@ public class SongVideoPlayer : MonoBehaviour
 
     public void LoadVideo(string videoPath)
     {
+        if (hasLoadedVideo)
+        {
+            ClearOutRenderTexture(videoPlayer.targetTexture);
+        }
+
         videoPlayer.url = "file://" + videoPath;
         // The url is empty if loading the video failed.
         hasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
@@ -213,5 +218,26 @@ public class SongVideoPlayer : MonoBehaviour
                 LoadVideo(videoPath);
             }
         }
+    }
+
+    void OnDisable()
+    {
+        if (hasLoadedVideo)
+        {
+            ClearOutRenderTexture(videoPlayer.targetTexture);
+        }
+    }
+
+    // If not cleared, then the RenderTexture will keep its last viewed frame until it is overwritten by a new video.
+    // This would cause the last played video to show up for a moment
+    // before a new video is loaded and applied to the RenderTexture.
+    // Thus, the texture should be cleared before showing a new video.
+    private void ClearOutRenderTexture(RenderTexture renderTexture)
+    {
+        // See https://answers.unity.com/questions/1511295/how-do-i-reset-a-render-texture-to-black-when-i-st.html
+        RenderTexture rt = RenderTexture.active;
+        RenderTexture.active = renderTexture;
+        GL.Clear(true, true, Color.clear);
+        RenderTexture.active = rt;
     }
 }
