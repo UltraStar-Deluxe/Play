@@ -3,55 +3,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using NLayer;
+using UniRx;
 
 public static class AudioUtils
 {
-    public static AudioClip GetAudioClip(string path)
-    {
-        if (!System.IO.File.Exists(path))
-        {
-            Debug.LogWarning($"Can not open audio file because it does not exist: {path}");
-            return null;
-        }
-        string fileExtension = System.IO.Path.GetExtension(path);
-
-        using (new DisposableStopwatch("Loaded audio in <millis> ms"))
-        {
-            if (fileExtension.ToLowerInvariant().Equals(".mp3"))
-            {
-                return LoadMp3(path);
-            }
-            else
-            {
-                return LoadAudio(path);
-            }
-        }
-    }
-
-    private static AudioClip LoadAudio(string path)
-    {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
-        {
-            www.SendWebRequest();
-
-            if (www.isNetworkError)
-            {
-                Debug.LogError("Error Loading Audio: " + path);
-                Debug.LogError(www.error);
-                return null;
-            }
-            else
-            {
-                while (!www.isDone)
-                {
-                    Task.Delay(30);
-                }
-                return DownloadHandlerAudioClip.GetContent(www);
-            }
-        }
-    }
-
-    private static AudioClip LoadMp3(string path)
+    public static AudioClip LoadMp3(string path)
     {
         string filename = System.IO.Path.GetFileNameWithoutExtension(path);
         MpegFile mpegFile = new MpegFile(path);

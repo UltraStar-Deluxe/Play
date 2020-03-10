@@ -12,7 +12,7 @@ using UniRx;
 
 public class SongPreviewController : MonoBehaviour, INeedInjection
 {
-    public float previewDelayInSeconds = 2;
+    public float previewDelayInSeconds = 1;
 
     public float fadeInDurationInSeconds = 5;
     private float fadeInStartInSeconds;
@@ -157,9 +157,13 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
-        songAudioPlayer.Init(songMeta);
-        songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-        songAudioPlayer.audioPlayer.volume = 0;
-        songAudioPlayer.PlayAudio();
+        string songPath = SongMetaUtils.GetAbsoluteSongFilePath(songMeta);
+        AudioManager.Instance.GetAudioClipAsync(songPath, loadedAudioClip =>
+        {
+            songAudioPlayer.Init(songMeta, loadedAudioClip);
+            songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+            songAudioPlayer.audioPlayer.volume = 0;
+            songAudioPlayer.PlayAudio();
+        });
     }
 }
