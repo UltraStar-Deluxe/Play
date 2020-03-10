@@ -35,7 +35,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     // The very first selected song should not be previewed.
     // The song is selected when opening the scene.
-    private bool skipNextSelection = true;
+    private bool isFirstSelectedSong = true;
 
     void Start()
     {
@@ -72,15 +72,19 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
     {
         StopSongPreview();
 
+        if (songSelection.SongIndex != 0)
+        {
+            isFirstSelectedSong = false;
+        }
+
         SongMeta songMeta = songSelection.SongMeta;
         if (songMeta == currentPreviewSongMeta)
         {
             return;
         }
 
-        if (skipNextSelection)
+        if (isFirstSelectedSong)
         {
-            skipNextSelection = false;
             return;
         }
 
@@ -120,6 +124,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     private void StopSongPreview()
     {
+        StopAllCoroutines();
         songAudioPlayer.PauseAudio();
         isFadeInStarted = false;
         songVideoPlayer.videoImageAndPlayerContainer.gameObject.SetActive(false);
