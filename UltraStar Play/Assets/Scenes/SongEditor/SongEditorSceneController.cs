@@ -120,7 +120,11 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     void Awake()
     {
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
-        songAudioPlayer.Init(SongMeta);
+
+        // For drawing the waveform, the AudioClip must not be streamed, i.e., must not be loaded asynchronously.
+        // Thus, do not use streaming AudioClips.
+        AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongFilePath(SongMeta), false);
+        songAudioPlayer.Init(SongMeta, audioClip);
         songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;

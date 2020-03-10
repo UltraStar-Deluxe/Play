@@ -19,6 +19,7 @@ TagManager:
   - ContextMenuManager
   - CursorManager
   - MidiManager
+  - AudioManager
   layers:
   - Default
   - TransparentFX
