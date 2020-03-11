@@ -2,31 +2,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // Handles loading and caching of AudioClips.
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
-public static class AudioManager
+public class AudioManager : MonoBehaviour
 {
-    private static readonly int criticalCacheSize = 3;
+    private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
 
-    public static AudioClip GetAudioClip(string path)
+    public static AudioManager Instance
     {
-        if (!audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip))
+        get
         {
-            return LoadAndCacheAudioClip(path);
+            return GameObjectUtils.FindComponentWithTag<AudioManager>("AudioManager");
         }
-        if (cachedAudioClip.AudioClip.samples == 0 && cachedAudioClip.AudioClip.loadState == AudioDataLoadState.Loaded)
-        {
-            // The AudioClip was unloaded by Unity. It has to be reloaded.
-            // It seems unloading audio data happens non-deterministically on scene changes.
-            return LoadAndCacheAudioClip(path);
-        }
-        return cachedAudioClip.AudioClip;
     }
 
-    private static AudioClip LoadAndCacheAudioClip(string path)
+    // When streamAudio is false, all audio data is loaded at once in a blocking way.
+    public AudioClip GetAudioClip(string path, bool streamAudio = true)
+    {
+        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip))
+        {
+            if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
+            {
+                return cachedAudioClip.StreamedAudioClip;
+            }
+            else if (!streamAudio && cachedAudioClip.FullAudioClip != null)
+            {
+                return cachedAudioClip.FullAudioClip;
+            }
+        }
+
+        return LoadAndCacheAudioClip(path, streamAudio);
+    }
+
+    private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)
     {
         if (!File.Exists(path))
         {
@@ -34,22 +48,27 @@ public static class AudioManager
             return null;
         }
 
-        AudioClip audioClip = AudioUtils.GetAudioClip(path);
+        AudioClip audioClip = AudioUtils.GetAudioClipUncached(path, streamAudio);
         if (audioClip == null)
         {
-            Debug.LogError("Could load not AudioClip from path: " + path);
+            Debug.LogError("Could not load not AudioClip from path: " + path);
             return null;
         }
 
+        AddAudioClipToCache(path, audioClip, streamAudio);
+        return audioClip;
+    }
+
+    private static void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
+    {
         if (audioClipCache.Count >= criticalCacheSize)
         {
             RemoveOldestAudioClipsFromCache();
         }
 
         // Cache the new AudioClip.
-        CachedAudioClip cachedAudioClip = new CachedAudioClip(path, audioClip, Time.frameCount);
+        CachedAudioClip cachedAudioClip = new CachedAudioClip(path, audioClip, Time.frameCount, streamAudio);
         audioClipCache[path] = cachedAudioClip;
-        return audioClip;
     }
 
     private static void RemoveOldestAudioClipsFromCache()
@@ -65,23 +84,66 @@ public static class AudioManager
 
         if (oldest != null)
         {
-            oldest.AudioClip.UnloadAudioData();
+            oldest.StreamedAudioClip?.UnloadAudioData();
+            oldest.FullAudioClip?.UnloadAudioData();
             audioClipCache.Remove(oldest.Path);
+        }
+    }
+
+    private class LoadingAudioClip
+    {
+        public string Path { get; private set; }
+        public DownloadHandlerAudioClip DownloadHandler { get; private set; }
+        public List<Action<AudioClip>> Callbacks { get; private set; } = new List<Action<AudioClip>>();
+        public long ElapsedMilliseconds
+        {
+            get
+            {
+                return stopwatch.ElapsedMilliseconds;
+            }
+        }
+
+        private System.Diagnostics.Stopwatch stopwatch;
+
+        public LoadingAudioClip(string path, DownloadHandlerAudioClip downloadHandler, Action<AudioClip> callback)
+        {
+            this.Path = path;
+            this.DownloadHandler = downloadHandler;
+            this.Callbacks.Add(callback);
+
+            stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+        }
+
+        public void DisposeAndNotifyCallbacks(AudioClip audioClip)
+        {
+            DownloadHandler.Dispose();
+            foreach (Action<AudioClip> callback in Callbacks)
+            {
+                callback(audioClip);
+            }
         }
     }
 
     private class CachedAudioClip
     {
         public string Path { get; private set; }
-        public AudioClip AudioClip { get; private set; }
+        public AudioClip StreamedAudioClip { get; private set; }
+        public AudioClip FullAudioClip { get; private set; }
         public int CreatedInFrame { get; private set; }
 
-        public CachedAudioClip(string path, AudioClip audioClip, int currentFrame)
+        public CachedAudioClip(string path, AudioClip audioClip, int currentFrame, bool isStreamedAudio)
         {
             Path = path;
-            AudioClip = audioClip;
             CreatedInFrame = currentFrame;
+            if (isStreamedAudio)
+            {
+                StreamedAudioClip = audioClip;
+            }
+            else
+            {
+                FullAudioClip = audioClip;
+            }
         }
     }
-
 }

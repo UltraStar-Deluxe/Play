@@ -22,6 +22,15 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         }
     }
 
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+
+    [InjectedInInspector]
+    public SongVideoPlayer songVideoPlayer;
+
+    [InjectedInInspector]
+    public SongRouletteController songRouletteController;
+
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
@@ -35,8 +44,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public SongSelectPlayerProfileListController playerProfileListController;
 
     private SearchInputField searchTextInputField;
-
-    private SongRouletteController songRouletteController;
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
@@ -73,8 +80,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         GetSongMetasFromManager();
 
-        songRouletteController = FindObjectOfType<SongRouletteController>();
-        songRouletteController.SongSelectSceneController = this;
+        songRouletteController.SelectionClickedEventStream
+            .Subscribe(selection => StartSingScene(selection.SongMeta));
 
         statsManager = StatsManager.Instance.Statistics;
 
@@ -347,6 +354,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     {
         BindingBuilder bb = new BindingBuilder();
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(songRouletteController);
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songVideoPlayer);
         return bb.GetBindings();
     }
 }

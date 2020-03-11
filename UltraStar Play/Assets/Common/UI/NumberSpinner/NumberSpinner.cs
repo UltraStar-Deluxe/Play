@@ -108,7 +108,7 @@ public class NumberSpinner : MonoBehaviour, INeedInjection
         selectedValueStream.OnNext(selectedValue);
     }
 
-    private void UpdateUiText(double newValue)
+    protected virtual void UpdateUiText(double newValue)
     {
         uiText.text = newValue.ToString(formatString);
     }

@@ -1,9 +1,15 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 public static class SongMetaUtils
 {
+    public static string GetAbsoluteSongFilePath(SongMeta songMeta)
+    {
+        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
+    }
+
     public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)
     {
         return songMeta.GetVoices().SelectMany(voice => voice.Sentences)

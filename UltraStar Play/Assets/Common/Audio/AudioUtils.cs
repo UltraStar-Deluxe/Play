@@ -3,10 +3,13 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using NLayer;
+using UniRx;
 
 public static class AudioUtils
 {
-    public static AudioClip GetAudioClip(string path)
+    // This method should only be called from tests and the AudioManager.
+    // Use the cached version of the AudioManager for the normal game logic.
+    public static AudioClip GetAudioClipUncached(string path, bool streamAudio)
     {
         if (!System.IO.File.Exists(path))
         {
@@ -15,43 +18,41 @@ public static class AudioUtils
         }
         string fileExtension = System.IO.Path.GetExtension(path);
 
-        using (new DisposableStopwatch("Loaded audio in <millis> ms"))
+        if (fileExtension.ToLowerInvariant().Equals(".mp3"))
         {
-            if (fileExtension.ToLowerInvariant().Equals(".mp3"))
-            {
-                return LoadMp3(path);
-            }
-            else
-            {
-                return LoadAudio(path);
-            }
+            AudioClip audioClip = LoadMp3(path);
+            return audioClip;
+        }
+        else
+        {
+            return LoadAudio(path, streamAudio);
         }
     }
 
-    private static AudioClip LoadAudio(string path)
+    private static AudioClip LoadAudio(string path, bool streamAudio)
     {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
+        using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
         {
-            www.SendWebRequest();
+            DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+            downloadHandler.streamAudio = streamAudio;
 
-            if (www.isNetworkError)
+            webRequest.SendWebRequest();
+            if (webRequest.isNetworkError || webRequest.isHttpError)
             {
                 Debug.LogError("Error Loading Audio: " + path);
-                Debug.LogError(www.error);
+                Debug.LogError(webRequest.error);
                 return null;
             }
-            else
+
+            while (!webRequest.isDone)
             {
-                while (!www.isDone)
-                {
-                    Task.Delay(30);
-                }
-                return DownloadHandlerAudioClip.GetContent(www);
+                Task.Delay(30);
             }
+            return downloadHandler.audioClip;
         }
     }
 
-    private static AudioClip LoadMp3(string path)
+    public static AudioClip LoadMp3(string path)
     {
         string filename = System.IO.Path.GetFileNameWithoutExtension(path);
         MpegFile mpegFile = new MpegFile(path);

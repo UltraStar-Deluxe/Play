@@ -80,7 +80,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
     {
         InitIfNotDoneYet();
         midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
-        StartCoroutine(ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
     public void StopMidiNote(int midiNote)
@@ -100,13 +100,6 @@ public class MidiManager : MonoBehaviour, INeedInjection
         InitIfNotDoneYet();
         MidiFile midiFile = midiSequencer.LoadMidiFromFile(path, false);
         return midiFile;
-    }
-
-    private IEnumerator ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
-    {
-        yield return new WaitForSeconds(delayInSeconds);
-        // Code to execute after the delay
-        action();
     }
 
     // See http://unity3d.com/support/documentation/ScriptReference/MonoBehaviour.OnAudioFilterRead.html for reference code
