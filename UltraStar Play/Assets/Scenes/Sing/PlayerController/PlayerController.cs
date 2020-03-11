@@ -118,6 +118,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
         newInjector.AddBindingForInstance(PlayerScoreController);
         newInjector.AddBindingForInstance(playerUiController);
+        newInjector.AddBindingForInstance(newInjector);
         newInjector.AddBindingForInstance(this);
         return newInjector;
     }

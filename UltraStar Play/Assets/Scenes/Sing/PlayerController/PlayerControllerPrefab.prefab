@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b23705d715dd213418e9f5d739c7621b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  usedJokerCount: 0
 --- !u!114 &6166246499440108607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,8 +107,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
-  pitchRecordHistoryLength: 5
+  halftoneContinuationBias: 0
   lastMidiNoteName: 
+  lastMidiNote: 0
 --- !u!82 &2112286677205179149
 AudioSource:
   m_ObjectHideFlags: 0

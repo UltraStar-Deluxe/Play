@@ -41,6 +41,7 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
         listEntry.transform.SetParent(scrollViewContent.transform);
         listEntry.Init(playerProfile);
 
+        listEntry.SetSelected(playerProfile.IsSelected);
         listEntry.isSelectedToggle.OnValueChangedAsObservable().Subscribe(newValue => OnSelectionStatusChanged(listEntry, newValue));
 
         listEntries.Add(listEntry);
@@ -48,6 +49,7 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
 
     private void OnSelectionStatusChanged(SongSelectPlayerProfileListEntry listEntry, bool newValue)
     {
+        listEntry.PlayerProfile.IsSelected = newValue;
         if (newValue == false)
         {
             listEntry.MicProfile = null;

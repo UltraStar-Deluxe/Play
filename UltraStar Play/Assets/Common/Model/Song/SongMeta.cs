@@ -49,6 +49,8 @@ public class SongMeta
     public string Language { get; set; }
     public bool Relative { get; set; }
     public float Start { get; set; }
+    public float PreviewStart { get; set; }
+    public float PreviewEnd { get; set; }
     public string Video { get; set; }
     public float VideoGap { get; set; }
     public uint Year { get; set; }

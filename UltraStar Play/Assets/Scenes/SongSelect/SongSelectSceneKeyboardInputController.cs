@@ -111,10 +111,11 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
             fuzzySearchText = "";
         }
 
-        if (!Input.inputString.IsNullOrEmpty())
+        string typedLetter = InputUtils.GetTypedLetter();
+        if (!typedLetter.IsNullOrEmpty())
         {
             fuzzySearchLastInputTimeInSeconds = Time.time;
-            fuzzySearchText += Input.inputString;
+            fuzzySearchText += typedLetter;
             songSelectSceneController.JumpToSongWhereTitleStartsWith(fuzzySearchText);
         }
     }
