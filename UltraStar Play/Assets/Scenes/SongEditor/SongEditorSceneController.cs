@@ -121,10 +121,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     {
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
 
-        // For drawing the waveform, the AudioClip must not be streamed, i.e., must not be loaded asynchronously.
-        // Thus, do not use streaming AudioClips.
-        AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongFilePath(SongMeta), false);
-        songAudioPlayer.Init(SongMeta, audioClip);
+        songAudioPlayer.Init(SongMeta);
         songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
@@ -163,8 +160,10 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         {
             using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
             {
+                // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
+                AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongFilePath(SongMeta), false);
                 audioWaveFormInitialized = true;
-                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(songAudioPlayer.AudioClip);
+                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
             }
         }
     }

@@ -157,13 +157,9 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
-        string songPath = SongMetaUtils.GetAbsoluteSongFilePath(songMeta);
-        AudioManager.Instance.GetAudioClipAsync(songPath, loadedAudioClip =>
-        {
-            songAudioPlayer.Init(songMeta, loadedAudioClip);
-            songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-            songAudioPlayer.audioPlayer.volume = 0;
-            songAudioPlayer.PlayAudio();
-        });
+        songAudioPlayer.Init(songMeta);
+        songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+        songAudioPlayer.audioPlayer.volume = 0;
+        songAudioPlayer.PlayAudio();
     }
 }
