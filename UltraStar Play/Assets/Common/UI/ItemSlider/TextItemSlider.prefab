@@ -138,9 +138,11 @@ MonoBehaviour:
   anchorMin: {x: 0.1357999, y: 0}
   anchorMax: {x: 0.86441976, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0.02745819, y: 0, z: 616.995}
+  localPosition: {x: 0.033569336, y: 0, z: 616.995}
+  anchoredPosition: {x: 0, y: 0}
+  position: {x: 481.8208, y: 218.25299, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 182.15497, y: 35}
+  size: {x: 222.68445, y: 31.90834}
 --- !u!1 &4090027367327793610
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +323,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6750085590155641732}
-  - component: {fileID: 6750085590155641729}
   m_Layer: 0
   m_Name: TextItemSlider
   m_TagString: Untagged
@@ -351,24 +352,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6750085590155641729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750085590155641733}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0aaf1d1e493f55e4495a8cd9683ffd1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  anchorMin: {x: 0.33637497, y: 0.36983332}
-  anchorMax: {x: 0.648875, y: 0.42816666}
-  pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -5.9000244, y: -60.600006, z: -616.995}
-  sizeDelta: {x: 0, y: 0}
-  size: {x: 250, y: 35}
 --- !u!1 &6750085590334753832
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,9 +491,11 @@ MonoBehaviour:
   anchorMin: {x: 0.86441994, y: 0}
   anchorMax: {x: 0.99998003, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 108.049995, y: 0, z: 616.995}
+  localPosition: {x: 132.09113, y: 0, z: 616.995}
+  anchoredPosition: {x: 0, y: 0}
+  position: {x: 613.87836, y: 218.25299, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 33.89003, y: 35}
+  size: {x: 41.430542, y: 31.90834}
 --- !u!114 &9011749559199016490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -741,9 +726,11 @@ MonoBehaviour:
   anchorMin: {x: 0.00022000885, y: 0}
   anchorMax: {x: 0.13577999, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -108, y: 0, z: 616.995}
+  localPosition: {x: -132.03, y: 0, z: 616.995}
+  anchoredPosition: {x: 0, y: 0}
+  position: {x: 349.75723, y: 218.25299, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 33.89, y: 35}
+  size: {x: 41.43051, y: 31.90834}
 --- !u!114 &3864959810830050899
 MonoBehaviour:
   m_ObjectHideFlags: 0

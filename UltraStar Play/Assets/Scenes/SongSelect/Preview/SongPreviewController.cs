@@ -39,7 +39,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        if (!settings.GraphicSettings.previewInSongSelectScene)
+        if (settings.AudioSettings.PreviewVolumePercent <= 0)
         {
             songVideoPlayer.gameObject.SetActive(false);
             songAudioPlayer.gameObject.SetActive(false);
@@ -58,7 +58,8 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
             float percent = (Time.time - fadeInStartInSeconds) / fadeInDurationInSeconds;
             percent = NumberUtils.Limit(percent, 0, 1);
 
-            songAudioPlayer.audioPlayer.volume = percent;
+            float maxVolume = settings.AudioSettings.PreviewVolumePercent / 100f;
+            songAudioPlayer.audioPlayer.volume = percent * maxVolume;
 
             if (percent >= 1)
             {
