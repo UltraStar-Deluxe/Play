@@ -84,7 +84,7 @@ public static class InputUtils
             return "";
         }
         string typedLetter = GetCharacter(keyCodes[0]);
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
             typedLetter = typedLetter.ToUpperInvariant();
         }
