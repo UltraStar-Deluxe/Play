@@ -11,7 +11,7 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
     // Thus, 1024 samples should be sufficient.
-    private const int MaxSampleCountToUse = 1024;
+    private const int MaxSampleCountToUse = 2048;
 
     public bool playRecordedAudio;
 
