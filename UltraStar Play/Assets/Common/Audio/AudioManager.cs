@@ -11,8 +11,6 @@ using UnityEngine.Networking;
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
 public class AudioManager : MonoBehaviour
 {
-    private const int LoadingTimeoutInMillis = 10000;
-
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
 
