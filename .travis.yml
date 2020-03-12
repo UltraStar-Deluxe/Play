@@ -53,10 +53,19 @@ jobs:
   - stage: build
     env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1
     script: "./tools/travis/docker_build.sh"
-    # no artifacts upload to reduce AWS S3 space usage and costs
+    addons:
+      artifacts:
+        s3_region: "eu-west-1"
+        paths:
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
     env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=gableroux/unity3d:2019.2.11f1-mac
     script: "./tools/travis/docker_build.sh"
+    addons:
+      artifacts:
+        s3_region: "eu-west-1"
+        paths:
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
     env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1-windows
     script: "./tools/travis/docker_build.sh"
