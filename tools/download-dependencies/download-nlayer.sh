@@ -14,8 +14,8 @@ git remote add origin https://github.com/naudio/NLayer.git
 git config core.sparsecheckout true
 echo "NLayer/*" >> .git/info/sparse-checkout
 git pull --depth=100 origin master
-# commit from 31 Mar 2018: 51ca3ec1304f0e2bbaa3cadca69013f4af8ae6f1
-git checkout 51ca3ec1304f0e2bbaa3cadca69013f4af8ae6f1
+# commit from 09 Mar 2020: 13f403f42388857fff347e6cc00824a5216ec754
+git checkout 13f403f42388857fff347e6cc00824a5216ec754
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v NLayer/* ./
