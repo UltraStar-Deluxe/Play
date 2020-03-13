@@ -1,35 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
 
 public class BeatGridDisplayer : MonoBehaviour
 {
-    public RectTransform linePrefab;
+    [InjectedInInspector]
+    public DynamicallyCreatedImage verticalGridImage;
 
-    private readonly List<RectTransform> lines = new List<RectTransform>();
+    public Color lineColor;
 
-    public void DisplaySentence(Sentence sentence)
-    {
-        if (!enabled || sentence == null)
-        {
-            return;
-        }
+    public int lineWidthInPx = 2;
 
-        RemoveAllLines();
-
-        CreateLines(sentence.MinBeat, sentence.MaxBeat);
-    }
-
-    private void RemoveAllLines()
-    {
-        foreach (RectTransform rectTransform in lines)
-        {
-            Destroy(rectTransform.gameObject);
-        }
-        lines.Clear();
-    }
-
-    private void CreateLines(int StartBeat, int EndBeat)
+    void Awake()
     {
         // This script is only for debugging
         if (!Application.isEditor)
@@ -37,24 +20,42 @@ public class BeatGridDisplayer : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+    }
 
-        int lengthInBeats = EndBeat - StartBeat;
+    public void DisplaySentence(Sentence sentence)
+    {
+        if (!gameObject.activeInHierarchy || sentence == null)
+        {
+            return;
+        }
+
+        verticalGridImage.ClearTexture();
+
+        DrawLines(sentence.MinBeat, sentence.MaxBeat);
+
+        verticalGridImage.ApplyTexture();
+    }
+
+    private void DrawLines(int startBeat, int endBeat)
+    {
+        int lengthInBeats = endBeat - startBeat;
 
         for (int i = 0; i <= lengthInBeats; i++)
         {
-            CreateLine(i, lengthInBeats);
+            DrawLine(i, lengthInBeats);
         }
     }
 
-    private void CreateLine(int i, int lengthInBeats)
+    private void DrawLine(int i, int lengthInBeats)
     {
-        RectTransform line = Instantiate(linePrefab, transform);
-        float x = (float)i / lengthInBeats;
-        line.anchorMin = new Vector2(x, 0);
-        line.anchorMax = new Vector2(x + (2f / 800f), 1);
-        line.MoveCornersToAnchors();
-        line.GetComponent<Image>().SetAlpha(0.25f);
-
-        lines.Add(line);
+        float xPercent = (float)i / lengthInBeats;
+        int x = (int)(verticalGridImage.TextureWidth * xPercent);
+        for (int xOffset = 0; xOffset < lineWidthInPx; xOffset++)
+        {
+            for (int y = 0; y < verticalGridImage.TextureHeight; y++)
+            {
+                verticalGridImage.SetPixel(x + xOffset, y, lineColor);
+            }
+        }
     }
 }
