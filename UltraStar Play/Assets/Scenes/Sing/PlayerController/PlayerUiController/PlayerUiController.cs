@@ -23,7 +23,7 @@ public class PlayerUiController : MonoBehaviour
     public void Init(PlayerProfile playerProfile, MicProfile micProfile)
     {
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
-        lineDisplayer.Init(6);
+        lineDisplayer.UpdateLines(6);
 
         sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
         sentenceDisplayer.Init(12, micProfile);
