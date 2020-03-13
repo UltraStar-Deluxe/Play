@@ -8,6 +8,7 @@ public class ImageHueHelper : MonoBehaviour
 {
     private Image image;
 
+    [Range(0, 1)]
     public float hue;
     public Color hueAsColor;
 
@@ -24,7 +25,9 @@ public class ImageHueHelper : MonoBehaviour
         // Check that the image has the proper shader
         if (Application.isEditor && !image.material.HasProperty("_UseColorRedAsHue"))
         {
-            throw new UnityException("The image must use a Material with a HSVRangeShader to set its hue.");
+            // LogError with a context, such that the GameObject in question is highlighted in the Hierarchy View.
+            Debug.LogError($"The image on '{image.gameObject.name}' must use a Material with a HSVRangeShader to set its hue.", image.gameObject);
+            return;
         }
 
         hueAsColor = Color.HSVToRGB(hue, 1, 1);

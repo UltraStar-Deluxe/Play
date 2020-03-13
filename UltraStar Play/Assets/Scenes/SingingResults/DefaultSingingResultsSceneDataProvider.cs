@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
 {
@@ -17,6 +18,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
         data.AddPlayerScores(playerProfile, playerScoreData);
+        data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
         return data;
     }
 }
