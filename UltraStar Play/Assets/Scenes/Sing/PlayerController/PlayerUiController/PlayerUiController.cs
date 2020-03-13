@@ -44,8 +44,8 @@ public class PlayerUiController : MonoBehaviour
 
         if (micProfile != null)
         {
-            totalScoreDisplayer.SetColorOfMicProfile(micProfile);
-            avatarImage.SetColorOfMicProfile(micProfile);
+            totalScoreDisplayer.SetColor(micProfile.Color);
+            avatarImage.SetColor(micProfile.Color);
         }
 
         // Inject all children
