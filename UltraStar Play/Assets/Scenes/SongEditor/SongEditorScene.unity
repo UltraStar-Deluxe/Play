@@ -2469,7 +2469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfac381e8120d2d41b8da847760356a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Me And My Broken Heart
+  defaultSongName: Summer Wine (short)
   defaultSongNamePasteBin: "Summer Wine\r\nEmptyTitle\r\nMe And My Broken Heart\r\nSomewhere
     Over The Rainbow (Wonderful World)\r\nMarry You\r\nHakuna matata"
 --- !u!4 &321425754
@@ -12445,8 +12445,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 71010841}
   m_HandleRect: {fileID: 71010840}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.98415524
+  m_Value: -0.0000015540039
+  m_Size: 0.938324
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15638,7 +15638,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00016173221}
+  m_AnchoredPosition: {x: 0, y: 19.63805}
   m_SizeDelta: {x: 0, y: 318.58}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2142613635
