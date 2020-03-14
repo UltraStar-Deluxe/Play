@@ -680,6 +680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb19be6c05319604197d56912f7ecf03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lineCount: 10
 --- !u!114 &2671619950860038950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1277,11 +1278,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5927508590671847046, guid: cc8f106d10591de4a91b0218e3d137da,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 0.25
-      objectReference: {fileID: 0}
     - target: {fileID: 996218955787764137, guid: cc8f106d10591de4a91b0218e3d137da,
         type: 3}
       propertyPath: hue
@@ -1296,6 +1292,11 @@ PrefabInstance:
         type: 3}
       propertyPath: hueAsColor.g
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927508590671847046, guid: cc8f106d10591de4a91b0218e3d137da,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cc8f106d10591de4a91b0218e3d137da, type: 3}
