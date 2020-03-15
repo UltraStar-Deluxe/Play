@@ -22,10 +22,18 @@ public class SongStatistic
 }
 
 //Comparer for score sorting
-public class CompareBySongScore : IComparer<SongStatistic>
+public class CompareBySongScoreAscending : IComparer<SongStatistic>
 {
     public int Compare(SongStatistic x, SongStatistic y)
     {
         return x.Score.CompareTo(y.Score);
+    }
+}
+
+public class CompareBySongScoreDescending: IComparer<SongStatistic>
+{
+    public int Compare(SongStatistic x, SongStatistic y)
+    {
+        return -x.Score.CompareTo(y.Score);
     }
 }
