@@ -20,13 +20,15 @@ public class PlayerUiController : MonoBehaviour
     private BeatGridDisplayer beatGridDisplayer;
     private CurrentBeatGridDisplayer currentBeatGridDisplayer;
 
+    public int lineCount = 10;
+
     public void Init(PlayerProfile playerProfile, MicProfile micProfile)
     {
         lineDisplayer = GetComponentInChildren<LineDisplayer>();
-        lineDisplayer.Init(6);
+        lineDisplayer.UpdateLines(lineCount);
 
         sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
-        sentenceDisplayer.Init(12, micProfile);
+        sentenceDisplayer.Init(lineCount * 2, micProfile);
 
         totalScoreDisplayer = GetComponentInChildren<TotalScoreDisplayer>();
 
@@ -44,8 +46,8 @@ public class PlayerUiController : MonoBehaviour
 
         if (micProfile != null)
         {
-            totalScoreDisplayer.SetColorOfMicProfile(micProfile);
-            avatarImage.SetColorOfMicProfile(micProfile);
+            totalScoreDisplayer.SetColor(micProfile.Color);
+            avatarImage.SetColor(micProfile.Color);
         }
 
         // Inject all children

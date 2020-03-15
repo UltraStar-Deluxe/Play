@@ -15,8 +15,8 @@ public class TotalScoreDisplayer : MonoBehaviour
         text.text = score.ToString();
     }
 
-    public void SetColorOfMicProfile(MicProfile micProfile)
+    public void SetColor(Color color)
     {
-        GetComponentInChildren<Image>().color = micProfile.Color;
+        GetComponentInChildren<ImageHueHelper>().SetHueByColor(color);
     }
 }

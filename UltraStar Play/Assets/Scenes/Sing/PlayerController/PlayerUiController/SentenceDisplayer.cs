@@ -14,15 +14,6 @@ using UnityEngine.UI;
 
 public class SentenceDisplayer : MonoBehaviour, INeedInjection
 {
-    // The number of lines on which notes can be placed.
-    // One can imagine that notes can be placed not only on the drawn lines,
-    // but also the rows between two lines.
-    // 
-    // This must be a multiply of 12, such that a note that is shifted by an octave
-    // will be wrapped around and placed on the same line as without the shift
-    // (so only relative note value is relevant).
-    private int noteLineCount = 12;
-
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
 
@@ -47,10 +38,21 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
 
     private int avgMidiNote;
 
-    public void Init(int noteLineCount, MicProfile micProfile)
+    // The number of rows on which notes can be placed.
+    private int noteRowCount;
+    private int maxNoteRowMidiNote;
+    private int minNoteRowMidiNote;
+
+    public void Init(int noteRowCount, MicProfile micProfile)
     {
         this.micProfile = micProfile;
-        this.noteLineCount = noteLineCount;
+        // Notes can be placed on and between the drawn lines.
+        this.noteRowCount = noteRowCount;
+        // Check that there is at least one row for every possible note in an octave.
+        if(this.noteRowCount < 12)
+        {
+            throw new UnityException("SentenceDisplayer must be initialized with a row count >= 12 (one row for each note in an octave)");
+        }
     }
 
     public void RemoveAllDisplayedNotes()
@@ -69,6 +71,9 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
         }
 
         avgMidiNote = (int)displayedSentence.Notes.Select(it => it.MidiNote).Average();
+        // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
+        maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
+        minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
         foreach (Note note in sentence.Notes)
         {
             CreateUiNote(note);
@@ -219,16 +224,13 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
 
     private void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
     {
-        // Calculate offset, such that the average note will be on the middle line
-        // (thus, middle line has offset of zero).
-        int offset = (noteLineCount / 2) - (avgMidiNote % noteLineCount);
-        int noteLine = (offset + midiNote) % noteLineCount;
+        int noteRow = CalculateNoteRow(midiNote);
 
         int sentenceStartBeat = displayedSentence.MinBeat;
         int sentenceEndBeat = displayedSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
-        float anchorY = (float)noteLine / noteLineCount;
+        float anchorY = (float)noteRow / noteRowCount;
         float anchorXStart = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
         float anchorXEnd = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
 
@@ -259,5 +261,26 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
         star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.6f);
         LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
             .setOnComplete(() => Destroy(star.gameObject));
+    }
+
+    private int CalculateNoteRow(int midiNote)
+    {
+        // Map midiNote to range of noteRows (wrap around).
+        int wrappedMidiNote = midiNote;
+        while(wrappedMidiNote > maxNoteRowMidiNote && wrappedMidiNote > 0)
+        {
+            // Reduce by one octave.
+            wrappedMidiNote -= 12;
+        }
+        while(wrappedMidiNote < minNoteRowMidiNote && wrappedMidiNote < 127)
+        {
+            // Increase by one octave.
+            wrappedMidiNote += 12;
+        }
+        // Calculate offset, such that the average note will be on the middle row
+        // (thus, middle row has offset of zero).
+        int offset = wrappedMidiNote - avgMidiNote;
+        int noteRow = (noteRowCount / 2) + offset;
+        return noteRow;
     }
 }
