@@ -40,11 +40,12 @@ public class SingingResultsSceneController : MonoBehaviour
         GameObject selectedLayout = GetSelectedLayout();
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
+            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             SingingResultsSceneData.PlayerScoreData playerScoreData = sceneData.GetPlayerScores(playerProfile);
             SingingResultsPlayerUiController[] uiControllers = selectedLayout.GetComponentsInChildren<SingingResultsPlayerUiController>();
             if (i < uiControllers.Length)
             {
-                uiControllers[i].Init(playerProfile, playerScoreData);
+                uiControllers[i].Init(i, playerProfile, playerScoreData, micProfile);
             }
             i++;
         }

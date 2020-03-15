@@ -8,10 +8,12 @@ using UnityEngine.UI;
 public class AvatarImage : MonoBehaviour
 {
     private Image image;
+    private ImageHueHelper imageHueHelper;
 
     void Awake()
     {
         image = GetComponent<Image>();
+        imageHueHelper = GetComponent<ImageHueHelper>();
     }
 
     public void SetPlayerProfile(PlayerProfile playerProfile)
@@ -27,8 +29,8 @@ public class AvatarImage : MonoBehaviour
         }
     }
 
-    public void SetColorOfMicProfile(MicProfile micProfile)
+    public void SetColor(Color color)
     {
-        image.color = micProfile.Color;
+        imageHueHelper.SetHueByColor(color);
     }
 }

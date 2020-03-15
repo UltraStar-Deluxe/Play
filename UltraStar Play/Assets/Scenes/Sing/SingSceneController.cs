@@ -244,6 +244,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
+        singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
 
         //Get the stats manager and the stats object
         Statistics stats = StatsManager.Instance.Statistics;

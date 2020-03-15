@@ -6,9 +6,12 @@ using UnityEngine;
 public class SingingResultsPlayerUiController : MonoBehaviour
 {
 
-    public void Init(PlayerProfile playerProfile, SingingResultsSceneData.PlayerScoreData playerScoreData)
+    public void Init(int playerProfileIndex,
+        PlayerProfile playerProfile,
+        SingingResultsSceneData.PlayerScoreData playerScoreData,
+        MicProfile micProfile)
     {
-        SetPlayerProfile(playerProfile);
+        SetPlayerProfile(playerProfileIndex, playerProfile, micProfile);
         SetNormalNotesScore(playerScoreData.NormalNotesScore);
         SetGoldenNotesScore(playerScoreData.GoldenNotesScore);
         SetPerfectSentenceBonusScore(playerScoreData.PerfectSentenceBonusScore);
@@ -51,9 +54,15 @@ public class SingingResultsPlayerUiController : MonoBehaviour
         GetComponentInChildren<NormalNotesScoreText>().TargetValue = score;
     }
 
-    private void SetPlayerProfile(PlayerProfile playerProfile)
+    private void SetPlayerProfile(int playerProfileIndex, PlayerProfile playerProfile, MicProfile micProfile)
     {
         GetComponentInChildren<PlayerNameText>().SetText(playerProfile.Name);
         GetComponentInChildren<AvatarImage>().SetPlayerProfile(playerProfile);
+        GetComponentInChildren<PlayerIndexText>().SetPlayerProfileIndex(playerProfileIndex);
+        if (micProfile != null)
+        {
+            GetComponentInChildren<AvatarImage>().SetColor(micProfile.Color);
+            GetComponentInChildren<PlayerIndexText>().SetBackgroundImageColor(micProfile.Color);
+        }
     }
 }
