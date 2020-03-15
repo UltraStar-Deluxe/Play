@@ -3,6 +3,7 @@
 public static class I18NKeys {
     public static readonly string cancel = "cancel";
     public static readonly string close = "close";
+    public static readonly string difficulty = "difficulty";
     public static readonly string difficulty_easy = "difficulty.easy";
     public static readonly string difficulty_hard = "difficulty.hard";
     public static readonly string difficulty_medium = "difficulty.medium";

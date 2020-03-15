@@ -4,13 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Handles storage and operation over the song statistic entries themselves
+// Handles storage and operation over the song statistic entries themselves
 [Serializable]
 public class StatisticEntries
 {
     public SortedSet<SongStatistic> SongStatistics { get; private set; }
 
-    //Returns the top score entry or null if no scores are yet recorded
+    // Returns the top score entry or null if no scores are yet recorded
     public SongStatistic TopScore
     {
         get
@@ -21,7 +21,7 @@ public class StatisticEntries
 
     public StatisticEntries()
     {
-        SongStatistics = new SortedSet<SongStatistic>(new CompareBySongScore());
+        SongStatistics = new SortedSet<SongStatistic>(new CompareBySongScoreDescending());
     }
 
     public void AddRecord(SongStatistic record)

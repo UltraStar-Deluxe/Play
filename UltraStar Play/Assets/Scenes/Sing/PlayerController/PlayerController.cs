@@ -336,4 +336,9 @@ public class PlayerController : MonoBehaviour, INeedInjection
     {
         return GetSentence(recordingSentenceIndex);
     }
+
+    public Note GetLastNote()
+    {
+        return sortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
+    }
 }

@@ -246,9 +246,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         singingResultsSceneData.SongMeta = SongMeta;
         singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
 
-        //Get the stats manager and the stats object
-        Statistics stats = StatsManager.Instance.Statistics;
-
+        // Check if the full song has been sung, i.e., the playback position is after the last note.
+        // This determines whether the statistics should be updated and the score should be recorded.
+        bool isAfterLastNote = true;
         foreach (PlayerController playerController in PlayerControllers)
         {
             SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();
@@ -258,11 +258,32 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
 
-            //Save to highscore database
-            stats.RecordSongFinished(SongMeta, playerController.PlayerProfile.Name, playerController.PlayerProfile.Difficulty,
-                                Convert.ToInt32(playerController.PlayerScoreController.TotalScore));
+            Note lastNote = playerController.GetLastNote();
+            if (CurrentBeat < lastNote.EndBeat)
+            {
+                isAfterLastNote = false;
+            }
         }
+
+        if (isAfterLastNote)
+        {
+            UpdateSongFinishedStats();
+        }
+
         SceneNavigator.Instance.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
+    }
+
+    private void UpdateSongFinishedStats()
+    {
+        //Get the stats manager and the stats object
+        Statistics stats = StatsManager.Instance.Statistics;
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            //Save to highscore database
+            stats.RecordSongFinished(SongMeta, playerController.PlayerProfile.Name,
+                playerController.PlayerProfile.Difficulty,
+                playerController.PlayerScoreController.TotalScore);
+        }
     }
 
     private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
