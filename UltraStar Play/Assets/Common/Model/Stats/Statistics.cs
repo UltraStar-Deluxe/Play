@@ -23,13 +23,13 @@ public class Statistics
 
     public LocalStatistic GetLocalStats(SongMeta songMeta)
     {
-        LocalStatistics.TryGetValue(songMeta.SongId, out LocalStatistic result);
+        LocalStatistics.TryGetValue(songMeta.SongHash, out LocalStatistic result);
         return result;
     }
 
     public WebStatistic GetWebStats(SongMeta songMeta)
     {
-        WebStatistics.TryGetValue(songMeta.SongId, out WebStatistic result);
+        WebStatistics.TryGetValue(songMeta.SongHash, out WebStatistic result);
         return result;
     }
 
@@ -40,7 +40,7 @@ public class Statistics
 
     public void RecordSongStarted(SongMeta songMeta)
     {
-        LocalStatistics.GetOrInitialize(songMeta.SongId).UpdateSongStarted();
+        LocalStatistics.GetOrInitialize(songMeta.SongHash).UpdateSongStarted();
         IsDirty = true;
     }
 
@@ -48,7 +48,7 @@ public class Statistics
     {
         Debug.Log("Recording song stats for " + playerName);
         SongStatistic statsObject = new SongStatistic(playerName, difficulty, score);
-        LocalStatistics.GetOrInitialize(songMeta.SongId).UpdateSongFinished(statsObject);
+        LocalStatistics.GetOrInitialize(songMeta.SongHash).UpdateSongFinished(statsObject);
 
         UpdateTopScores(songMeta, statsObject);
 

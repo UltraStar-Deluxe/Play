@@ -105,17 +105,34 @@ static class SongMetaBuilder
                 }
             }
 
-            // Hash the identifying song information.
-            string songTitle = requiredFields["title"];
-            string songArtist = requiredFields["artist"];
-            string songId = songArtist + "#" + songTitle;
+            // this _should_ get handled by the ArgumentNullException
+            // further down below, but that produces really vague
+            // messages about a parameter 's' for some reason
+            foreach (var item in requiredFields)
+            {
+                if (item.Value == null)
+                {
+                    throw new SongMetaBuilderException("Required tag '" + item.Key + "' was not set in file: " + path);
+                }
+            }
+
+            //Read the song file body
+            StringBuilder songBody = new StringBuilder();
+            string bodyLine;
+            while ((bodyLine = reader.ReadLine()) != null)
+            {
+                songBody.Append(bodyLine); //Ignorning the newlines for the hash
+            }
+
+            //Hash the song file body
+            string songHash = Hashing.Md5(Encoding.UTF8.GetBytes(songBody.ToString()));
 
             try
             {
                 SongMeta res = new SongMeta(
                     directory,
                     filename,
-                    songId,
+                    songHash,
                     requiredFields["artist"],
                     ConvertToFloat(requiredFields["bpm"]),
                     requiredFields["mp3"],
