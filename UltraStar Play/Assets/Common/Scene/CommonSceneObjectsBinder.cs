@@ -17,12 +17,14 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
+        bb.BindExistingInstance(I18NManager.Instance);
 
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
+        bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
 
         return bb.GetBindings();
     }

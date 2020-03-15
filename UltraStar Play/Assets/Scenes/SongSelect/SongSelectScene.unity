@@ -598,6 +598,7 @@ GameObject:
   - component: {fileID: 244019897}
   - component: {fileID: 244019899}
   - component: {fileID: 244019898}
+  - component: {fileID: 244019900}
   m_Layer: 5
   m_Name: Highscores
   m_TagString: Untagged
@@ -668,6 +669,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 244019896}
   m_CullTransparentMesh: 0
+--- !u!114 &244019900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244019896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 363933d74fe2dcf47a6c57ee14bde1d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highscoreLocalPlayerText: {fileID: 1395254179}
+  highscoreLocalScoreText: {fileID: 1407307752}
+  highscoreWebPlayerText: {fileID: 1810875765}
+  highscoreWebScoreText: {fileID: 1269442670}
 --- !u!1 &261392371
 GameObject:
   m_ObjectHideFlags: 0
@@ -1432,10 +1449,6 @@ MonoBehaviour:
   artistText: {fileID: 1340187610}
   songTitleText: {fileID: 425342157}
   songCountText: {fileID: 778661798}
-  highscoreLocalPlayerText: {fileID: 1395254179}
-  highscoreLocalScoreText: {fileID: 1407307752}
-  highscoreWebPlayerText: {fileID: 1810875765}
-  highscoreWebScoreText: {fileID: 1269442670}
   videoIndicator: {fileID: 909180080}
   duetIndicator: {fileID: 1246195317}
   playerProfileListController: {fileID: 222256820}

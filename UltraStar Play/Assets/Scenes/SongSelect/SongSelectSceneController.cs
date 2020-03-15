@@ -34,10 +34,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public ArtistText artistText;
     public Text songTitleText;
     public Text songCountText;
-    public Text highscoreLocalPlayerText;
-    public Text highscoreLocalScoreText;
-    public Text highscoreWebPlayerText;
-    public Text highscoreWebScoreText;
     public GameObject videoIndicator;
     public GameObject duetIndicator;
 
@@ -141,40 +137,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         artistText.SetText(selectedSong.Artist);
         songTitleText.text = selectedSong.Title;
         songCountText.text = (selection.SongIndex + 1) + "/" + selection.SongsCount;
-
-        //Display local highscore
-        highscoreLocalPlayerText.text = "";
-        highscoreLocalScoreText.text = "0";
-        LocalStatistic localStats = statsManager.GetLocalStats(selectedSong);
-        SongStatistic localTopScore;
-        if (localStats != null)
-        {
-            localTopScore = localStats.StatsEntries.TopScore;
-
-            if (localTopScore != null)
-            {
-                Debug.Log("Found local highscore: " + localTopScore.PlayerName + " " + localTopScore.Score.ToString());
-                highscoreLocalPlayerText.text = localTopScore.PlayerName;
-                highscoreLocalScoreText.text = localTopScore.Score.ToString();
-            }
-        }
-
-        //Display web highscore
-        highscoreWebPlayerText.text = "";
-        highscoreWebScoreText.text = "0";
-        WebStatistic webStats = statsManager.GetWebStats(selectedSong);
-        SongStatistic webTopScore;
-        if (webStats != null)
-        {
-            webTopScore = webStats.StatsEntries.TopScore;
-
-            if (webTopScore != null)
-            {
-                Debug.Log("Found web highscore: " + webTopScore.PlayerName + " " + webTopScore.Score.ToString());
-                highscoreWebPlayerText.text = webTopScore.PlayerName;
-                highscoreWebScoreText.text = webTopScore.Score.ToString();
-            }
-        }
 
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetActive(hasVideo);

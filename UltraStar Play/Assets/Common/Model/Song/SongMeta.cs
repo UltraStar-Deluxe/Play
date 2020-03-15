@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System;
 using System.IO;
@@ -10,7 +10,7 @@ public class SongMeta
     // required helper fields
     public string Directory { get; set; }
     public string Filename { get; set; }
-    public string SongHash { get; private set; }
+    public string SongId { get; private set; }
 
     // required fields
     public string Artist { get; set; }
@@ -70,7 +70,7 @@ public class SongMeta
         // required helper fields
         string directory,
         string filename,
-        string songHash,
+        string songId,
         // required fields
         string artist,
         float bpm,
@@ -81,17 +81,17 @@ public class SongMeta
         Encoding encoding
     )
     {
-        Directory = directory ?? throw new ArgumentNullException("directory");
-        Filename = filename ?? throw new ArgumentNullException("filename");
-        SongHash = songHash ?? throw new ArgumentNullException("songHash");
+        Directory = directory ?? throw new ArgumentNullException(nameof(directory));
+        Filename = filename ?? throw new ArgumentNullException(nameof(filename));
+        SongId = songId ?? throw new ArgumentNullException(nameof(songId));
 
-        Artist = artist ?? throw new ArgumentNullException("artist");
+        Artist = artist ?? throw new ArgumentNullException(nameof(artist));
         Bpm = bpm;
-        Mp3 = mp3 ?? throw new ArgumentNullException("mp3");
-        Title = title ?? throw new ArgumentNullException("title");
+        Mp3 = mp3 ?? throw new ArgumentNullException(nameof(mp3));
+        Title = title ?? throw new ArgumentNullException(nameof(title));
 
-        this.voiceNames = voiceNames ?? throw new ArgumentNullException("voiceNames");
-        Encoding = encoding ?? throw new ArgumentNullException("encoding");
+        this.voiceNames = voiceNames ?? throw new ArgumentNullException(nameof(voiceNames));
+        Encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
         // set some defaults that we could not set otherwise
         Gap = 0;

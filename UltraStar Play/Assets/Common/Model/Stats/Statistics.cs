@@ -3,29 +3,33 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FullSerializer;
 
-//Holds all in-memory stats data
+// Holds all in-memory stats data
 [Serializable]
 public class Statistics
 {
-    //Stats entries are static to persist across scenes
     public float TotalPlayTimeSeconds { get; private set; }
     public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new Dictionary<string, LocalStatistic>();
     public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new Dictionary<string, WebStatistic>();
     public List<TopEntry> TopTenList { get; private set; } = new List<TopEntry>();
     public TopEntry TopScore { get; private set; }
 
+    // Indicates whether the Statistics have non-persisted changes.
+    // The flag is checked by the StatsManager, e.g., on scene change.
+    // The flag is reset by the StatsManger on save.
+    [fsIgnore]
+    public bool IsDirty { get; set; }
+
     public LocalStatistic GetLocalStats(SongMeta songMeta)
     {
-        LocalStatistic result = null;
-        LocalStatistics.TryGetValue(songMeta.SongHash, out result);
+        LocalStatistics.TryGetValue(songMeta.SongId, out LocalStatistic result);
         return result;
     }
 
     public WebStatistic GetWebStats(SongMeta songMeta)
     {
-        WebStatistic result = null;
-        WebStatistics.TryGetValue(songMeta.SongHash, out result);
+        WebStatistics.TryGetValue(songMeta.SongId, out WebStatistic result);
         return result;
     }
 
@@ -36,19 +40,19 @@ public class Statistics
 
     public void RecordSongStarted(SongMeta songMeta)
     {
-        GetOrInitialize<LocalStatistic>(LocalStatistics, songMeta.SongHash).UpdateSongStarted();
-        TriggerDatabaseWrite();
+        LocalStatistics.GetOrInitialize(songMeta.SongId).UpdateSongStarted();
+        IsDirty = true;
     }
 
     public void RecordSongFinished(SongMeta songMeta, string playerName, EDifficulty difficulty, int score)
     {
         Debug.Log("Recording song stats for " + playerName);
         SongStatistic statsObject = new SongStatistic(playerName, difficulty, score);
-        GetOrInitialize<LocalStatistic>(LocalStatistics, songMeta.SongHash).UpdateSongFinished(statsObject);
+        LocalStatistics.GetOrInitialize(songMeta.SongId).UpdateSongFinished(statsObject);
 
         UpdateTopScores(songMeta, statsObject);
 
-        TriggerDatabaseWrite();
+        IsDirty = true;
     }
 
     private void UpdateTopScores(SongMeta songMeta, SongStatistic songStatistic)
@@ -93,17 +97,12 @@ public class Statistics
         }
     }
 
-    private void TriggerDatabaseWrite()
+    public bool HasHighscore(SongMeta songMeta)
     {
-        StatsManager.Instance.Save();
-    }
-
-    private T GetOrInitialize<T>(Dictionary<string, T> dict, string key) where T : new()
-    {
-        if (!dict.TryGetValue(key, out _))
+        if (GetLocalStats(songMeta) != null)
         {
-            dict[key] = new T();
+            return !GetLocalStats(songMeta).StatsEntries.SongStatistics.IsNullOrEmpty();
         }
-        return dict[key];
+        return false;
     }
 }

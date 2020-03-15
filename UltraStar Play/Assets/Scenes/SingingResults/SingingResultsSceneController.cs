@@ -2,15 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SingingResultsSceneController : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SingingResultsSceneController : MonoBehaviour, INeedInjection
 {
     public Text songLabel;
 
     public GameObject onePlayerLayout;
     public GameObject twoPlayerLayout;
+
+    [Inject]
+    private Statistics statistics;
 
     private SingingResultsSceneData sceneData;
 
@@ -77,9 +84,21 @@ public class SingingResultsSceneController : MonoBehaviour
 
     public void FinishScene()
     {
-        SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
-        songSelectSceneData.SongMeta = sceneData.SongMeta;
+        if (statistics.HasHighscore(sceneData.SongMeta))
+        {
+            // Go to highscore scene
+            HighscoreSceneData highscoreSceneData = new HighscoreSceneData();
+            highscoreSceneData.SongMeta = sceneData.SongMeta;
+            highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
+            SceneNavigator.Instance.LoadScene(EScene.HighscoreScene, highscoreSceneData);
+        }
+        else
+        {
+            // No highscores to show, thus go to song select scene
+            SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+            songSelectSceneData.SongMeta = sceneData.SongMeta;
+            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+        }
 
-        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public static class MapExtensions
@@ -21,4 +21,14 @@ public static class MapExtensions
         }
     }
 
+    // Returns the value for the associated key.
+    // If there is not yet an associated key, then a new value instance is created, associated with the key, and returned.
+    public static V GetOrInitialize<K, V>(this Dictionary<K, V> dict, K key) where V : new()
+    {
+        if (!dict.ContainsKey(key))
+        {
+            dict[key] = new V();
+        }
+        return dict[key];
+    }
 }
