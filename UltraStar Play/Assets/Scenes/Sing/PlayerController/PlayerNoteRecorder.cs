@@ -48,6 +48,9 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     // For debugging only: see how many jokers have been used in the inspector
     [ReadOnly]
     public int usedJokerCount;
+    // For debugging only: see how many times it was rounded to the target note because the pitch detection failed
+    [ReadOnly]
+    public int roundingBecausePitchDetectionFailedCount;
 
     public void OnInjectionFinished()
     {
@@ -275,6 +278,13 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
         {
             // Rap notes accept any noise as correct note.
+            return targetNote.MidiNote;
+        }
+        else if (recordedMidiNote < MidiUtils.SingableNoteMin || recordedMidiNote > MidiUtils.SingableNoteMax)
+        {
+            // The pitch detection can fail, which is the case when the detected pitch is outside of the singable note range.
+            // In this case, just assume that the player was singing correctly and round to the target note.
+            roundingBecausePitchDetectionFailedCount++;
             return targetNote.MidiNote;
         }
         else
