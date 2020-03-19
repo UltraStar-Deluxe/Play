@@ -34,13 +34,13 @@ public class StatsManager : MonoBehaviour
     {
         Debug.Log("Writing database");
         // Update the total play time before saving
-        statistics.UpdateTotalPlayTime();
+        Statistics.UpdateTotalPlayTime();
 
         // Do not pretty print json. The database is relatively big compared to the settings.
         // To view the JSON file, use an external viewer/formatter, for example a web browser or JSON Viewer plugin of Notepad++.
         string json = JsonConverter.ToJson(Statistics, false);
         File.WriteAllText(DatabasePath(), json);
-        statistics.IsDirty = false;
+        Statistics.IsDirty = false;
     }
 
     public void Reload()
@@ -67,7 +67,7 @@ public class StatsManager : MonoBehaviour
     void OnDisable()
     {
         // Save the statistics when necessary.
-        if (statistics.IsDirty)
+        if (statistics != null && statistics.IsDirty)
         {
             Debug.Log("Stats have changed. Saving stats");
             Save();
