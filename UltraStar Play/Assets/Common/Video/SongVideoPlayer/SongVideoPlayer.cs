@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UniInject;
 using UnityEngine.Video;
@@ -16,6 +16,9 @@ public class SongVideoPlayer : MonoBehaviour
 
     [InjectedInInspector]
     public Image backgroundImage;
+
+    [InjectedInInspector]
+    public Image videoImage;
 
     public bool forceSyncOnForwardJumpInTheSong;
 
