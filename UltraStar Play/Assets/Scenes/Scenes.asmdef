@@ -1,0 +1,9 @@
+{
+    "name": "Scenes",
+    "references": [
+        "Plugins",
+        "UniRx",
+        "UniInject",
+        "Common"
+    ]
+}

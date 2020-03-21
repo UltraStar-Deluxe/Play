@@ -1,0 +1,12 @@
+{
+    "name": "UniInjectEditor",
+    "references": [
+        "UniInject"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

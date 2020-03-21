@@ -1,0 +1,50 @@
+@startuml
+
+' ---------------------------
+' Assets/Plugins
+component [Plugins] {
+    [CompileTimeTracker]
+    [CSharpSynthForUnity]
+    [FullSerializer]
+    [LeanTween]
+    [NLayer]
+    [SharpZipLib]
+    [Threads]
+}
+
+[UniInject]
+[UniRx]
+
+' ---------------------------
+' Assets/Common
+[Common]
+
+' ---------------------------
+' Assets/Scenes
+[Scenes]
+[SongEditorScene]
+[Demos]
+
+' ---------------------------
+' Assets/Editor
+[USPlayEditor]
+
+' ---------------------------
+' Unity environment
+[NUnit]
+
+' ---------------------------
+' Dependencies
+
+Common --> Plugins
+Common --> UniRx
+Common --> UniInject
+
+Scenes --> Common
+SongEditorScene --> Common
+Demos --> Common
+
+USPlayEditor --> Common
+USPlayEditor --> NUnit
+
+@enduml

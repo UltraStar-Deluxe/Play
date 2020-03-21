@@ -1,0 +1,9 @@
+{
+    "name": "SongEditorScene",
+    "references": [
+        "Plugins",
+        "UniRx",
+        "UniInject",
+        "Common"
+    ]
+}
