@@ -1,0 +1,8 @@
+{
+	"name": "Common",
+	"references": [
+		"Plugins",
+		"UniRx",
+		"UniInject"
+	]
+}
