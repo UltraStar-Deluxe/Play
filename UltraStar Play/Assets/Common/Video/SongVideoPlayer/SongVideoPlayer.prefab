@@ -53,6 +53,7 @@ MonoBehaviour:
   videoPlayer: {fileID: 4716120666936176535}
   videoImageAndPlayerContainer: {fileID: 4716120665484008667}
   backgroundImage: {fileID: 0}
+  videoImage: {fileID: 4716120665864037558}
   forceSyncOnForwardJumpInTheSong: 0
 --- !u!1 &4716120665864037561
 GameObject:
