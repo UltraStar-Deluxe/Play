@@ -21,5 +21,8 @@ echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/FullSerializer/* ./
 rm -rf ./Assets
 
+echo "Creating assembly definition for editor scripts"
+echo "{ \"name\": \"FullSerializerEditor\", \"includePlatforms\": [\"Editor\"], \"references\": [\"Plugins\"] }" >  "./Source/Aot/Editor/FullSerializerEditor.asmdef"
+
 cd "$old_dir"
 echo "Downloading FullSerializer done"
