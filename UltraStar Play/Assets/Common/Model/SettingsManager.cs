@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 
-// The SettingsManager
 public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance
