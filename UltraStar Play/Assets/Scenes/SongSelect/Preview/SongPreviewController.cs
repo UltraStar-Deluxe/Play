@@ -14,8 +14,10 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 {
     public float previewDelayInSeconds = 1;
 
-    public float fadeInDurationInSeconds = 5;
+    public float audioFadeInDurationInSeconds = 5;
+    public float videoFadeInDurationInSeconds = 2;
     private float fadeInStartInSeconds;
+    private float videoFadeInStartInSeconds;
 
     private bool isFadeInStarted;
 
@@ -55,13 +57,22 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         // Update fade-in of music volume and video transparency
         if (isFadeInStarted)
         {
-            float percent = (Time.time - fadeInStartInSeconds) / fadeInDurationInSeconds;
-            percent = NumberUtils.Limit(percent, 0, 1);
-
+            float audioPercent = (Time.time - fadeInStartInSeconds) / audioFadeInDurationInSeconds;
+            audioPercent = NumberUtils.Limit(audioPercent, 0, 1);
             float maxVolume = settings.AudioSettings.PreviewVolumePercent / 100f;
-            songAudioPlayer.audioPlayer.volume = percent * maxVolume;
+            songAudioPlayer.audioPlayer.volume = audioPercent * maxVolume;
 
-            if (percent >= 1)
+            // The video has an additional delay to load.
+            // As long as no frame is ready yet, the VideoPlayer.time is 0.
+            if (songVideoPlayer.videoPlayer.time <= 0)
+            {
+                videoFadeInStartInSeconds = Time.time;
+            }
+            float videoPercent = (Time.time - videoFadeInStartInSeconds) / videoFadeInDurationInSeconds;
+            videoPercent = NumberUtils.Limit(videoPercent, 0, 1);
+            songVideoPlayer.videoImage.SetAlpha(videoPercent);
+
+            if (audioPercent >= 1 && videoPercent >= 1)
             {
                 // Fade-in is complete
                 isFadeInStarted = false;
@@ -140,6 +151,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         }
 
         fadeInStartInSeconds = Time.time;
+        videoFadeInStartInSeconds = Time.time;
         isFadeInStarted = true;
         StartAudioPreview(songMeta, previewStartInMillis);
         StartVideoPreview(songMeta);
@@ -154,6 +166,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
         songVideoPlayer.videoImageAndPlayerContainer.gameObject.SetActive(true);
         songVideoPlayer.Init(songMeta, songAudioPlayer);
+        songVideoPlayer.videoImage.SetAlpha(0);
     }
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
