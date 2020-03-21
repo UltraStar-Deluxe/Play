@@ -22,6 +22,9 @@ echo "Moving downloaded files to correct position for this project..."
 mv -v CompileTimeTracker/* ./
 rm -rf ./CompileTimeTracker
 
+echo "Creating assembly definition for editor scripts"
+echo "{ \"name\": \"CompileTimeTrackerEditor\", \"includePlatforms\": [\"Editor\"], \"references\": [\"Plugins\"] }" >  "./Editor/CompileTimeTrackerEditor.asmdef"
+
 cd "$old_dir"
 echo "Downloading CompileTimeTracker done"
 echo ""
