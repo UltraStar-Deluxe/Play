@@ -36,7 +36,7 @@ EditorBuildSettings:
     path: Assets/Scenes/SingingResults/SingingResultsScene.unity
     guid: 9647cd7b9dee4b44fb9a7e98c6c4b234
   - enabled: 1
-    path: Assets/Scenes/Result/StatisticsScene.unity
+    path: Assets/Scenes/Statistics/StatisticsScene.unity
     guid: e1ab09ef6a75a0d4c8833df9dfc6f69e
   - enabled: 1
     path: Assets/Scenes/Sing/SingScene.unity

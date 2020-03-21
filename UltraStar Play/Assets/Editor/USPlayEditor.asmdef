@@ -1,0 +1,15 @@
+{
+    "name": "USPlayEditor",
+    "references": [
+        "Plugins",
+        "UniRx",
+        "UniInject",
+        "Common"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}
