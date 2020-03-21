@@ -922,6 +922,12 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228108, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 921e129a3d6748c4aae38b416fbd8a4f,
+        type: 3}
     - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
       propertyPath: m_AnchorMin.x
@@ -942,21 +948,15 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3622033095437819812, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228108, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 921e129a3d6748c4aae38b416fbd8a4f,
-        type: 3}
     - target: {fileID: 3622033095365871879, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
       propertyPath: m_Text
       value: Recording Options
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095437819812, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3622033095437819808, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
@@ -1118,11 +1118,11 @@ MonoBehaviour:
   anchorMin: {x: 0.13727501, y: 0.703167}
   anchorMax: {x: 0.837625, y: 0.76150006}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -12.048004, y: 127.31879, z: 0}
+  localPosition: {x: -12.374298, y: 133.35945, z: 0}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 467.952, y: 401.3188, z: 0}
+  position: {x: 480.6257, y: 420.35944, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 672.336, y: 31.966492}
+  size: {x: 690.5451, y: 33.483185}
 --- !u!114 &1401080150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1186,11 +1186,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Amplification
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: 0 dB
       objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -1256,6 +1251,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: 0 dB
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -1877,6 +1877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
+  halftoneContinuationBias: 0.1
   lastMidiNoteName: 
   lastMidiNote: 0
 --- !u!82 &1699667246
@@ -2023,11 +2024,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: RecordingDevice
       objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Mic#1
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2092,6 +2088,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Mic#1
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -2426,11 +2427,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: NoiseSuppression
       objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: 0 %
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2495,6 +2491,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 22.40001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: 0 %
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -3189,6 +3190,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultButton: {fileID: 0}
+--- !u!114 &891486559112070679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891486559112070677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1df1f240b2a8b714c91f341788fd2d08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetScene: 2
 --- !u!114 &1171786670441985755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3639,11 +3653,11 @@ MonoBehaviour:
   anchorMin: {x: -0.0000037672655, y: 0.0000009546667}
   anchorMax: {x: 0.44620168, y: 0.99999714}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -186.17722, y: -0.000030517578, z: 0}
+  localPosition: {x: -191.2195, y: -0.000032424927, z: 0}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 281.76273, y: 242.03333, z: 0}
+  position: {x: 289.3938, y: 253.51666, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 300.01074, y: 31.966614}
+  size: {x: 308.13602, y: 33.483284}
 --- !u!114 &3951411888587536457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3780,11 +3794,11 @@ MonoBehaviour:
   anchorMin: {x: 0.86441994, y: 0}
   anchorMax: {x: 0.99998003, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 128.75708, y: 0, z: 616.995}
+  localPosition: {x: 132.24425, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 783.92163, y: 242.53336, z: 0}
+  position: {x: 805.15283, y: 254.0404, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 40.384827, y: 30.966736}
+  size: {x: 41.478577, y: 32.435966}
 --- !u!1 &5234300631281340595
 GameObject:
   m_ObjectHideFlags: 0
@@ -4062,11 +4076,11 @@ MonoBehaviour:
   anchorMin: {x: 0.00022001253, y: 0}
   anchorMax: {x: 0.13578, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -128.6975, y: 0, z: 616.995}
+  localPosition: {x: -132.18304, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 526.46704, y: 242.53336, z: 0}
+  position: {x: 540.7255, y: 254.0404, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 40.384796, y: 30.966736}
+  size: {x: 41.478546, y: 32.435966}
 --- !u!222 &5234300633005799992
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4161,11 +4175,11 @@ MonoBehaviour:
   anchorMin: {x: -0.0000037583222, y: 0.0000009264265}
   anchorMax: {x: 0.44620168, y: 0.99999714}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -186.17056, y: -0.000031471252, z: 0}
+  localPosition: {x: -191.21266, y: -0.000032424927, z: 0}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 281.7814, y: 188.80592, z: 0}
+  position: {x: 289.41296, y: 197.76385, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 300, y: 31.966553}
+  size: {x: 308.12497, y: 33.483227}
 --- !u!114 &5595192817001256900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4553,11 +4567,11 @@ MonoBehaviour:
   anchorMin: {x: 0.1357999, y: 0}
   anchorMax: {x: 0.86441976, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0.032714844, y: 0, z: 616.995}
+  localPosition: {x: 0.033607483, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 655.19727, y: 242.53336, z: 0}
+  position: {x: 672.94214, y: 254.0404, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 217.06378, y: 30.966736}
+  size: {x: 222.94258, y: 32.435966}
 --- !u!1 &8011713996265705926
 GameObject:
   m_ObjectHideFlags: 0
