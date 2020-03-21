@@ -1,9 +1,9 @@
 {
-	"name": "SongEditorScene",
-	"references": [
-		"Plugins",
-		"UniRx",
-		"UniInject",
-		"Common"
-	]
+    "name": "SongEditorScene",
+    "references": [
+        "Plugins",
+        "UniRx",
+        "UniInject",
+        "Common"
+    ]
 }
