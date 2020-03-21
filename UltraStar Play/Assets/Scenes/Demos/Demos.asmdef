@@ -1,9 +1,9 @@
 {
-	"name": "Demos",
-	"references": [
-		"Plugins",
-		"UniRx",
-		"UniInject",
-		"Common"
-	]
+    "name": "Demos",
+    "references": [
+        "Plugins",
+        "UniRx",
+        "UniInject",
+        "Common"
+    ]
 }
