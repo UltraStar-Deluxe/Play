@@ -88,7 +88,7 @@ public class SettingsManager : MonoBehaviour
         if (!settingsOverwriteJson.IsNullOrEmpty())
         {
             settingsOverwriteJson = settingsOverwriteJson.Strip("\"", "\"");
-            settingsOverwriteJson = settingsOverwriteJson.Strip("\'", "\'");
+            settingsOverwriteJson = settingsOverwriteJson.Strip("'", "'");
             try
             {
                 JsonConverter.FillFromJson(settingsOverwriteJson, settings);
