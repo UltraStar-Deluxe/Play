@@ -26,6 +26,11 @@ public static class StringExtensions
     // Removes opening and ending part from a string.
     public static string Strip(this string txt, string opening, string ending)
     {
+        if (txt == null)
+        {
+            return null;
+        }
+
         if (txt.Length >= (opening.Length + ending.Length)
             && txt.StartsWith(opening)
             && txt.EndsWith(ending))
