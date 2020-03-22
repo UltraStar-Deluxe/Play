@@ -41,6 +41,12 @@ public static class JsonConverter
         return deserialized;
     }
 
+    public static void FillFromJson<T>(string json, T existingInstance)
+    {
+        fsData data = fsJsonParser.Parse(json);
+        serializer.TryDeserialize<T>(data, ref existingInstance).AssertSuccessWithoutWarnings();
+    }
+
     // https://stackoverflow.com/questions/4580397/json-formatter-in-c
     private static string FormatJson(string json)
     {
