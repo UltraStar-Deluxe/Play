@@ -106,6 +106,8 @@ public class SettingsManager : MonoBehaviour
         if (settingsPath.IsNullOrEmpty())
         {
             string commandLineSettingsPath = ApplicationManager.Instance.GetCommandLineArgument("--settingsPath");
+            commandLineSettingsPath = commandLineSettingsPath.Strip("\"", "\"");
+            commandLineSettingsPath = commandLineSettingsPath.Strip("'", "'");
             if (!commandLineSettingsPath.IsNullOrEmpty())
             {
                 settingsPath = commandLineSettingsPath;
