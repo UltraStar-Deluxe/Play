@@ -84,7 +84,7 @@ public class SettingsManager : MonoBehaviour
 
     private void OverwriteSettingsWithCommandLineArguments()
     {
-        string settingsOverwriteJson = ApplicationManager.Instance.GetCommandLineArgument("-settingsOverwriteJson");
+        string settingsOverwriteJson = ApplicationManager.Instance.GetCommandLineArgument("--settingsOverwriteJson");
         if (!settingsOverwriteJson.IsNullOrEmpty())
         {
             settingsOverwriteJson = settingsOverwriteJson.Strip("\"", "\"");
@@ -105,7 +105,7 @@ public class SettingsManager : MonoBehaviour
     {
         if (settingsPath.IsNullOrEmpty())
         {
-            string commandLineSettingsPath = ApplicationManager.Instance.GetCommandLineArgument("-settingsPath");
+            string commandLineSettingsPath = ApplicationManager.Instance.GetCommandLineArgument("--settingsPath");
             if (!commandLineSettingsPath.IsNullOrEmpty())
             {
                 settingsPath = commandLineSettingsPath;
