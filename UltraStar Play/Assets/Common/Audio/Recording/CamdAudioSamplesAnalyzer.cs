@@ -82,17 +82,9 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         int midiNote = bestCandidate.halftone + MinNote;
         if (midiNote < MidiUtils.SingableNoteMin || midiNote > MidiUtils.SingableNoteMax)
         {
-            // This pitch is impossible to sing. Thus, assuming the pitch detection failed.
-            // Use the newest pitch from the history instead if possible.
-            if (candidateHistory.IsEmpty)
-            {
-                return new PitchEvent(midiNote);
-            }
-            else
-            {
-                int historyMidiNote = candidateHistory.Front().halftone + MinNote;
-                return new PitchEvent(historyMidiNote);
-            }
+            // This pitch is impossible to sing.
+            // Thus, assume the pitch detection failed and do not add the pitch to the history.
+            return new PitchEvent(midiNote);
         }
         else
         {
