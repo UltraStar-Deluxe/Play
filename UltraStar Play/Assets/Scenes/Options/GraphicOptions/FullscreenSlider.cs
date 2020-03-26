@@ -17,6 +17,16 @@ public class FullscreenSlider : TextItemSlider<FullScreenMode>
         else
         {
             Selection.Value = Screen.fullScreenMode;
+            // The full-screen mode can change, e.g., via global keyboard shortcut. Thus, synchronize with the settings.
+            SettingsManager.Instance.Settings.GraphicSettings.ObserveEveryValueChanged(it => it.fullScreenMode)
+                .Subscribe(newFullScreenMode =>
+                {
+                    // Avoid infinite recursion.
+                    if (newFullScreenMode != Selection.Value)
+                    {
+                        Selection.Value = newFullScreenMode;
+                    }
+                });
         }
         Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode = newValue);
     }
