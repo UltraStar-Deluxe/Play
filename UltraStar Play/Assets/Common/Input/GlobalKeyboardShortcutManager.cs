@@ -20,5 +20,11 @@ public class GlobalKeyboardShortcutManager : MonoBehaviour
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.1f,
                 () => SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode = Screen.fullScreenMode));
         }
+
+        // Mute / unmute audio via F12
+        if (Input.GetKeyUp(KeyCode.F12))
+        {
+            AudioManager.ToggleMuteAudio();
+        }
     }
 }
