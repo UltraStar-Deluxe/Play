@@ -64,13 +64,20 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
             // The video has an additional delay to load.
             // As long as no frame is ready yet, the VideoPlayer.time is 0.
-            if (songVideoPlayer.videoPlayer.time <= 0)
+            if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
             {
                 videoFadeInStartInSeconds = Time.time;
             }
             float videoPercent = (Time.time - videoFadeInStartInSeconds) / videoFadeInDurationInSeconds;
             videoPercent = NumberUtils.Limit(videoPercent, 0, 1);
-            songVideoPlayer.videoImage.SetAlpha(videoPercent);
+            if (songVideoPlayer.HasLoadedVideo)
+            {
+                songVideoPlayer.videoImage.SetAlpha(videoPercent);
+            }
+            else if (songVideoPlayer.HasLoadedBackgroundImage)
+            {
+                songVideoPlayer.backgroundImage.SetAlpha(videoPercent);
+            }
 
             if (audioPercent >= 1 && videoPercent >= 1)
             {
@@ -139,7 +146,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         StopAllCoroutines();
         songAudioPlayer.PauseAudio();
         isFadeInStarted = false;
-        songVideoPlayer.videoImageAndPlayerContainer.gameObject.SetActive(false);
+        songVideoPlayer.gameObject.SetActive(false);
     }
 
     private void StartSongPreview(SongMeta songMeta, int previewStartInMillis)
@@ -164,9 +171,11 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
             return;
         }
 
-        songVideoPlayer.videoImageAndPlayerContainer.gameObject.SetActive(true);
+        songVideoPlayer.gameObject.SetActive(true);
         songVideoPlayer.Init(songMeta, songAudioPlayer);
         songVideoPlayer.videoImage.SetAlpha(0);
+        songVideoPlayer.backgroundImage.SetAlpha(0);
+        songVideoPlayer.StartVideoOrShowBackgroundImage();
     }
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
