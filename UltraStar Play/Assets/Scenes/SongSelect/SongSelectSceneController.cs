@@ -8,6 +8,7 @@ using UniInject;
 using UnityEngine.EventSystems;
 using System.Globalization;
 using System.Threading;
+using System.IO;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -77,7 +78,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         GetSongMetasFromManager();
 
         songRouletteController.SelectionClickedEventStream
-            .Subscribe(selection => StartSingScene(selection.SongMeta));
+            .Subscribe(selection => CheckAudioAndStartSingScene());
 
         statsManager = StatsManager.Instance.Statistics;
 
@@ -232,10 +233,26 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SelectPreviousSong();
     }
 
-    public void StartSingScene()
+    public void CheckAudioAndStartSingScene()
     {
         if (SelectedSong != null)
         {
+            // Check that the audio file exists
+            string audioPath = SongMetaUtils.GetAbsoluteSongFilePath(SelectedSong);
+            if (!File.Exists(audioPath))
+            {
+                UiManager.Instance.CreateWarningDialog("Audio Error", "Audio file does not exist: " + audioPath);
+                return;
+            }
+
+            // Check that the used audio format can be loaded.
+            songAudioPlayer.Init(SelectedSong);
+            if (!songAudioPlayer.HasAudioClip)
+            {
+                UiManager.Instance.CreateWarningDialog("Audio Error", "Audio file could not be loaded.\nPlease use a supported format.");
+                return;
+            }
+
             StartSingScene(SelectedSong);
         }
     }
