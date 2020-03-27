@@ -92,7 +92,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
         // Open the sing scene via Return / Enter
         if (Input.GetKeyUp(KeyCode.Return) && IsNoControlOrSongButtonFocused())
         {
-            songSelectSceneController.StartSingScene();
+            songSelectSceneController.CheckAudioAndStartSingScene();
         }
 
         // Toggle active players with Tab
