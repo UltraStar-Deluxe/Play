@@ -22,6 +22,9 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
     private bool isFadeInStarted;
 
     [Inject]
+    private UiManager uiManager;
+
+    [Inject]
     private SongRouletteController songRouletteController;
 
     [Inject]
@@ -183,6 +186,13 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         songAudioPlayer.Init(songMeta);
         songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
         songAudioPlayer.audioPlayer.volume = 0;
-        songAudioPlayer.PlayAudio();
+        if (songAudioPlayer.HasAudioClip)
+        {
+            songAudioPlayer.PlayAudio();
+        }
+        else
+        {
+            uiManager.CreateNotification("Audio could not be loaded.", Colors.red);
+        }
     }
 }
