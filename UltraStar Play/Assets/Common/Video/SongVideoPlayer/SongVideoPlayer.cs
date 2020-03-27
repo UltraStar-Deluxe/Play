@@ -12,9 +12,6 @@ public class SongVideoPlayer : MonoBehaviour
     public VideoPlayer videoPlayer;
 
     [InjectedInInspector]
-    public GameObject videoImageAndPlayerContainer;
-
-    [InjectedInInspector]
     public Image backgroundImage;
 
     [InjectedInInspector]
@@ -28,7 +25,8 @@ public class SongVideoPlayer : MonoBehaviour
 
     private SongMeta SongMeta { get; set; }
 
-    private bool hasLoadedVideo;
+    public bool HasLoadedVideo { get; private set; }
+    public bool HasLoadedBackgroundImage { get; private set; }
     private string videoPath;
 
     private float nextSyncTimeInSeconds;
@@ -42,6 +40,7 @@ public class SongVideoPlayer : MonoBehaviour
         {
             songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
         }
+        HasLoadedBackgroundImage = false;
         InitVideo(songMeta);
     }
 
@@ -59,32 +58,46 @@ public class SongVideoPlayer : MonoBehaviour
 
     public void StartVideoOrShowBackgroundImage()
     {
-        if (hasLoadedVideo)
+        if (HasLoadedVideo)
         {
             StartVideoPlayback();
         }
         else
         {
-            Debug.LogWarning("Video file '" + videoPath + "' does not exist. Showing background image instead.");
             ShowBackgroundImage();
         }
     }
 
     public void LoadVideo(string videoPath)
     {
-        if (hasLoadedVideo)
+        if (!File.Exists(videoPath))
         {
-            ClearOutRenderTexture(videoPlayer.targetTexture);
+            Debug.LogWarning("Video does not exist: " + videoPath);
+            return;
         }
 
         videoPlayer.url = "file://" + videoPath;
         // The url is empty if loading the video failed.
-        hasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
+        HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
         // For now, only load the video. Starting it is done from the outside.
-        if (hasLoadedVideo)
+        if (HasLoadedVideo)
         {
+            videoImage.gameObject.SetActive(true);
             videoPlayer.Pause();
         }
+    }
+
+    private void UnloadVideo()
+    {
+        if (!HasLoadedVideo)
+        {
+            return;
+        }
+        HasLoadedVideo = false;
+        videoPlayer.Stop();
+        videoPlayer.clip = null;
+        videoPlayer.source = VideoSource.VideoClip;
+        ClearOutRenderTexture(videoPlayer.targetTexture);
     }
 
     private void SyncVideoWithMusic(bool forceImmediateSync)
@@ -98,9 +111,9 @@ public class SongVideoPlayer : MonoBehaviour
 
     private void StartVideoPlayback()
     {
-        if (string.IsNullOrEmpty(videoPlayer.url))
+        if (!HasLoadedVideo)
         {
-            Debug.LogWarning("Setting VideoPlayer URL failed. Showing background image instead.");
+            Debug.LogWarning("No video has been loaded. Showing background image instead.");
             ShowBackgroundImage();
             return;
         }
@@ -114,7 +127,7 @@ public class SongVideoPlayer : MonoBehaviour
 
     private void SyncVideoPlayPause(double positionInSongInMillis)
     {
-        if (!hasLoadedVideo || !videoPlayer.gameObject.activeInHierarchy)
+        if (!HasLoadedVideo || !videoPlayer.gameObject.activeInHierarchy)
         {
             return;
         }
@@ -133,7 +146,7 @@ public class SongVideoPlayer : MonoBehaviour
 
     public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync)
     {
-        if (!hasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis)
+        if (!HasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis)
             || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time))
         {
             return;
@@ -170,7 +183,7 @@ public class SongVideoPlayer : MonoBehaviour
 
     public void ShowBackgroundImage()
     {
-        videoImageAndPlayerContainer.gameObject.SetActive(false);
+        videoImage.gameObject.SetActive(false);
         if (string.IsNullOrEmpty(SongMeta.Background))
         {
             ShowCoverImageAsBackground();
@@ -180,8 +193,7 @@ public class SongVideoPlayer : MonoBehaviour
         string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
         if (File.Exists(backgroundImagePath))
         {
-            Sprite backgroundImageSprite = ImageManager.LoadSprite(backgroundImagePath);
-            backgroundImage.sprite = backgroundImageSprite;
+            LoadBackgroundImage(backgroundImagePath);
         }
         else
         {
@@ -200,8 +212,7 @@ public class SongVideoPlayer : MonoBehaviour
         string coverImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Cover;
         if (File.Exists(coverImagePath))
         {
-            Sprite coverImageSprite = ImageManager.LoadSprite(coverImagePath);
-            backgroundImage.sprite = coverImageSprite;
+            LoadBackgroundImage(coverImagePath);
         }
         else
         {
@@ -209,23 +220,28 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
+    private void LoadBackgroundImage(string imagePath)
+    {
+        Sprite coverImageSprite = ImageManager.LoadSprite(imagePath);
+        backgroundImage.sprite = coverImageSprite;
+        HasLoadedBackgroundImage = true;
+    }
+
     private void InitVideo(SongMeta songMeta)
     {
-        hasLoadedVideo = false;
+        UnloadVideo();
+
         videoPath = "";
         if (!string.IsNullOrEmpty(songMeta.Video))
         {
             videoPath = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
-            if (File.Exists(videoPath))
-            {
-                LoadVideo(videoPath);
-            }
+            LoadVideo(videoPath);
         }
     }
 
     void OnDisable()
     {
-        if (hasLoadedVideo)
+        if (HasLoadedVideo)
         {
             ClearOutRenderTexture(videoPlayer.targetTexture);
         }
