@@ -31,17 +31,38 @@ public class SongVideoPlayer : MonoBehaviour
 
     private float nextSyncTimeInSeconds;
 
+    private IDisposable jumpBackInSongEventStreamDisposable;
+    private IDisposable jumpForwardInSongEventStreamDisposable;
+
     public void Init(SongMeta songMeta, SongAudioPlayer songAudioPlayer)
     {
         this.SongMeta = songMeta;
         this.SongAudioPlayer = songAudioPlayer;
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
+        HasLoadedBackgroundImage = false;
+        InitEventSubscriber();
+        InitVideo(songMeta);
+    }
+
+    private void InitEventSubscriber()
+    {
+        // Jump backward in song
+        if (jumpBackInSongEventStreamDisposable != null)
+        {
+            jumpBackInSongEventStreamDisposable.Dispose();
+        }
+        jumpBackInSongEventStreamDisposable = SongAudioPlayer.JumpBackInSongEventStream
+            .Subscribe(_ => SyncVideoWithMusic(true));
+
+        // Jump forward in song
+        if (jumpForwardInSongEventStreamDisposable != null)
+        {
+            jumpForwardInSongEventStreamDisposable.Dispose();
+        }
         if (forceSyncOnForwardJumpInTheSong)
         {
-            songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncVideoWithMusic(true));
+            jumpForwardInSongEventStreamDisposable = SongAudioPlayer.JumpForwardInSongEventStream
+                .Subscribe(_ => SyncVideoWithMusic(true));
         }
-        HasLoadedBackgroundImage = false;
-        InitVideo(songMeta);
     }
 
     void Update()
