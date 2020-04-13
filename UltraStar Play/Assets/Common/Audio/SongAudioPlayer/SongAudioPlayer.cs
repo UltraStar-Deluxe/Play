@@ -227,6 +227,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else
         {
+            audioPlayer.clip = null;
             DurationOfSongInMillis = 0;
         }
     }
@@ -242,7 +243,7 @@ public class SongAudioPlayer : MonoBehaviour
 
     public void PlayAudio()
     {
-        if (!audioPlayer.isPlaying)
+        if (HasAudioClip && !audioPlayer.isPlaying)
         {
             audioPlayer.Play();
             playbackStartedEventStream.OnNext(PositionInSongInMillis);
