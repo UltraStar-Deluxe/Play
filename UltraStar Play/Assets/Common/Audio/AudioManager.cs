@@ -14,11 +14,29 @@ public class AudioManager : MonoBehaviour
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
 
+    private static float volumeBeforeMute = -1;
+
     public static AudioManager Instance
     {
         get
         {
             return GameObjectUtils.FindComponentWithTag<AudioManager>("AudioManager");
+        }
+    }
+
+    public static void ToggleMuteAudio()
+    {
+        if (volumeBeforeMute >= 0)
+        {
+            AudioListener.volume = volumeBeforeMute;
+            volumeBeforeMute = -1;
+            UiManager.Instance.CreateNotification("Unmute");
+        }
+        else
+        {
+            volumeBeforeMute = AudioListener.volume;
+            AudioListener.volume = 0;
+            UiManager.Instance.CreateNotification("Mute");
         }
     }
 
