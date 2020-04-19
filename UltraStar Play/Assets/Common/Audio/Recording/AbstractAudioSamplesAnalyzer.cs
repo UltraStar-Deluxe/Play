@@ -27,6 +27,16 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         return false;
     }
 
+    protected static int PreviousPowerOfTwo(int x)
+    {
+        x |= (x >> 1);
+        x |= (x >> 2);
+        x |= (x >> 4);
+        x |= (x >> 8);
+        x |= (x >> 16);
+        return x - (x >> 1);
+    }
+
     abstract public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic);
 
 }
