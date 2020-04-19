@@ -95,9 +95,18 @@ public class MicrophonePitchTracker : MonoBehaviour
 
     private IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer()
     {
-        CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz, MaxSampleCountToUse);
-        camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
-        return camdAudioSamplesAnalyzer;
+        switch (SettingsManager.Instance.Settings.AudioSettings.pitchDetectionAlgorithm)
+        {
+            case EPitchDetectionAlgorithm.Camd:
+                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(SampleRateHz, MaxSampleCountToUse);
+                camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
+                return camdAudioSamplesAnalyzer;
+            case EPitchDetectionAlgorithm.Dywa:
+                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new DywaAudioSamplesAnalyzer(SampleRateHz, MaxSampleCountToUse);
+                return dywaAudioSamplesAnalyzer;
+            default:
+                throw new UnityException("Unkown pitch detection algorithm:" + SettingsManager.Instance.Settings.AudioSettings.pitchDetectionAlgorithm);
+        }
     }
 
     void OnDisable()
