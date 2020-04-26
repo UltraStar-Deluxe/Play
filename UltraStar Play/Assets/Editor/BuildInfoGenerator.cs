@@ -21,10 +21,10 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
 
     public void OnPreprocessBuild(BuildReport report)
     {
-        UpdateVersionClass();
+        UpdateVersionFile();
     }
 
-    private void UpdateVersionClass()
+    private void UpdateVersionFile()
     {
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
         string[] versionFileLines = File.ReadAllLines(versionFile);
