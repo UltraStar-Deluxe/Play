@@ -317,13 +317,13 @@ public class PlayerController : MonoBehaviour, INeedInjection
         {
             return -1d;
         }
-        
+
         // It is possible that the display is still shown only because the LinebreakBeat is after the MaxBeat.
         if (displaySentence.MaxBeat < currentBeat)
         {
             // Use the beat of the following sentence
             Sentence nextDisplaySentence = GetSentence(displaySentenceIndex + 1);
-            if(nextDisplaySentence != null)
+            if (nextDisplaySentence != null)
             {
                 return nextDisplaySentence.MinBeat;
             }

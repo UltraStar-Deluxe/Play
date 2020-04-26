@@ -20,7 +20,7 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 
         // Create and configure Dynamic Wavelet Pitch Tracker.
         dywaPitchTracker = new DywaPitchTracker();
-        dywaPitchTracker.sampleRateHz = sampleRateHz;
+        dywaPitchTracker.SampleRateHz = sampleRateHz;
     }
 
     public override PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile micProfile)
