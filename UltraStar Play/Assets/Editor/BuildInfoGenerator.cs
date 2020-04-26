@@ -5,9 +5,12 @@ using System.Text.RegularExpressions;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-// Creates a file with build information before Unity performs the actual build.
+// Fills a file with build information before Unity performs the actual build.
 public class BuildInfoGenerator : IPreprocessBuildWithReport
 {
+    public static readonly string timeStampPropertyName = "build_timestamp";
+    public static readonly string versionFile = "Assets/Common/Version/version.properties.txt";
+
     public int callbackOrder
     {
         get
@@ -23,19 +26,16 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
 
     private void UpdateVersionClass()
     {
-        string versionClassFile = "Assets/Common/Version.cs";
-        string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
-        string[] versionClassLines = File.ReadAllLines(versionClassFile);
-        for (int i = 0; i < versionClassLines.Length; i++)
+        string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
+        string[] versionFileLines = File.ReadAllLines(versionFile);
+        for (int i = 0; i < versionFileLines.Length; i++)
         {
-            string line = versionClassLines[i];
-            if (line.Contains("buildTimeStamp"))
+            string line = versionFileLines[i];
+            if (line.StartsWith(timeStampPropertyName, true, CultureInfo.InvariantCulture))
             {
-                versionClassLines[i] = Regex.Replace(line,
-                    ".* buildTimeStamp = .*",
-                    $"    public static readonly string buildTimeStamp = \"{timeStamp}\";");
+                versionFileLines[i] = $"{timeStampPropertyName} = {timeStamp}";
             }
         }
-        File.WriteAllLines(versionClassFile, versionClassLines);
+        File.WriteAllLines(versionFile, versionFileLines);
     }
 }

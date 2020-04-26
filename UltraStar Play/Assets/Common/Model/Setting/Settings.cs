@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +13,10 @@ public class Settings
     public List<MicProfile> MicProfiles { get; set; } = new List<MicProfile>();
 
     public SongEditorSettings SongEditorSettings { get; set; } = new SongEditorSettings();
+
+    // The releases to be ignored when checking for updates.
+    // When containing the string "all", then all releases will be ignored.
+    public List<string> IgnoredReleases { get; set; } = new List<string>();
 
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
