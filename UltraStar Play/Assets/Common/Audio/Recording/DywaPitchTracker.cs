@@ -42,6 +42,11 @@ public class DywaPitchTracker
 
     public DywaPitchTracker()
     {
+        ClearPitchHistory();
+    }
+
+    public void ClearPitchHistory()
+    {
         _prevPitch = -1.0f;
         _pitchConfidence = -1;
     }
@@ -537,7 +542,6 @@ cleanup:
             raw_pitch *= (sampleRateHz / 44100f);
         }
 
-        return raw_pitch;
-        //return _dywapitch_dynamicprocess(raw_pitch);
+        return _dywapitch_dynamicprocess(raw_pitch);
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -47,6 +47,7 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         // Check if samples is louder than threshhold
         if (!IsAboveNoiseSuppressionThreshold(audioSamplesBuffer, sampleCountToUse, micProfile))
         {
+            dywaPitchTracker.ClearPitchHistory();
             return null;
         }
 
@@ -54,6 +55,7 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         float frequency = dywaPitchTracker.ComputePitch(audioSamplesBuffer, 0, sampleCountToUse);
         if (frequency <= 0)
         {
+            dywaPitchTracker.ClearPitchHistory();
             return null;
         }
 
