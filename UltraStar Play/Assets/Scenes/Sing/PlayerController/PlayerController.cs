@@ -310,13 +310,26 @@ public class PlayerController : MonoBehaviour, INeedInjection
         return sentence;
     }
 
-    public double GetNextStartBeat()
+    public double GetNextStartBeat(double currentBeat)
     {
-        if (GetDisplaySentence() == null)
+        Sentence displaySentence = GetDisplaySentence();
+        if (displaySentence == null)
         {
             return -1d;
         }
-        return GetDisplaySentence().MinBeat;
+        
+        // It is possible that the display is still shown only because the LinebreakBeat is after the MaxBeat.
+        if (displaySentence.MaxBeat < currentBeat)
+        {
+            // Use the beat of the following sentence
+            Sentence nextDisplaySentence = GetSentence(displaySentenceIndex + 1);
+            if(nextDisplaySentence != null)
+            {
+                return nextDisplaySentence.MinBeat;
+            }
+        }
+
+        return displaySentence.MinBeat;
     }
 
     public Sentence GetUpcomingSentenceForBeat(double currentBeat)

@@ -208,7 +208,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     public void SkipToNextSentence()
     {
-        double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
+        double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat(CurrentBeat)).Min();
         if (nextStartBeat < 0)
         {
             return;
