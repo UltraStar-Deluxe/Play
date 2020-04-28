@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System;
@@ -7,7 +7,7 @@ using System.Collections;
 public class RecordingOptionsMicVisualizer : MonoBehaviour
 {
     public Text currentNoteLabel;
-    public MicrophonePitchTracker microphonePitchTracker;
+    public MicPitchTracker micPitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
 
@@ -29,13 +29,13 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     private void UpdateWaveForm()
     {
-        MicProfile micProfile = microphonePitchTracker.MicProfile;
+        MicProfile micProfile = micPitchTracker.MicProfile;
         if (micProfile == null)
         {
             return;
         }
 
-        float[] micData = microphonePitchTracker.MicData;
+        float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
 
         // Apply noise suppression and amplification to the buffer
         float[] displayData = new float[micData.Length];
@@ -53,10 +53,10 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     public void SetMicProfile(MicProfile micProfile)
     {
-        microphonePitchTracker.MicProfile = micProfile;
+        micPitchTracker.MicProfile = micProfile;
         if (!string.IsNullOrEmpty(micProfile.Name))
         {
-            microphonePitchTracker.StartPitchDetection();
+            micPitchTracker.MicSampleRecorder.StartRecording();
         }
         micAmplifyMultiplier = micProfile.AmplificationMultiplier();
 
@@ -70,7 +70,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     void OnEnable()
     {
-        pitchEventStreamDisposable = microphonePitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
     }
 
     void OnDisable()

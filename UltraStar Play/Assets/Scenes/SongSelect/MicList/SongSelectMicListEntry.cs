@@ -5,24 +5,24 @@ public class SongSelectMicListEntry : MonoBehaviour
 {
     public Image micImage;
 
-    private MicrophonePitchTracker microphonePitchTracker;
+    private MicPitchTracker micPitchTracker;
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
 
     public void Init(MicProfile micProfile)
     {
-        microphonePitchTracker = GetComponentInChildren<MicrophonePitchTracker>();
+        micPitchTracker = GetComponentInChildren<MicPitchTracker>();
         audioWaveFormVisualizer = GetComponentInChildren<AudioWaveFormVisualizer>();
 
         micImage.color = micProfile.Color;
-        microphonePitchTracker.MicProfile = micProfile;
-        microphonePitchTracker.StartPitchDetection();
+        micPitchTracker.MicProfile = micProfile;
+        micPitchTracker.MicSampleRecorder.StartRecording();
     }
 
     void Update()
     {
-        if (audioWaveFormVisualizer != null && microphonePitchTracker != null)
+        if (audioWaveFormVisualizer != null && micPitchTracker != null)
         {
-            float[] micData = microphonePitchTracker.MicData;
+            float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
             audioWaveFormVisualizer.DrawWaveFormValues(micData, micData.Length - 1024, 1024);
         }
     }
