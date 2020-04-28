@@ -51,10 +51,7 @@ public class PlayerUiController : MonoBehaviour
         }
 
         // Inject all children
-        foreach (INeedInjection childThatNeedsInjection in GetComponentsInChildren<INeedInjection>())
-        {
-            injector.Inject(childThatNeedsInjection);
-        }
+        injector.InjectAllComponentsInChildren(this);
     }
 
     public void DisplaySentence(Sentence currentSentence)

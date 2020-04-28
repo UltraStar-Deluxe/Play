@@ -23,7 +23,7 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         dywaPitchTracker.SampleRateHz = sampleRateHz;
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
     {
         if (!isEnabled)
         {
@@ -31,11 +31,12 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             return null;
         }
 
-        if (samplesSinceLastFrame < MinSampleLength)
+        int sampleLength = sampleEndIndex - sampleStartIndex;
+        if (sampleLength < MinSampleLength)
         {
             return null;
         }
-        int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
+        int sampleCountToUse = PreviousPowerOfTwo(sampleLength);
 
         // The number of analyzed samples impacts the performance notably.
         // Do not analyze more samples than necessary.
@@ -45,14 +46,14 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
 
         // Check if samples is louder than threshhold
-        if (!IsAboveNoiseSuppressionThreshold(audioSamplesBuffer, sampleCountToUse, micProfile))
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, sampleStartIndex, sampleEndIndex, micProfile))
         {
             dywaPitchTracker.ClearPitchHistory();
             return null;
         }
 
         // Find frequency
-        float frequency = dywaPitchTracker.ComputePitch(audioSamplesBuffer, 0, sampleCountToUse);
+        float frequency = dywaPitchTracker.ComputePitch(sampleBuffer, sampleStartIndex, sampleCountToUse);
         if (frequency <= 0)
         {
             dywaPitchTracker.ClearPitchHistory();

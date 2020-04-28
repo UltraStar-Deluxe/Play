@@ -44,7 +44,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
     {
         if (!isEnabled)
         {
@@ -52,11 +52,12 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             return null;
         }
 
-        if (samplesSinceLastFrame < MinSampleLength)
+        int sampleLength = sampleEndIndex - sampleStartIndex;
+        if (sampleLength < MinSampleLength)
         {
             return null;
         }
-        int sampleCountToUse = PreviousPowerOfTwo(samplesSinceLastFrame);
+        int sampleCountToUse = PreviousPowerOfTwo(sampleLength);
 
         // The number of analyzed samples impacts the performance notable.
         // Do not analyze more samples than necessary.
@@ -66,14 +67,14 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
 
         // Check if samples is louder than threshhold
-        if (!IsAboveNoiseSuppressionThreshold(audioSamplesBuffer, sampleCountToUse, micProfile))
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, sampleStartIndex, sampleStartIndex + sampleCountToUse, micProfile))
         {
             OnNoPitchDetected();
             return null;
         }
 
         // Get best fitting tone
-        CircularAverageMagnitudeDifference(audioSamplesBuffer, sampleCountToUse, correlation);
+        CircularAverageMagnitudeDifference(sampleBuffer, sampleStartIndex, sampleCountToUse, correlation);
 
         FindCurrentCandidates(correlation, currentCandidates);
         CalculateNormalizedError(currentCandidates, candidateHistory);
@@ -200,15 +201,18 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     //   D_C(\tau)=\sum_{n=0}^{N-1}|x(mod(n+\tau, N)) - x(n)|
     // where \tau = halftoneDelay, n = index, N = samplesSinceLastFrame, x = sampleCountToUse
     // See: Equation (4) in http://www.utdallas.edu/~hxb076000/citing_papers/Muhammad%20Extended%20Average%20Magnitude%20Difference.pdf
-    private void CircularAverageMagnitudeDifference(float[] audioSamplesBuffer, int sampleCountToUse, float[] correlation)
+    private void CircularAverageMagnitudeDifference(float[] sampleBuffer, int sampleStartIndex, int sampleCountToUse, float[] correlation)
     {
         // accumulate the magnitude differences for samples in AnalysisBuffer
         for (int halftone = 0; halftone < NumHalftones; halftone++)
         {
             correlation[halftone] = 0;
-            for (int index = 0; index < sampleCountToUse; index++)
+            for (int i = 0; i < sampleCountToUse; i++)
             {
-                float diff = audioSamplesBuffer[(index + halftoneDelays[halftone]) & (sampleCountToUse - 1)] - audioSamplesBuffer[index];
+                // It should only consider the indices from sampleStartIndex to sampleStartIndex + sampleCountToUse |--->----<---|
+                // This is achieved via a modulo operation.
+                // Binary & is used for efficient calculation of modulo (works because sampleCountToUse is a power of 2).
+                float diff = sampleBuffer[sampleStartIndex + ((i + halftoneDelays[halftone]) & (sampleCountToUse - 1))] - sampleBuffer[sampleStartIndex + i];
                 correlation[halftone] += (diff < 0) ? -diff : diff;
             }
         }

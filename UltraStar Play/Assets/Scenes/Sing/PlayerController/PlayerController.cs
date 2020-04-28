@@ -96,10 +96,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
         // Inject all
-        foreach (INeedInjection childThatNeedsInjection in GetComponentsInChildren<INeedInjection>())
-        {
-            childrenInjector.Inject(childThatNeedsInjection);
-        }
+        childrenInjector.InjectAllComponentsInChildren(this);
         childrenInjector.Inject(playerUiController);
 
         // Init instances

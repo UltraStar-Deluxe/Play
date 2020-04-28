@@ -8,7 +8,7 @@ using System.Linq;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-[RequireComponent(typeof(MicrophonePitchTracker))]
+[RequireComponent(typeof(MicPitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IOnHotSwapFinishedListener
 {
     public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
@@ -29,7 +29,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     private MicProfile micProfile;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private MicrophonePitchTracker microphonePitchTracker;
+    private MicPitchTracker micPitchTracker;
 
     // The rounding distance of the PlayerProfile's difficulty.
     private int roundingDistance;
@@ -58,21 +58,21 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
         if (micProfile != null)
         {
-            microphonePitchTracker.MicProfile = micProfile;
+            micPitchTracker.MicProfile = micProfile;
         }
     }
 
     public void SetMicrophonePitchTrackerEnabled(bool newValue)
     {
-        microphonePitchTracker.enabled = newValue;
+        micPitchTracker.enabled = newValue;
     }
 
     void Start()
     {
         if (micProfile != null)
         {
-            microphonePitchTracker.StartPitchDetection();
-            microphonePitchTracker.PitchEventStream.Subscribe(HandlePitchEvent);
+            micPitchTracker.MicSampleRecorder.StartRecording();
+            micPitchTracker.PitchEventStream.Subscribe(HandlePitchEvent);
         }
         else
         {
@@ -89,7 +89,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         if (micProfile != null)
         {
-            microphonePitchTracker.StopPitchDetection();
+            micPitchTracker.MicSampleRecorder.StopRecording();
         }
     }
 

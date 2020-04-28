@@ -13,7 +13,7 @@ using UniRx;
 public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
-    public MicrophonePitchTracker micPitchTracker;
+    public MicPitchTracker micPitchTracker;
 
     [InjectedInInspector]
     public MicDelayNumberSpinner micDelaySpinner;
