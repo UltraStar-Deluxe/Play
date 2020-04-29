@@ -34,13 +34,13 @@ public class PlayerController : MonoBehaviour, INeedInjection
         private set
         {
             voice = value;
-            sortedSentences = voice.Sentences.ToList();
-            sortedSentences.Sort(Sentence.comparerByStartBeat);
+            SortedSentences = voice.Sentences.ToList();
+            SortedSentences.Sort(Sentence.comparerByStartBeat);
         }
     }
 
     // The sorted sentences of the Voice
-    private List<Sentence> sortedSentences = new List<Sentence>();
+    public List<Sentence> SortedSentences { get; private set; } = new List<Sentence>();
 
     [Inject]
     private Injector injector;
@@ -58,7 +58,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     private int displaySentenceIndex;
-    private int recordingSentenceIndex;
 
     private LyricsDisplayer lyricsDisplayer;
     public LyricsDisplayer LyricsDisplayer
@@ -104,7 +103,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         PlayerScoreController.Init(Voice);
 
         SetDisplaySentenceIndex(0);
-        recordingSentenceIndex = 0;
     }
 
     private Injector CreateChildrenInjectorWithAdditionalBindings()
@@ -123,10 +121,10 @@ public class PlayerController : MonoBehaviour, INeedInjection
     public void SetCurrentBeat(double currentBeat)
     {
         // Change the current display sentence, when the current beat is over its last note.
-        if (displaySentenceIndex < sortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
+        if (displaySentenceIndex < SortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
         {
             Sentence nextDisplaySentence = GetUpcomingSentenceForBeat(currentBeat);
-            int nextDisplaySentenceIndex = sortedSentences.IndexOf(nextDisplaySentence);
+            int nextDisplaySentenceIndex = SortedSentences.IndexOf(nextDisplaySentence);
             if (nextDisplaySentenceIndex >= 0)
             {
                 SetDisplaySentenceIndex(nextDisplaySentenceIndex);
@@ -138,14 +136,14 @@ public class PlayerController : MonoBehaviour, INeedInjection
         double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, micDelayInMillis);
         double currentBeatConsideringMicDelay = (micDelayInBeats > 0) ? currentBeat - micDelayInBeats : currentBeat;
         // The last sentence in the song should be scored as soon as possible such that one can continue to the next scene without waiting for the song to end.
-        bool isOverLastRecordingSentence = (recordingSentenceIndex == sortedSentences.Count - 1) && currentBeatConsideringMicDelay >= GetRecordingSentence().MaxBeat;
-        if (isOverLastRecordingSentence
-            || (recordingSentenceIndex >= 0 && recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat))
-        {
-            FinishRecordingSentence(recordingSentenceIndex);
-            Sentence nextRecordingSentence = GetUpcomingSentenceForBeat(currentBeatConsideringMicDelay);
-            recordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
-        }
+        //bool isOverLastRecordingSentence = (recordingSentenceIndex == sortedSentences.Count - 1) && currentBeatConsideringMicDelay >= GetRecordingSentence().MaxBeat;
+        //if (isOverLastRecordingSentence
+        //    || (recordingSentenceIndex >= 0 && recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat))
+        //{
+        //    FinishRecordingSentence(recordingSentenceIndex);
+        //    Sentence nextRecordingSentence = GetUpcomingSentenceForBeat(currentBeatConsideringMicDelay);
+        //    recordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
+        //}
     }
 
     private Voice GetVoice(SongMeta songMeta, string voiceName)
@@ -301,9 +299,9 @@ public class PlayerController : MonoBehaviour, INeedInjection
         lyricsDisplayer.SetNextSentence(next);
     }
 
-    private Sentence GetSentence(int index)
+    public Sentence GetSentence(int index)
     {
-        Sentence sentence = (index >= 0 && index < sortedSentences.Count) ? sortedSentences[index] : null;
+        Sentence sentence = (index >= 0 && index < SortedSentences.Count) ? SortedSentences[index] : null;
         return sentence;
     }
 
@@ -342,13 +340,8 @@ public class PlayerController : MonoBehaviour, INeedInjection
         return GetSentence(displaySentenceIndex);
     }
 
-    public Sentence GetRecordingSentence()
-    {
-        return GetSentence(recordingSentenceIndex);
-    }
-
     public Note GetLastNote()
     {
-        return sortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
+        return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
     }
 }

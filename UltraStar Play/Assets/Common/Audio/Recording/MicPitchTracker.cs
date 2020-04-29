@@ -36,7 +36,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
         {
             MicSampleRecorder.MicProfile = value;
             // The sample rate could have changed, which means a new analyzer is needed.
-            audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm);
+            audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
             audioSamplesAnalyzer.Enable();
         }
     }
@@ -61,7 +61,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
         pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
         MicSampleRecorder.RecordingEventStream.Subscribe(AnalyzePitchOfRecordingEvent);
 
-        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm);
+        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
         settings.AudioSettings.ObserveEveryValueChanged(it => it.pitchDetectionAlgorithm)
             .Subscribe(OnPitchDetectionAlgorithmChanged);
     }
@@ -74,19 +74,18 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    private IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm pitchDetectionAlgorithm)
+    public static IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm pitchDetectionAlgorithm, int sampleRateHz)
     {
         switch (pitchDetectionAlgorithm)
         {
             case EPitchDetectionAlgorithm.Camd:
-                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(MicSampleRecorder.SampleRateHz, MaxSampleCountToUse);
-                camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
+                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(sampleRateHz, MaxSampleCountToUse);
                 return camdAudioSamplesAnalyzer;
             case EPitchDetectionAlgorithm.Dywa:
-                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new DywaAudioSamplesAnalyzer(MicSampleRecorder.SampleRateHz, MaxSampleCountToUse);
+                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new DywaAudioSamplesAnalyzer(sampleRateHz, MaxSampleCountToUse);
                 return dywaAudioSamplesAnalyzer;
             default:
-                throw new UnityException("Unkown pitch detection algorithm:" + SettingsManager.Instance.Settings.AudioSettings.pitchDetectionAlgorithm);
+                throw new UnityException("Unkown pitch detection algorithm:" + pitchDetectionAlgorithm);
         }
     }
 
@@ -121,7 +120,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
     {
         if (MicProfile != null)
         {
-            audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue);
+            audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.SampleRateHz);
             audioSamplesAnalyzer.Enable();
         }
     }
