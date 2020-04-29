@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +12,6 @@ public class StutterSinger : AbstractDummySinger
         {
             pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + Random.Range(-3, 3));
         }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
+        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent, currentBeat, true);
     }
 }

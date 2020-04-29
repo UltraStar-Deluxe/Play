@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UniInject;
 
@@ -33,7 +33,7 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     protected Note GetNoteAtCurrentBeat(double currentBeat)
     {
-        Sentence currentSentence = playerController?.GetRecordingSentence();
+        Sentence currentSentence = playerController?.PlayerNoteRecorder?.RecordingSentence;
         if (currentSentence == null)
         {
             return null;
