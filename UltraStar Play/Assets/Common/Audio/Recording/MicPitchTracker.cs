@@ -8,12 +8,17 @@ using static MicSampleRecorder;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
+// Analyzes the newest samples from a mic and fires an event for the analysis result.
 [RequireComponent(typeof(MicSampleRecorder))]
 public class MicPitchTracker : MonoBehaviour, INeedInjection
 {
     // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
     // Thus, 1024 samples should be sufficient.
     private const int MaxSampleCountToUse = 2048;
+
+    // TODO: Wait until at least this amout of new samples is available in the mic buffer.
+    // This would make the MicPitchTracker frame rate independent.
+    private const int MinSampleCountToUse = 512;
 
     [Range(0, 1)]
     public float halftoneContinuationBias = 0.1f;

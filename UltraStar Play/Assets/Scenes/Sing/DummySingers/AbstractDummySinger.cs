@@ -28,12 +28,12 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
     {
         this.playerController = playerController;
         // Disable real microphone input for this player
-        playerController.PlayerNoteRecorder.SetMicrophonePitchTrackerEnabled(false);
+        playerController.PlayerPitchTracker.SetEnabled(false);
     }
 
     protected Note GetNoteAtCurrentBeat(double currentBeat)
     {
-        Sentence currentSentence = playerController?.PlayerNoteRecorder?.RecordingSentence;
+        Sentence currentSentence = playerController?.PlayerPitchTracker?.RecordingSentence;
         if (currentSentence == null)
         {
             return null;
