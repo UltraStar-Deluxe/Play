@@ -9,7 +9,9 @@ using CSharpSynth.Wave;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-[RequireComponent(typeof(MicSampleRecorder))]
+// Takes the analyzed pitches from the PlayerPitchTracker and creates display events to draw recorded notes.
+// For example, multiple beats next to each other can be considered as one note.
+[RequireComponent(typeof(PlayerPitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     public Dictionary<Sentence, List<RecordedNote>> sentenceToRecordedNotesMap = new Dictionary<Sentence, List<RecordedNote>>();
@@ -30,13 +32,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     private MicProfile micProfile;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private MicSampleRecorder micSampleRecorder;
-
-    [Inject]
-    private SingSceneController singSceneController;
-
-    [Inject]
-    private Settings settings;
+    private PlayerPitchTracker playerPitchTracker;
 
     // The rounding distance of the PlayerProfile's difficulty.
     private int roundingDistance;
@@ -45,16 +41,10 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     private RecordedNote lastEndedNote;
     private int nextNoteStartBeat;
 
-    private int recordingSentenceIndex;
-    private int nextBeatToAnalyze;
-
     // The joker is used to cancel a mistake in continued singing.
     // The joker is earned for continued singing of the correct pitch.
     private int availableJokerCount;
     private const int MaxJokerCount = 1;
-
-    public Sentence RecordingSentence { get; private set; }
-    private List<Note> currentAndUpcomingNotesInRecordingSentence;
 
     // For debugging only: see how many jokers have been used in the inspector
     [ReadOnly]
@@ -63,141 +53,16 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     [ReadOnly]
     public int roundingBecausePitchDetectionFailedCount;
 
-    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
-
     public void OnInjectionFinished()
     {
         roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
-
-        if (micProfile != null)
-        {
-            micSampleRecorder.MicProfile = micProfile;
-        }
+        playerPitchTracker.PitchEventStream
+            .Subscribe(beatAnalyzedEvent => HandlePitchEvent(beatAnalyzedEvent.PitchEvent, beatAnalyzedEvent.Beat, true));
     }
 
-    public void SetMicrophonePitchTrackerEnabled(bool newValue)
+    public void SetEnabled(bool newValue)
     {
-        micSampleRecorder.enabled = newValue;
-    }
-
-    void Start()
-    {
-        if (micProfile != null)
-        {
-            audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
-            audioSamplesAnalyzer.Enable();
-            micSampleRecorder.StartRecording();
-        }
-        else
-        {
-            Debug.LogWarning($"No mic for player ${playerProfile.Name}. Not recording player notes.");
-            gameObject.SetActive(false);
-        }
-    }
-
-    void Update()
-    {
-        // Find first sentence to analyze
-        if (recordingSentenceIndex == 0 && RecordingSentence == null)
-        {
-            SetRecordingSentence(recordingSentenceIndex);
-        }
-
-        // No sentence to analyze left (all done).
-        if (RecordingSentence == null)
-        {
-            return;
-        }
-
-        // Analyze the next beat with fully recorded mic samples
-        double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, nextBeatToAnalyze + 1);
-        if (nextBeatToAnalyzeEndPositionInMs < songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
-        {
-            // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
-            int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(nextBeatToAnalyze);
-            int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(nextBeatToAnalyze + 1);
-            if (startSampleBufferIndex > endSampleBufferIndex)
-            {
-                ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
-            }
-            //int sampleLength = endSampleBufferIndex - startSampleBufferIndex;
-
-            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
-
-            HandlePitchEvent(pitchEvent, nextBeatToAnalyze, true);
-
-            FindNextBeatToAnalyze();
-        }
-    }
-
-    private void FindNextBeatToAnalyze()
-    {
-        nextBeatToAnalyze++;
-        if (nextBeatToAnalyze > RecordingSentence.MaxBeat)
-        {
-            // All beats of the sentence analyzed. Go to next sentence.
-            recordingSentenceIndex++;
-            SetRecordingSentence(recordingSentenceIndex);
-            return;
-        }
-
-        // If there is no note at that beat, then use the StartBeat of the following note for next analysis.
-        // Remove notes that have been completely analyzed.
-        while (!currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty()
-            && currentAndUpcomingNotesInRecordingSentence[0].EndBeat <= nextBeatToAnalyze)
-        {
-            currentAndUpcomingNotesInRecordingSentence.RemoveAt(0);
-        }
-        // Check if there is still a current note that is analyzed. If not, skip to the next upcoming note.
-        if (!currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty())
-        {
-            Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
-            if (currentOrUpcomingNote.StartBeat > nextBeatToAnalyze)
-            {
-                // This note is upcoming, thus there is no current note to be analyzed anymore.
-                nextBeatToAnalyze = currentOrUpcomingNote.StartBeat;
-            }
-        }
-        else
-        {
-            // All notes of the sentence analyzed. Go to next sentence.
-            recordingSentenceIndex++;
-            SetRecordingSentence(recordingSentenceIndex);
-            return;
-        }
-    }
-
-    private int GetMicSampleBufferIndexForBeat(int beat)
-    {
-        double beatInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        double beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
-        int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * micSampleRecorder.SampleRateHz);
-        // The newest sample has the highest index in the MicSampleBuffer
-        int sampleBufferIndex = micSampleRecorder.MicSamples.Length - beatPassedBeforeSamplesInMicBuffer;
-        sampleBufferIndex = NumberUtils.Limit(sampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
-        return sampleBufferIndex;
-    }
-
-    private void SetRecordingSentence(int sentenceIndex)
-    {
-        RecordingSentence = playerController.GetSentence(sentenceIndex);
-        if (RecordingSentence == null)
-        {
-            currentAndUpcomingNotesInRecordingSentence = new List<Note>();
-            nextBeatToAnalyze = 0;
-            return;
-        }
-        currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
-
-        nextBeatToAnalyze = RecordingSentence.MinBeat;
-    }
-
-    void OnDisable()
-    {
-        if (micProfile != null)
-        {
-            micSampleRecorder.StopRecording();
-        }
+        playerPitchTracker.SetEnabled(newValue);
     }
 
     public List<RecordedNote> GetRecordedNotes(Sentence sentence)
@@ -290,7 +155,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         // Only accept recorded notes where a note is expected in the song
-        Note noteAtCurrentBeat = GetNoteAtBeat(RecordingSentence, currentBeat);
+        Note noteAtCurrentBeat = GetNoteAtBeat(playerPitchTracker.RecordingSentence, currentBeat);
         if (noteAtCurrentBeat == null)
         {
             return;
@@ -301,7 +166,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         int roundedMidiNote = GetRoundedMidiNoteForRecordedNote(noteAtCurrentBeat, midiNote);
         double startBeat = Math.Floor(currentBeat);
         if (lastEndedNote != null
-            && lastEndedNote.Sentence == RecordingSentence
+            && lastEndedNote.Sentence == playerPitchTracker.RecordingSentence
             && lastEndedNote.EndBeat == startBeat
             && lastEndedNote.RoundedMidiNote == roundedMidiNote
             && lastEndedNote.TargetNote.EndBeat > lastEndedNote.EndBeat)
@@ -314,11 +179,11 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         lastRecordedNote = new RecordedNote(midiNote, Math.Floor(currentBeat), currentBeat);
         // The note at the same beat is the target note that should be sung
         lastRecordedNote.TargetNote = noteAtCurrentBeat;
-        lastRecordedNote.Sentence = RecordingSentence;
+        lastRecordedNote.Sentence = playerPitchTracker.RecordingSentence;
         lastRecordedNote.RoundedMidiNote = roundedMidiNote;
 
         // Remember this note
-        AddRecordedNote(lastRecordedNote, RecordingSentence);
+        AddRecordedNote(lastRecordedNote, playerPitchTracker.RecordingSentence);
     }
 
     private void HandleRecordedNoteContinued(int midiNote, double currentBeat, bool updateUi)

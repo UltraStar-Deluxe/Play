@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 7882357268378806898}
   - component: {fileID: 2112286677205179149}
   - component: {fileID: 2166314046265869658}
-  - component: {fileID: 997225591644623465}
+  - component: {fileID: 3633208197333787065}
   - component: {fileID: 1426883935623920857}
   m_Layer: 0
   m_Name: PlayerNoteRecorder
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
---- !u!114 &997225591644623465
+--- !u!114 &3633208197333787065
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -200,12 +200,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4909833499222852315}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26a1026f071def4d95730c20aa294f8, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fd01a3c00c3dc640b716bc695592973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  halftoneContinuationBias: 0.1
-  lastMidiNoteName: 
-  lastMidiNote: 0
 --- !u!114 &1426883935623920857
 MonoBehaviour:
   m_ObjectHideFlags: 0
