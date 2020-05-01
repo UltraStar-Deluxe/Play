@@ -17,7 +17,7 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject]
     private PlayerController playerController;
 
-    [Inject]
+    [Inject(optional = true)]
     private MicProfile micProfile;
 
     [Inject]

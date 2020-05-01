@@ -87,7 +87,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogWarning($"No mic for player ${playerProfile.Name}. Not recording player notes.");
+            Debug.LogWarning($"No mic for player {playerProfile.Name}. Not recording player notes.");
             gameObject.SetActive(false);
         }
     }
