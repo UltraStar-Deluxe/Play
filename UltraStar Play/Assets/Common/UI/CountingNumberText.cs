@@ -22,6 +22,11 @@ public class CountingNumberText : MonoBehaviour
 
     void Update()
     {
+        if (displayedValue == TargetValue)
+        {
+            return;
+        }
+
         displayedValue = GetNextValue(displayedValue, TargetValue);
         DisplayNumber(displayedValue);
     }
