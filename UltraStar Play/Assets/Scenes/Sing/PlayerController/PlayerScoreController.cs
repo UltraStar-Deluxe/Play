@@ -219,7 +219,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
         double pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
-        bool isSound = (MaxScoreForNotes == pointsForAllNotes);
+        bool isSound = Math.Abs(MaxScoreForNotes - pointsForAllNotes) <= 0.01;
         if (!isSound)
         {
             Debug.LogWarning("The definition of scores for normal or golden notes is not sound.");
