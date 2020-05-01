@@ -38,7 +38,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     private int roundingDistance;
 
     private int recordingSentenceIndex;
-    private int beatToAnalyze;
+    public int BeatToAnalyze { get; private set; }
 
     public Sentence RecordingSentence { get; private set; }
     private List<Note> currentAndUpcomingNotesInRecordingSentence;
@@ -74,6 +74,9 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     void Start()
     {
+        // Find first sentence to analyze
+        SetRecordingSentence(recordingSentenceIndex);
+
         if (micProfile != null)
         {
             roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
@@ -91,12 +94,6 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     void Update()
     {
-        // Find first sentence to analyze
-        if (recordingSentenceIndex == 0 && RecordingSentence == null)
-        {
-            SetRecordingSentence(recordingSentenceIndex);
-        }
-
         // No sentence to analyze left (all done).
         if (RecordingSentence == null)
         {
@@ -104,24 +101,24 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
 
         // Analyze the next beat with fully recorded mic samples
-        double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beatToAnalyze + 1);
+        double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, BeatToAnalyze + 1);
         if (nextBeatToAnalyzeEndPositionInMs < songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
         {
             // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
-            int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(beatToAnalyze);
-            int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(beatToAnalyze + 1);
+            int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(BeatToAnalyze);
+            int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(BeatToAnalyze + 1);
             if (startSampleBufferIndex > endSampleBufferIndex)
             {
                 ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
             }
 
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
-            Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= beatToAnalyze && beatToAnalyze < currentOrUpcomingNote.EndBeat)
+            Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= BeatToAnalyze && BeatToAnalyze < currentOrUpcomingNote.EndBeat)
                 ? currentOrUpcomingNote
                 : null;
 
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
-            FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat);
+            FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat);
 
             GoToNextBeat();
         }
@@ -137,8 +134,8 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     public void GoToNextBeat()
     {
-        beatToAnalyze++;
-        if (beatToAnalyze > RecordingSentence.MaxBeat)
+        BeatToAnalyze++;
+        if (BeatToAnalyze > RecordingSentence.MaxBeat)
         {
             // All beats of the sentence analyzed. Go to next sentence.
             GoToNextRecordingSentence();
@@ -149,7 +146,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         // Remove notes that have been completely analyzed.
         Note passedNote = null;
         if (!currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty()
-            && currentAndUpcomingNotesInRecordingSentence[0].EndBeat <= beatToAnalyze)
+            && currentAndUpcomingNotesInRecordingSentence[0].EndBeat <= BeatToAnalyze)
         {
             passedNote = currentAndUpcomingNotesInRecordingSentence[0];
             currentAndUpcomingNotesInRecordingSentence.RemoveAt(0);
@@ -163,10 +160,10 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         if (!currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty())
         {
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
-            if (currentOrUpcomingNote.StartBeat > beatToAnalyze)
+            if (currentOrUpcomingNote.StartBeat > BeatToAnalyze)
             {
                 // Next beat to analyze is at the next note
-                beatToAnalyze = currentOrUpcomingNote.StartBeat;
+                BeatToAnalyze = currentOrUpcomingNote.StartBeat;
             }
         }
         else
@@ -204,12 +201,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         if (RecordingSentence == null)
         {
             currentAndUpcomingNotesInRecordingSentence = new List<Note>();
-            beatToAnalyze = 0;
+            BeatToAnalyze = 0;
             return;
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
 
-        beatToAnalyze = RecordingSentence.MinBeat;
+        BeatToAnalyze = RecordingSentence.MinBeat;
     }
 
     void OnDisable()

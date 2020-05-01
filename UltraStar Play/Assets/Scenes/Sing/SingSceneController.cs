@@ -195,15 +195,6 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     void Update()
     {
         PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
-
-        // TODO: Updating the pitch detection (including the dummy singers) for this frame must come after updating the current sentence.
-        // Otherwise, a pitch event may be fired for a beat of the "previous" sentence where no note is expected,
-        // afterwards the sentence changes (the note is expected now), but the pitch event is lost.
-
-        if (Application.isEditor)
-        {
-            DummySingers.ForEach(it => it.UpdateSinging(CurrentBeat));
-        }
     }
 
     public void SkipToNextSentence()

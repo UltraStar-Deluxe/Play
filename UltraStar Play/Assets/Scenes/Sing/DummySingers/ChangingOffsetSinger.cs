@@ -11,9 +11,10 @@
         {
             pitchEvent = new PitchEvent(noteAtBeat.MidiNote + noteOffset);
         }
-        else if (lastNote != null && noteAtBeat != lastNote)
+
+        // Change noteOffset when note changes.
+        if (lastNote != null && noteAtBeat != lastNote)
         {
-            // Change noteOffset when note changes.
             noteOffset = (noteOffset + 1) % maxOffset;
         }
         lastNote = noteAtBeat;

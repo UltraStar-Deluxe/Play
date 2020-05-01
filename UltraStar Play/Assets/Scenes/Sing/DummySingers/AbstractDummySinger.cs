@@ -12,9 +12,10 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
     protected PlayerController playerController;
 
     [Inject]
-    protected SongMeta songMeta;
+    protected SingSceneController singSceneController;
 
-    private int lastBeat;
+    [Inject]
+    protected SongMeta songMeta;
 
     void Awake()
     {
@@ -26,22 +27,20 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     protected abstract PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat);
 
-    public void UpdateSinging(double currentBeat)
+    void Update()
     {
-        if ((int)currentBeat <= (lastBeat + 1))
+        int currentBeat = (int)singSceneController.CurrentBeat;
+        int beatToAnalyze = playerController.PlayerPitchTracker.BeatToAnalyze;
+
+        if (currentBeat > 0
+            && beatToAnalyze <= currentBeat
+            && playerController.PlayerPitchTracker.RecordingSentence != null)
         {
-            return;
+            Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
+            PitchEvent pitchEvent = GetDummyPichtEvent(beatToAnalyze, noteAtBeat);
+            playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat);
+            playerController.PlayerPitchTracker.GoToNextBeat();
         }
-
-        int beat = (int)currentBeat;
-        Note noteAtBeat = GetNoteAtBeat(beat);
-
-        PitchEvent pitchEvent = GetDummyPichtEvent(beat, noteAtBeat);
-
-        playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beat, noteAtBeat);
-        playerController.PlayerPitchTracker.GoToNextBeat();
-
-        lastBeat = beat;
     }
 
     public void SetPlayerController(PlayerController playerController)
