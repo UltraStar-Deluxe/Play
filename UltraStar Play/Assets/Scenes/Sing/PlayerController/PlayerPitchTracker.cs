@@ -72,11 +72,6 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    public void SetEnabled(bool newValue)
-    {
-        micSampleRecorder.enabled = newValue;
-    }
-
     void Start()
     {
         if (micProfile != null)
@@ -126,14 +121,21 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
                 : null;
 
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
-            int roundedMidiNote = pitchEvent != null ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote) : -1;
-            beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beatToAnalyze, noteAtBeat, roundedMidiNote));
+            FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat);
 
-            FindNextBeatToAnalyze();
+            GoToNextBeat();
         }
     }
 
-    private void FindNextBeatToAnalyze()
+    public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat)
+    {
+        int roundedMidiNote = pitchEvent != null
+            ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote)
+            : -1;
+        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, roundedMidiNote));
+    }
+
+    public void GoToNextBeat()
     {
         beatToAnalyze++;
         if (beatToAnalyze > RecordingSentence.MaxBeat)

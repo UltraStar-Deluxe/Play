@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -89,9 +86,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
         // Inject all
         childrenInjector.InjectAllComponentsInChildren(this);
-        // The playerUiController is injected explicitly, to force injection even though it does not have INeedInjection interface.
-        // It does not have this interface to prevent the dummy playerUiController from beeing injected during SceneInjection.
-        childrenInjector.Inject(playerUiController);
         childrenInjector.InjectAllComponentsInChildren(playerUiController);
 
         // Init instances
@@ -128,20 +122,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
                 SetDisplaySentenceIndex(nextDisplaySentenceIndex);
             }
         }
-
-        // Score a sentence, when the current beat minus the mic delay is over its last note.
-        int micDelayInMillis = (MicProfile == null) ? 0 : MicProfile.DelayInMillis;
-        double micDelayInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, micDelayInMillis);
-        double currentBeatConsideringMicDelay = (micDelayInBeats > 0) ? currentBeat - micDelayInBeats : currentBeat;
-        // The last sentence in the song should be scored as soon as possible such that one can continue to the next scene without waiting for the song to end.
-        //bool isOverLastRecordingSentence = (recordingSentenceIndex == sortedSentences.Count - 1) && currentBeatConsideringMicDelay >= GetRecordingSentence().MaxBeat;
-        //if (isOverLastRecordingSentence
-        //    || (recordingSentenceIndex >= 0 && recordingSentenceIndex < sortedSentences.Count && currentBeatConsideringMicDelay >= GetRecordingSentence().LinebreakBeat))
-        //{
-        //    FinishRecordingSentence(recordingSentenceIndex);
-        //    Sentence nextRecordingSentence = GetUpcomingSentenceForBeat(currentBeatConsideringMicDelay);
-        //    recordingSentenceIndex = sortedSentences.IndexOf(nextRecordingSentence);
-        //}
     }
 
     private Voice GetVoice(SongMeta songMeta, string voiceName)
@@ -215,19 +195,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         return mergedVoice;
     }
 
-    public void OnRecordedNoteEnded(RecordedNote recordedNote)
-    {
-        DisplayRecordedNote(recordedNote);
-    }
-
-    public void OnRecordedNoteContinued(RecordedNote recordedNote, bool updateUi)
-    {
-        if (updateUi)
-        {
-            DisplayRecordedNote(recordedNote);
-        }
-    }
-
     private void SetDisplaySentenceIndex(int newValue)
     {
         displaySentenceIndex = newValue;
@@ -238,11 +205,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         // Update the UI
         playerUiController.DisplaySentence(current);
         UpdateLyricsDisplayer(current, next);
-    }
-
-    public void DisplayRecordedNote(RecordedNote recordedNote)
-    {
-        playerUiController.DisplayRecordedNote(recordedNote);
     }
 
     private void UpdateLyricsDisplayer(Sentence current, Sentence next)
@@ -297,7 +259,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         return GetSentence(displaySentenceIndex);
     }
 
-    public Note GetLastNote()
+    public Note GetLastNoteInSong()
     {
         return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
     }

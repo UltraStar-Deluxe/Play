@@ -9,7 +9,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerUiController : MonoBehaviour
+public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection
 {
     [Inject]
     private PlayerScoreController playerScoreController;
