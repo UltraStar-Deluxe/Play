@@ -289,7 +289,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     {
         // Find sentence to analyze next.
         RecordingSentence = playerController.SortedSentences
-            .Where(sentence => sentence.MinBeat <= currentBeat && currentBeat <= sentence.MaxBeat)
+            .Where(sentence => currentBeat <= sentence.MaxBeat)
             .FirstOrDefault();
         if (RecordingSentence != null)
         {
