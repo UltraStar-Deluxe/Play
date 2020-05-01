@@ -26,14 +26,21 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
     private Settings settings;
 
     [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
     private PlayerNoteRecorder playerNoteRecorder;
 
+    [Inject(optional = true)]
+    private MicProfile micProfile;
+
+    private double beatsPerSecond;
+
+    private readonly List<UiRecordedNote> uiRecordedNotes = new List<UiRecordedNote>();
     private readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
     private readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
     private Sentence displayedSentence;
-
-    private MicProfile micProfile;
 
     private int avgMidiNote;
 
@@ -42,8 +49,27 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
     private int maxNoteRowMidiNote;
     private int minNoteRowMidiNote;
 
+    void Update()
+    {
+        // Draw the UiRecordedNotes smoothly from their StartBeat to TargetEndBeat
+        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
+        {
+            if (uiRecordedNote.EndBeat < uiRecordedNote.TargetEndBeat)
+            {
+                uiRecordedNote.EndBeat = uiRecordedNote.StartBeat + (uiRecordedNote.LifeTimeInSeconds * beatsPerSecond);
+                if (uiRecordedNote.EndBeat > uiRecordedNote.TargetEndBeat)
+                {
+                    uiRecordedNote.EndBeat = uiRecordedNote.TargetEndBeat;
+                }
+
+                PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, uiRecordedNote.StartBeat, uiRecordedNote.EndBeat);
+            }
+        }
+    }
+
     public void OnInjectionFinished()
     {
+        beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
             DisplayRecordedNote(recordedNoteStartedEvent.RecordedNote);
@@ -54,9 +80,8 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         });
     }
 
-    public void Init(int noteRowCount, MicProfile micProfile)
+    public void SetNoteRowCount(int noteRowCount)
     {
-        this.micProfile = micProfile;
         // Notes can be placed on and between the drawn lines.
         this.noteRowCount = noteRowCount;
         // Check that there is at least one row for every possible note in an octave.
@@ -105,7 +130,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         {
             foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
             {
-                PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, recordedNote.StartBeat, recordedNote.EndBeat);
+                uiRecordedNote.TargetEndBeat = recordedNote.EndBeat;
             }
             return;
         }
@@ -197,6 +222,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         {
             Destroy(child.gameObject);
         }
+        uiRecordedNotes.Clear();
         recordedNoteToUiRecordedNotesMap.Clear();
     }
 
@@ -210,6 +236,13 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
+        uiNote.RecordedNote = recordedNote;
+        uiNote.StartBeat = recordedNote.StartBeat;
+        uiNote.TargetEndBeat = recordedNote.EndBeat;
+        // Draw already a portion of the note
+        uiNote.LifeTimeInSeconds = Time.deltaTime;
+        uiNote.EndBeat = recordedNote.StartBeat + (uiNote.LifeTimeInSeconds * beatsPerSecond);
+
         uiNote.MidiNote = midiNote;
         if (micProfile != null)
         {
@@ -228,8 +261,9 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         }
 
         RectTransform uiNoteRectTransform = uiNote.RectTransform;
-        PositionUiNote(uiNoteRectTransform, midiNote, recordedNote.StartBeat, recordedNote.EndBeat);
+        PositionUiNote(uiNoteRectTransform, midiNote, uiNote.StartBeat, uiNote.EndBeat);
 
+        uiRecordedNotes.Add(uiNote);
         recordedNoteToUiRecordedNotesMap.AddInsideList(recordedNote, uiNote);
     }
 

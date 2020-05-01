@@ -79,7 +79,7 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     public void OnInjectionFinished()
     {
         lineDisplayer.UpdateLines(lineCount);
-        sentenceDisplayer.Init(lineCount * 2, micProfile);
+        sentenceDisplayer.SetNoteRowCount(lineCount * 2);
         playerNameText.SetPlayerProfile(playerProfile);
         avatarImage.SetPlayerProfile(playerProfile);
 
