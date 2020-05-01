@@ -56,7 +56,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     public void OnInjectionFinished()
     {
         roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
-        playerPitchTracker.PitchEventStream
+        playerPitchTracker.BeatAnalyzedEventStream
             .Subscribe(beatAnalyzedEvent => HandlePitchEvent(beatAnalyzedEvent.PitchEvent, beatAnalyzedEvent.Beat, true));
     }
 

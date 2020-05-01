@@ -34,6 +34,9 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    // The rounding distance of the PlayerProfile
+    private int roundingDistance;
+
     private int recordingSentenceIndex;
     private int beatToAnalyze;
 
@@ -42,12 +45,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
-    private Subject<BeatAnalyzedEvent> pitchEventStream = new Subject<BeatAnalyzedEvent>();
-    public IObservable<BeatAnalyzedEvent> PitchEventStream
+    private Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new Subject<BeatAnalyzedEvent>();
+    public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream
     {
         get
         {
-            return pitchEventStream;
+            return beatAnalyzedEventStream;
         }
     }
 
@@ -78,6 +81,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     {
         if (micProfile != null)
         {
+            roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
             audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
             audioSamplesAnalyzer.Enable();
             micSampleRecorder.MicProfile = micProfile;
@@ -116,8 +120,14 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
                 ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
             }
 
+            Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
+            Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= beatToAnalyze && beatToAnalyze < currentOrUpcomingNote.EndBeat)
+                ? currentOrUpcomingNote
+                : null;
+
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
-            pitchEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beatToAnalyze));
+            int roundedMidiNote = pitchEvent != null ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote) : -1;
+            beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beatToAnalyze, noteAtBeat, roundedMidiNote));
 
             FindNextBeatToAnalyze();
         }
@@ -208,15 +218,52 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
+    private int GetRoundedMidiNoteForRecordedMidiNote(Note targetNote, int recordedMidiNote)
+    {
+        if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
+        {
+            // Rap notes accept any noise as correct note.
+            return targetNote.MidiNote;
+        }
+        else if (recordedMidiNote < MidiUtils.SingableNoteMin || recordedMidiNote > MidiUtils.SingableNoteMax)
+        {
+            // The pitch detection can fail, which is the case when the detected pitch is outside of the singable note range.
+            // In this case, just assume that the player was singing correctly and round to the target note.
+            return targetNote.MidiNote;
+        }
+        else
+        {
+            // Round recorded note if it is close to the target note.
+            return GetRoundedMidiNote(recordedMidiNote, targetNote.MidiNote, roundingDistance);
+        }
+    }
+
+    private int GetRoundedMidiNote(int recordedMidiNote, int targetMidiNote, int roundingDistance)
+    {
+        int distance = MidiUtils.GetRelativePitchDistance(recordedMidiNote, targetMidiNote);
+        if (distance <= roundingDistance)
+        {
+            return targetMidiNote;
+        }
+        else
+        {
+            return recordedMidiNote;
+        }
+    }
+
     public class BeatAnalyzedEvent
     {
         public PitchEvent PitchEvent { get; private set; }
         public int Beat { get; private set; }
+        public Note NoteAtBeat { get; private set; }
+        public int RoundedMidiNote { get; private set; }
 
-        public BeatAnalyzedEvent(PitchEvent pitchEvent, int beat)
+        public BeatAnalyzedEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, int roundedMidiNote)
         {
             PitchEvent = pitchEvent;
             Beat = beat;
+            NoteAtBeat = noteAtBeat;
+            RoundedMidiNote = roundedMidiNote;
         }
     }
 
