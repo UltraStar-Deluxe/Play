@@ -325,7 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Rockabye ft. Sean Paul & Anne-Marie
+  defaultSongName: Through Glass
   defaultSongNamePasteBin: "Summer Wine\r\nMe And My Broken Heart\r\nSomewhere Over
     The Rainbow (Wonderful World)\r\nMarry You\r\nSurvivor\nThrough Glass\nRockabye
     ft. Sean Paul & Anne-Marie"
@@ -1214,24 +1214,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1281954281 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1740204221091376139, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
-    type: 3}
-  m_PrefabInstance: {fileID: 1740204221145833707}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1281954286
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1281954281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3223a9f374c9dbd40a9a077040a4045a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1343358234
 GameObject:
   m_ObjectHideFlags: 0
