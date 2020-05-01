@@ -347,6 +347,10 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         {
             Debug.Log($"Skipping forward to {SceneData.PositionInSongInMillis} milliseconds");
             songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
+            foreach (PlayerController playerController in PlayerControllers)
+            {
+                playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
+            }
         }
     }
 

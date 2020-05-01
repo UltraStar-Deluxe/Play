@@ -285,6 +285,40 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
+    public void SkipToBeat(double currentBeat)
+    {
+        // Find sentence to analyze next.
+        RecordingSentence = playerController.SortedSentences
+            .Where(sentence => sentence.MinBeat <= currentBeat && currentBeat <= sentence.MaxBeat)
+            .FirstOrDefault();
+        if (RecordingSentence != null)
+        {
+            recordingSentenceIndex = playerController.SortedSentences.IndexOf(RecordingSentence);
+            // Find note to analyze next
+            currentAndUpcomingNotesInRecordingSentence = RecordingSentence.Notes
+                .Where(note => currentBeat <= note.EndBeat)
+                .OrderBy(note => note.StartBeat)
+                .ToList();
+            if (currentAndUpcomingNotesInRecordingSentence.Count > 0)
+            {
+                if (currentAndUpcomingNotesInRecordingSentence[0].StartBeat < currentBeat)
+                {
+                    // currentBeat is inside note
+                    BeatToAnalyze = (int)currentBeat;
+                }
+                else
+                {
+                    // The note is upcoming, analyze its first beat next.
+                    BeatToAnalyze = currentAndUpcomingNotesInRecordingSentence[0].StartBeat;
+                }
+            }
+            else
+            {
+                BeatToAnalyze = RecordingSentence.MaxBeat;
+            }
+        }
+    }
+
     public class BeatAnalyzedEvent
     {
         public PitchEvent PitchEvent { get; private set; }
