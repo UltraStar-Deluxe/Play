@@ -72,6 +72,9 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject]
     private PlayerPitchTracker playerPitchTracker;
 
+    [Inject]
+    private Voice voice;
+
     private Dictionary<Sentence, SentenceScore> sentenceToSentenceScoreMap = new Dictionary<Sentence, SentenceScore>();
     private Dictionary<Note, NoteScore> noteToNoteScoreMap = new Dictionary<Note, NoteScore>();
 
@@ -105,13 +108,10 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     private double correctNormalNoteLengthTotal;
     private double correctGoldenNoteLengthTotal;
 
-    public void Init(Voice voice)
-    {
-        UpdateMaxScores(voice.Sentences);
-    }
-
     public void OnInjectionFinished()
     {
+        UpdateMaxScores(voice.Sentences);
+
         playerPitchTracker.BeatAnalyzedEventStream.Subscribe(OnBeatAnalyzed);
         playerPitchTracker.NoteAnalyzedEventStream.Subscribe(OnNoteAnalyzed);
         playerPitchTracker.SentenceAnalyzedEventStream.Subscribe(OnSentenceAnalyzed);

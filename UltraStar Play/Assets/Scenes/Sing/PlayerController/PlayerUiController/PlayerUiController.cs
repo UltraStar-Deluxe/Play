@@ -9,17 +9,43 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection
+public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
     [Inject]
     private PlayerScoreController playerScoreController;
 
+    [Inject]
+    private PlayerController playerController;
+
+    [Inject]
+    private MicProfile micProfile;
+
+    [Inject]
+    private PlayerProfile playerProfile;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private LineDisplayer lineDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceDisplayer sentenceDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
     private BeatGridDisplayer beatGridDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
     private CurrentBeatGridDisplayer currentBeatGridDisplayer;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private PlayerNameText playerNameText;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private AvatarImage avatarImage;
 
     public int lineCount = 10;
 
@@ -50,26 +76,11 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
             .Subscribe(xs => CreatePerfectSentenceEffect());
     }
 
-    public void Init(PlayerProfile playerProfile, MicProfile micProfile)
+    public void OnInjectionFinished()
     {
-        lineDisplayer = GetComponentInChildren<LineDisplayer>();
         lineDisplayer.UpdateLines(lineCount);
-
-        sentenceDisplayer = GetComponentInChildren<SentenceDisplayer>();
         sentenceDisplayer.Init(lineCount * 2, micProfile);
-
-        totalScoreDisplayer = GetComponentInChildren<TotalScoreDisplayer>();
-
-        sentenceRatingDisplayer = GetComponentInChildren<SentenceRatingDisplayer>();
-
-        beatGridDisplayer = GetComponentInChildren<BeatGridDisplayer>();
-
-        currentBeatGridDisplayer = GetComponentInChildren<CurrentBeatGridDisplayer>();
-
-        PlayerNameText playerNameText = GetComponentInChildren<PlayerNameText>();
         playerNameText.SetPlayerProfile(playerProfile);
-
-        AvatarImage avatarImage = GetComponentInChildren<AvatarImage>();
         avatarImage.SetPlayerProfile(playerProfile);
 
         if (micProfile != null)

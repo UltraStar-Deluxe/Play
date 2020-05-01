@@ -88,10 +88,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         childrenInjector.InjectAllComponentsInChildren(this);
         childrenInjector.InjectAllComponentsInChildren(playerUiController);
 
-        // Init instances
-        playerUiController.Init(PlayerProfile, MicProfile);
-        PlayerScoreController.Init(Voice);
-
         SetDisplaySentenceIndex(0);
     }
 
@@ -100,6 +96,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
         newInjector.AddBindingForInstance(PlayerProfile);
         newInjector.AddBindingForInstance(MicProfile);
+        newInjector.AddBindingForInstance(Voice);
         newInjector.AddBindingForInstance(MicSampleRecorder);
         newInjector.AddBindingForInstance(PlayerPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
