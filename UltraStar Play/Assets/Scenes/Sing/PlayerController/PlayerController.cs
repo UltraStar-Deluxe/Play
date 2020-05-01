@@ -79,19 +79,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
     }
 
-    private readonly Subject<SentenceRating> sentenceRatingStream = new Subject<SentenceRating>();
-
-    void Start()
-    {
-        // Create effect when there are at least two perfect sentences in a row.
-        // Therefor, consider the currently finished sentence and its predecessor.
-        sentenceRatingStream.Buffer(2, 1)
-            // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.AllMatch(x => x == SentenceRating.Perfect))
-            // Create an effect for these.
-            .Subscribe(xs => playerUiController.CreatePerfectSentenceEffect());
-    }
-
     public void Init(PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
     {
         this.PlayerProfile = playerProfile;
@@ -102,7 +89,10 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
         // Inject all
         childrenInjector.InjectAllComponentsInChildren(this);
+        // The playerUiController is injected explicitly, to force injection even though it does not have INeedInjection interface.
+        // It does not have this interface to prevent the dummy playerUiController from beeing injected during SceneInjection.
         childrenInjector.Inject(playerUiController);
+        childrenInjector.InjectAllComponentsInChildren(playerUiController);
 
         // Init instances
         playerUiController.Init(PlayerProfile, MicProfile);
@@ -227,7 +217,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
 
     public void OnRecordedNoteEnded(RecordedNote recordedNote)
     {
-        CheckPerfectlySungNote(recordedNote);
         DisplayRecordedNote(recordedNote);
     }
 
@@ -236,46 +225,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
         if (updateUi)
         {
             DisplayRecordedNote(recordedNote);
-        }
-    }
-
-    private void CheckPerfectlySungNote(RecordedNote lastRecordedNote)
-    {
-        if (lastRecordedNote == null || lastRecordedNote.TargetNote == null)
-        {
-            return;
-        }
-
-        Note targetNote = lastRecordedNote.TargetNote;
-        int targetMidiNoteRelative = MidiUtils.GetRelativePitch(targetNote.MidiNote);
-        int recordedMidiNoteRelative = MidiUtils.GetRelativePitch(lastRecordedNote.RoundedMidiNote);
-        bool isPerfect = ((targetMidiNoteRelative == recordedMidiNoteRelative)
-            && (targetNote.StartBeat >= lastRecordedNote.StartBeat)
-            && (targetNote.EndBeat <= lastRecordedNote.EndBeat));
-        if (isPerfect)
-        {
-            playerUiController.CreatePerfectNoteEffect(targetNote);
-        }
-    }
-
-    private void FinishRecordingSentence(int sentenceIndex)
-    {
-        PlayerNoteRecorder.OnSentenceEnded();
-
-        Sentence recordingSentence = GetSentence(sentenceIndex);
-        if (recordingSentence == null)
-        {
-            return;
-        }
-
-        List<RecordedNote> recordedNotes = PlayerNoteRecorder.GetRecordedNotes(recordingSentence);
-        PlayerNoteRecorder.RemoveRecordedNotes(recordingSentence);
-        SentenceRating sentenceRating = PlayerScoreController.CalculateScoreForSentence(recordingSentence, recordedNotes);
-        playerUiController.ShowTotalScore(PlayerScoreController.TotalScore);
-        if (sentenceRating != null)
-        {
-            playerUiController.ShowSentenceRating(sentenceRating);
-            sentenceRatingStream.OnNext(sentenceRating);
         }
     }
 
