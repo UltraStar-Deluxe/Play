@@ -16,9 +16,10 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
     // Thus, 1024 samples should be sufficient.
     private const int MaxSampleCountToUse = 2048;
 
-    // TODO: Wait until at least this amout of new samples is available in the mic buffer.
-    // This would make the MicPitchTracker frame rate independent.
-    private const int MinSampleCountToUse = 512;
+    // Wait until at least this amout of new samples is available in the mic buffer.
+    // This makes the MicPitchTracker frame-rate independent.
+    private const int MinSampleCountToUse = 1024;
+    private int bufferedNotAnalyzedSampleCount;
 
     [Range(0, 1)]
     public float halftoneContinuationBias = 0.1f;
@@ -64,7 +65,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
     {
         // Update label in inspector for debugging.
         pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
-        MicSampleRecorder.RecordingEventStream.Subscribe(AnalyzePitchOfRecordingEvent);
+        MicSampleRecorder.RecordingEventStream.Subscribe(OnRecordingEvent);
 
         audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
         settings.AudioSettings.ObserveEveryValueChanged(it => it.pitchDetectionAlgorithm)
@@ -94,14 +95,29 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    private void AnalyzePitchOfRecordingEvent(RecordingEvent recordingEvent)
+    private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Detect the pitch of the sample
-        int sampleLength = recordingEvent.NewSamplesEndIndex - recordingEvent.NewSamplesStartIndex;
-        int endIndex = (sampleLength > MaxSampleCountToUse)
-            ? recordingEvent.NewSamplesStartIndex + MaxSampleCountToUse
-            : recordingEvent.NewSamplesEndIndex;
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(recordingEvent.MicSamples, recordingEvent.NewSamplesStartIndex, endIndex, MicProfile);
+        int newSampleLength = recordingEvent.NewSamplesEndIndex - recordingEvent.NewSamplesStartIndex;
+        bufferedNotAnalyzedSampleCount += newSampleLength;
+
+        // Wait until enough new samples are buffered
+        if (bufferedNotAnalyzedSampleCount < MinSampleCountToUse)
+        {
+            return;
+        }
+
+        // Do not analyze more than necessary
+        if (bufferedNotAnalyzedSampleCount > MaxSampleCountToUse)
+        {
+            bufferedNotAnalyzedSampleCount = MaxSampleCountToUse;
+        }
+
+        // Analyze the newest portion of the not-yet-analyzed MicSamples
+        int startIndex = recordingEvent.MicSamples.Length - bufferedNotAnalyzedSampleCount;
+        int endIndex = recordingEvent.MicSamples.Length;
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(recordingEvent.MicSamples, startIndex, endIndex, MicProfile);
+        bufferedNotAnalyzedSampleCount = 0;
 
         // Notify listeners
         pitchEventStream.OnNext(pitchEvent);

@@ -9,6 +9,8 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
     public Text currentNoteLabel;
     public MicPitchTracker micPitchTracker;
 
+    public int displayedSampleCount = 8096;
+
     private IDisposable pitchEventStreamDisposable;
 
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
@@ -48,7 +50,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
             }
         }
 
-        audioWaveFormVisualizer.DrawWaveFormValues(displayData, micData.Length - 4048, 4048);
+        audioWaveFormVisualizer.DrawWaveFormValues(displayData, micData.Length - displayedSampleCount, displayedSampleCount);
     }
 
     public void SetMicProfile(MicProfile micProfile)
