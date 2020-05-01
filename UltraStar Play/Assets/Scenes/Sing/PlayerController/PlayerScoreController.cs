@@ -177,12 +177,21 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     private void OnSentenceAnalyzed(PlayerPitchTracker.SentenceAnalyzedEvent sentenceAnalyzedEvent)
     {
         Sentence analyzedSentence = sentenceAnalyzedEvent.Sentence;
+        int totalScorableNoteLength = analyzedSentence.Notes
+                .Where(note => note.IsNormal || note.IsGolden)
+                .Select(note => note.Length)
+                .Sum();
+
+        if (totalScorableNoteLength <= 0)
+        {
+            return;
+        }
+
         SentenceRating sentenceRating;
         if (sentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
         {
-            int totalNoteLength = analyzedSentence.Notes.Select(note => note.Length).Sum();
             int correctlySungNoteLength = sentenceScore.CorrectlySungNormalBeats + sentenceScore.CorrectlySungGoldenBeats;
-            double correctNotesPercentage = (double)correctlySungNoteLength / totalNoteLength;
+            double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
 
             // Score for a perfect sentence
             if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
