@@ -5,6 +5,7 @@ using UniRx;
 using UniInject;
 using System.Linq;
 using CSharpSynth.Wave;
+using CircularBuffer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -44,6 +45,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     private List<Note> currentAndUpcomingNotesInRecordingSentence;
 
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
+
+    private bool hasJoker;
+
+    // Only for debugging: see how many jokers have been used in the inspector
+    [ReadOnly]
+    public int usedJokerCount;
 
     private Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new Subject<BeatAnalyzedEvent>();
     public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream
@@ -124,12 +131,40 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
+    private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
+    {
+        // Earn a joker when singing correctly (without using a joker).
+        // A failed beat can be undone via joker-rule.
+        if (pitchEvent != null && roundedMidiNote == noteAtBeat.MidiNote)
+        {
+            hasJoker = true;
+        }
+        // The joker is only for continued singing.
+        if (pitchEvent == null)
+        {
+            hasJoker = false;
+        }
+
+        // If the player fails a beat in continued singing, but the previous beats were sung correctly,
+        // then this failed beat is ignored.
+        if (roundedMidiNote != noteAtBeat.MidiNote
+            && hasJoker)
+        {
+            hasJoker = false;
+            usedJokerCount++;
+            return noteAtBeat.MidiNote;
+        }
+        return roundedMidiNote;
+    }
+
     public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat)
     {
         int roundedMidiNote = pitchEvent != null
             ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote)
             : -1;
-        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, roundedMidiNote));
+        int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedMidiNote, noteAtBeat);
+
+        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, roundedMidiNoteAfterJoker));
     }
 
     public void GoToNextBeat()
