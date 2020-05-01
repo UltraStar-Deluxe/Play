@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Media;
-using System.Text;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SentenceDisplayer : MonoBehaviour, INeedInjection
+public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
@@ -29,6 +25,9 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private PlayerNoteRecorder playerNoteRecorder;
+
     private readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
     private readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
@@ -43,13 +42,25 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
     private int maxNoteRowMidiNote;
     private int minNoteRowMidiNote;
 
+    public void OnInjectionFinished()
+    {
+        playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
+        {
+            DisplayRecordedNote(recordedNoteStartedEvent.RecordedNote);
+        });
+        playerNoteRecorder.RecordedNoteContinuedEventStream.Subscribe(recordedNoteContinuedEvent =>
+        {
+            DisplayRecordedNote(recordedNoteContinuedEvent.RecordedNote);
+        });
+    }
+
     public void Init(int noteRowCount, MicProfile micProfile)
     {
         this.micProfile = micProfile;
         // Notes can be placed on and between the drawn lines.
         this.noteRowCount = noteRowCount;
         // Check that there is at least one row for every possible note in an octave.
-        if(this.noteRowCount < 12)
+        if (this.noteRowCount < 12)
         {
             throw new UnityException("SentenceDisplayer must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
@@ -267,12 +278,12 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection
     {
         // Map midiNote to range of noteRows (wrap around).
         int wrappedMidiNote = midiNote;
-        while(wrappedMidiNote > maxNoteRowMidiNote && wrappedMidiNote > 0)
+        while (wrappedMidiNote > maxNoteRowMidiNote && wrappedMidiNote > 0)
         {
             // Reduce by one octave.
             wrappedMidiNote -= 12;
         }
-        while(wrappedMidiNote < minNoteRowMidiNote && wrappedMidiNote < 127)
+        while (wrappedMidiNote < minNoteRowMidiNote && wrappedMidiNote < 127)
         {
             // Increase by one octave.
             wrappedMidiNote += 12;

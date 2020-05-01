@@ -258,8 +258,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
 
-            Note lastNote = playerController.GetLastNote();
-            if (CurrentBeat < lastNote.EndBeat)
+            Note lastNoteInSong = playerController.GetLastNoteInSong();
+            if (CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }
