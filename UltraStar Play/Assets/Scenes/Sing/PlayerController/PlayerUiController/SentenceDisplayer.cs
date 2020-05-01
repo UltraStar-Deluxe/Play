@@ -48,6 +48,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
     private int noteRowCount;
     private int maxNoteRowMidiNote;
     private int minNoteRowMidiNote;
+    private float noteHeightPercent;
 
     void Update()
     {
@@ -89,6 +90,8 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         {
             throw new UnityException("SentenceDisplayer must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
+
+        noteHeightPercent = 1.0f / noteRowCount;
     }
 
     public void RemoveAllDisplayedNotes()
@@ -276,13 +279,14 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
         float anchorY = (float)noteRow / noteRowCount;
+        float anchorYStart = anchorY - noteHeightPercent;
+        float anchorYEnd = anchorY + noteHeightPercent;
         float anchorXStart = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
         float anchorXEnd = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
 
-        uiNote.anchorMin = new Vector2(anchorXStart, anchorY);
-        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY);
-        uiNote.MoveCornersToAnchors_Width();
-        uiNote.MoveCornersToAnchors_CenterPosition();
+        uiNote.anchorMin = new Vector2(anchorXStart, anchorYStart);
+        uiNote.anchorMax = new Vector2(anchorXEnd, anchorYEnd);
+        uiNote.MoveCornersToAnchors();
     }
 
     public void CreatePerfectSentenceEffect()
