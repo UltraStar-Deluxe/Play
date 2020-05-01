@@ -29,7 +29,6 @@ public class MicSampleRecorder : MonoBehaviour
             if (micProfile != null && !micProfile.Name.IsNullOrEmpty())
             {
                 Microphone.GetDeviceCaps(micProfile.Name, out int minFrequency, out int maxFrequency);
-                Debug.Log($"Mic frequency range: {minFrequency} - {maxFrequency} Hz");
                 SampleRateHz = maxFrequency;
                 MicSamples = new float[SampleRateHz];
                 if (restartPitchDetection)
@@ -54,6 +53,8 @@ public class MicSampleRecorder : MonoBehaviour
 
     private AudioSource audioSource;
     private AudioClip micAudioClip;
+
+    private int lastSamplePosition;
 
     public bool IsRecording { get; private set; }
 
@@ -148,14 +149,31 @@ public class MicSampleRecorder : MonoBehaviour
 
         // Process the portion that has been buffered by Unity since the last frame.
         // New samples come into the buffer "from the right", i.e., highest index holds the newest sample.
-        int samplesSinceLastFrame = (int)(SampleRateHz * Time.deltaTime);
-        int newSamplesStartIndex = MicSamples.Length - samplesSinceLastFrame;
+        int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition);
+        int newSamplesStartIndex = MicSamples.Length - newSamplesCount;
         int newSamplesEndIndex = MicSamples.Length - 1;
         ApplyMicAmplification(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
 
         // Notify listeners
         RecordingEvent recordingEvent = new RecordingEvent(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
         recordingEventStream.OnNext(recordingEvent);
+
+        lastSamplePosition = currentSamplePosition;
+    }
+
+    private int GetNewSampleCountInCircularBuffer(int lastSamplePosition, int currentSamplePosition)
+    {
+        int bufferLength = MicSamples.Length;
+
+        // Check if the recording re-started from index 0 after reaching the end of the buffer.
+        if (currentSamplePosition <= lastSamplePosition)
+        {
+            return (bufferLength - lastSamplePosition) + currentSamplePosition;
+        }
+        else
+        {
+            return currentSamplePosition - lastSamplePosition;
+        }
     }
 
     private void ApplyMicAmplification(float[] buffer, int startIndex, int endIndex)
