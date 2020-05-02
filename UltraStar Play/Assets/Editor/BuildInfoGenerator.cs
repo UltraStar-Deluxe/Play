@@ -10,7 +10,7 @@ using UnityEditor.Build.Reporting;
 public class BuildInfoGenerator : IPreprocessBuildWithReport
 {
     public static readonly string timeStampPropertyName = "build_timestamp";
-    public static readonly string versionFile = "Assets/Common/Version/version.properties.txt";
+    public static readonly string versionFile = "Assets/VERSION.txt";
 
     public int callbackOrder
     {
