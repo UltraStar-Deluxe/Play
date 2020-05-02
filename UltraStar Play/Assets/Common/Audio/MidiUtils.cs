@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 public static class MidiUtils
@@ -72,19 +72,37 @@ public static class MidiUtils
         return roundedMidiNote;
     }
 
-    public static int GetRelativePitchDistance(int recordedMidiNote, int targetMidiNote)
+    public static int GetRelativePitchDistance(int fromMidiNote, int toMidiNote)
     {
-        int recordedRelativePitch = GetRelativePitch(recordedMidiNote);
-        int targetRelativePitch = GetRelativePitch(targetMidiNote);
+        int fromRelativeMidiNote = GetRelativePitch(fromMidiNote);
+        int toRelativeMidiNote = GetRelativePitch(toMidiNote);
 
         // Distance when going from 2 to 10 via 3, 4, 5...
-        int distanceUnwrapped = Math.Abs(targetRelativePitch - recordedRelativePitch);
+        int distanceUnwrapped = Math.Abs(toRelativeMidiNote - fromRelativeMidiNote);
         // Distance when going from 2 to 10 via 1, 11, 10
         int distanceWrapped = 12 - distanceUnwrapped;
         // Note that (distanceUnwrapped + distanceWrapped) == 12, which is going a full circle in any direction.
 
         // Distance in shortest direction is result distance
         return Math.Min(distanceUnwrapped, distanceWrapped);
+    }
+
+    public static int GetRelativePitchDistanceSigned(int fromMidiNote, int toMidiNote)
+    {
+        int toRelativeMidiNote = MidiUtils.GetRelativePitch(toMidiNote);
+        int fromRelativeMidiNote = MidiUtils.GetRelativePitch(fromMidiNote);
+        // Distance when going from 2 to 10 via 3, 4, 5... -> (8)
+        // Distance when going from 10 to 2 via 9, 8, 7... -> (-8)
+        int distanceUnwrapped = toRelativeMidiNote - fromRelativeMidiNote;
+        // Distance when going from 2 to 10 via 1, 0, 11, 10 -> (-4)
+        // Distance when going from 10 to 2 via 11, 0, 1, 2 -> (4)
+        int distanceWrapped = distanceUnwrapped >= 0
+            ? distanceUnwrapped - 12
+            : distanceUnwrapped + 12;
+        int distance = Math.Abs(distanceUnwrapped) < Math.Abs(distanceWrapped)
+            ? distanceUnwrapped
+            : distanceWrapped;
+        return distance;
     }
 
     public static bool IsBlackPianoKey(int midiNote)
