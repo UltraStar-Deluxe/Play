@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
@@ -37,5 +38,7 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
             }
         }
         File.WriteAllLines(versionFile, versionFileLines);
+        // Unity needs a hint that this asset has changed.
+        AssetDatabase.ImportAsset(versionFile);
     }
 }
