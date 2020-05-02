@@ -4,6 +4,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using System;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -236,7 +237,26 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
             return;
         }
 
-        int midiNote = (useRoundedMidiNote) ? recordedNote.RoundedMidiNote : recordedNote.RecordedMidiNote;
+        // Pitch detection algorithms often have issues finding the correct octave. However, the octave is irrelevant for scores.
+        // When notes are drawn far away from the target note because the pitch detection got the wrong octave then it looks wrong.
+        // Thus, only the relative pitch of the roundedMidiNote is used and drawn on the octave of the target note.
+        int midiNote;
+        if (useRoundedMidiNote)
+        {
+            int relativeSignedDistance = MidiUtils.GetRelativePitchDistanceSigned(recordedNote.TargetNote.MidiNote, recordedNote.RoundedMidiNote);
+            int roundedMidiNoteOnOctaveOfTargetNote = recordedNote.TargetNote.MidiNote + relativeSignedDistance;
+            if (MidiUtils.GetRelativePitch(recordedNote.RoundedMidiNote) != MidiUtils.GetRelativePitch(roundedMidiNoteOnOctaveOfTargetNote))
+            {
+                // Should never happen
+                Debug.LogError($"The displayed midi note does not correspond to the rounded recorded midi note:"
+                    + $"recorded {recordedNote.RoundedMidiNote}, target: {recordedNote.TargetNote.MidiNote}, displayed: {roundedMidiNoteOnOctaveOfTargetNote}");
+            }
+            midiNote = roundedMidiNoteOnOctaveOfTargetNote;
+        }
+        else
+        {
+            midiNote = recordedNote.RecordedMidiNote;
+        }
 
         UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
         uiNote.RecordedNote = recordedNote;
