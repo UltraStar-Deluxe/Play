@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -221,26 +222,17 @@ public class PlayerController : MonoBehaviour, INeedInjection
         return sentence;
     }
 
-    public double GetNextStartBeat(double currentBeat)
+    public Note GetNextSingableNote(double currentBeat)
     {
-        Sentence displaySentence = GetDisplaySentence();
-        if (displaySentence == null)
-        {
-            return -1d;
-        }
-
-        // It is possible that the display is still shown only because the LinebreakBeat is after the MaxBeat.
-        if (displaySentence.MaxBeat < currentBeat)
-        {
-            // Use the beat of the following sentence
-            Sentence nextDisplaySentence = GetSentence(displaySentenceIndex + 1);
-            if (nextDisplaySentence != null)
-            {
-                return nextDisplaySentence.MinBeat;
-            }
-        }
-
-        return displaySentence.MinBeat;
+        Note nextSingableNote = SortedSentences
+            .SelectMany(sentence => sentence.Notes)
+            // Freestyle notes are not displayed and not sung.
+            // They do not contribute to the score.
+            .Where(note => !note.IsFreestyle)
+            .Where(note => currentBeat <= note.StartBeat)
+            .OrderBy(note => note.StartBeat)
+            .FirstOrDefault();
+        return nextSingableNote;
     }
 
     public Sentence GetUpcomingSentenceForBeat(double currentBeat)

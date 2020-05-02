@@ -20,7 +20,7 @@ public class SingSceneKeyboardInputController : MonoBehaviour, INeedInjection
     {
         if (Input.GetKeyUp(SkipShortcut))
         {
-            singSceneController.SkipToNextSentence();
+            singSceneController.SkipToNextSingableNote();
         }
 
         if (Input.GetKeyUp(OpenInEditorShortcut))
