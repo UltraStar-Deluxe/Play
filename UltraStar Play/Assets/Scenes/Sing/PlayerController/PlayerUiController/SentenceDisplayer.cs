@@ -114,7 +114,9 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
         minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
-        foreach (Note note in sentence.Notes)
+        // Freestyle notes are not drawn
+        IEnumerable<Note> nonFreestyleNotes = sentence.Notes.Where(note => !note.IsFreestyle);
+        foreach (Note note in nonFreestyleNotes)
         {
             CreateUiNote(note);
         }
@@ -126,6 +128,12 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         {
             // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
             // Do not draw the recorded note, it is not in the displayed sentence.
+            return;
+        }
+
+        // Freestyle notes are not drawn
+        if (recordedNote.TargetNote.IsFreestyle)
+        {
             return;
         }
 
