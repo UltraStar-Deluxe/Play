@@ -197,20 +197,34 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
     }
 
-    public void SkipToNextSentence()
+    public void SkipToNextSingableNote()
     {
-        double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat(CurrentBeat)).Min();
-        if (nextStartBeat < 0)
+        IEnumerable<int> nextSingableNotes = PlayerControllers
+            .Select(it => it.GetNextSingableNote(CurrentBeat))
+            .Where(nextSingableNote => nextSingableNote != null)
+            .Select(nextSingableNote => nextSingableNote.StartBeat);
+        if (nextSingableNotes.Count() <= 0)
         {
             return;
         }
+        int nextStartBeat = nextSingableNotes.Min();
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
         double offsetInMillis = Application.isEditor ? 500 : 1500;
         double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
-            songAudioPlayer.PositionInSongInMillis = targetPositionInMillis;
+            SkipToPositionInSong(targetPositionInMillis);
+        }
+    }
+
+    public void SkipToPositionInSong(double positionInSongInMillis)
+    {
+        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds");
+        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
 
@@ -345,12 +359,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         songAudioPlayer.PlayAudio();
         if (SceneData.PositionInSongInMillis > 0)
         {
-            Debug.Log($"Skipping forward to {SceneData.PositionInSongInMillis} milliseconds");
-            songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
-            foreach (PlayerController playerController in PlayerControllers)
-            {
-                playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
-            }
+            SkipToPositionInSong(SceneData.PositionInSongInMillis);
         }
     }
 
