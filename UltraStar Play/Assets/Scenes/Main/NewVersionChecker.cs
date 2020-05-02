@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 
 public class NewVersionChecker : MonoBehaviour, INeedInjection
 {
-    private static readonly string remoteVersionFileUrl = "http://localhost:8080/examples/version.properties.txt";
+    private static readonly string remoteVersionFileUrl = "https://raw.githubusercontent.com/UltraStar-Deluxe/Play/master/UltraStar%20Play/Assets/VERSION.txt";
 
     // Static variables, to persist these values across scene changes.
     private static bool isRemoteVersionFileDownloadDone;
