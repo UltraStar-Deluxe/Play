@@ -1,17 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class StutterSinger : AbstractDummySinger
 {
-    public override void UpdateSinging(double currentBeat)
+    protected override PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat)
     {
-        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
         PitchEvent pitchEvent = null;
-        if (noteAtCurrentBeat != null && Random.Range(0, 5) != 0)
+        if (noteAtBeat != null && Random.Range(0, 5) != 0)
         {
-            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + Random.Range(-3, 3));
+            pitchEvent = new PitchEvent(noteAtBeat.MidiNote + Random.Range(-3, 3));
         }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
+        return pitchEvent;
     }
 }

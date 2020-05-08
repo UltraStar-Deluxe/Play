@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UniInject;
 
 public class PerfectSinger : AbstractDummySinger
 {
     public int offset = 12;
 
-    public override void UpdateSinging(double currentBeat)
+    protected override PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat)
     {
-        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
         PitchEvent pitchEvent = null;
-        if (noteAtCurrentBeat != null)
+        if (noteAtBeat != null)
         {
-            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + offset);
+            pitchEvent = new PitchEvent(noteAtBeat.MidiNote + offset);
         }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
+        return pitchEvent;
     }
 }

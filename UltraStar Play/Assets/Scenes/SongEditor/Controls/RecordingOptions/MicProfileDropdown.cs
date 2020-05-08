@@ -21,7 +21,7 @@ public class MicProfileDropdown : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private MicrophonePitchTracker microphonePitchTracker;
+    private MicPitchTracker micPitchTracker;
 
     private List<MicProfile> micProfilesInDropdown;
 
@@ -33,7 +33,7 @@ public class MicProfileDropdown : MonoBehaviour, INeedInjection
 
         if (micProfilesInDropdown.Count > 0)
         {
-            microphonePitchTracker.MicProfile = micProfilesInDropdown[0];
+            micPitchTracker.MicProfile = micProfilesInDropdown[0];
         }
     }
 
@@ -42,7 +42,7 @@ public class MicProfileDropdown : MonoBehaviour, INeedInjection
         if (index > 0 && index < micProfilesInDropdown.Count)
         {
             MicProfile selectedMicProfile = micProfilesInDropdown[index];
-            microphonePitchTracker.MicProfile = selectedMicProfile;
+            micPitchTracker.MicProfile = selectedMicProfile;
         }
     }
 }

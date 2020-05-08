@@ -6,7 +6,18 @@ using UnityEngine;
 public class PitchDetectionTests
 {
     [Test]
-    public void TestPitchDetection()
+    public void TestCamdPitchDetection()
+    {
+        TestPitchDetection(sampleRateHz => new CamdAudioSamplesAnalyzer(sampleRateHz, 2048));
+    }
+
+    [Test]
+    public void TestDywaPitchDetection()
+    {
+        TestPitchDetection(sampleRateHz => new DywaAudioSamplesAnalyzer(sampleRateHz, 2048));
+    }
+
+    private void TestPitchDetection(Func<int, IAudioSamplesAnalyzer> audioSamplesAnalyzerProvider)
     {
         MicProfile micProfile = CreateDummyMicProfile();
 
@@ -29,9 +40,9 @@ public class PitchDetectionTests
             audioClip.GetData(samples, 0);
 
             // Analyze the samples
-            IAudioSamplesAnalyzer audioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(audioClip.frequency, 2048);
+            IAudioSamplesAnalyzer audioSamplesAnalyzer = audioSamplesAnalyzerProvider(audioClip.frequency);
             audioSamplesAnalyzer.Enable();
-            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, samples.Length, micProfile);
+            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, 0, samples.Length - 1, micProfile);
 
             // Check result
             Assert.NotNull(pitchEvent, $"No pitch detected when analyzing {path}");
