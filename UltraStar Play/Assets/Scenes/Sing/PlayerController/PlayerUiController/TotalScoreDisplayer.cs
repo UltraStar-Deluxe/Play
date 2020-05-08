@@ -1,18 +1,18 @@
-﻿using UnityEngine;
+﻿using UniInject;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class TotalScoreDisplayer : MonoBehaviour
-{
-    private Text text;
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
-    void Awake()
-    {
-        text = GetComponentInChildren<Text>();
-    }
+public class TotalScoreDisplayer : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection
+{
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private CountingNumberText countingNumberText;
 
     public void ShowTotalScore(int score)
     {
-        text.text = score.ToString();
+        countingNumberText.TargetValue = score;
     }
 
     public void SetColor(Color color)

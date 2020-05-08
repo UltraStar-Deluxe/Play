@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
@@ -14,12 +14,12 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         isEnabled = false;
     }
 
-    protected static bool IsAboveNoiseSuppressionThreshold(float[] audioSamplesBuffer, int sampleCountToUse, MicProfile micProfile)
+    protected static bool IsAboveNoiseSuppressionThreshold(float[] samplesBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
     {
         float minThreshold = micProfile.NoiseSuppression / 100f;
-        for (int index = 0; index < sampleCountToUse; index++)
+        for (int index = sampleStartIndex; index < sampleEndIndex; index++)
         {
-            if (Math.Abs(audioSamplesBuffer[index]) >= minThreshold)
+            if (Math.Abs(samplesBuffer[index]) >= minThreshold)
             {
                 return true;
             }
@@ -27,6 +27,16 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         return false;
     }
 
-    abstract public PitchEvent ProcessAudioSamples(float[] audioSamplesBuffer, int samplesSinceLastFrame, MicProfile mic);
+    protected static int PreviousPowerOfTwo(int x)
+    {
+        x |= (x >> 1);
+        x |= (x >> 2);
+        x |= (x >> 4);
+        x |= (x >> 8);
+        x |= (x >> 16);
+        return x - (x >> 1);
+    }
+
+    abstract public PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile mic);
 
 }

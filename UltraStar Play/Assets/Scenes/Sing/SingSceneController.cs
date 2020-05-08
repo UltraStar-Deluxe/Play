@@ -195,31 +195,36 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     void Update()
     {
         PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
-
-        // TODO: Updating the pitch detection (including the dummy singers) for this frame must come after updating the current sentence.
-        // Otherwise, a pitch event may be fired for a beat of the "previous" sentence where no note is expected,
-        // afterwards the sentence changes (the note is expected now), but the pitch event is lost.
-
-        if (Application.isEditor)
-        {
-            DummySingers.ForEach(it => it.UpdateSinging(CurrentBeat));
-        }
     }
 
-    public void SkipToNextSentence()
+    public void SkipToNextSingableNote()
     {
-        double nextStartBeat = PlayerControllers.Select(it => it.GetNextStartBeat()).Min();
-        if (nextStartBeat < 0)
+        IEnumerable<int> nextSingableNotes = PlayerControllers
+            .Select(it => it.GetNextSingableNote(CurrentBeat))
+            .Where(nextSingableNote => nextSingableNote != null)
+            .Select(nextSingableNote => nextSingableNote.StartBeat);
+        if (nextSingableNotes.Count() <= 0)
         {
             return;
         }
+        int nextStartBeat = nextSingableNotes.Min();
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
         double offsetInMillis = Application.isEditor ? 500 : 1500;
         double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
-            songAudioPlayer.PositionInSongInMillis = targetPositionInMillis;
+            SkipToPositionInSong(targetPositionInMillis);
+        }
+    }
+
+    public void SkipToPositionInSong(double positionInSongInMillis)
+    {
+        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds");
+        songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
 
@@ -258,8 +263,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
 
-            Note lastNote = playerController.GetLastNote();
-            if (CurrentBeat < lastNote.EndBeat)
+            Note lastNoteInSong = playerController.GetLastNoteInSong();
+            if (CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }
@@ -354,8 +359,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         songAudioPlayer.PlayAudio();
         if (SceneData.PositionInSongInMillis > 0)
         {
-            Debug.Log($"Skipping forward to {SceneData.PositionInSongInMillis} milliseconds");
-            songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
+            SkipToPositionInSong(SceneData.PositionInSongInMillis);
         }
     }
 

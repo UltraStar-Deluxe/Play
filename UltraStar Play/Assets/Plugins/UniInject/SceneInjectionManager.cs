@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -156,7 +156,8 @@ namespace UniInject
                     sceneInjectionFinishedListeners.Add(script as ISceneInjectionFinishedListener);
                 }
 
-                if (!onlyInjectScriptsWithMarkerInterface || script is INeedInjection)
+                if ((!onlyInjectScriptsWithMarkerInterface || script is INeedInjection)
+                    && !(script is IExcludeFromSceneInjection))
                 {
                     List<InjectionData> injectionDatas = UniInjectUtils.GetInjectionDatas(script.GetType());
                     if (injectionDatas.Count > 0)

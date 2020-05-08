@@ -1684,7 +1684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onlyInjectScriptsWithMarkerInterface: 1
-  logTime: 1
+  logTime: 0
 --- !u!1 &6032929594356007782
 GameObject:
   m_ObjectHideFlags: 0

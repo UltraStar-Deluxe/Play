@@ -57,9 +57,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7882357268378806898}
-  - component: {fileID: 1426883935623920857}
-  - component: {fileID: 6166246499440108607}
   - component: {fileID: 2112286677205179149}
+  - component: {fileID: 2166314046265869658}
+  - component: {fileID: 3633208197333787065}
+  - component: {fileID: 1426883935623920857}
   m_Layer: 0
   m_Name: PlayerNoteRecorder
   m_TagString: Untagged
@@ -81,35 +82,6 @@ Transform:
   m_Father: {fileID: 8027944080584314603}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1426883935623920857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4909833499222852315}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b23705d715dd213418e9f5d739c7621b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  usedJokerCount: 0
---- !u!114 &6166246499440108607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4909833499222852315}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf2308ba4a559d3488166d7bdad4d41d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playRecordedAudio: 0
-  halftoneContinuationBias: 0
-  lastMidiNoteName: 
-  lastMidiNote: 0
 --- !u!82 &2112286677205179149
 AudioSource:
   m_ObjectHideFlags: 0
@@ -206,6 +178,45 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2166314046265869658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909833499222852315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playRecordedAudio: 0
+--- !u!114 &3633208197333787065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909833499222852315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fd01a3c00c3dc640b716bc695592973, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1426883935623920857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909833499222852315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b23705d715dd213418e9f5d739c7621b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usedJokerCount: 0
+  roundingBecausePitchDetectionFailedCount: 0
 --- !u!1 &4968118855066421690
 GameObject:
   m_ObjectHideFlags: 0

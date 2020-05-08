@@ -146,7 +146,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4408495301249745281}
   - component: {fileID: 4408495301249745283}
-  - component: {fileID: 4408495301249745280}
+  - component: {fileID: 3850659714455562756}
+  - component: {fileID: 6650910945373594817}
   m_Layer: 5
   m_Name: MicPitchTracker
   m_TagString: Untagged
@@ -269,7 +270,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4408495301249745280
+--- !u!114 &3850659714455562756
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -278,10 +279,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 4408495301249745294}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf2308ba4a559d3488166d7bdad4d41d, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playRecordedAudio: 0
+--- !u!114 &6650910945373594817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4408495301249745294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f26a1026f071def4d95730c20aa294f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  halftoneContinuationBias: 0.1
   lastMidiNoteName: 
   lastMidiNote: 0
 --- !u!1 &4408495303113264892
@@ -424,6 +438,8 @@ MonoBehaviour:
   anchorMax: {x: 0.5, y: 0.5}
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: -0.5, y: 26.5, z: 0}
+  anchoredPosition: {x: -0.5, y: 26.5}
+  position: {x: 518.5, y: 307.5, z: 0}
   sizeDelta: {x: 171, y: 35}
   size: {x: 171, y: 35}
 --- !u!114 &4408495303239637789

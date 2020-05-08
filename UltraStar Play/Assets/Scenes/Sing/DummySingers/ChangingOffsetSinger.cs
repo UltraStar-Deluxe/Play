@@ -1,29 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ChangingOffsetSinger : AbstractDummySinger
+﻿public class ChangingOffsetSinger : AbstractDummySinger
 {
     public int maxOffset = 5;
     private int noteOffset;
     Note lastNote;
 
-    public override void UpdateSinging(double currentBeat)
+    protected override PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat)
     {
-        Note noteAtCurrentBeat = GetNoteAtCurrentBeat(currentBeat);
         PitchEvent pitchEvent = null;
-        if (noteAtCurrentBeat != null)
+        if (noteAtBeat != null)
         {
-            pitchEvent = new PitchEvent(noteAtCurrentBeat.MidiNote + noteOffset);
+            pitchEvent = new PitchEvent(noteAtBeat.MidiNote + noteOffset);
         }
-        else if (lastNote != null)
-        {
-            // Change noteOffset on falling flank of note
-            // (falling flank: now there is no note, but in last frame there was one)
-            noteOffset = (noteOffset + 1) % 5;
-        }
-        playerController.PlayerNoteRecorder.HandlePitchEvent(pitchEvent);
 
-        lastNote = noteAtCurrentBeat;
+        // Change noteOffset when note changes.
+        if (lastNote != null && noteAtBeat != lastNote)
+        {
+            noteOffset = (noteOffset + 1) % maxOffset;
+        }
+        lastNote = noteAtBeat;
+        return pitchEvent;
     }
 }

@@ -41,7 +41,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     public EditorNoteDisplayer editorNoteDisplayer;
 
     [InjectedInInspector]
-    public MicrophonePitchTracker microphonePitchTracker;
+    public MicPitchTracker micPitchTracker;
 
     [InjectedInInspector]
     public Canvas canvas;
@@ -103,7 +103,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(noteArea);
         bb.BindExistingInstance(noteAreaDragHandler);
         bb.BindExistingInstance(songEditorLayerManager);
-        bb.BindExistingInstance(microphonePitchTracker);
+        bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(selectionController);
         bb.BindExistingInstance(editorNoteDisplayer);

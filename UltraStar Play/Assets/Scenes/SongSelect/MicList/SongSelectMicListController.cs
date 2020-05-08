@@ -2,13 +2,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 
-public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedListener
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection
 {
     public SongSelectMicListEntry listEntryPrefab;
     public GameObject scrollViewContent;
     public GameObject emptyListLabel;
+
+    [Inject]
+    private Injector injector;
 
     void Start()
     {
@@ -48,6 +55,7 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
     private void CreateListEntry(MicProfile micProfile)
     {
         SongSelectMicListEntry listEntry = Instantiate(listEntryPrefab, scrollViewContent.transform);
+        injector.InjectAllComponentsInChildren(listEntry);
         listEntry.Init(micProfile);
     }
 }
