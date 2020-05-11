@@ -361,7 +361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Kryptonite
+  defaultSongName: Call Me When You're Sober
   defaultSongNamePasteBin: "Summer Wine\r\nMe And My Broken Heart\r\nSomewhere Over
     The Rainbow (Wonderful World)\r\nMarry You\r\nSurvivor\nThrough Glass\nRockabye
     ft. Sean Paul & Anne-Marie"

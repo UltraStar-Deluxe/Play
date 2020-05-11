@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 [Serializable]
@@ -7,9 +7,9 @@ public class SingingResultsSceneData : SceneData
     public SongMeta SongMeta { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new List<PlayerProfile>();
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
-    private readonly Dictionary<PlayerProfile, PlayerScoreData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreData>();
+    private readonly Dictionary<PlayerProfile, PlayerScoreResultData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreResultData>();
 
-    public void AddPlayerScores(PlayerProfile profile, PlayerScoreData scoreData)
+    public void AddPlayerScores(PlayerProfile profile, PlayerScoreResultData scoreData)
     {
         if (!PlayerProfiles.Contains(profile))
         {
@@ -18,12 +18,12 @@ public class SingingResultsSceneData : SceneData
         playerScoreMap[profile] = scoreData;
     }
 
-    public PlayerScoreData GetPlayerScores(PlayerProfile playerProfile)
+    public PlayerScoreResultData GetPlayerScores(PlayerProfile playerProfile)
     {
         return playerScoreMap[playerProfile];
     }
 
-    public class PlayerScoreData
+    public class PlayerScoreResultData
     {
         public double TotalScore { get; set; }
         public double NormalNotesScore { get; set; }
