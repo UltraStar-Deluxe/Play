@@ -155,7 +155,9 @@ public class SongVideoPlayer : MonoBehaviour
 
         bool songAudioPlayerIsPlaying = (SongAudioPlayer == null || SongAudioPlayer.IsPlaying);
 
-        if (!songAudioPlayerIsPlaying && videoPlayer.isPlaying)
+        if ((!songAudioPlayerIsPlaying && videoPlayer.isPlaying)
+            || (videoPlayer.length > 0
+                && (videoPlayer.length * 1000) <= SongAudioPlayer.PositionInSongInMillis))
         {
             videoPlayer.Pause();
         }
