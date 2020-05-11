@@ -1,12 +1,19 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SongRouletteItem : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SongRouletteItem : MonoBehaviour, INeedInjection
 {
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private SongRouletteItemContextMenuHandler songRouletteItemContextMenuHandler;
+
     private SongMeta songMeta;
     public SongMeta SongMeta
     {
@@ -17,6 +24,7 @@ public class SongRouletteItem : MonoBehaviour
         set
         {
             songMeta = value;
+            songRouletteItemContextMenuHandler.SongMeta = songMeta;
             UpdateCover(songMeta);
         }
     }
