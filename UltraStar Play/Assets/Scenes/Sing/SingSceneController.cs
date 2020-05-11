@@ -244,7 +244,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
-    public void FinishScene()
+    public void FinishScene(bool isAfterEndOfSong)
     {
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
@@ -264,7 +264,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
 
             Note lastNoteInSong = playerController.GetLastNoteInSong();
-            if (CurrentBeat < lastNoteInSong.EndBeat)
+            if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }
