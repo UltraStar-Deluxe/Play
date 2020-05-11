@@ -248,7 +248,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         {
             micPitchTracker.MicSampleRecorder.StopRecording();
         }
-        else if (isPlaying && micRecordingEnabled && !micPitchTracker.MicSampleRecorder.IsRecording)
+        else if (isPlaying && !micPitchTracker.MicSampleRecorder.IsRecording
+                 && micRecordingEnabled && micPitchTracker.MicProfile != null)
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }
