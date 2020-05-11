@@ -35,7 +35,7 @@ public class SingSceneFinisher : MonoBehaviour
             durationAfterSongFinishedInSeconds += Time.deltaTime;
             if (durationAfterSongFinishedInSeconds >= 1)
             {
-                singSceneController.FinishScene();
+                singSceneController.FinishScene(true);
             }
         }
         else
