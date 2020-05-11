@@ -80,6 +80,12 @@ public class MicSampleRecorder : MonoBehaviour
         {
             return;
         }
+        if (MicProfile == null)
+        {
+            Debug.LogError("missing MicProfile");
+            return;
+        }
+
         IsRecording = true;
 
         // Check for microphone existence.
