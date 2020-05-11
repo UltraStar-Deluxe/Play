@@ -1,4 +1,4 @@
-
+﻿
 using System;
 
 public static class ObjectExtensions
@@ -26,26 +26,13 @@ public static class ObjectExtensions
         }
     }
 
-    /// Returns true iff the value is one of the specified values.
-    public static bool IsOneOf<T>(T value, params T[] values)
+    /// Returns true iff the value is equal to one of the specified values.
+    /// Thereby, comparison is done using object.Equals.
+    public static bool IsOneOf<T>(this T value, params T[] values)
     {
         foreach (T v in values)
         {
-            if (value.Equals(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// Returns true iff the value is one of the specified values.
-    public static bool IsOneOf(this ValueType value, params ValueType[] values)
-    {
-        foreach (ValueType v in values)
-        {
-            if (value.Equals(v))
+            if (object.Equals(value, v))
             {
                 return true;
             }
