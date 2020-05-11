@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 public static class SongMetaUtils
 {
@@ -149,5 +150,15 @@ public static class SongMetaUtils
         List<Sentence> result = new List<Sentence>(voice.Sentences);
         result.Sort(Sentence.comparerByStartBeat);
         return result;
+    }
+
+    public static void OpenDirectory(SongMeta songMeta)
+    {
+        if (songMeta == null || !Directory.Exists(songMeta.Directory))
+        {
+            return;
+        }
+
+        Application.OpenURL("file://" + songMeta.Directory);
     }
 }

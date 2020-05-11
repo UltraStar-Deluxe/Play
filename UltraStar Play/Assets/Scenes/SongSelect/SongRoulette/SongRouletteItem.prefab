@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8702917037895005486}
   - component: {fileID: -1423319442704424370}
   - component: {fileID: -8827688963652286953}
+  - component: {fileID: -1732557786571405377}
   m_Layer: 5
   m_Name: SongRouletteItem
   m_TagString: Untagged
@@ -65,6 +66,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 1d183c612f1866943a54609ced7fece7, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
@@ -118,6 +121,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &-8827688963652286953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,5 +133,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 946c0f54574550d4493b436e04066c41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-1732557786571405377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7384377897424262121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11e9ac71d9e527147b088f646e28a993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
