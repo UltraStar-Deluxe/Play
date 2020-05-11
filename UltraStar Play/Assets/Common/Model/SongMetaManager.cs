@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -119,14 +120,58 @@ public class SongMetaManager : MonoBehaviour
         });
     }
 
+    // Checks whether the audio and video file formats of the song are supported.
+    // Returns true iff the audio file of the SongMeta exists and is supported.
+    private bool CheckSupportedMediaFormats(SongMeta songMeta)
+    {
+        // Check video format.
+        // Video is optional.
+        if (!songMeta.Video.IsNullOrEmpty())
+        {
+            if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Video)))
+            {
+                Debug.LogWarning("Unsupported video format: " + songMeta.Video);
+                songMeta.Video = "";
+            }
+            else if (!File.Exists(SongMetaUtils.GetAbsoluteSongVideoPath(songMeta)))
+            {
+                Debug.LogWarning("Video file does not exist: " + SongMetaUtils.GetAbsoluteSongVideoPath(songMeta));
+                songMeta.Video = "";
+            }
+        }
+
+        // Check audio format.
+        // Audio is mandatory. Without working audio file, the song cannot be played.
+        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
+        {
+            Debug.LogWarning("Unsupported audio format: " + songMeta.Mp3);
+            return false;
+        }
+        else if (!File.Exists(SongMetaUtils.GetAbsoluteSongFilePath(songMeta)))
+        {
+            Debug.LogWarning("Audio file does not exist: " + SongMetaUtils.GetAbsoluteSongFilePath(songMeta));
+            return false;
+        }
+
+        return true;
+    }
+
     private void LoadTxtFiles(List<string> txtFiles)
     {
         txtFiles.ForEach(delegate (string path)
         {
             try
             {
-                Add(SongMetaBuilder.ParseFile(path));
-                SongsSuccess++;
+                SongMeta newSongMeta = SongMetaBuilder.ParseFile(path);
+                if (CheckSupportedMediaFormats(newSongMeta))
+                {
+                    Add(newSongMeta);
+                    SongsSuccess++;
+                }
+                else
+                {
+                    SongsFailed++;
+                }
             }
             catch (SongMetaBuilderException e)
             {
