@@ -10,7 +10,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
 
-        SingingResultsSceneData.PlayerScoreData playerScoreData = new SingingResultsSceneData.PlayerScoreData();
+        SingingResultsSceneData.PlayerScoreResultData playerScoreData = new SingingResultsSceneData.PlayerScoreResultData();
         playerScoreData.TotalScore = 6500;
         playerScoreData.NormalNotesScore = 4000;
         playerScoreData.GoldenNotesScore = 2000;
