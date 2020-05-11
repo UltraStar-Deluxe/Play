@@ -6,6 +6,16 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
+    public static string GetAbsoluteSongVideoPath(SongMeta songMeta)
+    {
+        if (songMeta.Video.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
+    }
+
     public static string GetAbsoluteSongFilePath(SongMeta songMeta)
     {
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
