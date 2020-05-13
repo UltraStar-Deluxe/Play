@@ -34,6 +34,8 @@ public class SongVideoPlayer : MonoBehaviour
     private IDisposable jumpBackInSongEventStreamDisposable;
     private IDisposable jumpForwardInSongEventStreamDisposable;
 
+    public string videoPlayerErrorMessage;
+
     public void Init(SongMeta songMeta, SongAudioPlayer songAudioPlayer)
     {
         this.SongMeta = songMeta;
@@ -67,6 +69,20 @@ public class SongVideoPlayer : MonoBehaviour
 
     void Update()
     {
+        if (!videoPlayerErrorMessage.IsNullOrEmpty())
+        {
+            UiManager.Instance.CreateNotification(videoPlayerErrorMessage, Colors.red);
+            videoPlayerErrorMessage = "";
+            UnloadVideo();
+            // Do not attempt to load the video again
+            SongMeta.Video = "";
+        }
+
+        if (!HasLoadedVideo)
+        {
+            return;
+        }
+
         if (SongAudioPlayer != null)
         {
             SyncVideoWithMusic(false);
@@ -262,12 +278,23 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        videoPlayer.errorReceived += OnVideoPlayerErrorReceived;
+    }
+
     void OnDisable()
     {
+        videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
         if (HasLoadedVideo)
         {
             ClearOutRenderTexture(videoPlayer.targetTexture);
         }
+    }
+
+    private void OnVideoPlayerErrorReceived(VideoPlayer source, string message)
+    {
+        videoPlayerErrorMessage = message;
     }
 
     // If not cleared, then the RenderTexture will keep its last viewed frame until it is overwritten by a new video.
