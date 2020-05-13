@@ -10,6 +10,6 @@ public class SingSceneData : SceneData
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
     public double PositionInSongInMillis { get; set; }
     public bool IsRestart { get; set; }
-    public int NextBeatToAnalyze { get; set; }
+    public int NextBeatToScore { get; set; }
     public Dictionary<PlayerProfile, PlayerScoreControllerData> PlayerProfileToScoreDataMap { get; set; } = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
 }

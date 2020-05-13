@@ -69,6 +69,8 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
+    public int NextBeatToScore { get; set; }
+
     [Inject]
     private PlayerPitchTracker playerPitchTracker;
 
@@ -119,6 +121,11 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             return;
         }
 
+        if (beatAnalyzedEvent.Beat < NextBeatToScore)
+        {
+            return;
+        }
+
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
 
         // Check if note was hit
@@ -156,6 +163,11 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
     private void OnNoteAnalyzed(PlayerPitchTracker.NoteAnalyzedEvent noteAnalyzedEvent)
     {
+        if (noteAnalyzedEvent.Note.EndBeat < NextBeatToScore)
+        {
+            return;
+        }
+
         Note analyzedNote = noteAnalyzedEvent.Note;
         if (ScoreData.NoteToNoteScoreMap.TryGetValue(analyzedNote, out NoteScore noteScore))
         {
@@ -169,6 +181,11 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
     private void OnSentenceAnalyzed(PlayerPitchTracker.SentenceAnalyzedEvent sentenceAnalyzedEvent)
     {
+        if (sentenceAnalyzedEvent.Sentence.MaxBeat < NextBeatToScore)
+        {
+            return;
+        }
+
         Sentence analyzedSentence = sentenceAnalyzedEvent.Sentence;
         int totalScorableNoteLength = analyzedSentence.Notes
                 .Where(note => note.IsNormal || note.IsGolden)

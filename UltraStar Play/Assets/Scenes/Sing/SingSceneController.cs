@@ -228,12 +228,13 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
-        int nextBeatToAnalyze = (int)Math.Max(CurrentBeat, sceneData.NextBeatToAnalyze);
-        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to analyze is {nextBeatToAnalyze}");
+        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
+        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         foreach (PlayerController playerController in PlayerControllers)
         {
-            playerController.PlayerPitchTracker.SkipToBeat(nextBeatToAnalyze);
+            playerController.PlayerScoreController.NextBeatToScore = nextBeatToScore;
+            playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
 
@@ -246,10 +247,12 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     public void OpenSongInEditor()
     {
         int maxBeatToAnalyze = PlayerControllers
-            .Select(playerController => playerController.PlayerNoteRecorder)
-            .Select(playerNoteRecorder => playerNoteRecorder.PlayerPitchTracker.BeatToAnalyze)
+            .Select(playerController => playerController.PlayerNoteRecorder.PlayerPitchTracker.BeatToAnalyze)
             .Max();
-        SceneData.NextBeatToAnalyze = Math.Max(SceneData.NextBeatToAnalyze, maxBeatToAnalyze);
+        int maxBeatToScore = PlayerControllers
+            .Select(playerController => playerController.PlayerScoreController.NextBeatToScore)
+            .Max();
+        SceneData.NextBeatToScore = Math.Max(SceneData.NextBeatToScore, Math.Max(maxBeatToAnalyze, maxBeatToScore));
 
         SceneData.PlayerProfileToScoreDataMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
         foreach (PlayerController playerController in PlayerControllers)
