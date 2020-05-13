@@ -79,12 +79,12 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
         }
 
         // Select next / previous song with arrow keys or mouse wheel
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.mouseScrollDelta.y > 0)
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.mouseScrollDelta.y < 0)
         {
             songSelectSceneController.OnNextSong();
         }
 
-        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.mouseScrollDelta.y < 0)
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.mouseScrollDelta.y > 0)
         {
             songSelectSceneController.OnPreviousSong();
         }
