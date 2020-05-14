@@ -243,13 +243,10 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     public void OpenSongInEditor()
     {
-        int maxBeatToAnalyze = PlayerControllers
-            .Select(playerController => playerController.PlayerNoteRecorder.PlayerPitchTracker.BeatToAnalyze)
-            .Max();
         int maxBeatToScore = PlayerControllers
             .Select(playerController => playerController.PlayerScoreController.NextBeatToScore)
             .Max();
-        SceneData.NextBeatToScore = Math.Max(SceneData.NextBeatToScore, Math.Max(maxBeatToAnalyze, maxBeatToScore));
+        SceneData.NextBeatToScore = Math.Max((int)CurrentBeat, maxBeatToScore);
 
         SceneData.PlayerProfileToScoreDataMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
         foreach (PlayerController playerController in PlayerControllers)
