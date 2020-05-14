@@ -140,7 +140,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             noteScore = new NoteScore(analyzedNote);
             ScoreData.NoteToNoteScoreMap.Add(analyzedNote, noteScore);
         }
-        noteScore.correctlySungBeats++;
+        noteScore.CorrectlySungBeats++;
 
         Sentence analyzedSentence = beatAnalyzedEvent.NoteAtBeat.Sentence;
         if (!ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
@@ -172,7 +172,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         if (ScoreData.NoteToNoteScoreMap.TryGetValue(analyzedNote, out NoteScore noteScore))
         {
             //Debug.Log($"OnNoteAnalyzed: {noteScore.correctlySungBeats} / {analyzedNote.Length}, {analyzedNote.StartBeat}, {analyzedNote.EndBeat}, {analyzedNote.Text}");
-            if (noteScore.correctlySungBeats >= analyzedNote.Length)
+            if (noteScore.CorrectlySungBeats >= analyzedNote.Length)
             {
                 noteScoreEventStream.OnNext(new NoteScoreEvent(noteScore));
             }
