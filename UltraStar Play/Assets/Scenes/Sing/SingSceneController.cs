@@ -110,12 +110,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             }
             PlayerController playerController = CreatePlayerController(playerProfile, micProfile);
 
-            if (SceneData.PlayerProfileToScoreDataMap.Count > 0)
+            if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
             {
-                if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
-                {
-                    playerController.PlayerScoreController.ScoreData = scoreData;
-                }
+                playerController.PlayerScoreController.ScoreData = scoreData;
             }
         }
 
