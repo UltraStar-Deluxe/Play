@@ -1,16 +1,10 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using Boo.Lang;
 using UnityEngine;
 
 public static class ApplicationUtils
 {
-
-    public static string AppVersion
-    {
-        get
-        {
-            return "0.1.0";
-        }
-    }
-
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR
@@ -28,5 +22,43 @@ public static class ApplicationUtils
         // Thus, use Screen.width and Screen.height instead, which return the pixel size of the Unity application.
         ScreenResolution res = new ScreenResolution(Screen.width, Screen.height, Screen.currentResolution.refreshRate);
         return res;
+    }
+
+    public static bool IsSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return fileExtension.IsOneOf(
+            "mp3",
+            "ogg",
+            "wav");
+    }
+
+    public static bool IsSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return fileExtension.IsOneOf(
+            "avi",
+            "mp4",
+            "mpg",
+            "mpeg",
+            "vp8",
+            "m4v",
+            "mov",
+            "dv",
+            "afs",
+            "wmf");
+    }
+
+    private static string NormalizeFileExtension(string fileExtension)
+    {
+        if (fileExtension == null)
+        {
+            return "";
+        }
+        if (fileExtension.StartsWith("."))
+        {
+            fileExtension = fileExtension.Substring(1);
+        }
+        return fileExtension.ToLowerInvariant();
     }
 }

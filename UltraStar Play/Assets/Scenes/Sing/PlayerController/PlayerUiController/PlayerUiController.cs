@@ -52,6 +52,7 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     void Start()
     {
         // Show rating and score after each sentence
+        ShowTotalScore(playerScoreController.TotalScore);
         playerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
         {
             ShowTotalScore(playerScoreController.TotalScore);

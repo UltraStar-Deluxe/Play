@@ -148,8 +148,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     public void JumpToSongWhereTitleStartsWith(string text)
     {
-        string textToLower = text.ToLowerInvariant();
-        SongMeta match = songRouletteController.Find(it => it.Title.ToLowerInvariant().StartsWith(textToLower));
+        string textToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
+        SongMeta match = songRouletteController.Find(it =>
+        {
+            string titleToLowerNoWhitespace = it.Title.ToLowerInvariant().Replace(" ", "");
+            return titleToLowerNoWhitespace.StartsWith(textToLowerNoWhitespace);
+        });
+
         if (match != null)
         {
             songRouletteController.SelectSong(match);

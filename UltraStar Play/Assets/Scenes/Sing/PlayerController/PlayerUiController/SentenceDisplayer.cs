@@ -110,7 +110,9 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
             return;
         }
 
-        avgMidiNote = (int)displayedSentence.Notes.Select(it => it.MidiNote).Average();
+        avgMidiNote = displayedSentence.Notes.Count > 0
+            ? (int)displayedSentence.Notes.Select(it => it.MidiNote).Average()
+            : 0;
         // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
         minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);

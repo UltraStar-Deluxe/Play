@@ -35,7 +35,7 @@ public class SingSceneKeyboardInputController : MonoBehaviour, INeedInjection
 
         if (Input.GetKeyUp(BackToSongSelectShortcut) || Input.GetKeyUp(BackToSongSelectShortcut2))
         {
-            singSceneController.FinishScene();
+            singSceneController.FinishScene(false);
         }
 
         if (Input.GetKeyUp(PauseShortcut))
