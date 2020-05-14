@@ -31,13 +31,13 @@ public class SentenceScore
 public class NoteScore
 {
     public Note Note { get; private set; }
-    public int correctlySungBeats { get; set; }
+    public int CorrectlySungBeats { get; set; }
 
     public bool IsPerfect
     {
         get
         {
-            return correctlySungBeats >= Note.Length;
+            return CorrectlySungBeats >= Note.Length;
         }
     }
 
