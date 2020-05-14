@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
 using UnityEngine.EventSystems;
+using UniRx;
 
 #pragma warning disable CS0649
 
 public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
+    public ContinuedKeyPressDetector leftArrowKeyPressDetector;
+    [InjectedInInspector]
+    public ContinuedKeyPressDetector rightArrowKeyPressDetector;
+
     [Inject]
     private EventSystem eventSystem;
 
@@ -18,6 +24,14 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
     private float fuzzySearchLastInputTimeInSeconds;
     private string fuzzySearchText = "";
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
+
+    void Start()
+    {
+        rightArrowKeyPressDetector.ContinuedKeyPressEventStream
+            .Subscribe(_ => songSelectSceneController.OnNextSong());
+        leftArrowKeyPressDetector.ContinuedKeyPressEventStream
+            .Subscribe(_ => songSelectSceneController.OnPreviousSong());
+    }
 
     void Update()
     {
@@ -79,12 +93,12 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
         }
 
         // Select next / previous song with arrow keys or mouse wheel
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.mouseScrollDelta.y > 0)
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.mouseScrollDelta.y < 0)
         {
             songSelectSceneController.OnNextSong();
         }
 
-        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.mouseScrollDelta.y < 0)
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.mouseScrollDelta.y > 0)
         {
             songSelectSceneController.OnPreviousSong();
         }

@@ -8,7 +8,7 @@ public class SingingResultsPlayerUiController : MonoBehaviour
 
     public void Init(int playerProfileIndex,
         PlayerProfile playerProfile,
-        SingingResultsSceneData.PlayerScoreData playerScoreData,
+        SingingResultsSceneData.PlayerScoreResultData playerScoreData,
         MicProfile micProfile)
     {
         SetPlayerProfile(playerProfileIndex, playerProfile, micProfile);

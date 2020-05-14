@@ -2,9 +2,20 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 public static class SongMetaUtils
 {
+    public static string GetAbsoluteSongVideoPath(SongMeta songMeta)
+    {
+        if (songMeta.Video.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
+    }
+
     public static string GetAbsoluteSongFilePath(SongMeta songMeta)
     {
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
@@ -149,5 +160,15 @@ public static class SongMetaUtils
         List<Sentence> result = new List<Sentence>(voice.Sentences);
         result.Sort(Sentence.comparerByStartBeat);
         return result;
+    }
+
+    public static void OpenDirectory(SongMeta songMeta)
+    {
+        if (songMeta == null || !Directory.Exists(songMeta.Directory))
+        {
+            return;
+        }
+
+        Application.OpenURL("file://" + songMeta.Directory);
     }
 }

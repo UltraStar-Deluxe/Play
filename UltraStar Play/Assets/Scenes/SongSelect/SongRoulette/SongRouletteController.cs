@@ -7,10 +7,20 @@ using UnityEngine.UI;
 using UniRx;
 using UniInject;
 
-public class SongRouletteController : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SongRouletteController : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
     public SongRouletteItem songRouletteItemPrefab;
+    [InjectedInInspector]
     public List<RouletteItemPlaceholder> rouletteItemPlaceholders;
+
+    public bool showRouletteItemPlaceholders;
+
+    [Inject]
+    private Injector injector;
 
     private List<RouletteItemPlaceholder> activeRouletteItemPlaceholders = new List<RouletteItemPlaceholder>();
     private RouletteItemPlaceholder centerItem;
@@ -34,8 +44,6 @@ public class SongRouletteController : MonoBehaviour
     }
 
     private readonly List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
-
-    public bool showRouletteItemPlaceholders;
 
     private bool isInitialized;
 
@@ -122,6 +130,7 @@ public class SongRouletteController : MonoBehaviour
     private SongRouletteItem CreateSongRouletteItem(SongMeta songMeta, RouletteItemPlaceholder rouletteItem)
     {
         SongRouletteItem item = Instantiate(songRouletteItemPrefab);
+        injector.InjectAllComponentsInChildren(item);
         item.transform.SetParent(transform);
         item.SongMeta = songMeta;
         item.RectTransform.anchorMin = rouletteItem.RectTransform.anchorMin;

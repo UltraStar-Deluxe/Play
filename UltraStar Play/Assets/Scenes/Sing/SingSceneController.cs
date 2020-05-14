@@ -108,7 +108,12 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
-            CreatePlayerController(playerProfile, micProfile);
+            PlayerController playerController = CreatePlayerController(playerProfile, micProfile);
+
+            if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
+            {
+                playerController.PlayerScoreController.ScoreData = scoreData;
+            }
         }
 
         // Handle dummy singers
@@ -220,10 +225,12 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
-        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds");
+        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
+        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         foreach (PlayerController playerController in PlayerControllers)
         {
+            playerController.PlayerScoreController.NextBeatToScore = nextBeatToScore;
             playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
@@ -236,6 +243,17 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     public void OpenSongInEditor()
     {
+        int maxBeatToScore = PlayerControllers
+            .Select(playerController => playerController.PlayerScoreController.NextBeatToScore)
+            .Max();
+        SceneData.NextBeatToScore = Math.Max((int)CurrentBeat, maxBeatToScore);
+
+        SceneData.PlayerProfileToScoreDataMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
+        }
+
         SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
         songEditorSceneData.PreviousSceneData = SceneData;
         songEditorSceneData.PreviousScene = EScene.SingScene;
@@ -244,7 +262,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
-    public void FinishScene()
+    public void FinishScene(bool isAfterEndOfSong)
     {
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
@@ -256,7 +274,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         bool isAfterLastNote = true;
         foreach (PlayerController playerController in PlayerControllers)
         {
-            SingingResultsSceneData.PlayerScoreData scoreData = new SingingResultsSceneData.PlayerScoreData();
+            SingingResultsSceneData.PlayerScoreResultData scoreData = new SingingResultsSceneData.PlayerScoreResultData();
             scoreData.TotalScore = playerController.PlayerScoreController.TotalScore;
             scoreData.GoldenNotesScore = playerController.PlayerScoreController.GoldenNotesTotalScore;
             scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
@@ -264,7 +282,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
 
             Note lastNoteInSong = playerController.GetLastNoteInSong();
-            if (CurrentBeat < lastNoteInSong.EndBeat)
+            if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }
@@ -291,7 +309,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         }
     }
 
-    private void CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
+    private PlayerController CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
     {
         string voiceName = GetVoiceName(playerProfile);
         PlayerController playerController = GameObject.Instantiate<PlayerController>(playerControllerPrefab);
@@ -299,6 +317,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         playerController.Init(playerProfile, voiceName, micProfile);
 
         PlayerControllers.Add(playerController);
+        return playerController;
     }
 
     private string GetVoiceName(PlayerProfile playerProfile)
