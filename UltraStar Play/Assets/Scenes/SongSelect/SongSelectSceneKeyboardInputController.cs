@@ -57,6 +57,13 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
             return;
         }
 
+        // Toggle favorite playlist via Shift+F
+        if (Input.GetKeyUp(KeyCode.F) && modifier == EKeyboardModifier.Shift
+            && !songSelectSceneController.IsSearchEnabled())
+        {
+            songSelectSceneController.ToggleFavoritePlaylist();
+        }
+
         if (modifier != EKeyboardModifier.None)
         {
             return;
@@ -89,6 +96,12 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
             if (Input.GetKeyUp(KeyCode.E) && IsNoControlOrSongButtonFocused())
             {
                 songSelectSceneController.StartSongEditorScene();
+            }
+
+            // Toggle favorite via F
+            if (Input.GetKeyUp(KeyCode.F))
+            {
+                songSelectSceneController.ToggleSelectedSongIsFavorite();
             }
         }
 

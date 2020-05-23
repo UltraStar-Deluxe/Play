@@ -187,10 +187,11 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
     public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
+        int newSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
         songs = new List<SongMeta>(songMetas);
         if (songs.Count > 0)
         {
-            Selection.Value = new SongSelection(songs[0], 0, songs.Count);
+            Selection.Value = new SongSelection(songs[newSelectedSongIndex], newSelectedSongIndex, songs.Count);
             FindActiveRouletteItems();
             UpdateRouletteItemsActiveState();
         }
