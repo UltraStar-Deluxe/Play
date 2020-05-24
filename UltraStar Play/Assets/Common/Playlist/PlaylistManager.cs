@@ -18,15 +18,16 @@ public class PlaylistManager : MonoBehaviour
 
     // static references to be persisted across scenes
     private static Dictionary<UltraStarPlaylist, string> playlistToFilePathMap = new Dictionary<UltraStarPlaylist, string>();
-    private static List<UltraStarPlaylist> playlists;
-    private static UltraStarPlaylist favoritesPlaylist;
+    private static List<UltraStarPlaylist> playlists = new List<UltraStarPlaylist>();
+    private static UltraStarPlaylist favoritesPlaylist = new UltraStarPlaylist();
 
     public IReadOnlyList<UltraStarPlaylist> Playlists
     {
         get
         {
-            if (playlists == null)
+            if (playlists.IsNullOrEmpty())
             {
+                CreateFavoritePlaylistIfNotExist();
                 ScanPlaylistFolder();
             }
             return playlists;
@@ -50,6 +51,11 @@ public class PlaylistManager : MonoBehaviour
         playlistFolder = Application.persistentDataPath + "/Playlists";
         favoritesPlaylistFile = playlistFolder + "/Favorites" + playlistFileExtension;
 
+        CreateFavoritePlaylistIfNotExist();
+    }
+
+    private void CreateFavoritePlaylistIfNotExist()
+    {
         if (!Directory.Exists(playlistFolder))
         {
             Directory.CreateDirectory(playlistFolder);
