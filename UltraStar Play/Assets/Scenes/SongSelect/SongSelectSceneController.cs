@@ -32,11 +32,16 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     [InjectedInInspector]
     public SongRouletteController songRouletteController;
 
+    [InjectedInInspector]
+    public PlaylistSlider playlistSlider;
+
     public ArtistText artistText;
     public Text songTitleText;
+
     public Text songCountText;
     public GameObject videoIndicator;
     public GameObject duetIndicator;
+    public FavoriteIndicator favoriteIndicator;
 
     public SongSelectPlayerProfileListController playerProfileListController;
 
@@ -51,6 +56,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     [Inject]
     private EventSystem eventSystem;
+
+    [Inject]
+    private PlaylistManager playlistManager;
 
     public GameObject noSongsFoundMessage;
 
@@ -86,6 +94,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         // Show a message when no songs have been found.
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
+
+        playlistSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
     }
 
     private void GetSongMetasFromManager()
@@ -117,7 +127,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private void InitSongRoulette()
     {
         lastSongMetasReloadFrame = Time.frameCount;
-        songRouletteController.SetSongs(songMetas);
+        UpdateFilteredSongs();
         if (sceneData.SongMeta != null)
         {
             songRouletteController.SelectSong(sceneData.SongMeta);
@@ -273,10 +283,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void OnSearchTextChanged()
     {
         SongMeta lastSelectedSong = SelectedSong;
-        string searchText = searchTextInputField.Text.ToLower();
-        if (string.IsNullOrEmpty(searchText))
+        UpdateFilteredSongs();
+        if (string.IsNullOrEmpty(GetSearchText()))
         {
-            songRouletteController.SetSongs(songMetas);
             if (lastSelectedSong != null)
             {
                 songRouletteController.SelectSong(lastSelectedSong);
@@ -286,21 +295,20 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
                 songRouletteController.SelectSong(selectedSongBeforeSearch);
             }
         }
-        else
-        {
-            DoSearch((songMeta) =>
-            {
-                bool titleMatches = songMeta.Title.ToLower().Contains(searchText);
-                bool artistMatches = songMeta.Artist.ToLower().Contains(searchText);
-                return titleMatches || artistMatches;
-            });
-        }
     }
 
-    private void DoSearch(Func<SongMeta, bool> condition)
+    public List<SongMeta> GetFilteredSongMetas()
     {
-        List<SongMeta> matchingSongs = songMetas.Where(condition).ToList();
-        songRouletteController.SetSongs(matchingSongs);
+        string searchText = IsSearchEnabled() ? GetSearchText() : null;
+        UltraStarPlaylist playlist = playlistSlider.SelectedItem;
+        List<SongMeta> filteredSongs = songMetas
+            .Where(songMeta => searchText.IsNullOrEmpty()
+                               || songMeta.Title.ToLower().Contains(searchText)
+                               || songMeta.Artist.ToLower().Contains(searchText))
+            .Where(songMeta => playlist == null
+                            || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
+            .ToList();
+        return filteredSongs;
     }
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
@@ -317,6 +325,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     {
         searchTextInputField.Text = "";
         searchTextInputField.Hide();
+    }
+
+    public string GetSearchText()
+    {
+        return searchTextInputField.Text.ToLower();
     }
 
     public bool IsSearchEnabled()
@@ -342,5 +355,46 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         return bb.GetBindings();
+    }
+
+    public void ToggleFavoritePlaylist()
+    {
+        if (playlistSlider.SelectedItemIndex == 0)
+        {
+            playlistSlider.Selection.Value = playlistManager.FavoritesPlaylist;
+        }
+        else
+        {
+            playlistSlider.Selection.Value = playlistSlider.Items[0];
+        }
+    }
+
+    public void ToggleSelectedSongIsFavorite()
+    {
+        if (SelectedSong == null)
+        {
+            return;
+        }
+
+        if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong.Artist, SelectedSong.Title))
+        {
+            playlistManager.FavoritesPlaylist.RemoveSongEntry(SelectedSong.Artist, SelectedSong.Title);
+        }
+        else
+        {
+            playlistManager.FavoritesPlaylist.AddLineEntry(new UltraStartPlaylistSongEntry(SelectedSong.Artist, SelectedSong.Title));
+        }
+        playlistManager.SavePlaylist(playlistManager.FavoritesPlaylist);
+
+        favoriteIndicator.UpdateImage(SelectedSong);
+        if (!(playlistSlider.SelectedItem is UltraStarAllSongsPlaylist))
+        {
+            UpdateFilteredSongs();
+        }
+    }
+
+    public void UpdateFilteredSongs()
+    {
+        songRouletteController.SetSongs(GetFilteredSongMetas());
     }
 }
