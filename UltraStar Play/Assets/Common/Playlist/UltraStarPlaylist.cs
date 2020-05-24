@@ -13,10 +13,6 @@ public class UltraStarPlaylist
     private readonly List<UltraStartPlaylistSongEntry> songEntries = new List<UltraStartPlaylistSongEntry>();
     public IReadOnlyList<UltraStartPlaylistSongEntry> SongEntries => songEntries;
 
-    public UltraStarPlaylist()
-    {
-    }
-
     public void AddLineEntry(UltraStartPlaylistLineEntry lineEntry)
     {
         lineEntries.Add(lineEntry);
