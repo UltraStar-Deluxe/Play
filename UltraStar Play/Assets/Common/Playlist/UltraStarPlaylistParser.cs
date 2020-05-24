@@ -59,14 +59,7 @@ public static class UltraStarPlaylistParser
                     if (insideQuote)
                     {
                         // What has been read before for this token is now obsolete
-                        if (targetToken == Token.Artist)
-                        {
-                            artistBuilder.Clear();
-                        }
-                        else if (targetToken == Token.Title)
-                        {
-                            titleBuilder.Clear();
-                        }
+                        GetStringBuilder(targetToken, artistBuilder, titleBuilder)?.Clear();
                     }
                     else if (targetToken == Token.Artist)
                     {
@@ -86,15 +79,7 @@ public static class UltraStarPlaylistParser
                 }
                 else if (c != '\\' || (c == '\\' && lastChar == '\\'))
                 {
-                    switch (targetToken)
-                    {
-                        case Token.Artist:
-                            artistBuilder.Append(c);
-                            break;
-                        case Token.Title:
-                            titleBuilder.Append(c);
-                            break;
-                    }
+                    GetStringBuilder(targetToken, artistBuilder, titleBuilder)?.Append(c);
                 }
                 lastChar = c;
             }
@@ -109,6 +94,19 @@ public static class UltraStarPlaylistParser
             {
                 throw new UltraStarPlaylistParserException("Missing artist or title");
             }
+        }
+
+        private static StringBuilder GetStringBuilder(Token targetToken, StringBuilder artistBuilder, StringBuilder titleBuilder)
+        {
+            if (targetToken == Token.Artist)
+            {
+                return artistBuilder;
+            }
+            else if (targetToken == Token.Title)
+            {
+                return titleBuilder;
+            }
+            return null;
         }
     }
 
