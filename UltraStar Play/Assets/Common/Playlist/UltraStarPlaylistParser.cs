@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 public static class UltraStarPlaylistParser
@@ -47,8 +48,8 @@ public static class UltraStarPlaylistParser
             // Add this character either to the artist or title, depending on the targetToken.
             Token targetToken = Token.Artist;
             bool insideQuote = false;
-            string artist = "";
-            string title = "";
+            StringBuilder artistBuilder = new StringBuilder(line.Length);
+            StringBuilder titleBuilder = new StringBuilder(line.Length);
             char lastChar = '0';
             foreach (char c in line)
             {
@@ -60,11 +61,11 @@ public static class UltraStarPlaylistParser
                         // What has been read before for this token is now obsolete
                         if (targetToken == Token.Artist)
                         {
-                            artist = "";
+                            artistBuilder.Clear();
                         }
                         else if (targetToken == Token.Title)
                         {
-                            title = "";
+                            titleBuilder.Clear();
                         }
                     }
                     else if (targetToken == Token.Artist)
@@ -88,18 +89,18 @@ public static class UltraStarPlaylistParser
                     switch (targetToken)
                     {
                         case Token.Artist:
-                            artist += c;
+                            artistBuilder.Append(c);
                             break;
                         case Token.Title:
-                            title += c;
+                            titleBuilder.Append(c);
                             break;
                     }
                 }
                 lastChar = c;
             }
 
-            artist = artist.Trim();
-            title = title.Trim();
+            string artist = artistBuilder.ToString().Trim();
+            string title = titleBuilder.ToString().Trim();
             if (!artist.IsNullOrEmpty() && !title.IsNullOrEmpty())
             {
                 return new UltraStartPlaylistSongEntry(line, artist, title);
