@@ -6,10 +6,27 @@ using NUnit.Framework;
 using UnityEngine;
 using static UltraStarPlaylistParser;
 
-public class UltraStarPlaylistParserTest
+public class UltraStarPlaylistTest
 {
     [Test]
-    public void ParseLineTest()
+    public void PlaylistTest()
+    {
+        UltraStarPlaylist playlist = new UltraStarPlaylist();
+        playlist.AddLineEntry(new UltraStartPlaylistLineEntry("# comment"));
+        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(1, playlist.GetLines().Length);
+
+        playlist.AddLineEntry(new UltraStartPlaylistSongEntry("The artist", "The title"));
+        Assert.IsTrue(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(2, playlist.GetLines().Length);
+
+        playlist.RemoveSongEntry("The artist", "The title");
+        Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
+        Assert.AreEqual(1, playlist.GetLines().Length);
+    }
+
+    [Test]
+    public void ParsePlaylistLineTest()
     {
         UltraStartPlaylistLineEntry entry;
         entry = UltraStarPlaylistLineParser.ParseLine("# this is a comment");

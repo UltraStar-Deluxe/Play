@@ -1,43 +1,48 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using UnityEngine;
 
 public class UltraStarPlaylist
 {
     private readonly List<UltraStartPlaylistLineEntry> lineEntries = new List<UltraStartPlaylistLineEntry>();
-    public IReadOnlyList<UltraStartPlaylistLineEntry> LineEntries => lineEntries;
+    private readonly HashSet<string> songHashes = new HashSet<string>();
 
-    private readonly List<UltraStartPlaylistSongEntry> songEntries = new List<UltraStartPlaylistSongEntry>();
-    public IReadOnlyList<UltraStartPlaylistSongEntry> SongEntries => songEntries;
+    public string[] GetLines()
+    {
+        return lineEntries.Select(it => it.Line).ToArray();
+    }
 
     public void AddLineEntry(UltraStartPlaylistLineEntry lineEntry)
     {
         lineEntries.Add(lineEntry);
         if (lineEntry is UltraStartPlaylistSongEntry songEntry)
         {
-            songEntries.Add(songEntry);
+            songHashes.Add(GetHash(songEntry.Artist, songEntry.Title));
         }
     }
 
     public void RemoveSongEntry(string artist, string title)
     {
-        UltraStartPlaylistSongEntry songEntry = songEntries
-            .Where(it => it.Artist == artist.Trim() && it.Title == title.Trim()).FirstOrDefault();
-        if (songEntry != null)
+        UltraStartPlaylistLineEntry lineEntry = lineEntries
+            .Find(it => (it is UltraStartPlaylistSongEntry songEntry)
+                        && songEntry.Artist == artist.Trim()
+                        && songEntry.Title == title.Trim());
+        if (lineEntry != null)
         {
-            lineEntries.Remove(songEntry);
-            songEntries.Remove(songEntry);
+            lineEntries.Remove(lineEntry);
+            songHashes.Remove(GetHash(artist, title));
         }
     }
 
     public virtual bool HasSongEntry(string artist, string title)
     {
-        UltraStartPlaylistSongEntry songEntry = songEntries
-            .Where(it => it.Artist == artist.Trim() && it.Title == title.Trim()).FirstOrDefault();
-        return songEntry != null;
+        return songHashes.Contains(GetHash(artist, title));
+    }
+
+    private string GetHash(string artist, string title)
+    {
+        return artist.Trim() + "-" + title.Trim();
     }
 }
 

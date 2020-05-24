@@ -62,7 +62,7 @@ public class PlaylistManager : MonoBehaviour
 
     public void SavePlaylist(UltraStarPlaylist playlist)
     {
-        string[] lines = playlist.LineEntries.Select(it => it.Line).ToArray();
+        string[] lines = playlist.GetLines();
         string filePath = GetFilePathForPlaylist(playlist);
         File.WriteAllLines(filePath, lines);
     }
