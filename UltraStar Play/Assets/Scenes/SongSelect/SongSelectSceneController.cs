@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 using UnityEngine.UI;
 using System.Linq;
 using UniRx;
@@ -325,6 +324,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     {
         searchTextInputField.Text = "";
         searchTextInputField.Hide();
+        // Remove the focus from the search input text field
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     public string GetSearchText()
