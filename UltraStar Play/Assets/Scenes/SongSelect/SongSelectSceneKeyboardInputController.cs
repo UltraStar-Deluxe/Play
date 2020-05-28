@@ -76,6 +76,7 @@ public class SongSelectSceneKeyboardInputController : MonoBehaviour, INeedInject
                 || (Input.GetKeyUp(KeyCode.Return) && songSelectSceneController.IsSearchTextInputHasFocus()))
             {
                 songSelectSceneController.DisableSearch();
+                return;
             }
         }
         else
