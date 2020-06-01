@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
 using UniRx;
-using System;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
+abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingSceneNoteDisplayer, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
@@ -24,53 +25,44 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
     public bool showPitchOfNotes;
 
     [Inject]
-    private Settings settings;
+    protected Settings settings;
 
     [Inject]
-    private SongMeta songMeta;
+    protected SongMeta songMeta;
 
     [Inject]
-    private PlayerNoteRecorder playerNoteRecorder;
+    protected PlayerNoteRecorder playerNoteRecorder;
 
     [Inject(optional = true)]
-    private MicProfile micProfile;
+    protected MicProfile micProfile;
 
-    private double beatsPerSecond;
+    protected double beatsPerSecond;
 
-    private readonly List<UiRecordedNote> uiRecordedNotes = new List<UiRecordedNote>();
-    private readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
-    private readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
+    protected readonly List<UiRecordedNote> uiRecordedNotes = new List<UiRecordedNote>();
+    protected readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
+    protected readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
-    private Sentence displayedSentence;
+    protected Sentence displayedSentence;
 
-    private int avgMidiNote;
+    protected int avgMidiNote;
 
     // The number of rows on which notes can be placed.
-    private int noteRowCount;
-    private int maxNoteRowMidiNote;
-    private int minNoteRowMidiNote;
-    private float noteHeightPercent;
+    protected int noteRowCount;
+    protected int maxNoteRowMidiNote;
+    protected int minNoteRowMidiNote;
+    protected float noteHeightPercent;
 
-    void Update()
+    abstract protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat);
+
+    abstract public void DisplaySentence(Sentence sentence, Sentence nextSentence);
+
+    public virtual void OnInjectionFinished()
     {
-        // Draw the UiRecordedNotes smoothly from their StartBeat to TargetEndBeat
-        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
+        if (!enabled)
         {
-            if (uiRecordedNote.EndBeat < uiRecordedNote.TargetEndBeat)
-            {
-                uiRecordedNote.EndBeat = uiRecordedNote.StartBeat + (uiRecordedNote.LifeTimeInSeconds * beatsPerSecond);
-                if (uiRecordedNote.EndBeat > uiRecordedNote.TargetEndBeat)
-                {
-                    uiRecordedNote.EndBeat = uiRecordedNote.TargetEndBeat;
-                }
-
-                PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, uiRecordedNote.StartBeat, uiRecordedNote.EndBeat);
-            }
+            return;
         }
-    }
 
-    public void OnInjectionFinished()
-    {
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
@@ -89,7 +81,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         // Check that there is at least one row for every possible note in an octave.
         if (this.noteRowCount < 12)
         {
-            throw new UnityException("SentenceDisplayer must be initialized with a row count >= 12 (one row for each note in an octave)");
+            throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
 
         noteHeightPercent = 1.0f / noteRowCount;
@@ -99,29 +91,6 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
     {
         RemoveUiNotes();
         RemoveUiRecordedNotes();
-    }
-
-    public void DisplaySentence(Sentence sentence)
-    {
-        displayedSentence = sentence;
-        RemoveAllDisplayedNotes();
-        if (sentence == null)
-        {
-            return;
-        }
-
-        avgMidiNote = displayedSentence.Notes.Count > 0
-            ? (int)displayedSentence.Notes.Select(it => it.MidiNote).Average()
-            : 0;
-        // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
-        maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
-        minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
-        // Freestyle notes are not drawn
-        IEnumerable<Note> nonFreestyleNotes = sentence.Notes.Where(note => !note.IsFreestyle);
-        foreach (Note note in nonFreestyleNotes)
-        {
-            CreateUiNote(note);
-        }
     }
 
     public void DisplayRecordedNote(RecordedNote recordedNote)
@@ -166,7 +135,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         }
     }
 
-    private void RemoveUiNotes()
+    protected void RemoveUiNotes()
     {
         foreach (Transform child in uiNotesContainer.transform)
         {
@@ -175,11 +144,11 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         noteToUiNoteMap.Clear();
     }
 
-    private void CreateUiNote(Note note)
+    protected virtual UiNote CreateUiNote(Note note)
     {
         if (note.StartBeat == note.EndBeat)
         {
-            return;
+            return null;
         }
 
         UiNote uiNote = Instantiate(uiNotePrefab, uiNotesContainer);
@@ -212,6 +181,8 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
 
         noteToUiNoteMap[note] = uiNote;
+
+        return uiNote;
     }
 
     public string GetDisplayText(Note note)
@@ -230,7 +201,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         }
     }
 
-    private void RemoveUiRecordedNotes()
+    protected void RemoveUiRecordedNotes()
     {
         foreach (Transform child in uiRecordedNotesContainer.transform)
         {
@@ -240,7 +211,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         recordedNoteToUiRecordedNotesMap.Clear();
     }
 
-    private void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
+    protected void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
         if (recordedNote.StartBeat == recordedNote.EndBeat)
         {
@@ -253,15 +224,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         int midiNote;
         if (useRoundedMidiNote)
         {
-            int relativeSignedDistance = MidiUtils.GetRelativePitchDistanceSigned(recordedNote.TargetNote.MidiNote, recordedNote.RoundedMidiNote);
-            int roundedMidiNoteOnOctaveOfTargetNote = recordedNote.TargetNote.MidiNote + relativeSignedDistance;
-            if (MidiUtils.GetRelativePitch(recordedNote.RoundedMidiNote) != MidiUtils.GetRelativePitch(roundedMidiNoteOnOctaveOfTargetNote))
-            {
-                // Should never happen
-                Debug.LogError($"The displayed midi note does not correspond to the rounded recorded midi note:"
-                    + $"recorded {recordedNote.RoundedMidiNote}, target: {recordedNote.TargetNote.MidiNote}, displayed: {roundedMidiNoteOnOctaveOfTargetNote}");
-            }
-            midiNote = roundedMidiNoteOnOctaveOfTargetNote;
+            midiNote = MidiUtils.GetMidiNoteOnOctaveOfTargetMidiNote(recordedNote.RoundedMidiNote, recordedNote.TargetNote.MidiNote);
         }
         else
         {
@@ -300,25 +263,6 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         recordedNoteToUiRecordedNotesMap.AddInsideList(recordedNote, uiNote);
     }
 
-    private void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
-    {
-        int noteRow = CalculateNoteRow(midiNote);
-
-        int sentenceStartBeat = displayedSentence.MinBeat;
-        int sentenceEndBeat = displayedSentence.MaxBeat;
-        int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
-
-        float anchorY = (float)noteRow / noteRowCount;
-        float anchorYStart = anchorY - noteHeightPercent;
-        float anchorYEnd = anchorY + noteHeightPercent;
-        float anchorXStart = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
-        float anchorXEnd = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
-
-        uiNote.anchorMin = new Vector2(anchorXStart, anchorYStart);
-        uiNote.anchorMax = new Vector2(anchorXEnd, anchorYEnd);
-        uiNote.MoveCornersToAnchors();
-    }
-
     public void CreatePerfectSentenceEffect()
     {
         for (int i = 0; i < 50; i++)
@@ -327,7 +271,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         }
     }
 
-    private void CreatePerfectSentenceStar()
+    protected void CreatePerfectSentenceStar()
     {
         StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
@@ -342,7 +286,7 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
             .setOnComplete(() => Destroy(star.gameObject));
     }
 
-    private int CalculateNoteRow(int midiNote)
+    protected int CalculateNoteRow(int midiNote)
     {
         // Map midiNote to range of noteRows (wrap around).
         int wrappedMidiNote = midiNote;
@@ -361,5 +305,23 @@ public class SentenceDisplayer : MonoBehaviour, INeedInjection, IExcludeFromScen
         int offset = wrappedMidiNote - avgMidiNote;
         int noteRow = (noteRowCount / 2) + offset;
         return noteRow;
+    }
+
+    public Vector2 GetAnchorYForMidiNote(int midiNote)
+    {
+        int noteRow = CalculateNoteRow(midiNote);
+        float anchorY = (float)noteRow / noteRowCount;
+        float anchorYStart = anchorY - noteHeightPercent;
+        float anchorYEnd = anchorY + noteHeightPercent;
+        return new Vector2(anchorYStart, anchorYEnd);
+    }
+
+    protected void UpdateUiRecordedNoteEndBeat(UiRecordedNote uiRecordedNote)
+    {
+        uiRecordedNote.EndBeat = uiRecordedNote.StartBeat + (uiRecordedNote.LifeTimeInSeconds * beatsPerSecond);
+        if (uiRecordedNote.EndBeat > uiRecordedNote.TargetEndBeat)
+        {
+            uiRecordedNote.EndBeat = uiRecordedNote.TargetEndBeat;
+        }
     }
 }

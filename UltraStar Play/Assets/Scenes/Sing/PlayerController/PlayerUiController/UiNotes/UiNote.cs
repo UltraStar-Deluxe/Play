@@ -116,6 +116,7 @@ public class UiNote : MonoBehaviour
     {
         StarParticle star = Instantiate(goldenStarPrefab);
         star.transform.SetParent(RectTransform);
+        star.RectTransformToFollow = RectTransform;
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
         float anchorX = Random.Range(0f, 1f);
         float anchorY = Random.Range(0f, 1f);
@@ -142,6 +143,7 @@ public class UiNote : MonoBehaviour
     {
         StarParticle star = Instantiate(perfectStarPrefab);
         star.transform.SetParent(transform);
+        star.RectTransformToFollow = RectTransform;
         RectTransform starRectTransform = star.GetComponent<RectTransform>();
         float anchorX = 1;
         float anchorY = 0.9f;
