@@ -26,8 +26,8 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private LineDisplayer lineDisplayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private SentenceDisplayer sentenceDisplayer;
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
+    private ISingSceneNoteDisplayer sentenceDisplayer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
@@ -91,9 +91,9 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         }
     }
 
-    public void DisplaySentence(Sentence currentSentence)
+    public void DisplaySentence(Sentence currentSentence, Sentence nextSentence)
     {
-        sentenceDisplayer.DisplaySentence(currentSentence);
+        sentenceDisplayer.DisplaySentence(currentSentence, nextSentence);
         beatGridDisplayer?.DisplaySentence(currentSentence);
         currentBeatGridDisplayer?.DisplaySentence(currentSentence);
     }
@@ -106,11 +106,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     public void ShowTotalScore(int score)
     {
         totalScoreDisplayer.ShowTotalScore(score);
-    }
-
-    public void DisplayRecordedNote(RecordedNote recordedNote)
-    {
-        sentenceDisplayer.DisplayRecordedNote(recordedNote);
     }
 
     public void CreatePerfectSentenceEffect()

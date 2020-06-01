@@ -112,19 +112,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         if (nextBeatToAnalyzeEndPositionInMs < songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
         {
             // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
-            int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(BeatToAnalyze);
-            int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(BeatToAnalyze + 1);
-            if (startSampleBufferIndex > endSampleBufferIndex)
-            {
-                ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
-            }
-
+            PitchEvent pitchEvent = GetPitchEventOfBeat(BeatToAnalyze);
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
             Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= BeatToAnalyze && BeatToAnalyze < currentOrUpcomingNote.EndBeat)
                 ? currentOrUpcomingNote
                 : null;
 
-            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
             FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat);
 
             GoToNextBeat();
@@ -317,6 +310,26 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
                 BeatToAnalyze = RecordingSentence.MaxBeat;
             }
         }
+    }
+
+    public PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
+    {
+        if (startSampleBufferIndex > endSampleBufferIndex)
+        {
+            ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
+        }
+        startSampleBufferIndex = NumberUtils.Limit(startSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
+        endSampleBufferIndex = NumberUtils.Limit(endSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
+        return pitchEvent;
+    }
+
+    public PitchEvent GetPitchEventOfBeat(int beat)
+    {
+        int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat);
+        int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat + 1);
+        PitchEvent pitchEvent = GetPitchEventOfSamples(startSampleBufferIndex, endSampleBufferIndex);
+        return pitchEvent;
     }
 
     public class BeatAnalyzedEvent

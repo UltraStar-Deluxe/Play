@@ -201,7 +201,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         Sentence next = GetSentence(displaySentenceIndex + 1);
 
         // Update the UI
-        playerUiController.DisplaySentence(current);
+        playerUiController.DisplaySentence(current, next);
         UpdateLyricsDisplayer(current, next);
     }
 
