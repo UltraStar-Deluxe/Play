@@ -14,8 +14,9 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-#if UNITY_STANDALONE
-        contextMenu.AddItem("Open song folder", () => SongMetaUtils.OpenDirectory(SongMeta));
-#endif
+        if (PlatformUtils.IsStandalone)
+        {
+            contextMenu.AddItem("Open song folder", () => SongMetaUtils.OpenDirectory(SongMeta));
+        }
     }
 }
