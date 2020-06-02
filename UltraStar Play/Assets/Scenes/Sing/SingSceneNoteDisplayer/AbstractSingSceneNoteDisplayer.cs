@@ -281,9 +281,15 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
         starRectTransform.anchoredPosition = Vector2.zero;
 
-        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.6f);
+        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.8f);
+        LeanTween.move(star.RectTransform, GetRandomVector2(-100, 100), 1f);
         LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
             .setOnComplete(() => Destroy(star.gameObject));
+    }
+
+    private Vector2 GetRandomVector2(float min, float max)
+    {
+        return new Vector3(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
     }
 
     protected int CalculateNoteRow(int midiNote)
