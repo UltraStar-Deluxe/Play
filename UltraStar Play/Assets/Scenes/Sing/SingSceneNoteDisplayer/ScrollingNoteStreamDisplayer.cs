@@ -48,9 +48,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    override public void OnInjectionFinished()
+    override public void Init(int lineCount)
     {
-        if (!enabled)
+        if (!enabled || !gameObject.activeInHierarchy)
         {
             return;
         }
@@ -61,12 +61,12 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
 
         avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
-        base.OnInjectionFinished();
+        base.Init(lineCount);
     }
 
     override public void DisplaySentence(Sentence sentence, Sentence nextSentence)
     {
-        displayedSentence = sentence;
+        currentSentence = sentence;
         RemoveAllDisplayedNotes();
         if (sentence == null)
         {
@@ -135,5 +135,31 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
         }
         return uiNote;
+    }
+
+    protected override void RemoveUiRecordedNotes()
+    {
+        if (previousSentenceNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        // Only remove UiRecordedNotes if they are out of the screen.
+        // This is the case when they end before the previous sentence begins.
+        int previousSentenceEndStart = previousSentenceNotes.Select(note => note.StartBeat).Min();
+        foreach (UiRecordedNote uiRecordedNote in new List<UiRecordedNote>(uiRecordedNotes))
+        {
+            if (uiRecordedNote.EndBeat < previousSentenceEndStart)
+            {
+                RemoveUiRecordedNote(uiRecordedNote);
+            }
+        }
+    }
+
+    private void RemoveUiRecordedNote(UiRecordedNote uiRecordedNote)
+    {
+        uiRecordedNotes.Remove(uiRecordedNote);
+        recordedNoteToUiRecordedNotesMap.Remove(uiRecordedNote.RecordedNote);
+        Destroy(uiRecordedNote.gameObject);
     }
 }

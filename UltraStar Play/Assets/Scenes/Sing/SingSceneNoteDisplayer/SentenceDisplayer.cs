@@ -26,15 +26,15 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
     override public void DisplaySentence(Sentence sentence, Sentence nextSentence)
     {
-        displayedSentence = sentence;
+        currentSentence = sentence;
         RemoveAllDisplayedNotes();
         if (sentence == null)
         {
             return;
         }
 
-        avgMidiNote = displayedSentence.Notes.Count > 0
-            ? (int)displayedSentence.Notes.Select(it => it.MidiNote).Average()
+        avgMidiNote = currentSentence.Notes.Count > 0
+            ? (int)currentSentence.Notes.Select(it => it.MidiNote).Average()
             : 0;
         // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
@@ -51,8 +51,8 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     {
         int noteRow = CalculateNoteRow(midiNote);
 
-        int sentenceStartBeat = displayedSentence.MinBeat;
-        int sentenceEndBeat = displayedSentence.MaxBeat;
+        int sentenceStartBeat = currentSentence.MinBeat;
+        int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
         Vector2 anchorY = GetAnchorYForMidiNote(midiNote);

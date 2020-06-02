@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using UniInject;
-using UniRx;
+﻿using UnityEngine;
 
 public interface ISingSceneNoteDisplayer
 {
@@ -15,5 +8,7 @@ public interface ISingSceneNoteDisplayer
 
     void CreatePerfectNoteEffect(Note perfectNote);
 
-    void SetNoteRowCount(int noteRowCount);
+    void Init(int lineCount);
+
+    GameObject GetGameObject();
 }

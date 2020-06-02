@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingSceneNoteDisplayer, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
+abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingSceneNoteDisplayer, INeedInjection, IExcludeFromSceneInjection
 {
     public UiNote uiNotePrefab;
     public UiRecordedNote uiRecordedNotePrefab;
@@ -36,13 +36,16 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
     [Inject(optional = true)]
     protected MicProfile micProfile;
 
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    protected LineDisplayer lineDisplayer;
+
     protected double beatsPerSecond;
 
     protected readonly List<UiRecordedNote> uiRecordedNotes = new List<UiRecordedNote>();
     protected readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
     protected readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
-    protected Sentence displayedSentence;
+    protected Sentence currentSentence;
 
     protected int avgMidiNote;
 
@@ -56,13 +59,15 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     abstract public void DisplaySentence(Sentence sentence, Sentence nextSentence);
 
-    public virtual void OnInjectionFinished()
+    public virtual void Init(int lineCount)
     {
-        if (!enabled)
+        if (!enabled || !gameObject.activeInHierarchy)
         {
             return;
         }
 
+        lineDisplayer.UpdateLines(lineCount);
+        SetNoteRowCount(lineCount * 2);
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
@@ -74,10 +79,15 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         });
     }
 
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
     public void SetNoteRowCount(int noteRowCount)
     {
         // Notes can be placed on and between the drawn lines.
-        this.noteRowCount = noteRowCount;
+        this.noteRowCount = noteRowCount * 2;
         // Check that there is at least one row for every possible note in an octave.
         if (this.noteRowCount < 12)
         {
@@ -95,7 +105,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     public void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        if (recordedNote.TargetNote.Sentence != displayedSentence)
+        if (recordedNote.TargetNote.Sentence != currentSentence)
         {
             // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
             // Do not draw the recorded note, it is not in the displayed sentence.
@@ -201,7 +211,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         }
     }
 
-    protected void RemoveUiRecordedNotes()
+    protected virtual void RemoveUiRecordedNotes()
     {
         foreach (Transform child in uiRecordedNotesContainer.transform)
         {
