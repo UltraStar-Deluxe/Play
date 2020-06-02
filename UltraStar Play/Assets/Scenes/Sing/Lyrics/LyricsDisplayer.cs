@@ -1,15 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LyricsDisplayer : MonoBehaviour
+public class LyricsDisplayer : MonoBehaviour, INeedInjection
 {
     public Text currentSentenceText;
     public Text nextSentenceText;
 
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new List<Note>();
+
+    [Inject]
+    private Settings settings;
+
+    void Start()
+    {
+        // The ScrollingNoteStreamDisplayer shows the lyrics below the notes. Thus, there is no need for this LyricsDisplayer.
+        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream) ;
+        {
+            gameObject.SetActive(false);
+        }
+    }
 
     public void SetCurrentSentence(Sentence sentence)
     {

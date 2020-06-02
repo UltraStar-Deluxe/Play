@@ -15,8 +15,8 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
     [InjectedInInspector]
     public Image arrowImage;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
-    private ScrollingNoteStreamDisplayer scrollingNoteStreamDisplayer;
+    [InjectedInInspector]
+    public ScrollingNoteStreamDisplayer scrollingNoteStreamDisplayer;
 
     [Inject]
     private PlayerPitchTracker playerPitchTracker;
