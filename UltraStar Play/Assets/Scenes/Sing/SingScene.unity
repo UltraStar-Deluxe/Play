@@ -653,11 +653,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 518, y: 280.5, z: 0}
-  anchoredPosition: {x: 518, y: 280.5}
-  position: {x: 518, y: 280.5, z: 0}
-  sizeDelta: {x: 800, y: 433.20465}
-  size: {x: 800, y: 433.20465}
+  localPosition: {x: 519.5, y: 280.5, z: 0}
+  anchoredPosition: {x: 519.5, y: 280.5}
+  position: {x: 519.5, y: 280.5, z: 0}
+  sizeDelta: {x: 2374.8572, y: 1282.2858}
+  size: {x: 2374.8572, y: 1282.2858}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0

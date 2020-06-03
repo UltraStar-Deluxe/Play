@@ -20,6 +20,8 @@ public class UiNote : MonoBehaviour
 
     [InjectedInInspector]
     public Text lyricsUiText;
+    [InjectedInInspector]
+    public RectTransform lyricsUiTextRectTransform;
 
     public Note Note { get; set; }
     public bool isGolden;

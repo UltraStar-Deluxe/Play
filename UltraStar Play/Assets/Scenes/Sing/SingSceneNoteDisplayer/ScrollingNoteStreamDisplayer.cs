@@ -17,6 +17,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     public float pitchIndicatorAnchorX = 0.15f;
     public float lyricsHeightInPercent = 0.1f;
+    public float displayedNoteDurationInSeconds = 5;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -24,16 +25,86 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private Voice voice;
 
-    private int micDelayInMillis;
+    private List<Note> upcomingNotes = new List<Note>();
 
-    private List<Note> previousSentenceNotes = new List<Note>();
+    private int micDelayInMillis;
+    private int displayedBeats;
+
+    private readonly DelayedAction delayedAction = new DelayedAction();
 
     void Update()
+    {
+        // For some reason, Unity seems to need one frame to finish the calculation of the lyricsBar position.
+        // In the first frame, the lyrics positions are wrong. Thus, as a workaround, delay the Update code by one frame.
+        delayedAction.CountTimeAndRunDelayed(1, () =>
+        {
+            RemoveNotesOutsideOfDisplayArea();
+            CreateNotesInDisplayArea();
+
+            UpdateUiNotePositions();
+        });
+    }
+
+    override public void Init(int lineCount)
+    {
+        if (micProfile != null)
+        {
+            micDelayInMillis = micProfile.DelayInMillis;
+        }
+        base.Init(lineCount);
+
+        upcomingNotes = voice.Sentences
+            .SelectMany(sentence => sentence.Notes)
+            .ToList();
+        upcomingNotes.Sort(Note.comparerByStartBeat);
+
+        avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
+        maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
+        minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
+
+        displayedBeats = (int)Math.Ceiling(BpmUtils.GetBeatsPerSecond(songMeta) * displayedNoteDurationInSeconds);
+    }
+
+    override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
+    {
+        // The VerticalPitchIndicator's position is the position where recording happens.
+        // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
+        double millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
+        double currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
+
+        Vector2 anchorY = GetAnchorYForMidiNote(midiNote);
+        float anchorXStart = (float)((noteStartBeat - currentBeatConsideringMicDelay) / displayedBeats) + pitchIndicatorAnchorX;
+        float anchorXEnd = (float)((noteEndBeat - currentBeatConsideringMicDelay) / displayedBeats) + pitchIndicatorAnchorX;
+
+        uiNote.anchorMin = new Vector2(anchorXStart, anchorY.x);
+        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY.y);
+        uiNote.MoveCornersToAnchors();
+    }
+
+    override protected UiNote CreateUiNote(Note note)
+    {
+        UiNote uiNote = base.CreateUiNote(note);
+        if (uiNote != null)
+        {
+            uiNote.lyricsUiText.enabled = true;
+            uiNote.lyricsUiText.color = Color.white;
+            uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
+            uiNote.lyricsUiText.horizontalOverflow = HorizontalWrapMode.Overflow;
+
+            RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
+            lyricsRectTransform.SetParent(lyricsBar);
+            lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
+            lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
+            uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform);
+        }
+        return uiNote;
+    }
+
+    private void UpdateUiNotePositions()
     {
         foreach (UiNote uiNote in noteToUiNoteMap.Values)
         {
             PositionUiNote(uiNote.RectTransform, uiNote.Note.MidiNote, uiNote.Note.StartBeat, uiNote.Note.EndBeat);
-            PositionUiNoteLyricsInLyricsBar(uiNote);
         }
 
         foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
@@ -48,47 +119,52 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    override public void Init(int lineCount)
+    private void CreateNotesInDisplayArea()
     {
-        if (!enabled || !gameObject.activeInHierarchy)
+        // Create UiNotes to fill the display area
+        int displayAreaMinBeat = CalculateDisplayAreaMinBeat();
+        int displayAreaMaxBeat = CalculateDisplayAreaMaxBeat();
+
+        List<Note> newNotes = new List<Note>();
+        foreach (Note note in upcomingNotes)
         {
-            return;
+            if (displayAreaMinBeat <= note.StartBeat && note.StartBeat <= displayAreaMaxBeat)
+            {
+                newNotes.Add(note);
+            }
+            else if (note.StartBeat > displayAreaMaxBeat)
+            {
+                // The upcoming notes are sorted. Thus, all following notes will not be inside the drawingArea as well.
+                break;
+            }
         }
 
-        if (micProfile != null)
+        // Create UiNotes
+        foreach (Note note in newNotes)
         {
-            micDelayInMillis = micProfile.DelayInMillis;
-        }
-
-        avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
-        base.Init(lineCount);
-    }
-
-    override public void DisplaySentence(Sentence sentence, Sentence nextSentence)
-    {
-        currentSentence = sentence;
-        RemoveAllDisplayedNotes();
-        if (sentence == null)
-        {
-            return;
-        }
-
-        // The division is rounded down on purpose (e.g. noteRowCount of 3 will result in (noteRowCount / 2) == 1)
-        maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
-        minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
-        // Freestyle notes are not drawn
-        IEnumerable<Note> nonFreestyleNotes = sentence.Notes
-            .Union(nextSentence.Notes)
-            .Union(previousSentenceNotes)
-            .Where(note => !note.IsFreestyle);
-        foreach (Note note in nonFreestyleNotes)
-        {
+            // The note is not upcoming anymore
+            upcomingNotes.Remove(note);
             CreateUiNote(note);
         }
+    }
 
-        previousSentenceNotes = sentence != null
-            ? sentence.Notes.ToList()
-            : new List<Note>();
+    private void RemoveNotesOutsideOfDisplayArea()
+    {
+        int displayAreaMinBeat = CalculateDisplayAreaMinBeat();
+        foreach (UiNote uiNote in noteToUiNoteMap.Values.ToList())
+        {
+            if (uiNote.Note.EndBeat < displayAreaMinBeat)
+            {
+                RemoveUiNote(uiNote);
+            }
+        }
+        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes.ToList())
+        {
+            if (uiRecordedNote.EndBeat < displayAreaMinBeat)
+            {
+                RemoveUiRecordedNote(uiRecordedNote);
+            }
+        }
     }
 
     private int CalculateAvgMidiNote(IReadOnlyCollection<Note> notes)
@@ -98,68 +174,15 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             : 0;
     }
 
-    override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
+    private int CalculateDisplayAreaMinBeat()
     {
-        // Display the beats for the next 2 seconds.
-        int displayedBeats = (int)Math.Ceiling(BpmUtils.GetBeatsPerSecond(songMeta)) * 2;
-
-        // The VerticalPitchIndicator's position is the position where recording happens.
-        // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
-        double millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
-        double currentBeat = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
-
-        Vector2 anchorY = GetAnchorYForMidiNote(midiNote);
-        float anchorXStart = (float)((noteStartBeat - currentBeat) / displayedBeats) + pitchIndicatorAnchorX;
-        float anchorXEnd = (float)((noteEndBeat - currentBeat) / displayedBeats) + pitchIndicatorAnchorX;
-
-        uiNote.anchorMin = new Vector2(anchorXStart, anchorY.x);
-        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY.y);
-        uiNote.MoveCornersToAnchors();
+        // This is an over-approximation of the visible displayArea
+        return (int)songAudioPlayer.CurrentBeat - displayedBeats / 2;
     }
 
-    private void PositionUiNoteLyricsInLyricsBar(UiNote uiNote)
+    private int CalculateDisplayAreaMaxBeat()
     {
-        RectTransform lyricsUiNoteRectTransform = uiNote.lyricsUiText.GetComponent<RectTransform>();
-        lyricsUiNoteRectTransform.SetParent(lyricsBar, true);
-        lyricsUiNoteRectTransform.localPosition = new Vector2(lyricsUiNoteRectTransform.localPosition.x, 0);
-        lyricsUiNoteRectTransform.sizeDelta = new Vector2(lyricsUiNoteRectTransform.sizeDelta.x, 0);
-        uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform);
-    }
-
-    protected override UiNote CreateUiNote(Note note)
-    {
-        UiNote uiNote = base.CreateUiNote(note);
-        if (uiNote != null)
-        {
-            uiNote.lyricsUiText.color = Color.white;
-            uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
-        }
-        return uiNote;
-    }
-
-    protected override void RemoveUiRecordedNotes()
-    {
-        if (previousSentenceNotes.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        // Only remove UiRecordedNotes if they are out of the screen.
-        // This is the case when they end before the previous sentence begins.
-        int previousSentenceEndStart = previousSentenceNotes.Select(note => note.StartBeat).Min();
-        foreach (UiRecordedNote uiRecordedNote in new List<UiRecordedNote>(uiRecordedNotes))
-        {
-            if (uiRecordedNote.EndBeat < previousSentenceEndStart)
-            {
-                RemoveUiRecordedNote(uiRecordedNote);
-            }
-        }
-    }
-
-    private void RemoveUiRecordedNote(UiRecordedNote uiRecordedNote)
-    {
-        uiRecordedNotes.Remove(uiRecordedNote);
-        recordedNoteToUiRecordedNotesMap.Remove(uiRecordedNote.RecordedNote);
-        Destroy(uiRecordedNote.gameObject);
+        // This is an over-approximation of the visible displayArea
+        return (int)songAudioPlayer.CurrentBeat + displayedBeats;
     }
 }

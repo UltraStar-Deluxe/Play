@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 public class LyricsDisplayer : MonoBehaviour, INeedInjection
 {
@@ -18,10 +22,24 @@ public class LyricsDisplayer : MonoBehaviour, INeedInjection
     void Start()
     {
         // The ScrollingNoteStreamDisplayer shows the lyrics below the notes. Thus, there is no need for this LyricsDisplayer.
-        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream) ;
+        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
         {
             gameObject.SetActive(false);
+            return;
         }
+    }
+
+    public void Init(PlayerController playerController)
+    {
+        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        {
+            Sentence nextSentence = playerController.GetSentence(enterSentenceEvent.SentenceIndex + 1);
+            SetCurrentSentence(enterSentenceEvent.Sentence);
+            SetNextSentence(nextSentence);
+        });
+
+        SetCurrentSentence(playerController.GetSentence(0));
+        SetNextSentence(playerController.GetSentence(1));
     }
 
     public void SetCurrentSentence(Sentence sentence)

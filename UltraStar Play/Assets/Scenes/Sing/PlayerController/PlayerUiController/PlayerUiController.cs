@@ -16,9 +16,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject]
     private PlayerScoreController playerScoreController;
 
-    [Inject]
-    private PlayerController playerController;
-
     [Inject(optional = true)]
     private MicProfile micProfile;
 
@@ -30,12 +27,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
-    private BeatGridDisplayer beatGridDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
-    private CurrentBeatGridDisplayer currentBeatGridDisplayer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerNameText playerNameText;
@@ -90,13 +81,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
             totalScoreDisplayer.SetColor(micProfile.Color);
             avatarImage.SetColor(micProfile.Color);
         }
-    }
-
-    public void DisplaySentence(Sentence currentSentence, Sentence nextSentence)
-    {
-        noteDisplayer.DisplaySentence(currentSentence, nextSentence);
-        beatGridDisplayer?.DisplaySentence(currentSentence);
-        currentBeatGridDisplayer?.DisplaySentence(currentSentence);
     }
 
     public void ShowSentenceRating(SentenceRating sentenceRating)
