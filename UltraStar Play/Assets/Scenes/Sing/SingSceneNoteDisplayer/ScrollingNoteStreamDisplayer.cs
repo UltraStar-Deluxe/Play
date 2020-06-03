@@ -86,10 +86,15 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         UiNote uiNote = base.CreateUiNote(note);
         if (uiNote != null)
         {
+            // Freestyle notes are not drawn
+            if (uiNote.Note.IsFreestyle)
+            {
+                uiNote.image.enabled = false;
+            }
+
             uiNote.lyricsUiText.enabled = true;
             uiNote.lyricsUiText.color = Color.white;
             uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
-            uiNote.lyricsUiText.horizontalOverflow = HorizontalWrapMode.Overflow;
 
             RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
             lyricsRectTransform.SetParent(lyricsBar);
