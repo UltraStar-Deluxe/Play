@@ -11,6 +11,11 @@ using System;
 
 public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 {
+    [Inject]
+    private PlayerController playerController;
+
+    private Sentence currentSentence;
+
     void Update()
     {
         // Draw the UiRecordedNotes smoothly from their StartBeat to TargetEndBeat
@@ -24,7 +29,17 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    override public void DisplaySentence(Sentence sentence, Sentence nextSentence)
+    public override void Init(int lineCount)
+    {
+        base.Init(lineCount);
+
+        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        {
+            DisplaySentence(enterSentenceEvent.Sentence);
+        });
+    }
+
+    private void DisplaySentence(Sentence sentence)
     {
         currentSentence = sentence;
         RemoveAllDisplayedNotes();
@@ -45,6 +60,18 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         {
             CreateUiNote(note);
         }
+    }
+
+    public override void DisplayRecordedNote(RecordedNote recordedNote)
+    {
+        if (recordedNote.TargetNote.Sentence != currentSentence)
+        {
+            // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
+            // Do not draw the recorded note, it is not in the displayed sentence.
+            return;
+        }
+
+        base.DisplayRecordedNote(recordedNote);
     }
 
     override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)

@@ -2,8 +2,6 @@
 
 public interface ISingSceneNoteDisplayer
 {
-    void DisplaySentence(Sentence currentSentence, Sentence nextSentence);
-
     void CreatePerfectSentenceEffect();
 
     void CreatePerfectNoteEffect(Note perfectNote);

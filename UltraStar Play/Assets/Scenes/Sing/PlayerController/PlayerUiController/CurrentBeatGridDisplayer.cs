@@ -1,26 +1,26 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
+using UniRx;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 // Draws vertical lines to illustrate where Update is called.
-public class CurrentBeatGridDisplayer : MonoBehaviour
+public class CurrentBeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
+    [Inject]
+    private PlayerController playerController;
+
+    [Inject]
     private SingSceneController singSceneController;
-    private Sentence currentSentence;
+
+    [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
-    public void DisplaySentence(Sentence sentence)
-    {
-        currentSentence = sentence;
-        UiManager.Instance.DestroyAllDebugPoints();
-    }
-
-    void Awake()
-    {
-        singSceneController = FindObjectOfType<SingSceneController>();
-        rectTransform = GetComponent<RectTransform>();
-    }
+    private Sentence currentSentence;
 
     void Update()
     {
@@ -38,6 +38,20 @@ public class CurrentBeatGridDisplayer : MonoBehaviour
 
         double currentBeat = singSceneController.CurrentBeat;
         CreateLine(currentBeat, currentSentence.MinBeat, currentSentence.MaxBeat);
+    }
+
+    public void OnInjectionFinished()
+    {
+        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        {
+            DisplaySentence(enterSentenceEvent.Sentence);
+        });
+    }
+
+    public void DisplaySentence(Sentence sentence)
+    {
+        currentSentence = sentence;
+        UiManager.Instance.DestroyAllDebugPoints();
     }
 
     private void CreateLine(double currentBeat, int sentenceStartBeat, int sentenceEndBeat)

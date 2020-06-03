@@ -45,8 +45,6 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
     protected readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
     protected readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
 
-    protected Sentence currentSentence;
-
     protected int avgMidiNote;
 
     // The number of rows on which notes can be placed.
@@ -57,15 +55,8 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     abstract protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat);
 
-    abstract public void DisplaySentence(Sentence sentence, Sentence nextSentence);
-
     public virtual void Init(int lineCount)
     {
-        if (!enabled || !gameObject.activeInHierarchy)
-        {
-            return;
-        }
-
         lineDisplayer.UpdateLines(lineCount);
         SetNoteRowCount(lineCount * 2);
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
@@ -103,15 +94,8 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         RemoveUiRecordedNotes();
     }
 
-    public void DisplayRecordedNote(RecordedNote recordedNote)
+    public virtual void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        if (recordedNote.TargetNote.Sentence != currentSentence)
-        {
-            // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
-            // Do not draw the recorded note, it is not in the displayed sentence.
-            return;
-        }
-
         // Freestyle notes are not drawn
         if (recordedNote.TargetNote.IsFreestyle)
         {
@@ -302,7 +286,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         return new Vector3(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
     }
 
-    protected int CalculateNoteRow(int midiNote)
+    protected virtual int CalculateNoteRow(int midiNote)
     {
         // Map midiNote to range of noteRows (wrap around).
         int wrappedMidiNote = midiNote;
@@ -339,5 +323,18 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         {
             uiRecordedNote.EndBeat = uiRecordedNote.TargetEndBeat;
         }
+    }
+
+    protected void RemoveUiNote(UiNote uiNote)
+    {
+        noteToUiNoteMap.Remove(uiNote.Note);
+        Destroy(uiNote.gameObject);
+    }
+
+    protected void RemoveUiRecordedNote(UiRecordedNote uiRecordedNote)
+    {
+        uiRecordedNotes.Remove(uiRecordedNote);
+        recordedNoteToUiRecordedNotesMap.Remove(uiRecordedNote.RecordedNote);
+        Destroy(uiRecordedNote.gameObject);
     }
 }
