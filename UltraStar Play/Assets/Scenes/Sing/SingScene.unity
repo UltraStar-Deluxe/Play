@@ -289,6 +289,7 @@ MonoBehaviour:
   backgroundImage: {fileID: 242843843}
   videoImage: {fileID: 992840889}
   forceSyncOnForwardJumpInTheSong: 0
+  videoPlayerErrorMessage: 
 --- !u!1 &234276795
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,11 +653,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 519, y: 281, z: 0}
-  anchoredPosition: {x: 519, y: 281}
-  position: {x: 519, y: 281, z: 0}
-  sizeDelta: {x: 800, y: 433.14066}
-  size: {x: 800, y: 433.14066}
+  localPosition: {x: 519.5, y: 280.5, z: 0}
+  anchoredPosition: {x: 519.5, y: 280.5}
+  position: {x: 519.5, y: 280.5, z: 0}
+  sizeDelta: {x: 800, y: 431.9538}
+  size: {x: 800, y: 431.9538}
 --- !u!1 &475691986
 GameObject:
   m_ObjectHideFlags: 0
@@ -2234,6 +2235,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7022167052025826603, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: NaN
+      objectReference: {fileID: 0}
+    - target: {fileID: 1740204221501400869, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6784183375455940221, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba, type: 3}
