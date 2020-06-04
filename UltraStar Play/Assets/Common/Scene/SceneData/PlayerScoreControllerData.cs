@@ -17,6 +17,11 @@ public class PlayerScoreControllerData
     public int PerfectSentenceCount { get; set; }
     public int TotalSentenceCount { get; set; }
 
+    public int TotalScore { get; set; }
+    public int NormalNotesTotalScore { get; set; }
+    public int GoldenNotesTotalScore { get; set; }
+    public int PerfectSentenceBonusTotalScore { get; set; }
+
     public PlayerScoreControllerBeatData GetBeatData(Note note)
     {
         if (note.IsNormal)

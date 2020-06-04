@@ -8,13 +8,13 @@ public class SingingResultsPlayerUiController : MonoBehaviour
 
     public void Init(int playerProfileIndex,
         PlayerProfile playerProfile,
-        SingingResultsSceneData.PlayerScoreResultData playerScoreData,
+        PlayerScoreControllerData playerScoreData,
         MicProfile micProfile)
     {
         SetPlayerProfile(playerProfileIndex, playerProfile, micProfile);
-        SetNormalNotesScore(playerScoreData.NormalNotesScore);
-        SetGoldenNotesScore(playerScoreData.GoldenNotesScore);
-        SetPerfectSentenceBonusScore(playerScoreData.PerfectSentenceBonusScore);
+        SetNormalNotesScore(playerScoreData.NormalNotesTotalScore);
+        SetGoldenNotesScore(playerScoreData.GoldenNotesTotalScore);
+        SetPerfectSentenceBonusScore(playerScoreData.PerfectSentenceBonusTotalScore);
         SetTotalScore(playerScoreData.TotalScore);
     }
 

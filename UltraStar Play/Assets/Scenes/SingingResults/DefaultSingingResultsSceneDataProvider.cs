@@ -10,11 +10,11 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
 
-        SingingResultsSceneData.PlayerScoreResultData playerScoreData = new SingingResultsSceneData.PlayerScoreResultData();
+        PlayerScoreControllerData playerScoreData = new PlayerScoreControllerData();
         playerScoreData.TotalScore = 6500;
-        playerScoreData.NormalNotesScore = 4000;
-        playerScoreData.GoldenNotesScore = 2000;
-        playerScoreData.PerfectSentenceBonusScore = 500;
+        playerScoreData.NormalNotesTotalScore = 4000;
+        playerScoreData.GoldenNotesTotalScore = 2000;
+        playerScoreData.PerfectSentenceBonusTotalScore = 500;
 
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
         data.AddPlayerScores(playerProfile, playerScoreData);

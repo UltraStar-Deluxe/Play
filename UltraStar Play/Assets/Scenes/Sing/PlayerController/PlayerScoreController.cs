@@ -222,6 +222,13 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             sentenceRating = GetSentenceRating(0);
         }
         sentenceScore.TotalScoreSoFar = TotalScore;
+
+        // Update the total score in the SceneData
+        ScoreData.TotalScore = TotalScore;
+        ScoreData.NormalNotesTotalScore = NormalNotesTotalScore;
+        ScoreData.GoldenNotesTotalScore = GoldenNotesTotalScore;
+        ScoreData.PerfectSentenceBonusTotalScore = PerfectSentenceBonusTotalScore;
+
         sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentenceScore, sentenceRating));
     }
 

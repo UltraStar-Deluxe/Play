@@ -274,12 +274,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         bool isAfterLastNote = true;
         foreach (PlayerController playerController in PlayerControllers)
         {
-            SingingResultsSceneData.PlayerScoreResultData scoreData = new SingingResultsSceneData.PlayerScoreResultData();
-            scoreData.TotalScore = playerController.PlayerScoreController.TotalScore;
-            scoreData.GoldenNotesScore = playerController.PlayerScoreController.GoldenNotesTotalScore;
-            scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
-            scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
-            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
+            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
 
             Note lastNoteInSong = playerController.GetLastNoteInSong();
             if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)

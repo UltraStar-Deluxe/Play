@@ -48,7 +48,7 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            SingingResultsSceneData.PlayerScoreResultData playerScoreData = sceneData.GetPlayerScores(playerProfile);
+            PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
             SingingResultsPlayerUiController[] uiControllers = selectedLayout.GetComponentsInChildren<SingingResultsPlayerUiController>();
             if (i < uiControllers.Length)
             {
