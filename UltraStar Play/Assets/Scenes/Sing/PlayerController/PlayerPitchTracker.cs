@@ -152,12 +152,15 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat)
     {
-        int roundedMidiNote = pitchEvent != null
+        int recordedMidiNote = pitchEvent != null
+            ? pitchEvent.MidiNote
+            : -1;
+        int roundedRecordedMidiNote = pitchEvent != null
             ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote)
             : -1;
-        int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedMidiNote, noteAtBeat);
+        int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedRecordedMidiNote, noteAtBeat);
 
-        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, roundedMidiNoteAfterJoker));
+        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
     }
 
     public void GoToNextBeat()
@@ -337,14 +340,16 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         public PitchEvent PitchEvent { get; private set; }
         public int Beat { get; private set; }
         public Note NoteAtBeat { get; private set; }
-        public int RoundedMidiNote { get; private set; }
+        public int RoundedRecordedMidiNote { get; private set; }
+        public int RecordedMidiNote { get; private set; }
 
-        public BeatAnalyzedEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, int roundedMidiNote)
+        public BeatAnalyzedEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, int recordedMidiNote, int roundedRecordedMidiNote)
         {
             PitchEvent = pitchEvent;
             Beat = beat;
             NoteAtBeat = noteAtBeat;
-            RoundedMidiNote = roundedMidiNote;
+            RecordedMidiNote = recordedMidiNote;
+            RoundedRecordedMidiNote = roundedRecordedMidiNote;
         }
     }
 
