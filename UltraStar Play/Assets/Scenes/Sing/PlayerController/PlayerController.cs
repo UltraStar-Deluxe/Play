@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -43,6 +43,9 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
     }
 
+    private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
+    public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
+
     // The sorted sentences of the Voice
     public List<Sentence> SortedSentences { get; private set; } = new List<Sentence>();
 
@@ -62,20 +65,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     private int displaySentenceIndex;
-
-    private LyricsDisplayer lyricsDisplayer;
-    public LyricsDisplayer LyricsDisplayer
-    {
-        get
-        {
-            return lyricsDisplayer;
-        }
-        set
-        {
-            lyricsDisplayer = value;
-            UpdateLyricsDisplayer(GetSentence(displaySentenceIndex), GetSentence(displaySentenceIndex + 1));
-        }
-    }
 
     public void Init(PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
     {
@@ -197,23 +186,10 @@ public class PlayerController : MonoBehaviour, INeedInjection
     {
         displaySentenceIndex = newValue;
 
-        Sentence current = GetSentence(displaySentenceIndex);
-        Sentence next = GetSentence(displaySentenceIndex + 1);
+        Sentence displaySentence = GetSentence(displaySentenceIndex);
 
         // Update the UI
-        playerUiController.DisplaySentence(current);
-        UpdateLyricsDisplayer(current, next);
-    }
-
-    private void UpdateLyricsDisplayer(Sentence current, Sentence next)
-    {
-        if (lyricsDisplayer == null)
-        {
-            return;
-        }
-
-        lyricsDisplayer.SetCurrentSentence(current);
-        lyricsDisplayer.SetNextSentence(next);
+        enterSentenceEventStream.OnNext(new EnterSentenceEvent(displaySentence, displaySentenceIndex));
     }
 
     public Sentence GetSentence(int index)
@@ -251,5 +227,17 @@ public class PlayerController : MonoBehaviour, INeedInjection
     public Note GetLastNoteInSong()
     {
         return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
+    }
+
+    public class EnterSentenceEvent
+    {
+        public Sentence Sentence { get; private set; }
+        public int SentenceIndex { get; private set; }
+
+        public EnterSentenceEvent(Sentence sentence, int sentenceIndex)
+        {
+            Sentence = sentence;
+            SentenceIndex = sentenceIndex;
+        }
     }
 }

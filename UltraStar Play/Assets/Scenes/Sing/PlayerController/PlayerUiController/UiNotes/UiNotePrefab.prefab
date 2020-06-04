@@ -57,6 +57,7 @@ MonoBehaviour:
   image: {fileID: 8590359238081736741}
   imageHueHelper: {fileID: 3889450297425548421}
   lyricsUiText: {fileID: 8590359238897754697}
+  lyricsUiTextRectTransform: {fileID: 8590359238897754698}
   isGolden: 0
 --- !u!1 &8590359238081736743
 GameObject:
@@ -225,5 +226,5 @@ MonoBehaviour:
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
-    m_LineSpacing: 1
+    m_LineSpacing: 0
   m_Text: A#3

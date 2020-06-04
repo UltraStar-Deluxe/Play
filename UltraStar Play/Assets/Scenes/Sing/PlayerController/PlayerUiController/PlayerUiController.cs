@@ -11,11 +11,10 @@ using UniRx;
 
 public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
-    [Inject]
-    private PlayerScoreController playerScoreController;
+    public int lineCount = 10;
 
     [Inject]
-    private PlayerController playerController;
+    private PlayerScoreController playerScoreController;
 
     [Inject(optional = true)]
     private MicProfile micProfile;
@@ -24,22 +23,10 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     private PlayerProfile playerProfile;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private LineDisplayer lineDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private SentenceDisplayer sentenceDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
-    private BeatGridDisplayer beatGridDisplayer;
-
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
-    private CurrentBeatGridDisplayer currentBeatGridDisplayer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerNameText playerNameText;
@@ -47,7 +34,13 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private AvatarImage avatarImage;
 
-    public int lineCount = 10;
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private Injector injector;
+
+    private ISingSceneNoteDisplayer noteDisplayer;
 
     void Start()
     {
@@ -79,8 +72,7 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
 
     public void OnInjectionFinished()
     {
-        lineDisplayer.UpdateLines(lineCount);
-        sentenceDisplayer.SetNoteRowCount(lineCount * 2);
+        InitNoteDisplayer(lineCount);
         playerNameText.SetPlayerProfile(playerProfile);
         avatarImage.SetPlayerProfile(playerProfile);
 
@@ -89,13 +81,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
             totalScoreDisplayer.SetColor(micProfile.Color);
             avatarImage.SetColor(micProfile.Color);
         }
-    }
-
-    public void DisplaySentence(Sentence currentSentence)
-    {
-        sentenceDisplayer.DisplaySentence(currentSentence);
-        beatGridDisplayer?.DisplaySentence(currentSentence);
-        currentBeatGridDisplayer?.DisplaySentence(currentSentence);
     }
 
     public void ShowSentenceRating(SentenceRating sentenceRating)
@@ -108,18 +93,44 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         totalScoreDisplayer.ShowTotalScore(score);
     }
 
-    public void DisplayRecordedNote(RecordedNote recordedNote)
-    {
-        sentenceDisplayer.DisplayRecordedNote(recordedNote);
-    }
-
     public void CreatePerfectSentenceEffect()
     {
-        sentenceDisplayer.CreatePerfectSentenceEffect();
+        noteDisplayer.CreatePerfectSentenceEffect();
     }
 
     public void CreatePerfectNoteEffect(Note perfectNote)
     {
-        sentenceDisplayer.CreatePerfectNoteEffect(perfectNote);
+        noteDisplayer.CreatePerfectNoteEffect(perfectNote);
+    }
+
+    private void InitNoteDisplayer(int lineCount)
+    {
+        // Find a suited note displayer
+        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence)
+        {
+            noteDisplayer = GetComponentInChildren<SentenceDisplayer>(true);
+        }
+        else if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
+        {
+            noteDisplayer = GetComponentInChildren<ScrollingNoteStreamDisplayer>(true);
+        }
+        if (noteDisplayer == null)
+        {
+            throw new UnityException("Did not find a suited ISingSceneNoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);
+        }
+
+        // Enable and initialize the selected note displayer
+        noteDisplayer.GetGameObject().SetActive(true);
+        injector.InjectAllComponentsInChildren(noteDisplayer.GetGameObject());
+        noteDisplayer.Init(lineCount);
+
+        // Disable other note displayers
+        foreach (ISingSceneNoteDisplayer singSceneNoteDisplayer in GetComponentsInChildren<ISingSceneNoteDisplayer>())
+        {
+            if (singSceneNoteDisplayer != noteDisplayer)
+            {
+                singSceneNoteDisplayer.GetGameObject().SetActive(false);
+            }
+        }
     }
 }

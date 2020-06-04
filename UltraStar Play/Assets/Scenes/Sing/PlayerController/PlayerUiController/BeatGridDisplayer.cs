@@ -2,17 +2,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
+using UniRx;
 
-public class BeatGridDisplayer : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class BeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
     [InjectedInInspector]
     public DynamicallyCreatedImage verticalGridImage;
+
+    [Inject]
+    private PlayerController playerController;
 
     public Color lineColor;
 
     public int lineWidthInPx = 2;
 
-    void Awake()
+    void Update()
     {
         // This script is only for debugging
         if (!Application.isEditor)
@@ -20,6 +27,14 @@ public class BeatGridDisplayer : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+    }
+
+    public void OnInjectionFinished()
+    {
+        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        {
+            DisplaySentence(enterSentenceEvent.Sentence);
+        });
     }
 
     public void DisplaySentence(Sentence sentence)

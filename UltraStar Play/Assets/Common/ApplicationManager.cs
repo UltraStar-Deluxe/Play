@@ -15,11 +15,12 @@ public class ApplicationManager : MonoBehaviour
 
     public List<string> simulatedCommandLineArguments = new List<string>();
 
-    [Range(5, 60)]
+    [Range(-1, 60)]
     public int targetFrameRate = 30;
 
     void Start()
     {
+        targetFrameRate = SettingsManager.Instance.Settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
     }
@@ -66,11 +67,14 @@ public class ApplicationManager : MonoBehaviour
         }
         else
         {
-#if UNITY_STANDALONE
-            return System.Environment.GetCommandLineArgs();
-#else
-            return Array.Empty<string>();
-#endif
+            if (PlatformUtils.IsStandalone)
+            {
+                return System.Environment.GetCommandLineArgs();
+            }
+            else
+            {
+                return Array.Empty<string>();
+            }
         }
     }
 }

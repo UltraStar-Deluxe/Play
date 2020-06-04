@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UnityEngine;
 
 public static class MidiUtils
 {
@@ -134,5 +135,18 @@ public static class MidiUtils
             noteDelays[index] = Convert.ToInt32(sampleRateHz / halftoneFrequencies[index]);
         }
         return noteDelays;
+    }
+
+    public static int GetMidiNoteOnOctaveOfTargetMidiNote(int midiNote, int targetMidiNote)
+    {
+        int relativeSignedDistance = GetRelativePitchDistanceSigned(targetMidiNote, midiNote);
+        int midiNoteOnOctaveOfTargetNote = targetMidiNote + relativeSignedDistance;
+        if (GetRelativePitch(midiNote) != GetRelativePitch(midiNoteOnOctaveOfTargetNote))
+        {
+            // Should never happen
+            Debug.LogError($"The midiNote rounded to the targetMidiNote differs not only in the octave but also in pitch. This should never happen:"
+                + $"midiNote {midiNote}, targetMidiNote: {targetMidiNote}, displayed: {midiNoteOnOctaveOfTargetNote}");
+        }
+        return midiNoteOnOctaveOfTargetNote;
     }
 }

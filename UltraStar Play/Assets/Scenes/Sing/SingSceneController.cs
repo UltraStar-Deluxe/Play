@@ -145,7 +145,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         if (!PlayerControllers.IsNullOrEmpty())
         {
             LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-            PlayerControllers[0].LyricsDisplayer = lyricsDisplayer;
+            lyricsDisplayer?.Init(PlayerControllers[0]);
         }
 
         //Save information about the song being started into stats
