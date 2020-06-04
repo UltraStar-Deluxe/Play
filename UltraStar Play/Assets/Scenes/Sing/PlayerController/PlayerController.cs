@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
         }
     }
 
-    private Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
+    private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
     // The sorted sentences of the Voice

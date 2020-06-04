@@ -25,7 +25,6 @@ public class LyricsDisplayer : MonoBehaviour, INeedInjection
         if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
         {
             gameObject.SetActive(false);
-            return;
         }
     }
 

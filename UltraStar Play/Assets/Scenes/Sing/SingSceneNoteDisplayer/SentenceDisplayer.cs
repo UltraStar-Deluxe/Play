@@ -76,8 +76,6 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
     override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
     {
-        int noteRow = CalculateNoteRow(midiNote);
-
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
