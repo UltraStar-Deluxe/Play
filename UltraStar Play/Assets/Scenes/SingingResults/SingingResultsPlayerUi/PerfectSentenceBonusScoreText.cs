@@ -9,9 +9,6 @@ using UniInject;
 
 public class PerfectSentenceBonusScoreText : CountingNumberText, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private Text text;
-
     [Inject]
     private PlayerScoreControllerData playerScoreData;
 
