@@ -73,14 +73,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     public void OnInjectionFinished()
     {
         InitNoteDisplayer(lineCount);
-        playerNameText.SetPlayerProfile(playerProfile);
-        avatarImage.SetPlayerProfile(playerProfile);
-
-        if (micProfile != null)
-        {
-            totalScoreDisplayer.SetColor(micProfile.Color);
-            avatarImage.SetColor(micProfile.Color);
-        }
     }
 
     public void ShowSentenceRating(SentenceRating sentenceRating)

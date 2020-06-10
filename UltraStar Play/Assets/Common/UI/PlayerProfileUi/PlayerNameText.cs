@@ -1,27 +1,27 @@
-﻿using UnityEngine;
+﻿using UniInject;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerNameText : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class PlayerNameText : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text text;
 
-    void OnEnable()
-    {
-        text = GetComponent<Text>();
-    }
+    [Inject]
+    private PlayerProfile playerProfile;
 
-    public void SetText(string value)
-    {
-        text.text = value;
-    }
+    [Inject(optional = true)]
+    private MicProfile micProfile;
 
-    public void SetPlayerProfile(PlayerProfile playerProfile)
+    public void OnInjectionFinished()
     {
         text.text = playerProfile.Name;
-    }
-
-    public void SetColorOfMicProfile(MicProfile micProfile)
-    {
-        text.color = micProfile.Color;
+        if (micProfile != null)
+        {
+            text.color = micProfile.Color;
+        }
     }
 }

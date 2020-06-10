@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
@@ -9,15 +10,22 @@ using UnityEngine.UI;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneController : MonoBehaviour, INeedInjection
+public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBinder
 {
+    [InjectedInInspector]
     public Text songLabel;
 
+    [InjectedInInspector]
     public GameObject onePlayerLayout;
+
+    [InjectedInInspector]
     public GameObject twoPlayerLayout;
 
     [Inject]
     private Statistics statistics;
+
+    [Inject]
+    private Injector injector;
 
     private SingingResultsSceneData sceneData;
 
@@ -49,10 +57,19 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
+            SongRating songRating = GetSongRating(playerScoreData.TotalScore);
+
+            Injector childInjector = UniInjectUtils.CreateInjector(injector);
+            childInjector.AddBindingForInstance(playerProfile);
+            childInjector.AddBindingForInstance(micProfile);
+            childInjector.AddBindingForInstance(playerScoreData);
+            childInjector.AddBindingForInstance(songRating);
+            childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
+
             SingingResultsPlayerUiController[] uiControllers = selectedLayout.GetComponentsInChildren<SingingResultsPlayerUiController>();
             if (i < uiControllers.Length)
             {
-                uiControllers[i].Init(i, playerProfile, playerScoreData, micProfile);
+                childInjector.InjectAllComponentsInChildren(uiControllers[i]);
             }
             i++;
         }
@@ -100,5 +117,25 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection
             SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
 
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(sceneData);
+        return bb.GetBindings();
+    }
+
+    private SongRating GetSongRating(double totalScore)
+    {
+        foreach (SongRating songRating in SongRating.Values)
+        {
+            if (totalScore > songRating.ScoreThreshold)
+            {
+                return songRating;
+            }
+        }
+        return SongRating.ToneDeaf;
     }
 }

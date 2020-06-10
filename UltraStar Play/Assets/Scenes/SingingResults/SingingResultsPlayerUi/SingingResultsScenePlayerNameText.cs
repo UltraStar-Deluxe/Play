@@ -1,22 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsTotalScoreText : CountingNumberText, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
+public class SingingResultsScenePlayerNameText : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text text;
 
     [Inject]
-    private PlayerScoreControllerData playerScoreData;
+    private PlayerProfile playerProfile;
 
     public void OnInjectionFinished()
     {
-        TargetValue = playerScoreData.TotalScore;
+        text.text = playerProfile.Name;
     }
 }
