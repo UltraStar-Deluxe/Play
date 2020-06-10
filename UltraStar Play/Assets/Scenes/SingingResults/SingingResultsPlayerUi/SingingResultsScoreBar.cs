@@ -1,26 +1,32 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
 
-public class SingingResultsScoreBar : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SingingResultsScoreBar : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    public double TargetValue { get; set; }
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private RectTransform rectTransform;
 
+    [Inject]
+    private PlayerScoreControllerData playerScoreData;
+
+    private double targetValue;
     private double displayedValue;
     private float startHeightPercent;
 
-    private Image image;
-    private RectTransform rectTransform;
-
-    void Awake()
+    public void OnInjectionFinished()
     {
-        image = GetComponent<Image>();
-        rectTransform = GetComponent<RectTransform>();
+        targetValue = playerScoreData.NormalNotesTotalScore;
         startHeightPercent = rectTransform.anchorMax.y;
     }
 
     void Update()
     {
-        if (TargetValue <= 0)
+        if (targetValue <= 0
+            || startHeightPercent <= 0)
         {
             return;
         }
@@ -28,6 +34,6 @@ public class SingingResultsScoreBar : MonoBehaviour
         double displayedValuePercent = displayedValue / PlayerScoreController.MaxScore;
         float heightPercent = Mathf.Max(startHeightPercent, (float)displayedValuePercent);
         rectTransform.anchorMax = new Vector2(rectTransform.anchorMax.x, heightPercent);
-        displayedValue = CountingNumberText.GetNextValue(displayedValue, TargetValue);
+        displayedValue = CountingNumberText.GetNextValue(displayedValue, targetValue);
     }
 }
