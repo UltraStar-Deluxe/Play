@@ -21,6 +21,9 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
     [InjectedInInspector]
     public GameObject twoPlayerLayout;
 
+    [InjectedInInspector]
+    public RectTransform statisticsLegend;
+
     [Inject]
     private Statistics statistics;
 
@@ -137,5 +140,15 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
             }
         }
         return SongRating.ToneDeaf;
+    }
+
+    public void ToggleStatistics()
+    {
+        bool newActiveState = !statisticsLegend.gameObject.activeInHierarchy;
+        statisticsLegend.gameObject.SetActive(newActiveState);
+        foreach (SingingResultsStatisticsWindow statisticsWindow in GetSelectedLayout().GetComponentsInChildren<SingingResultsStatisticsWindow>(true))
+        {
+            statisticsWindow.gameObject.SetActive(newActiveState);
+        }
     }
 }
