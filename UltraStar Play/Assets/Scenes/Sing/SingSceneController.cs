@@ -268,6 +268,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
         singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+        singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
 
         // Check if the full song has been sung, i.e., the playback position is after the last note.
         // This determines whether the statistics should be updated and the score should be recorded.

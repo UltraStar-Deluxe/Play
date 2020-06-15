@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.UI.Extensions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -22,7 +23,7 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
     public RectTransform missedBeatBar;
 
     [InjectedInInspector]
-    public LineRenderer lineRenderer;
+    public UILineRenderer uiLineRenderer;
 
     [InjectedInInspector]
     public RectTransform dataPointsContainer;
@@ -31,7 +32,13 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
     public ScoreGraphDataPoint scoreGraphDataPointPrefab;
 
     [Inject]
+    private Injector injector;
+
+    [Inject]
     private PlayerScoreControllerData playerScoreData;
+
+    [Inject]
+    private SingingResultsSceneData sceneData;
 
     public void OnInjectionFinished()
     {
@@ -44,10 +51,11 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
         int totalBeatCount = playerScoreData.NormalNoteLengthTotal + playerScoreData.GoldenNoteLengthTotal;
         float perfectBeatPercent = CalculatePerfectBeatPercent(totalBeatCount);
         float goodBeatPercent = CalculateGoodBeatPercent(totalBeatCount);
+        float missedBeatPercent = 1 - (perfectBeatPercent + goodBeatPercent);
 
-        PositionBeatBar(perfectBeatBar, 0, perfectBeatPercent);
-        PositionBeatBar(goodBeatBar, perfectBeatPercent, perfectBeatPercent + goodBeatPercent);
-        PositionBeatBar(missedBeatBar, perfectBeatPercent + goodBeatPercent, totalBeatCount > 0 ? 1 : 0);
+        PositionBeatBar(missedBeatBar, 0, missedBeatPercent);
+        PositionBeatBar(goodBeatBar, missedBeatPercent, missedBeatPercent + goodBeatPercent);
+        PositionBeatBar(perfectBeatBar, missedBeatPercent + goodBeatPercent, totalBeatCount > 0 ? 1 : 0);
     }
 
     private void InitDataPoints()
@@ -57,6 +65,41 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
         {
             Destroy(dataPoint.gameObject);
         }
+
+        if (sceneData.SongDurationInMillis <= 0)
+        {
+            return;
+        }
+
+        List<Vector2> lineRendererPositions = new List<Vector2>();
+        lineRendererPositions.Add(Vector2.zero);
+        foreach (SentenceScore sentenceScore in playerScoreData.SentenceToSentenceScoreMap.Values)
+        {
+            double scorePercent = (double)sentenceScore.TotalScoreSoFar / PlayerScoreController.MaxScore;
+
+            double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSong(sceneData.SongMeta, sentenceScore.Sentence.MaxBeat);
+            double timePercent = sentenceEndInMillis / sceneData.SongDurationInMillis;
+
+            Vector2 anchorPosition = new Vector2((float)timePercent, (float)scorePercent);
+            ScoreGraphDataPoint dataPoint = CreateDataPoint(anchorPosition, (int)sentenceEndInMillis, sentenceScore.TotalScoreSoFar);
+
+            lineRendererPositions.Add(anchorPosition);
+        }
+        lineRendererPositions.Add(new Vector2(1, lineRendererPositions.Last().y));
+
+        uiLineRenderer.Points = lineRendererPositions.ToArray();
+        uiLineRenderer.SetAllDirty();
+    }
+
+    private ScoreGraphDataPoint CreateDataPoint(Vector2 anchorPosition, int sentenceEndInMillis, int totalScoreSoFar)
+    {
+        ScoreGraphDataPoint dataPoint = Instantiate(scoreGraphDataPointPrefab, dataPointsContainer);
+        injector.InjectAllComponentsInChildren(dataPoint);
+        dataPoint.CoordinateDetails = FormatMilliseconds(sentenceEndInMillis) + "\n" + totalScoreSoFar + " points";
+        dataPoint.RectTransform.anchorMin = anchorPosition;
+        dataPoint.RectTransform.anchorMax = anchorPosition;
+        dataPoint.RectTransform.MoveCornersToAnchors_CenterPosition();
+        return dataPoint;
     }
 
     private void PositionBeatBar(RectTransform beatBarRectTransform, float anchorMinY, float anchorMaxY)
@@ -86,5 +129,13 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
 
         int goodBeatsTotal = playerScoreData.NormalBeatData.GoodBeats + playerScoreData.GoldenBeatData.GoodBeats;
         return (float)goodBeatsTotal / totalBeatCount;
+    }
+
+    private string FormatMilliseconds(int millis)
+    {
+        int seconds = millis / 1000;
+        int minutes = seconds / 60;
+        int secondsRemaining = seconds - (minutes * 60);
+        return string.Format("{0}:{1:00}", minutes, secondsRemaining);
     }
 }
