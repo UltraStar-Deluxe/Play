@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class SingingResultsSceneData : SceneData
 {
     public SongMeta SongMeta { get; set; }
+    public int SongDurationInMillis { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new List<PlayerProfile>();
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
     private readonly Dictionary<PlayerProfile, PlayerScoreControllerData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();

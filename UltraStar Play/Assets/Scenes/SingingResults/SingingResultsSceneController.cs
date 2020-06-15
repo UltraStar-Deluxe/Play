@@ -42,9 +42,9 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
 
     void Start()
     {
-        sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
         SelectLayout();
         FillLayout();
+        SetStatisticsVisible(false);
     }
 
     private void FillLayout()
@@ -124,6 +124,8 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
 
     public List<IBinding> GetBindings()
     {
+        sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
+
         BindingBuilder bb = new BindingBuilder();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(sceneData);
@@ -144,7 +146,11 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
 
     public void ToggleStatistics()
     {
-        bool newActiveState = !statisticsLegend.gameObject.activeInHierarchy;
+        SetStatisticsVisible(!statisticsLegend.gameObject.activeInHierarchy);
+    }
+
+    public void SetStatisticsVisible(bool newActiveState)
+    {
         statisticsLegend.gameObject.SetActive(newActiveState);
         foreach (SingingResultsStatisticsWindow statisticsWindow in GetSelectedLayout().GetComponentsInChildren<SingingResultsStatisticsWindow>(true))
         {
