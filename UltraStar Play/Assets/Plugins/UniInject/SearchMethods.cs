@@ -1,4 +1,4 @@
-namespace UniInject
+﻿namespace UniInject
 {
     // Determines how the value to be injected is found.
     // This can be a search in an injector's bindings,
@@ -10,6 +10,7 @@ namespace UniInject
         // Unity method to search in the scene hierarchy.
         GetComponent,
         GetComponentInChildren,
+        GetComponentInChildrenIncludeInactive,
         GetComponentInParent,
         FindObjectOfType
     }
