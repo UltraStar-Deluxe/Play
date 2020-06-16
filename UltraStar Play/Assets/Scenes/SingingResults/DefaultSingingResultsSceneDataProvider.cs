@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -26,9 +27,9 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.GoldenBeatData.GoodBeats = 5;
         playerScoreData.GoldenBeatData.PerfectBeats = 5;
 
-        Sentence sentence1 = new Sentence(0, 200);
-        Sentence sentence2 = new Sentence(201, 500);
-        Sentence sentence3 = new Sentence(501, 1500);
+        Sentence sentence1 = CreateDummySentence(0, 200);
+        Sentence sentence2 = CreateDummySentence(201, 500);
+        Sentence sentence3 = CreateDummySentence(501, 1500);
 
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence1, CreateSentenceScore(sentence1, 3000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
@@ -38,6 +39,19 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         data.AddPlayerScores(playerProfile, playerScoreData);
         data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
         return data;
+    }
+
+    private Sentence CreateDummySentence(int startBeat, int endBeat)
+    {
+        int noteCount = 3;
+        int noteLength = 10;
+        Sentence sentence = new Sentence(startBeat, endBeat);
+        for (int i = 0; i < noteCount; i++)
+        {
+            Note note = new Note(ENoteType.Normal, startBeat + (noteLength * i), noteLength, 0, "b");
+            sentence.AddNote(note);
+        }
+        return sentence;
     }
 
     private SentenceScore CreateSentenceScore(Sentence sentence, int totalScoreSoFar)

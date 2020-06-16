@@ -48,14 +48,21 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
 
     private void InitBeatBars()
     {
+        // The done beats are approximated using the done sentences (a sentence that might have started but not finished will not be not inclueded).
         int totalBeatCount = playerScoreData.NormalNoteLengthTotal + playerScoreData.GoldenNoteLengthTotal;
+        int doneBeatCount = playerScoreData.SentenceToSentenceScoreMap.Keys
+            .SelectMany(sentence => sentence.Notes)
+            .Where(note => !note.IsFreestyle)
+            .Select(note => note.Length)
+            .Sum();
+        float doneBeatPercent = totalBeatCount > 0 ? (float)doneBeatCount / totalBeatCount : 0;
         float perfectBeatPercent = CalculatePerfectBeatPercent(totalBeatCount);
         float goodBeatPercent = CalculateGoodBeatPercent(totalBeatCount);
-        float missedBeatPercent = 1 - (perfectBeatPercent + goodBeatPercent);
+        float missedBeatPercent = doneBeatPercent - (perfectBeatPercent + goodBeatPercent);
 
-        PositionBeatBar(missedBeatBar, 0, missedBeatPercent);
+        PositionBeatBar(missedBeatBar, 0, missedBeatPercent * doneBeatPercent);
         PositionBeatBar(goodBeatBar, missedBeatPercent, missedBeatPercent + goodBeatPercent);
-        PositionBeatBar(perfectBeatBar, missedBeatPercent + goodBeatPercent, totalBeatCount > 0 ? 1 : 0);
+        PositionBeatBar(perfectBeatBar, missedBeatPercent + goodBeatPercent, doneBeatPercent);
     }
 
     private void InitDataPoints()
@@ -71,6 +78,8 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
             return;
         }
 
+        float songGap = sceneData.SongMeta.Gap;
+
         List<Vector2> lineRendererPositions = new List<Vector2>();
         lineRendererPositions.Add(Vector2.zero);
         foreach (SentenceScore sentenceScore in playerScoreData.SentenceToSentenceScoreMap.Values)
@@ -78,7 +87,7 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
             double scorePercent = (double)sentenceScore.TotalScoreSoFar / PlayerScoreController.MaxScore;
 
             double sentenceEndInMillis = BpmUtils.BeatToMillisecondsInSong(sceneData.SongMeta, sentenceScore.Sentence.MaxBeat);
-            double timePercent = sentenceEndInMillis / sceneData.SongDurationInMillis;
+            double timePercent = (sentenceEndInMillis - songGap) / (sceneData.SongDurationInMillis - songGap);
 
             Vector2 anchorPosition = new Vector2((float)timePercent, (float)scorePercent);
             ScoreGraphDataPoint dataPoint = CreateDataPoint(anchorPosition, (int)sentenceEndInMillis, sentenceScore.TotalScoreSoFar);
