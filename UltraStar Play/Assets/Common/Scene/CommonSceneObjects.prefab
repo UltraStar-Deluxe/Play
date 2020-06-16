@@ -186,6 +186,8 @@ MonoBehaviour:
     type: 3}
   contextMenuPrefab: {fileID: 6871491115905279586, guid: 0af42b8cd7c5a1b48a7af989c960a75a,
     type: 3}
+  tooltipPrefab: {fileID: 5647552520249715628, guid: 61c5cda38fdd0ca4786cf5987297a4b2,
+    type: 3}
 --- !u!1 &116669178087187369
 GameObject:
   m_ObjectHideFlags: 0

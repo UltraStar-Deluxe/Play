@@ -638,7 +638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8b7828a4ac8fed42a4e01bb6147fe7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: fca503b94f1f3304e9dac038d32bb2f5, type: 2}
+  m_Material: {fileID: 0}
   m_Color: {r: 0.7529412, g: 0.7529412, b: 0.7529412, a: 1}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
@@ -3721,12 +3721,12 @@ PrefabInstance:
     - target: {fileID: 1346592500385493159, guid: d2f68ed2e28e1f149b6713f48f4139af,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -45
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1346592500385493159, guid: d2f68ed2e28e1f149b6713f48f4139af,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 45
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1346592500385493159, guid: d2f68ed2e28e1f149b6713f48f4139af,
         type: 3}
