@@ -13,25 +13,22 @@ using UnityEngine.EventSystems;
 
 public class ScoreGraphDataPoint : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IPointerEnterHandler, IPointerExitHandler
 {
-    [InjectedInInspector]
-    public GameObject coordinateDetailsTextContainer;
-
-    [InjectedInInspector]
-    public Text coordinateDetailsText;
-
     [Inject(searchMethod = SearchMethods.GetComponent)]
     public RectTransform RectTransform { get; private set; }
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private TooltipHandler tooltipHandler;
 
     public string CoordinateDetails { get; set; } = "";
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        coordinateDetailsTextContainer.gameObject.SetActive(true);
-        coordinateDetailsText.text = CoordinateDetails;
+        tooltipHandler.tooltipText = CoordinateDetails;
+        tooltipHandler.ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        coordinateDetailsTextContainer.gameObject.SetActive(false);
+        tooltipHandler.CloseTooltip();
     }
 }
