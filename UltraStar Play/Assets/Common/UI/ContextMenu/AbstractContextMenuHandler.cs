@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -56,6 +56,6 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
 
     private ContextMenu GetContextMenuPrefab()
     {
-        return ContextMenuManager.Instance.contextMenuPrefab;
+        return UiManager.Instance.contextMenuPrefab;
     }
 }
