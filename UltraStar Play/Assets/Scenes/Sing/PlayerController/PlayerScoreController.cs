@@ -140,7 +140,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         Sentence analyzedSentence = beatAnalyzedEvent.NoteAtBeat.Sentence;
         if (!ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
         {
-            sentenceScore = new SentenceScore(analyzedSentence);
+            sentenceScore = CreateSentenceScore(analyzedSentence);
             ScoreData.SentenceToSentenceScoreMap.Add(analyzedSentence, sentenceScore);
         }
 
@@ -158,7 +158,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
     private bool IsPerfectHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
     {
-        return beatAnalyzedEvent.NoteAtBeat.MidiNote == beatAnalyzedEvent.RecordedMidiNote;
+        return MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote) == MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote);
     }
 
     private bool IsGoodHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
@@ -218,7 +218,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
         else
         {
-            sentenceScore = new SentenceScore(analyzedSentence);
+            sentenceScore = CreateSentenceScore(analyzedSentence);
             sentenceRating = GetSentenceRating(0);
         }
         sentenceScore.TotalScoreSoFar = TotalScore;
@@ -295,6 +295,13 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             }
         }
         return null;
+    }
+
+    private SentenceScore CreateSentenceScore(Sentence sentence)
+    {
+        SentenceScore sentenceScore = new SentenceScore(sentence);
+        sentenceScore.TotalScoreSoFar = TotalScore;
+        return sentenceScore;
     }
 
     public class SentenceScoreEvent
