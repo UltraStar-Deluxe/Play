@@ -4,6 +4,7 @@
         "Plugins",
         "UniRx",
         "UniInject",
-        "Common"
+        "Common",
+        "UnityUIExtensions"
     ]
 }
