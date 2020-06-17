@@ -2696,7 +2696,7 @@ GameObject:
   - component: {fileID: 4887831962416960118}
   - component: {fileID: 297777082433191780}
   - component: {fileID: 3394238082668534906}
-  - component: {fileID: 5285632059634800909}
+  - component: {fileID: 302926084000438616}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -2765,7 +2765,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Medium
---- !u!114 &5285632059634800909
+--- !u!114 &302926084000438616
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2774,10 +2774,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4784213856351793863}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b30dd83a12669d4f973ff5a79ca9842, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0.1254902, g: 0.1254902, b: 0.1254902, a: 0.36078432}
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
 --- !u!1 &4986604662894894479
@@ -2890,7 +2890,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.0076781707, y: 0.00984792}
   m_AnchorMax: {x: 0.98072726, y: 0.96449333}
-  m_AnchoredPosition: {x: 0, y: -0.0000076293945}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5282389063790470663
