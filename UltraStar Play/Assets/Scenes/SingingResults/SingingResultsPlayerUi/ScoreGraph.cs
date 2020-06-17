@@ -60,7 +60,7 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
         float goodBeatPercent = CalculateGoodBeatPercent(totalBeatCount);
         float missedBeatPercent = doneBeatPercent - (perfectBeatPercent + goodBeatPercent);
 
-        PositionBeatBar(missedBeatBar, 0, missedBeatPercent * doneBeatPercent);
+        PositionBeatBar(missedBeatBar, 0, missedBeatPercent);
         PositionBeatBar(goodBeatBar, missedBeatPercent, missedBeatPercent + goodBeatPercent);
         PositionBeatBar(perfectBeatBar, missedBeatPercent + goodBeatPercent, doneBeatPercent);
     }
