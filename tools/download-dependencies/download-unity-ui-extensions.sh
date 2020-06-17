@@ -17,6 +17,8 @@ echo "/Scripts/Primitives/UIPrimitiveBase.cs" >> .git/info/sparse-checkout
 echo "/Scripts/Utilities/BezierPath.cs" >> .git/info/sparse-checkout
 echo "/Scripts/Utilities/CableCurve.cs" >> .git/info/sparse-checkout
 echo "/Scripts/Utilities/SetPropertyUtility.cs" >> .git/info/sparse-checkout
+echo "/Scripts/Effects/BestFitOutline.cs" >> .git/info/sparse-checkout
+echo "/Scripts/Effects/LetterSpacing.cs" >> .git/info/sparse-checkout
 echo "UnityUIExtensions.asmdef" >> .git/info/sparse-checkout
 echo "LICENSE" >> .git/info/sparse-checkout
 git pull --depth=20 origin master
