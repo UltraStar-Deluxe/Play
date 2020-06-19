@@ -90,7 +90,7 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
             double timePercent = (sentenceEndInMillis - songGap) / (sceneData.SongDurationInMillis - songGap);
 
             Vector2 anchorPosition = new Vector2((float)timePercent, (float)scorePercent);
-            ScoreGraphDataPoint dataPoint = CreateDataPoint(anchorPosition, (int)sentenceEndInMillis, sentenceScore.TotalScoreSoFar);
+            CreateDataPoint(anchorPosition, (int)sentenceEndInMillis, sentenceScore.TotalScoreSoFar);
 
             lineRendererPositions.Add(anchorPosition);
         }

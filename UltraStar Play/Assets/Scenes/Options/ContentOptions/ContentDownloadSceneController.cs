@@ -23,7 +23,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
     public Button startDownloadButton;
     public Button cancelDownloadButton;
 
-    private string downloadUrl => downloadPath.text.Trim();
+    private string DownloadUrl => downloadPath.text.Trim();
 
     private UnityWebRequest downloadRequest;
 
@@ -32,7 +32,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
         startDownloadButton.OnClickAsObservable().Subscribe(_ => StartDownload());
         cancelDownloadButton.OnClickAsObservable().Subscribe(_ => CancelDownload());
         downloadPath.OnEndEditAsObservable().Subscribe(_ => FetchFileSize());
-        if (!downloadUrl.IsNullOrEmpty())
+        if (!DownloadUrl.IsNullOrEmpty())
         {
             FetchFileSize();
         }
@@ -52,7 +52,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private void StartDownload()
     {
-        StartCoroutine(DownloadFileAsync(downloadUrl, PersistentTempPath()));
+        StartCoroutine(DownloadFileAsync(DownloadUrl, PersistentTempPath()));
     }
 
     private void CancelDownload()
@@ -67,7 +67,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private void FetchFileSize()
     {
-        StartCoroutine(FileSizeUpdateAsync(downloadUrl));
+        StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
     }
 
     private string PersistentTempPath()
@@ -179,7 +179,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     public void UpdateFileSize()
     {
-        StartCoroutine(FileSizeUpdateAsync(downloadUrl));
+        StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
     }
 
     private IEnumerator FileSizeUpdateAsync(string url)
