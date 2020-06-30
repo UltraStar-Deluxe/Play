@@ -31,6 +31,12 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
     [InjectedInInspector]
     public ScoreGraphDataPoint scoreGraphDataPointPrefab;
 
+    [InjectedInInspector]
+    public Color lineColor = Color.gray;
+
+    [InjectedInInspector]
+    public float lineThickness = 3;
+
     [Inject]
     private Injector injector;
 
@@ -39,6 +45,9 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
 
     [Inject]
     private SingingResultsSceneData sceneData;
+
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private DynamicallyCreatedImage dynamicallyCreatedImage;
 
     public void OnInjectionFinished()
     {
@@ -96,8 +105,41 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
         }
         lineRendererPositions.Add(new Vector2(1, lineRendererPositions.Last().y));
 
-        uiLineRenderer.Points = lineRendererPositions.ToArray();
-        uiLineRenderer.SetAllDirty();
+        DrawGraphLine(lineRendererPositions);
+
+        //uiLineRenderer.Points = lineRendererPositions.ToArray();
+        //uiLineRenderer.SetAllDirty();
+    }
+
+    private void DrawGraphLine(List<Vector2> lineRendererPositions)
+    {
+        dynamicallyCreatedImage.GetComponent<RawImage>().enabled = true;
+        dynamicallyCreatedImage.ClearTexture();
+
+        int w = dynamicallyCreatedImage.TextureWidth;
+        int h = dynamicallyCreatedImage.TextureHeight;
+
+        bool isFirst = true;
+        Vector2 lastPoint = Vector2.zero;
+        foreach (Vector2 point in lineRendererPositions)
+        {
+            if (isFirst)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                dynamicallyCreatedImage.DrawLine((int)(lastPoint.x * w),
+                    (int)(lastPoint.y * h),
+                    (int)(point.x * w),
+                    (int)(point.y * h),
+                    lineThickness,
+                    lineColor);
+            }
+            lastPoint = point;
+        }
+
+        dynamicallyCreatedImage.ApplyTexture();
     }
 
     private ScoreGraphDataPoint CreateDataPoint(Vector2 anchorPosition, int sentenceEndInMillis, int totalScoreSoFar)
