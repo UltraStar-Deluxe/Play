@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
-using UnityEngine.UI.Extensions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -21,9 +20,6 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
 
     [InjectedInInspector]
     public RectTransform missedBeatBar;
-
-    [InjectedInInspector]
-    public UILineRenderer uiLineRenderer;
 
     [InjectedInInspector]
     public RectTransform dataPointsContainer;
@@ -89,8 +85,8 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
 
         float songGap = sceneData.SongMeta.Gap;
 
-        List<Vector2> lineRendererPositions = new List<Vector2>();
-        lineRendererPositions.Add(Vector2.zero);
+        List<Vector2> anchorPositions = new List<Vector2>();
+        anchorPositions.Add(Vector2.zero);
         foreach (SentenceScore sentenceScore in playerScoreData.SentenceToSentenceScoreMap.Values)
         {
             double scorePercent = (double)sentenceScore.TotalScoreSoFar / PlayerScoreController.MaxScore;
@@ -101,27 +97,26 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
             Vector2 anchorPosition = new Vector2((float)timePercent, (float)scorePercent);
             CreateDataPoint(anchorPosition, (int)sentenceEndInMillis, sentenceScore.TotalScoreSoFar);
 
-            lineRendererPositions.Add(anchorPosition);
+            anchorPositions.Add(anchorPosition);
         }
-        lineRendererPositions.Add(new Vector2(1, lineRendererPositions.Last().y));
+        anchorPositions.Add(new Vector2(1, anchorPositions.Last().y));
 
-        DrawGraphLine(lineRendererPositions);
-
-        //uiLineRenderer.Points = lineRendererPositions.ToArray();
-        //uiLineRenderer.SetAllDirty();
+        DrawGraphLine(anchorPositions);
     }
 
-    private void DrawGraphLine(List<Vector2> lineRendererPositions)
+    private void DrawGraphLine(List<Vector2> anchorPositions)
     {
         dynamicallyCreatedImage.GetComponent<RawImage>().enabled = true;
         dynamicallyCreatedImage.ClearTexture();
+
+        DrawXYAxis();
 
         int w = dynamicallyCreatedImage.TextureWidth;
         int h = dynamicallyCreatedImage.TextureHeight;
 
         bool isFirst = true;
         Vector2 lastPoint = Vector2.zero;
-        foreach (Vector2 point in lineRendererPositions)
+        foreach (Vector2 point in anchorPositions)
         {
             if (isFirst)
             {
@@ -140,6 +135,12 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
         }
 
         dynamicallyCreatedImage.ApplyTexture();
+    }
+
+    private void DrawXYAxis()
+    {
+        dynamicallyCreatedImage.DrawLine(0, 0, 0, dynamicallyCreatedImage.TextureHeight, 2, lineColor);
+        dynamicallyCreatedImage.DrawLine(0, 0, dynamicallyCreatedImage.TextureWidth, 0, 2, lineColor);
     }
 
     private ScoreGraphDataPoint CreateDataPoint(Vector2 anchorPosition, int sentenceEndInMillis, int totalScoreSoFar)

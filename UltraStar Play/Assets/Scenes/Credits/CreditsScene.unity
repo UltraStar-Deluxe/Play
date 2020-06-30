@@ -847,27 +847,7 @@ MonoBehaviour:
     A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\r AUTHORS OR COPYRIGHT
     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\r LIABILITY, WHETHER IN AN ACTION
     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\r SOFTWARE.\n\n-----\nUltraStar Play
-    uses code from Unity UI Extensions\n\nUnity UI Extensions License (BSD)\r\nCopyright
-    (c) 2019\r\n\r\nRedistribution and use in source and binary forms, with or without
-    modification, \r\nare permitted provided that the following conditions are met:\r\n\r\n1.
-    Redistributions of source code must retain the above copyright notice, this list
-    of conditions and the following disclaimer.\r\n\r\n2. Redistributions in binary
-    form must reproduce the above copyright notice, this list of conditions and the
-    following disclaimer in the documentation and/or other materials provided with
-    the distribution.\r\n\r\n3. Neither the name of the copyright holder nor the names
-    of its contributors may be used to endorse or promote products derived \rfrom
-    this software without specific prior written permission.\r\n\r\nTHIS SOFTWARE
-    IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS
-    OR IMPLIED WARRANTIES, \r\nINCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-    OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. \r\nIN
-    NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, \r\nOR CONSEQUENTIAL DAMAGES (INCLUDING,
-    BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-    DATA, \r\nOR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-    OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, \r\nOR TORT (INCLUDING NEGLIGENCE
-    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, \r\nEVEN IF
-    ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\r SOFTWARE.\n"
 --- !u!222 &699323124
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1782,10 +1762,50 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 3622033095437819811, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
-      propertyPath: m_FontData.m_MaxSize
-      value: 25
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.0000038146973
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.05614002
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.49507397
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.115829
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.7510069
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033095365871879, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_Text
+      value: Credits
       objectReference: {fileID: 0}
     - target: {fileID: 3622033095365871882, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
@@ -1867,50 +1887,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0.41119215
       objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+    - target: {fileID: 3622033095437819811, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.0000038146973
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0.05614002
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0.49507397
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0.115829
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0.7510069
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095099228146, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3622033095365871879, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_Text
-      value: Credits
+      propertyPath: m_FontData.m_MaxSize
+      value: 25
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3622033095365871876, guid: 176e869a9ab83ce4aa378e24fe6fb891, type: 3}
