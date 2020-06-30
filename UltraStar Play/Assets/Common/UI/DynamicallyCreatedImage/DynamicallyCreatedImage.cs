@@ -119,12 +119,14 @@ public class DynamicallyCreatedImage : MonoBehaviour
             if (e2 > dy)
             {
                 /* e_xy+e_x > 0 */
-                err += dy; ax += sx;
+                err += dy;
+                ax += sx;
             }
             if (e2 < dx)
             {
                 /* e_xy+e_y < 0 */
-                err += dx; ay += sy;
+                err += dx;
+                ay += sy;
             }
         }
     }
@@ -154,7 +156,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
         {
             for (int x = x0; x <= x1; x++)
             {
-                float alpha = Mathf.Max(Mathf.Min(0.5f - CapsuleSDF(x, y, ax, ay, bx, by, r), 1.0f), 0.0f);
+                float alpha = Mathf.Max(Mathf.Min(0.5f - CapsuleSdf(x, y, ax, ay, bx, by, r), 1.0f), 0.0f);
                 Color currentColor = texture.GetPixel(x, y);
                 Color finalColor = AlphaBlend(currentColor, color, alpha);
                 SetPixel(x, y, finalColor);
@@ -162,7 +164,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
         }
     }
 
-    private float CapsuleSDF(float px, float py, float ax, float ay, float bx, float by, float r)
+    private float CapsuleSdf(float px, float py, float ax, float ay, float bx, float by, float r)
     {
         // See https://github.com/miloyip/line/blob/master/line_sdfaabb.c
         float pax = px - ax;
