@@ -141,15 +141,22 @@ public class DynamicallyCreatedImage : MonoBehaviour
         // r is the radius of the capsule. Thus, use half the thickness.
         float r = thickness / 2;
         int x0 = (int)Mathf.Floor(Math.Min(ax, bx) - r);
+        x0 = NumberUtils.Limit(x0, 0, TextureWidth - 1);
         int x1 = (int)Mathf.Ceil(Math.Max(ax, bx) + r);
+        x1 = NumberUtils.Limit(x1, 0, TextureWidth - 1);
+
         int y0 = (int)Mathf.Floor(Math.Min(ay, by) - r);
+        y0 = NumberUtils.Limit(y0, 0, TextureHeight - 1);
         int y1 = (int)Mathf.Ceil(Math.Max(ay, by) + r);
+        y1 = NumberUtils.Limit(y1, 0, TextureHeight - 1);
+
         for (int y = y0; y <= y1; y++)
         {
             for (int x = x0; x <= x1; x++)
             {
                 float alpha = Mathf.Max(Mathf.Min(0.5f - CapsuleSDF(x, y, ax, ay, bx, by, r), 1.0f), 0.0f);
-                Color finalColor = new Color(color.r, color.g, color.b, alpha);
+                Color currentColor = texture.GetPixel(x, y);
+                Color finalColor = AlphaBlend(currentColor, color, alpha);
                 SetPixel(x, y, finalColor);
             }
         }
@@ -165,5 +172,13 @@ public class DynamicallyCreatedImage : MonoBehaviour
         float h = Mathf.Max(Mathf.Min((pax * bax + pay * bay) / (bax * bax + bay * bay), 1.0f), 0.0f);
         float dx = pax - bax * h, dy = pay - bay * h;
         return Mathf.Sqrt(dx * dx + dy * dy) - r;
+    }
+
+    private Color AlphaBlend(Color currentColor, Color targetColor, float alpha)
+    {
+        return new Color(currentColor.r * (1 - alpha) + targetColor.r * alpha,
+            currentColor.g * (1 - alpha) + targetColor.g * alpha,
+            currentColor.b * (1 - alpha) + targetColor.b * alpha,
+            currentColor.a * (1 - alpha) + targetColor.a * alpha);
     }
 }
