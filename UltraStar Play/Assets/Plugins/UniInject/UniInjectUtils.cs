@@ -84,6 +84,8 @@ namespace UniInject
                     return script.GetComponent(componentType);
                 case SearchMethods.GetComponentInChildren:
                     return script.GetComponentInChildren(componentType);
+                case SearchMethods.GetComponentInChildrenIncludeInactive:
+                    return script.GetComponentInChildren(componentType, true);
                 case SearchMethods.GetComponentInParent:
                     return script.GetComponentInParent(componentType);
                 case SearchMethods.FindObjectOfType:

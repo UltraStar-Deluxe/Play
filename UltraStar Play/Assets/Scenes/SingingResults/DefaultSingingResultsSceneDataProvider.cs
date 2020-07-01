@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -9,16 +10,54 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
+        data.SongDurationInMillis = 120 * 1000;
 
-        SingingResultsSceneData.PlayerScoreResultData playerScoreData = new SingingResultsSceneData.PlayerScoreResultData();
+        PlayerScoreControllerData playerScoreData = new PlayerScoreControllerData();
         playerScoreData.TotalScore = 6500;
-        playerScoreData.NormalNotesScore = 4000;
-        playerScoreData.GoldenNotesScore = 2000;
-        playerScoreData.PerfectSentenceBonusScore = 500;
+        playerScoreData.NormalNotesTotalScore = 4000;
+        playerScoreData.GoldenNotesTotalScore = 2000;
+        playerScoreData.PerfectSentenceBonusTotalScore = 500;
+
+        playerScoreData.NormalNoteLengthTotal = 80;
+        playerScoreData.GoldenNoteLengthTotal = 20;
+        playerScoreData.PerfectSentenceCount = 10;
+
+        playerScoreData.NormalBeatData.GoodBeats = 30;
+        playerScoreData.NormalBeatData.PerfectBeats = 10;
+        playerScoreData.GoldenBeatData.GoodBeats = 5;
+        playerScoreData.GoldenBeatData.PerfectBeats = 5;
+
+        Sentence sentence1 = CreateDummySentence(0, 200);
+        Sentence sentence2 = CreateDummySentence(201, 500);
+        Sentence sentence3 = CreateDummySentence(501, 1500);
+
+        playerScoreData.SentenceToSentenceScoreMap.Add(sentence1, CreateSentenceScore(sentence1, 3000));
+        playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
+        playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
 
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
         data.AddPlayerScores(playerProfile, playerScoreData);
         data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
         return data;
+    }
+
+    private Sentence CreateDummySentence(int startBeat, int endBeat)
+    {
+        int noteCount = 3;
+        int noteLength = 10;
+        Sentence sentence = new Sentence(startBeat, endBeat);
+        for (int i = 0; i < noteCount; i++)
+        {
+            Note note = new Note(ENoteType.Normal, startBeat + (noteLength * i), noteLength, 0, "b");
+            sentence.AddNote(note);
+        }
+        return sentence;
+    }
+
+    private SentenceScore CreateSentenceScore(Sentence sentence, int totalScoreSoFar)
+    {
+        SentenceScore sentenceScore = new SentenceScore(sentence);
+        sentenceScore.TotalScoreSoFar = totalScoreSoFar;
+        return sentenceScore;
     }
 }

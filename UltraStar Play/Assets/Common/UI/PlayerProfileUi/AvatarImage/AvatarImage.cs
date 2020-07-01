@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UniInject;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 [RequireComponent(typeof(Image))]
-public class AvatarImage : MonoBehaviour
+public class AvatarImage : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
+    [Inject(searchMethod = SearchMethods.GetComponent)]
     private Image image;
+
+    [Inject(searchMethod = SearchMethods.GetComponent)]
     private ImageHueHelper imageHueHelper;
 
-    void Awake()
-    {
-        image = GetComponent<Image>();
-        imageHueHelper = GetComponent<ImageHueHelper>();
-    }
+    [Inject(optional = true)]
+    private MicProfile micProfile;
 
     public void SetPlayerProfile(PlayerProfile playerProfile)
     {
@@ -29,8 +33,11 @@ public class AvatarImage : MonoBehaviour
         }
     }
 
-    public void SetColor(Color color)
+    public void OnInjectionFinished()
     {
-        imageHueHelper.SetHueByColor(color);
+        if (micProfile != null)
+        {
+            imageHueHelper.SetHueByColor(micProfile.Color);
+        }
     }
 }

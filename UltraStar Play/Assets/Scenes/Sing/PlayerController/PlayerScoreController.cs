@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using Unity.Collections.LowLevel.Unsafe;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -32,11 +30,11 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     {
         get
         {
-            if (ScoreData.NormalNoteLengthTotal <= 0)
+            if (ScoreData.NormalBeatData.PerfectAndGoodBeats <= 0)
             {
                 return 0;
             }
-            return (int)(maxScoreForNormalNotes * ScoreData.CorrectNormalNoteLengthTotal / ScoreData.NormalNoteLengthTotal);
+            return (int)(maxScoreForNormalNotes * ScoreData.NormalBeatData.PerfectAndGoodBeats / ScoreData.NormalNoteLengthTotal);
         }
     }
 
@@ -44,11 +42,11 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     {
         get
         {
-            if (ScoreData.GoldenNoteLengthTotal <= 0)
+            if (ScoreData.GoldenBeatData.PerfectAndGoodBeats <= 0)
             {
                 return 0;
             }
-            return (int)(maxScoreForGoldenNotes * ScoreData.CorrectGoldenNoteLengthTotal / ScoreData.GoldenNoteLengthTotal);
+            return (int)(maxScoreForGoldenNotes * ScoreData.GoldenBeatData.PerfectAndGoodBeats / ScoreData.GoldenNoteLengthTotal);
         }
     }
 
@@ -56,8 +54,8 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     {
         get
         {
-            int targetSentenceCount = (sentenceCount > 20) ? 20 : sentenceCount;
-            double score = (double)MaxPerfectSentenceBonusScore * perfectSentenceCount / targetSentenceCount;
+            int targetSentenceCount = (ScoreData.TotalSentenceCount > 20) ? 20 : ScoreData.TotalSentenceCount;
+            double score = (double)MaxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
 
             // Round the score up
             score = Math.Ceiling(score);
@@ -95,9 +93,6 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private int perfectSentenceCount;
-    private int sentenceCount;
-
     private double maxScoreForNormalNotes;
     private double maxScoreForGoldenNotes;
 
@@ -129,7 +124,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
 
         // Check if note was hit
-        if (MidiUtils.GetRelativePitch(beatAnalyzedEvent.RoundedMidiNote) != MidiUtils.GetRelativePitch(analyzedNote.MidiNote))
+        if (MidiUtils.GetRelativePitch(beatAnalyzedEvent.RoundedRecordedMidiNote) != MidiUtils.GetRelativePitch(analyzedNote.MidiNote))
         {
             return;
         }
@@ -145,20 +140,30 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         Sentence analyzedSentence = beatAnalyzedEvent.NoteAtBeat.Sentence;
         if (!ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
         {
-            sentenceScore = new SentenceScore(analyzedSentence);
+            sentenceScore = CreateSentenceScore(analyzedSentence);
             ScoreData.SentenceToSentenceScoreMap.Add(analyzedSentence, sentenceScore);
         }
 
-        if (analyzedNote.IsNormal)
+        if (IsPerfectHit(beatAnalyzedEvent))
         {
-            ScoreData.CorrectNormalNoteLengthTotal++;
-            sentenceScore.CorrectlySungNormalBeats++;
+            ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
+            sentenceScore.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
         }
-        else if (analyzedNote.IsGolden)
+        else if (IsGoodHit(beatAnalyzedEvent))
         {
-            ScoreData.CorrectGoldenNoteLengthTotal++;
-            sentenceScore.CorrectlySungGoldenBeats++;
+            ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.GoodBeats++);
+            sentenceScore.GetBeatData(analyzedNote).IfNotNull(it => it.GoodBeats++);
         }
+    }
+
+    private bool IsPerfectHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    {
+        return MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote) == MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote);
+    }
+
+    private bool IsGoodHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    {
+        return beatAnalyzedEvent.NoteAtBeat.MidiNote == beatAnalyzedEvent.RoundedRecordedMidiNote;
     }
 
     private void OnNoteAnalyzed(PlayerPitchTracker.NoteAnalyzedEvent noteAnalyzedEvent)
@@ -200,22 +205,30 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         SentenceRating sentenceRating;
         if (ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
         {
-            int correctlySungNoteLength = sentenceScore.CorrectlySungNormalBeats + sentenceScore.CorrectlySungGoldenBeats;
+            int correctlySungNoteLength = sentenceScore.NormalBeatData.PerfectAndGoodBeats + sentenceScore.GoldenBeatData.PerfectAndGoodBeats;
             double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
 
             // Score for a perfect sentence
             if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
             {
-                perfectSentenceCount++;
+                ScoreData.PerfectSentenceCount++;
             }
 
             sentenceRating = GetSentenceRating(correctNotesPercentage);
         }
         else
         {
-            sentenceScore = new SentenceScore(analyzedSentence);
+            sentenceScore = CreateSentenceScore(analyzedSentence);
             sentenceRating = GetSentenceRating(0);
         }
+        sentenceScore.TotalScoreSoFar = TotalScore;
+
+        // Update the total score in the SceneData
+        ScoreData.TotalScore = TotalScore;
+        ScoreData.NormalNotesTotalScore = NormalNotesTotalScore;
+        ScoreData.GoldenNotesTotalScore = GoldenNotesTotalScore;
+        ScoreData.PerfectSentenceBonusTotalScore = PerfectSentenceBonusTotalScore;
+
         sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentenceScore, sentenceRating));
     }
 
@@ -230,7 +243,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             ScoreData.GoldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        double scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / (ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
+        double scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / ((double)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
         double scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
 
         maxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * ScoreData.NormalNoteLengthTotal;
@@ -241,7 +254,8 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         bool isSound = Math.Abs(MaxScoreForNotes - pointsForAllNotes) <= 0.01;
         if (!isSound)
         {
-            Debug.LogWarning("The definition of scores for normal or golden notes is not sound.");
+            Debug.LogWarning("The definition of scores for normal or golden notes is not sound: "
+                + $"maxScoreForNormalNotes: {maxScoreForNormalNotes}, maxScoreForGoldenNotes: {maxScoreForGoldenNotes}, sum: {maxScoreForNormalNotes + maxScoreForGoldenNotes}");
         }
 
         // Round the values for the max score of normal / golden notes to avoid floating point inaccuracy.
@@ -253,7 +267,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         maxScoreForNormalNotes -= overhang;
 
         // Remember the sentence count to calculate the points for a perfect sentence.
-        sentenceCount = sentences.Count;
+        ScoreData.TotalSentenceCount = sentences.Count;
     }
 
     private int GetNormalNoteLength(Sentence sentence)
@@ -281,6 +295,13 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             }
         }
         return null;
+    }
+
+    private SentenceScore CreateSentenceScore(Sentence sentence)
+    {
+        SentenceScore sentenceScore = new SentenceScore(sentence);
+        sentenceScore.TotalScoreSoFar = TotalScore;
+        return sentenceScore;
     }
 
     public class SentenceScoreEvent
