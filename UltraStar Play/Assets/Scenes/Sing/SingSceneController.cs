@@ -268,18 +268,14 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
         singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+        singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
 
         // Check if the full song has been sung, i.e., the playback position is after the last note.
         // This determines whether the statistics should be updated and the score should be recorded.
         bool isAfterLastNote = true;
         foreach (PlayerController playerController in PlayerControllers)
         {
-            SingingResultsSceneData.PlayerScoreResultData scoreData = new SingingResultsSceneData.PlayerScoreResultData();
-            scoreData.TotalScore = playerController.PlayerScoreController.TotalScore;
-            scoreData.GoldenNotesScore = playerController.PlayerScoreController.GoldenNotesTotalScore;
-            scoreData.NormalNotesScore = playerController.PlayerScoreController.NormalNotesTotalScore;
-            scoreData.PerfectSentenceBonusScore = playerController.PlayerScoreController.PerfectSentenceBonusTotalScore;
-            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, scoreData);
+            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
 
             Note lastNoteInSong = playerController.GetLastNoteInSong();
             if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)

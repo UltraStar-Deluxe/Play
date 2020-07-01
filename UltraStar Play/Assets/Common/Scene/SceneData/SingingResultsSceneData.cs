@@ -5,11 +5,12 @@ using System.Collections.Generic;
 public class SingingResultsSceneData : SceneData
 {
     public SongMeta SongMeta { get; set; }
+    public int SongDurationInMillis { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new List<PlayerProfile>();
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
-    private readonly Dictionary<PlayerProfile, PlayerScoreResultData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreResultData>();
+    private readonly Dictionary<PlayerProfile, PlayerScoreControllerData> playerScoreMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
 
-    public void AddPlayerScores(PlayerProfile profile, PlayerScoreResultData scoreData)
+    public void AddPlayerScores(PlayerProfile profile, PlayerScoreControllerData scoreData)
     {
         if (!PlayerProfiles.Contains(profile))
         {
@@ -18,16 +19,8 @@ public class SingingResultsSceneData : SceneData
         playerScoreMap[profile] = scoreData;
     }
 
-    public PlayerScoreResultData GetPlayerScores(PlayerProfile playerProfile)
+    public PlayerScoreControllerData GetPlayerScores(PlayerProfile playerProfile)
     {
         return playerScoreMap[playerProfile];
-    }
-
-    public class PlayerScoreResultData
-    {
-        public double TotalScore { get; set; }
-        public double NormalNotesScore { get; set; }
-        public double GoldenNotesScore { get; set; }
-        public double PerfectSentenceBonusScore { get; set; }
     }
 }

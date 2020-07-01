@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -6,21 +6,6 @@ using UnityEngine.UI;
 
 abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickHandler
 {
-    // The fields of this class are loaded lazy instead of in Awake,
-    // because if the context menu would never be opened then the fields would never be used.
-    private RectTransform rectTransform;
-    private RectTransform RectTransform
-    {
-        get
-        {
-            if (rectTransform == null)
-            {
-                rectTransform = GetComponent<RectTransform>();
-            }
-            return rectTransform;
-        }
-    }
-
     private Canvas canvas;
     private Canvas Canvas
     {
@@ -41,8 +26,7 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
         if (ped.button == PointerEventData.InputButton.Right)
         {
             ContextMenu contextMenu = OpenContextMenu();
-            RectTransform contextMenuRectTransform = contextMenu.GetComponent<RectTransform>();
-            contextMenuRectTransform.position = ped.position;
+            contextMenu.RectTransform.position = ped.position;
         }
     }
 
@@ -56,6 +40,6 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
 
     private ContextMenu GetContextMenuPrefab()
     {
-        return ContextMenuManager.Instance.contextMenuPrefab;
+        return UiManager.Instance.contextMenuPrefab;
     }
 }

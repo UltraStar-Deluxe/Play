@@ -28,6 +28,12 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public RectTransform debugPositionIndicatorPrefab;
 
+    [InjectedInInspector]
+    public ContextMenu contextMenuPrefab;
+
+    [InjectedInInspector]
+    public Tooltip tooltipPrefab;
+
     private Canvas canvas;
     private RectTransform canvasRectTransform;
     private float notificationHeightInPixels;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -95,5 +95,92 @@ public class DynamicallyCreatedImage : MonoBehaviour
                 SetPixel(x, y, color);
             }
         }
+    }
+
+    /**
+     * Draws a 1px thick line between points a and b.
+     */
+    public void DrawLine(int ax, int ay, int bx, int by, Color color)
+    {
+        // Bresenham algorithm to draw lines.
+        // See https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+        int dx = Math.Abs(bx - ax), sx = ax < bx ? 1 : -1;
+        int dy = -Math.Abs(by - ay), sy = ay < by ? 1 : -1;
+        int err = dx + dy, e2; /* error value e_xy */
+
+        while (true)
+        {
+            SetPixel(ax, ay, color);
+            if (ax == bx && ay == by)
+            {
+                break;
+            }
+            e2 = 2 * err;
+            if (e2 > dy)
+            {
+                /* e_xy+e_x > 0 */
+                err += dy;
+                ax += sx;
+            }
+            if (e2 < dx)
+            {
+                /* e_xy+e_y < 0 */
+                err += dx;
+                ay += sy;
+            }
+        }
+    }
+
+    /**
+     * Draws a line (between points a and b) with thickness and anti-aliasing.
+     */
+    public void DrawLine(int ax, int ay, int bx, int by, float thickness, Color color)
+    {
+        // Represent lines as capsule shapes,
+        // implements anti-aliasing by signed distance field (SDF) and optimization with AABB
+        // See https://github.com/miloyip/line/blob/master/line_sdfaabb.c
+
+        // r is the radius of the capsule. Thus, use half the thickness.
+        float r = thickness / 2;
+        int x0 = (int)Mathf.Floor(Math.Min(ax, bx) - r);
+        x0 = NumberUtils.Limit(x0, 0, TextureWidth - 1);
+        int x1 = (int)Mathf.Ceil(Math.Max(ax, bx) + r);
+        x1 = NumberUtils.Limit(x1, 0, TextureWidth - 1);
+
+        int y0 = (int)Mathf.Floor(Math.Min(ay, by) - r);
+        y0 = NumberUtils.Limit(y0, 0, TextureHeight - 1);
+        int y1 = (int)Mathf.Ceil(Math.Max(ay, by) + r);
+        y1 = NumberUtils.Limit(y1, 0, TextureHeight - 1);
+
+        for (int y = y0; y <= y1; y++)
+        {
+            for (int x = x0; x <= x1; x++)
+            {
+                float alpha = Mathf.Max(Mathf.Min(0.5f - CapsuleSdf(x, y, ax, ay, bx, by, r), 1.0f), 0.0f);
+                Color currentColor = texture.GetPixel(x, y);
+                Color finalColor = AlphaBlend(currentColor, color, alpha);
+                SetPixel(x, y, finalColor);
+            }
+        }
+    }
+
+    private float CapsuleSdf(float px, float py, float ax, float ay, float bx, float by, float r)
+    {
+        // See https://github.com/miloyip/line/blob/master/line_sdfaabb.c
+        float pax = px - ax;
+        float pay = py - ay;
+        float bax = bx - ax;
+        float bay = by - ay;
+        float h = Mathf.Max(Mathf.Min((pax * bax + pay * bay) / (bax * bax + bay * bay), 1.0f), 0.0f);
+        float dx = pax - bax * h, dy = pay - bay * h;
+        return Mathf.Sqrt(dx * dx + dy * dy) - r;
+    }
+
+    private Color AlphaBlend(Color currentColor, Color targetColor, float alpha)
+    {
+        return new Color(currentColor.r * (1 - alpha) + targetColor.r * alpha,
+            currentColor.g * (1 - alpha) + targetColor.g * alpha,
+            currentColor.b * (1 - alpha) + targetColor.b * alpha,
+            currentColor.a * (1 - alpha) + targetColor.a * alpha);
     }
 }
