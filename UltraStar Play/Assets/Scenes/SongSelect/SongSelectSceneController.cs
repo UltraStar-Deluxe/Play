@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 using System.Globalization;
 using System.Threading;
 using System.IO;
+using System;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -425,5 +426,34 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
             return true;
         }
         return false;
+    }
+
+    public void DoCharacterQuickJump(char character)
+    {
+        Predicate<char> matchPredicate;
+        if (char.IsLetterOrDigit(character))
+        {
+            // Jump to song where artist starts with character
+            matchPredicate = (artistCharacter) => artistCharacter == character;
+        }
+        else if (character == '#')
+        {
+            // Jump to song where artist starts with number
+            matchPredicate = (artistCharacter) => char.IsDigit(artistCharacter);
+        }
+        else
+        {
+            // Jump to song where artist starts with non-alphanumeric character
+            matchPredicate = (artistCharacter) => !char.IsLetterOrDigit(artistCharacter);
+        }
+
+        SongMeta match = GetFilteredSongMetas()
+                .Where(songMeta => !songMeta.Artist.IsNullOrEmpty()
+                                   && matchPredicate.Invoke(songMeta.Artist.ToLower()[0]))
+                .FirstOrDefault();
+        if (match != null)
+        {
+            songRouletteController.SelectSong(match);
+        }
     }
 }
