@@ -282,6 +282,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void OnSearchTextChanged()
     {
         SongMeta lastSelectedSong = SelectedSong;
+        string rawSearchText = GetRawSearchText();
+        if (TryExecuteSpecialSearchSyntax(rawSearchText))
+        {
+            // Special search syntax used. Do not perform normal filtering.
+            return;
+        }
+
         UpdateFilteredSongs();
         if (string.IsNullOrEmpty(GetSearchText()))
         {
@@ -298,7 +305,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     public List<SongMeta> GetFilteredSongMetas()
     {
-        string searchText = IsSearchEnabled() ? GetSearchText() : null;
+        string searchText = IsSearchEnabled() ? GetSearchText().TrimStart() : null;
         UltraStarPlaylist playlist = playlistSlider.SelectedItem;
         List<SongMeta> filteredSongs = songMetas
             .Where(songMeta => searchText.IsNullOrEmpty()
@@ -328,9 +335,14 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         EventSystem.current.SetSelectedGameObject(null);
     }
 
+    public string GetRawSearchText()
+    {
+        return searchTextInputField.Text;
+    }
+
     public string GetSearchText()
     {
-        return searchTextInputField.Text.ToLower();
+        return GetRawSearchText().TrimStart().ToLower();
     }
 
     public bool IsSearchEnabled()
@@ -397,5 +409,21 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void UpdateFilteredSongs()
     {
         songRouletteController.SetSongs(GetFilteredSongMetas());
+    }
+
+    private bool TryExecuteSpecialSearchSyntax(string searchText)
+    {
+        if (searchText != null && searchText.StartsWith("#"))
+        {
+            // #<number> jumps to song at index <number>.
+            // The check for the special syntax has already been made, so we know the searchText starts with #.
+            string numberString = searchText.Substring(1);
+            if (int.TryParse(numberString, out int number))
+            {
+                songRouletteController.SelectSongByIndex(number - 1, false);
+            }
+            return true;
+        }
+        return false;
     }
 }
