@@ -232,6 +232,19 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         Selection.Value = new SongSelection(songMeta, songs.IndexOf(songMeta), songs.Count);
     }
 
+    public void SelectSongByIndex(int index, bool wrapAround = true)
+    {
+        if (!wrapAround
+            && (index < 0 || songs.Count <= index))
+        {
+            // Ignore out-of-range index
+            return;
+        }
+
+        SongMeta nextSong = GetSongAtIndex(index);
+        SelectSong(nextSong);
+    }
+
     public SongMeta Find(Predicate<SongMeta> predicate)
     {
         return songs.Find(predicate);
@@ -248,8 +261,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         {
             nextIndex = SelectedSongIndex + 1;
         }
-        SongMeta nextSong = GetSongAtIndex(nextIndex);
-        SelectSong(nextSong);
+        SelectSongByIndex(nextIndex);
     }
 
     public void SelectPreviousSong()
@@ -263,15 +275,13 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         {
             nextIndex = SelectedSongIndex - 1;
         }
-        SongMeta nextSong = GetSongAtIndex(nextIndex);
-        SelectSong(nextSong);
+        SelectSongByIndex(nextIndex);
     }
 
     public void SelectRandomSong()
     {
         int songIndex = new System.Random().Next(0, songs.Count - 1);
-        SongMeta nextSong = GetSongAtIndex(songIndex);
-        SelectSong(nextSong);
+        SelectSongByIndex(songIndex);
     }
 
     private SongMeta GetSongAtIndex(int nextIndex)
