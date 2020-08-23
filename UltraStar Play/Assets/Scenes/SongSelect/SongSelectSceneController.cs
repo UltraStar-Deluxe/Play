@@ -35,6 +35,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     [InjectedInInspector]
     public PlaylistSlider playlistSlider;
 
+    [InjectedInInspector]
+    public OrderSlider orderSlider;
+
     public ArtistText artistText;
     public Text songTitleText;
 
@@ -50,8 +53,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
     private int lastSongMetasReloadFrame = -1;
-    private Statistics statsManager;
-
     private SongMeta selectedSongBeforeSearch;
 
     [Inject]
@@ -88,14 +89,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SelectionClickedEventStream
             .Subscribe(selection => CheckAudioAndStartSingScene());
 
-        statsManager = StatsManager.Instance.Statistics;
-
         InitSongRoulette();
 
         // Show a message when no songs have been found.
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
 
         playlistSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
+        orderSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
     }
 
     private void GetSongMetasFromManager()
@@ -314,8 +314,31 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
                                || songMeta.Artist.ToLower().Contains(searchText))
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
+            .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
             .ToList();
         return filteredSongs;
+    }
+
+    private object GetSongMetaOrderByProperty(SongMeta songMeta)
+    {
+        switch (orderSlider.SelectedItem)
+        {
+            case ESongSelectOrder.Artist:
+                return songMeta.Artist;
+            case ESongSelectOrder.Title:
+                return songMeta.Title;
+            case ESongSelectOrder.Genre:
+                return songMeta.Genre;
+            case ESongSelectOrder.Language:
+                return songMeta.Language;
+            case ESongSelectOrder.Folder:
+                return songMeta.Directory + "/" + songMeta.Filename;
+            case ESongSelectOrder.Year:
+                return songMeta.Year;
+            case ESongSelectOrder.YearReverse:
+                return -songMeta.Year;
+        }
+        return songMeta.Artist;
     }
 
     public void EnableSearch(SearchInputField.ESearchMode searchMode)
@@ -368,6 +391,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         bb.BindExistingInstance(songRouletteController);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(playlistSlider);
+        bb.BindExistingInstance(orderSlider);
         return bb.GetBindings();
     }
 
