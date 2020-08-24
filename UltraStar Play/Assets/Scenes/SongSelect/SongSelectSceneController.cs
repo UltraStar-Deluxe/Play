@@ -101,7 +101,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         InitSongRoulette();
     }
 
-    private void GetSongMetasFromManager()
+    public void GetSongMetasFromManager()
     {
         songMetas = new List<SongMeta>(SongMetaManager.Instance.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
@@ -459,32 +459,53 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         return false;
     }
 
-    public void DoCharacterQuickJump(char character)
+    public SongMeta GetCharacterQuickJumpSongMeta(char character)
     {
         Predicate<char> matchPredicate;
         if (char.IsLetterOrDigit(character))
         {
-            // Jump to song where artist starts with character
-            matchPredicate = (artistCharacter) => artistCharacter == character;
+            // Jump to song starts with character
+            matchPredicate = (songCharacter) => songCharacter == character;
         }
         else if (character == '#')
         {
-            // Jump to song where artist starts with number
-            matchPredicate = (artistCharacter) => char.IsDigit(artistCharacter);
+            // Jump to song starts with number
+            matchPredicate = (songCharacter) => char.IsDigit(songCharacter);
         }
         else
         {
-            // Jump to song where artist starts with non-alphanumeric character
-            matchPredicate = (artistCharacter) => !char.IsLetterOrDigit(artistCharacter);
+            // Jump to song starts with non-alphanumeric character
+            matchPredicate = (songCharacter) => !char.IsLetterOrDigit(songCharacter);
         }
 
         SongMeta match = GetFilteredSongMetas()
-                .Where(songMeta => !songMeta.Artist.IsNullOrEmpty()
-                                   && matchPredicate.Invoke(songMeta.Artist.ToLower()[0]))
-                .FirstOrDefault();
-        if (match != null)
-        {
-            songRouletteController.SelectSong(match);
-        }
+            .Where(songMeta =>
+            {
+                string relevantString;
+                if (orderSlider.SelectedItem == ESongOrder.Title)
+                {
+                    relevantString = songMeta.Title;
+                }
+                else if (orderSlider.SelectedItem == ESongOrder.Genre)
+                {
+                    relevantString = songMeta.Genre;
+                }
+                else if (orderSlider.SelectedItem == ESongOrder.Language)
+                {
+                    relevantString = songMeta.Language;
+                }
+                else if (orderSlider.SelectedItem == ESongOrder.Folder)
+                {
+                    relevantString = songMeta.Directory + "/" + songMeta.Filename;
+                }
+                else
+                {
+                    relevantString = songMeta.Artist;
+                }
+                return !relevantString.IsNullOrEmpty()
+                    && matchPredicate.Invoke(relevantString.ToLower()[0]);
+            })
+            .FirstOrDefault();
+        return match;
     }
 }

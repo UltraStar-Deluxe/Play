@@ -21,16 +21,41 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private OrderSlider orderSlider;
+
+    [Inject]
+    private SongSelectSceneController songSelectSceneController;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
+
+    private bool isSongMetasOutdated;
+
     void Start()
     {
         UpdateCharacters();
+        orderSlider.Selection.Subscribe(newSongOrder => UpdateCharacters());
+        songMetaManager.SongScanFinishedEventStream.Subscribe(_ => isSongMetasOutdated = true);
+    }
+
+    void Update()
+    {
+        if (isSongMetasOutdated)
+        {
+            Debug.Log("Song Metas Outdated");
+            isSongMetasOutdated = false;
+            songSelectSceneController.GetSongMetasFromManager();
+            songSelectSceneController.UpdateFilteredSongs();
+            UpdateCharacters();
+        }
     }
 
     private void UpdateCharacters()
     {
         GetComponentsInChildren<CharacterQuickJump>().ForEach(it => Destroy(it.gameObject));
 
-        foreach (char c in characters)
+        foreach (char c in characters.ToLower())
         {
             CreateCharacter(c);
         }
@@ -41,5 +66,11 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
         CharacterQuickJump characterQuickJump = Instantiate(characterQuickJumpPrefab, transform);
         characterQuickJump.character = character.ToString();
         injector.Inject(characterQuickJump);
+
+        SongMeta match = songSelectSceneController.GetCharacterQuickJumpSongMeta(character);
+        if (match == null)
+        {
+            characterQuickJump.Interactable = false;
+        }
     }
 }

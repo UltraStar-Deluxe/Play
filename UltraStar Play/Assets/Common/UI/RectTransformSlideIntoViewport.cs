@@ -23,7 +23,7 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
 
     public Side side;
 
-    public float animTimeInSeconds = 0.5f;
+    public float animTimeInSeconds = 0.2f;
 
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
