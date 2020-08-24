@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UniRx;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
@@ -37,6 +38,9 @@ public class SongMetaManager : MonoBehaviour
             return isSongScanFinished;
         }
     }
+
+    private Subject<SongScanFinishedEvent> songScanFinishedEventStream = new Subject<SongScanFinishedEvent>();
+    public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
     public void Add(SongMeta songMeta)
     {
@@ -117,6 +121,7 @@ public class SongMetaManager : MonoBehaviour
             }
             stopwatch.Stop();
             Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms.");
+            songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
         });
     }
 
@@ -227,5 +232,9 @@ public class SongMetaManager : MonoBehaviour
             Thread.Sleep(100);
         }
         Debug.LogError("Song scan did not finish - timeout reached.");
+    }
+
+    public class SongScanFinishedEvent
+    {
     }
 }
