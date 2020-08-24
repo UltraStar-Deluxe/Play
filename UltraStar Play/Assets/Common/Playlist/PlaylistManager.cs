@@ -105,7 +105,8 @@ public class PlaylistManager : MonoBehaviour
 
     public string GetPlaylistName(UltraStarPlaylist playlist)
     {
-        if (playlist == null)
+        if (playlist == null
+            || playlist is UltraStarAllSongsPlaylist)
         {
             return "";
         }

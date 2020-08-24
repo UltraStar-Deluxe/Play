@@ -45,6 +45,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     [Inject]
     private Injector sceneInjector;
 
+    [Inject]
+    private Statistics statistics;
+
     public List<PlayerController> PlayerControllers { get; private set; } = new List<PlayerController>();
 
     public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
@@ -294,15 +297,12 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     private void UpdateSongFinishedStats()
     {
-        //Get the stats manager and the stats object
-        Statistics stats = StatsManager.Instance.Statistics;
-        foreach (PlayerController playerController in PlayerControllers)
-        {
-            //Save to highscore database
-            stats.RecordSongFinished(SongMeta, playerController.PlayerProfile.Name,
-                playerController.PlayerProfile.Difficulty,
-                playerController.PlayerScoreController.TotalScore);
-        }
+        List<SongStatistic> songStatistics = PlayerControllers
+            .Select(playerController => new SongStatistic(playerController.PlayerProfile.Name,
+                                                          playerController.PlayerProfile.Difficulty,
+                                                          playerController.PlayerScoreController.TotalScore))
+            .ToList();
+        statistics.RecordSongFinished(SongMeta, songStatistics);
     }
 
     private PlayerController CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
