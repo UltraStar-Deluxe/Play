@@ -92,17 +92,52 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 uiNote.image.enabled = false;
             }
 
+            // Position lyrics. Width until next note, vertically centered on lyricsBar.
             uiNote.lyricsUiText.enabled = true;
             uiNote.lyricsUiText.color = Color.white;
             uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
 
             RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
-            lyricsRectTransform.SetParent(lyricsBar);
-            lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
+            lyricsRectTransform.SetParent(uiNote.transform.parent, true);
+            PositionUiNote(lyricsRectTransform, 60, note.StartBeat, GetNoteStartBeatOfFollowingNote(note));
+            lyricsRectTransform.SetParent(lyricsBar, true);
+            lyricsRectTransform.anchorMin = new Vector2(lyricsRectTransform.anchorMin.x, 0);
+            lyricsRectTransform.anchorMax = new Vector2(lyricsRectTransform.anchorMax.x, 1);
             lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
-            uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform);
+            lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
+            uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform, true);
         }
         return uiNote;
+    }
+
+    private double GetNoteStartBeatOfFollowingNote(Note note)
+    {
+        Sentence sentence = note.Sentence;
+        if (sentence == null)
+        {
+            return note.EndBeat;
+        }
+
+        Note followingNote = sentence.Notes
+            .Where(otherNote => otherNote.StartBeat >= note.EndBeat)
+            .OrderBy(otherNote => otherNote.StartBeat)
+            .FirstOrDefault();
+        if (followingNote != null)
+        {
+            if (note.EndBeat == followingNote.StartBeat)
+            {
+                return note.EndBeat;
+            }
+            else
+            {
+                // Add a little bit spacing
+                return followingNote.StartBeat - 1;
+            }
+        }
+        else
+        {
+            return sentence.ExtendedMaxBeat;
+        }
     }
 
     private void UpdateUiNotePositions()
