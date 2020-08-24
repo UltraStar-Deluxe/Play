@@ -10,6 +10,7 @@ public class GraphicSettings
     public FullScreenMode fullScreenMode = FullScreenMode.Windowed;
     public int targetFps = 30;
     public ENoteDisplayMode noteDisplayMode = ENoteDisplayMode.SentenceBySentence;
+    public bool showPitchIndicator = false;
     public bool useImageAsCursor = true;
     public bool showLyricsOnNotes = true;
 }
