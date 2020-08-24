@@ -56,6 +56,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     private SongMeta selectedSongBeforeSearch;
 
     [Inject]
+    private Statistics statistics;
+
+    [Inject]
     private EventSystem eventSystem;
 
     [Inject]
@@ -89,13 +92,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SelectionClickedEventStream
             .Subscribe(selection => CheckAudioAndStartSingScene());
 
-        InitSongRoulette();
-
         // Show a message when no songs have been found.
         noSongsFoundMessage.SetActive(songMetas.IsNullOrEmpty());
 
         playlistSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
         orderSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
+
+        InitSongRoulette();
     }
 
     private void GetSongMetasFromManager()
@@ -323,21 +326,24 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     {
         switch (orderSlider.SelectedItem)
         {
-            case ESongSelectOrder.Artist:
+            case ESongOrder.Artist:
                 return songMeta.Artist;
-            case ESongSelectOrder.Title:
+            case ESongOrder.Title:
                 return songMeta.Title;
-            case ESongSelectOrder.Genre:
+            case ESongOrder.Genre:
                 return songMeta.Genre;
-            case ESongSelectOrder.Language:
+            case ESongOrder.Language:
                 return songMeta.Language;
-            case ESongSelectOrder.Folder:
+            case ESongOrder.Folder:
                 return songMeta.Directory + "/" + songMeta.Filename;
-            case ESongSelectOrder.Year:
+            case ESongOrder.Year:
                 return songMeta.Year;
-            case ESongSelectOrder.YearReverse:
-                return -songMeta.Year;
+            case ESongOrder.CountStarted:
+                return statistics.GetLocalStats(songMeta)?.TimesStarted;
+            case ESongOrder.CountFinished:
+                return statistics.GetLocalStats(songMeta)?.TimesFinished;
         }
+        Debug.LogWarning("Unkown order for songs: " + orderSlider.SelectedItem);
         return songMeta.Artist;
     }
 

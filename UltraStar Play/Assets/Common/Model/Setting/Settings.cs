@@ -13,6 +13,7 @@ public class Settings
     public List<MicProfile> MicProfiles { get; set; } = new List<MicProfile>();
 
     public SongEditorSettings SongEditorSettings { get; set; } = new SongEditorSettings();
+    public SongSelectSettings SongSelectSettings { get; set; } = new SongSelectSettings();
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.

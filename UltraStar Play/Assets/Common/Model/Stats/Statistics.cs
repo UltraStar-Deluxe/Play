@@ -40,17 +40,20 @@ public class Statistics
 
     public void RecordSongStarted(SongMeta songMeta)
     {
-        LocalStatistics.GetOrInitialize(songMeta.SongHash).UpdateSongStarted();
+        LocalStatistics.GetOrInitialize(songMeta.SongHash).IncrementSongStarted();
         IsDirty = true;
     }
 
-    public void RecordSongFinished(SongMeta songMeta, string playerName, EDifficulty difficulty, int score)
+    public void RecordSongFinished(SongMeta songMeta, List<SongStatistic> songStatistics)
     {
-        Debug.Log("Recording song stats for " + playerName);
-        SongStatistic statsObject = new SongStatistic(playerName, difficulty, score);
-        LocalStatistics.GetOrInitialize(songMeta.SongHash).UpdateSongFinished(statsObject);
-
-        UpdateTopScores(songMeta, statsObject);
+        Debug.Log("Recording song finished stats for: " + songMeta.Title);
+        LocalStatistic localStatistic = LocalStatistics.GetOrInitialize(songMeta.SongHash);
+        localStatistic.IncrementSongFinished();
+        foreach (SongStatistic songStatistic in songStatistics)
+        {
+            localStatistic.AddSongStatistics(songStatistic);
+            UpdateTopScores(songMeta, songStatistic);
+        }
 
         IsDirty = true;
     }
