@@ -97,6 +97,13 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         playlistSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
         orderSlider.Selection.Subscribe(_ => UpdateFilteredSongs());
+        playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
+        {
+            if (playlistChangeEvent.Playlist == playlistSlider.SelectedItem)
+            {
+                UpdateFilteredSongs();
+            }
+        });
 
         InitSongRoulette();
     }
@@ -423,18 +430,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
         if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong.Artist, SelectedSong.Title))
         {
-            playlistManager.FavoritesPlaylist.RemoveSongEntry(SelectedSong.Artist, SelectedSong.Title);
+            playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
         }
         else
         {
-            playlistManager.FavoritesPlaylist.AddLineEntry(new UltraStartPlaylistSongEntry(SelectedSong.Artist, SelectedSong.Title));
-        }
-        playlistManager.SavePlaylist(playlistManager.FavoritesPlaylist);
-
-        favoriteIndicator.UpdateImage(SelectedSong);
-        if (!(playlistSlider.SelectedItem is UltraStarAllSongsPlaylist))
-        {
-            UpdateFilteredSongs();
+            playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
         }
     }
 
