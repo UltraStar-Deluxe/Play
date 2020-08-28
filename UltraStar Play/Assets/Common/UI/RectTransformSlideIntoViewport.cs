@@ -96,6 +96,9 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
                 return new Vector2(0, 1);
             case Side.Bottom:
                 return new Vector2(0, -1);
+            default:
+                // Use return at end of method
+                break;
         }
         return Vector2.zero;
     }

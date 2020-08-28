@@ -320,8 +320,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         UltraStarPlaylist playlist = playlistSlider.SelectedItem;
         List<SongMeta> filteredSongs = songMetas
             .Where(songMeta => searchText.IsNullOrEmpty()
-                               || songMeta.Title.ToLower().Contains(searchText)
-                               || songMeta.Artist.ToLower().Contains(searchText))
+                               || songMeta.Title.ToLowerInvariant().Contains(searchText)
+                               || songMeta.Artist.ToLowerInvariant().Contains(searchText))
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
@@ -349,6 +349,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
                 return statistics.GetLocalStats(songMeta)?.TimesStarted;
             case ESongOrder.CountFinished:
                 return statistics.GetLocalStats(songMeta)?.TimesFinished;
+            default:
+                // See end of method
+                break;
         }
         Debug.LogWarning("Unkown order for songs: " + orderSlider.SelectedItem);
         return songMeta.Artist;
@@ -379,7 +382,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     public string GetSearchText()
     {
-        return GetRawSearchText().TrimStart().ToLower();
+        return GetRawSearchText().TrimStart().ToLowerInvariant();
     }
 
     public bool IsSearchEnabled()
@@ -503,7 +506,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
                     relevantString = songMeta.Artist;
                 }
                 return !relevantString.IsNullOrEmpty()
-                    && matchPredicate.Invoke(relevantString.ToLower()[0]);
+                    && matchPredicate.Invoke(relevantString.ToLowerInvariant()[0]);
             })
             .FirstOrDefault();
         return match;

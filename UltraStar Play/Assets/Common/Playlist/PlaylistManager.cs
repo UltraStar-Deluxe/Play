@@ -42,7 +42,7 @@ public class PlaylistManager : MonoBehaviour
         }
     }
 
-    private Subject<PlaylistChangeEvent> playlistChangeEventStream = new Subject<PlaylistChangeEvent>();
+    private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new Subject<PlaylistChangeEvent>();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
     private readonly string playlistFileExtension = ".playlist";

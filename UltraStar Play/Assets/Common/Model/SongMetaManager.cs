@@ -39,7 +39,7 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
-    private Subject<SongScanFinishedEvent> songScanFinishedEventStream = new Subject<SongScanFinishedEvent>();
+    private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new Subject<SongScanFinishedEvent>();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
     public void Add(SongMeta songMeta)
