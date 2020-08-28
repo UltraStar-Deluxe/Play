@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class RectTransformUtils
+public static class RectTransformUtils
 {
     public static bool IsMouseOverRectTransform(RectTransform rectTransform)
     {

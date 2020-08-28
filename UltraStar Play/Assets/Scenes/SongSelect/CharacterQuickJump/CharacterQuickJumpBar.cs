@@ -55,7 +55,7 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
     {
         GetComponentsInChildren<CharacterQuickJump>().ForEach(it => Destroy(it.gameObject));
 
-        foreach (char c in characters.ToLower())
+        foreach (char c in characters.ToLowerInvariant())
         {
             CreateCharacter(c);
         }

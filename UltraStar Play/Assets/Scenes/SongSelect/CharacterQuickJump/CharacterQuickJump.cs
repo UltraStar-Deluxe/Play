@@ -5,6 +5,7 @@ using UniRx;
 using UniRx.Triggers;
 using UnityEngine.EventSystems;
 using System;
+using System.Globalization;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -39,19 +40,19 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        uiText.text = character.ToUpper();
+        uiText.text = character.ToUpperInvariant();
 
         uiButton.OnClickAsObservable()
             .Subscribe(_ => DoCharacterQuickJump());
         this.ObserveEveryValueChanged(me => me.character).WhereNotNull()
-            .Subscribe(newCharacter => uiText.text = newCharacter.ToUpper());
+            .Subscribe(newCharacter => uiText.text = newCharacter.ToUpperInvariant());
     }
 
     private void DoCharacterQuickJump()
     {
         if (!character.IsNullOrEmpty())
         {
-            SongMeta match = songSelectSceneController.GetCharacterQuickJumpSongMeta(character.ToLower()[0]);
+            SongMeta match = songSelectSceneController.GetCharacterQuickJumpSongMeta(character.ToLowerInvariant()[0]);
             if (match != null)
             {
                 songRouletteController.SelectSong(match);
