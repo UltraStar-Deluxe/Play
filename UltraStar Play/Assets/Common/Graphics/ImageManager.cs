@@ -1,6 +1,4 @@
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -84,6 +82,8 @@ public class ImageManager
                 RemoveCachedSprite(cachedSprite);
             }
         }
+        // Trigger garbage collection of used resources.
+        Resources.UnloadUnusedAssets();
     }
 
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
@@ -92,8 +92,6 @@ public class ImageManager
         // Destoying the texture is important to free the memory.
         GameObject.Destroy(cachedSprite.Sprite.texture);
         GameObject.Destroy(cachedSprite.Sprite);
-        // Trigger garbage collection of used resources.
-        Resources.UnloadUnusedAssets();
     }
 
     private class CachedSprite
