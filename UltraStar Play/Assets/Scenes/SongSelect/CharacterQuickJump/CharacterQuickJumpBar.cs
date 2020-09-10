@@ -14,7 +14,7 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
 {
     // Quick jump letters that are also found on an Android contacts list.
     // Q, X, Y and Z are skipped (probably because nearly never used).
-    private static readonly string characters = "&ABCDEFGHIJKLMNOPQRSTUVVWXYZ#";
+    private static readonly string characters = "&ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 
     public CharacterQuickJump characterQuickJumpPrefab;
 
