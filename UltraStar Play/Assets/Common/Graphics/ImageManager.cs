@@ -82,8 +82,6 @@ public class ImageManager
                 RemoveCachedSprite(cachedSprite);
             }
         }
-        // Trigger garbage collection of used resources.
-        Resources.UnloadUnusedAssets();
     }
 
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
