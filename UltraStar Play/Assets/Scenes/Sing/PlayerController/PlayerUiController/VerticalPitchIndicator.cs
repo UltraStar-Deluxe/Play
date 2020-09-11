@@ -36,6 +36,9 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
     [Inject(optional = true)]
     private MicProfile micProfile;
 
+    [Inject]
+    private Settings settings;
+
     private RectTransform arrowImageRectTransform;
 
     private int samplesPerBeat;
@@ -64,6 +67,12 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
 
     void Update()
     {
+        if (!settings.GraphicSettings.showPitchIndicator)
+        {
+            arrowImage.gameObject.SetActive(false);
+            return;
+        }
+
         if (songAudioPlayer.PositionInSongInMillis <= 0)
         {
             return;
