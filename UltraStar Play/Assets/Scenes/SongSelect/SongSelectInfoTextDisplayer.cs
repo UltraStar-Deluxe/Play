@@ -10,16 +10,20 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectHighscoreDisplayer : MonoBehaviour, INeedInjection
+public class SongSelectInfoTextDisplayer : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public Text highscoreLocalPlayerText;
     [InjectedInInspector]
     public Text highscoreLocalScoreText;
+
     [InjectedInInspector]
     public Text highscoreWebPlayerText;
     [InjectedInInspector]
     public Text highscoreWebScoreText;
+
+    [InjectedInInspector]
+    public Text countStartedFinishedText;
 
     [Inject]
     private Statistics statistics;
@@ -29,27 +33,29 @@ public class SongSelectHighscoreDisplayer : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        songRouletteController.Selection.Subscribe(songSelection => UpdateHighscoreText(songSelection.SongMeta));
+        songRouletteController.Selection.Subscribe(songSelection => UpdateSongInfoText(songSelection.SongMeta));
     }
 
-    private void UpdateHighscoreText(SongMeta selectedSong)
+    private void UpdateSongInfoText(SongMeta selectedSong)
     {
-        ResetHighscoreText();
+        ResetInfoText();
         if (selectedSong == null)
         {
             return;
         }
 
-        // Display local highscore
         LocalStatistic localStats = statistics.GetLocalStats(selectedSong);
         if (localStats != null)
         {
+            // Display local highscore
             SongStatistic localTopScore = localStats.StatsEntries.TopScore;
             if (localTopScore != null)
             {
-                highscoreLocalPlayerText.text = localTopScore.PlayerName;
-                highscoreLocalScoreText.text = localTopScore.Score.ToString();
+                SetLocalHighscoreText(localTopScore.PlayerName, localTopScore.Score);
             }
+
+            // Display count started/finished
+            SetStartedFinishedText(localStats.TimesStarted, localStats.TimesFinished);
         }
 
         // Display web highscore
@@ -59,17 +65,32 @@ public class SongSelectHighscoreDisplayer : MonoBehaviour, INeedInjection
             SongStatistic webTopScore = webStats.StatsEntries.TopScore;
             if (webTopScore != null)
             {
-                highscoreWebPlayerText.text = webTopScore.PlayerName;
-                highscoreWebScoreText.text = webTopScore.Score.ToString();
+                SetWebHighscoreText(webTopScore.PlayerName, webTopScore.Score);
             }
         }
     }
 
-    private void ResetHighscoreText()
+    private void SetLocalHighscoreText(string playerName, int score)
     {
-        highscoreLocalPlayerText.text = "";
-        highscoreLocalScoreText.text = "0";
-        highscoreWebPlayerText.text = "";
-        highscoreWebScoreText.text = "0";
+        highscoreLocalPlayerText.text = playerName;
+        highscoreLocalScoreText.text = score.ToString();
+    }
+
+    private void SetWebHighscoreText(string playerName, int score)
+    {
+        highscoreWebPlayerText.text = playerName;
+        highscoreWebScoreText.text = score.ToString();
+    }
+
+    private void SetStartedFinishedText(int started, int finished)
+    {
+        countStartedFinishedText.text = started + "/" + finished;
+    }
+
+    private void ResetInfoText()
+    {
+        SetLocalHighscoreText("", 0);
+        SetWebHighscoreText("", 0);
+        SetStartedFinishedText(0, 0);
     }
 }

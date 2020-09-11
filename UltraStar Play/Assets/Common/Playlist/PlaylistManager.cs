@@ -42,6 +42,9 @@ public class PlaylistManager : MonoBehaviour
         }
     }
 
+    private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new Subject<PlaylistChangeEvent>();
+    public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
+
     private readonly string playlistFileExtension = ".playlist";
     private string favoritesPlaylistFile;
     private string playlistFolder;
@@ -105,7 +108,8 @@ public class PlaylistManager : MonoBehaviour
 
     public string GetPlaylistName(UltraStarPlaylist playlist)
     {
-        if (playlist == null)
+        if (playlist == null
+            || playlist is UltraStarAllSongsPlaylist)
         {
             return "";
         }
@@ -113,5 +117,31 @@ public class PlaylistManager : MonoBehaviour
         string filePath = playlistToFilePathMap[playlist];
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         return fileName;
+    }
+
+    public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
+    {
+        playlist.RemoveSongEntry(songMeta.Artist, songMeta.Title);
+        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, songMeta));
+        SavePlaylist(playlist);
+    }
+
+    public void AddSongToPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
+    {
+        playlist.AddLineEntry(new UltraStartPlaylistSongEntry(songMeta.Artist, songMeta.Title));
+        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, songMeta));
+        SavePlaylist(playlist);
+    }
+
+    public class PlaylistChangeEvent
+    {
+        public UltraStarPlaylist Playlist { get; set; }
+        public SongMeta SongMeta { get; set; }
+
+        public PlaylistChangeEvent(UltraStarPlaylist playlist, SongMeta songMeta)
+        {
+            Playlist = playlist;
+            SongMeta = songMeta;
+        }
     }
 }

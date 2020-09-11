@@ -15,6 +15,9 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
     [Inject]
     private PlaylistManager playlistManager;
 
+    [Inject]
+    private Settings settings;
+
     protected override void Start()
     {
         base.Start();
@@ -22,7 +25,11 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
         playlists.Add(new UltraStarAllSongsPlaylist());
         playlists.AddRange(playlistManager.Playlists);
         Items = playlists;
-        Selection.Value = Items[0];
+        Selection.Value = playlists
+            .Where(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
+            .FirstOrDefault()
+            .OrIfNull(playlists[0]);
+        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
     }
 
     protected override string GetDisplayString(UltraStarPlaylist playlist)

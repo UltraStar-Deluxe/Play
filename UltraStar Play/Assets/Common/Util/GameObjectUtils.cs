@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -62,5 +62,17 @@ public static class GameObjectUtils
         {
             GameObject.Destroy(child.gameObject);
         }
+    }
+
+    public static T GetOrAddComponent<T>(GameObject gameObject)
+            where T : Component
+    {
+        var component = gameObject.GetComponent<T>();
+        if (component == null)
+        {
+            component = gameObject.AddComponent<T>();
+        }
+
+        return component;
     }
 }

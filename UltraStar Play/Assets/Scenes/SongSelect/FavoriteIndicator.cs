@@ -34,6 +34,14 @@ public class FavoriteIndicator : MonoBehaviour, INeedInjection
     {
         songRouletteController.Selection.Subscribe(newSelection => UpdateImage(newSelection.SongMeta));
         image.OnPointerClickAsObservable().Subscribe(_ => songSelectSceneController.ToggleSelectedSongIsFavorite());
+
+        playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
+        {
+            if (songRouletteController.Selection.Value.SongMeta == playlistChangeEvent.SongMeta)
+            {
+                UpdateImage(playlistChangeEvent.SongMeta);
+            }
+        });
     }
 
     public void UpdateImage(SongMeta songMeta)
