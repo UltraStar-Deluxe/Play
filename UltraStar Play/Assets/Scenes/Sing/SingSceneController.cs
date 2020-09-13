@@ -103,7 +103,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
         // Prepare columns and rows for player UI
-        playerUiArea.SetPlayerCount(SceneData.SelectedPlayerProfiles.Count);
+        PlayerUiArea.SetupPlayerUiGrid(SceneData.SelectedPlayerProfiles.Count, playerUiArea.GetComponent<GridLayoutGroupCellSizer>());
 
         // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
