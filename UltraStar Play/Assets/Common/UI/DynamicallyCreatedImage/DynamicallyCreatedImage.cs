@@ -48,6 +48,14 @@ public class DynamicallyCreatedImage : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (texture != null)
+        {
+            Destroy(texture);
+        }
+    }
+
     private void TryCreateTexture()
     {
         // The size of the RectTransform can be zero in the first frame, when inside a layout group.
