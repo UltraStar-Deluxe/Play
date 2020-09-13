@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UniRx.Triggers;
+using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(GridLayoutGroup))]
@@ -14,14 +15,35 @@ public class GridLayoutGroupCellSizer : MonoBehaviour
     private GridLayoutGroup gridLayoutGroup;
     private RectTransform rectTransform;
 
-    void Awake()
+    private int lastColumns;
+    private int lastRows;
+    private Vector2 lastSpacing;
+    private RectOffset lastPadding;
+    private Rect lastRect;
+
+    private void Awake()
     {
         gridLayoutGroup = GetComponent<GridLayoutGroup>();
         rectTransform = GetComponent<RectTransform>();
     }
 
-    void Update()
+    private void Update()
     {
-        gridLayoutGroup.cellSize = new Vector2(rectTransform.rect.width / columns, rectTransform.rect.height / rows);
+        if (lastRows != rows
+            || lastColumns != columns
+            || lastSpacing != gridLayoutGroup.spacing
+            || lastPadding != gridLayoutGroup.padding
+            || lastRect != rectTransform.rect)
+        {
+            float availableWidth = rectTransform.rect.width - (gridLayoutGroup.spacing.x * (columns - 1)) - (gridLayoutGroup.padding.left + gridLayoutGroup.padding.right);
+            float availableHeight = rectTransform.rect.height - (gridLayoutGroup.spacing.y * (rows - 1)) - (gridLayoutGroup.padding.top + gridLayoutGroup.padding.bottom);
+            gridLayoutGroup.cellSize = new Vector2(availableWidth / columns, availableHeight / rows);
+
+            lastRows = rows;
+            lastColumns = columns;
+            lastSpacing = gridLayoutGroup.spacing;
+            lastPadding = gridLayoutGroup.padding;
+            lastRect = rectTransform.rect;
+        }
     }
 }
