@@ -161,6 +161,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
         StartCoroutine(StartMusicAndVideo());
+
+        // Rebuild whole UI
+        LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
     }
 
     private void InitTimeBar()
