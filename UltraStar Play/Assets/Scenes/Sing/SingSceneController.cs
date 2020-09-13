@@ -102,6 +102,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
+        // Prepare columns and rows for player UI
+        playerUiArea.SetPlayerCount(SceneData.SelectedPlayerProfiles.Count);
+
         // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in SceneData.SelectedPlayerProfiles)
