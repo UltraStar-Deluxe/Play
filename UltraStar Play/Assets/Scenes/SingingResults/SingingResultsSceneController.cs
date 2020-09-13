@@ -22,7 +22,16 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
     public GameObject twoPlayerLayout;
 
     [InjectedInInspector]
+    public GameObject threePlayerLayout;
+
+    [InjectedInInspector]
+    public GameObject nPlayerLayout;
+
+    [InjectedInInspector]
     public RectTransform statisticsLegend;
+
+    [InjectedInInspector]
+    public SingingResultsPlayerUiController singingResultsPlayerUiControllerPrefab;
 
     [Inject]
     private Statistics statistics;
@@ -42,9 +51,13 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
 
     void Start()
     {
-        SelectLayout();
-        FillLayout();
+        if (GetSelectedLayout() == nPlayerLayout)
+        {
+            PrepareNPlayerLayout();
+        }
+        ActivateLayout();
         SetStatisticsVisible(false);
+        FillLayout();
     }
 
     private void FillLayout()
@@ -55,7 +68,7 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
         songLabel.text = titleText + artistText;
 
         int i = 0;
-        GameObject selectedLayout = GetSelectedLayout();
+        SingingResultsPlayerUiController[] uiControllers = GetSelectedLayout().GetComponentsInChildren<SingingResultsPlayerUiController>();
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
@@ -69,21 +82,21 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
             childInjector.AddBindingForInstance(songRating);
             childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
 
-            SingingResultsPlayerUiController[] uiControllers = selectedLayout.GetComponentsInChildren<SingingResultsPlayerUiController>();
             if (i < uiControllers.Length)
             {
-                childInjector.InjectAllComponentsInChildren(uiControllers[i]);
+                childInjector.InjectAllComponentsInChildren(uiControllers[i], true);
             }
             i++;
         }
     }
 
-    private void SelectLayout()
+    private void ActivateLayout()
     {
-        int playerCount = sceneData.PlayerProfiles.Count;
         List<GameObject> layouts = new List<GameObject>();
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
+        layouts.Add(threePlayerLayout);
+        layouts.Add(nPlayerLayout);
 
         GameObject selectedLayout = GetSelectedLayout();
         foreach (GameObject layout in layouts)
@@ -95,11 +108,31 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
     private GameObject GetSelectedLayout()
     {
         int playerCount = sceneData.PlayerProfiles.Count;
+        if (playerCount == 1)
+        {
+            return onePlayerLayout;
+        }
         if (playerCount == 2)
         {
             return twoPlayerLayout;
         }
-        return onePlayerLayout;
+        if (playerCount == 3)
+        {
+            return threePlayerLayout;
+        }
+        return nPlayerLayout;
+    }
+
+    private void PrepareNPlayerLayout()
+    {
+        nPlayerLayout.GetComponentsInChildren<SingingResultsPlayerUiController>().ForEach(it => it.gameObject.SetActive(false));
+        GameObjectUtils.DestroyAllDirectChildren(nPlayerLayout.transform);
+        for (int i = 0; i < sceneData.PlayerProfiles.Count; i++)
+        {
+            SingingResultsPlayerUiController singingResultsPlayerUiController = Instantiate(singingResultsPlayerUiControllerPrefab, nPlayerLayout.transform);
+        }
+
+        PlayerUiArea.SetupPlayerUiGrid(sceneData.PlayerProfiles.Count, nPlayerLayout.GetComponent<GridLayoutGroupCellSizer>());
     }
 
     public void FinishScene()
