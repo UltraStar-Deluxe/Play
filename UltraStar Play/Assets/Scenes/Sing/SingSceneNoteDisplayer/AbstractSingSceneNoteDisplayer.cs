@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using System.Xml;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -47,8 +48,10 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     protected int avgMidiNote;
 
-    // The number of rows on which notes can be placed.
     protected int noteRowCount;
+    protected float[] noteRowToAnchorY;
+
+    // The number of rows on which notes can be placed.
     protected int maxNoteRowMidiNote;
     protected int minNoteRowMidiNote;
     protected float noteHeightPercent;
@@ -57,8 +60,8 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     public virtual void Init(int lineCount)
     {
-        lineDisplayer.SetLineCount(lineCount);
-        SetNoteRowCount(lineCount * 2);
+        SetLineCount(lineCount);
+        lineDisplayer.SetTargetLineCount(lineCount);
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
@@ -75,17 +78,28 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         return gameObject;
     }
 
-    public void SetNoteRowCount(int noteRowCount)
+    public void SetLineCount(int lineCount)
     {
-        // Notes can be placed on and between the drawn lines.
-        this.noteRowCount = noteRowCount * 2;
+        // Notes can be placed on and between the drawn lines (between causes -1).
+        // The first and last line is not used (which causes -2). Thus, in total it is -3.
+        noteRowCount = (lineCount * 2) - 3;
         // Check that there is at least one row for every possible note in an octave.
-        if (this.noteRowCount < 12)
+        if (noteRowCount < 12)
         {
             throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
+        noteRowToAnchorY = new float[noteRowCount];
 
-        noteHeightPercent = 1.0f / noteRowCount;
+        float lineHeightPercent = 1.0f / lineCount;
+        noteHeightPercent = lineHeightPercent / 2.0f;
+
+        for (int i = 0; i < noteRowCount; i++)
+        {
+            int lineIndex = (int)Math.Floor(i / 2f);
+            // The even noteRows are drawn between the lines. Thus they have an offset of half the line height.
+            float lineOffset = ((i % 2) == 0) ? 0 : (lineHeightPercent / 2);
+            noteRowToAnchorY[i] = ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
+        }
     }
 
     public void RemoveAllDisplayedNotes()
@@ -304,13 +318,14 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         // (thus, middle row has offset of zero).
         int offset = wrappedMidiNote - avgMidiNote;
         int noteRow = (noteRowCount / 2) + offset;
+        noteRow = NumberUtils.Limit(noteRow, 0, noteRowCount - 1);
         return noteRow;
     }
 
     public Vector2 GetAnchorYForMidiNote(int midiNote)
     {
         int noteRow = CalculateNoteRow(midiNote);
-        float anchorY = (float)noteRow / noteRowCount;
+        float anchorY = noteRowToAnchorY[noteRow];
         float anchorYStart = anchorY - noteHeightPercent;
         float anchorYEnd = anchorY + noteHeightPercent;
         return new Vector2(anchorYStart, anchorYEnd);

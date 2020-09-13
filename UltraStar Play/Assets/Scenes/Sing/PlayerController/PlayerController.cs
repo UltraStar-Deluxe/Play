@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -72,6 +73,10 @@ public class PlayerController : MonoBehaviour, INeedInjection
         this.MicProfile = micProfile;
         this.Voice = GetVoice(songMeta, voiceName);
         this.playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
+
+        // Recalculate layout
+        LayoutRebuilder.ForceRebuildLayoutImmediate(playerUiArea.GetComponent<RectTransform>());
+
         this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
         // Inject all

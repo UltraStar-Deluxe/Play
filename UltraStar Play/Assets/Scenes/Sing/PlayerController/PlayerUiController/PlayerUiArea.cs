@@ -25,6 +25,8 @@ public class PlayerUiArea : MonoBehaviour, INeedInjection
 
         int columns = 1;
         int rows = 2;
+        gridLayoutGroup.spacing = new Vector2(0, gridSpacing);
+
         if (playerCount >= 3)
         {
             columns = 1;

@@ -15,29 +15,29 @@ public class DynamicallyCreatedImage : MonoBehaviour
     private RawImage rawImage;
     private RectTransform rectTransform;
 
-    public int TextureWidth { get; set; } = -1;
-    public int TextureHeight { get; set; } = -1;
+    public int TextureWidth { get; private set; } = -1;
+    public int TextureHeight { get; private set; } = -1;
 
     // The texture might not be creatable until the layout engine has calculated the size of the RectTransform.
     // In this case the actions are stored in this list for later execution when the texture has been created.
     private List<Action> actionQueue = new List<Action>();
-    private bool isTextureCreated;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         rawImage = GetComponent<RawImage>();
-        TryCreateTexture();
+        rawImage.enabled = false;
     }
 
     private void Update()
     {
-        if (!isTextureCreated)
+        if (texture == null
+            && actionQueue.Count > 0)
         {
             TryCreateTexture();
         }
 
-        if (isTextureCreated
+        if (texture != null
             && actionQueue.Count > 0)
         {
             foreach (Action action in actionQueue)
@@ -58,23 +58,25 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     private void TryCreateTexture()
     {
+        if (texture != null)
+        {
+            return;
+        }
+
         // The size of the RectTransform can be zero in the first frame, when inside a layout group.
         // See https://forum.unity.com/threads/solved-cant-get-the-rect-width-rect-height-of-an-element-when-using-layouts.377953/
         if (rectTransform.rect.width <= 0
             || rectTransform.rect.height <= 0)
         {
-            rawImage.enabled = false;
             return;
         }
-        isTextureCreated = true;
-        rawImage.enabled = true;
-
-        TextureWidth = (int)rectTransform.rect.width;
-        TextureHeight = (int)rectTransform.rect.height;
 
         // create the texture and assign to the rawImage
+        TextureWidth = (int)rectTransform.rect.width;
+        TextureHeight = (int)rectTransform.rect.height;
         texture = new Texture2D(TextureWidth, TextureHeight);
         rawImage.texture = texture;
+        rawImage.enabled = true;
 
         // create a 'blank screen' image 
         blank = new Color[TextureWidth * TextureHeight];
@@ -90,6 +92,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void ApplyTexture()
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => ApplyTexture());
@@ -101,6 +104,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void ClearTexture()
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => ClearTexture());
@@ -112,6 +116,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void ShiftImageHorizontally(float xPercent)
     {
+        TryCreateTexture();
         if (rawImage == null)
         {
             actionQueue.Add(() => ShiftImageHorizontally(xPercent));
@@ -123,6 +128,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void ShiftImageVertically(float yPercent)
     {
+        TryCreateTexture();
         if (rawImage == null)
         {
             actionQueue.Add(() => ShiftImageVertically(yPercent));
@@ -134,6 +140,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void SetPixel(int x, int y, Color color)
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => SetPixel(x, y, color));
@@ -145,6 +152,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void DrawRectByWidthAndHeight(int xStart, int yStart, int width, int height, Color color)
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => DrawRectByWidthAndHeight(xStart, yStart, width, height, color));
@@ -158,6 +166,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void DrawRectByCorners(int xStart, int yStart, int xEnd, int yEnd, Color color)
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => DrawRectByCorners(xStart, yStart, xEnd, yEnd, color));
@@ -178,6 +187,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
      */
     public void DrawLine(int ax, int ay, int bx, int by, Color color)
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => DrawLine(ax, ay, bx, by, color));
@@ -218,6 +228,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
      */
     public void DrawLine(int ax, int ay, int bx, int by, float thickness, Color color)
     {
+        TryCreateTexture();
         if (texture == null)
         {
             actionQueue.Add(() => DrawLine(ax, ay, bx, by, thickness, color));
