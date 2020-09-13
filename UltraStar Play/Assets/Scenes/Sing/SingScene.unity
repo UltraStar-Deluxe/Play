@@ -401,7 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Call Me When You're Sober
+  defaultSongName: Kryptonite
   defaultSongNamePasteBin: 'Summer Wine
 
     Me And My Broken Heart
@@ -612,7 +612,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 1
-  m_CellSize: {x: 0, y: 0}
+  m_CellSize: {x: 799.99994, y: 183.08195}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -738,11 +738,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 429.5, y: 241.5, z: 0}
-  anchoredPosition: {x: 429.5, y: 241.5}
-  position: {x: 429.5, y: 241.5, z: 0}
-  sizeDelta: {x: 800, y: 449.82538}
-  size: {x: 800, y: 449.82538}
+  localPosition: {x: 432, y: 243, z: 0}
+  anchoredPosition: {x: 432, y: 243}
+  position: {x: 432, y: 243, z: 0}
+  sizeDelta: {x: 799.99994, y: 449.99997}
+  size: {x: 799.99994, y: 449.99997}
 --- !u!1 &375955950
 GameObject:
   m_ObjectHideFlags: 0
