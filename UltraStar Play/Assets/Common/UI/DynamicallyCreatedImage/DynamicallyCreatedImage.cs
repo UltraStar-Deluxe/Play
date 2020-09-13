@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,25 +18,48 @@ public class DynamicallyCreatedImage : MonoBehaviour
     public int TextureWidth { get; set; } = 256;
     public int TextureHeight { get; set; } = 256;
 
-    void Awake()
+    // The texture might not be creatable until the layout engine has calculated the size of the RectTransform.
+    // In this case the actions are stored in this list for later execution when the texture has been created.
+    private List<Action> actionQueue = new List<Action>();
+    private bool isTextureCreated;
+
+    private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         rawImage = GetComponent<RawImage>();
-        CreateTexture();
+        TryCreateTexture();
     }
 
-    private void CreateTexture()
+    private void Update()
+    {
+        if (!isTextureCreated)
+        {
+            TryCreateTexture();
+        }
+
+        if (isTextureCreated
+            && actionQueue.Count > 0)
+        {
+            foreach (Action action in actionQueue)
+            {
+                action.Invoke();
+            }
+            actionQueue.Clear();
+        }
+    }
+
+    private void TryCreateTexture()
     {
         // The size of the RectTransform can be zero in the first frame, when inside a layout group.
         // See https://forum.unity.com/threads/solved-cant-get-the-rect-width-rect-height-of-an-element-when-using-layouts.377953/
-        if (rectTransform.rect.width != 0)
+        if (rectTransform.rect.width <= 0
+            || rectTransform.rect.height <= 0)
         {
-            TextureWidth = (int)rectTransform.rect.width;
+            rawImage.enabled = false;
+            return;
         }
-        if (rectTransform.rect.height != 0)
-        {
-            TextureHeight = (int)rectTransform.rect.height;
-        }
+        isTextureCreated = true;
+        rawImage.enabled = true;
 
         // create the texture and assign to the rawImage
         texture = new Texture2D(TextureWidth, TextureHeight);
@@ -55,32 +79,67 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void ApplyTexture()
     {
-        // upload to the graphics card 
+        if (texture == null)
+        {
+            actionQueue.Add(() => ApplyTexture());
+            return;
+        }
+
         texture.Apply();
     }
 
     public void ClearTexture()
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => ClearTexture());
+            return;
+        }
+
         texture.SetPixels(blank);
     }
 
     public void ShiftImageHorizontally(float xPercent)
     {
+        if (rawImage == null)
+        {
+            actionQueue.Add(() => ShiftImageHorizontally(xPercent));
+            return;
+        }
+
         rawImage.uvRect = new Rect(xPercent, rawImage.uvRect.y, rawImage.uvRect.width, rawImage.uvRect.height);
     }
 
     public void ShiftImageVertically(float yPercent)
     {
+        if (rawImage == null)
+        {
+            actionQueue.Add(() => ShiftImageVertically(yPercent));
+            return;
+        }
+
         rawImage.uvRect = new Rect(rawImage.uvRect.x, yPercent, rawImage.uvRect.width, rawImage.uvRect.height);
     }
 
     public void SetPixel(int x, int y, Color color)
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => SetPixel(x, y, color));
+            return;
+        }
+
         texture.SetPixel(x, y, color);
     }
 
     public void DrawRectByWidthAndHeight(int xStart, int yStart, int width, int height, Color color)
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => DrawRectByWidthAndHeight(xStart, yStart, width, height, color));
+            return;
+        }
+
         int xEnd = xStart + width;
         int yEnd = yStart + height;
         DrawRectByCorners(xStart, yStart, xEnd, yEnd, color);
@@ -88,6 +147,12 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     public void DrawRectByCorners(int xStart, int yStart, int xEnd, int yEnd, Color color)
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => DrawRectByCorners(xStart, yStart, xEnd, yEnd, color));
+            return;
+        }
+
         for (int x = xStart; x < xEnd; x++)
         {
             for (int y = yStart; y < yEnd; y++)
@@ -102,6 +167,12 @@ public class DynamicallyCreatedImage : MonoBehaviour
      */
     public void DrawLine(int ax, int ay, int bx, int by, Color color)
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => DrawLine(ax, ay, bx, by, color));
+            return;
+        }
+
         // Bresenham algorithm to draw lines.
         // See https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
         int dx = Math.Abs(bx - ax), sx = ax < bx ? 1 : -1;
@@ -136,6 +207,12 @@ public class DynamicallyCreatedImage : MonoBehaviour
      */
     public void DrawLine(int ax, int ay, int bx, int by, float thickness, Color color)
     {
+        if (texture == null)
+        {
+            actionQueue.Add(() => DrawLine(ax, ay, bx, by, thickness, color));
+            return;
+        }
+
         // Represent lines as capsule shapes,
         // implements anti-aliasing by signed distance field (SDF) and optimization with AABB
         // See https://github.com/miloyip/line/blob/master/line_sdfaabb.c
