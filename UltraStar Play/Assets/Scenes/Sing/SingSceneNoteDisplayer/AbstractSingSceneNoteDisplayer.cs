@@ -57,7 +57,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     public virtual void Init(int lineCount)
     {
-        lineDisplayer.UpdateLines(lineCount);
+        lineDisplayer.SetLineCount(lineCount);
         SetNoteRowCount(lineCount * 2);
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>

@@ -13,8 +13,35 @@ public class LineDisplayer : MonoBehaviour
 
     public int lineHeightInPx = 2;
 
-    public void UpdateLines(int lineCount)
+    private int currentLineCount;
+    // Drawing the lines has to be delayed until the texture of the lines has a proper size.
+    private int targetLineCount;
+
+    private void Update()
     {
+        if (targetLineCount > 0
+            && targetLineCount != currentLineCount
+            && horizontalGridImage.TextureWidth > 0)
+        {
+            UpdateLines(targetLineCount);
+        }
+    }
+
+    public void SetLineCount(int lineCount)
+    {
+        if (horizontalGridImage.TextureWidth <= 0)
+        {
+            targetLineCount = lineCount;
+        }
+        else
+        {
+            UpdateLines(lineCount);
+        }
+    }
+
+    private void UpdateLines(int lineCount)
+    {
+        currentLineCount = lineCount;
         horizontalGridImage.ClearTexture();
 
         for (int i = 0; i <= lineCount; i++)

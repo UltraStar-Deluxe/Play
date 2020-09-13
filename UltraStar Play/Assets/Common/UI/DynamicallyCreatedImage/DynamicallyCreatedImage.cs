@@ -15,8 +15,8 @@ public class DynamicallyCreatedImage : MonoBehaviour
     private RawImage rawImage;
     private RectTransform rectTransform;
 
-    public int TextureWidth { get; set; } = 256;
-    public int TextureHeight { get; set; } = 256;
+    public int TextureWidth { get; set; } = -1;
+    public int TextureHeight { get; set; } = -1;
 
     // The texture might not be creatable until the layout engine has calculated the size of the RectTransform.
     // In this case the actions are stored in this list for later execution when the texture has been created.
@@ -60,6 +60,9 @@ public class DynamicallyCreatedImage : MonoBehaviour
         }
         isTextureCreated = true;
         rawImage.enabled = true;
+
+        TextureWidth = (int)rectTransform.rect.width;
+        TextureHeight = (int)rectTransform.rect.height;
 
         // create the texture and assign to the rawImage
         texture = new Texture2D(TextureWidth, TextureHeight);
