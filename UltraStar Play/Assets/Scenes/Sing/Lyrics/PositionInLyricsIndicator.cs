@@ -1,17 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PositionInLyricsIndicator : MonoBehaviour
-{
-    // The reference size of the canvas
-    private float canvasWidth;
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
+public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
+{
+    [InjectedInInspector]
     public LyricsDisplayer lyricsDisplayer;
 
+    [Inject]
     private SingSceneController singSceneController;
+
+    [Inject(searchMethod = SearchMethods.GetComponent)]
+    private RectTransform rectTransform;
 
     private double velocityPerSecond;
 
@@ -49,17 +56,9 @@ public class PositionInLyricsIndicator : MonoBehaviour
         }
     }
 
-    private RectTransform rectTransform;
-
     void Start()
     {
-        rectTransform = GetComponent<RectTransform>();
-        singSceneController = FindObjectOfType<SingSceneController>();
-
-        // Get the canvas width.
-        Canvas canvas = CanvasUtils.FindCanvas();
-        RectTransform canvasRectTransform = canvas.GetComponent<RectTransform>();
-        canvasWidth = canvasRectTransform.rect.width;
+        Reset();
     }
 
     void Update()
@@ -85,7 +84,7 @@ public class PositionInLyricsIndicator : MonoBehaviour
 
     private void MoveToLeftSideOfScreen()
     {
-        rectTransform.position = new Vector3(0, rectTransform.position.y, rectTransform.position.z);
+        rectTransform.anchoredPosition = new Vector2(-1, 0);
     }
 
     private void CalculateVelocity()
