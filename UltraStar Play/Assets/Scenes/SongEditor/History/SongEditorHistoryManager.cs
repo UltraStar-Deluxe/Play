@@ -12,6 +12,12 @@ using UniRx;
 
 public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        songMetaToSongEditorMementoMap.Clear();
+    }
+
     private static readonly int maxHistoryLength = 20;
 
     // Static reference to last state to load it when opening the song editor scene
