@@ -8,6 +8,14 @@ using UnityEngine;
 
 public class SettingsManager : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        settingsPath = null;
+        settings = null;
+        initializedResolution = false;
+    }
+
     public static SettingsManager Instance
     {
         get

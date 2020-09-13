@@ -8,6 +8,14 @@ using System.IO;
 
 public class PlaylistManager : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        playlistToFilePathMap.Clear();
+        playlists.Clear();
+        favoritesPlaylist = new UltraStarPlaylist();
+    }
+
     public static PlaylistManager Instance
     {
         get

@@ -11,6 +11,17 @@ using UnityEngine.Networking;
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
 public class AudioManager : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        volumeBeforeMute = -1;
+        foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
+        {
+            RemoveCachedAudioClip(cachedAudioClip);
+        }
+        audioClipCache.Clear();
+    }
+
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
 
@@ -102,9 +113,22 @@ public class AudioManager : MonoBehaviour
 
         if (oldest != null)
         {
-            oldest.StreamedAudioClip?.UnloadAudioData();
-            oldest.FullAudioClip?.UnloadAudioData();
-            audioClipCache.Remove(oldest.Path);
+            RemoveCachedAudioClip(oldest);
+        }
+    }
+
+    private static void RemoveCachedAudioClip(CachedAudioClip cachedAudioClip)
+    {
+        audioClipCache.Remove(cachedAudioClip.Path);
+
+        if (cachedAudioClip.StreamedAudioClip != null)
+        {
+            cachedAudioClip.StreamedAudioClip.UnloadAudioData();
+        }
+
+        if (cachedAudioClip.FullAudioClip != null)
+        {
+            cachedAudioClip.FullAudioClip.UnloadAudioData();
         }
     }
 

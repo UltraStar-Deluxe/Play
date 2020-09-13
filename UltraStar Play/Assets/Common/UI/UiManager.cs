@@ -9,6 +9,12 @@ using UniInject;
 
 public class UiManager : MonoBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        LeanTween.ResetStaticFields();
+    }
+
     public static UiManager Instance
     {
         get

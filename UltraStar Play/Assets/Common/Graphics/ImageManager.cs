@@ -6,6 +6,16 @@ using UnityEngine.UI;
 // Handles loading and caching of images.
 public class ImageManager
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
+        {
+            RemoveCachedSprite(cachedSprite);
+        }
+        spriteCache.Clear();
+    }
+
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
@@ -88,8 +98,14 @@ public class ImageManager
     {
         spriteCache.Remove(cachedSprite.Path);
         // Destoying the texture is important to free the memory.
-        GameObject.Destroy(cachedSprite.Sprite.texture);
-        GameObject.Destroy(cachedSprite.Sprite);
+        if (cachedSprite.Sprite != null)
+        {
+            if (cachedSprite.Sprite.texture != null)
+            {
+                GameObject.Destroy(cachedSprite.Sprite.texture);
+            }
+            GameObject.Destroy(cachedSprite.Sprite);
+        }
     }
 
     private class CachedSprite
