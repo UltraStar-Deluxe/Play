@@ -129,7 +129,7 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
         GameObjectUtils.DestroyAllDirectChildren(nPlayerLayout.transform);
         for (int i = 0; i < sceneData.PlayerProfiles.Count; i++)
         {
-            SingingResultsPlayerUiController singingResultsPlayerUiController = Instantiate(singingResultsPlayerUiControllerPrefab, nPlayerLayout.transform);
+            Instantiate(singingResultsPlayerUiControllerPrefab, nPlayerLayout.transform);
         }
 
         PlayerUiArea.SetupPlayerUiGrid(sceneData.PlayerProfiles.Count, nPlayerLayout.GetComponent<GridLayoutGroupCellSizer>());

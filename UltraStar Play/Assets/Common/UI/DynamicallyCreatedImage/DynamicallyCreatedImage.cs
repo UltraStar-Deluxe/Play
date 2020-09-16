@@ -20,7 +20,7 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     // The texture might not be creatable until the layout engine has calculated the size of the RectTransform.
     // In this case the actions are stored in this list for later execution when the texture has been created.
-    private List<Action> actionQueue = new List<Action>();
+    private readonly List<Action> actionQueue = new List<Action>();
 
     private void Awake()
     {
