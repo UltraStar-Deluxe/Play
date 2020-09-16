@@ -48,10 +48,10 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
     protected int avgMidiNote;
 
+    // The number of rows on which notes can be placed.
     protected int noteRowCount;
     protected float[] noteRowToAnchorY;
 
-    // The number of rows on which notes can be placed.
     protected int maxNoteRowMidiNote;
     protected int minNoteRowMidiNote;
     protected float noteHeightPercent;
