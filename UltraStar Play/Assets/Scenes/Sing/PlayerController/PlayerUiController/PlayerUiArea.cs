@@ -27,6 +27,8 @@ public class PlayerUiArea : MonoBehaviour, INeedInjection
         int rows = 2;
         gridLayoutGroup.spacing = new Vector2(0, gridSpacing);
 
+        gridLayoutGroup.childAlignment = (playerCount == 1) ? TextAnchor.LowerLeft : TextAnchor.UpperLeft;
+
         if (playerCount >= 3)
         {
             columns = 1;

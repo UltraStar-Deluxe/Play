@@ -609,10 +609,10 @@ MonoBehaviour:
     m_Right: 10
     m_Top: 10
     m_Bottom: 10
-  m_ChildAlignment: 0
+  m_ChildAlignment: 6
   m_StartCorner: 0
   m_StartAxis: 1
-  m_CellSize: {x: 780, y: 173.10532}
+  m_CellSize: {x: 780.00006, y: 173.17839}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -738,11 +738,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 435.5, y: 245, z: 0}
-  anchoredPosition: {x: 435.5, y: 245}
-  position: {x: 435.5, y: 245, z: 0}
-  sizeDelta: {x: 800, y: 450.0574}
-  size: {x: 800, y: 450.0574}
+  localPosition: {x: 422, y: 237.5, z: 0}
+  anchoredPosition: {x: 422, y: 237.5}
+  position: {x: 422, y: 237.5, z: 0}
+  sizeDelta: {x: 800.00006, y: 450.237}
+  size: {x: 800.00006, y: 450.237}
 --- !u!1 &375955950
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,9 +2349,9 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0.5}
   anchorMax: {x: 0, y: 0.5}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0, y: 0, z: 0}
+  localPosition: {x: -0.000030517578, y: 0, z: 0}
   anchoredPosition: {x: 400, y: 0}
-  position: {x: 435.5, y: 71.461334, z: 0}
+  position: {x: 421.99997, y: 69.27367, z: 0}
   sizeDelta: {x: 2, y: 36}
   size: {x: 2, y: 36}
 --- !u!1001 &1740204221145833707
