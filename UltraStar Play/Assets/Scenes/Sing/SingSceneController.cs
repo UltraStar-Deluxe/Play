@@ -102,6 +102,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
+        // Prepare columns and rows for player UI
+        PlayerUiArea.SetupPlayerUiGrid(SceneData.SelectedPlayerProfiles.Count, playerUiArea.GetComponent<GridLayoutGroupCellSizer>());
+
         // Handle players
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
         foreach (PlayerProfile playerProfile in SceneData.SelectedPlayerProfiles)
@@ -158,6 +161,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         songVideoPlayer.Init(SongMeta, songAudioPlayer);
 
         StartCoroutine(StartMusicAndVideo());
+
+        // Rebuild whole UI
+        LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
     }
 
     private void InitTimeBar()
