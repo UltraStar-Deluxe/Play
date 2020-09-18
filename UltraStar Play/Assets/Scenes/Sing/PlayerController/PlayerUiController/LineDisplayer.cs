@@ -3,21 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
+using UnityEngine.UI;
 
-public class LineDisplayer : MonoBehaviour
+public class LineDisplayer : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public DynamicallyCreatedImage horizontalGridImage;
 
     public Color lineColor;
 
-    public int lineHeightInPx = 2;
+    [Inject(searchMethod = SearchMethods.GetComponent)]
+    private RectTransform rectTransform;
 
-    public void UpdateLines(int lineCount)
+    private int currentLineCount;
+    // Drawing the lines has to be delayed until the texture of the lines has a proper size.
+    private int targetLineCount;
+
+    private void Update()
     {
+        if (targetLineCount > 0
+            && targetLineCount != currentLineCount
+            && rectTransform.rect.width > 0
+            && rectTransform.rect.height > 0)
+        {
+            UpdateLines(targetLineCount);
+        }
+    }
+
+    public void SetTargetLineCount(int lineCount)
+    {
+        targetLineCount = lineCount;
+    }
+
+    private void UpdateLines(int lineCount)
+    {
+        currentLineCount = lineCount;
         horizontalGridImage.ClearTexture();
 
-        for (int i = 0; i <= lineCount; i++)
+        for (int i = 1; i <= lineCount; i++)
         {
             DrawLine(i, lineCount);
         }
@@ -27,15 +50,11 @@ public class LineDisplayer : MonoBehaviour
 
     private void DrawLine(int index, int lineCount)
     {
-        double yPercent = (double)index / (double)lineCount;
-        int y = (int)((horizontalGridImage.TextureHeight - lineHeightInPx) * yPercent);
+        float yPercent = (float)index / (float)lineCount;
+        int y = (int)(horizontalGridImage.TextureHeight * yPercent);
         for (int x = 0; x < horizontalGridImage.TextureWidth; x++)
         {
-            for (int yOffset = 0; yOffset < lineHeightInPx; yOffset++)
-            {
-                horizontalGridImage.SetPixel(x, y, lineColor);
-                horizontalGridImage.SetPixel(x, y + yOffset, lineColor);
-            }
+            horizontalGridImage.SetPixel(x, y, lineColor);
         }
     }
 }

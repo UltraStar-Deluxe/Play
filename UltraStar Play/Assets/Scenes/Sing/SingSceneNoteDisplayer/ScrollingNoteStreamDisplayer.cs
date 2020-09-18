@@ -16,7 +16,6 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     public RectTransform lyricsBar;
 
     public float pitchIndicatorAnchorX = 0.15f;
-    public float lyricsHeightInPercent = 0.1f;
     public float displayedNoteDurationInSeconds = 5;
 
     [Inject]
@@ -34,9 +33,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     void Update()
     {
-        // For some reason, Unity seems to need one frame to finish the calculation of the lyricsBar position.
+        // For some reason, Unity seems to need some frames to finish the calculation of the lyricsBar position.
         // In the first frame, the lyrics positions are wrong. Thus, as a workaround, delay the Update code by one frame.
-        delayedAction.CountTimeAndRunDelayed(1, () =>
+        delayedAction.CountTimeAndRunDelayed(2, () =>
         {
             RemoveNotesOutsideOfDisplayArea();
             CreateNotesInDisplayArea();
@@ -92,22 +91,27 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 uiNote.image.enabled = false;
             }
 
-            // Position lyrics. Width until next note, vertically centered on lyricsBar.
-            uiNote.lyricsUiText.enabled = true;
-            uiNote.lyricsUiText.color = Color.white;
-            uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
-
-            RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
-            lyricsRectTransform.SetParent(uiNote.transform.parent, true);
-            PositionUiNote(lyricsRectTransform, 60, note.StartBeat, GetNoteStartBeatOfFollowingNote(note));
-            lyricsRectTransform.SetParent(lyricsBar, true);
-            lyricsRectTransform.anchorMin = new Vector2(lyricsRectTransform.anchorMin.x, 0);
-            lyricsRectTransform.anchorMax = new Vector2(lyricsRectTransform.anchorMax.x, 1);
-            lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
-            lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
-            uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform, true);
+            PositionUiNoteLyrics(uiNote);
         }
         return uiNote;
+    }
+
+    private void PositionUiNoteLyrics(UiNote uiNote)
+    {
+        // Position lyrics. Width until next note, vertically centered on lyricsBar.
+        uiNote.lyricsUiText.enabled = true;
+        uiNote.lyricsUiText.color = Color.white;
+        uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
+
+        RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
+        lyricsRectTransform.SetParent(uiNote.transform.parent, true);
+        PositionUiNote(lyricsRectTransform, 60, uiNote.Note.StartBeat, GetNoteStartBeatOfFollowingNote(uiNote.Note));
+        lyricsRectTransform.SetParent(lyricsBar, true);
+        lyricsRectTransform.anchorMin = new Vector2(lyricsRectTransform.anchorMin.x, 0);
+        lyricsRectTransform.anchorMax = new Vector2(lyricsRectTransform.anchorMax.x, 1);
+        lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
+        lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
+        uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform, true);
     }
 
     private double GetNoteStartBeatOfFollowingNote(Note note)
