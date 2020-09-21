@@ -12,6 +12,10 @@ using System.Linq;
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public const int ViewportMinHeight = 12;
+    // A piano has 88 keys.
+    public const int ViewportMaxHeight = 88;
+
     // The first midi note that is visible in the viewport
     public int ViewportY { get; private set; }
     // The number of midi notes that are visible in the viewport
@@ -261,6 +265,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void ZoomVertical(int direction)
     {
+        if (direction < 0 && ViewportHeight >= ViewportMaxHeight
+            || direction > 0 && ViewportHeight <= ViewportMinHeight)
+        {
+            // The max zoom limit has been reached. Ignore further attemps to zoom.
+            return;
+        }
+
         double viewportChangeInPercent = 0.25;
 
         Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
@@ -364,13 +375,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     private void SetViewportHeightWithoutChangeEvent(int newViewportHeight)
     {
-        if (newViewportHeight < 12)
+        if (newViewportHeight < ViewportMinHeight)
         {
-            newViewportHeight = 12;
+            newViewportHeight = ViewportMinHeight;
         }
-        if (newViewportHeight > 48)
+        if (newViewportHeight > ViewportMaxHeight)
         {
-            newViewportHeight = 48;
+            newViewportHeight = ViewportMaxHeight;
         }
 
         ViewportHeight = newViewportHeight;
