@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 [Serializable]
@@ -12,7 +12,10 @@ public class SongEditorSettings
 
     public bool AdjustFollowingNotes { get; set; }
 
-    public int MidiNoteVolume { get; set; } = 250;
+    // Velocity should be between 0 and 127
+    public int MidiVelocity { get; set; } = 100;
+    // Gain is similar to volume and should be between 0 and 1 to make it more silent and above 1 to make it louder.
+    public float MidiGain { get; set; } = 1;
     public bool MidiSoundPlayAlongEnabled { get; set; } = true;
     public string MidiFilePath { get; set; } = "";
 

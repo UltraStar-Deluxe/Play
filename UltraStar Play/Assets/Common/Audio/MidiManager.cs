@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,9 +33,10 @@ public class MidiManager : MonoBehaviour, INeedInjection
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
     private readonly string bankFilePath = "GM Bank - Piano/GM Bank - Piano";
     private readonly int bufferSize = 1024;
-    public float gain = 1f;
+    public float midiGain = 1f;
 
-    private int midiNoteVolume;
+    [Range(0, 127)]
+    private int midiVelocity;
 
     private float[] sampleBuffer;
     private MidiSequencer midiSequencer;
@@ -49,9 +50,13 @@ public class MidiManager : MonoBehaviour, INeedInjection
     void Start()
     {
         // Synchronize with settings
-        midiNoteVolume = settings.SongEditorSettings.MidiNoteVolume;
-        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiNoteVolume)
-            .Subscribe(newValue => midiNoteVolume = newValue);
+        midiVelocity = settings.SongEditorSettings.MidiVelocity;
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiVelocity)
+            .Subscribe(newMidiVelocity => midiVelocity = newMidiVelocity);
+
+        midiGain = settings.SongEditorSettings.MidiGain;
+        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiGain)
+            .Subscribe(newMidiGain => midiGain = newMidiGain);
     }
 
     private void InitIfNotDoneYet()
@@ -73,13 +78,13 @@ public class MidiManager : MonoBehaviour, INeedInjection
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiVelocity, midiInstrument);
     }
 
     public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiNoteVolume, midiInstrument);
+        midiStreamSynthesizer.NoteOn(0, midiNote, midiVelocity, midiInstrument);
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
@@ -128,7 +133,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
 
         for (int i = 0; i < data.Length; i++)
         {
-            data[i] = sampleBuffer[i] * gain;
+            data[i] = sampleBuffer[i] * midiGain;
         }
     }
 }

@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMidiVolumeSlider : MonoBehaviour, INeedInjection
+public class SongEditorMidiGainSlider : MonoBehaviour, INeedInjection
 {
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Slider slider;
@@ -20,8 +20,8 @@ public class SongEditorMidiVolumeSlider : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        slider.value = (float)settings.SongEditorSettings.MidiNoteVolume;
+        slider.value = settings.SongEditorSettings.MidiGain;
         slider.OnValueChangedAsObservable()
-            .Subscribe(newValue => settings.SongEditorSettings.MidiNoteVolume = (int)newValue);
+            .Subscribe(newValue => settings.SongEditorSettings.MidiGain = newValue);
     }
 }
