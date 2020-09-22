@@ -15,8 +15,8 @@ git config core.sparsecheckout true
 echo "Assets/*" >> .git/info/sparse-checkout
 # UltraStar-Play-subset is a dedicated branch for the UltraStar Play project
 git pull --depth=100 origin UltraStar-Play-subset
-# Commit from 09 February 2020: 0bc2afbe88cceceac6d618d612f4aeeb8cfcecf0
-git checkout 0bc2afbe88cceceac6d618d612f4aeeb8cfcecf0
+# Commit from 22 September 2020: 79a6cc343665ef0005194b14e882aca78b29c531
+git checkout 79a6cc343665ef0005194b14e882aca78b29c531
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/* ./
