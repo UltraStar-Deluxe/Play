@@ -10,7 +10,7 @@ cd LeanTween
 
 echo "Cloning LeanTween from remote..."
 git init
-git remote add origin https://github.com/achimmihca/LeanTween.git
+git remote add origin https://github.com/UltraStar-Deluxe/LeanTween.git
 git config core.sparsecheckout true
 echo "Assets/LeanTween/Framework/*" >> .git/info/sparse-checkout
 echo "Assets/LeanTween/Editor/*" >> .git/info/sparse-checkout
