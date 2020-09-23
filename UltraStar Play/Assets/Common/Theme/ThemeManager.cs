@@ -8,10 +8,16 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class ThemeManager : MonoBehaviour
 {
-    public string currentThemeName;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        themes.Clear();
+    }
 
     // Themes is static to be persisted across scenes.
     private static readonly List<Theme> themes = new List<Theme>();
+
+    public string currentThemeName;
 
     public static ThemeManager Instance
     {

@@ -13,9 +13,17 @@ public class SongMetaManager : MonoBehaviour
 {
     private static readonly object scanLock = new object();
 
-    public int SongsFound { get; private set; }
-    public int SongsSuccess { get; private set; }
-    public int SongsFailed { get; private set; }
+    // The collection of songs is static to be persisted across scenes.
+    // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
+    private static ConcurrentBag<SongMeta> songMetas = new ConcurrentBag<SongMeta>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        songMetas = new ConcurrentBag<SongMeta>();
+        isSongScanStarted = false;
+        isSongScanFinished = false;
+    }
 
     public static SongMetaManager Instance
     {
@@ -24,10 +32,6 @@ public class SongMetaManager : MonoBehaviour
             return GameObjectUtils.FindComponentWithTag<SongMetaManager>("SongMetaManager");
         }
     }
-
-    // The collection of songs is static to be persisted across scenes.
-    // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
-    private static readonly ConcurrentBag<SongMeta> songMetas = new ConcurrentBag<SongMeta>();
 
     private static bool isSongScanStarted;
     private static bool isSongScanFinished;
@@ -41,6 +45,10 @@ public class SongMetaManager : MonoBehaviour
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new Subject<SongScanFinishedEvent>();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
+
+    public int SongsFound { get; private set; }
+    public int SongsSuccess { get; private set; }
+    public int SongsFailed { get; private set; }
 
     public void Add(SongMeta songMeta)
     {
