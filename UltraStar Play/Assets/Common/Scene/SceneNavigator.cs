@@ -6,6 +6,12 @@ using UnityEngine.SceneManagement;
 
 public class SceneNavigator : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        staticSceneDatas.Clear();
+    }
+
     public static SceneNavigator Instance
     {
         get

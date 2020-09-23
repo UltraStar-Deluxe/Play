@@ -8,6 +8,12 @@ using UnityEngine;
 [Serializable]
 public class StatsManager : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        statistics = null;
+    }
+
     // Statistics are static to persist across scenes
     private static Statistics statistics;
     public Statistics Statistics
