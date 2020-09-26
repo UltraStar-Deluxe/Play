@@ -21,6 +21,14 @@ public static class CollectionExtensions
         }
     }
 
+    public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+    {
+        foreach (T item in enumerable)
+        {
+            action(item);
+        }
+    }
+
     public static string ToCsv<T>(this IEnumerable<T> enumerable, string separator = ",", string prefix = "[", string suffix = "]")
     {
         return prefix + string.Join(separator, enumerable) + suffix;
