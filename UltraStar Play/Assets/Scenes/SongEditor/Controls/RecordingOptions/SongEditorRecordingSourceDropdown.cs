@@ -25,16 +25,15 @@ public class SongEditorRecordingSourceDropdown : MonoBehaviour, INeedInjection
     void Start()
     {
         itemsInDropdown = EnumUtils.GetValuesAsList<ESongEditorRecordingSource>();
+        int currentItemIndex = itemsInDropdown.IndexOf(settings.SongEditorSettings.RecordingSource);
         dropdown.options = itemsInDropdown.Select(it => new OptionData(it.ToString())).ToList();
+        dropdown.value = currentItemIndex;
         dropdown.OnValueChangedAsObservable().Subscribe(OnDropdownValueChanged);
-
-        int index = itemsInDropdown.IndexOf(settings.SongEditorSettings.RecordingSource);
-        dropdown.value = index;
     }
 
     private void OnDropdownValueChanged(int index)
     {
-        if (index > 0 && index < itemsInDropdown.Count)
+        if (index >= 0 && index < itemsInDropdown.Count)
         {
             ESongEditorRecordingSource selectedItem = itemsInDropdown[index];
             settings.SongEditorSettings.RecordingSource = selectedItem;
