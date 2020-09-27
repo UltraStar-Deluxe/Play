@@ -46,6 +46,9 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
 
+    [Inject]
+    private SpaceBetweenNotesAction spaceBetweenNotesAction;
+
     private enum EVoices
     {
         Voice0,
@@ -68,11 +71,28 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
 
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
+        FillContextMenuToAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherVoice(contextMenu, selectedNotes);
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
+    }
+
+    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenu contextMenu, List<Note> selectedNotes)
+    {
+        contextMenu.AddSeparator();
+        if (spaceBetweenNotesAction.CanExecute(selectedNotes))
+        {
+            contextMenu.AddItem("Add space between notes", () =>
+            {
+                SpaceBetweenNotesButton spaceBetweenNotesButton = FindObjectOfType<SpaceBetweenNotesButton>(true);
+                if (int.TryParse(spaceBetweenNotesButton.numberOfBeatsInputField.text, out int spaceInBeats))
+                {
+                    spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
+                }
+            });
+        }
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenu contextMenu, List<Note> selectedNotes)
@@ -89,7 +109,6 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         }
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
-            contextMenu.AddItem("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, uiNote.Note));
         }
     }
 
