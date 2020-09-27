@@ -25,10 +25,13 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     private NoteArea noteArea;
 
     [Inject]
+    private SongEditorSelectionController selectionController;
+
+    [Inject]
     private AddNoteAction addNoteAction;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SetMusicGapAction setMusicGapAction;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
@@ -45,5 +48,11 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
 
         contextMenu.AddSeparator();
         contextMenu.AddItem("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
+
+        if (selectedNotes.Count == 0)
+        {
+            contextMenu.AddSeparator();
+            contextMenu.AddItem("Set Gap to playback position", () => setMusicGapAction.ExecuteAndNotify());
+        }
     }
 }
