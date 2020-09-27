@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
-public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
+public class OverviewBar : MonoBehaviour, IPointerDownHandler, IDragHandler, INeedInjection
 {
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
@@ -22,8 +22,17 @@ public class OverviewBar : MonoBehaviour, IPointerClickHandler, INeedInjection
         rectWidth = rectTransform.rect.width;
     }
 
-    // Scroll through the song via click on the overview bar.
-    public void OnPointerClick(PointerEventData ped)
+    public void OnDrag(PointerEventData ped)
+    {
+        ScrollToPointer(ped);
+    }
+
+    public void OnPointerDown(PointerEventData ped)
+    {
+        ScrollToPointer(ped);
+    }
+
+    private void ScrollToPointer(PointerEventData ped)
     {
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
                                                                      ped.position,
