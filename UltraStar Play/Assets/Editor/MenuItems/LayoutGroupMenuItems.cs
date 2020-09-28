@@ -51,7 +51,7 @@ public class LayoutGroupMenuItems : MonoBehaviour
     {
         GetSelectedGameObjectsWithoutComponent<GridLayoutGroup>().ForEach(gameObject =>
         {
-            GridLayoutGroup layoutGroup = Undo.AddComponent<GridLayoutGroup>(gameObject);
+            Undo.AddComponent<GridLayoutGroup>(gameObject);
             GridLayoutGroupCellSizer layoutGroupCellSizer = Undo.AddComponent<GridLayoutGroupCellSizer>(gameObject);
             layoutGroupCellSizer.columns = 3;
             layoutGroupCellSizer.rows = 3;
