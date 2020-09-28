@@ -109,6 +109,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         }
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
+            contextMenu.AddItem("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, uiNote.Note));
         }
     }
 
