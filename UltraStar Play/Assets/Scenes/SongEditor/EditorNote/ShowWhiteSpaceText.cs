@@ -5,9 +5,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class ShowWhiteSpaceText : MonoBehaviour
 {
-    // Unicode Middle Dot (U+00B7).
+    // Unicode BULLET (U+2022).
     // This (or a similar ) character is also used to indicate white-space in office word processing and notepad++.
-    public static readonly char spaceReplacementCharacter = '·';
+    public static readonly char spaceReplacementCharacter = '•';
     public static readonly string spaceReplacementHexColor = "FF00FF";
     public static readonly string spaceReplacementRichText = $"<b><color=#{spaceReplacementHexColor}>{spaceReplacementCharacter}</color></b>";
     public static readonly string nospaceReplacementRichText = $"<b><color=#{spaceReplacementHexColor}></color></b>";
