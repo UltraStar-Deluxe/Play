@@ -49,6 +49,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private bool hasRecordedNotes;
 
+    private bool isRecording;
+
     void Start()
     {
         micPitchTracker.MicProfile = settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
@@ -59,8 +61,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
-        micPitchTracker.PitchEventStream
-            .Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
+        micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
+        micPitchTracker.MicSampleRecorder.StartRecording();
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)
@@ -115,7 +117,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
-        if (lastPitchDetectedFrame == Time.frameCount)
+        if (!isRecording
+            || lastPitchDetectedFrame == Time.frameCount)
         {
             return;
         }
@@ -231,27 +234,27 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     private void OnNoteRecordingSourceChanged(ESongEditorRecordingSource recordingSource)
     {
         bool micRecordingEnabled = (recordingSource == ESongEditorRecordingSource.Microphone);
-        if (!micRecordingEnabled && micPitchTracker.MicSampleRecorder.IsRecording)
+        if (!micRecordingEnabled && isRecording)
         {
-            micPitchTracker.MicSampleRecorder.StopRecording();
+            StopRecording();
         }
-        else if (micRecordingEnabled && songAudioPlayer.IsPlaying && !micPitchTracker.MicSampleRecorder.IsRecording)
+        else if (micRecordingEnabled && songAudioPlayer.IsPlaying && !isRecording)
         {
-            micPitchTracker.MicSampleRecorder.StartRecording();
+            StartRecording();
         }
     }
 
     private void OnSongIsPlayingChanged(bool isPlaying)
     {
         bool micRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone);
-        if (!isPlaying && micPitchTracker.MicSampleRecorder.IsRecording)
+        if (!isPlaying && isRecording)
         {
-            micPitchTracker.MicSampleRecorder.StopRecording();
+            StopRecording();
         }
-        else if (isPlaying && !micPitchTracker.MicSampleRecorder.IsRecording
+        else if (isPlaying && !isRecording
                  && micRecordingEnabled && micPitchTracker.MicProfile != null)
         {
-            micPitchTracker.MicSampleRecorder.StartRecording();
+            StartRecording();
         }
     }
 
@@ -281,5 +284,15 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
         return currentBeat;
+    }
+
+    private void StopRecording()
+    {
+        isRecording = false;
+    }
+
+    private void StartRecording()
+    {
+        isRecording = true;
     }
 }

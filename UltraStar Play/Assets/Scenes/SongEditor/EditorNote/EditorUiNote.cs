@@ -38,7 +38,7 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     public Text pitchLabel;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private Text uiText;
+    private ShowWhiteSpaceText uiText;
 
     [Inject]
     private SongMeta songMeta;

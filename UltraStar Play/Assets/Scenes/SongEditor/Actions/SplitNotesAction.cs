@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 
@@ -21,8 +21,20 @@ public class SplitNotesAction : INeedInjection
         {
             if (note.Length > 1)
             {
+                string newNoteText;
+                if (note.Text.EndsWith(" "))
+                {
+                    // Move space from the end of the original note
+                    // to the end of the newly created note, to preserve lyrics separation.
+                    note.SetText(note.Text.Substring(0, note.Text.Length - 1));
+                    newNoteText = "~ ";
+                }
+                else
+                {
+                    newNoteText = "~";
+                }
                 int splitBeat = note.StartBeat + (note.Length / 2);
-                Note newNote = new Note(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, "~");
+                Note newNote = new Note(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, newNoteText);
                 newNote.SetSentence(note.Sentence);
                 note.SetEndBeat(splitBeat);
             }

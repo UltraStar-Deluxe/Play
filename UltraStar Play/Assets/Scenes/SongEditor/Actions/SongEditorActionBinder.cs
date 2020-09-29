@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UniInject;
 using System.Collections.Generic;
 
@@ -29,6 +29,8 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(SetMusicGapAction));
         bb.BindTypeToNewInstances(typeof(SetVideoGapAction));
         bb.BindTypeToNewInstances(typeof(ChangeBpmAction));
+        bb.BindTypeToNewInstances(typeof(ApplyBpmAction));
+        bb.BindTypeToNewInstances(typeof(SpaceBetweenNotesAction));
         return bb.GetBindings();
     }
 }
