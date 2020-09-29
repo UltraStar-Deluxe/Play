@@ -32,7 +32,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         }
         set
         {
-            inputField.text = value;
+            inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(value);
         }
     }
 
@@ -40,7 +40,17 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     {
         RequestFocus();
 
+        inputField.onValidateInput += OnValidateInput;
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
+    }
+
+    private char OnValidateInput(string text, int charIndex, char addedChar)
+    {
+        if (addedChar == ' ')
+        {
+            return ShowWhiteSpaceText.spaceReplacementCharacter;
+        }
+        return addedChar;
     }
 
     public void Init(EditorUiNote uiEditorNote, string text)
@@ -55,15 +65,27 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         inputField.ActivateInputField();
     }
 
-    private void OnEndEdit(string newText)
+    private void OnValueChanged(string newInputFieldText)
     {
-        if (!IsOnlyWhitespace(newText))
+        string newSimpleText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
+        if (ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(inputField.text) != newSimpleText)
+        {
+            inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newSimpleText);
+        }
+    }
+
+    private void OnEndEdit(string inputFieldText)
+    {
+        string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(inputFieldText);
+        if (!IsOnlyWhitespace(inputFieldText))
         {
             uiEditorNote.Note.SetText(newText);
             uiEditorNote.SetLyrics(newText);
 
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
         }
+
+        inputField.onValidateInput -= OnValidateInput;
 
         Destroy(gameObject);
     }

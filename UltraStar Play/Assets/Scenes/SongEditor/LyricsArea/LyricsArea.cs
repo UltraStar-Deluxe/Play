@@ -57,14 +57,14 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     public void UpdateLyrics()
     {
         lyrics = GetLyrics();
-        inputField.text = lyrics;
+        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(lyrics);
     }
 
     private void OnEndEdit(string newText)
     {
         // TODO: Change the lyrics if only the lyrics for a single note changed
         // Ignore new lyrics for now.
-        inputField.text = lyrics;
+        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(lyrics);
     }
 
     private void SyncPositionInSongWithSelectedText()
