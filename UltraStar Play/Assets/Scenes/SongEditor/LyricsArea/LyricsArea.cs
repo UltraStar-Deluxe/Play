@@ -6,11 +6,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System.Text;
+using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
 public class LyricsArea : MonoBehaviour, INeedInjection
 {
+    private static readonly char syllableSeparator = ';';
+    private static readonly char sentenceSeparator = '\n';
+    private static readonly char spaceCharacter = ' ';
+
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
@@ -23,21 +28,34 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    private readonly Dictionary<int, Note> positionInLyricsToNoteMap = new Dictionary<int, Note>();
-
     private int lastCaretPosition;
 
-    private string lyrics;
+    private bool newlineAdded;
+
+    private LyricsAreaMode lyricsAreaMode = LyricsAreaMode.ViewMode;
 
     void Start()
     {
         UpdateLyrics();
+        inputField.GetComponent<OnSelectObserver>().OnSelectEventStream.Subscribe(_ => OnBeginEdit());
         inputField.OnEndEditAsObservable().Subscribe(OnEndEdit);
+        inputField.onValidateInput += OnValidateInput;
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
     void Update()
     {
+        if (lyricsAreaMode == LyricsAreaMode.EditMode && newlineAdded)
+        {
+            // Make newline complete with visible character and the newline
+            int caretPosition = inputField.caretPosition;
+            inputField.text = inputField.text
+                .Replace("\n", "")
+                .Replace("↵", ShowWhiteSpaceText.newlineReplacement);
+            inputField.caretPosition = caretPosition + 1;
+            newlineAdded = false;
+        }
+
         if (inputField.isFocused && lastCaretPosition != inputField.caretPosition)
         {
             lastCaretPosition = inputField.caretPosition;
@@ -46,9 +64,27 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         }
     }
 
+    private char OnValidateInput(string text, int charIndex, char addedChar)
+    {
+        if (addedChar == ' ')
+        {
+            return ShowWhiteSpaceText.spaceReplacement[0];
+        }
+        if (addedChar == '\n'
+            && (charIndex == 0
+                || text.Length < charIndex
+                || text[charIndex - 1] != ShowWhiteSpaceText.newlineReplacement[0]))
+        {
+            newlineAdded = true;
+            return ShowWhiteSpaceText.newlineReplacement[0];
+        }
+        return addedChar;
+    }
+
     private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is LyricsChangedEvent)
+        if (changeEvent is LyricsChangedEvent
+            && lyricsAreaMode == LyricsAreaMode.ViewMode)
         {
             UpdateLyrics();
         }
@@ -56,20 +92,36 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     public void UpdateLyrics()
     {
-        lyrics = GetLyrics();
-        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(lyrics);
+        string text = (lyricsAreaMode == LyricsAreaMode.ViewMode)
+            ? GetViewModeText()
+            : GetEditModeText();
+        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
+    }
+
+    private void OnBeginEdit()
+    {
+        // Map lyrics of notes to edit-mode text.
+        string editModeText = GetEditModeText();
+        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
+
+        lyricsAreaMode = LyricsAreaMode.EditMode;
     }
 
     private void OnEndEdit(string newText)
     {
-        // TODO: Change the lyrics if only the lyrics for a single note changed
-        // Ignore new lyrics for now.
-        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(lyrics);
+        // Map edit-mode text to lyrics of notes
+        string editModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
+        MapEditModeTextToNotes(editModeText);
+        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
+
+        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+
+        lyricsAreaMode = LyricsAreaMode.ViewMode;
     }
 
     private void SyncPositionInSongWithSelectedText()
     {
-        Note note = GetNoteForPositionInLyrics(inputField.caretPosition);
+        Note note = GetNoteForCaretPosition(inputField.text, inputField.caretPosition);
         if (note != null)
         {
             double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
@@ -77,10 +129,8 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         }
     }
 
-    public string GetLyrics()
+    private string GetEditModeText()
     {
-        positionInLyricsToNoteMap.Clear();
-
         StringBuilder stringBuilder = new StringBuilder();
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
         Note lastNote = null;
@@ -89,31 +139,164 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
             foreach (Note note in sortedNotes)
             {
-                foreach (char c in note.Text)
+                if (lastNote != null
+                    && lastNote.Sentence == note.Sentence)
                 {
-                    positionInLyricsToNoteMap[stringBuilder.Length] = note;
-                    stringBuilder.Append(c);
+                    // Add a space when the last note ended or the current note started with a space.
+                    // Otherwise use the non-whitespace syllabeSeparator as end-of-note.
+                    if (lastNote.Text.EndsWith(spaceCharacter)
+                        || note.Text.StartsWith(spaceCharacter))
+                    {
+                        stringBuilder.Append(spaceCharacter);
+                    }
+                    else
+                    {
+                        stringBuilder.Append(syllableSeparator);
+                    }
                 }
+                stringBuilder.Append(note.Text.Trim());
+
                 lastNote = note;
             }
-            stringBuilder.Append("\n");
-        }
-        if (lastNote != null)
-        {
-            positionInLyricsToNoteMap[stringBuilder.Length] = lastNote;
+            stringBuilder.Append(sentenceSeparator);
         }
         return stringBuilder.ToString();
     }
 
-    public Note GetNoteForPositionInLyrics(int positionInLyrics)
+    private string GetViewModeText()
     {
-        if (positionInLyricsToNoteMap.TryGetValue(positionInLyrics, out Note note))
+        StringBuilder stringBuilder = new StringBuilder();
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        foreach (Sentence sentence in sortedSentences)
         {
-            return note;
+            List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
+            foreach (Note note in sortedNotes)
+            {
+                stringBuilder.Append(note.Text);
+            }
+            stringBuilder.Append(sentenceSeparator);
         }
-        else
+        return stringBuilder.ToString();
+    }
+
+    private void MapEditModeTextToNotes(string editModeText)
+    {
+        int sentenceIndex = 0;
+        int noteIndex = 0;
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        List<Note> sortedNotes = (sentenceIndex < sortedSentences.Count)
+            ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
+            : new List<Note>();
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Action applyNoteText = () =>
+        {
+            if (noteIndex < sortedNotes.Count)
+            {
+                sortedNotes[noteIndex].SetText(stringBuilder.ToString());
+                stringBuilder = new StringBuilder();
+            }
+        };
+
+        Action selectNextSentence = () =>
+        {
+            applyNoteText();
+
+            for (int i = noteIndex + 1; i < sortedNotes.Count; i++)
+            {
+                sortedNotes[i].SetText("");
+            }
+
+            sentenceIndex++;
+            noteIndex = 0;
+
+            sortedNotes = (sentenceIndex < sortedSentences.Count)
+                    ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
+                    : new List<Note>();
+        };
+
+        Action selectNextNote = () =>
+        {
+            applyNoteText();
+
+            noteIndex++;
+        };
+
+        foreach (char c in editModeText)
+        {
+            if (c == sentenceSeparator)
+            {
+                selectNextSentence();
+            }
+            else if (c == syllableSeparator)
+            {
+                selectNextNote();
+            }
+            else if (c == ' ')
+            {
+                stringBuilder.Append(c);
+                selectNextNote();
+            }
+            else
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        for (int s = sentenceIndex; s < sortedSentences.Count; s++)
+        {
+            sortedNotes = SongMetaUtils.GetSortedNotes(sortedSentences[s]);
+            for (int n = noteIndex; n < sortedNotes.Count; n++)
+            {
+                sortedNotes[n].SetText("");
+            }
+        }
+    }
+
+    private Note GetNoteForCaretPosition(string text, int caretPosition)
+    {
+        // Count sentence borders
+        int relevantSentenceIndex = 0;
+        int relevantSentenceTextStartIndex = 0;
+        for (int i = 0; i < text.Length && i < caretPosition; i++)
+        {
+            if (text[i] == sentenceSeparator)
+            {
+                relevantSentenceIndex++;
+                relevantSentenceTextStartIndex = i + 1;
+            }
+        }
+
+        // Get relevant sentence
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        if (relevantSentenceIndex >= sortedSentences.Count
+            || sortedSentences[relevantSentenceIndex].Notes.IsNullOrEmpty())
         {
             return null;
         }
+        Sentence relevantSentence = sortedSentences[relevantSentenceIndex];
+
+        // Count note borders
+        string relevantSentenceText = text.Substring(relevantSentenceTextStartIndex, caretPosition - relevantSentenceTextStartIndex);
+        int noteIndex = 0;
+        for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
+        {
+            char c = text[i];
+            if (c == spaceCharacter
+                || c == ShowWhiteSpaceText.spaceReplacement[0]
+                || c == syllableSeparator)
+            {
+                noteIndex++;
+            }
+        }
+
+        // Get relevant note
+        List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(relevantSentence);
+        if (noteIndex >= sortedNotes.Count)
+        {
+            return null;
+        }
+        return sortedNotes[noteIndex];
     }
 }

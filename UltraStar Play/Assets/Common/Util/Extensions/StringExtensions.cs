@@ -39,4 +39,14 @@ public static class StringExtensions
         }
         return txt;
     }
+
+    public static bool StartsWith(this string txt, char c)
+    {
+        return txt != null && txt.Length > 0 && txt[0] == c;
+    }
+
+    public static bool EndsWith(this string txt, char c)
+    {
+        return txt != null && txt.Length > 0 && txt[txt.Length - 1] == c;
+    }
 }
