@@ -48,7 +48,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     {
         if (addedChar == ' ')
         {
-            return ShowWhiteSpaceText.spaceReplacementCharacter;
+            return ShowWhiteSpaceText.spaceReplacement[0];
         }
         return addedChar;
     }
