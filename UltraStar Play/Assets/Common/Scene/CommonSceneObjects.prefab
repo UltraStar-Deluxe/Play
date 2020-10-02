@@ -180,7 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   warningDialogPrefab: {fileID: 6090808193284951113, guid: 26a11ce5964394349a3e18d9ffccf003,
     type: 3}
-  questionDialogPrefab: {fileID: 8068263864902124345, guid: d74f5cedd8a3aba1e955300bc09f1fe7,
+  questionDialogPrefab: {fileID: 8068263864902124345, guid: 7a92a57c453d28bfb9c4dd88c18f3c29,
     type: 3}
   notificationPrefab: {fileID: 24204236167550392, guid: 69a3dd5155fb1874a9e3ed373ca4d931,
     type: 3}
@@ -189,6 +189,8 @@ MonoBehaviour:
   contextMenuPrefab: {fileID: 6871491115905279586, guid: 0af42b8cd7c5a1b48a7af989c960a75a,
     type: 3}
   tooltipPrefab: {fileID: 5647552520249715628, guid: 61c5cda38fdd0ca4786cf5987297a4b2,
+    type: 3}
+  dialogBackdropPrefab: {fileID: 8140360624453496707, guid: e47e73de458c3965a988a4cd623faecc,
     type: 3}
 --- !u!1 &116669178087187369
 GameObject:
