@@ -16,6 +16,10 @@ public class QuitGameButton : MonoBehaviour, INeedInjection
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
-            .Subscribe(_ => ApplicationUtils.QuitOrStopPlayMode());
+            .Subscribe(_ =>
+            {
+                QuestionDialog quitDialog = UiManager.Instance.CreateQuestionDialog("Quit?", "Really quit UltraStar Play?");
+                quitDialog.yesAction = ApplicationUtils.QuitOrStopPlayMode;
+            });
     }
 }
