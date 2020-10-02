@@ -21,6 +21,9 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
+    
+    [InjectedInInspector]
+    public QuestionDialog questionDialogPrefab;
 
     [InjectedInInspector]
     public Notification notificationPrefab;
@@ -71,6 +74,24 @@ public class UiManager : MonoBehaviour, INeedInjection
             warningDialog.Message = message;
         }
         return warningDialog;
+    }
+    
+    public QuestionDialog CreateQuestionDialog(string title, string message)
+    {
+        FindCanvas();
+
+        QuestionDialog questionDialog = Instantiate(questionDialogPrefab, canvas.transform);
+        injector.Inject(questionDialog);
+        questionDialog.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        if (title != null)
+        {
+            questionDialog.Title = title;
+        }
+        if (message != null)
+        {
+            questionDialog.Message = message;
+        }
+        return questionDialog;
     }
 
     public Notification CreateNotification(string message)
