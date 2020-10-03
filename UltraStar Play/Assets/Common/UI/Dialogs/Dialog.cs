@@ -34,6 +34,10 @@ public class Dialog : MonoBehaviour
 
     private void OnDestroy()
     {
-        UiManager.Instance.OnDialogClosed(this);
+        UiManager uiManager = UiManager.Instance;
+        if (uiManager != null)
+        {
+            UiManager.Instance.OnDialogClosed(this);
+        }
     }
 }
