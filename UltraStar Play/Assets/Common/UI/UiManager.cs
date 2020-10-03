@@ -46,6 +46,9 @@ public class UiManager : MonoBehaviour, INeedInjection
     private Injector injector;
 
     private readonly List<Notification> notifications = new List<Notification>();
+    private List<Dialog> dialogs = new List<Dialog>();
+
+    public bool DialogOpen => dialogs.Count > 0;
 
     void Awake()
     {
@@ -73,6 +76,8 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             warningDialog.Message = message;
         }
+        
+        dialogs.Add(warningDialog);
         return warningDialog;
     }
     
@@ -91,6 +96,8 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             questionDialog.Message = message;
         }
+        
+        dialogs.Add(questionDialog);
         return questionDialog;
     }
 
@@ -105,6 +112,11 @@ public class UiManager : MonoBehaviour, INeedInjection
 
         notifications.Add(notification);
         return notification;
+    }
+
+    public void OnDialogClosed(Dialog dialog)
+    {
+        dialogs.Remove(dialog);
     }
 
     public Notification CreateNotification(string message, Color color)
