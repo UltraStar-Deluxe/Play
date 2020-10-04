@@ -46,7 +46,7 @@ public class UiManager : MonoBehaviour, INeedInjection
     private Injector injector;
 
     private readonly List<Notification> notifications = new List<Notification>();
-    private List<Dialog> dialogs = new List<Dialog>();
+    private readonly List<Dialog> dialogs = new List<Dialog>();
 
     public bool DialogOpen => dialogs.Count > 0;
 
