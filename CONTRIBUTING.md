@@ -53,8 +53,9 @@ The code style is configured in a file [`.editorconfig`](https://EditorConfig.or
 
 - only use public where necessary
 - avoid protected
-- avoid static/readonly where possible (their values are lost on [Hotswap](https://gist.github.com/cobbpg/a74c8a5359554eb3daa5))
-
+- avoid static where possible
+    - these values are lost on [Hotswap](https://gist.github.com/cobbpg/a74c8a5359554eb3daa5)
+    - static fields have to be reset explicitly when [Domain Reload](https://docs.unity3d.com/2020.1/Documentation/Manual/DomainReloading.html) is disabled (which is the case for UltraStar Play)
 
 ```
 public class MySceneController 
