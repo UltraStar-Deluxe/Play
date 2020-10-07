@@ -14,10 +14,19 @@ using UniRx;
 public class ChangeSceneButton : MonoBehaviour, INeedInjection
 {
     public EScene targetScene;
+    public bool triggerWithEscape;
 
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
             .Subscribe(_ => SceneNavigator.Instance.LoadScene(targetScene));
+    }
+
+    private void Update()
+    {
+        if (triggerWithEscape && Input.GetKeyDown(KeyCode.Escape) && !UiManager.Instance.DialogOpen)
+        {
+            SceneNavigator.Instance.LoadScene(targetScene);
+        }
     }
 }

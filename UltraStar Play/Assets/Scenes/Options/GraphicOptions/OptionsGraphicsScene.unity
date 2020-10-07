@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 11
+  serializedVersion: 12
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -96,8 +96,10 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 958e3e39f3e858671927ec1f115c4c22,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -117,6 +119,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -226,11 +230,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 3622033094347370611, guid: 176e869a9ab83ce4aa378e24fe6fb891,
-        type: 3}
-      propertyPath: m_Name
-      value: SceneTitle
-      objectReference: {fileID: 0}
     - target: {fileID: 3622033094347370610, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -335,6 +334,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622033094347370611, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+        type: 3}
+      propertyPath: m_Name
+      value: SceneTitle
       objectReference: {fileID: 0}
     - target: {fileID: 3622033095099228108, guid: 176e869a9ab83ce4aa378e24fe6fb891,
         type: 3}
@@ -637,16 +641,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: NoteDisplayMode
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Sentence By Sentence
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -717,6 +711,11 @@ PrefabInstance:
       propertyPath: position.z
       value: -616.995
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -747,6 +746,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Note Display Mode
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: NoteDisplayMode
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -771,6 +775,11 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 189.9737
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Sentence By Sentence
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -877,6 +886,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Label
+      objectReference: {fileID: 0}
     - target: {fileID: 9202059109578588013, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -906,16 +920,6 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 189.47366
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Label
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -1033,16 +1037,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ShowLyricsOnNotes
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Yes
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1113,6 +1107,11 @@ PrefabInstance:
       propertyPath: position.z
       value: -616.995
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1143,6 +1142,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Show Lyrics on Notes
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ShowLyricsOnNotes
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1167,6 +1171,11 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 240.49997
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Yes
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -1273,6 +1282,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Label
+      objectReference: {fileID: 0}
     - target: {fileID: 9202059109578588013, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1302,16 +1316,6 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 239.99995
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Label
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -1349,16 +1353,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Fullscreen
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Windowed
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1394,6 +1388,11 @@ PrefabInstance:
       propertyPath: size.y
       value: 54.825012
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1414,6 +1413,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Fullscreen
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Fullscreen
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1428,6 +1432,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 54.825012
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Windowed
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -1534,6 +1543,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Label
+      objectReference: {fileID: 0}
     - target: {fileID: 9202059109578588013, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1553,16 +1567,6 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 55.8248
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Label
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -1610,16 +1614,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ShowPitchIndicator
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Yes
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1690,6 +1684,11 @@ PrefabInstance:
       propertyPath: position.z
       value: -616.995
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1720,6 +1719,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Show Pitch Indicator
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ShowPitchIndicator
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1744,6 +1748,11 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 140.34804
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Yes
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -1850,6 +1859,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Label
+      objectReference: {fileID: 0}
     - target: {fileID: 9202059109578588013, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -1879,16 +1893,6 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 139.848
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Label
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -2064,11 +2068,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 1107399272158783315, guid: d25b56f386ff678439032a836c95dd10,
-        type: 3}
-      propertyPath: m_Name
-      value: BackButton
-      objectReference: {fileID: 0}
     - target: {fileID: 1107399272158783314, guid: d25b56f386ff678439032a836c95dd10,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2174,6 +2173,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1107399272158783315, guid: d25b56f386ff678439032a836c95dd10,
+        type: 3}
+      propertyPath: m_Name
+      value: BackButton
+      objectReference: {fileID: 0}
     - target: {fileID: 1107399272158783325, guid: d25b56f386ff678439032a836c95dd10,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -2263,6 +2267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetScene: 2
+  triggerWithEscape: 1
 --- !u!114 &1877623198 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
@@ -2318,16 +2323,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: TargetFps
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: 30
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2373,6 +2368,11 @@ PrefabInstance:
       propertyPath: size.y
       value: 54.825012
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2403,6 +2403,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Target FPS
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: TargetFps
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2427,6 +2432,11 @@ PrefabInstance:
         type: 3}
       propertyPath: position.y
       value: 342.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -2563,11 +2573,6 @@ PrefabInstance:
       propertyPath: position.y
       value: 341.91998
       objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
     - {fileID: 94536781857880445, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -2592,16 +2597,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: UseImageAsCursor
-      objectReference: {fileID: 0}
-    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Text
-      value: Yes
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2637,6 +2632,11 @@ PrefabInstance:
       propertyPath: size.y
       value: 54.825043
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2657,6 +2657,11 @@ PrefabInstance:
       propertyPath: m_Text
       value: Use image as cursor
       objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: UseImageAsCursor
+      objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2671,6 +2676,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 54.825043
+      objectReference: {fileID: 0}
+    - target: {fileID: 7214891532376088749, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Text
+      value: Yes
       objectReference: {fileID: 0}
     - target: {fileID: 7474452301240123628, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -2777,6 +2787,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Label
+      objectReference: {fileID: 0}
     - target: {fileID: 9202059109578588013, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2796,16 +2811,6 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 55.82483
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ItemSlider
-      objectReference: {fileID: 0}
-    - target: {fileID: 8033636465069693806, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Label
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
@@ -2901,11 +2906,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 364603712}
     m_Modifications:
-    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: Resolution
-      objectReference: {fileID: 0}
     - target: {fileID: 94536781375073644, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2941,6 +2941,11 @@ PrefabInstance:
       propertyPath: size.y
       value: 54.825012
       objectReference: {fileID: 0}
+    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: ResolutionSlider
+      objectReference: {fileID: 0}
     - target: {fileID: 94536781857880447, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
       propertyPath: localPosition.x
@@ -2955,6 +2960,11 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 54.825012
+      objectReference: {fileID: 0}
+    - target: {fileID: 2793207500214643716, guid: f7f4dd63810ceeb458e89387485df04a,
+        type: 3}
+      propertyPath: m_Name
+      value: Resolution
       objectReference: {fileID: 0}
     - target: {fileID: 2802880515523125580, guid: f7f4dd63810ceeb458e89387485df04a,
         type: 3}
@@ -3095,11 +3105,6 @@ PrefabInstance:
         type: 3}
       propertyPath: size.y
       value: 55.8248
-      objectReference: {fileID: 0}
-    - target: {fileID: 94536781571482332, guid: f7f4dd63810ceeb458e89387485df04a,
-        type: 3}
-      propertyPath: m_Name
-      value: ResolutionSlider
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5022133717749375114, guid: f7f4dd63810ceeb458e89387485df04a, type: 3}
