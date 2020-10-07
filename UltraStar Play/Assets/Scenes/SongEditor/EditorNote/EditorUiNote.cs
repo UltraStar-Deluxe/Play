@@ -37,8 +37,8 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     [InjectedInInspector]
     public Text pitchLabel;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private ShowWhiteSpaceText uiText;
+    [InjectedInInspector]
+    public ShowWhiteSpaceText uiText;
 
     [Inject]
     private SongMeta songMeta;
@@ -111,6 +111,14 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
         {
             UpdateHandles();
         }
+
+        UpdateFontSize();
+    }
+
+    private void UpdateFontSize()
+    {
+        float rectTransformWidthInPt = Mathf.Floor(RectTransform.rect.width * 72 / Screen.dpi) - 2;
+        uiText.FontSize = (int)Mathf.Max(2, Mathf.Min(20f, rectTransformWidthInPt));
     }
 
     private bool IsKeyDownOrUp(KeyCode keyCode)
@@ -269,7 +277,6 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     public void SetColor(Color color)
     {
         backgroundImage.color = color;
-        pitchLabel.color = color;
     }
 
     public void SetSelected(bool isSelected)
