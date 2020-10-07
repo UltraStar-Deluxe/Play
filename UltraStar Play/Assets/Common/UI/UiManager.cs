@@ -21,6 +21,9 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
+    
+    [InjectedInInspector]
+    public QuestionDialog questionDialogPrefab;
 
     [InjectedInInspector]
     public Notification notificationPrefab;
@@ -43,6 +46,9 @@ public class UiManager : MonoBehaviour, INeedInjection
     private Injector injector;
 
     private readonly List<Notification> notifications = new List<Notification>();
+    private readonly List<Dialog> dialogs = new List<Dialog>();
+
+    public bool DialogOpen => dialogs.Count > 0;
 
     void Awake()
     {
@@ -70,7 +76,29 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             warningDialog.Message = message;
         }
+        
+        dialogs.Add(warningDialog);
         return warningDialog;
+    }
+    
+    public QuestionDialog CreateQuestionDialog(string title, string message)
+    {
+        FindCanvas();
+
+        QuestionDialog questionDialog = Instantiate(questionDialogPrefab, canvas.transform);
+        injector.Inject(questionDialog);
+        questionDialog.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        if (title != null)
+        {
+            questionDialog.Title = title;
+        }
+        if (message != null)
+        {
+            questionDialog.Message = message;
+        }
+        
+        dialogs.Add(questionDialog);
+        return questionDialog;
     }
 
     public Notification CreateNotification(string message)
@@ -84,6 +112,11 @@ public class UiManager : MonoBehaviour, INeedInjection
 
         notifications.Add(notification);
         return notification;
+    }
+
+    public void OnDialogClosed(Dialog dialog)
+    {
+        dialogs.Remove(dialog);
     }
 
     public Notification CreateNotification(string message, Color color)

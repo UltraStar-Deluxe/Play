@@ -12,5 +12,12 @@ using UniRx;
 
 public class MainSceneController : MonoBehaviour, INeedInjection
 {
-
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) && !UiManager.Instance.DialogOpen)
+        {
+            QuestionDialog quitDialog = UiManager.Instance.CreateQuestionDialog("Quit?", "Really quit UltraStar Play?");
+            quitDialog.yesAction = ApplicationUtils.QuitOrStopPlayMode;
+        }
+    }
 }

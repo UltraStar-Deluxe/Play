@@ -31,4 +31,13 @@ public class Dialog : MonoBehaviour
             messageUiText.text = value;
         }
     }
+
+    private void OnDestroy()
+    {
+        UiManager uiManager = UiManager.Instance;
+        if (uiManager != null)
+        {
+            UiManager.Instance.OnDialogClosed(this);
+        }
+    }
 }
