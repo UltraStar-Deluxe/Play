@@ -65,19 +65,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             lastCaretPosition = inputField.caretPosition;
 
             SyncPositionInSongWithSelectedText();
-            ScrollToCaretPosition();
         }
-    }
-
-    private void ScrollToCaretPosition()
-    {
-        if (inputField.text.Length < 100)
-        {
-            return;
-        }
-        float visibleAreaPercent = scrollRect.viewport.rect.height / scrollRect.content.rect.height;
-        Debug.Log("visible:" + visibleAreaPercent);
-        Debug.Log("vscroll:" + scrollRect.verticalNormalizedPosition);
     }
 
     private char OnValidateInput(string text, int charIndex, char addedChar)
