@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System.Text;
-using UnityEngine.EventSystems;
+using TMPro;
 
 #pragma warning disable CS0649
 
@@ -17,7 +17,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private static readonly char spaceCharacter = ' ';
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private InputField inputField;
+    private TMP_InputField inputField;
 
     [Inject]
     private SongMeta songMeta;
@@ -28,6 +28,9 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private ScrollRect scrollRect;
+
     private int lastCaretPosition;
 
     private bool newlineAdded;
@@ -37,8 +40,8 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     void Start()
     {
         UpdateLyrics();
-        inputField.GetComponent<OnSelectObserver>().OnSelectEventStream.Subscribe(_ => OnBeginEdit());
-        inputField.OnEndEditAsObservable().Subscribe(OnEndEdit);
+        inputField.onSelect.AsObservable().Subscribe(_ => OnBeginEdit());
+        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
         inputField.onValidateInput += OnValidateInput;
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
@@ -49,9 +52,10 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         {
             // Make newline complete with visible character and the newline
             int caretPosition = inputField.caretPosition;
-            inputField.text = inputField.text
+            string newInputFieldText = inputField.text
                 .Replace("\n", "")
                 .Replace("↵", ShowWhiteSpaceText.newlineReplacement);
+            SetInputFieldText(newInputFieldText);
             inputField.caretPosition = caretPosition + 1;
             newlineAdded = false;
         }
@@ -61,7 +65,19 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             lastCaretPosition = inputField.caretPosition;
 
             SyncPositionInSongWithSelectedText();
+            ScrollToCaretPosition();
         }
+    }
+
+    private void ScrollToCaretPosition()
+    {
+        if (inputField.text.Length < 100)
+        {
+            return;
+        }
+        float visibleAreaPercent = scrollRect.viewport.rect.height / scrollRect.content.rect.height;
+        Debug.Log("visible:" + visibleAreaPercent);
+        Debug.Log("vscroll:" + scrollRect.verticalNormalizedPosition);
     }
 
     private char OnValidateInput(string text, int charIndex, char addedChar)
@@ -95,14 +111,16 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         string text = (lyricsAreaMode == LyricsAreaMode.ViewMode)
             ? GetViewModeText()
             : GetEditModeText();
-        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
+        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
+        SetInputFieldText(newInputFieldText);
     }
 
     private void OnBeginEdit()
     {
         // Map lyrics of notes to edit-mode text.
         string editModeText = GetEditModeText();
-        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
+        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
+        SetInputFieldText(newInputFieldText);
 
         lyricsAreaMode = LyricsAreaMode.EditMode;
     }
@@ -112,11 +130,19 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         // Map edit-mode text to lyrics of notes
         string editModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
         MapEditModeTextToNotes(editModeText);
-        inputField.text = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
+        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
+        SetInputFieldText(newInputFieldText);
 
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
 
         lyricsAreaMode = LyricsAreaMode.ViewMode;
+    }
+
+    private void SetInputFieldText(string text)
+    {
+        inputField.text = text;
+        int lineBreaks = text.Select((char c) => c == '\n').Count();
+        scrollRect.verticalScrollbar.numberOfSteps = lineBreaks;
     }
 
     private void SyncPositionInSongWithSelectedText()
