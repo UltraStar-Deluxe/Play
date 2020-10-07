@@ -15562,7 +15562,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 71010841}
   m_HandleRect: {fileID: 71010840}
   m_Direction: 3
-  m_Value: -0
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -20777,6 +20777,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EditorNotePrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 8883102138045539863, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -2121.3206
+      objectReference: {fileID: 0}
+    - target: {fileID: 8883102138045539863, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 2651.6504
+      objectReference: {fileID: 0}
+    - target: {fileID: 8883102138045539863, guid: 1ddb7c352ea45e748a0d4df3143043fe,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ddb7c352ea45e748a0d4df3143043fe, type: 3}

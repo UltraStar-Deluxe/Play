@@ -26,6 +26,21 @@ public class ShowWhiteSpaceText : MonoBehaviour
         }
     }
 
+    public float PreferredWidth => uiText.preferredWidth;
+    public float PreferredHeight => uiText.preferredHeight;
+
+    public int FontSize
+    {
+        get
+        {
+            return uiText.fontSize;
+        }
+        set
+        {
+            uiText.fontSize = value;
+        }
+    }
+
     private void Awake()
     {
         uiText = GetComponent<Text>();
