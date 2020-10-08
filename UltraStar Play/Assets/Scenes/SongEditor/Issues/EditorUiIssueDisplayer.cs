@@ -66,11 +66,6 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
 
     private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is LyricsChangedEvent)
-        {
-            return;
-        }
-
         UpdateIssues();
     }
 

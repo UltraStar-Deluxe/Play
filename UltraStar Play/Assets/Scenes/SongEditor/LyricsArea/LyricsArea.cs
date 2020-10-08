@@ -31,6 +31,20 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private ScrollRect scrollRect;
 
+    private Voice voice;
+    public Voice Voice
+    {
+        get
+        {
+            return voice;
+        }
+        set
+        {
+            voice = value;
+            UpdateLyrics();
+        }
+    }
+
     private int lastCaretPosition;
 
     private bool newlineAdded;
@@ -39,6 +53,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     void Start()
     {
+        voice = songMeta.GetVoices()[0];
         UpdateLyrics();
         inputField.onSelect.AsObservable().Subscribe(_ => OnBeginEdit());
         inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
@@ -146,7 +161,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private string GetEditModeText()
     {
         StringBuilder stringBuilder = new StringBuilder();
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         Note lastNote = null;
         foreach (Sentence sentence in sortedSentences)
         {
@@ -180,7 +195,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private string GetViewModeText()
     {
         StringBuilder stringBuilder = new StringBuilder();
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         foreach (Sentence sentence in sortedSentences)
         {
             List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
@@ -197,7 +212,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     {
         int sentenceIndex = 0;
         int noteIndex = 0;
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         List<Note> sortedNotes = (sentenceIndex < sortedSentences.Count)
             ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
             : new List<Note>();
@@ -283,7 +298,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         }
 
         // Get relevant sentence
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(songMeta);
+        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         if (relevantSentenceIndex >= sortedSentences.Count
             || sortedSentences[relevantSentenceIndex].Notes.IsNullOrEmpty())
         {
