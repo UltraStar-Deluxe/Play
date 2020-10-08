@@ -84,6 +84,12 @@ public static class SongMetaUtils
         return result;
     }
 
+    public static List<Note> GetAllNotes(Voice voice)
+    {
+        List<Note> result = voice.Sentences.SelectMany(sentence => sentence.Notes).ToList();
+        return result;
+    }
+
     public static List<Sentence> GetAllSentences(SongMeta songMeta)
     {
         List<Sentence> result = new List<Sentence>();
