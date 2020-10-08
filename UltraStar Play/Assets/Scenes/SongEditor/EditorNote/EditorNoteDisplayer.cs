@@ -55,7 +55,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
     }
 
-    private void OnSongMetaChangeEvent(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChangeEvent(SongMetaChangeEvent changeEvent)
     {
         ReloadSentences();
         UpdateNotesAndSentences();

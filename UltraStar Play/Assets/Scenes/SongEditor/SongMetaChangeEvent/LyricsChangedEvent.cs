@@ -1,4 +1,4 @@
-public class LyricsChangedEvent : ISongMetaChangeEvent
+﻿public class LyricsChangedEvent : SongMetaChangeEvent
 {
 
 }

@@ -64,7 +64,7 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
         lastViewportEvent = viewportEvent;
     }
 
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         UpdateIssues();
     }

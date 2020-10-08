@@ -44,9 +44,10 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
     }
 
-    private void OnSongMetaChangeEvent(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChangeEvent(SongMetaChangeEvent changeEvent)
     {
-        if (!(changeEvent is LoadedMementoEvent))
+        if (changeEvent.Undoable
+            && !(changeEvent is LoadedMementoEvent))
         {
             AddUndoState();
         }
