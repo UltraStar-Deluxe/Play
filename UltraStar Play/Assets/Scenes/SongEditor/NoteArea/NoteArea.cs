@@ -94,7 +94,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         FitViewportVerticalToNotes();
     }
 
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
         {

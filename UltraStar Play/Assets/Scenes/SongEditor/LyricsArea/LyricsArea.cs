@@ -51,6 +51,8 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     private LyricsAreaMode lyricsAreaMode = LyricsAreaMode.ViewMode;
 
+    private string lastEditModeText;
+
     void Start()
     {
         voice = songMeta.GetVoices()[0];
@@ -63,16 +65,29 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     void Update()
     {
-        if (lyricsAreaMode == LyricsAreaMode.EditMode && newlineAdded)
+        if (lyricsAreaMode == LyricsAreaMode.EditMode)
         {
-            // Make newline complete with visible character and the newline
-            int caretPosition = inputField.caretPosition;
-            string newInputFieldText = inputField.text
-                .Replace("\n", "")
-                .Replace("↵", ShowWhiteSpaceText.newlineReplacement);
-            SetInputFieldText(newInputFieldText);
-            inputField.caretPosition = caretPosition + 1;
-            newlineAdded = false;
+            // Make add visible character to the newline
+            if (newlineAdded)
+            {
+                int caretPosition = inputField.caretPosition;
+                string newInputFieldText = inputField.text
+                    .Replace("\n", "")
+                    .Replace("↵", ShowWhiteSpaceText.newlineReplacement);
+                SetInputFieldText(newInputFieldText);
+                inputField.caretPosition = caretPosition + 1;
+                newlineAdded = false;
+            }
+
+            // Immediately apply changed lyrics to notes, but do not record it in the history.
+            if (lastEditModeText != inputField.text)
+            {
+                if (lastEditModeText != null)
+                {
+                    ApplyEditModeText(inputField.text, false);
+                }
+                lastEditModeText = inputField.text;
+            }
         }
 
         if (inputField.isFocused && lastCaretPosition != inputField.caretPosition)
@@ -100,10 +115,11 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         return addedChar;
     }
 
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is LyricsChangedEvent
-            && lyricsAreaMode == LyricsAreaMode.ViewMode)
+        if (lyricsAreaMode == LyricsAreaMode.ViewMode
+            && (changeEvent is LyricsChangedEvent
+                || changeEvent is LoadedMementoEvent))
         {
             UpdateLyrics();
         }
@@ -121,6 +137,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private void OnBeginEdit()
     {
         // Map lyrics of notes to edit-mode text.
+        lastEditModeText = null;
         string editModeText = GetEditModeText();
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
@@ -130,15 +147,20 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
     private void OnEndEdit(string newText)
     {
-        // Map edit-mode text to lyrics of notes
-        string editModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
-        MapEditModeTextToNotes(editModeText);
+        ApplyEditModeText(newText, true);
+
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
         SetInputFieldText(newInputFieldText);
 
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
-
         lyricsAreaMode = LyricsAreaMode.ViewMode;
+    }
+
+    private void ApplyEditModeText(string editModeText, bool undoable)
+    {
+        // Map edit-mode text to lyrics of notes
+        string text = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
+        MapEditModeTextToNotes(text);
+        songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
     private void SetInputFieldText(string text)

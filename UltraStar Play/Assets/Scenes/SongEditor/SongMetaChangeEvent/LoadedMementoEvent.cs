@@ -1,4 +1,4 @@
-public class LoadedMementoEvent : ISongMetaChangeEvent
+public class LoadedMementoEvent : SongMetaChangeEvent
 {
 
 }

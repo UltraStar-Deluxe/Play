@@ -1,4 +1,4 @@
-public class BpmChangeEvent : ISongMetaChangeEvent
+public class BpmChangeEvent : SongMetaChangeEvent
 {
 
 }

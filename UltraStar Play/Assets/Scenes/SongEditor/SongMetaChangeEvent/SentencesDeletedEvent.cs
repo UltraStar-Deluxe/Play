@@ -1,3 +1,3 @@
-public class SentencesDeletedEvent : ISongMetaChangeEvent
+public class SentencesDeletedEvent : SongMetaChangeEvent
 {
 }

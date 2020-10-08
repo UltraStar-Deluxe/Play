@@ -23,7 +23,7 @@ public class MusicGapText : AbstractSongMetaTagText
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         if (changeEvent is MusicGapChangedEvent || changeEvent is LoadedMementoEvent)
         {
