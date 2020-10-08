@@ -209,8 +209,8 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             if (noteIndex < sortedNotes.Count)
             {
                 sortedNotes[noteIndex].SetText(stringBuilder.ToString());
-                stringBuilder = new StringBuilder();
             }
+            stringBuilder = new StringBuilder();
         };
 
         Action selectNextSentence = () =>

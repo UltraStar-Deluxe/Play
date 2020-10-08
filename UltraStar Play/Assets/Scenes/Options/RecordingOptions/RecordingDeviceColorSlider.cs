@@ -13,8 +13,7 @@ public class RecordingDeviceColorSlider : ColorItemSlider
     protected override void Awake()
     {
         base.Awake();
-        Items = new List<Color> { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
-                                  Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
+        Items = new List<Color>(ColorPalettes.Aussie.colors);
     }
 
     public void SetMicProfile(MicProfile micProfile)
@@ -24,7 +23,13 @@ public class RecordingDeviceColorSlider : ColorItemSlider
             disposable.Dispose();
         }
 
-        Selection.Value = Items.Where(it => it == micProfile.Color).First();
+        Color matchingColor = Items.Where(it => it == micProfile.Color).FirstOrDefault();
+        if (matchingColor == null)
+        {
+            matchingColor = Items[0];
+            micProfile.Color = Items[0];
+        }
+        Selection.Value = matchingColor;
         disposable = Selection.Subscribe(newValue => micProfile.Color = newValue);
     }
 }

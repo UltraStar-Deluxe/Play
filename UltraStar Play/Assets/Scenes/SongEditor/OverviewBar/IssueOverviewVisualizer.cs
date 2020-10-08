@@ -32,11 +32,6 @@ public class IssueOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInje
 
     private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is LyricsChangedEvent)
-        {
-            return;
-        }
-
         issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
         UpdateIssueOverviewImage();
     }

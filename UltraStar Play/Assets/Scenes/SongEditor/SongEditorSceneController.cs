@@ -195,7 +195,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private void CreateVoiceToColorMap()
     {
-        List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
+        List<Color> colors = new List<Color>(ColorPalettes.Aussie.colors);
         int index = 0;
         foreach (Voice v in SongMeta.GetVoices())
         {

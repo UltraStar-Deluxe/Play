@@ -5,15 +5,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public static class GameObjectUtils
 {
-    /// Returns true if there is a selected GameObject and it has a Component of type InputField
+    /// Returns true if there is a selected GameObject and it has a Component of type (TextMesh Pro) InputField
     /// The EventSystem is one of the CommonSceneObjects that can be injected.
     public static bool InputFieldHasFocus(EventSystem eventSystem)
     {
         GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
-        return selectedGameObject != null && selectedGameObject.GetComponentInChildren<InputField>() != null;
+        return selectedGameObject != null
+            && (selectedGameObject.GetComponentInChildren<InputField>() != null
+                || selectedGameObject.GetComponentInChildren<TMP_InputField>() != null);
     }
 
     /// Looks in the GameObject with the given tag
