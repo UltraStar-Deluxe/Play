@@ -120,10 +120,10 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
-    public void FitViewportHorizontalToNotes(List<Note> notes)
+    public void FitViewportHorizontal(int minBeat, int maxBeat)
     {
-        int minBeat = notes.Select(it => it.StartBeat).Min();
-        int maxBeat = notes.Select(it => it.StartBeat).Max();
+        maxBeat = NumberUtils.Limit(maxBeat, 0, maxBeat);
+        minBeat = NumberUtils.Limit(minBeat, 0, maxBeat);
         double minPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
         double maxPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
         int newViewportX = (int)Math.Floor(minPositionInMillis);

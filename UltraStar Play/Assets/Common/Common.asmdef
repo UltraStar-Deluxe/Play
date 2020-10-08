@@ -3,6 +3,7 @@
     "references": [
         "Plugins",
         "UniRx",
-        "UniInject"
+        "UniInject",
+        "Unity.TextMeshPro"
     ]
 }

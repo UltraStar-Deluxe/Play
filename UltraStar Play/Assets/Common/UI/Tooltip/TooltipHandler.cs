@@ -8,8 +8,13 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [TextArea(3, 10)]
     public string tooltipText;
 
-    private readonly float showDelayInSeconds = 1f;
-    private readonly float closeDelayInSeconds = 0.5f;
+    private readonly float defaultShowDelayInSeconds = 1f;
+    private readonly float defaultCloseDelayInSeconds = 0.5f;
+
+    [Range(-1, 2)]
+    public float showDelayInSeconds = -1f;
+    [Range(-1, 2)]
+    public float closeDelayInSeconds = -1f;
 
     private float tooltipShowTime = -1;
     private float tooltipCloseTime = -1;
@@ -50,14 +55,14 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData ped)
     {
-        tooltipShowTime = Time.time + showDelayInSeconds;
+        tooltipShowTime = Time.time + (showDelayInSeconds >= 0 ? showDelayInSeconds : defaultShowDelayInSeconds);
         tooltipCloseTime = -1;
     }
 
     public void OnPointerExit(PointerEventData ped)
     {
         tooltipShowTime = -1;
-        tooltipCloseTime = Time.time + closeDelayInSeconds;
+        tooltipCloseTime = Time.time + (closeDelayInSeconds >= 0 ? closeDelayInSeconds : defaultCloseDelayInSeconds);
     }
 
     public void CloseTooltip()
