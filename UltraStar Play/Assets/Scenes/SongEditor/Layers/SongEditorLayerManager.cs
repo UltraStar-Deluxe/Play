@@ -84,7 +84,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
         result[ESongEditorLayer.MicRecording].Color = Colors.coral;
         result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
-        result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 0.8f);
+        result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 200);
         result[ESongEditorLayer.MidiFile].Color = Colors.mediumVioletRed;
         return result;
     }

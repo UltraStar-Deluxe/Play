@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 
-public class ColorItemSlider : ItemSlider<Color>
+public class ColorItemSlider : ItemSlider<Color32>
 {
     public Image uiImage;
 
