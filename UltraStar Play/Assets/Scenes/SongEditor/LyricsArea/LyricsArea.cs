@@ -185,32 +185,39 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         StringBuilder stringBuilder = new StringBuilder();
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         Note lastNote = null;
-        foreach (Sentence sentence in sortedSentences)
+
+        void ProcessNote(Note note)
+        {
+            if (lastNote != null
+                && lastNote.Sentence == note.Sentence)
+            {
+                // Add a space when the last note ended or the current note started with a space.
+                // Otherwise use the non-whitespace syllabeSeparator as end-of-note.
+                if (lastNote.Text.EndsWith(spaceCharacter)
+                    || note.Text.StartsWith(spaceCharacter))
+                {
+                    stringBuilder.Append(spaceCharacter);
+                }
+                else
+                {
+                    stringBuilder.Append(syllableSeparator);
+                }
+            }
+            stringBuilder.Append(note.Text.Trim());
+
+            lastNote = note;
+        }
+
+        void ProcessSentence(Sentence sentence)
         {
             List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
-            foreach (Note note in sortedNotes)
-            {
-                if (lastNote != null
-                    && lastNote.Sentence == note.Sentence)
-                {
-                    // Add a space when the last note ended or the current note started with a space.
-                    // Otherwise use the non-whitespace syllabeSeparator as end-of-note.
-                    if (lastNote.Text.EndsWith(spaceCharacter)
-                        || note.Text.StartsWith(spaceCharacter))
-                    {
-                        stringBuilder.Append(spaceCharacter);
-                    }
-                    else
-                    {
-                        stringBuilder.Append(syllableSeparator);
-                    }
-                }
-                stringBuilder.Append(note.Text.Trim());
+            sortedNotes.ForEach(ProcessNote);
 
-                lastNote = note;
-            }
             stringBuilder.Append(sentenceSeparator);
         }
+
+        sortedSentences.ForEach(ProcessSentence);
+
         return stringBuilder.ToString();
     }
 
@@ -241,18 +248,18 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        Action applyNoteText = () =>
+        void ApplyNoteText()
         {
             if (noteIndex < sortedNotes.Count)
             {
                 sortedNotes[noteIndex].SetText(stringBuilder.ToString());
             }
             stringBuilder = new StringBuilder();
-        };
+        }
 
-        Action selectNextSentence = () =>
+        void SelectNextSentence()
         {
-            applyNoteText();
+            ApplyNoteText();
 
             for (int i = noteIndex + 1; i < sortedNotes.Count; i++)
             {
@@ -265,29 +272,29 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             sortedNotes = (sentenceIndex < sortedSentences.Count)
                     ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
                     : new List<Note>();
-        };
+        }
 
-        Action selectNextNote = () =>
+        void SelectNextNote()
         {
-            applyNoteText();
+            ApplyNoteText();
 
             noteIndex++;
-        };
+        }
 
         foreach (char c in editModeText)
         {
             if (c == sentenceSeparator)
             {
-                selectNextSentence();
+                SelectNextSentence();
             }
             else if (c == syllableSeparator)
             {
-                selectNextNote();
+                SelectNextNote();
             }
             else if (c == ' ')
             {
                 stringBuilder.Append(c);
-                selectNextNote();
+                SelectNextNote();
             }
             else
             {
@@ -329,7 +336,6 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         Sentence relevantSentence = sortedSentences[relevantSentenceIndex];
 
         // Count note borders
-        string relevantSentenceText = text.Substring(relevantSentenceTextStartIndex, caretPosition - relevantSentenceTextStartIndex);
         int noteIndex = 0;
         for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
         {
