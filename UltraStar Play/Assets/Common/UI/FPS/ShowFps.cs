@@ -1,20 +1,31 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class ShowFps : MonoBehaviour
 {
     public Text fpsText;
-    public float deltaTime;
+
+    [ReadOnly]
+    public int fps;
+
+    private float deltaTime;
+    private int frameCount;
 
     void Update()
     {
-        deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
-        float fps = 1.0f / deltaTime;
+        frameCount++;
+        deltaTime += Time.deltaTime;
 
-        if (fpsText != null)
+        if (deltaTime >= 0.5f)
         {
-            fpsText.text = Mathf.Ceil(fps).ToString();
+            fps = (int)Mathf.Ceil(frameCount / deltaTime);
+            frameCount = 0;
+            deltaTime -= 0.5f;
+
+            if (fpsText != null)
+            {
+                fpsText.text = fps.ToString();
+            }
         }
     }
 }
