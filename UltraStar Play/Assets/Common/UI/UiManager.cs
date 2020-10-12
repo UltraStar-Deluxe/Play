@@ -18,7 +18,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private List<RectTransform> debugPoints = new List<RectTransform>();
+    private readonly List<RectTransform> debugPoints = new List<RectTransform>();
 
     [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
@@ -38,7 +38,7 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Tooltip tooltipPrefab;
 
-    private Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
+    private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
     public IObservable<Vector3> MousePositionChangeEventStream => mousePositionChangeEventStream;
 
     public bool DialogOpen => dialogs.Count > 0;
