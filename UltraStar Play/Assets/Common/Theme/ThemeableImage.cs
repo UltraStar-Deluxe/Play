@@ -11,10 +11,6 @@ public class ThemeableImage : Themeable
     public EImageResource imageResource = EImageResource.NONE;
     public Image target;
 
-#if UNITY_EDITOR
-    private EImageResource lastImageResource = EImageResource.NONE;
-#endif
-
     void OnEnable()
     {
         if (target == null)
@@ -26,18 +22,22 @@ public class ThemeableImage : Themeable
 #if UNITY_EDITOR
     void Update()
     {
-        if (imageResource != EImageResource.NONE && lastImageResource != imageResource)
+        if (imageResource != EImageResource.NONE
+            && imagePath != imageResource.GetPath())
         {
-            lastImageResource = imageResource;
             imagePath = imageResource.GetPath();
-            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-            ReloadResources(currentTheme);
+            ReloadResources(ThemeManager.Instance.CurrentTheme);
         }
     }
 #endif
 
     public override void ReloadResources(Theme theme)
     {
+        if (theme == null)
+        {
+            Debug.LogError("Theme is null", gameObject);
+            return;
+        }
         if (string.IsNullOrEmpty(imagePath))
         {
             Debug.LogWarning($"Theme resource not specified", gameObject);
@@ -49,7 +49,7 @@ public class ThemeableImage : Themeable
             return;
         }
 
-        Sprite loadedSprite = LoadResourceFromTheme<Sprite>(theme, imagePath);
+        Sprite loadedSprite = theme.FindResource<Sprite>(imagePath);
         if (loadedSprite == null)
         {
             Debug.LogError($"Could not load image {imagePath}", gameObject);

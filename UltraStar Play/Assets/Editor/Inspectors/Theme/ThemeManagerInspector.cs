@@ -21,7 +21,7 @@ public class ThemeManagerInspector : EditorBase
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
-                ThemeManager.Instance.currentThemeName = quickThemeSelectItems[quickThemeSelectIndex];
+                ThemeManager.Instance.CurrentTheme = ThemeManager.Instance.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
                 UpdateThemeResources();
             }
         }
@@ -31,9 +31,10 @@ public class ThemeManagerInspector : EditorBase
             UpdateThemeResources();
         }
 
-        if (GUILayout.Button("Refresh Resources Folder"))
+        if (GUILayout.Button("Reload Themes"))
         {
             RefreshAssetsInResourcesFolder();
+            ThemeManager.Instance.ReloadThemes();
         }
     }
 
@@ -61,7 +62,7 @@ public class ThemeManagerInspector : EditorBase
     {
         List<string> loadedThemeNames = ThemeManager.Instance.GetLoadedThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
-        Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
+        Theme currentTheme = ThemeManager.Instance.CurrentTheme;
         if (currentTheme != null)
         {
             quickThemeSelectIndex = loadedThemeNames.IndexOf(currentTheme.Name);

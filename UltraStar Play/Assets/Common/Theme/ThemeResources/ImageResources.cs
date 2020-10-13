@@ -7,9 +7,9 @@ public static class ImageResources
     {
         switch (eImageResource)
         {
-            case EImageResource.DEMO_SMILEY1: return "themedemo/smiley1";
-            case EImageResource.DEMO_SMILEY2: return "themedemo/smiley2";
-            case EImageResource.DEMO_SMILEY3: return "themedemo/smiley3";
+            case EImageResource.DEMO_SMILEY1: return "Smiley1";
+            case EImageResource.DEMO_SMILEY2: return "Smiley2";
+            case EImageResource.DEMO_SMILEY3: return "Smiley3";
             default:
                 throw new ArgumentException("No image resource path defined for enum value " + eImageResource.ToString());
         }
