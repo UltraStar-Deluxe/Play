@@ -18,6 +18,12 @@ public class ThemeManager : MonoBehaviour
     public static readonly string themesFileBaseName = "Themes";
     public static readonly string colorsFileBaseName = "Colors";
 
+    public List<string> GetAvailableColors()
+    {
+        ReloadThemes();
+        return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
+    }
+
     // Field is static to be persisted across scenes.
     private static readonly Dictionary<string, Theme> themeNameToTheme = new Dictionary<string, Theme>();
 

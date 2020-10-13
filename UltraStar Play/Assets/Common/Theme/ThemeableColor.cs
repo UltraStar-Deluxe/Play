@@ -6,30 +6,17 @@ using UnityEngine.UI;
 [ExecuteInEditMode]
 public class ThemeableColor : Themeable
 {
-    [ReadOnly]
     public string colorName;
-    public EColorResource colorResource = EColorResource.NONE;
     public Image target;
 
 #if UNITY_EDITOR
-    private EColorResource lastColorResource = EColorResource.NONE;
-#endif
+    private string lastColorName;
 
-    void OnEnable()
-    {
-        if (target == null)
-        {
-            target = GetComponent<Image>();
-        }
-    }
-
-#if UNITY_EDITOR
     void Update()
     {
-        if (lastColorResource != colorResource)
+        if (lastColorName != colorName)
         {
-            lastColorResource = colorResource;
-            colorName = colorResource.GetName();
+            lastColorName = colorName;
             ReloadResources(ThemeManager.Instance.CurrentTheme);
         }
     }
@@ -47,15 +34,17 @@ public class ThemeableColor : Themeable
             Debug.LogWarning($"Missing color name", gameObject);
             return;
         }
-        if (target == null)
+
+        Image targetImage = target != null ? target : GetComponent<Image>();
+        if (targetImage == null)
         {
-            Debug.LogWarning($"Target is null", gameObject);
+            Debug.LogWarning($"Target is null and GameObject does not have an Image Component", gameObject);
             return;
         }
 
         if (theme.TryFindColor(colorName, out Color32 loadedColor))
         {
-            target.color = loadedColor;
+            targetImage.color = loadedColor;
         }
         else
         {

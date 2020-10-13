@@ -12,9 +12,9 @@ public static class DifficultyExtensions
     {
         switch (difficulty)
         {
-            case EDifficulty.Easy: return I18NKeys.difficulty_easy;
-            case EDifficulty.Medium: return I18NKeys.difficulty_medium;
-            case EDifficulty.Hard: return I18NKeys.difficulty_hard;
+            case EDifficulty.Easy: return R.String.difficulty_easy;
+            case EDifficulty.Medium: return R.String.difficulty_medium;
+            case EDifficulty.Hard: return R.String.difficulty_hard;
             default:
                 throw new UnityException("Unhandled difficulty: " + difficulty);
         }

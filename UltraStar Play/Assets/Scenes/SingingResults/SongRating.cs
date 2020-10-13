@@ -1,16 +1,16 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class SongRating
 {
-    public static readonly SongRating ToneDeaf = new SongRating(ESongRating.ToneDeaf, 0, I18NKeys.rating_song_tone_deaf);
-    public static readonly SongRating Amateur = new SongRating(ESongRating.Amateur, 2000, I18NKeys.rating_song_amateur);
-    public static readonly SongRating Wannabe = new SongRating(ESongRating.Wannabe, 4000, I18NKeys.rating_song_wannabe);
-    public static readonly SongRating Hopeful = new SongRating(ESongRating.Hopeful, 5000, I18NKeys.rating_song_hopeful);
-    public static readonly SongRating RisingStar = new SongRating(ESongRating.RisingStar, 6000, I18NKeys.rating_song_rising_star);
-    public static readonly SongRating LeadSinger = new SongRating(ESongRating.LeadSinger, 7500, I18NKeys.rating_song_lead_singer);
-    public static readonly SongRating Superstar = new SongRating(ESongRating.Superstar, 8500, I18NKeys.rating_song_superstar);
-    public static readonly SongRating Ultrastar = new SongRating(ESongRating.Ultrastar, 9000, I18NKeys.rating_song_ultrastar);
+    public static readonly SongRating ToneDeaf = new SongRating(ESongRating.ToneDeaf, 0, R.String.rating_song_tone_deaf);
+    public static readonly SongRating Amateur = new SongRating(ESongRating.Amateur, 2000, R.String.rating_song_amateur);
+    public static readonly SongRating Wannabe = new SongRating(ESongRating.Wannabe, 4000, R.String.rating_song_wannabe);
+    public static readonly SongRating Hopeful = new SongRating(ESongRating.Hopeful, 5000, R.String.rating_song_hopeful);
+    public static readonly SongRating RisingStar = new SongRating(ESongRating.RisingStar, 6000, R.String.rating_song_rising_star);
+    public static readonly SongRating LeadSinger = new SongRating(ESongRating.LeadSinger, 7500, R.String.rating_song_lead_singer);
+    public static readonly SongRating Superstar = new SongRating(ESongRating.Superstar, 8500, R.String.rating_song_superstar);
+    public static readonly SongRating Ultrastar = new SongRating(ESongRating.Ultrastar, 9000, R.String.rating_song_ultrastar);
 
     public enum ESongRating
     {
