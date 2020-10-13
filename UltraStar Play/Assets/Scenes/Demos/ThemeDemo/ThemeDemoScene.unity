@@ -665,7 +665,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorName: demo_color1
-  colorResource: 1
   target: {fileID: 1368557776}
 --- !u!114 &1368557776
 MonoBehaviour:

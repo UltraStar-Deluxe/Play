@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BoolItemSlider : TextItemSlider<bool>
 {
-    private readonly string i18nCodeTrue = I18NKeys.yes;
-    private readonly string i18nCodeFalse = I18NKeys.no;
+    private readonly string i18nCodeTrue = R.String.yes;
+    private readonly string i18nCodeFalse = R.String.no;
 
     protected override void Start()
     {
