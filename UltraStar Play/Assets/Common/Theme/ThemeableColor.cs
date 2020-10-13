@@ -7,8 +7,6 @@ using UnityEngine.UI;
 public class ThemeableColor : Themeable
 {
     [ReadOnly]
-    public string colorsFileName = "colors";
-    [ReadOnly]
     public string colorName;
     public EColorResource colorResource = EColorResource.NONE;
     public Image target;
@@ -31,19 +29,22 @@ public class ThemeableColor : Themeable
         if (lastColorResource != colorResource)
         {
             lastColorResource = colorResource;
-            colorsFileName = colorResource.GetPath();
             colorName = colorResource.GetName();
-            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-            ReloadResources(currentTheme);
+            ReloadResources(ThemeManager.Instance.CurrentTheme);
         }
     }
 #endif
 
     public override void ReloadResources(Theme theme)
     {
+        if (theme == null)
+        {
+            Debug.LogError("Theme is null", gameObject);
+            return;
+        }
         if (string.IsNullOrEmpty(colorName))
         {
-            Debug.LogWarning($"Missing image name", gameObject);
+            Debug.LogWarning($"Missing color name", gameObject);
             return;
         }
         if (target == null)
@@ -52,7 +53,7 @@ public class ThemeableColor : Themeable
             return;
         }
 
-        if (TryLoadColorFromTheme(theme, colorsFileName, colorName, out Color loadedColor))
+        if (theme.TryFindColor(colorName, out Color32 loadedColor))
         {
             target.color = loadedColor;
         }

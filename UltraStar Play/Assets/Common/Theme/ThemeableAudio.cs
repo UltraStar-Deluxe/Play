@@ -10,10 +10,6 @@ public class ThemeableAudio : Themeable
     public EAudioResource audioResource = EAudioResource.NONE;
     public AudioSource target;
 
-#if UNITY_EDITOR
-    private EAudioResource lastAudioResource = EAudioResource.NONE;
-#endif
-
     void OnEnable()
     {
         if (target == null)
@@ -25,18 +21,22 @@ public class ThemeableAudio : Themeable
 #if UNITY_EDITOR
     void Update()
     {
-        if (audioResource != EAudioResource.NONE && lastAudioResource != audioResource)
+        if (audioResource != EAudioResource.NONE
+            && audioPath != audioResource.GetPath())
         {
-            lastAudioResource = audioResource;
             audioPath = audioResource.GetPath();
-            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-            ReloadResources(currentTheme);
+            ReloadResources(ThemeManager.Instance.CurrentTheme);
         }
     }
 #endif
 
     public override void ReloadResources(Theme theme)
     {
+        if (theme == null)
+        {
+            Debug.LogError("Theme is null", gameObject);
+            return;
+        }
         if (string.IsNullOrEmpty(audioPath))
         {
             Debug.LogWarning($"Missing audio file name", gameObject);
@@ -48,7 +48,7 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioClip audioClip = LoadResourceFromTheme<AudioClip>(theme, audioPath);
+        AudioClip audioClip = theme.FindResource<AudioClip>(audioPath);
         if (audioClip == null)
         {
             Debug.LogError($"Could not load audio file {audioPath}", gameObject);

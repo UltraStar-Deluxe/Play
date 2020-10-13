@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 11
+  serializedVersion: 12
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -96,8 +96,10 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 97e5f66afac6aef45b4256ee207cfbcd,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -117,6 +119,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -170,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imagePath: themedemo/smiley2
+  imagePath: Smiley2
   imageResource: 2
   target: {fileID: 258787933}
 --- !u!114 &258787933
@@ -188,12 +192,12 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 2ba0852137ce7fe4eb76564db65ddf0a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9060b630a0c8cf346b6fe5321da168ea, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -386,7 +390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imagePath: themedemo/smiley3
+  imagePath: Smiley3
   imageResource: 3
   target: {fileID: 860388683}
 --- !u!114 &860388683
@@ -404,12 +408,12 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 73f7613c6ef5a894cb8153e68a2e8ba5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d3010368468647849b7bdf4e87ab400b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -583,11 +587,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
@@ -660,7 +664,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75eb2dba6fdabf6438840f067978af15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorsFileName: themedemo/colors
   colorName: demo_color1
   colorResource: 1
   target: {fileID: 1368557776}
@@ -679,12 +682,12 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 0d690005a3d99284aa700430f1728455, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b0d55ac59be3a7429c2b6d294b547da, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -754,11 +757,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
@@ -774,18 +777,20 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Start the Scene and change the current theme name in the ThemeManager.
 
-    Available themes are loaded from the themes.xml file under the Assets/Resources
-    folder.
+    Available
+    themes are loaded from the themes.xml file under the Assets/Resources folder.
 
-    Currently available are ''base'' and ''christmas''.
-
-
-    A theme can have a parent theme. If a resource is not found then it is searched
-    in the parent theme.
+    Currently
+    available are ''base'' and ''christmas''.
 
 
-    You can change which theme resource is used by the GameObjects from a drop down
-    of available resources.'
+    A theme can have a parent theme.
+    If a resource is not found then it is searched in the parent theme.
+
+
+    You
+    can change which theme resource is used by the GameObjects from a drop down of
+    available resources.'
 --- !u!222 &1537310916
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -845,7 +850,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 965cc617439254c41a0f3900ac16020b, type: 3}
+  m_audioClip: {fileID: 8300000, guid: e4f5b5ebb81ce384da09bde77783f24e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -975,6 +980,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1793075904}
+        m_TargetAssemblyTypeName: 
         m_MethodName: Play
         m_Mode: 1
         m_Arguments:
@@ -985,8 +991,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!114 &1793075906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1002,11 +1006,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
@@ -1037,7 +1041,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ce5b27129d3ad46acc6cc0de9dbc68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioPath: themedemo/button_click1
+  audioPath: ButtonClick1
   audioResource: 1
   target: {fileID: 1793075904}
 --- !u!1001 &7070348881521034251
@@ -1051,6 +1055,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CommonSceneObjects
+      objectReference: {fileID: 0}
+    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
+        type: 3}
+      propertyPath: isOverwriteSystemLanguage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
+        type: 3}
+      propertyPath: overwriteLanguage
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8069444317427349030, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
@@ -1112,15 +1126,10 @@ PrefabInstance:
       propertyPath: currentThemeName
       value: base
       objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
+    - target: {fileID: 9158773460734947099, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
-      propertyPath: isOverwriteSystemLanguage
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: overwriteLanguage
-      value: 10
+      propertyPath: logInfo
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}
