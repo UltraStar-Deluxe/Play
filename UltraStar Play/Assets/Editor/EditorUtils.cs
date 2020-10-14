@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -23,5 +23,11 @@ public class EditorUtils
             }
         }
         return result;
+    }
+
+    public static void RefreshAssetsInResourcesFolder()
+    {
+        // Update Unity's version of files in the Resources folder
+        AssetDatabase.ImportAsset("Assets/Resources", ImportAssetOptions.ImportRecursive);
     }
 }

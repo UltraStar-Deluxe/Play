@@ -10,27 +10,30 @@ public class Theme
     private readonly Dictionary<string, Color32> loadedColors = new Dictionary<string, Color32>();
     public IReadOnlyDictionary<string, Color32> LoadedColors => loadedColors;
 
-    public Theme(string name, Theme parentTheme)
+    public Theme(string name, Theme parentTheme, ThemeManager themeManager)
     {
         Name = name;
         ParentTheme = parentTheme;
 
-        LoadColors();
+        LoadColors(themeManager);
     }
 
-    private void LoadColors()
+    private void LoadColors(ThemeManager themeManager)
     {
         loadedColors.Clear();
-        TextAsset textAsset = FindResource<TextAsset>(ThemeManager.colorsFileBaseName);
-        if (textAsset != null)
+        string colorsFileUri = ApplicationUtils.GetStreamingAssetsUri(GetResourcePath(ThemeManager.colorsFileName));
+        themeManager.StartCoroutine(WebRequestUtils.LoadTextFromUri(colorsFileUri,
+            (loadedText) => LoadColorsFromText(loadedText)));
+    }
+
+    private void LoadColorsFromText(string text)
+    {
+        Dictionary<string, string> loadedColorHexValues = PropertiesFileParser.ParseText(text);
+        loadedColorHexValues.ForEach(entry =>
         {
-            Dictionary<string, string> loadedColorHexValues = PropertiesFileParser.ParseText(textAsset.text);
-            loadedColorHexValues.ForEach(entry =>
-            {
-                Color32 loadedColor = Colors.CreateColor(entry.Value);
-                loadedColors.Add(entry.Key, loadedColor);
-            });
-        }
+            Color32 loadedColor = Colors.CreateColor(entry.Value);
+            loadedColors.Add(entry.Key, loadedColor);
+        });
     }
 
     /// Looks for the color with the given name in the current theme and all parent themes.
@@ -49,27 +52,9 @@ public class Theme
         return false;
     }
 
-    /// Looks for the resource with the given name in the specified theme and all parent themes.
-    /// Returns null if the resource was not found. Otherwise the loaded resource is returned.
-    public T FindResource<T>(string resourceBaseName) where T : UnityEngine.Object
+    private string GetResourcePath(string resourceName)
     {
-        string resourcePath = GetResourcePath(resourceBaseName);
-        T asset = Resources.Load<T>(resourcePath);
-        if (asset != null)
-        {
-            return asset;
-        }
-        if (ParentTheme != null)
-        {
-            return ParentTheme.FindResource<T>(resourceBaseName);
-        }
-        Debug.LogError("Could not load resource: " + resourcePath);
-        return null;
-    }
-
-    private string GetResourcePath(string resourceBaseName)
-    {
-        return ThemeManager.themesFolderName + "/" + Name + "/" + resourceBaseName;
+        return ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
     }
 
     public override string ToString()

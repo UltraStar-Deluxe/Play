@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
@@ -11,21 +9,17 @@ public class ThemeManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        themeNameToTheme.Clear();
+        themeNameToTheme?.Clear();
     }
 
     public static readonly string themesFolderName = "Themes";
-    public static readonly string themesFileBaseName = "Themes";
-    public static readonly string colorsFileBaseName = "Colors";
+    public static readonly string themesFileName = "Themes.xml";
+    public static readonly string colorsFileName = "Colors.properties";
 
     public List<string> GetAvailableColors()
     {
-        ReloadThemes();
         return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
     }
-
-    // Field is static to be persisted across scenes.
-    private static readonly Dictionary<string, Theme> themeNameToTheme = new Dictionary<string, Theme>();
 
     public static ThemeManager Instance
     {
@@ -35,20 +29,14 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    public bool logInfo;
+    // Field is static to be persisted across scenes.
+    private static Dictionary<string, Theme> themeNameToTheme;
 
-    [ReadOnly]
-    public string currentThemeName;
-
-    public Theme currentTheme;
-    public Theme CurrentTheme
+    public static Theme currentTheme;
+    public static Theme CurrentTheme
     {
         get
         {
-            if (themeNameToTheme.IsNullOrEmpty())
-            {
-                ReloadThemes();
-            }
             return currentTheme;
         }
         set
@@ -56,7 +44,7 @@ public class ThemeManager : MonoBehaviour
             if (value != null)
             {
                 currentTheme = value;
-                currentThemeName = currentTheme.Name;
+                ThemeManager.Instance.currentThemeName = currentTheme.Name;
             }
             else
             {
@@ -65,10 +53,26 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
+    public bool logInfo;
+
+    [ReadOnly]
+    public string currentThemeName;
+
+    private void OnEnable()
+    {
+        if (themeNameToTheme == null)
+        {
+            ReloadThemes();
+        }
+
+        if (currentTheme != null)
+        {
+            currentThemeName = currentTheme.Name;
+        }
+    }
+
     public void UpdateThemeResources()
     {
-        ReloadThemes();
-
         if (CurrentTheme == null)
         {
             return;
@@ -95,13 +99,16 @@ public class ThemeManager : MonoBehaviour
 
     public void ReloadThemes()
     {
-        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        stopwatch.Start();
+        themeNameToTheme = new Dictionary<string, Theme>();
+        string themesFileUri = ApplicationUtils.GetStreamingAssetsUri(themesFolderName + "/" + themesFileName);
+        StartCoroutine(WebRequestUtils.LoadTextFromUri(themesFileUri,
+            (loadedXml) => ReloadThemesFromXml(loadedXml)));
+    }
 
+    private void ReloadThemesFromXml(string xml)
+    {
         Dictionary<string, string> themeNameToParentThemeNameMap = new Dictionary<string, string>();
 
-        TextAsset themesTextAsset = Resources.Load<TextAsset>(themesFolderName + "/" + themesFileBaseName);
-        string xml = themesTextAsset.text;
         XElement xthemes = XElement.Parse(xml);
         foreach (XElement xtheme in xthemes.Elements("theme"))
         {
@@ -118,12 +125,10 @@ public class ThemeManager : MonoBehaviour
 
         CurrentTheme = themeNameToTheme.Values.FirstOrDefault();
 
-        stopwatch.Stop();
-
         if (logInfo)
         {
             string themeNamesCsv = string.Join(", ", GetLoadedThemeNames());
-            Debug.Log($"Loaded themes: [{themeNamesCsv}] in {stopwatch.ElapsedMilliseconds} ms");
+            Debug.Log($"Loaded themes: [{themeNamesCsv}]");
         }
     }
 
@@ -141,12 +146,12 @@ public class ThemeManager : MonoBehaviour
         themeNameToParentThemeNameMap.TryGetValue(themeName, out string parentThemeName);
         if (string.IsNullOrEmpty(parentThemeName))
         {
-            newTheme = new Theme(themeName, null);
+            newTheme = new Theme(themeName, null, this);
         }
         else
         {
             Theme parentTheme = GetOrCreateAndAddTheme(parentThemeName, themeNameToParentThemeNameMap);
-            newTheme = new Theme(themeName, parentTheme);
+            newTheme = new Theme(themeName, parentTheme, this);
         }
         themeNameToTheme.Add(newTheme.Name, newTheme);
         return newTheme;

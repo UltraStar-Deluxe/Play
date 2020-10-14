@@ -6,6 +6,7 @@ using UnityEngine.UI;
 [ExecuteInEditMode]
 public class ThemeableColor : Themeable
 {
+    [Delayed]
     public string colorName;
     public Image target;
 
@@ -17,7 +18,7 @@ public class ThemeableColor : Themeable
         if (lastColorName != colorName)
         {
             lastColorName = colorName;
-            ReloadResources(ThemeManager.Instance.CurrentTheme);
+            ReloadResources(ThemeManager.CurrentTheme);
         }
     }
 #endif

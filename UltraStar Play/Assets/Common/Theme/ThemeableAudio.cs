@@ -5,27 +5,19 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class ThemeableAudio : Themeable
 {
-    [ReadOnly]
+    [Delayed]
     public string audioPath;
-    public EAudioResource audioResource = EAudioResource.NONE;
     public AudioSource target;
 
-    void OnEnable()
-    {
-        if (target == null)
-        {
-            target = GetComponent<AudioSource>();
-        }
-    }
-
 #if UNITY_EDITOR
+    private string lastAudioPath;
+
     void Update()
     {
-        if (audioResource != EAudioResource.NONE
-            && audioPath != audioResource.GetPath())
+        if (lastAudioPath != audioPath)
         {
-            audioPath = audioResource.GetPath();
-            ReloadResources(ThemeManager.Instance.CurrentTheme);
+            lastAudioPath = audioPath;
+            ReloadResources(ThemeManager.CurrentTheme);
         }
     }
 #endif
@@ -42,20 +34,15 @@ public class ThemeableAudio : Themeable
             Debug.LogWarning($"Missing audio file name", gameObject);
             return;
         }
-        if (target == null)
+
+        AudioSource targetAudioSource = target != null ? target : GetComponent<AudioSource>();
+        if (targetAudioSource == null)
         {
-            Debug.LogWarning($"Target is null", gameObject);
+            Debug.LogWarning($"Target is null and GameObject does not have an AudioSource Component", gameObject);
             return;
         }
 
-        AudioClip audioClip = theme.FindResource<AudioClip>(audioPath);
-        if (audioClip == null)
-        {
-            Debug.LogError($"Could not load audio file {audioPath}", gameObject);
-        }
-        else
-        {
-            target.clip = audioClip;
-        }
+        AudioManager.Instance.LoadAudioClipFromUri(GetStreamingAssetsUri(theme, audioPath),
+                (loadedAudioClip) => target.clip = loadedAudioClip);
     }
 }

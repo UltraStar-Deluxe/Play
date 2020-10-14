@@ -21,19 +21,18 @@ public class ThemeManagerInspector : EditorBase
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
-                ThemeManager.Instance.CurrentTheme = ThemeManager.Instance.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
+                ThemeManager.CurrentTheme = ThemeManager.Instance.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
                 UpdateThemeResources();
             }
         }
 
-        if (GUILayout.Button("Update Theme Resources"))
+        if (GUILayout.Button("Update Theme Components in Scene"))
         {
             UpdateThemeResources();
         }
 
         if (GUILayout.Button("Reload Themes"))
         {
-            RefreshAssetsInResourcesFolder();
             ThemeManager.Instance.ReloadThemes();
         }
     }
@@ -52,17 +51,11 @@ public class ThemeManagerInspector : EditorBase
         }
     }
 
-    private void RefreshAssetsInResourcesFolder()
-    {
-        // Update Unity's version of files in the Resources folder
-        AssetDatabase.ImportAsset("Assets/Resources", ImportAssetOptions.ImportRecursive);
-    }
-
     private void UpdateQuickThemeSelect()
     {
         List<string> loadedThemeNames = ThemeManager.Instance.GetLoadedThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
-        Theme currentTheme = ThemeManager.Instance.CurrentTheme;
+        Theme currentTheme = ThemeManager.CurrentTheme;
         if (currentTheme != null)
         {
             quickThemeSelectIndex = loadedThemeNames.IndexOf(currentTheme.Name);

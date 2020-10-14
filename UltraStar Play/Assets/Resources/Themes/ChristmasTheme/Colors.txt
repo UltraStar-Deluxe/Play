@@ -1,3 +1,0 @@
-# This is a properties file. It has 'txt' extension because otherwise Unity will not load the TextAsset
-demo_color1=#ff0000
-demo_color2=#000000

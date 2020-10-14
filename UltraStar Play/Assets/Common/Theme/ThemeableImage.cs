@@ -1,32 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class ThemeableImage : Themeable
 {
-    [ReadOnly]
+    [Delayed]
     public string imagePath;
-    public EImageResource imageResource = EImageResource.NONE;
     public Image target;
 
-    void OnEnable()
-    {
-        if (target == null)
-        {
-            target = GetComponent<Image>();
-        }
-    }
-
 #if UNITY_EDITOR
+    private string lastImagePath;
+
     void Update()
     {
-        if (imageResource != EImageResource.NONE
-            && imagePath != imageResource.GetPath())
+        if (imagePath != lastImagePath)
         {
-            imagePath = imageResource.GetPath();
-            ReloadResources(ThemeManager.Instance.CurrentTheme);
+            lastImagePath = imagePath;
+            ReloadResources(ThemeManager.CurrentTheme);
         }
     }
 #endif
@@ -43,20 +37,15 @@ public class ThemeableImage : Themeable
             Debug.LogWarning($"Theme resource not specified", gameObject);
             return;
         }
-        if (target == null)
+
+        Image targetImage = target != null ? target : GetComponent<Image>();
+        if (targetImage == null)
         {
-            Debug.LogWarning($"Target is null", gameObject);
+            Debug.LogWarning($"Target is null and GameObject does not have an Image Component", gameObject);
             return;
         }
 
-        Sprite loadedSprite = theme.FindResource<Sprite>(imagePath);
-        if (loadedSprite == null)
-        {
-            Debug.LogError($"Could not load image {imagePath}", gameObject);
-        }
-        else
-        {
-            target.sprite = loadedSprite;
-        }
+        ImageManager.LoadSpriteFromUri(GetStreamingAssetsUri(theme, imagePath),
+                (loadedSprite) => targetImage.sprite = loadedSprite);
     }
 }

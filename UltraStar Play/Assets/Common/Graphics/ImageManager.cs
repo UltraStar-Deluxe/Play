@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,37 +24,47 @@ public class ImageManager
 
     public static Sprite LoadSprite(string path)
     {
-        if (!spriteCache.TryGetValue(path, out CachedSprite cachedSprite))
+        if (spriteCache.TryGetValue(path, out CachedSprite cachedSprite))
         {
-            if (!File.Exists(path))
-            {
-                Debug.LogError("File does not exist: " + path);
-                return null;
-            }
-
-            Sprite sprite = CreateNewSprite(path);
-            if (sprite == null)
-            {
-                Debug.LogError("Could not create sprite from path: " + path);
-                return null;
-            }
-
-            // Check critical size of cache BEFORE adding the new sprite.
-            // (Otherwise the new sprite will be removed immediately because it is not used yet.)
-            if (spriteCache.Count >= criticalCacheSize)
-            {
-                RemoveUnusedSpritesFromCache();
-            }
-
-            // Cache the new sprite.
-            cachedSprite = new CachedSprite(path, sprite);
-            spriteCache.Add(path, cachedSprite);
-            return sprite;
+            return cachedSprite.Sprite;
         }
-        return cachedSprite.Sprite;
+
+        if (!File.Exists(path))
+        {
+            Debug.LogError("File does not exist: " + path);
+            return null;
+        }
+
+        Sprite sprite = CreateNewSpriteUncached(path);
+        if (sprite == null)
+        {
+            Debug.LogError("Could not create sprite from path: " + path);
+            return null;
+        }
+
+        AddSpriteToCache(sprite, path);
+        return sprite;
     }
 
-    private static Sprite CreateNewSprite(string path)
+    public static void LoadSpriteFromUri(string uri, Action<Sprite> useSpriteCallback)
+    {
+        if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite))
+        {
+            useSpriteCallback(cachedSprite.Sprite);
+            return;
+        }
+
+        Action<Texture2D> createSpriteFromTextureCallback = (loadedTexture) =>
+        {
+            Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f));
+            AddSpriteToCache(sprite, uri);
+            useSpriteCallback(sprite);
+        };
+
+        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, createSpriteFromTextureCallback));
+    }
+
+    public static Texture2D LoadTextureUncached(string path)
     {
         int width = 256;
         int height = 256;
@@ -61,8 +72,28 @@ public class ImageManager
         Texture2D texture = new Texture2D(width, height, TextureFormat.RGB24, false);
         texture.filterMode = FilterMode.Trilinear;
         texture.LoadImage(bytes);
+        return texture;
+    }
+
+    private static Sprite CreateNewSpriteUncached(string path)
+    {
+        Texture2D texture = LoadTextureUncached(path);
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1.0f);
         return sprite;
+    }
+
+    private static void AddSpriteToCache(Sprite sprite, string source)
+    {
+        // Check critical size of cache BEFORE adding the new sprite.
+        // (Otherwise the new sprite will be removed immediately because it is not used yet.)
+        if (spriteCache.Count >= criticalCacheSize)
+        {
+            RemoveUnusedSpritesFromCache();
+        }
+
+        // Cache the new sprite.
+        CachedSprite cachedSprite = new CachedSprite(source, sprite);
+        spriteCache.Add(source, cachedSprite);
     }
 
     private static void RemoveUnusedSpritesFromCache()
@@ -96,7 +127,7 @@ public class ImageManager
 
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
     {
-        spriteCache.Remove(cachedSprite.Path);
+        spriteCache.Remove(cachedSprite.Source);
         // Destoying the texture is important to free the memory.
         if (cachedSprite.Sprite != null)
         {
@@ -110,12 +141,12 @@ public class ImageManager
 
     private class CachedSprite
     {
-        public string Path { get; private set; }
+        public string Source { get; private set; }
         public Sprite Sprite { get; private set; }
 
-        public CachedSprite(string path, Sprite sprite)
+        public CachedSprite(string source, Sprite sprite)
         {
-            Path = path;
+            Source = source;
             Sprite = sprite;
         }
     }
