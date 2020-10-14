@@ -11,6 +11,17 @@ public static class ApplicationUtils
 #endif
     }
 
+    public static string GetStreamingAssetsUri(string pathInStreamingAssetsFolder)
+    {
+#if UNITY_ANDROID
+        // Android has StreamingAssets in a jar.
+        // Thus, Application.streamingAssetsPath already starts with the protocol ("jar:file://" + Application.dataPath + "!/assets")
+        return Application.streamingAssetsPath + "/" + pathInStreamingAssetsFolder;
+#else
+        return "file://" + Application.streamingAssetsPath + "/" + pathInStreamingAssetsFolder;
+#endif
+    }
+
     // This method uses Screen.currentResolution,
     // which may only be called from an Awake() or Start() method on the main thread.
     public static ScreenResolution GetCurrentAppResolution()

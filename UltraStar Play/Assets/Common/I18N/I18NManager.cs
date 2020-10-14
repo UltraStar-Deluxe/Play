@@ -1,12 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
+using UniInject;
 using UnityEngine;
+using UniRx;
 
-public class I18NManager : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+[ExecuteInEditMode]
+public class I18NManager : MonoBehaviour, INeedInjection
 {
-    private const string I18NFolder = "I18NMessages";
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        currentLanguageMessages?.Clear();
+        fallbackMessages?.Clear();
+    }
+
+    private const string I18NFolder = "I18N";
     private const string PropertiesFileExtension = ".properties";
     private const string PropertiesFileName = "messages";
 
@@ -18,24 +31,30 @@ public class I18NManager : MonoBehaviour
         }
     }
 
-    public bool isOverwriteSystemLanguage;
+    public bool logInfo;
+
+    public bool isOverwriteLanguage;
     public SystemLanguage overwriteLanguage;
 
     private SystemLanguage language;
 
-    private Dictionary<string, string> currentLanguageMessages = new Dictionary<string, string>();
-    private Dictionary<string, string> fallbackMessages = new Dictionary<string, string>();
+    // Fields are static to be persisted across scenes
+    private static Dictionary<string, string> currentLanguageMessages;
+    private static Dictionary<string, string> fallbackMessages;
+
+    private void OnEnable()
+    {
+        language = SettingsManager.Instance.Settings.GameSettings.language;
+        if (currentLanguageMessages == null
+            || fallbackMessages == null)
+        {
+            UpdateCurrentLanguageAndTranslations();
+        }
+    }
 
     public List<string> GetKeys()
     {
-        UpdateCurrentLanguageAndTranslations();
-
-        List<string> result = new List<string>();
-        foreach (string key in fallbackMessages.Keys)
-        {
-            result.Add(key);
-        }
-        return result;
+        return fallbackMessages.Keys.ToList();
     }
 
     public string GetTranslation(string key, Dictionary<string, string> placeholders)
@@ -58,8 +77,6 @@ public class I18NManager : MonoBehaviour
 
     public string GetTranslation(string key)
     {
-        UpdateCurrentLanguageAndTranslations();
-
         if (currentLanguageMessages.TryGetValue(key, out string translation))
         {
             return translation;
@@ -79,47 +96,38 @@ public class I18NManager : MonoBehaviour
         }
     }
 
-    private void LoadProperties()
+    public void UpdateCurrentLanguageAndTranslations()
     {
+        currentLanguageMessages = new Dictionary<string, string>();
+        fallbackMessages = new Dictionary<string, string>();
+        SystemLanguage selectedLanguage = Application.isEditor && isOverwriteLanguage
+            ? overwriteLanguage
+            : language;
+
         // Load the default properties file
-        string path = GetPropertiesFilePath(PropertiesFileName);
-        if (!File.Exists(path))
-        {
-            Debug.LogError("File not found: " + path);
-            return;
-        }
-        fallbackMessages = PropertiesFileParser.ParseFile(path);
+        string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
+        StartCoroutine(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
+            (loadedText) => LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath)));
 
         // Load the properties file of the current language
-        string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(language);
-        path = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
-        if (!File.Exists(path))
-        {
-            Debug.LogError("File not found: " + path);
-            return;
-        }
-        currentLanguageMessages = PropertiesFileParser.ParseFile(path);
+        string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(selectedLanguage);
+        string propertiesFilePath = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
+        StartCoroutine(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
+            (loadedText) => LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath)));
     }
 
-    /// Decide which language to use.
-    /// Update the translation mappings if the language changed or it is not loaded yet.
-    private void UpdateCurrentLanguageAndTranslations()
+    private void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)
     {
-        SystemLanguage oldLangauge = language;
+        targetDictionary.Clear();
+        PropertiesFileParser.ParseText(text).ForEach(entry => targetDictionary.Add(entry.Key, entry.Value));
 
-        language = Application.systemLanguage;
-        if (Application.isEditor && isOverwriteSystemLanguage)
+        if (logInfo)
         {
-            language = overwriteLanguage;
-        }
-
-        if (oldLangauge != language || fallbackMessages.Count == 0)
-        {
-            LoadProperties();
+            Debug.Log("Loaded " + targetDictionary.Count + " translations from " + textSource);
         }
     }
 
-    private string GetCountryCodeSuffixForPropertiesFile(SystemLanguage langauge)
+    private string GetCountryCodeSuffixForPropertiesFile(SystemLanguage language)
     {
         if (language != SystemLanguage.English)
         {

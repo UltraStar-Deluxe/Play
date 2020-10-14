@@ -69,6 +69,23 @@ public class AudioManager : MonoBehaviour
         return LoadAndCacheAudioClip(path, streamAudio);
     }
 
+    public void LoadAudioClipFromUri(string uri, Action<AudioClip> useAudioClipCallback)
+    {
+        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip))
+        {
+            useAudioClipCallback(cachedAudioClip.FullAudioClip);
+            return;
+        }
+
+        Action<AudioClip> cacheAudioClipCallback = (loadedAudioClip) =>
+        {
+            AddAudioClipToCache(uri, loadedAudioClip, false);
+            useAudioClipCallback(loadedAudioClip);
+        };
+
+        StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, cacheAudioClipCallback));
+    }
+
     private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)
     {
         if (!File.Exists(path))
@@ -80,7 +97,7 @@ public class AudioManager : MonoBehaviour
         AudioClip audioClip = AudioUtils.GetAudioClipUncached(path, streamAudio);
         if (audioClip == null)
         {
-            Debug.LogError("Could not load not AudioClip from path: " + path);
+            Debug.LogError("Could not load AudioClip from path: " + path);
             return null;
         }
 

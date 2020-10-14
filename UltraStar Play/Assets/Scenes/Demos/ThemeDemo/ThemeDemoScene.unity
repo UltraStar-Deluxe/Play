@@ -174,9 +174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imagePath: Smiley2
-  imageResource: 2
-  target: {fileID: 258787933}
+  imagePath: Smiley2.png
+  target: {fileID: 0}
 --- !u!114 &258787933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,7 +196,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9060b630a0c8cf346b6fe5321da168ea, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -390,9 +389,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c1e8910bb051d45887e66ad68a10cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imagePath: Smiley3
-  imageResource: 3
-  target: {fileID: 860388683}
+  imagePath: Smiley3.png
+  target: {fileID: 0}
 --- !u!114 &860388683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,7 +411,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d3010368468647849b7bdf4e87ab400b, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -664,8 +662,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75eb2dba6fdabf6438840f067978af15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorName: demo_color1
-  target: {fileID: 1368557776}
+  colorName: demo_color2
+  target: {fileID: 0}
 --- !u!114 &1368557776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -679,14 +677,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5b0d55ac59be3a7429c2b6d294b547da, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5deb6694a398abc4ab780d5d83778900, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -849,7 +847,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: e4f5b5ebb81ce384da09bde77783f24e, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -1040,8 +1038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ce5b27129d3ad46acc6cc0de9dbc68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioPath: ButtonClick1
-  audioResource: 1
+  audioPath: ButtonClick1.wav
   target: {fileID: 1793075904}
 --- !u!1001 &7070348881521034251
 PrefabInstance:

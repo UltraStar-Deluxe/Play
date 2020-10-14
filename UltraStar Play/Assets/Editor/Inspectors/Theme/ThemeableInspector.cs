@@ -12,7 +12,7 @@ public class ThemeableInspector : EditorBase
         Themeable myScript = target as Themeable;
         if (GUILayout.Button("Update Resources"))
         {
-            myScript.ReloadResources(ThemeManager.Instance.CurrentTheme);
+            myScript.ReloadResources(ThemeManager.CurrentTheme);
         }
     }
 }
