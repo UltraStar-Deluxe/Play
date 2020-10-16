@@ -34,6 +34,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public bool logInfo;
 
     public bool isOverwriteLanguage;
+    public bool updateAllTranslationsWhenReloadingLangauge;
     public SystemLanguage overwriteLanguage;
 
     private SystemLanguage language;
@@ -41,6 +42,8 @@ public class I18NManager : MonoBehaviour, INeedInjection
     // Fields are static to be persisted across scenes
     private static Dictionary<string, string> currentLanguageMessages;
     private static Dictionary<string, string> fallbackMessages;
+
+    private CoroutineManager coroutineManager;
 
     private void OnEnable()
     {
@@ -96,7 +99,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public void UpdateCurrentLanguageAndTranslations()
+    public void UpdateCurrentLanguageAndTranslations(Action callback = null)
     {
         currentLanguageMessages = new Dictionary<string, string>();
         fallbackMessages = new Dictionary<string, string>();
@@ -104,16 +107,43 @@ public class I18NManager : MonoBehaviour, INeedInjection
             ? overwriteLanguage
             : language;
 
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
+
+        // Flags to execute the callback when all has been loaded.
+        bool loadedFallbackTranslationsFinished = false;
+        bool loadedTranslationsFinished = false;
+
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
-            (loadedText) => LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath)));
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
+            (loadedText) =>
+            {
+                LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath);
+
+                loadedFallbackTranslationsFinished = true;
+                if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
+                {
+                    callback();
+                }
+            }));
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(selectedLanguage);
         string propertiesFilePath = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
-            (loadedText) => LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath)));
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
+            (loadedText) =>
+            {
+                LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath);
+
+                loadedTranslationsFinished = true;
+                if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
+                {
+                    callback();
+                }
+            }));
     }
 
     private void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)

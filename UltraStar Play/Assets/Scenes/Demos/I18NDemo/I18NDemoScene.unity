@@ -545,21 +545,6 @@ PrefabInstance:
       propertyPath: isOverwriteSystemLanguage
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: overwriteLanguage
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: isOverwriteLanguage
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: logInfo
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8069444317427349030, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -614,11 +599,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9158773460734947099, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: logInfo
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}

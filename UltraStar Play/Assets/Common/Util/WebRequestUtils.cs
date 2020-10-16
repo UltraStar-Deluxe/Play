@@ -15,7 +15,10 @@ public static class WebRequestUtils
             DownloadHandlerTexture downloadHandler = webRequest.downloadHandler as DownloadHandlerTexture;
             webRequest.SendWebRequest();
 
-            yield return new WaitUntil(() => webRequest.isDone);
+            while (!webRequest.isDone)
+            {
+                yield return null;
+            }
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
@@ -38,7 +41,10 @@ public static class WebRequestUtils
             DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
             webRequest.SendWebRequest();
 
-            yield return new WaitUntil(() => webRequest.isDone);
+            while (!webRequest.isDone)
+            {
+                yield return null;
+            }
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
@@ -58,7 +64,10 @@ public static class WebRequestUtils
         {
             webRequest.SendWebRequest();
 
-            yield return new WaitUntil(() => webRequest.isDone);
+            while (!webRequest.isDone)
+            {
+                yield return null;
+            }
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {

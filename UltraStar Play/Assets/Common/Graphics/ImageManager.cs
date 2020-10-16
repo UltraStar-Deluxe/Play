@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Handles loading and caching of images.
-public class ImageManager
+public static class ImageManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -22,9 +22,12 @@ public class ImageManager
     private static readonly int criticalCacheSize = 50;
     private static readonly Dictionary<string, CachedSprite> spriteCache = new Dictionary<string, CachedSprite>();
 
+    private static CoroutineManager coroutineManager;
+
     public static Sprite LoadSprite(string path)
     {
-        if (spriteCache.TryGetValue(path, out CachedSprite cachedSprite))
+        if (spriteCache.TryGetValue(path, out CachedSprite cachedSprite)
+            && cachedSprite.Sprite != null)
         {
             return cachedSprite.Sprite;
         }
@@ -48,7 +51,8 @@ public class ImageManager
 
     public static void LoadSpriteFromUri(string uri, Action<Sprite> useSpriteCallback)
     {
-        if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite))
+        if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
+            && cachedSprite.Sprite != null)
         {
             useSpriteCallback(cachedSprite.Sprite);
             return;
@@ -61,7 +65,11 @@ public class ImageManager
             useSpriteCallback(sprite);
         };
 
-        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, createSpriteFromTextureCallback));
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, createSpriteFromTextureCallback));
     }
 
     public static Texture2D LoadTextureUncached(string path)
@@ -93,7 +101,7 @@ public class ImageManager
 
         // Cache the new sprite.
         CachedSprite cachedSprite = new CachedSprite(source, sprite);
-        spriteCache.Add(source, cachedSprite);
+        spriteCache[source] = cachedSprite;
     }
 
     private static void RemoveUnusedSpritesFromCache()

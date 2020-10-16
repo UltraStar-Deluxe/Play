@@ -20,6 +20,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(I18NManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
+        bb.BindExistingInstance(CoroutineManager.Instance);
 
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);

@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8069444317427349030}
-  m_RootOrder: 17
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8385457548214155417
 MonoBehaviour:
@@ -190,8 +190,6 @@ MonoBehaviour:
     type: 3}
   tooltipPrefab: {fileID: 5647552520249715628, guid: 61c5cda38fdd0ca4786cf5987297a4b2,
     type: 3}
-  dialogBackdropPrefab: {fileID: 8140360624453496707, guid: e47e73de458c3965a988a4cd623faecc,
-    type: 3}
 --- !u!1 &116669178087187369
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,6 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46b9d9acb7b010b4990b243b5b34cee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  logInfo: 1
   currentThemeName: base
 --- !u!1 &568775263153110267
 GameObject:
@@ -452,8 +451,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9568d536d865a945b0c564a5a1c07c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOverwriteSystemLanguage: 1
-  overwriteLanguage: 10
+  logInfo: 1
+  isOverwriteLanguage: 1
+  updateAllTranslationsWhenReloadingLangauge: 1
+  overwriteLanguage: 15
 --- !u!1 &1182483571995992771
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,6 +588,7 @@ Transform:
   - {fileID: 1726528158099047256}
   - {fileID: 5594954776714672956}
   - {fileID: 2459340085578023173}
+  - {fileID: 4093991565477540851}
   - {fileID: 4725083428892299482}
   - {fileID: 8570025457633197298}
   - {fileID: 1133568350397856062}
@@ -636,7 +638,7 @@ Transform:
   - {fileID: 8833734914231061216}
   - {fileID: 8862048243498412527}
   m_Father: {fileID: 8069444317427349030}
-  m_RootOrder: 18
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &732203885253972898
 MonoBehaviour:
@@ -775,7 +777,7 @@ RectTransform:
   - {fileID: 3372493024150735314}
   - {fileID: 6240876478710337996}
   m_Father: {fileID: 8069444317427349030}
-  m_RootOrder: 19
+  m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2335,7 +2337,7 @@ Transform:
   - {fileID: 9186492574502165930}
   - {fileID: 604217469178436494}
   m_Father: {fileID: 8069444317427349030}
-  m_RootOrder: 20
+  m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7763783724366295958
 GameObject:
@@ -2514,6 +2516,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatar: 3
+--- !u!1 &8668917355665245141
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4093991565477540851}
+  - component: {fileID: 4904368546356500874}
+  m_Layer: 0
+  m_Name: CoroutineManager
+  m_TagString: CoroutineManager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4093991565477540851
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668917355665245141}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8069444317427349030}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4904368546356500874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668917355665245141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3a946f8cdd74be41804ff41a3da042f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8759456488564759637
 GameObject:
   m_ObjectHideFlags: 0

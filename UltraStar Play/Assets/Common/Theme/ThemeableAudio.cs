@@ -12,8 +12,10 @@ public class ThemeableAudio : Themeable
 #if UNITY_EDITOR
     private string lastAudioPath;
 
-    void Update()
+    override protected void Update()
     {
+        base.Update();
+
         if (lastAudioPath != audioPath)
         {
             lastAudioPath = audioPath;
@@ -31,7 +33,7 @@ public class ThemeableAudio : Themeable
         }
         if (string.IsNullOrEmpty(audioPath))
         {
-            Debug.LogWarning($"Missing audio file name", gameObject);
+            Debug.LogWarning($"Missing audio file path", gameObject);
             return;
         }
 
@@ -42,7 +44,7 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioManager.Instance.LoadAudioClipFromUri(GetStreamingAssetsUri(theme, audioPath),
+        AudioManager.Instance.LoadAudioClipFromUri(theme.GetStreamingAssetsUri(audioPath),
                 (loadedAudioClip) => target.clip = loadedAudioClip);
     }
 }
