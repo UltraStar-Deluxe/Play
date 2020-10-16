@@ -47,7 +47,7 @@ public class ThemeableImage : Themeable
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(theme.GetStreamingAssetsUri(imagePath),
-                (loadedSprite) => targetImage.sprite = loadedSprite);
+        theme.LoadSprite(imagePath,
+            (loadedSprite) => targetImage.sprite = loadedSprite);
     }
 }

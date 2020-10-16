@@ -44,7 +44,7 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioManager.Instance.LoadAudioClipFromUri(theme.GetStreamingAssetsUri(audioPath),
-                (loadedAudioClip) => target.clip = loadedAudioClip);
+        theme.LoadAudioClip(audioPath,
+            (loadedAudioClip) => target.clip = loadedAudioClip);
     }
 }
