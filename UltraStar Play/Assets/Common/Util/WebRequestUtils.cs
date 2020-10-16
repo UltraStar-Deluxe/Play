@@ -8,7 +8,7 @@ public static class WebRequestUtils
 {
     // Do not use this method directly!
     // Instead, use the ImageManager where Sprites and Textures are cached and released when no longer needed.
-    public static IEnumerator LoadTexture2DFromUri(string uri, Action<Texture2D> callback)
+    public static IEnumerator LoadTexture2DFromUri(string uri, Action<Texture2D> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(uri))
         {
@@ -22,19 +22,24 @@ public static class WebRequestUtils
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
+                if (onFailure != null)
+                {
+                    onFailure(webRequest);
+                    yield break;
+                }
+
                 Debug.LogError("Error loading Texture2D from: " + uri);
                 Debug.LogError(webRequest.error);
+                yield break;
             }
-            else
-            {
-                callback(downloadHandler.texture);
-            }
+
+            onSuccess(downloadHandler.texture);
         }
     }
 
     // Do not use this method directly!
     // Instead, use the AudioManager where AudioClips are cached and released when no longer needed.
-    public static IEnumerator LoadAudioClipFromUri(string uri, Action<AudioClip> callback)
+    public static IEnumerator LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.UNKNOWN))
         {
@@ -48,17 +53,22 @@ public static class WebRequestUtils
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
+                if (onFailure != null)
+                {
+                    onFailure(webRequest);
+                    yield break;
+                }
+
                 Debug.LogError("Error loading AudioClip from: " + uri);
                 Debug.LogError(webRequest.error);
+                yield break;
             }
-            else
-            {
-                callback(downloadHandler.audioClip);
-            }
+
+            onSuccess(downloadHandler.audioClip);
         }
     }
 
-    public static IEnumerator LoadTextFromUri(string uri, Action<string> callback)
+    public static IEnumerator LoadTextFromUri(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
@@ -71,13 +81,18 @@ public static class WebRequestUtils
 
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
+                if (onFailure != null)
+                {
+                    onFailure(webRequest);
+                    yield break;
+                }
+
                 Debug.LogError("Error loading text from: " + uri);
                 Debug.LogError(webRequest.error);
+                yield break;
             }
-            else
-            {
-                callback(webRequest.downloadHandler.text);
-            }
+
+            onSuccess(webRequest.downloadHandler.text);
         }
     }
 }

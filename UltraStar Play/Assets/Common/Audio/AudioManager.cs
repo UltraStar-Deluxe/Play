@@ -72,26 +72,26 @@ public class AudioManager : MonoBehaviour
         return LoadAndCacheAudioClip(path, streamAudio);
     }
 
-    public void LoadAudioClipFromUri(string uri, Action<AudioClip> useAudioClipCallback)
+    public void LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
-            useAudioClipCallback(cachedAudioClip.FullAudioClip);
+            onSuccess(cachedAudioClip.FullAudioClip);
             return;
         }
 
-        Action<AudioClip> cacheAudioClipCallback = (loadedAudioClip) =>
+        Action<AudioClip> doCacheAudioClipThenOnSuccess = (loadedAudioClip) =>
         {
             AddAudioClipToCache(uri, loadedAudioClip, false);
-            useAudioClipCallback(loadedAudioClip);
+            onSuccess(loadedAudioClip);
         };
 
         if (coroutineManager == null)
         {
             coroutineManager = CoroutineManager.Instance;
         }
-        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, cacheAudioClipCallback));
+        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, doCacheAudioClipThenOnSuccess, onFailure));
     }
 
     private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)

@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.XR.WSA;
 
 public class Theme
 {
@@ -10,6 +13,8 @@ public class Theme
     public IReadOnlyDictionary<string, Color32> LoadedColors => loadedColors;
 
     public bool HasFinishedLoadingColors { get; private set; }
+
+    private AudioManager audioManager;
 
     public Theme(string name, Theme parentTheme, CoroutineManager coroutineManager)
     {
@@ -37,6 +42,61 @@ public class Theme
         });
         HasFinishedLoadingColors = true;
         Debug.Log(Name + " finished loading colors");
+    }
+
+    internal void LoadAudioClip(string audioPath, Action<AudioClip> onSuccess)
+    {
+        void OnFailure(UnityWebRequest webRequest)
+        {
+            if (ParentTheme != null)
+            {
+                ParentTheme.LoadAudioClip(audioPath, onSuccess);
+                return;
+            }
+            Debug.LogWarning("Could not load theme file: " + audioPath);
+        }
+
+        if (audioManager == null)
+        {
+            audioManager = AudioManager.Instance;
+        }
+        audioManager.LoadAudioClipFromUri(GetStreamingAssetsUri(audioPath),
+                onSuccess,
+                OnFailure);
+    }
+
+    public void LoadSprite(string imagePath, Action<Sprite> onSuccess)
+    {
+        void OnFailure(UnityWebRequest webRequest)
+        {
+            if (ParentTheme != null)
+            {
+                ParentTheme.LoadSprite(imagePath, onSuccess);
+                return;
+            }
+            Debug.LogWarning("Could not load theme file: " + imagePath);
+        }
+
+        ImageManager.LoadSpriteFromUri(GetStreamingAssetsUri(imagePath),
+                onSuccess,
+                OnFailure);
+    }
+
+    public void LoadText(string textFilePath, Action<string> onSuccess)
+    {
+        void OnFailure(UnityWebRequest webRequest)
+        {
+            if (ParentTheme != null)
+            {
+                ParentTheme.LoadText(textFilePath, onSuccess);
+                return;
+            }
+            Debug.LogWarning("Could not load theme file: " + textFilePath);
+        }
+
+        WebRequestUtils.LoadTextFromUri(GetStreamingAssetsUri(textFilePath),
+                onSuccess,
+                OnFailure);
     }
 
     /// Looks for the color with the given name in the current theme and all parent themes.

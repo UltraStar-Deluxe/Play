@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 // Handles loading and caching of images.
@@ -49,27 +50,27 @@ public static class ImageManager
         return sprite;
     }
 
-    public static void LoadSpriteFromUri(string uri, Action<Sprite> useSpriteCallback)
+    public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite.Sprite != null)
         {
-            useSpriteCallback(cachedSprite.Sprite);
+            onSuccess(cachedSprite.Sprite);
             return;
         }
 
-        Action<Texture2D> createSpriteFromTextureCallback = (loadedTexture) =>
+        void DoCacheSpriteThenOnSuccess(Texture2D loadedTexture)
         {
             Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f));
             AddSpriteToCache(sprite, uri);
-            useSpriteCallback(sprite);
-        };
+            onSuccess(sprite);
+        }
 
         if (coroutineManager == null)
         {
             coroutineManager = CoroutineManager.Instance;
         }
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, createSpriteFromTextureCallback));
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
     }
 
     public static Texture2D LoadTextureUncached(string path)
