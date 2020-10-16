@@ -16,11 +16,6 @@ public class ThemeManager : MonoBehaviour
     public static readonly string themesFileName = "Themes.xml";
     public static readonly string colorsFileName = "Colors.properties";
 
-    public List<string> GetAvailableColors()
-    {
-        return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
-    }
-
     public static ThemeManager Instance
     {
         get
@@ -71,18 +66,27 @@ public class ThemeManager : MonoBehaviour
 
     private void Awake()
     {
-        coroutineManager = CoroutineManager.Instance;
+        if (themeNameToTheme == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+            ReloadThemes();
+        }
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
 
         if (themeNameToTheme == null)
         {
             ReloadThemes();
         }
-
-        if (currentTheme != null)
-        {
-            currentThemeName = currentTheme.Name;
-        }
     }
+#endif
 
     public void UpdateThemeResources()
     {
@@ -99,9 +103,14 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    public List<string> GetLoadedThemeNames()
+    public List<string> GetAvailableThemeNames()
     {
         return themeNameToTheme.Keys.ToList();
+    }
+
+    public List<string> GetAvailableColors()
+    {
+        return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
     }
 
     public Theme GetTheme(string themeName)
@@ -140,7 +149,7 @@ public class ThemeManager : MonoBehaviour
 
         if (logInfo)
         {
-            string themeNamesCsv = string.Join(", ", GetLoadedThemeNames());
+            string themeNamesCsv = string.Join(", ", GetAvailableThemeNames());
             Debug.Log($"Loaded themes: [{themeNamesCsv}]");
         }
     }

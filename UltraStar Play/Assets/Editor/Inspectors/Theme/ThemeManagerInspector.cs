@@ -7,13 +7,18 @@ using System;
 [CustomEditor(typeof(ThemeManager))]
 public class ThemeManagerInspector : EditorBase
 {
-
     int quickThemeSelectIndex;
     string[] quickThemeSelectItems;
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
+
+        if (ThemeManager.HasFinishedLoadingThemes
+            && quickThemeSelectItems == null || quickThemeSelectItems.Length == 0)
+        {
+            quickThemeSelectItems = ThemeManager.Instance.GetAvailableThemeNames().ToArray();
+        }
 
         if (quickThemeSelectItems != null && quickThemeSelectItems.Length > 0)
         {
@@ -53,7 +58,7 @@ public class ThemeManagerInspector : EditorBase
 
     private void UpdateQuickThemeSelect()
     {
-        List<string> loadedThemeNames = ThemeManager.Instance.GetLoadedThemeNames();
+        List<string> loadedThemeNames = ThemeManager.Instance.GetAvailableThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
         Theme currentTheme = ThemeManager.CurrentTheme;
         if (currentTheme != null)
