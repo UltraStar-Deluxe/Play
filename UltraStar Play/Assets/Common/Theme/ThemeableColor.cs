@@ -13,8 +13,10 @@ public class ThemeableColor : Themeable
 #if UNITY_EDITOR
     private string lastColorName;
 
-    void Update()
+    override protected void Update()
     {
+        base.Update();
+
         if (lastColorName != colorName)
         {
             lastColorName = colorName;

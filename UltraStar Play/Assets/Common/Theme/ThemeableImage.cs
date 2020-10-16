@@ -15,8 +15,10 @@ public class ThemeableImage : Themeable
 #if UNITY_EDITOR
     private string lastImagePath;
 
-    void Update()
+    override protected void Update()
     {
+        base.Update();
+
         if (imagePath != lastImagePath)
         {
             lastImagePath = imagePath;
@@ -34,7 +36,7 @@ public class ThemeableImage : Themeable
         }
         if (string.IsNullOrEmpty(imagePath))
         {
-            Debug.LogWarning($"Theme resource not specified", gameObject);
+            Debug.LogWarning($"Missing image file path", gameObject);
             return;
         }
 
@@ -45,7 +47,7 @@ public class ThemeableImage : Themeable
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(GetStreamingAssetsUri(theme, imagePath),
+        ImageManager.LoadSpriteFromUri(theme.GetStreamingAssetsUri(imagePath),
                 (loadedSprite) => targetImage.sprite = loadedSprite);
     }
 }

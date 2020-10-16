@@ -53,13 +53,26 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
+    public static bool HasFinishedLoadingThemes
+    {
+        get
+        {
+            return themeNameToTheme != null
+                && themeNameToTheme.Values.AllMatch(theme => theme.HasFinishedLoadingColors);
+        }
+    }
+
     public bool logInfo;
 
     [ReadOnly]
     public string currentThemeName;
 
-    private void OnEnable()
+    private CoroutineManager coroutineManager;
+
+    private void Awake()
     {
+        coroutineManager = CoroutineManager.Instance;
+
         if (themeNameToTheme == null)
         {
             ReloadThemes();
@@ -101,7 +114,7 @@ public class ThemeManager : MonoBehaviour
     {
         themeNameToTheme = new Dictionary<string, Theme>();
         string themesFileUri = ApplicationUtils.GetStreamingAssetsUri(themesFolderName + "/" + themesFileName);
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(themesFileUri,
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(themesFileUri,
             (loadedXml) => ReloadThemesFromXml(loadedXml)));
     }
 
@@ -146,12 +159,12 @@ public class ThemeManager : MonoBehaviour
         themeNameToParentThemeNameMap.TryGetValue(themeName, out string parentThemeName);
         if (string.IsNullOrEmpty(parentThemeName))
         {
-            newTheme = new Theme(themeName, null, this);
+            newTheme = new Theme(themeName, null, coroutineManager);
         }
         else
         {
             Theme parentTheme = GetOrCreateAndAddTheme(parentThemeName, themeNameToParentThemeNameMap);
-            newTheme = new Theme(themeName, parentTheme, this);
+            newTheme = new Theme(themeName, parentTheme, coroutineManager);
         }
         themeNameToTheme.Add(newTheme.Name, newTheme);
         return newTheme;

@@ -35,6 +35,8 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private CoroutineManager coroutineManager;
+
     public static void ToggleMuteAudio()
     {
         if (volumeBeforeMute >= 0)
@@ -54,7 +56,8 @@ public class AudioManager : MonoBehaviour
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
     public AudioClip GetAudioClip(string path, bool streamAudio = true)
     {
-        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip))
+        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip)
+            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
             {
@@ -71,7 +74,8 @@ public class AudioManager : MonoBehaviour
 
     public void LoadAudioClipFromUri(string uri, Action<AudioClip> useAudioClipCallback)
     {
-        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip))
+        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
+            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
             useAudioClipCallback(cachedAudioClip.FullAudioClip);
             return;
@@ -83,7 +87,11 @@ public class AudioManager : MonoBehaviour
             useAudioClipCallback(loadedAudioClip);
         };
 
-        StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, cacheAudioClipCallback));
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
+        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, cacheAudioClipCallback));
     }
 
     private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)

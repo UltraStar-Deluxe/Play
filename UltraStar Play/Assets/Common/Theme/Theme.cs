@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Theme
@@ -10,19 +9,21 @@ public class Theme
     private readonly Dictionary<string, Color32> loadedColors = new Dictionary<string, Color32>();
     public IReadOnlyDictionary<string, Color32> LoadedColors => loadedColors;
 
-    public Theme(string name, Theme parentTheme, ThemeManager themeManager)
+    public bool HasFinishedLoadingColors { get; private set; }
+
+    public Theme(string name, Theme parentTheme, CoroutineManager coroutineManager)
     {
         Name = name;
         ParentTheme = parentTheme;
 
-        LoadColors(themeManager);
+        LoadColors(coroutineManager);
     }
 
-    private void LoadColors(ThemeManager themeManager)
+    private void LoadColors(CoroutineManager coroutineManager)
     {
         loadedColors.Clear();
-        string colorsFileUri = ApplicationUtils.GetStreamingAssetsUri(GetResourcePath(ThemeManager.colorsFileName));
-        themeManager.StartCoroutine(WebRequestUtils.LoadTextFromUri(colorsFileUri,
+        string colorsFileUri = GetStreamingAssetsUri(ThemeManager.colorsFileName);
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(colorsFileUri,
             (loadedText) => LoadColorsFromText(loadedText)));
     }
 
@@ -34,6 +35,8 @@ public class Theme
             Color32 loadedColor = Colors.CreateColor(entry.Value);
             loadedColors.Add(entry.Key, loadedColor);
         });
+        HasFinishedLoadingColors = true;
+        Debug.Log(Name + " finished loading colors");
     }
 
     /// Looks for the color with the given name in the current theme and all parent themes.
@@ -52,9 +55,10 @@ public class Theme
         return false;
     }
 
-    private string GetResourcePath(string resourceName)
+    public string GetStreamingAssetsUri(string resourceName)
     {
-        return ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
+        string resourcePath = ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
+        return ApplicationUtils.GetStreamingAssetsUri(resourcePath);
     }
 
     public override string ToString()
