@@ -1,6 +1,8 @@
 // To update this file use the corresponding menu item in the Unity Editor.
-public static partial class R {
-    public static class String {
+public static partial class R
+{
+    public static class String
+    {
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
         public static readonly string difficulty = "difficulty";
