@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class CoroutineUtils
 {
+    public static IEnumerator ExecuteWhenConditionIsTrue(int delayInFrames, Func<bool> condition, Action action)
+    {
+        while (!condition())
+        {
+            yield return null;
+        }
+        action();
+    }
+
     public static IEnumerator ExecuteAfterDelayInFrames(int delayInFrames, Action action)
     {
-        for(int i = 0; i < delayInFrames; i++)
+        for (int i = 0; i < delayInFrames; i++)
         {
             yield return null;
         }

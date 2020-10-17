@@ -806,7 +806,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameField: {fileID: 5359969183409418429}
   avatarField: {fileID: 5359969182019337376}
-  difficultyField: {fileID: 0}
+  difficultyField: {fileID: 4367371195047782001}
   enabledToggle: {fileID: 7976219644923372556}
   deleteButton: {fileID: 972474118346428030}
 --- !u!1 &5359969181950851698
