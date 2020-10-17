@@ -20,8 +20,7 @@ public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
         {
             SettingsManager.Instance.Settings.GameSettings.language = newValue;
             i18nManager.language = newValue;
-            i18nManager.UpdateCurrentLanguageAndTranslations();
-            i18nManager.UpdateAllTranslationsInScene();
+            i18nManager.UpdateCurrentLanguageAndTranslations(() => i18nManager.UpdateAllTranslationsInScene());
         });
     }
 

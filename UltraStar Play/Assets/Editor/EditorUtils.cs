@@ -30,4 +30,10 @@ public class EditorUtils
         // Update Unity's version of files in the Resources folder
         AssetDatabase.ImportAsset("Assets/Resources", ImportAssetOptions.ImportRecursive);
     }
+
+    public static void RefreshAssetsInStreamingAssetsFolder()
+    {
+        // Update Unity's version of files in the StreamingAssets folder
+        AssetDatabase.ImportAsset("Assets/StreamingAssets", ImportAssetOptions.ImportRecursive);
+    }
 }

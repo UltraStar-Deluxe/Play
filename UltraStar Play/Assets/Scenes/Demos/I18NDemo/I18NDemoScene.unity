@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe7b882660b950e48822e5e5eb6a59ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: i18n_demo_scene.hello
+  key: i18nDemoScene_hello
   greetingName: Alice
 --- !u!114 &590770612
 MonoBehaviour:
@@ -667,7 +667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: i18n_demo_scene.multiline
+  key: i18nDemoScene_multiline
 --- !u!114 &1952111945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -764,7 +764,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: i18n_demo_scene.love
+  key: i18nDemoScene_love
 --- !u!114 &1976626585
 MonoBehaviour:
   m_ObjectHideFlags: 0
