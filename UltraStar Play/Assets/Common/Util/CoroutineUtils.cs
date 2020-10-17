@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CoroutineUtils
 {
-    public static IEnumerator ExecuteWhenConditionIsTrue(int delayInFrames, Func<bool> condition, Action action)
+    public static IEnumerator ExecuteWhenConditionIsTrue(Func<bool> condition, Action action)
     {
         while (!condition())
         {

@@ -28,7 +28,7 @@ public class ThemeSlider : TextItemSlider<Theme>, INeedInjection
         }
         else
         {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(5,
+            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
                 () => ThemeManager.HasFinishedLoadingThemes,
                 () => DoSetup()));
         }
