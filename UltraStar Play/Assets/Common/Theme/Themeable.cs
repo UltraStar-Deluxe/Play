@@ -4,23 +4,29 @@ abstract public class Themeable : MonoBehaviour
 {
     abstract public void ReloadResources(Theme theme);
 
-#if UNITY_EDITOR
     private bool hasLoadedTheme;
-    virtual protected void Update()
+
+    virtual protected void Start()
     {
+        // In the normal game, the themes are loaded in during the LoadingScene,
+        // such that they are always available later.
         if (!hasLoadedTheme
-            && ThemeManager.HasFinishedLoadingThemes)
+            && Application.isPlaying)
         {
             hasLoadedTheme = true;
             ReloadResources(ThemeManager.CurrentTheme);
         }
     }
-#else
-    // In the normal game, the themes are loaded in during the LoadingScene,
-    // such that they are always available later.
-    protected void Start()
+
+#if UNITY_EDITOR
+    virtual protected void Update()
     {
-        ReloadResources(ThemeManager.CurrentTheme);
+        //if (!hasLoadedTheme
+        //    && ThemeManager.HasFinishedLoadingThemes)
+        //{
+        //    hasLoadedTheme = true;
+        //    ReloadResources(ThemeManager.CurrentTheme);
+        //}
     }
 #endif
 }

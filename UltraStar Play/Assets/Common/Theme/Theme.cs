@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.XR.WSA;
 
 public class Theme
 {
@@ -46,7 +45,6 @@ public class Theme
 
 
         HasFinishedLoadingColors = true;
-        Debug.Log(Name + " finished loading colors");
     }
 
     private string ReplaceColorReferences(string colorValueString)

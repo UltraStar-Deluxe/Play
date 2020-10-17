@@ -12,6 +12,12 @@ public class ThemeableAudio : Themeable
 #if UNITY_EDITOR
     private string lastAudioPath;
 
+    override protected void Start()
+    {
+        base.Start();
+        lastAudioPath = audioPath;
+    }
+
     override protected void Update()
     {
         base.Update();

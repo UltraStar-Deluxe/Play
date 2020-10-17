@@ -15,6 +15,12 @@ public class ThemeableImage : Themeable
 #if UNITY_EDITOR
     private string lastImagePath;
 
+    override protected void Start()
+    {
+        base.Start();
+        lastImagePath = imagePath;
+    }
+
     override protected void Update()
     {
         base.Update();
