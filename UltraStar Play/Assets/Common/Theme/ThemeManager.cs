@@ -128,8 +128,8 @@ public class ThemeManager : MonoBehaviour
     {
         themeNameToTheme = new Dictionary<string, Theme>();
         string themesFileUri = ApplicationUtils.GetStreamingAssetsUri(themesFolderName + "/" + themesFileName);
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(themesFileUri,
-            (loadedXml) => ReloadThemesFromXml(loadedXml)));
+        WebRequestUtils.LoadTextFromUri(coroutineManager, themesFileUri,
+            (loadedXml) => ReloadThemesFromXml(loadedXml));
     }
 
     private void ReloadThemesFromXml(string xml)

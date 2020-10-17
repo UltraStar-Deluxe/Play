@@ -5,6 +5,7 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UniRx;
+using System.IO;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -152,7 +153,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
+        WebRequestUtils.LoadTextFromUri(coroutineManager, ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
             (loadedText) =>
             {
                 LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath);
@@ -162,12 +163,12 @@ public class I18NManager : MonoBehaviour, INeedInjection
                 {
                     callback();
                 }
-            }));
+            });
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(selectedLanguage);
         string propertiesFilePath = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
+        WebRequestUtils.LoadTextFromUri(coroutineManager, ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
             (loadedText) =>
             {
                 LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath);
@@ -177,7 +178,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
                 {
                     callback();
                 }
-            }));
+            });
     }
 
     public void UpdateAllTranslationsInScene()

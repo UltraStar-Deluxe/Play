@@ -31,6 +31,12 @@ public class I18NText : MonoBehaviour
 
     public void UpdateTranslation()
     {
+        if (key == null)
+        {
+            Debug.LogWarning($"Missing translation key for object '{gameObject.name}'", gameObject);
+            return;
+        }
+
         string timmedKey = key.Trim();
         if (string.IsNullOrEmpty(timmedKey))
         {

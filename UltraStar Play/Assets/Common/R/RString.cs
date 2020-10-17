@@ -7,12 +7,21 @@ public static partial class R
         public static readonly string back = "back";
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
+        public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string difficulty = "difficulty";
         public static readonly string difficulty_easy = "difficulty_easy";
         public static readonly string difficulty_hard = "difficulty_hard";
         public static readonly string difficulty_medium = "difficulty_medium";
         public static readonly string exit = "exit";
+        public static readonly string favoritesIcon_tooltip = "favoritesIcon_tooltip";
+        public static readonly string filter = "filter";
+        public static readonly string filter_allSongs = "filter_allSongs";
+        public static readonly string graph_button_label = "graph_button_label";
+        public static readonly string graph_legend_good = "graph_legend_good";
+        public static readonly string graph_legend_missed = "graph_legend_missed";
+        public static readonly string graph_legend_perfect = "graph_legend_perfect";
+        public static readonly string highscoreScene_title = "highscoreScene_title";
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
         public static readonly string i18nDemoScene_multiline = "i18nDemoScene_multiline";
@@ -37,6 +46,7 @@ public static partial class R
         public static readonly string ok = "ok";
         public static readonly string open = "open";
         public static readonly string options = "options";
+        public static readonly string order = "order";
         public static readonly string quit = "quit";
         public static readonly string rating_sentence_awful = "rating_sentence_awful";
         public static readonly string rating_sentence_bad = "rating_sentence_bad";
@@ -55,7 +65,20 @@ public static partial class R
         public static readonly string rating_song_ultrastar = "rating_song_ultrastar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
         public static readonly string save = "save";
+        public static readonly string score_goldenNotes = "score_goldenNotes";
+        public static readonly string score_notes = "score_notes";
+        public static readonly string score_phraseBonus = "score_phraseBonus";
+        public static readonly string score_total = "score_total";
+        public static readonly string search_placeholder = "search_placeholder";
+        public static readonly string singingResultsScene_title = "singingResultsScene_title";
+        public static readonly string songSelectScene_stats_localBest = "songSelectScene_stats_localBest";
+        public static readonly string songSelectScene_stats_startedFinished = "songSelectScene_stats_startedFinished";
+        public static readonly string songSelectScene_stats_webBest = "songSelectScene_stats_webBest";
+        public static readonly string songSelectScene_subTitle = "songSelectScene_subTitle";
+        public static readonly string songSelectScene_title = "songSelectScene_title";
         public static readonly string start = "start";
+        public static readonly string timeUppercase = "timeUppercase";
+        public static readonly string warning = "warning";
         public static readonly string yes = "yes";
     }
 }

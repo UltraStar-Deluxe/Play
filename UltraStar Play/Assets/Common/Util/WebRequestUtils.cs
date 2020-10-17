@@ -68,7 +68,7 @@ public static class WebRequestUtils
         }
     }
 
-    public static IEnumerator LoadTextFromUri(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
+    public static void LoadTextFromUri(CoroutineManager coroutineManager, string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         // Immediately load file if possible
         if (uri.StartsWith("file://"))
@@ -78,10 +78,15 @@ public static class WebRequestUtils
             {
                 string content = File.ReadAllText(path);
                 onSuccess(content);
-                yield break;
+                return;
             }
         }
 
+        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUriCoroutine(uri, onSuccess, onFailure));
+    }
+
+    private static IEnumerator LoadTextFromUriCoroutine(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
+    {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
             webRequest.SendWebRequest();

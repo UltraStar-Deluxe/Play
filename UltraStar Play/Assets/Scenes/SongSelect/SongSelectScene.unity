@@ -1621,8 +1621,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 308872951}
   m_HandleRect: {fileID: 308872950}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9981552
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2423,6 +2423,7 @@ GameObject:
   - component: {fileID: 847631327}
   - component: {fileID: 847631329}
   - component: {fileID: 847631328}
+  - component: {fileID: 847631330}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -2482,7 +2483,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Web Best:'
+  m_Text: Web Spitze
 --- !u!222 &847631329
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2491,6 +2492,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 847631326}
   m_CullTransparentMesh: 0
+--- !u!114 &847631330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847631326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_stats_webBest
 --- !u!114 &852322838 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3741094789097670527, guid: 944788f8bb28747409508086974dbc8d,
@@ -2728,8 +2742,8 @@ RectTransform:
   m_Father: {fileID: 1273343426}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.0000015616671, y: 0.1870907}
-  m_AnchorMax: {x: 0.8644208, y: 0.81290936}
+  m_AnchorMin: {x: 0.13557115, y: 0.18709071}
+  m_AnchorMax: {x: 1.0000011, y: 0.81290936}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3329,6 +3343,44 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 984523324}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &984523326 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3622033095437819812, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+    type: 3}
+  m_PrefabInstance: {fileID: 984523324}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &984523327 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3622033095365871883, guid: 176e869a9ab83ce4aa378e24fe6fb891,
+    type: 3}
+  m_PrefabInstance: {fileID: 984523324}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &984523328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984523326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_subTitle
+--- !u!114 &984523329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984523327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_title
 --- !u!1 &1008262212
 GameObject:
   m_ObjectHideFlags: 0
@@ -3697,6 +3749,7 @@ GameObject:
   - component: {fileID: 1060634220}
   - component: {fileID: 1060634222}
   - component: {fileID: 1060634221}
+  - component: {fileID: 1060634223}
   m_Layer: 5
   m_Name: Placeholder
   m_TagString: Untagged
@@ -3756,7 +3809,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Search...
+  m_Text: Suchen...
 --- !u!222 &1060634222
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3765,6 +3818,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1060634219}
   m_CullTransparentMesh: 0
+--- !u!114 &1060634223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1060634219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: search_placeholder
 --- !u!1 &1135768687
 GameObject:
   m_ObjectHideFlags: 0
@@ -4617,6 +4683,7 @@ GameObject:
   - component: {fileID: 1410318986}
   - component: {fileID: 1410318988}
   - component: {fileID: 1410318987}
+  - component: {fileID: 1410318989}
   m_Layer: 5
   m_Name: StartedFinishedLabel
   m_TagString: Untagged
@@ -4638,8 +4705,8 @@ RectTransform:
   m_Father: {fileID: 669358970}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: -0.000008160106, y: -0.0000013519918}
-  m_AnchorMax: {x: 0.53753257, y: 1.0000213}
+  m_AnchorMin: {x: -0.000066893524, y: -0.0000013370588}
+  m_AnchorMax: {x: 0.67390627, y: 1.0000213}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4676,7 +4743,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Started/Finished:'
+  m_Text: Angefangen/Beendet
 --- !u!222 &1410318988
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4685,6 +4752,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1410318985}
   m_CullTransparentMesh: 0
+--- !u!114 &1410318989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410318985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_stats_startedFinished
 --- !u!1 &1422664117
 GameObject:
   m_ObjectHideFlags: 0
@@ -4696,6 +4776,7 @@ GameObject:
   - component: {fileID: 1422664118}
   - component: {fileID: 1422664120}
   - component: {fileID: 1422664119}
+  - component: {fileID: 1422664121}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -4755,7 +4836,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Local Best:'
+  m_Text: Lokale Spitze
 --- !u!222 &1422664120
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4764,6 +4845,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1422664117}
   m_CullTransparentMesh: 0
+--- !u!114 &1422664121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1422664117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_stats_localBest
 --- !u!1 &1436892918
 GameObject:
   m_ObjectHideFlags: 0
@@ -5569,11 +5663,11 @@ MonoBehaviour:
   anchorMin: {x: 0.00001046317, y: 0}
   anchorMax: {x: 0.13557066, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -116.15629, y: 0, z: 616.995}
+  localPosition: {x: -118.4524, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 18.16629, y: 11.531036, z: 0}
+  position: {x: 18.52539, y: 13.818176, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 36.43181, y: 23.056854}
+  size: {x: 37.151962, y: 27.630127}
 --- !u!114 &1616092804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5743,7 +5837,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6db4ed83fedbcb64f9693801c5482285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tooltipText: Toggle favorites
+  tooltipText: 
+  i18nKey: favoritesIcon_tooltip
+  showDelayInSeconds: -1
+  closeDelayInSeconds: -1
 --- !u!1 &1694892260
 GameObject:
   m_ObjectHideFlags: 0
@@ -7665,11 +7762,11 @@ MonoBehaviour:
   anchorMin: {x: 0.86441994, y: 0}
   anchorMax: {x: 0.99998003, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 116.15374, y: 0, z: 616.995}
+  localPosition: {x: 118.449814, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 841.77673, y: 11.508148, z: 0}
+  position: {x: 858.41656, y: 13.7907715, z: 0}
   sizeDelta: {x: 0.000030517578, y: 0}
-  size: {x: 36.43181, y: 23.056854}
+  size: {x: 37.151978, y: 27.630127}
 --- !u!224 &6702459375939703474
 RectTransform:
   m_ObjectHideFlags: 0
