@@ -17,6 +17,8 @@ public class I18NManager : MonoBehaviour, INeedInjection
     {
         currentLanguageMessages?.Clear();
         fallbackMessages?.Clear();
+        loadedFallbackTranslationsFinished = false;
+        loadedTranslationsFinished = false;
     }
 
     private const string I18NFolder = "I18N";
@@ -46,11 +48,22 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
     private CoroutineManager coroutineManager;
 
+    private static bool loadedFallbackTranslationsFinished;
+    private static bool loadedTranslationsFinished;
+
+    public static bool HasLoadedTranslations
+    {
+        get
+        {
+            return loadedFallbackTranslationsFinished
+                && loadedTranslationsFinished;
+        }
+    }
+
     private void Awake()
     {
         language = SettingsManager.Instance.Settings.GameSettings.language;
-        if (currentLanguageMessages.IsNullOrEmpty()
-            || fallbackMessages.IsNullOrEmpty())
+        if (!HasLoadedTranslations)
         {
             UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
         }
@@ -69,10 +82,9 @@ public class I18NManager : MonoBehaviour, INeedInjection
             coroutineManager = CoroutineManager.Instance;
         }
 
-        if (currentLanguageMessages.IsNullOrEmpty()
-                || fallbackMessages.IsNullOrEmpty())
+        if (!HasLoadedTranslations)
         {
-            UpdateCurrentLanguageAndTranslations();
+            UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
         }
     }
 #endif
@@ -135,8 +147,8 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
 
         // Flags to execute the callback when all has been loaded.
-        bool loadedFallbackTranslationsFinished = false;
-        bool loadedTranslationsFinished = false;
+        loadedFallbackTranslationsFinished = false;
+        loadedTranslationsFinished = false;
 
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
