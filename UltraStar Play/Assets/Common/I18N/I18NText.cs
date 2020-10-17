@@ -1,20 +1,33 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 [RequireComponent(typeof(Text))]
+[ExecuteInEditMode]
 public class I18NText : MonoBehaviour
 {
-    [ReadOnly]
+    [Delayed]
     public string key;
+    private string lastKey;
 
     void Start()
     {
         UpdateTranslation();
     }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (lastKey != key)
+        {
+            lastKey = key;
+            UpdateTranslation();
+        }
+    }
+#endif
 
     public void UpdateTranslation()
     {
@@ -25,10 +38,10 @@ public class I18NText : MonoBehaviour
             return;
         }
 
-        Text text = GetComponent<Text>();
         Dictionary<string, string> translationArguments = GetTranslationArguments();
         string translation = I18NManager.Instance.GetTranslation(timmedKey, translationArguments);
-        text.text = translation;
+        Text uiText = GetComponent<Text>();
+        uiText.text = translation;
     }
 
     protected virtual Dictionary<string, string> GetTranslationArguments()

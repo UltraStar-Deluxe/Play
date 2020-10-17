@@ -118,9 +118,9 @@ public class Theme
             Debug.LogWarning("Could not load theme file: " + textFilePath);
         }
 
-        WebRequestUtils.LoadTextFromUri(GetStreamingAssetsUri(textFilePath),
+        CoroutineManager.Instance.StartCoroutine(WebRequestUtils.LoadTextFromUri(GetStreamingAssetsUri(textFilePath),
                 onSuccess,
-                OnFailure);
+                OnFailure));
     }
 
     /// Looks for the color with the given name in the current theme and all parent themes.

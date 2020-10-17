@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Not yet implemented
+  buttonDescriptionI18nKey: mainScene_button_description_noImplementation
 --- !u!1001 &339024703
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -417,7 +417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: About this game
+  buttonDescriptionI18nKey: mainScene_button_about_description
 --- !u!114 &339024707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,6 +680,25 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 570215399}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &617290049 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1177802556}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &617290050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617290049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_jukebox_label
 --- !u!1001 &676827592
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -869,7 +888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Edit the options
+  buttonDescriptionI18nKey: mainScene_button_settings_description
 --- !u!114 &728531243 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5124115183525111794, guid: be0e3235464c346458a464603cce47c0,
@@ -882,6 +901,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &728954200 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 570215399}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &728954201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728954200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_party_label
 --- !u!1 &743028458
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,6 +931,7 @@ GameObject:
   - component: {fileID: 743028459}
   - component: {fileID: 743028463}
   - component: {fileID: 743028462}
+  - component: {fileID: 743028460}
   m_Layer: 5
   m_Name: SceneTitle
   m_TagString: Untagged
@@ -919,6 +958,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &743028460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743028458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_title
 --- !u!114 &743028462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -952,7 +1004,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Main Menu
+  m_Text: "Hauptmen\xFC"
 --- !u!222 &743028463
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -961,6 +1013,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 743028458}
   m_CullTransparentMesh: 0
+--- !u!1 &743547251 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 676827592}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &743547252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743547251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_settings_label
 --- !u!1 &773743379
 GameObject:
   m_ObjectHideFlags: 0
@@ -972,7 +1043,7 @@ GameObject:
   - component: {fileID: 773743380}
   - component: {fileID: 773743383}
   m_Layer: 5
-  m_Name: ButtonList2
+  m_Name: HLayout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1390,7 +1461,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Not yet implemented
+  buttonDescriptionI18nKey: mainScene_button_description_noImplementation
 --- !u!1001 &1001363791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1842,7 +1913,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: End the game
+  buttonDescriptionI18nKey: mainScene_button_quit_description
 --- !u!114 &1061399169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1855,6 +1926,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd396c8550dbe7438b7e2d4778efbc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1064420604 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 5124115183148902490}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1064420608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064420604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_sing_label
 --- !u!114 &1174743326 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
@@ -2036,6 +2126,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc66311bf99e9314687631472fc2ad54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1308332382 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1061399165}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1308332383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308332382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_quit_label
 --- !u!1 &1384091043
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,7 +2483,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78db9b2de25bddd4fa589a7bf1c66ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDescription: Sing a song
+  buttonDescriptionI18nKey: mainScene_button_sing_description
+--- !u!1 &1828451074 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 339024703}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1828451075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828451074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: mainScene_button_about_label
 --- !u!114 &1867000108 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
@@ -2444,6 +2572,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e492ecc050f43045aed2e783a588288, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menuButtonDescriptionText: {fileID: 2054057984}
 --- !u!1 &1975681768
 GameObject:
   m_ObjectHideFlags: 0
@@ -2504,7 +2633,7 @@ GameObject:
   - component: {fileID: 2040502565}
   - component: {fileID: 2040502566}
   m_Layer: 5
-  m_Name: ButtonList
+  m_Name: HLayout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3414,6 +3543,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FontData.m_MaxSize
       value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
+        type: 3}
+      propertyPath: m_Text
+      value: Sing2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0, type: 3}

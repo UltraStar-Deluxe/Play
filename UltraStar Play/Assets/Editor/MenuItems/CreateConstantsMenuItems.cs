@@ -22,6 +22,8 @@ public static class CreateConstantsMenuItems
     [MenuItem("R Class/Create all C# constants")]
     public static void CreateAllConstants()
     {
+        EditorUtils.RefreshAssetsInStreamingAssetsFolder();
+
         CreateI18nConstants();
         CreateConstantsForColors();
         CreateConstantsForImageFiles();

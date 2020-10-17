@@ -1,19 +1,31 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UniInject;
 
-public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler, INeedInjection
 {
-    public string buttonDescription;
+    public string buttonDescriptionI18nKey;
+
+    [Inject]
     private MenuButtonDescriptionText uiButtonDescriptionText;
 
-    void Start()
-    {
-        uiButtonDescriptionText = FindObjectOfType<MenuButtonDescriptionText>();
-    }
+    [Inject]
+    private I18NManager i18nManager;
 
     public void OnSelect(BaseEventData eventData)
     {
-        uiButtonDescriptionText.SetText(buttonDescription);
+        if (uiButtonDescriptionText == null)
+        {
+            return;
+        }
+
+        string description = buttonDescriptionI18nKey.IsNullOrEmpty()
+            ? ""
+            : i18nManager.GetTranslation(buttonDescriptionI18nKey);
+        uiButtonDescriptionText.SetText(description);
     }
 }

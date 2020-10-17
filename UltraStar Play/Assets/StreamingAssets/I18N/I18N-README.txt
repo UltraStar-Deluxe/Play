@@ -7,7 +7,7 @@ Conventions
 -----------
 - Use camelCase 
 - Separate hierarchy levels (e.g. "Scene > Button > Label" vs. "Scene > Button > Tooltip") by underscore.
-- Example: `sceneOne_startButton_toolTip = Start the game`
+    - Example: `sceneOne_startButton_toolTip = Start the game`
 
 Syntax
 ------
