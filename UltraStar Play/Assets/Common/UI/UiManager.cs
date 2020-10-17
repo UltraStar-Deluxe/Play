@@ -38,6 +38,9 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Tooltip tooltipPrefab;
 
+    [InjectedInInspector]
+    public ShowFps showFpsPrefab;
+
     private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
     public IObservable<Vector3> MousePositionChangeEventStream => mousePositionChangeEventStream;
 
@@ -56,6 +59,8 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private Vector3 lastMousePosition;
 
+    private ShowFps showFpsInstance;
+
     void Awake()
     {
         LeanTween.init(800);
@@ -65,6 +70,11 @@ public class UiManager : MonoBehaviour, INeedInjection
     {
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
+
+        if (SettingsManager.Instance.Settings.DeveloperSettings.showFps)
+        {
+            CreateShowFpsInstance();
+        }
     }
 
     void Update()
@@ -74,6 +84,27 @@ public class UiManager : MonoBehaviour, INeedInjection
             mousePositionChangeEventStream.OnNext(Input.mousePosition);
         }
         lastMousePosition = Input.mousePosition;
+    }
+
+    public void CreateShowFpsInstance()
+    {
+        if (showFpsInstance != null)
+        {
+            return;
+        }
+
+        showFpsInstance = Instantiate(showFpsPrefab, CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+        // Move to front
+        showFpsInstance.transform.SetAsLastSibling();
+        showFpsInstance.transform.position = new Vector3(20, 20, 0);
+    }
+
+    public void DestroyShowFpsInstance()
+    {
+        if (showFpsInstance != null)
+        {
+            Destroy(showFpsInstance);
+        }
     }
 
     public WarningDialog CreateWarningDialog(string title, string message)

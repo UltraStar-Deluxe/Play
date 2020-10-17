@@ -190,6 +190,8 @@ MonoBehaviour:
     type: 3}
   tooltipPrefab: {fileID: 5647552520249715628, guid: 61c5cda38fdd0ca4786cf5987297a4b2,
     type: 3}
+  showFpsPrefab: {fileID: 7200366228149695045, guid: 50d02acac4813a94490c57776dc5e4ee,
+    type: 3}
 --- !u!1 &116669178087187369
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,7 +457,6 @@ MonoBehaviour:
   isOverwriteLanguage: 0
   updateAllTranslationsWhenReloadingLangauge: 1
   overwriteLanguage: 15
-  language: 0
 --- !u!1 &1182483571995992771
 GameObject:
   m_ObjectHideFlags: 0
