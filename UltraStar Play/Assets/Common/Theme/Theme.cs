@@ -143,7 +143,8 @@ public class Theme
     /// Returns true iff the color was found.
     private bool TryFindColorRawStringValue(string colorName, out string colorValue)
     {
-        if (loadedColorRawStringValues.TryGetValue(colorName, out colorValue))
+        if (loadedColorRawStringValues != null
+            && loadedColorRawStringValues.TryGetValue(colorName, out colorValue))
         {
             return true;
         }
