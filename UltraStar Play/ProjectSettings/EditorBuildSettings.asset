@@ -56,4 +56,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/ContentOptions/ContentDownloadScene.unity
     guid: 10cb82cf2be19ee46b443c17c2efc000
+  - enabled: 1
+    path: Assets/Scenes/Options/ThemeOptions/ThemeOptionsScene.unity
+    guid: 00e91542d7928d24b92cafbbda62b290
   m_configObjects: {}

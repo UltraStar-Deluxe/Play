@@ -37,7 +37,8 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public bool updateAllTranslationsWhenReloadingLangauge;
     public SystemLanguage overwriteLanguage;
 
-    private SystemLanguage language;
+    [ReadOnly]
+    public SystemLanguage language;
 
     // Fields are static to be persisted across scenes
     private static Dictionary<string, string> currentLanguageMessages;
@@ -45,15 +46,36 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
     private CoroutineManager coroutineManager;
 
-    private void OnEnable()
+    private void Awake()
     {
         language = SettingsManager.Instance.Settings.GameSettings.language;
-        if (currentLanguageMessages == null
-            || fallbackMessages == null)
+        if (currentLanguageMessages.IsNullOrEmpty()
+            || fallbackMessages.IsNullOrEmpty())
+        {
+            UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
+        }
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (Application.isPlaying)
+        {
+            return;
+        }
+
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
+
+        if (currentLanguageMessages.IsNullOrEmpty()
+                || fallbackMessages.IsNullOrEmpty())
         {
             UpdateCurrentLanguageAndTranslations();
         }
     }
+#endif
 
     public List<string> GetKeys()
     {
@@ -144,6 +166,16 @@ public class I18NManager : MonoBehaviour, INeedInjection
                     callback();
                 }
             }));
+    }
+
+    public void UpdateAllTranslationsInScene()
+    {
+        I18NText[] i18nTexts = GameObject.FindObjectsOfType<I18NText>();
+        Debug.Log($"Updating I18NText instances in scene: {i18nTexts.Length}");
+        foreach (I18NText i18nText in i18nTexts)
+        {
+            i18nText.UpdateTranslation();
+        }
     }
 
     private void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)

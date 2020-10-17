@@ -17,7 +17,7 @@ public class ThemeManagerInspector : EditorBase
         if (ThemeManager.HasFinishedLoadingThemes
             && quickThemeSelectItems == null || quickThemeSelectItems.Length == 0)
         {
-            quickThemeSelectItems = ThemeManager.Instance.GetAvailableThemeNames().ToArray();
+            quickThemeSelectItems = ThemeManager.GetThemeNames().ToArray();
         }
 
         if (quickThemeSelectItems != null && quickThemeSelectItems.Length > 0)
@@ -26,7 +26,7 @@ public class ThemeManagerInspector : EditorBase
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
-                ThemeManager.CurrentTheme = ThemeManager.Instance.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
+                ThemeManager.CurrentTheme = ThemeManager.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
                 UpdateThemeResources();
             }
         }
@@ -58,7 +58,7 @@ public class ThemeManagerInspector : EditorBase
 
     private void UpdateQuickThemeSelect()
     {
-        List<string> loadedThemeNames = ThemeManager.Instance.GetAvailableThemeNames();
+        List<string> loadedThemeNames = ThemeManager.GetThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
         Theme currentTheme = ThemeManager.CurrentTheme;
         if (currentTheme != null)

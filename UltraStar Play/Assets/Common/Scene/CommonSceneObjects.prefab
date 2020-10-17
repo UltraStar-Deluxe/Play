@@ -452,9 +452,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   logInfo: 1
-  isOverwriteLanguage: 1
+  isOverwriteLanguage: 0
   updateAllTranslationsWhenReloadingLangauge: 1
   overwriteLanguage: 15
+  language: 0
 --- !u!1 &1182483571995992771
 GameObject:
   m_ObjectHideFlags: 0

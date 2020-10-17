@@ -52,7 +52,7 @@ public class ThemeManager : MonoBehaviour
     {
         get
         {
-            return themeNameToTheme != null
+            return !themeNameToTheme.IsNullOrEmpty()
                 && themeNameToTheme.Values.AllMatch(theme => theme.HasFinishedLoadingColors);
         }
     }
@@ -66,7 +66,7 @@ public class ThemeManager : MonoBehaviour
 
     private void Awake()
     {
-        if (themeNameToTheme == null)
+        if (themeNameToTheme.IsNullOrEmpty())
         {
             coroutineManager = CoroutineManager.Instance;
             ReloadThemes();
@@ -103,17 +103,22 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    public List<string> GetAvailableThemeNames()
+    public static List<Theme> GetThemes()
+    {
+        return themeNameToTheme.Values.ToList();
+    }
+
+    public static List<string> GetThemeNames()
     {
         return themeNameToTheme.Keys.ToList();
     }
 
-    public List<string> GetAvailableColors()
+    public static List<string> GetAvailableColors()
     {
         return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
     }
 
-    public Theme GetTheme(string themeName)
+    public static Theme GetTheme(string themeName)
     {
         themeNameToTheme.TryGetValue(themeName, out Theme resultTheme);
         return resultTheme;
@@ -145,11 +150,20 @@ public class ThemeManager : MonoBehaviour
             GetOrCreateAndAddTheme(themeName, themeNameToParentThemeNameMap);
         }
 
-        CurrentTheme = themeNameToTheme.Values.FirstOrDefault();
+        // Use theme from settings
+        string themeNameFromSettings = SettingsManager.Instance.Settings.GraphicSettings.themeName;
+        if (themeNameToTheme.TryGetValue(themeNameFromSettings, out Theme themeFromSettings))
+        {
+            CurrentTheme = themeFromSettings;
+        }
+        else
+        {
+            CurrentTheme = themeNameToTheme.Values.FirstOrDefault();
+        }
 
         if (logInfo)
         {
-            string themeNamesCsv = string.Join(", ", GetAvailableThemeNames());
+            string themeNamesCsv = string.Join(", ", GetThemeNames());
             Debug.Log($"Loaded themes: [{themeNamesCsv}]");
         }
     }
