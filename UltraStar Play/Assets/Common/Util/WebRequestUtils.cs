@@ -70,6 +70,18 @@ public static class WebRequestUtils
 
     public static IEnumerator LoadTextFromUri(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
+        // Immediately load file if possible
+        if (uri.StartsWith("file://"))
+        {
+            string path = uri.Substring(7);
+            if (File.Exists(path))
+            {
+                string content = File.ReadAllText(path);
+                onSuccess(content);
+                yield break;
+            }
+        }
+
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
             webRequest.SendWebRequest();
