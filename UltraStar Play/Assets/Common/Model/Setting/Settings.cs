@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 [Serializable]
 public class Settings
@@ -14,6 +15,8 @@ public class Settings
 
     public SongEditorSettings SongEditorSettings { get; set; } = new SongEditorSettings();
     public SongSelectSettings SongSelectSettings { get; set; } = new SongSelectSettings();
+
+    public DeveloperSettings DeveloperSettings { get; set; } = new DeveloperSettings();
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.

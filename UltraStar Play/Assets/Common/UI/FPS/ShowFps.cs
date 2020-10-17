@@ -24,7 +24,7 @@ public class ShowFps : MonoBehaviour
 
             if (fpsText != null)
             {
-                fpsText.text = fps.ToString();
+                fpsText.text = "FPS: " + fps.ToString();
             }
         }
     }
