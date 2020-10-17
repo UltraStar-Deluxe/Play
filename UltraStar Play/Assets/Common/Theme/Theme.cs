@@ -9,6 +9,7 @@ public class Theme
     public string Name { get; set; }
     public Theme ParentTheme { get; private set; }
 
+    private Dictionary<string, string> loadedColorRawStringValues;
     private readonly Dictionary<string, Color32> loadedColors = new Dictionary<string, Color32>();
     public IReadOnlyDictionary<string, Color32> LoadedColors => loadedColors;
 
@@ -34,14 +35,39 @@ public class Theme
 
     private void LoadColorsFromText(string text)
     {
-        Dictionary<string, string> loadedColorHexValues = PropertiesFileParser.ParseText(text);
-        loadedColorHexValues.ForEach(entry =>
+        loadedColorRawStringValues = PropertiesFileParser.ParseText(text);
+        loadedColorRawStringValues.ForEach(entry =>
         {
-            Color32 loadedColor = Colors.CreateColor(entry.Value);
+            // Replace reference to other color
+            string colorHexValue = ReplaceColorReferences(entry.Value);
+            Color32 loadedColor = Colors.CreateColor(colorHexValue);
             loadedColors.Add(entry.Key, loadedColor);
         });
+
+
         HasFinishedLoadingColors = true;
         Debug.Log(Name + " finished loading colors");
+    }
+
+    private string ReplaceColorReferences(string colorValueString)
+    {
+        if (colorValueString.StartsWith("$"))
+        {
+            string otherColorVariableName = colorValueString.Substring(1);
+            // Lookup in the colors of this Theme
+            if (loadedColorRawStringValues.TryGetValue(otherColorVariableName, out string otherColorValueFromThisTheme))
+            {
+                // Recursively replace further color references
+                return ReplaceColorReferences(otherColorValueFromThisTheme);
+            }
+            // Lookup in ParentTheme
+            if (ParentTheme.TryFindColorRawStringValue(otherColorVariableName, out string otherColorValueFromParentTheme))
+            {
+                // Recursively replace further color references
+                return ReplaceColorReferences(otherColorValueFromParentTheme);
+            }
+        }
+        return colorValueString;
     }
 
     internal void LoadAudioClip(string audioPath, Action<AudioClip> onSuccess)
@@ -112,6 +138,22 @@ public class Theme
             return ParentTheme.TryFindColor(colorName, out resultColor);
         }
         resultColor = Colors.white;
+        return false;
+    }
+
+    /// Looks for the color with the given name in the current theme and all parent themes.
+    /// Returns true iff the color was found.
+    private bool TryFindColorRawStringValue(string colorName, out string colorValue)
+    {
+        if (loadedColorRawStringValues.TryGetValue(colorName, out colorValue))
+        {
+            return true;
+        }
+        else if (ParentTheme != null)
+        {
+            return ParentTheme.TryFindColorRawStringValue(colorName, out colorValue);
+        }
+        colorValue = "";
         return false;
     }
 
