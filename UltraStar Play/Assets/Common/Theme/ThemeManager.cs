@@ -103,6 +103,16 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
+    public static Color32 GetColor(string colorName)
+    {
+        if (CurrentTheme.TryFindColor(colorName, out Color32 result))
+        {
+            return result;
+        }
+        Debug.LogWarning("Color not found: " + colorName);
+        return Colors.white;
+    }
+
     public static List<Theme> GetThemes()
     {
         return themeNameToTheme.Values.ToList();

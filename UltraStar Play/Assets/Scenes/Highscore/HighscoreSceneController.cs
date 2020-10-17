@@ -24,8 +24,6 @@ public class HighscoreSceneController : MonoBehaviour, INeedInjection, IBinder
     private SceneNavigator sceneNavigator;
     [Inject]
     private Statistics statistics;
-    [Inject]
-    private I18NManager i18nManager;
 
     private HighscoreSceneData sceneData;
     private EDifficulty currentDifficulty;
@@ -55,7 +53,7 @@ public class HighscoreSceneController : MonoBehaviour, INeedInjection, IBinder
     private void ShowHighscores(SongMeta songMeta, EDifficulty difficulty)
     {
         currentDifficulty = difficulty;
-        difficultyText.text = i18nManager.GetTranslation(R.String.difficulty) + ": " + difficulty.GetTranslatedName();
+        difficultyText.text = I18NManager.GetTranslation(R.String.difficulty) + ": " + difficulty.GetTranslatedName();
         titleAndArtistText.text = $"{songMeta.Title} - {songMeta.Artist}";
 
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);

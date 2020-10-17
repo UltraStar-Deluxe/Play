@@ -7,9 +7,6 @@ using UniInject;
 
 public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
 {
-    [Inject]
-    private I18NManager i18nManager;
-
     protected override void Start()
     {
         base.Start();
@@ -19,8 +16,7 @@ public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
         Selection.Subscribe(newValue =>
         {
             SettingsManager.Instance.Settings.GameSettings.language = newValue;
-            i18nManager.language = newValue;
-            i18nManager.UpdateCurrentLanguageAndTranslations(() => i18nManager.UpdateAllTranslationsInScene());
+            I18NManager.Instance.UpdateCurrentLanguageAndTranslations(() => I18NManager.UpdateAllTranslationsInScene());
         });
     }
 

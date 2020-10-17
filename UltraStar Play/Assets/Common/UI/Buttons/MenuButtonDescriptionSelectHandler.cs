@@ -13,9 +13,6 @@ public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler,
     [Inject]
     private MenuButtonDescriptionText uiButtonDescriptionText;
 
-    [Inject]
-    private I18NManager i18nManager;
-
     public void OnSelect(BaseEventData eventData)
     {
         if (uiButtonDescriptionText == null)
@@ -25,7 +22,7 @@ public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler,
 
         string description = buttonDescriptionI18nKey.IsNullOrEmpty()
             ? ""
-            : i18nManager.GetTranslation(buttonDescriptionI18nKey);
+            : I18NManager.GetTranslation(buttonDescriptionI18nKey);
         uiButtonDescriptionText.SetText(description);
     }
 }

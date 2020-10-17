@@ -47,6 +47,14 @@ public static partial class R
         public static readonly string open = "open";
         public static readonly string options = "options";
         public static readonly string order = "order";
+        public static readonly string order_Artist = "order_Artist";
+        public static readonly string order_CountFinished = "order_CountFinished";
+        public static readonly string order_CountStarted = "order_CountStarted";
+        public static readonly string order_Folder = "order_Folder";
+        public static readonly string order_Genre = "order_Genre";
+        public static readonly string order_Language = "order_Language";
+        public static readonly string order_Title = "order_Title";
+        public static readonly string order_Year = "order_Year";
         public static readonly string quit = "quit";
         public static readonly string rating_sentence_awful = "rating_sentence_awful";
         public static readonly string rating_sentence_bad = "rating_sentence_bad";

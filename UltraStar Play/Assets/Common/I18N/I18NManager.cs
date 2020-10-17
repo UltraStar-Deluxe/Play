@@ -40,14 +40,11 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public bool updateAllTranslationsWhenReloadingLangauge;
     public SystemLanguage overwriteLanguage;
 
-    [ReadOnly]
-    public SystemLanguage language;
-
     // Fields are static to be persisted across scenes
     private static Dictionary<string, string> currentLanguageMessages;
     private static Dictionary<string, string> fallbackMessages;
 
-    private CoroutineManager coroutineManager;
+    private static CoroutineManager coroutineManager;
 
     private static bool loadedFallbackTranslationsFinished;
     private static bool loadedTranslationsFinished;
@@ -63,7 +60,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
     private void Awake()
     {
-        language = SettingsManager.Instance.Settings.GameSettings.language;
         if (!HasLoadedTranslations)
         {
             UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
@@ -95,7 +91,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         return fallbackMessages.Keys.ToList();
     }
 
-    public string GetTranslation(string key, Dictionary<string, string> placeholders)
+    public static string GetTranslation(string key, Dictionary<string, string> placeholders)
     {
         string translation = GetTranslation(key);
         foreach (KeyValuePair<string, string> placeholder in placeholders)
@@ -113,7 +109,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         return translation;
     }
 
-    public string GetTranslation(string key)
+    public static string GetTranslation(string key)
     {
         if (currentLanguageMessages.TryGetValue(key, out string translation))
         {
@@ -121,7 +117,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogWarning($"Missing translation in language '{language}' for key '{key}'");
+            Debug.LogWarning($"Missing translation in language '{SettingsManager.Instance.Settings.GameSettings.language}' for key '{key}'");
             if (fallbackMessages.TryGetValue(key, out string fallbackTranslation))
             {
                 return fallbackTranslation;
@@ -140,7 +136,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         fallbackMessages = new Dictionary<string, string>();
         SystemLanguage selectedLanguage = Application.isEditor && isOverwriteLanguage
             ? overwriteLanguage
-            : language;
+            : SettingsManager.Instance.Settings.GameSettings.language;
 
         if (coroutineManager == null)
         {
@@ -159,6 +155,10 @@ public class I18NManager : MonoBehaviour, INeedInjection
                 LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath);
 
                 loadedFallbackTranslationsFinished = true;
+                if (logInfo)
+                {
+                    Debug.Log("Loaded " + fallbackMessages.Count + " translations from " + fallbackPropertiesFilePath);
+                }
                 if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
                 {
                     callback();
@@ -174,6 +174,10 @@ public class I18NManager : MonoBehaviour, INeedInjection
                 LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath);
 
                 loadedTranslationsFinished = true;
+                if (logInfo)
+                {
+                    Debug.Log("Loaded " + currentLanguageMessages.Count + " translations from " + propertiesFilePath);
+                }
                 if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
                 {
                     callback();
@@ -181,7 +185,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
             });
     }
 
-    public void UpdateAllTranslationsInScene()
+    public static void UpdateAllTranslationsInScene()
     {
         I18NText[] i18nTexts = GameObject.FindObjectsOfType<I18NText>();
         Debug.Log($"Updating I18NText instances in scene: {i18nTexts.Length}");
@@ -191,18 +195,13 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)
+    private static void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)
     {
         targetDictionary.Clear();
         PropertiesFileParser.ParseText(text).ForEach(entry => targetDictionary.Add(entry.Key, entry.Value));
-
-        if (logInfo)
-        {
-            Debug.Log("Loaded " + targetDictionary.Count + " translations from " + textSource);
-        }
     }
 
-    private string GetCountryCodeSuffixForPropertiesFile(SystemLanguage language)
+    private static string GetCountryCodeSuffixForPropertiesFile(SystemLanguage language)
     {
         if (language != SystemLanguage.English)
         {
@@ -214,7 +213,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private string GetPropertiesFilePath(string propertiesFileNameWithCountryCode)
+    private static string GetPropertiesFilePath(string propertiesFileNameWithCountryCode)
     {
         string path = I18NFolder + "/" + propertiesFileNameWithCountryCode + PropertiesFileExtension;
         return path;

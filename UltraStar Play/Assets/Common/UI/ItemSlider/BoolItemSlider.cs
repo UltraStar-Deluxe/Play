@@ -18,6 +18,6 @@ public class BoolItemSlider : TextItemSlider<bool>
 
     protected override string GetDisplayString(bool item)
     {
-        return I18NManager.Instance.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
+        return I18NManager.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
     }
 }

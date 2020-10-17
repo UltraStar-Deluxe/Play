@@ -42,7 +42,7 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (!i18nKey.IsNullOrEmpty()
             && tooltipText.IsNullOrEmpty())
         {
-            tooltipText = I18NManager.Instance.GetTranslation(i18nKey);
+            tooltipText = I18NManager.GetTranslation(i18nKey);
         }
     }
 
