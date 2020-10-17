@@ -28,8 +28,8 @@ public class Theme
     {
         loadedColors.Clear();
         string colorsFileUri = GetStreamingAssetsUri(ThemeManager.colorsFileName);
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUri(colorsFileUri,
-            (loadedText) => LoadColorsFromText(loadedText)));
+        WebRequestUtils.LoadTextFromUri(coroutineManager, colorsFileUri,
+            (loadedText) => LoadColorsFromText(loadedText));
     }
 
     private void LoadColorsFromText(string text)
@@ -118,9 +118,9 @@ public class Theme
             Debug.LogWarning("Could not load theme file: " + textFilePath);
         }
 
-        CoroutineManager.Instance.StartCoroutine(WebRequestUtils.LoadTextFromUri(GetStreamingAssetsUri(textFilePath),
+        WebRequestUtils.LoadTextFromUri(CoroutineManager.Instance, GetStreamingAssetsUri(textFilePath),
                 onSuccess,
-                OnFailure));
+                OnFailure);
     }
 
     /// Looks for the color with the given name in the current theme and all parent themes.

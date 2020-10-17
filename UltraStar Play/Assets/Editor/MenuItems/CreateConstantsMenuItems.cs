@@ -13,7 +13,7 @@ public static class CreateConstantsMenuItems
         "using", "class", "enum", "interface", "new", "this", "override", "virtual",
         "string", "int", "float", "double", "short", "long", "bool",
         "null", "true", "false", "out", "ref",
-        "get", "set", "if", "else", "while", "return", "do", "for", "foreach", "in" };
+        "get", "set", "if", "else", "while", "return", "do", "for", "foreach", "in", "continue" };
 
     public static readonly string className = "R";
 

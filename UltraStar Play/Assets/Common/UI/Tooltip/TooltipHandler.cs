@@ -8,6 +8,9 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [TextArea(3, 10)]
     public string tooltipText;
 
+    [InjectedInInspector]
+    public string i18nKey;
+
     private readonly float defaultShowDelayInSeconds = 1f;
     private readonly float defaultCloseDelayInSeconds = 0.5f;
 
@@ -31,6 +34,15 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
                 canvas = CanvasUtils.FindCanvas();
             }
             return canvas;
+        }
+    }
+
+    void Start()
+    {
+        if (!i18nKey.IsNullOrEmpty()
+            && tooltipText.IsNullOrEmpty())
+        {
+            tooltipText = I18NManager.Instance.GetTranslation(i18nKey);
         }
     }
 

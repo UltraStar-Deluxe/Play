@@ -393,7 +393,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6214154219501138296
 RectTransform:
   m_ObjectHideFlags: 0
@@ -656,6 +656,7 @@ GameObject:
   - component: {fileID: 3913333330022386151}
   - component: {fileID: 3913333330022386169}
   - component: {fileID: 3913333330022386150}
+  - component: {fileID: 5860360922604501399}
   m_Layer: 5
   m_Name: ScoreLabel
   m_TagString: Untagged
@@ -723,7 +724,20 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Notes
+  m_Text: score_notes
+--- !u!114 &5860360922604501399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3913333330022386148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: score_notes
 --- !u!1 &3913333330077278580
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,6 +1302,7 @@ GameObject:
   - component: {fileID: 3913333330740590948}
   - component: {fileID: 3913333330740590950}
   - component: {fileID: 3913333330740590951}
+  - component: {fileID: 4446103660583902570}
   m_Layer: 5
   m_Name: ScoreLabel
   m_TagString: Untagged
@@ -1355,7 +1370,20 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Phrase Bonus
+  m_Text: score_phraseBonus
+--- !u!114 &4446103660583902570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3913333330740590949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: score_phraseBonus
 --- !u!1 &3913333331104623503
 GameObject:
   m_ObjectHideFlags: 0
@@ -1834,6 +1862,7 @@ GameObject:
   - component: {fileID: 3913333331378054046}
   - component: {fileID: 3913333331378054032}
   - component: {fileID: 3913333331378054033}
+  - component: {fileID: 3797110703291053466}
   m_Layer: 5
   m_Name: TotalScoreLabel
   m_TagString: Untagged
@@ -1901,7 +1930,20 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Total
+  m_Text: score_total
+--- !u!114 &3797110703291053466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3913333331378054047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: score_total
 --- !u!1 &3913333331441856328
 GameObject:
   m_ObjectHideFlags: 0
@@ -2199,6 +2241,7 @@ GameObject:
   - component: {fileID: 3913333331572475247}
   - component: {fileID: 3913333331572475233}
   - component: {fileID: 3913333331572475246}
+  - component: {fileID: 8401141698078116771}
   m_Layer: 5
   m_Name: ScoreLabel
   m_TagString: Untagged
@@ -2266,7 +2309,20 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Golden Notes
+  m_Text: score_goldenNotes
+--- !u!114 &8401141698078116771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3913333331572475244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: score_goldenNotes
 --- !u!1 &3913333331607703938
 GameObject:
   m_ObjectHideFlags: 0

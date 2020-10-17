@@ -18,6 +18,9 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private I18NManager i18nManager;
+
     protected override void Start()
     {
         base.Start();
@@ -37,7 +40,7 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist)
         {
-            return "All Songs";
+            return i18nManager.GetTranslation(R.String.filter_allSongs);
         }
         else
         {
