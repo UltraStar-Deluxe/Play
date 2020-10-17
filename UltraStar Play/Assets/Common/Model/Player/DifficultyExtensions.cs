@@ -5,7 +5,7 @@ public static class DifficultyExtensions
     public static string GetTranslatedName(this EDifficulty difficulty)
     {
         string i18nCode = difficulty.GetI18NCode();
-        return I18NManager.Instance.GetTranslation(i18nCode);
+        return I18NManager.GetTranslation(i18nCode);
     }
 
     private static string GetI18NCode(this EDifficulty difficulty)

@@ -13,6 +13,12 @@ public static partial class R
         public static readonly string demoColor2 = "demoColor2";
         public static readonly string demoColorReference1 = "demoColorReference1";
         public static readonly string demoColorReference2 = "demoColorReference2";
+        public static readonly string deviceColor_1 = "deviceColor_1";
+        public static readonly string deviceColor_2 = "deviceColor_2";
+        public static readonly string deviceColor_3 = "deviceColor_3";
+        public static readonly string deviceColor_4 = "deviceColor_4";
+        public static readonly string deviceColor_5 = "deviceColor_5";
+        public static readonly string deviceColor_6 = "deviceColor_6";
         public static readonly string usdxBlue = "usdxBlue";
         public static readonly string usdxDarkBlue = "usdxDarkBlue";
         public static readonly string usdxDarkGrey = "usdxDarkGrey";

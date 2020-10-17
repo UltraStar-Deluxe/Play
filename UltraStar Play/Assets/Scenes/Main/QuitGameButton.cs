@@ -16,17 +16,14 @@ public class QuitGameButton : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    [Inject]
-    private I18NManager i18n;
-
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
             .Subscribe(_ =>
             {
                 QuestionDialog quitDialog = uiManager.CreateQuestionDialog(
-                    i18n.GetTranslation(R.String.mainScene_quitDialog_title),
-                    i18n.GetTranslation(R.String.mainScene_quitDialog_message));
+                    I18NManager.GetTranslation(R.String.mainScene_quitDialog_title),
+                    I18NManager.GetTranslation(R.String.mainScene_quitDialog_message));
                 quitDialog.yesAction = ApplicationUtils.QuitOrStopPlayMode;
             });
     }

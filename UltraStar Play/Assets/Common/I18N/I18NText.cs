@@ -45,7 +45,7 @@ public class I18NText : MonoBehaviour
         }
 
         Dictionary<string, string> translationArguments = GetTranslationArguments();
-        string translation = I18NManager.Instance.GetTranslation(timmedKey, translationArguments);
+        string translation = I18NManager.GetTranslation(timmedKey, translationArguments);
         Text uiText = GetComponent<Text>();
         uiText.text = translation;
     }

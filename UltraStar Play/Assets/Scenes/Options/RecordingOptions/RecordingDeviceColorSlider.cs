@@ -5,16 +5,26 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UniInject;
 
-public class RecordingDeviceColorSlider : ColorItemSlider
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class RecordingDeviceColorSlider : ColorItemSlider, INeedInjection
 {
     private IDisposable disposable;
 
     protected override void Awake()
     {
         base.Awake();
-        Items = new List<Color32> { Colors.crimson, Colors.forestGreen, Colors.dodgerBlue,
-                                  Colors.gold, Colors.greenYellow, Colors.salmon, Colors.violet };
+        Items = new List<Color32> {
+            ThemeManager.GetColor(R.Color.deviceColor_1),
+            ThemeManager.GetColor(R.Color.deviceColor_2),
+            ThemeManager.GetColor(R.Color.deviceColor_3),
+            ThemeManager.GetColor(R.Color.deviceColor_4),
+            ThemeManager.GetColor(R.Color.deviceColor_5),
+            ThemeManager.GetColor(R.Color.deviceColor_6)
+        };
     }
 
     public void SetMicProfile(MicProfile micProfile)

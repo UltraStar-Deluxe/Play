@@ -15,9 +15,6 @@ public class OrderSlider : TextItemSlider<ESongOrder>, INeedInjection
     [Inject]
     Settings settings;
 
-    [Inject]
-    I18NManager i18nManager;
-
     protected override void Start()
     {
         base.Start();
@@ -28,6 +25,6 @@ public class OrderSlider : TextItemSlider<ESongOrder>, INeedInjection
 
     protected override string GetDisplayString(ESongOrder value)
     {
-        return $"{i18nManager.GetTranslation(R.String.order)}: {i18nManager.GetTranslation("order_" + value.ToString())}";
+        return $"{I18NManager.GetTranslation(R.String.order)}: {I18NManager.GetTranslation("order_" + value.ToString())}";
     }
 }

@@ -25,7 +25,7 @@ public class SongRating
     {
         get
         {
-            return I18NManager.Instance.GetTranslation(i18nCode);
+            return I18NManager.GetTranslation(i18nCode);
         }
     }
 
