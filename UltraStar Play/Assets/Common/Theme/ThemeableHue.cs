@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
-public class ThemeableColor : Themeable
+public class ThemeableHue : Themeable
 {
     [Delayed]
     public string colorName;
-    public Image target;
+    public ImageHueHelper target;
 
 #if UNITY_EDITOR
     private string lastColorName;
@@ -44,16 +44,16 @@ public class ThemeableColor : Themeable
             return;
         }
 
-        Image targetImage = target != null ? target : GetComponent<Image>();
+        ImageHueHelper targetImage = target != null ? target : GetComponent<ImageHueHelper>();
         if (targetImage == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have an Image Component", gameObject);
+            Debug.LogWarning($"Target is null and GameObject does not have an ImageHueHelper Component", gameObject);
             return;
         }
 
         if (theme.TryFindColor(colorName, out Color32 loadedColor))
         {
-            targetImage.color = loadedColor;
+            targetImage.SetHueByColor(loadedColor);
         }
         else
         {

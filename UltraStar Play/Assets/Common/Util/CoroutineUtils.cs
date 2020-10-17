@@ -1,19 +1,23 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 
 public class CoroutineUtils
 {
-    public static IEnumerator ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
+    public static IEnumerator ExecuteAfterDelayInFrames(int delayInFrames, Action action)
     {
-        yield return new WaitForSeconds(delayInSeconds);
+        for(int i = 0; i < delayInFrames; i++)
+        {
+            yield return null;
+        }
         // Code to execute after the delay
         action();
     }
 
-    public static IEnumerator Execute(Action action)
+    public static IEnumerator ExecuteAfterDelayInSeconds(float delayInSeconds, Action action)
     {
-        yield return null;
+        yield return new WaitForSeconds(delayInSeconds);
+        // Code to execute after the delay
         action();
     }
 }

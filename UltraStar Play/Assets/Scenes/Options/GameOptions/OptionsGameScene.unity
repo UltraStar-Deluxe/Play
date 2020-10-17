@@ -1234,11 +1234,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 1}
   anchorMax: {x: 0, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 363.17566, y: -26.500004, z: 0}
-  anchoredPosition: {x: 363.17566, y: -26.500004}
-  position: {x: 537.016, y: 223.32938, z: 0}
-  sizeDelta: {x: 710.3513, y: 37.000008}
-  size: {x: 710.3513, y: 37.000008}
+  localPosition: {x: 278.46713, y: -26.500004, z: 0}
+  anchoredPosition: {x: 278.46713, y: -26.500004}
+  position: {x: 411.76028, y: 219.90791, z: 0}
+  sizeDelta: {x: 540.93427, y: 37.000008}
+  size: {x: 540.93427, y: 37.000008}
 --- !u!1001 &1051339506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1839,11 +1839,11 @@ MonoBehaviour:
   anchorMin: {x: 0.02164491, y: 0.75349224}
   anchorMax: {x: 0.974187, y: 0.75349224}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0.10385132, y: 50.568077, z: 0}
+  localPosition: {x: 0.48480225, y: 49.849937, z: 0}
   anchoredPosition: {x: 1.7370911, y: 0.40000153}
-  position: {x: 545.56036, y: 253.61752, z: 0}
+  position: {x: 418.7169, y: 250.00156, z: 0}
   sizeDelta: {x: -4, y: 0.5999985}
-  size: {x: 742.4994, y: 0.5999985}
+  size: {x: 568.38293, y: 0.5999985}
 --- !u!114 &1386089905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2067,7 +2067,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 878467876}
   m_HandleRect: {fileID: 878467875}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
