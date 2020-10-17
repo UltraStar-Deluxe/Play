@@ -58,6 +58,12 @@ public class DynamicallyCreatedImage : MonoBehaviour
 
     private void TryCreateTexture()
     {
+        if (rectTransform == null
+            || rawImage == null)
+        {
+            Awake();
+        }
+
         if (texture != null)
         {
             return;

@@ -19,6 +19,14 @@ public static partial class R
         public static readonly string deviceColor_4 = "deviceColor_4";
         public static readonly string deviceColor_5 = "deviceColor_5";
         public static readonly string deviceColor_6 = "deviceColor_6";
+        public static readonly string rating_sentence_awful = "rating_sentence_awful";
+        public static readonly string rating_sentence_bad = "rating_sentence_bad";
+        public static readonly string rating_sentence_cool = "rating_sentence_cool";
+        public static readonly string rating_sentence_good = "rating_sentence_good";
+        public static readonly string rating_sentence_great = "rating_sentence_great";
+        public static readonly string rating_sentence_notBad = "rating_sentence_notBad";
+        public static readonly string rating_sentence_perfect = "rating_sentence_perfect";
+        public static readonly string rating_sentence_poor = "rating_sentence_poor";
         public static readonly string usdxBlue = "usdxBlue";
         public static readonly string usdxDarkBlue = "usdxDarkBlue";
         public static readonly string usdxDarkGrey = "usdxDarkGrey";
