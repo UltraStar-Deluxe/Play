@@ -161,7 +161,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
             {
                 // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-                AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongFilePath(SongMeta), false);
+                AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongAudioPath(SongMeta), false);
                 audioWaveFormInitialized = true;
                 audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
             }

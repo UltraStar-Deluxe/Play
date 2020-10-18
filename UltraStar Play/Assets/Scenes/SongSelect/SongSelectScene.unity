@@ -5665,9 +5665,9 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: -118.4524, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 18.52539, y: 13.818176, z: 0}
+  position: {x: 18.52539, y: 11.745453, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 37.151962, y: 27.630127}
+  size: {x: 37.151962, y: 23.485596}
 --- !u!114 &1616092804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7764,9 +7764,9 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 118.449814, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 858.41656, y: 13.7907715, z: 0}
+  position: {x: 858.41656, y: 11.722153, z: 0}
   sizeDelta: {x: 0.000030517578, y: 0}
-  size: {x: 37.151978, y: 27.630127}
+  size: {x: 37.151978, y: 23.485596}
 --- !u!224 &6702459375939703474
 RectTransform:
   m_ObjectHideFlags: 0
