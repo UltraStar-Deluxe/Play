@@ -263,7 +263,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         if (SelectedSong != null)
         {
             // Check that the audio file exists
-            string audioPath = SongMetaUtils.GetAbsoluteSongFilePath(SelectedSong);
+            string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
             if (!File.Exists(audioPath))
             {
                 UiManager.Instance.CreateWarningDialog("Audio Error", "Audio file does not exist: " + audioPath);
