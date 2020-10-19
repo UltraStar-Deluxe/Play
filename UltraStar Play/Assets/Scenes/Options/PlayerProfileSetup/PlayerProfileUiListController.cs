@@ -34,8 +34,7 @@ public class PlayerProfileUiListController : MonoBehaviour
 
     private void CreateListEntry(PlayerProfile playerProfile)
     {
-        PlayerProfileUiListEntry uiListEntry = Instantiate(listEntryPrefab);
-        uiListEntry.transform.SetParent(scrollViewContent);
+        PlayerProfileUiListEntry uiListEntry = Instantiate(listEntryPrefab, scrollViewContent);
 
         uiListEntry.SetPlayerProfile(playerProfile);
 

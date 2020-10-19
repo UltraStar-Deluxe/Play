@@ -139,6 +139,7 @@ MonoBehaviour:
   selectedColorName: button_selectedColor
   disabledColorName: button_disabledColor
   target: {fileID: 0}
+  fadeDuration: 0.1
 --- !u!1 &5124115183637839173
 GameObject:
   m_ObjectHideFlags: 0
@@ -209,7 +210,7 @@ MonoBehaviour:
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 25
     m_Alignment: 4
     m_AlignByGeometry: 0

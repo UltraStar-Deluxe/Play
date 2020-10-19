@@ -33,7 +33,7 @@ public class VersionPropertiesText : MonoBehaviour, INeedInjection
         }
         else
         {
-            buildTimeStampUiText.gameObject.SetActive(false);
+            buildTimeStampUiText.text = "";
         }
     }
 }
