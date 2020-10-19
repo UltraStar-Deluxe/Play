@@ -22,5 +22,8 @@ Plugins/CompileTimeTracker.meta
 Plugins/Unity-Ui-Extensions/
 Plugins/Unity-Ui-Extensions.meta
 
+Plugins/SharpZipLib/
+Plugins/SharpZipLib.meta
+
 Plugins/TexMesh Pro/
 Plugins/TexMesh Pro.meta
