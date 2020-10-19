@@ -7,7 +7,6 @@ using UniRx;
 
 public class SongDirUiListController : MonoBehaviour
 {
-
     public Button addButton;
     public Transform scrollViewContent;
     public SongDirUiListEntry listEntryPrefab;
@@ -38,8 +37,7 @@ public class SongDirUiListController : MonoBehaviour
 
     private void CreateListEntry(string songDir, int indexInList)
     {
-        SongDirUiListEntry songDirUiListEntry = Instantiate(listEntryPrefab);
-        songDirUiListEntry.transform.SetParent(scrollViewContent);
+        SongDirUiListEntry songDirUiListEntry = Instantiate(listEntryPrefab, scrollViewContent);
 
         songDirUiListEntry.SetSongDir(songDir, indexInList);
 
