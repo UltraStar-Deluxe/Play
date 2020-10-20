@@ -16,7 +16,7 @@ public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
         Selection.Subscribe(newValue =>
         {
             SettingsManager.Instance.Settings.GameSettings.language = newValue;
-            I18NManager.Instance.UpdateCurrentLanguageAndTranslations(() => I18NManager.UpdateAllTranslationsInScene());
+            I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
         });
     }
 

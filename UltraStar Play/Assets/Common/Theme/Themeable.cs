@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 abstract public class Themeable : MonoBehaviour
 {
@@ -19,14 +20,6 @@ abstract public class Themeable : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    virtual protected void Update()
-    {
-        //if (!hasLoadedTheme
-        //    && ThemeManager.HasFinishedLoadingThemes)
-        //{
-        //    hasLoadedTheme = true;
-        //    ReloadResources(ThemeManager.CurrentTheme);
-        //}
-    }
+    abstract public List<UnityEngine.Object> GetAffectedObjects();
 #endif
 }

@@ -44,6 +44,7 @@ public static class WebRequestUtils
         using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.UNKNOWN))
         {
             DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+            downloadHandler.streamAudio = true;
             webRequest.SendWebRequest();
 
             while (!webRequest.isDone)

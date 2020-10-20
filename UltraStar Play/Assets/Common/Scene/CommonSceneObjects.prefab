@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   logInfo: 1
-  currentThemeName: base
+  currentThemeName: BaseTheme
 --- !u!1 &568775263153110267
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,7 +455,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logInfo: 1
   isOverwriteLanguage: 0
-  updateAllTranslationsWhenReloadingLangauge: 1
   overwriteLanguage: 15
 --- !u!1 &1182483571995992771
 GameObject:

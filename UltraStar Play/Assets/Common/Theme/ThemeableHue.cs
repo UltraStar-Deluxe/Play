@@ -3,31 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(ImageHueHelper))]
 [ExecuteInEditMode]
 public class ThemeableHue : Themeable
 {
     [Delayed]
     public string colorName;
-    public ImageHueHelper target;
+
+    private ImageHueHelper target;
+
+    private void Awake()
+    {
+        target = GetComponent<ImageHueHelper>();
+    }
 
 #if UNITY_EDITOR
     private string lastColorName;
 
     override protected void Start()
     {
+        target = GetComponent<ImageHueHelper>();
         base.Start();
         lastColorName = colorName;
     }
 
-    override protected void Update()
+    private void Update()
     {
-        base.Update();
-
         if (lastColorName != colorName)
         {
             lastColorName = colorName;
             ReloadResources(ThemeManager.CurrentTheme);
         }
+    }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target, target.GetComponent<Image>() };
     }
 #endif
 
@@ -43,17 +54,15 @@ public class ThemeableHue : Themeable
             Debug.LogWarning($"Missing color name", gameObject);
             return;
         }
-
-        ImageHueHelper targetImage = target != null ? target : GetComponent<ImageHueHelper>();
-        if (targetImage == null)
+        if (target == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have an ImageHueHelper Component", gameObject);
+            Debug.LogWarning($"Target is null", gameObject);
             return;
         }
 
         if (theme.TryFindColor(colorName, out Color32 loadedColor))
         {
-            targetImage.SetHueByColor(loadedColor);
+            target.SetHueByColor(loadedColor);
         }
         else
         {

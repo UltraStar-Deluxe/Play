@@ -5,31 +5,42 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Image))]
 [ExecuteInEditMode]
 public class ThemeableImage : Themeable
 {
     [Delayed]
     public string imagePath;
-    public Image target;
+
+    private Image target;
+
+    private void Awake()
+    {
+        target = GetComponent<Image>();
+    }
 
 #if UNITY_EDITOR
     private string lastImagePath;
 
     override protected void Start()
     {
+        target = GetComponent<Image>();
         base.Start();
         lastImagePath = imagePath;
     }
 
-    override protected void Update()
+    private void Update()
     {
-        base.Update();
-
         if (imagePath != lastImagePath)
         {
             lastImagePath = imagePath;
             ReloadResources(ThemeManager.CurrentTheme);
         }
+    }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target };
     }
 #endif
 
@@ -45,15 +56,20 @@ public class ThemeableImage : Themeable
             Debug.LogWarning($"Missing image file path", gameObject);
             return;
         }
-
-        Image targetImage = target != null ? target : GetComponent<Image>();
-        if (targetImage == null)
+        if (target == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have an Image Component", gameObject);
+            Debug.LogWarning($"Target is null", gameObject);
             return;
         }
 
-        theme.LoadSprite(imagePath,
-            (loadedSprite) => targetImage.sprite = loadedSprite);
+        Sprite newSprite = theme.LoadSprite(imagePath);
+        if (newSprite == null)
+        {
+            Debug.LogWarning($"Could not load file '{imagePath}' from theme '{theme.Name}'");
+        }
+        else
+        {
+            target.sprite = newSprite;
+        }
     }
 }

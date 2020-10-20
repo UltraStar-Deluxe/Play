@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
@@ -48,15 +49,6 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    public static bool HasFinishedLoadingThemes
-    {
-        get
-        {
-            return !themeNameToTheme.IsNullOrEmpty()
-                && themeNameToTheme.Values.AllMatch(theme => theme.HasFinishedLoadingColors);
-        }
-    }
-
     public bool logInfo;
 
     [ReadOnly]
@@ -74,6 +66,12 @@ public class ThemeManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
+    private void Start()
+    {
+        // Awake is not called normally after re-compile.
+        Awake();
+    }
+
     private void Update()
     {
         if (coroutineManager == null)
@@ -137,9 +135,9 @@ public class ThemeManager : MonoBehaviour
     public void ReloadThemes()
     {
         themeNameToTheme = new Dictionary<string, Theme>();
-        string themesFileUri = ApplicationUtils.GetStreamingAssetsUri(themesFolderName + "/" + themesFileName);
-        WebRequestUtils.LoadTextFromUri(coroutineManager, themesFileUri,
-            (loadedXml) => ReloadThemesFromXml(loadedXml));
+        string themesFilePath = ApplicationUtils.GetStreamingAssetsPath(themesFolderName + "/" + themesFileName);
+        string themesFileContent = File.ReadAllText(themesFilePath);
+        ReloadThemesFromXml(themesFileContent);
     }
 
     private void ReloadThemesFromXml(string xml)
@@ -192,12 +190,12 @@ public class ThemeManager : MonoBehaviour
         themeNameToParentThemeNameMap.TryGetValue(themeName, out string parentThemeName);
         if (string.IsNullOrEmpty(parentThemeName))
         {
-            newTheme = new Theme(themeName, null, coroutineManager);
+            newTheme = new Theme(themeName, null);
         }
         else
         {
             Theme parentTheme = GetOrCreateAndAddTheme(parentThemeName, themeNameToParentThemeNameMap);
-            newTheme = new Theme(themeName, parentTheme, coroutineManager);
+            newTheme = new Theme(themeName, parentTheme);
         }
         themeNameToTheme.Add(newTheme.Name, newTheme);
         return newTheme;

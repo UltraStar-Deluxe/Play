@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class Theme
 {
@@ -12,24 +12,109 @@ public class Theme
     private readonly Dictionary<string, Color32> loadedColors = new Dictionary<string, Color32>();
     public IReadOnlyDictionary<string, Color32> LoadedColors => loadedColors;
 
-    public bool HasFinishedLoadingColors { get; private set; }
-
     private AudioManager audioManager;
 
-    public Theme(string name, Theme parentTheme, CoroutineManager coroutineManager)
+    public Theme(string name, Theme parentTheme)
     {
         Name = name;
         ParentTheme = parentTheme;
 
-        LoadColors(coroutineManager);
+        LoadColors();
     }
 
-    private void LoadColors(CoroutineManager coroutineManager)
+    /**
+     * Looks for the AudioClip on the given path in this theme and all parent themes.
+     * Returns null if it could not be loaded.
+     */
+    public AudioClip LoadAudioClip(string audioPath)
+    {
+        if (audioManager == null)
+        {
+            audioManager = AudioManager.Instance;
+        }
+
+        string fullAudioPath = GetStreamingAssetsPath(audioPath);
+        AudioClip audioClip = null;
+        if (File.Exists(fullAudioPath))
+        {
+            audioClip = audioManager.LoadAudioClip(fullAudioPath);
+        }
+        else if (ParentTheme != null)
+        {
+            audioClip = ParentTheme.LoadAudioClip(audioPath);
+        }
+        return audioClip;
+    }
+
+    /**
+     * Looks for the Sprite on the given path in this theme and all parent themes.
+     * Returns null if it could not be loaded.
+     */
+    public Sprite LoadSprite(string imagePath)
+    {
+        string fullImagePath = GetStreamingAssetsPath(imagePath);
+        Sprite sprite = null;
+        if (File.Exists(fullImagePath))
+        {
+            sprite = ImageManager.LoadSprite(fullImagePath);
+        }
+        else if (ParentTheme != null)
+        {
+            sprite = ParentTheme.LoadSprite(imagePath);
+        }
+        return sprite;
+    }
+
+    /**
+     * Looks for the color with the given name in the current theme and all parent themes.
+     * Returns true iff the color was found.
+     */
+    public bool TryFindColor(string colorName, out Color32 resultColor)
+    {
+        if (loadedColors.TryGetValue(colorName, out resultColor))
+        {
+            return true;
+        }
+        else if (ParentTheme != null)
+        {
+            return ParentTheme.TryFindColor(colorName, out resultColor);
+        }
+        resultColor = Colors.white;
+        return false;
+    }
+
+    /**
+     * Looks for the color with the given name in the current theme and all parent themes.
+     * Returns true iff the color was found.
+     */
+    private bool TryFindColorRawStringValue(string colorName, out string colorValue)
+    {
+        if (loadedColorRawStringValues != null
+            && loadedColorRawStringValues.TryGetValue(colorName, out colorValue))
+        {
+            return true;
+        }
+        else if (ParentTheme != null)
+        {
+            return ParentTheme.TryFindColorRawStringValue(colorName, out colorValue);
+        }
+        colorValue = "";
+        return false;
+    }
+
+    private string GetStreamingAssetsPath(string resourceName)
+    {
+        string resourcePath = ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
+        return ApplicationUtils.GetStreamingAssetsPath(resourcePath);
+    }
+
+
+    private void LoadColors()
     {
         loadedColors.Clear();
-        string colorsFileUri = GetStreamingAssetsUri(ThemeManager.colorsFileName);
-        WebRequestUtils.LoadTextFromUri(coroutineManager, colorsFileUri,
-            (loadedText) => LoadColorsFromText(loadedText));
+        string colorsFilePath = GetStreamingAssetsPath(ThemeManager.colorsFileName);
+        string colorsFileContent = File.ReadAllText(colorsFilePath);
+        LoadColorsFromText(colorsFileContent);
     }
 
     private void LoadColorsFromText(string text)
@@ -42,9 +127,6 @@ public class Theme
             Color32 loadedColor = Colors.CreateColor(colorHexValue);
             loadedColors.Add(entry.Key, loadedColor);
         });
-
-
-        HasFinishedLoadingColors = true;
     }
 
     private string ReplaceColorReferences(string colorValueString)
@@ -68,105 +150,11 @@ public class Theme
         return colorValueString;
     }
 
-    internal void LoadAudioClip(string audioPath, Action<AudioClip> onSuccess)
-    {
-        void OnFailure(UnityWebRequest webRequest)
-        {
-            if (ParentTheme != null)
-            {
-                ParentTheme.LoadAudioClip(audioPath, onSuccess);
-                return;
-            }
-            Debug.LogWarning("Could not load theme file: " + audioPath);
-        }
-
-        if (audioManager == null)
-        {
-            audioManager = AudioManager.Instance;
-        }
-        audioManager.LoadAudioClipFromUri(GetStreamingAssetsUri(audioPath),
-                onSuccess,
-                OnFailure);
-    }
-
-    public void LoadSprite(string imagePath, Action<Sprite> onSuccess)
-    {
-        void OnFailure(UnityWebRequest webRequest)
-        {
-            if (ParentTheme != null)
-            {
-                ParentTheme.LoadSprite(imagePath, onSuccess);
-                return;
-            }
-            Debug.LogWarning("Could not load theme file: " + imagePath);
-        }
-
-        ImageManager.LoadSpriteFromUri(GetStreamingAssetsUri(imagePath),
-                onSuccess,
-                OnFailure);
-    }
-
-    public void LoadText(string textFilePath, Action<string> onSuccess)
-    {
-        void OnFailure(UnityWebRequest webRequest)
-        {
-            if (ParentTheme != null)
-            {
-                ParentTheme.LoadText(textFilePath, onSuccess);
-                return;
-            }
-            Debug.LogWarning("Could not load theme file: " + textFilePath);
-        }
-
-        WebRequestUtils.LoadTextFromUri(CoroutineManager.Instance, GetStreamingAssetsUri(textFilePath),
-                onSuccess,
-                OnFailure);
-    }
-
-    /// Looks for the color with the given name in the current theme and all parent themes.
-    /// Returns true iff the color was found.
-    public bool TryFindColor(string colorName, out Color32 resultColor)
-    {
-        if (loadedColors.TryGetValue(colorName, out resultColor))
-        {
-            return true;
-        }
-        else if (ParentTheme != null)
-        {
-            return ParentTheme.TryFindColor(colorName, out resultColor);
-        }
-        resultColor = Colors.white;
-        return false;
-    }
-
-    /// Looks for the color with the given name in the current theme and all parent themes.
-    /// Returns true iff the color was found.
-    private bool TryFindColorRawStringValue(string colorName, out string colorValue)
-    {
-        if (loadedColorRawStringValues != null
-            && loadedColorRawStringValues.TryGetValue(colorName, out colorValue))
-        {
-            return true;
-        }
-        else if (ParentTheme != null)
-        {
-            return ParentTheme.TryFindColorRawStringValue(colorName, out colorValue);
-        }
-        colorValue = "";
-        return false;
-    }
-
-    public string GetStreamingAssetsUri(string resourceName)
-    {
-        string resourcePath = ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
-        return ApplicationUtils.GetStreamingAssetsUri(resourcePath);
-    }
-
     public override string ToString()
     {
         if (ParentTheme != null)
         {
-            return $"{Name}<{ParentTheme.Name}";
+            return $"{Name} extends {ParentTheme.Name}";
         }
         else
         {

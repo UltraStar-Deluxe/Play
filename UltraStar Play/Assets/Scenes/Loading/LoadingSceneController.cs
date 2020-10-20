@@ -17,11 +17,14 @@ public class LoadingSceneController : MonoBehaviour
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         Debug.Log("started loading songs.");
 
-        // Wait for Theme and I18N resources to have been loaded
-        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-            () => ThemeManager.HasFinishedLoadingThemes
-                  && I18NManager.HasLoadedTranslations,
-            () => FinishScene()));
+        // Extract StreamingAssets on Android from the JAR
+        AndroidStreamingAssets.Extract();
+
+        // Wait for Theme and I18N resources
+        I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
+        ThemeManager.Instance.ReloadThemes();
+
+        FinishScene();
     }
 
     void Update()

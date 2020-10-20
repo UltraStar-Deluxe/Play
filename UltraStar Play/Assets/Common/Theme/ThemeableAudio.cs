@@ -2,31 +2,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 [ExecuteInEditMode]
 public class ThemeableAudio : Themeable
 {
     [Delayed]
     public string audioPath;
-    public AudioSource target;
+
+    private AudioSource target;
+
+    private void Awake()
+    {
+        target = GetComponent<AudioSource>();
+    }
 
 #if UNITY_EDITOR
     private string lastAudioPath;
 
     override protected void Start()
     {
+        target = GetComponent<AudioSource>();
         base.Start();
         lastAudioPath = audioPath;
     }
 
-    override protected void Update()
+    private void Update()
     {
-        base.Update();
-
         if (lastAudioPath != audioPath)
         {
             lastAudioPath = audioPath;
             ReloadResources(ThemeManager.CurrentTheme);
         }
+    }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target };
     }
 #endif
 
@@ -42,15 +53,20 @@ public class ThemeableAudio : Themeable
             Debug.LogWarning($"Missing audio file path", gameObject);
             return;
         }
-
-        AudioSource targetAudioSource = target != null ? target : GetComponent<AudioSource>();
-        if (targetAudioSource == null)
+        if (target == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have an AudioSource Component", gameObject);
+            Debug.LogWarning($"Target is null", gameObject);
             return;
         }
 
-        theme.LoadAudioClip(audioPath,
-            (loadedAudioClip) => target.clip = loadedAudioClip);
+        AudioClip newAudioClip = theme.LoadAudioClip(audioPath);
+        if (newAudioClip == null)
+        {
+            Debug.LogWarning($"Could not load file '{audioPath}' from theme '{theme.Name}'");
+        }
+        else
+        {
+            target.clip = newAudioClip;
+        }
     }
 }

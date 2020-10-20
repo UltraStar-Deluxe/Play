@@ -25,14 +25,7 @@ public class I18NManagerInspector : EditorBase
             || lastOverwriteLanguage != i18nManager.overwriteLanguage)
         {
 
-            if (i18nManager.updateAllTranslationsWhenReloadingLangauge)
-            {
-                i18nManager.UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslations());
-            }
-            else
-            {
-                i18nManager.UpdateCurrentLanguageAndTranslations();
-            }
+            i18nManager.UpdateCurrentLanguageAndTranslations();
         }
     }
 

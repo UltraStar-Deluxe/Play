@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Selectable))]
 [ExecuteInEditMode]
 public class ThemeableSelectableColors : Themeable
 {
@@ -18,9 +19,14 @@ public class ThemeableSelectableColors : Themeable
     [Delayed]
     public string disabledColorName;
 
-    public Selectable target;
-
     public float fadeDuration = 0.1f;
+
+    private Selectable target;
+
+    private void Awake()
+    {
+        target = GetComponent<Selectable>();
+    }
 
 #if UNITY_EDITOR
     private string lastNormalColorName;
@@ -31,6 +37,7 @@ public class ThemeableSelectableColors : Themeable
 
     override protected void Start()
     {
+        target = GetComponent<Selectable>();
         base.Start();
         lastNormalColorName = normalColorName;
         lastHighlightedColorName = highlightedColorName;
@@ -41,10 +48,8 @@ public class ThemeableSelectableColors : Themeable
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => RestoreFadeDuration()));
     }
 
-    override protected void Update()
+    private void Update()
     {
-        base.Update();
-
         RestoreFadeDuration();
 
         if (lastNormalColorName != normalColorName
@@ -62,6 +67,11 @@ public class ThemeableSelectableColors : Themeable
             ReloadResources(ThemeManager.CurrentTheme);
         }
     }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target };
+    }
 #else
     override protected void Start()
     {
@@ -74,12 +84,11 @@ public class ThemeableSelectableColors : Themeable
     {
         // The fade duration must be 0 when applying new colors.
         // The original fade duration is restored here.
-        Selectable targetSelectable = target != null ? target : GetComponent<Selectable>();
-        if (targetSelectable != null)
+        if (target != null)
         {
-            ColorBlock colorBlock = targetSelectable.colors;
+            ColorBlock colorBlock = target.colors;
             colorBlock.fadeDuration = fadeDuration;
-            targetSelectable.colors = colorBlock;
+            target.colors = colorBlock;
         }
     }
 
@@ -116,14 +125,13 @@ public class ThemeableSelectableColors : Themeable
             return;
         }
 
-        Selectable targetSelectable = target != null ? target : GetComponent<Selectable>();
-        if (targetSelectable == null)
+        if (target == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have a Selectable Component", gameObject);
+            Debug.LogWarning($"Target is null", gameObject);
             return;
         }
 
-        ApplyThemeColors(theme, targetSelectable);
+        ApplyThemeColors(theme, target);
     }
 
     private void ApplyThemeColors(Theme theme, Selectable selectable)
