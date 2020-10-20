@@ -18,8 +18,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
     {
         currentLanguageMessages?.Clear();
         fallbackMessages?.Clear();
-        loadedFallbackTranslationsFinished = false;
-        loadedTranslationsFinished = false;
     }
 
     private const string I18NFolder = "I18N";
@@ -37,7 +35,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public bool logInfo;
 
     public bool isOverwriteLanguage;
-    public bool updateAllTranslationsWhenReloadingLangauge;
     public SystemLanguage overwriteLanguage;
 
     // Fields are static to be persisted across scenes
@@ -46,23 +43,11 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
     private static CoroutineManager coroutineManager;
 
-    private static bool loadedFallbackTranslationsFinished;
-    private static bool loadedTranslationsFinished;
-
-    public static bool HasLoadedTranslations
-    {
-        get
-        {
-            return loadedFallbackTranslationsFinished
-                && loadedTranslationsFinished;
-        }
-    }
-
     private void Awake()
     {
-        if (!HasLoadedTranslations)
+        if (fallbackMessages.IsNullOrEmpty())
         {
-            UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
+            UpdateCurrentLanguageAndTranslations();
         }
     }
 
@@ -79,9 +64,9 @@ public class I18NManager : MonoBehaviour, INeedInjection
             coroutineManager = CoroutineManager.Instance;
         }
 
-        if (!HasLoadedTranslations)
+        if (fallbackMessages.IsNullOrEmpty())
         {
-            UpdateCurrentLanguageAndTranslations(() => UpdateAllTranslationsInScene());
+            UpdateCurrentLanguageAndTranslations();
         }
     }
 #endif
@@ -130,7 +115,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public void UpdateCurrentLanguageAndTranslations(Action callback = null)
+    public void UpdateCurrentLanguageAndTranslations()
     {
         currentLanguageMessages = new Dictionary<string, string>();
         fallbackMessages = new Dictionary<string, string>();
@@ -143,49 +128,27 @@ public class I18NManager : MonoBehaviour, INeedInjection
             coroutineManager = CoroutineManager.Instance;
         }
 
-        // Flags to execute the callback when all has been loaded.
-        loadedFallbackTranslationsFinished = false;
-        loadedTranslationsFinished = false;
-
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
-        WebRequestUtils.LoadTextFromUri(coroutineManager, ApplicationUtils.GetStreamingAssetsUri(fallbackPropertiesFilePath),
-            (loadedText) =>
-            {
-                LoadPropertiesFromText(loadedText, fallbackMessages, fallbackPropertiesFilePath);
-
-                loadedFallbackTranslationsFinished = true;
-                if (logInfo)
-                {
-                    Debug.Log("Loaded " + fallbackMessages.Count + " translations from " + fallbackPropertiesFilePath);
-                }
-                if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
-                {
-                    callback();
-                }
-            });
+        string fallbackPropertiesFileContent = File.ReadAllText(fallbackPropertiesFilePath);
+        LoadPropertiesFromText(fallbackPropertiesFileContent, fallbackMessages, fallbackPropertiesFilePath);
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(selectedLanguage);
         string propertiesFilePath = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
-        WebRequestUtils.LoadTextFromUri(coroutineManager, ApplicationUtils.GetStreamingAssetsUri(propertiesFilePath),
-            (loadedText) =>
-            {
-                LoadPropertiesFromText(loadedText, currentLanguageMessages, propertiesFilePath);
+        string propertiesFileContent = File.ReadAllText(propertiesFilePath);
+        LoadPropertiesFromText(propertiesFileContent, currentLanguageMessages, propertiesFilePath);
 
-                loadedTranslationsFinished = true;
-                if (logInfo)
-                {
-                    Debug.Log("Loaded " + currentLanguageMessages.Count + " translations from " + propertiesFilePath);
-                }
-                if (loadedFallbackTranslationsFinished && loadedTranslationsFinished && callback != null)
-                {
-                    callback();
-                }
-            });
+        if (logInfo)
+        {
+            Debug.Log("Loaded " + fallbackMessages.Count + " translations from " + fallbackPropertiesFilePath);
+            Debug.Log("Loaded " + currentLanguageMessages.Count + " translations from " + propertiesFilePath);
+        }
+
+        UpdateAllTranslationsInScene();
     }
 
-    public static void UpdateAllTranslationsInScene()
+    private static void UpdateAllTranslationsInScene()
     {
         I18NText[] i18nTexts = GameObject.FindObjectsOfType<I18NText>();
         Debug.Log($"Updating I18NText instances in scene: {i18nTexts.Length}");
@@ -216,6 +179,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
     private static string GetPropertiesFilePath(string propertiesFileNameWithCountryCode)
     {
         string path = I18NFolder + "/" + propertiesFileNameWithCountryCode + PropertiesFileExtension;
+        path = ApplicationUtils.GetStreamingAssetsPath(path);
         return path;
     }
 }

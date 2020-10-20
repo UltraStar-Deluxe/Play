@@ -13,29 +13,17 @@ using UniRx;
 public class ThemeSlider : TextItemSlider<Theme>, INeedInjection
 {
     [Inject]
-    private ThemeManager themeManager;
-
-    [Inject]
     private Settings settings;
 
     protected override void Start()
     {
         base.Start();
-        // The ThemeManager needs some time to load the available themes
-        if (ThemeManager.HasFinishedLoadingThemes)
-        {
-            DoSetup();
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => ThemeManager.HasFinishedLoadingThemes,
-                () => DoSetup()));
-        }
-    }
 
-    private void DoSetup()
-    {
+        if (ThemeManager.GetThemes().IsNullOrEmpty())
+        {
+            ThemeManager.Instance.ReloadThemes();
+        }
+
         Items = ThemeManager.GetThemes();
         if (Items.Count == 0)
         {

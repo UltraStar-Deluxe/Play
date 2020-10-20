@@ -3,31 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Image))]
 [ExecuteInEditMode]
 public class ThemeableColor : Themeable
 {
     [Delayed]
     public string colorName;
-    public Image target;
+
+    private Image target;
+
+    private void Awake()
+    {
+        target = GetComponent<Image>();
+    }
 
 #if UNITY_EDITOR
     private string lastColorName;
 
     override protected void Start()
     {
+        target = GetComponent<Image>();
         base.Start();
         lastColorName = colorName;
     }
 
-    override protected void Update()
+    private void Update()
     {
-        base.Update();
-
         if (lastColorName != colorName)
         {
             lastColorName = colorName;
             ReloadResources(ThemeManager.CurrentTheme);
         }
+    }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target };
     }
 #endif
 
@@ -43,17 +54,15 @@ public class ThemeableColor : Themeable
             Debug.LogWarning($"Missing color name", gameObject);
             return;
         }
-
-        Image targetImage = target != null ? target : GetComponent<Image>();
-        if (targetImage == null)
+        if (target == null)
         {
-            Debug.LogWarning($"Target is null and GameObject does not have an Image Component", gameObject);
+            Debug.LogWarning($"Target is null", gameObject);
             return;
         }
 
         if (theme.TryFindColor(colorName, out Color32 loadedColor))
         {
-            targetImage.color = loadedColor;
+            target.color = loadedColor;
         }
         else
         {

@@ -54,7 +54,7 @@ public class AudioManager : MonoBehaviour
     }
 
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
-    public AudioClip GetAudioClip(string path, bool streamAudio = true)
+    public AudioClip LoadAudioClip(string path, bool streamAudio = true)
     {
         if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
@@ -83,7 +83,7 @@ public class AudioManager : MonoBehaviour
 
         Action<AudioClip> doCacheAudioClipThenOnSuccess = (loadedAudioClip) =>
         {
-            AddAudioClipToCache(uri, loadedAudioClip, false);
+            AddAudioClipToCache(uri, loadedAudioClip, true);
             onSuccess(loadedAudioClip);
         };
 

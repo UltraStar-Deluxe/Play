@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Linq;
 
 [CustomEditor(typeof(ThemeManager))]
 public class ThemeManagerInspector : EditorBase
@@ -14,18 +15,21 @@ public class ThemeManagerInspector : EditorBase
     {
         DrawDefaultInspector();
 
-        if (ThemeManager.HasFinishedLoadingThemes
-            && quickThemeSelectItems == null || quickThemeSelectItems.Length == 0)
+        if (quickThemeSelectItems.IsNullOrEmpty()
+            || (ThemeManager.CurrentTheme != null
+                && ThemeManager.CurrentTheme.Name != ThemeManager.Instance.currentThemeName))
         {
-            quickThemeSelectItems = ThemeManager.GetThemeNames().ToArray();
+            UpdateQuickThemeSelect();
         }
 
-        if (quickThemeSelectItems != null && quickThemeSelectItems.Length > 0)
+        if (!quickThemeSelectItems.IsNullOrEmpty())
         {
             int newQuickThemeSelectIndex = EditorGUILayout.Popup("Quick Theme Select", quickThemeSelectIndex, quickThemeSelectItems);
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
+
+                Undo.RecordObject(ThemeManager.Instance, $"Set currentThemeName");
                 ThemeManager.CurrentTheme = ThemeManager.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
                 UpdateThemeResources();
             }
@@ -44,26 +48,45 @@ public class ThemeManagerInspector : EditorBase
 
     private void UpdateThemeResources()
     {
-        // Update the themes
-        ThemeManager.Instance.UpdateThemeResources();
-        UpdateQuickThemeSelect();
+        if (ThemeManager.CurrentTheme == null)
+        {
+            Debug.LogError("CurrentTheme is null");
+            return;
+        }
 
-        // Make Themeable instances dirty, such they will be refreshed in the Unity Editor.
+        // Add Undo entry for Themeable changes
         Themeable[] themeables = FindObjectsOfType<Themeable>();
         foreach (Themeable themeable in themeables)
         {
-            EditorUtility.SetDirty(themeable.gameObject);
+            RegisterUndo(themeable);
         }
+
+        // Update the themes
+        ThemeManager.Instance.UpdateThemeResources();
+        UpdateQuickThemeSelect();
+    }
+
+    private void RegisterUndo(Themeable themeable)
+    {
+        themeable.GetAffectedObjects().Where(it => it != null).ForEach(affectedObject =>
+        {
+            Undo.RecordObject(affectedObject, $"Apply theme '{ThemeManager.CurrentTheme.Name}'");
+            // For some reason, Undo.RecordObject is not enough. Thus, also mark the affected object as dirty.
+            EditorUtility.SetDirty(affectedObject);
+            if (affectedObject is MonoBehaviour so)
+            {
+                EditorUtility.SetDirty(so.gameObject);
+            }
+        });
     }
 
     private void UpdateQuickThemeSelect()
     {
         List<string> loadedThemeNames = ThemeManager.GetThemeNames();
         quickThemeSelectItems = loadedThemeNames.ToArray();
-        Theme currentTheme = ThemeManager.CurrentTheme;
-        if (currentTheme != null)
+        if (ThemeManager.CurrentTheme != null)
         {
-            quickThemeSelectIndex = loadedThemeNames.IndexOf(currentTheme.Name);
+            quickThemeSelectIndex = loadedThemeNames.IndexOf(ThemeManager.CurrentTheme.Name);
         }
     }
 }
