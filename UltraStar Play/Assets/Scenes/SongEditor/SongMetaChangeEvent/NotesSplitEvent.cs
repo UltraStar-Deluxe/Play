@@ -1,3 +1,3 @@
-public class NotesSplitEvent : ISongMetaChangeEvent
+public class NotesSplitEvent : SongMetaChangeEvent
 {
 }

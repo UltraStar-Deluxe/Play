@@ -33,12 +33,17 @@ public class SpaceBetweenNotesButton : MonoBehaviour, INeedInjection
         {
             if (int.TryParse(numberOfBeatsInputField.text, out int spaceInBeats))
             {
-                List<Note> notes = selectionController.GetSelectedNotes();
-                if (notes.IsNullOrEmpty())
+                List<Note> selectedNotes = selectionController.GetSelectedNotes();
+                if (selectedNotes.IsNullOrEmpty())
                 {
-                    notes = SongMetaUtils.GetAllNotes(songMeta);
+                    // Perform on all notes, but per voice
+                    songMeta.GetVoices()
+                        .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(SongMetaUtils.GetAllNotes(voice), spaceInBeats));
                 }
-                spaceBetweenNotesAction.ExecuteAndNotify(notes, spaceInBeats);
+                else
+                {
+                    spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
+                }
             }
         });
     }

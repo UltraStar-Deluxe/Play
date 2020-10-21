@@ -7,10 +7,9 @@ public class ShowWhiteSpaceText : MonoBehaviour
 {
     // Unicode BULLET (U+2022).
     // This (or a similar ) character is also used to indicate white-space in office word processing and notepad++.
-    public static readonly char spaceReplacementCharacter = '•';
-    public static readonly string spaceReplacementHexColor = "FF00FF";
-    public static readonly string spaceReplacementRichText = $"<b><color=#{spaceReplacementHexColor}>{spaceReplacementCharacter}</color></b>";
-    public static readonly string nospaceReplacementRichText = $"<b><color=#{spaceReplacementHexColor}></color></b>";
+    public static readonly string spaceReplacement = "•";
+    // Unicode DOWNWARDS ARROW WITH CORNER LEFTWARDS (U+21B5)
+    public static readonly string newlineReplacement = "↵\n";
 
     private Text uiText;
 
@@ -19,11 +18,26 @@ public class ShowWhiteSpaceText : MonoBehaviour
     {
         get
         {
-            return ReplaceVisibleCharactersRichTextWithWhiteSpace(uiText.text);
+            return ReplaceVisibleCharactersWithWhiteSpace(uiText.text);
         }
         set
         {
-            uiText.text = ReplaceWhiteSpaceWithVisibleCharactersRichText(value);
+            uiText.text = ReplaceWhiteSpaceWithVisibleCharacters(value);
+        }
+    }
+
+    public float PreferredWidth => uiText.preferredWidth;
+    public float PreferredHeight => uiText.preferredHeight;
+
+    public int FontSize
+    {
+        get
+        {
+            return uiText.fontSize;
+        }
+        set
+        {
+            uiText.fontSize = value;
         }
     }
 
@@ -39,28 +53,19 @@ public class ShowWhiteSpaceText : MonoBehaviour
 
     void UpdateUiText()
     {
-        uiText.text = ReplaceWhiteSpaceWithVisibleCharactersRichText(uiText.text);
-    }
-
-    public static string ReplaceVisibleCharactersRichTextWithWhiteSpace(string text)
-    {
-        return text
-            .Replace(spaceReplacementRichText, " ")
-            .Replace(nospaceReplacementRichText, "");
-    }
-
-    public static string ReplaceWhiteSpaceWithVisibleCharactersRichText(string text)
-    {
-        return text.Replace(" ", spaceReplacementRichText);
+        uiText.text = ReplaceWhiteSpaceWithVisibleCharacters(uiText.text);
     }
 
     public static string ReplaceVisibleCharactersWithWhiteSpace(string text)
     {
-        return text.Replace(spaceReplacementCharacter, ' ');
+        return text.Replace(spaceReplacement, " ")
+            .Replace("\n", "")
+            .Replace("↵", "\n");
     }
 
     public static string ReplaceWhiteSpaceWithVisibleCharacters(string text)
     {
-        return text.Replace(' ', spaceReplacementCharacter);
+        return text.Replace(" ", spaceReplacement)
+            .Replace("\n", newlineReplacement);
     }
 }

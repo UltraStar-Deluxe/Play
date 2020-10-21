@@ -35,7 +35,7 @@ public class BpmText : MonoBehaviour, INeedInjection, ISceneInjectionFinishedLis
         songMetaChangeEventStream.Subscribe(OnSongChanged);
     }
 
-    private void OnSongChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongChanged(SongMetaChangeEvent changeEvent)
     {
         if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
         {

@@ -51,6 +51,8 @@ public class CursorManager : MonoBehaviour, INeedInjection
     public Texture2D grabCursorTexture;
     public Texture2D musicNoteCursorTexture;
 
+    public ECursor CurrentCursor { get; private set; } = ECursor.Default;
+
     void Start()
     {
         settingsManager.Settings.GraphicSettings
@@ -65,6 +67,11 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     public void SetCursor(ECursor cursor)
     {
+        if (CurrentCursor == cursor)
+        {
+            return;
+        }
+
         switch (cursor)
         {
             case ECursor.Default:
@@ -90,6 +97,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     public void SetDefaultCursor()
     {
+        CurrentCursor = ECursor.Default;
         if (UseImageAsCursor())
         {
             Cursor.SetCursor(cursorTexture, cursorTopLeftCorner, CursorMode.Auto);
@@ -107,6 +115,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        CurrentCursor = ECursor.ArrowsLeftRight;
         Cursor.SetCursor(horizontalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
@@ -117,6 +126,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        CurrentCursor = ECursor.MusicNote;
         Cursor.SetCursor(musicNoteCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
@@ -127,11 +137,13 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        CurrentCursor = ECursor.ArrowsUpDown;
         Cursor.SetCursor(verticalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorGrab()
     {
+        CurrentCursor = ECursor.Grab;
         if (!UseImageAsCursor())
         {
             return;

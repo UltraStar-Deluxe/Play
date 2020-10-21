@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -17,11 +18,11 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private List<RectTransform> debugPoints = new List<RectTransform>();
+    private readonly List<RectTransform> debugPoints = new List<RectTransform>();
 
     [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
-    
+
     [InjectedInInspector]
     public QuestionDialog questionDialogPrefab;
 
@@ -37,6 +38,11 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Tooltip tooltipPrefab;
 
+    private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
+    public IObservable<Vector3> MousePositionChangeEventStream => mousePositionChangeEventStream;
+
+    public bool DialogOpen => dialogs.Count > 0;
+
     private Canvas canvas;
     private RectTransform canvasRectTransform;
     private float notificationHeightInPixels;
@@ -48,7 +54,7 @@ public class UiManager : MonoBehaviour, INeedInjection
     private readonly List<Notification> notifications = new List<Notification>();
     private readonly List<Dialog> dialogs = new List<Dialog>();
 
-    public bool DialogOpen => dialogs.Count > 0;
+    private Vector3 lastMousePosition;
 
     void Awake()
     {
@@ -59,6 +65,15 @@ public class UiManager : MonoBehaviour, INeedInjection
     {
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
+    }
+
+    void Update()
+    {
+        if (lastMousePosition != Input.mousePosition)
+        {
+            mousePositionChangeEventStream.OnNext(Input.mousePosition);
+        }
+        lastMousePosition = Input.mousePosition;
     }
 
     public WarningDialog CreateWarningDialog(string title, string message)
@@ -76,11 +91,11 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             warningDialog.Message = message;
         }
-        
+
         dialogs.Add(warningDialog);
         return warningDialog;
     }
-    
+
     public QuestionDialog CreateQuestionDialog(string title, string message)
     {
         FindCanvas();
@@ -96,7 +111,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             questionDialog.Message = message;
         }
-        
+
         dialogs.Add(questionDialog);
         return questionDialog;
     }

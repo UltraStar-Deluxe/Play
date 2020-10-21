@@ -27,18 +27,11 @@ public class IssueOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInje
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
-    }
-
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
-    {
-        if (changeEvent is LyricsChangedEvent)
+        songMetaChangeEventStream.Subscribe(_ =>
         {
-            return;
-        }
-
-        issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
-        UpdateIssueOverviewImage();
+            issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
+            UpdateIssueOverviewImage();
+        });
     }
 
     void Start()
