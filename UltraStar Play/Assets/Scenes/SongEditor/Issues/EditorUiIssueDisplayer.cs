@@ -39,7 +39,7 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        songMetaChangeEventStream.Subscribe(_ => UpdateIssues());
     }
 
     void Start()
@@ -62,16 +62,6 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
             UpdateIssues();
         }
         lastViewportEvent = viewportEvent;
-    }
-
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
-    {
-        if (changeEvent is LyricsChangedEvent)
-        {
-            return;
-        }
-
-        UpdateIssues();
     }
 
     private void UpdateIssues()

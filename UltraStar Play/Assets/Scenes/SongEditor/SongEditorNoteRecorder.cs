@@ -62,7 +62,10 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
         micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
-        micPitchTracker.MicSampleRecorder.StartRecording();
+        if (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone)
+        {
+            micPitchTracker.MicSampleRecorder.StartRecording();
+        }
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)
@@ -241,6 +244,15 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         else if (micRecordingEnabled && songAudioPlayer.IsPlaying && !isRecording)
         {
             StartRecording();
+        }
+
+        if (micRecordingEnabled)
+        {
+            micPitchTracker.MicSampleRecorder.StartRecording();
+        }
+        else
+        {
+            micPitchTracker.MicSampleRecorder.StopRecording();
         }
     }
 

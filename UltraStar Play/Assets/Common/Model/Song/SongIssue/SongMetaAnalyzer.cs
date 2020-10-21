@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 public static class SongMetaAnalyzer
@@ -48,6 +48,13 @@ public static class SongMetaAnalyzer
             if (note.MidiNote < MidiUtils.SingableNoteMin || note.MidiNote > MidiUtils.SingableNoteMax)
             {
                 SongIssue issue = SongIssue.CreateWarning("Unusual pitch (human range is roughly from C2 to C6).", note.StartBeat, note.EndBeat);
+                result.Add(issue);
+            }
+
+            // Check that each note has lyrics
+            if (note.Text.IsNullOrEmpty())
+            {
+                SongIssue issue = SongIssue.CreateWarning("Missing lyrics on note", note.StartBeat, note.EndBeat);
                 result.Add(issue);
             }
 

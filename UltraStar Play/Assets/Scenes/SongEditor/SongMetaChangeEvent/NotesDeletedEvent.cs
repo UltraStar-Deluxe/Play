@@ -1,3 +1,3 @@
-public class NotesDeletedEvent : ISongMetaChangeEvent
+public class NotesDeletedEvent : SongMetaChangeEvent
 {
 }

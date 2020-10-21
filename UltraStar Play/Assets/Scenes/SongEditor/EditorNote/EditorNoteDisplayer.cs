@@ -52,13 +52,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
-    }
-
-    private void OnSongMetaChangeEvent(ISongMetaChangeEvent changeEvent)
-    {
-        ReloadSentences();
-        UpdateNotesAndSentences();
+        songMetaChangeEventStream.Subscribe(_ =>
+        {
+            ReloadSentences();
+            UpdateNotesAndSentences();
+        });
     }
 
     void Start()

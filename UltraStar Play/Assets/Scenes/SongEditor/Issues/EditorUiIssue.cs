@@ -11,14 +11,11 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorUiIssue : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler
+public class EditorUiIssue : MonoBehaviour, INeedInjection
 {
     public SongIssue SongIssue { get; private set; }
 
     public bool isPointerOver;
-
-    [InjectedInInspector]
-    public Text uiText;
 
     [InjectedInInspector]
     public Image backgroundImage;
@@ -26,27 +23,13 @@ public class EditorUiIssue : MonoBehaviour, INeedInjection, IPointerEnterHandler
     [InjectedInInspector]
     public Image uiTextBackgroundImage;
 
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private TooltipHandler tooltipHandler;
+
     public void Init(SongIssue songIssue)
     {
         this.SongIssue = songIssue;
-        uiText.text = SongIssue.Message;
-        SetTextVisible(false);
         backgroundImage.color = SongIssueUtils.GetColorForIssue(songIssue);
-    }
-
-    private void SetTextVisible(bool isVisible)
-    {
-        uiText.gameObject.SetActive(isVisible);
-        uiTextBackgroundImage.gameObject.SetActive(isVisible);
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        SetTextVisible(true);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        SetTextVisible(false);
+        tooltipHandler.tooltipText = songIssue.Message;
     }
 }

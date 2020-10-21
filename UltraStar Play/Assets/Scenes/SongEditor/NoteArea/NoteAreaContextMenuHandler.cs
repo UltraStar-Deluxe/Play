@@ -40,10 +40,20 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
 
         contextMenu.AddItem("Fit vertical", () => noteArea.FitViewportVerticalToNotes());
 
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentencesAtBeat(songMeta, beat).FirstOrDefault();
+        if (sentenceAtBeat != null)
+        {
+            int minBeat = sentenceAtBeat.MinBeat - 1;
+            int maxBeat = sentenceAtBeat.ExtendedMaxBeat + 1;
+            contextMenu.AddItem("Fit horizontal to sentence ", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
+        }
+
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
         if (selectedNotes.Count > 0)
         {
-            contextMenu.AddItem("Fit horizontal to selection", () => noteArea.FitViewportHorizontalToNotes(selectedNotes));
+            int minBeat = selectedNotes.Select(it => it.StartBeat).Min() - 1;
+            int maxBeat = selectedNotes.Select(it => it.EndBeat).Max() + 1;
+            contextMenu.AddItem("Fit horizontal to selection", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
         }
 
         contextMenu.AddSeparator();

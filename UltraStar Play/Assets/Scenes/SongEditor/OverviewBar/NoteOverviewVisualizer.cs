@@ -34,7 +34,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInjec
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
-    private void OnSongMetaChanged(ISongMetaChangeEvent changeEvent)
+    private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         if (changeEvent is LyricsChangedEvent)
         {

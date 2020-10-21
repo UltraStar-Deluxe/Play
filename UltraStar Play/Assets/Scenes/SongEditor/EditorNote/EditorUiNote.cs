@@ -10,7 +10,8 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable CS0649
 
-public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class EditorUiNote : MonoBehaviour,
+    INeedInjection, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public static readonly IComparer<EditorUiNote> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
@@ -37,8 +38,8 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     [InjectedInInspector]
     public Text pitchLabel;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private ShowWhiteSpaceText uiText;
+    [InjectedInInspector]
+    public ShowWhiteSpaceText uiText;
 
     [Inject]
     private SongMeta songMeta;
@@ -64,6 +65,12 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     [Inject]
     private CursorManager cursorManager;
 
+    [Inject]
+    private NoteArea noteArea;
+
+    [Inject]
+    private UiManager uiManager;
+
     private EditorNoteLyricsInputField activeLyricsInputField;
 
     private bool isPlayingMidiSound;
@@ -74,6 +81,8 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     public bool IsPointerOverCenter { get; private set; }
 
     public Note Note { get; private set; }
+
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
 
     public void Init(Note note)
     {
@@ -98,9 +107,16 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     void Start()
     {
         UpdateHandles();
+        disposables.Add(noteArea.ViewportEventStream.Subscribe(_ => UpdateFontSize()));
+        disposables.Add(uiManager.MousePositionChangeEventStream.Subscribe(_ => OnMousePositionChanged()));
     }
 
-    void Update()
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
+    }
+
+    private void OnMousePositionChanged()
     {
         if (IsPointerOver)
         {
@@ -110,6 +126,16 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
         if (IsKeyDownOrUp(KeyCode.LeftControl) || IsKeyDownOrUp(KeyCode.LeftAlt) || IsKeyDownOrUp(KeyCode.LeftShift))
         {
             UpdateHandles();
+        }
+    }
+
+    private void UpdateFontSize()
+    {
+        float rectTransformWidthInPt = Mathf.Floor(RectTransform.rect.width * 72 / Screen.dpi) - 2;
+        int fontSize = (int)Mathf.Max(2, Mathf.Min(20f, rectTransformWidthInPt));
+        if (fontSize != uiText.FontSize)
+        {
+            uiText.FontSize = fontSize;
         }
     }
 
@@ -269,7 +295,6 @@ public class EditorUiNote : MonoBehaviour, IPointerClickHandler, IPointerDownHan
     public void SetColor(Color color)
     {
         backgroundImage.color = color;
-        pitchLabel.color = color;
     }
 
     public void SetSelected(bool isSelected)

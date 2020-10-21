@@ -1,3 +1,3 @@
-public class VideoGapChangedEvent : ISongMetaChangeEvent
+public class VideoGapChangedEvent : SongMetaChangeEvent
 {
 }

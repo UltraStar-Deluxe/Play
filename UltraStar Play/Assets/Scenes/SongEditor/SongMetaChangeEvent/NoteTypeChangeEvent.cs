@@ -1,3 +1,3 @@
-public class NoteTypeChangeEvent : ISongMetaChangeEvent
+public class NoteTypeChangeEvent : SongMetaChangeEvent
 {
 }
