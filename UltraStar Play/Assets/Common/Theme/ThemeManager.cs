@@ -101,6 +101,27 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
+    /**
+     * Loads an AudioClip from the current theme.
+     * The path is relative to the theme folder.
+     */
+    public static AudioClip GetAudioClip(string path)
+    {
+        return CurrentTheme.LoadAudioClip(path);
+    }
+
+    /**
+     * Loads a Sprite from the current theme.
+     * The path is relative to the theme folder.
+     */
+    public static Sprite GetSprite(string path)
+    {
+        return CurrentTheme.LoadSprite(path);
+    }
+
+    /**
+    * Loads a Color from the current theme.
+    */
     public static Color32 GetColor(string colorName)
     {
         if (CurrentTheme.TryFindColor(colorName, out Color32 result))
@@ -114,16 +135,6 @@ public class ThemeManager : MonoBehaviour
     public static List<Theme> GetThemes()
     {
         return themeNameToTheme.Values.ToList();
-    }
-
-    public static List<string> GetThemeNames()
-    {
-        return themeNameToTheme.Keys.ToList();
-    }
-
-    public static List<string> GetAvailableColors()
-    {
-        return themeNameToTheme.Values.SelectMany(theme => theme.LoadedColors.Keys).Distinct().ToList();
     }
 
     public static Theme GetTheme(string themeName)
@@ -171,7 +182,7 @@ public class ThemeManager : MonoBehaviour
 
         if (logInfo)
         {
-            string themeNamesCsv = string.Join(", ", GetThemeNames());
+            string themeNamesCsv = string.Join(", ", themeNameToTheme.Keys.ToList());
             Debug.Log($"Loaded themes: [{themeNamesCsv}]");
         }
     }

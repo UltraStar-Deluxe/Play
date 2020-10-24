@@ -82,7 +82,7 @@ public class ThemeManagerInspector : EditorBase
 
     private void UpdateQuickThemeSelect()
     {
-        List<string> loadedThemeNames = ThemeManager.GetThemeNames();
+        List<string> loadedThemeNames = ThemeManager.GetThemes().Select(theme => theme.Name).ToList();
         quickThemeSelectItems = loadedThemeNames.ToArray();
         if (ThemeManager.CurrentTheme != null)
         {

@@ -55,7 +55,10 @@ public static class CreateConstantsMenuItems
         string subClassName = "Color";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
-        List<string> colors = ThemeManager.GetAvailableColors();
+        List<string> colors = ThemeManager.GetThemes()
+            .SelectMany(theme => theme.LoadedColors.Keys)
+            .Distinct()
+            .ToList();
         if (colors.IsNullOrEmpty())
         {
             Debug.LogWarning("No theme colors found.");
