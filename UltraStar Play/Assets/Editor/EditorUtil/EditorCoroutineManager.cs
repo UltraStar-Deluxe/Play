@@ -9,7 +9,7 @@ using System.Collections.Generic;
  * This works also in Edit Mode.
  */
 [InitializeOnLoad]
-public class EditorCoroutineManager
+public static class EditorCoroutineManager
 {
     private static CoroutineManager coroutineManager;
 

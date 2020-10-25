@@ -131,13 +131,13 @@ public class I18NManager : MonoBehaviour, INeedInjection
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
         string fallbackPropertiesFileContent = File.ReadAllText(fallbackPropertiesFilePath);
-        LoadPropertiesFromText(fallbackPropertiesFileContent, fallbackMessages, fallbackPropertiesFilePath);
+        LoadPropertiesFromText(fallbackPropertiesFileContent, fallbackMessages);
 
         // Load the properties file of the current language
         string propertiesFileNameWithCountryCode = PropertiesFileName + GetCountryCodeSuffixForPropertiesFile(selectedLanguage);
         string propertiesFilePath = GetPropertiesFilePath(propertiesFileNameWithCountryCode);
         string propertiesFileContent = File.ReadAllText(propertiesFilePath);
-        LoadPropertiesFromText(propertiesFileContent, currentLanguageMessages, propertiesFilePath);
+        LoadPropertiesFromText(propertiesFileContent, currentLanguageMessages);
 
         if (logInfo)
         {
@@ -158,7 +158,7 @@ public class I18NManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary, string textSource)
+    private static void LoadPropertiesFromText(string text, Dictionary<string, string> targetDictionary)
     {
         targetDictionary.Clear();
         PropertiesFileParser.ParseText(text).ForEach(entry => targetDictionary.Add(entry.Key, entry.Value));
