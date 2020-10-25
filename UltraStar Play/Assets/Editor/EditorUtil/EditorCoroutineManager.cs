@@ -31,7 +31,7 @@ public static class EditorCoroutineManager
 
         if (coroutineManager.CoroutinesInProgress.Count <= 0)
         {
-            //Debug.Log("No coroutines");
+            // No coroutines
             return;
         }
 
