@@ -54,13 +54,10 @@ public class ThemeManager : MonoBehaviour
     [ReadOnly]
     public string currentThemeName;
 
-    private CoroutineManager coroutineManager;
-
     private void Awake()
     {
         if (themeNameToTheme.IsNullOrEmpty())
         {
-            coroutineManager = CoroutineManager.Instance;
             ReloadThemes();
         }
     }
@@ -74,11 +71,6 @@ public class ThemeManager : MonoBehaviour
 
     private void Update()
     {
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-
         if (themeNameToTheme == null)
         {
             ReloadThemes();
