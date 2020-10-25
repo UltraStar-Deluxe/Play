@@ -8,7 +8,7 @@ using UnityEngine;
 
 public static class CreateConstantsMenuItems
 {
-    public static HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
+    private static HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
         "static", "void", "readonly", "const",
         "using", "class", "enum", "interface", "new", "this", "override", "virtual",
         "string", "int", "float", "double", "short", "long", "bool",
@@ -24,14 +24,14 @@ public static class CreateConstantsMenuItems
     {
         EditorUtils.RefreshAssetsInStreamingAssetsFolder();
 
-        CreateI18nConstants();
+        CreateI18NConstants();
         CreateConstantsForColors();
         CreateConstantsForImageFiles();
         CreateConstantsForAudioFiles();
     }
 
     [MenuItem("R Class/Create C# constants for I18N properties")]
-    public static void CreateI18nConstants()
+    public static void CreateI18NConstants()
     {
         string subClassName = "String";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
@@ -123,9 +123,9 @@ public static class CreateConstantsMenuItems
         string themesFolderPrefix = "Assets/StreamingAssets/" + ThemeManager.themesFolderName + "/";
 
         string result = file.Replace("\\", "/");
-        int indexOfThemesFolder = result.IndexOf(themesFolderPrefix);
+        int indexOfThemesFolder = result.IndexOf(themesFolderPrefix, StringComparison.CurrentCulture);
         result = result.Substring(indexOfThemesFolder + themesFolderPrefix.Length);
-        int indexOfNextFolder = result.IndexOf("/");
+        int indexOfNextFolder = result.IndexOf("/", StringComparison.CurrentCulture);
         result = result.Substring(indexOfNextFolder + 1);
 
         return result;

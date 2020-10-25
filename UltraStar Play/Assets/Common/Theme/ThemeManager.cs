@@ -28,7 +28,7 @@ public class ThemeManager : MonoBehaviour
     // Field is static to be persisted across scenes.
     private static Dictionary<string, Theme> themeNameToTheme;
 
-    public static Theme currentTheme;
+    private static Theme currentTheme;
     public static Theme CurrentTheme
     {
         get

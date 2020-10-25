@@ -16,17 +16,17 @@ public static class AndroidStreamingAssets
     private const string STREAMING_ASSETS_INTERNAL_DATA_DIR = "assets/bin/";
     private const string META_EXTENSION = ".meta";
 
-    private static string m_path = null;
+    private static string path;
     public static string Path
     {
         get
         {
-            if (m_path == null)
+            if (path == null)
             {
                 Extract();
             }
 
-            return m_path;
+            return path;
         }
     }
 
@@ -94,9 +94,9 @@ public static class AndroidStreamingAssets
             }
         }
 
-        m_path = result;
+        path = result;
 #else
-        m_path = Application.streamingAssetsPath;
+        path = Application.streamingAssetsPath;
 #endif
     }
 }
