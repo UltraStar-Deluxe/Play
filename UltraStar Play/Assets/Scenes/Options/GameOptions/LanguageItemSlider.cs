@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using UniRx;
+using UniInject;
 
-public class LanguageItemSlider : TextItemSlider<SystemLanguage>
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
 {
     protected override void Start()
     {
@@ -9,7 +13,11 @@ public class LanguageItemSlider : TextItemSlider<SystemLanguage>
         Items = EnumUtils.GetValuesAsList<SystemLanguage>();
         SystemLanguage currentLanguage = SettingsManager.Instance.Settings.GameSettings.language;
         Selection.Value = currentLanguage;
-        Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GameSettings.language = newValue);
+        Selection.Subscribe(newValue =>
+        {
+            SettingsManager.Instance.Settings.GameSettings.language = newValue;
+            I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
+        });
     }
 
     protected override string GetDisplayString(SystemLanguage item)

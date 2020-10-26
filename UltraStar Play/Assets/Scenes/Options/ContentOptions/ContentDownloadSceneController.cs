@@ -10,6 +10,7 @@ using System.IO;
 using UnityEngine.Networking;
 using ICSharpCode.SharpZipLib.Tar;
 using static ThreadPool;
+using System.Text;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -230,7 +231,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
         {
             using (Stream tarStream = File.OpenRead(tarPath))
             {
-                using (TarArchive archive = TarArchive.CreateInputTarArchive(tarStream))
+                using (TarArchive archive = TarArchive.CreateInputTarArchive(tarStream, Encoding.UTF8))
                 {
                     try
                     {

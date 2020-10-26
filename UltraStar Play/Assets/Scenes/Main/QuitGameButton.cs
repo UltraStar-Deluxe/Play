@@ -13,12 +13,17 @@ using UniRx;
 [RequireComponent(typeof(Button))]
 public class QuitGameButton : MonoBehaviour, INeedInjection
 {
+    [Inject]
+    private UiManager uiManager;
+
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
             .Subscribe(_ =>
             {
-                QuestionDialog quitDialog = UiManager.Instance.CreateQuestionDialog("Quit?", "Really quit UltraStar Play?");
+                QuestionDialog quitDialog = uiManager.CreateQuestionDialog(
+                    I18NManager.GetTranslation(R.String.mainScene_quitDialog_title),
+                    I18NManager.GetTranslation(R.String.mainScene_quitDialog_message));
                 quitDialog.yesAction = ApplicationUtils.QuitOrStopPlayMode;
             });
     }

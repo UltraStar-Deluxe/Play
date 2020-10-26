@@ -161,7 +161,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
             {
                 // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-                AudioClip audioClip = AudioManager.Instance.GetAudioClip(SongMetaUtils.GetAbsoluteSongFilePath(SongMeta), false);
+                AudioClip audioClip = AudioManager.Instance.LoadAudioClip(SongMetaUtils.GetAbsoluteSongAudioPath(SongMeta), false);
                 audioWaveFormInitialized = true;
                 audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
             }
@@ -195,7 +195,14 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     private void CreateVoiceToColorMap()
     {
-        List<Color> colors = new List<Color> { Colors.beige, Colors.lightSeaGreen };
+        List<Color32> colors = new List<Color32> {
+            ThemeManager.GetColor(R.Color.deviceColor_1),
+            ThemeManager.GetColor(R.Color.deviceColor_2),
+            ThemeManager.GetColor(R.Color.deviceColor_3),
+            ThemeManager.GetColor(R.Color.deviceColor_4),
+            ThemeManager.GetColor(R.Color.deviceColor_5),
+            ThemeManager.GetColor(R.Color.deviceColor_6)
+        };
         int index = 0;
         foreach (Voice v in SongMeta.GetVoices())
         {

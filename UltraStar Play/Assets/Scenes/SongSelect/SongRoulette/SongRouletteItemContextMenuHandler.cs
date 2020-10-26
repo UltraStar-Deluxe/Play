@@ -20,12 +20,17 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
+        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_reloadSong),
+            () => SongMeta.Reload());
+
         if (PlatformUtils.IsStandalone)
         {
-            contextMenu.AddItem("Open song folder", () => SongMetaUtils.OpenDirectory(SongMeta));
-            contextMenu.AddSeparator();
+            contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongFolder),
+                () => SongMetaUtils.OpenDirectory(SongMeta));
             AddPlaylistContextMenuItems(contextMenu);
         }
+
+        contextMenu.AddSeparator();
     }
 
     private void AddPlaylistContextMenuItems(ContextMenu contextMenu)
@@ -33,13 +38,16 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
         foreach (UltraStarPlaylist playlist in playlistManager.Playlists)
         {
             string playlistName = playlistManager.GetPlaylistName(playlist);
+            Dictionary<string, string> placeholders = new Dictionary<string, string> { ["playlist"] = playlistName };
             if (playlist.HasSongEntry(SongMeta.Artist, SongMeta.Title))
             {
-                contextMenu.AddItem($"Remove from '{playlistName}'", () => playlistManager.RemoveSongFromPlaylist(playlist, SongMeta));
+                contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_removeFromPlaylist, placeholders),
+                    () => playlistManager.RemoveSongFromPlaylist(playlist, SongMeta));
             }
             else
             {
-                contextMenu.AddItem($"Add to '{playlistName}'", () => playlistManager.AddSongToPlaylist(playlist, SongMeta));
+                contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_addToPlaylist, placeholders),
+                    () => playlistManager.AddSongToPlaylist(playlist, SongMeta));
             }
         }
     }

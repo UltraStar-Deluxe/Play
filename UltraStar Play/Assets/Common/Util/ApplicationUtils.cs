@@ -11,6 +11,15 @@ public static class ApplicationUtils
 #endif
     }
 
+    public static string GetStreamingAssetsPath(string pathInStreamingAssetsFolder)
+    {
+#if UNITY_ANDROID
+        return AndroidStreamingAssets.Path + "/" + pathInStreamingAssetsFolder;
+#else
+        return Application.streamingAssetsPath + "/" + pathInStreamingAssetsFolder;
+#endif
+    }
+
     // This method uses Screen.currentResolution,
     // which may only be called from an Awake() or Start() method on the main thread.
     public static ScreenResolution GetCurrentAppResolution()

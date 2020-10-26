@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
@@ -11,13 +10,12 @@ public class ThemeManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        themes.Clear();
+        themeNameToTheme?.Clear();
     }
 
-    // Themes is static to be persisted across scenes.
-    private static readonly List<Theme> themes = new List<Theme>();
-
-    public string currentThemeName;
+    public static readonly string themesFolderName = "Themes";
+    public static readonly string themesFileName = "Themes.xml";
+    public static readonly string colorsFileName = "Colors.properties";
 
     public static ThemeManager Instance
     {
@@ -27,57 +25,128 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    void OnEnable()
+    // Field is static to be persisted across scenes.
+    private static Dictionary<string, Theme> themeNameToTheme;
+
+    private static Theme currentTheme;
+    public static Theme CurrentTheme
     {
-        if (themes.IsNullOrEmpty())
+        get
+        {
+            return currentTheme;
+        }
+        set
+        {
+            if (value != null)
+            {
+                currentTheme = value;
+                ThemeManager.Instance.currentThemeName = currentTheme.Name;
+            }
+            else
+            {
+                Debug.LogError("Trying to set CurrentTheme to null");
+            }
+        }
+    }
+
+    public bool logInfo;
+
+    [ReadOnly]
+    public string currentThemeName;
+
+    private void Awake()
+    {
+        if (themeNameToTheme.IsNullOrEmpty())
         {
             ReloadThemes();
         }
     }
 
+#if UNITY_EDITOR
+    private void Start()
+    {
+        // Awake is not called normally after re-compile.
+        Awake();
+    }
+
+    private void Update()
+    {
+        if (themeNameToTheme == null)
+        {
+            ReloadThemes();
+        }
+    }
+#endif
+
     public void UpdateThemeResources()
     {
-        ReloadThemes();
-
-        if (GetCurrentTheme() == null)
+        if (CurrentTheme == null)
         {
             return;
         }
 
-        Themeable[] themables = FindObjectsOfType<Themeable>();
+        Themeable[] themables = FindObjectsOfType<Themeable>(true);
         Debug.Log($"Updating {themables.Length} Themeable instances in scene");
         foreach (Themeable themeable in themables)
         {
-            themeable.ReloadResources(GetCurrentTheme());
+            themeable.ReloadResources(CurrentTheme);
         }
     }
 
-    public List<string> GetLoadedThemeNames()
+    /**
+     * Loads an AudioClip from the current theme.
+     * The path is relative to the theme folder.
+     */
+    public static AudioClip GetAudioClip(string path)
     {
-        return themes.Select(it => it.Name).ToList();
+        return CurrentTheme.LoadAudioClip(path);
     }
 
-    public Theme GetCurrentTheme()
+    /**
+     * Loads a Sprite from the current theme.
+     * The path is relative to the theme folder.
+     */
+    public static Sprite GetSprite(string path)
     {
-        Theme currentTheme = GetTheme(currentThemeName);
-        if (currentTheme == null)
+        return CurrentTheme.LoadSprite(path);
+    }
+
+    /**
+    * Loads a Color from the current theme.
+    */
+    public static Color32 GetColor(string colorName)
+    {
+        if (CurrentTheme.TryFindColor(colorName, out Color32 result))
         {
-            throw new Exception($"Current theme {currentThemeName} does not exist: ");
+            return result;
         }
-        return currentTheme;
+        Debug.LogWarning("Color not found: " + colorName);
+        return Colors.white;
     }
 
-    public Theme GetTheme(string themeName)
+    public static List<Theme> GetThemes()
     {
-        return themes.Where(it => it.Name == themeName).FirstOrDefault();
+        return themeNameToTheme.Values.ToList();
+    }
+
+    public static Theme GetTheme(string themeName)
+    {
+        themeNameToTheme.TryGetValue(themeName, out Theme resultTheme);
+        return resultTheme;
     }
 
     public void ReloadThemes()
     {
+        themeNameToTheme = new Dictionary<string, Theme>();
+        string themesFilePath = ApplicationUtils.GetStreamingAssetsPath(themesFolderName + "/" + themesFileName);
+        string themesFileContent = File.ReadAllText(themesFilePath);
+        ReloadThemesFromXml(themesFileContent);
+    }
+
+    private void ReloadThemesFromXml(string xml)
+    {
         Dictionary<string, string> themeNameToParentThemeNameMap = new Dictionary<string, string>();
 
-        TextAsset themesTextAsset = Resources.Load<TextAsset>("themes");
-        string xml = themesTextAsset.text;
         XElement xthemes = XElement.Parse(xml);
         foreach (XElement xtheme in xthemes.Elements("theme"))
         {
@@ -86,14 +155,28 @@ public class ThemeManager : MonoBehaviour
             themeNameToParentThemeNameMap.Add(name, parentName);
         }
 
-        themes.Clear();
+        themeNameToTheme.Clear();
         foreach (string themeName in themeNameToParentThemeNameMap.Keys)
         {
             GetOrCreateAndAddTheme(themeName, themeNameToParentThemeNameMap);
         }
 
-        string themeNamesCsv = string.Join(", ", themes.Select(it => it.ToString()));
-        Debug.Log("Loaded themes: " + themeNamesCsv);
+        // Use theme from settings
+        string themeNameFromSettings = SettingsManager.Instance.Settings.GraphicSettings.themeName;
+        if (themeNameToTheme.TryGetValue(themeNameFromSettings, out Theme themeFromSettings))
+        {
+            CurrentTheme = themeFromSettings;
+        }
+        else
+        {
+            CurrentTheme = themeNameToTheme.Values.FirstOrDefault();
+        }
+
+        if (logInfo)
+        {
+            string themeNamesCsv = string.Join(", ", themeNameToTheme.Keys.ToList());
+            Debug.Log($"Loaded themes: [{themeNamesCsv}]");
+        }
     }
 
     private Theme GetOrCreateAndAddTheme(string themeName, Dictionary<string, string> themeNameToParentThemeNameMap)
@@ -117,7 +200,7 @@ public class ThemeManager : MonoBehaviour
             Theme parentTheme = GetOrCreateAndAddTheme(parentThemeName, themeNameToParentThemeNameMap);
             newTheme = new Theme(themeName, parentTheme);
         }
-        themes.Add(newTheme);
+        themeNameToTheme.Add(newTheme.Name, newTheme);
         return newTheme;
     }
 }

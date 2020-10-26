@@ -1,47 +1,25 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 abstract public class Themeable : MonoBehaviour
 {
     abstract public void ReloadResources(Theme theme);
 
-    /// Looks for the color with the given name in the current theme and all parent themes.
-    /// Returns true iff the color was found.
-    protected bool TryLoadColorFromTheme(Theme theme, string colorsResource, string colorName, out Color resultColor)
+    private bool hasLoadedTheme;
+
+    virtual protected void Start()
     {
-        TextAsset textAsset = LoadResourceFromTheme<TextAsset>(theme, colorsResource);
-        if (textAsset != null)
+        // In the normal game, the themes are loaded in during the LoadingScene,
+        // such that they are always available later.
+        if (!hasLoadedTheme
+            && Application.isPlaying)
         {
-            XElement xcolors = XElement.Parse(textAsset.text);
-            foreach (XElement xcolor in xcolors.Elements("color"))
-            {
-                string loadedColorName = xcolor.Attribute("name").String();
-                if (loadedColorName == colorName)
-                {
-                    string hexColorValue = xcolor.Value;
-                    return ColorUtility.TryParseHtmlString("#" + hexColorValue, out resultColor);
-                }
-            }
+            hasLoadedTheme = true;
+            ReloadResources(ThemeManager.CurrentTheme);
         }
-        resultColor = Color.black;
-        return false;
     }
 
-    /// Looks for the resource with the given name in the specified theme and all parent themes.
-    /// Returns null if the resource was not found. Otherwise the loaded resource is returned.
-    protected T LoadResourceFromTheme<T>(Theme theme, string resourceName) where T : UnityEngine.Object
-    {
-        if (theme == null)
-        {
-            return null;
-        }
-
-        string path = theme.Name + "/" + resourceName;
-        T asset = Resources.Load<T>(path);
-        if (asset != null)
-        {
-            return asset;
-        }
-        return LoadResourceFromTheme<T>(theme.ParentTheme, resourceName);
-    }
+#if UNITY_EDITOR
+    abstract public List<UnityEngine.Object> GetAffectedObjects();
+#endif
 }

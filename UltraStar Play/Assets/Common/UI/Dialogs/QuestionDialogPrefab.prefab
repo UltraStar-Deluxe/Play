@@ -131,7 +131,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleUiText: {fileID: 8130659233654285970}
   messageUiText: {fileID: 4537085547811317146}
-  background: {fileID: 0}
   yesButton: {fileID: 4730993027468983253}
   noButton: {fileID: 8784962495780917531}
   noOnEscape: 1
@@ -215,6 +214,32 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: The message
+--- !u!114 &6047749109231355786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4730993027650904418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: yes
+--- !u!114 &6001621973145643354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8784962495627299756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: no
 --- !u!1 &8848739866060714161
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,7 +504,7 @@ PrefabInstance:
     - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_Text
-      value: Yes
+      value: Ja
       objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -512,6 +537,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4730993027650904418 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 485085339775425575}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2091745400158636323
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -822,7 +853,7 @@ PrefabInstance:
     - target: {fileID: 5124115183637839227, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
       propertyPath: m_Text
-      value: No
+      value: Nein
       objectReference: {fileID: 0}
     - target: {fileID: 7390061747104496988, guid: be0e3235464c346458a464603cce47c0,
         type: 3}
@@ -855,3 +886,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8784962495627299756 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5124115183637839173, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 4537085546187831017}
+  m_PrefabAsset: {fileID: 0}

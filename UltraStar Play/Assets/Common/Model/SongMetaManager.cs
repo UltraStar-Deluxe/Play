@@ -160,9 +160,9 @@ public class SongMetaManager : MonoBehaviour
             Debug.LogWarning("Unsupported audio format: " + songMeta.Mp3);
             return false;
         }
-        else if (!File.Exists(SongMetaUtils.GetAbsoluteSongFilePath(songMeta)))
+        else if (!File.Exists(SongMetaUtils.GetAbsoluteSongAudioPath(songMeta)))
         {
-            Debug.LogWarning("Audio file does not exist: " + SongMetaUtils.GetAbsoluteSongFilePath(songMeta));
+            Debug.LogWarning("Audio file does not exist: " + SongMetaUtils.GetAbsoluteSongAudioPath(songMeta));
             return false;
         }
 

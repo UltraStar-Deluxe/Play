@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(Themeable), true)]
@@ -11,11 +9,11 @@ public class ThemeableInspector : EditorBase
     {
         DrawDefaultInspector();
 
-        Themeable myScript = target as Themeable;
+        Themeable themeable = target as Themeable;
         if (GUILayout.Button("Update Resources"))
         {
-            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-            myScript.ReloadResources(currentTheme);
+            themeable.ReloadResources(ThemeManager.CurrentTheme);
+            EditorUtility.SetDirty(themeable.gameObject);
         }
     }
 }

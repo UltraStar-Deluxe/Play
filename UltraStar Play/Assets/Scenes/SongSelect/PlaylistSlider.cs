@@ -37,7 +37,7 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist)
         {
-            return "All Songs";
+            return I18NManager.GetTranslation(R.String.filter_allSongs);
         }
         else
         {
