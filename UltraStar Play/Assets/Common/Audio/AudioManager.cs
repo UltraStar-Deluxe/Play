@@ -35,6 +35,8 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private CoroutineManager coroutineManager;
+
     public static void ToggleMuteAudio()
     {
         if (volumeBeforeMute >= 0)
@@ -52,9 +54,10 @@ public class AudioManager : MonoBehaviour
     }
 
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
-    public AudioClip GetAudioClip(string path, bool streamAudio = true)
+    public AudioClip LoadAudioClip(string path, bool streamAudio = true)
     {
-        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip))
+        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip)
+            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
             {
@@ -69,6 +72,28 @@ public class AudioManager : MonoBehaviour
         return LoadAndCacheAudioClip(path, streamAudio);
     }
 
+    public void LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
+    {
+        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
+            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
+        {
+            onSuccess(cachedAudioClip.FullAudioClip);
+            return;
+        }
+
+        Action<AudioClip> doCacheAudioClipThenOnSuccess = (loadedAudioClip) =>
+        {
+            AddAudioClipToCache(uri, loadedAudioClip, true);
+            onSuccess(loadedAudioClip);
+        };
+
+        if (coroutineManager == null)
+        {
+            coroutineManager = CoroutineManager.Instance;
+        }
+        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, doCacheAudioClipThenOnSuccess, onFailure));
+    }
+
     private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)
     {
         if (!File.Exists(path))
@@ -80,7 +105,7 @@ public class AudioManager : MonoBehaviour
         AudioClip audioClip = AudioUtils.GetAudioClipUncached(path, streamAudio);
         if (audioClip == null)
         {
-            Debug.LogError("Could not load not AudioClip from path: " + path);
+            Debug.LogError("Could not load AudioClip from path: " + path);
             return null;
         }
 

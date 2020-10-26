@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5124115183525111792}
   - component: {fileID: 5124115183525111795}
   - component: {fileID: 5124115183525111794}
+  - component: {fileID: 3013825688176723293}
   m_Layer: 5
   m_Name: MenuButton
   m_TagString: Untagged
@@ -62,11 +63,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 55f3e2c7b25af03468f72991504fb124, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
@@ -120,8 +121,25 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+--- !u!114 &3013825688176723293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5124115183525111804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c21c3db8dc64c54488ccd605f1b68030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalColorName: button_normalColor
+  highlightedColorName: button_highlightedColor
+  pressedColorName: button_pressedColor
+  selectedColorName: button_selectedColor
+  disabledColorName: button_disabledColor
+  target: {fileID: 0}
+  fadeDuration: 0.1
 --- !u!1 &5124115183637839173
 GameObject:
   m_ObjectHideFlags: 0
@@ -182,17 +200,17 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 25
     m_Alignment: 4
     m_AlignByGeometry: 0

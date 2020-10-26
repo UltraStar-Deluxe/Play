@@ -37,8 +37,7 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
 
     private void CreateListEntry(PlayerProfile playerProfile)
     {
-        SongSelectPlayerProfileListEntry listEntry = Instantiate(listEntryPrefab);
-        listEntry.transform.SetParent(scrollViewContent.transform);
+        SongSelectPlayerProfileListEntry listEntry = Instantiate(listEntryPrefab, scrollViewContent.transform);
         listEntry.Init(playerProfile);
 
         listEntry.SetSelected(playerProfile.IsSelected);

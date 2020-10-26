@@ -2,44 +2,55 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 [ExecuteInEditMode]
 public class ThemeableAudio : Themeable
 {
-    [ReadOnly]
+    [Delayed]
     public string audioPath;
-    public EAudioResource audioResource = EAudioResource.NONE;
-    public AudioSource target;
 
-#if UNITY_EDITOR
-    private EAudioResource lastAudioResource = EAudioResource.NONE;
-#endif
+    private AudioSource target;
 
-    void OnEnable()
+    private void Awake()
     {
-        if (target == null)
-        {
-            target = GetComponent<AudioSource>();
-        }
+        target = GetComponent<AudioSource>();
     }
 
 #if UNITY_EDITOR
-    void Update()
+    private string lastAudioPath;
+
+    override protected void Start()
     {
-        if (audioResource != EAudioResource.NONE && lastAudioResource != audioResource)
+        target = GetComponent<AudioSource>();
+        base.Start();
+        lastAudioPath = audioPath;
+    }
+
+    private void Update()
+    {
+        if (lastAudioPath != audioPath)
         {
-            lastAudioResource = audioResource;
-            audioPath = audioResource.GetPath();
-            Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-            ReloadResources(currentTheme);
+            lastAudioPath = audioPath;
+            ReloadResources(ThemeManager.CurrentTheme);
         }
+    }
+
+    override public List<UnityEngine.Object> GetAffectedObjects()
+    {
+        return new List<UnityEngine.Object> { target };
     }
 #endif
 
     public override void ReloadResources(Theme theme)
     {
+        if (theme == null)
+        {
+            Debug.LogError("Theme is null", gameObject);
+            return;
+        }
         if (string.IsNullOrEmpty(audioPath))
         {
-            Debug.LogWarning($"Missing audio file name", gameObject);
+            Debug.LogWarning($"Missing audio file path", gameObject);
             return;
         }
         if (target == null)
@@ -48,14 +59,14 @@ public class ThemeableAudio : Themeable
             return;
         }
 
-        AudioClip audioClip = LoadResourceFromTheme<AudioClip>(theme, audioPath);
-        if (audioClip == null)
+        AudioClip newAudioClip = theme.LoadAudioClip(audioPath);
+        if (newAudioClip == null)
         {
-            Debug.LogError($"Could not load audio file {audioPath}", gameObject);
+            Debug.LogWarning($"Could not load file '{audioPath}' from theme '{theme.Name}'");
         }
         else
         {
-            target.clip = audioClip;
+            target.clip = newAudioClip;
         }
     }
 }

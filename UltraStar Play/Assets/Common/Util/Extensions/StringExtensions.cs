@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 public static class StringExtensions
@@ -48,5 +49,11 @@ public static class StringExtensions
     public static bool EndsWith(this string txt, char c)
     {
         return txt != null && txt.Length > 0 && txt[txt.Length - 1] == c;
+    }
+
+    public static void AppendLine(this StringBuilder sb, string line)
+    {
+        sb.Append(line);
+        sb.Append("\n");
     }
 }

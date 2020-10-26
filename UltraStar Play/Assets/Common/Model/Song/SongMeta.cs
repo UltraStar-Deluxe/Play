@@ -12,7 +12,7 @@ public class SongMeta
     public string Filename { get; set; }
     public string SongHash { get; private set; }
 
-    // required fields
+    // required 
     public string Artist { get; set; }
     public float Bpm { get; set; }
     public string Mp3 { get; set; }
@@ -37,6 +37,7 @@ public class SongMeta
             return voiceNames;
         }
     }
+
     public Encoding Encoding { get; private set; }
 
     // optional fields
@@ -138,5 +139,37 @@ public class SongMeta
     public void AddUnkownHeaderEntry(string key, string value)
     {
         unkownHeaderEntries.Add(key, value);
+    }
+
+    public void Reload()
+    {
+        SongMeta other = SongMetaBuilder.ParseFile(SongMetaUtils.GetAbsoluteSongMetaPath(this));
+
+        // Copy values
+        Encoding = other.Encoding;
+        SongHash = other.SongHash;
+
+        voiceNames = other.voiceNames;
+        voices = new List<Voice>();
+
+        Artist = other.Artist;
+        Title = other.Title;
+        Bpm = other.Bpm;
+        Mp3 = other.Mp3;
+
+        Background = other.Background;
+        Cover = other.Cover;
+        Edition = other.Edition;
+        End = other.End;
+        Gap = other.Gap;
+        Genre = other.Genre;
+        Language = other.Language;
+        Relative = other.Relative;
+        Start = other.Start;
+        PreviewStart = other.PreviewStart;
+        PreviewEnd = other.PreviewEnd;
+        Video = other.Video;
+        VideoGap = other.VideoGap;
+        Year = other.Year;
     }
 }

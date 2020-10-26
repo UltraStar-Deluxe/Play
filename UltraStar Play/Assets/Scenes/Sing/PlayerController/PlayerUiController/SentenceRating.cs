@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class SentenceRating
 {
-    public static readonly SentenceRating Perfect = new SentenceRating(0.95, I18NKeys.rating_sentence_perfect, "3AFF4E");
-    public static readonly SentenceRating Cool = new SentenceRating(0.8, I18NKeys.rating_sentence_cool, "7FE82A");
-    public static readonly SentenceRating Great = new SentenceRating(0.7, I18NKeys.rating_sentence_great, "7FE82A");
-    public static readonly SentenceRating Good = new SentenceRating(0.6, I18NKeys.rating_sentence_good, "E4FF1F");
-    public static readonly SentenceRating NotBad = new SentenceRating(0.5, I18NKeys.rating_sentence_notbad, "E4FF1F");
-    public static readonly SentenceRating Bad = new SentenceRating(0.3, I18NKeys.rating_sentence_bad, "FF9C4F");
-    public static readonly SentenceRating Poor = new SentenceRating(0.2, I18NKeys.rating_sentence_poor, "E848E6");
-    public static readonly SentenceRating Awful = new SentenceRating(0, I18NKeys.rating_sentence_awful, "764FFF");
+    public static readonly SentenceRating Perfect = new SentenceRating(0.95, R.String.rating_sentence_perfect, R.Color.rating_sentence_perfect);
+    public static readonly SentenceRating Cool = new SentenceRating(0.8, R.String.rating_sentence_cool, R.Color.rating_sentence_cool);
+    public static readonly SentenceRating Great = new SentenceRating(0.7, R.String.rating_sentence_great, R.Color.rating_sentence_great);
+    public static readonly SentenceRating Good = new SentenceRating(0.6, R.String.rating_sentence_good, R.Color.rating_sentence_good);
+    public static readonly SentenceRating NotBad = new SentenceRating(0.5, R.String.rating_sentence_notBad, R.Color.rating_sentence_notBad);
+    public static readonly SentenceRating Bad = new SentenceRating(0.3, R.String.rating_sentence_bad, R.Color.rating_sentence_bad);
+    public static readonly SentenceRating Poor = new SentenceRating(0.2, R.String.rating_sentence_poor, R.Color.rating_sentence_poor);
+    public static readonly SentenceRating Awful = new SentenceRating(0, R.String.rating_sentence_awful, R.Color.rating_sentence_awful);
 
     private readonly string i18nCode;
     public double PercentageThreshold { get; private set; }
@@ -19,7 +19,7 @@ public class SentenceRating
     {
         get
         {
-            return I18NManager.Instance.GetTranslation(i18nCode);
+            return I18NManager.GetTranslation(i18nCode);
         }
     }
 
@@ -50,15 +50,6 @@ public class SentenceRating
     {
         this.PercentageThreshold = percentThreshold;
         this.i18nCode = i18nCode;
-        if (ColorUtility.TryParseHtmlString("#" + hexBackgroundColor, out Color backgroundColor))
-        {
-            backgroundColor.a = 0.5f;
-            BackgroundColor = backgroundColor;
-        }
-        else
-        {
-            Debug.LogError("Parsing hex color failed: " + hexBackgroundColor);
-        }
+        BackgroundColor = ThemeManager.GetColor(hexBackgroundColor);
     }
-
 }

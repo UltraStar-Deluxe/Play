@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Linq;
 
 [CustomEditor(typeof(ThemeManager))]
 public class ThemeManagerInspector : EditorBase
 {
-
     int quickThemeSelectIndex;
     string[] quickThemeSelectItems;
 
@@ -15,56 +15,78 @@ public class ThemeManagerInspector : EditorBase
     {
         DrawDefaultInspector();
 
-        if (quickThemeSelectItems != null && quickThemeSelectItems.Length > 0)
+        if (quickThemeSelectItems.IsNullOrEmpty()
+            || (ThemeManager.CurrentTheme != null
+                && ThemeManager.CurrentTheme.Name != ThemeManager.Instance.currentThemeName))
+        {
+            UpdateQuickThemeSelect();
+        }
+
+        if (!quickThemeSelectItems.IsNullOrEmpty())
         {
             int newQuickThemeSelectIndex = EditorGUILayout.Popup("Quick Theme Select", quickThemeSelectIndex, quickThemeSelectItems);
             if (newQuickThemeSelectIndex != quickThemeSelectIndex)
             {
                 quickThemeSelectIndex = newQuickThemeSelectIndex;
-                ThemeManager.Instance.currentThemeName = quickThemeSelectItems[quickThemeSelectIndex];
+
+                Undo.RecordObject(ThemeManager.Instance, $"Set currentThemeName");
+                ThemeManager.CurrentTheme = ThemeManager.GetTheme(quickThemeSelectItems[quickThemeSelectIndex]);
                 UpdateThemeResources();
             }
         }
 
-        if (GUILayout.Button("Update Theme Resources"))
+        if (GUILayout.Button("Update Theme Components in Scene"))
         {
             UpdateThemeResources();
         }
 
-        if (GUILayout.Button("Refresh Resources Folder"))
+        if (GUILayout.Button("Reload Themes"))
         {
-            RefreshAssetsInResourcesFolder();
+            ThemeManager.Instance.ReloadThemes();
         }
     }
 
     private void UpdateThemeResources()
     {
-        // Update the themes
-        ThemeManager.Instance.UpdateThemeResources();
-        UpdateQuickThemeSelect();
+        if (ThemeManager.CurrentTheme == null)
+        {
+            Debug.LogError("CurrentTheme is null");
+            return;
+        }
 
-        // Make Themeable instances dirty, such they will be refreshed in the Unity Editor.
+        // Add Undo entry for Themeable changes
         Themeable[] themeables = FindObjectsOfType<Themeable>();
         foreach (Themeable themeable in themeables)
         {
-            EditorUtility.SetDirty(themeable.gameObject);
+            RegisterUndo(themeable);
         }
+
+        // Update the themes
+        ThemeManager.Instance.UpdateThemeResources();
+        UpdateQuickThemeSelect();
     }
 
-    private void RefreshAssetsInResourcesFolder()
+    private void RegisterUndo(Themeable themeable)
     {
-        // Update Unity's version of files in the Resources folder
-        AssetDatabase.ImportAsset("Assets/Resources", ImportAssetOptions.ImportRecursive);
+        themeable.GetAffectedObjects().Where(it => it != null).ForEach(affectedObject =>
+        {
+            Undo.RecordObject(affectedObject, $"Apply theme '{ThemeManager.CurrentTheme.Name}'");
+            // For some reason, Undo.RecordObject is not enough. Thus, also mark the affected object as dirty.
+            EditorUtility.SetDirty(affectedObject);
+            if (affectedObject is MonoBehaviour so)
+            {
+                EditorUtility.SetDirty(so.gameObject);
+            }
+        });
     }
 
     private void UpdateQuickThemeSelect()
     {
-        List<string> loadedThemeNames = ThemeManager.Instance.GetLoadedThemeNames();
+        List<string> loadedThemeNames = ThemeManager.GetThemes().Select(theme => theme.Name).ToList();
         quickThemeSelectItems = loadedThemeNames.ToArray();
-        Theme currentTheme = ThemeManager.Instance.GetCurrentTheme();
-        if (currentTheme != null)
+        if (ThemeManager.CurrentTheme != null)
         {
-            quickThemeSelectIndex = loadedThemeNames.IndexOf(currentTheme.Name);
+            quickThemeSelectIndex = loadedThemeNames.IndexOf(ThemeManager.CurrentTheme.Name);
         }
     }
 }

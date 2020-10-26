@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BoolItemSlider : TextItemSlider<bool>
 {
-    private readonly string i18nCodeTrue = I18NKeys.yes;
-    private readonly string i18nCodeFalse = I18NKeys.no;
+    private readonly string i18nCodeTrue = R.String.yes;
+    private readonly string i18nCodeFalse = R.String.no;
 
     protected override void Start()
     {
@@ -18,6 +18,6 @@ public class BoolItemSlider : TextItemSlider<bool>
 
     protected override string GetDisplayString(bool item)
     {
-        return I18NManager.Instance.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
+        return I18NManager.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
     }
 }

@@ -21,6 +21,7 @@ TagManager:
   - MidiManager
   - AudioManager
   - PlaylistManager
+  - CoroutineManager
   layers:
   - Default
   - TransparentFX

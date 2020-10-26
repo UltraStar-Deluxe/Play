@@ -5,16 +5,16 @@ public static class DifficultyExtensions
     public static string GetTranslatedName(this EDifficulty difficulty)
     {
         string i18nCode = difficulty.GetI18NCode();
-        return I18NManager.Instance.GetTranslation(i18nCode);
+        return I18NManager.GetTranslation(i18nCode);
     }
 
     private static string GetI18NCode(this EDifficulty difficulty)
     {
         switch (difficulty)
         {
-            case EDifficulty.Easy: return I18NKeys.difficulty_easy;
-            case EDifficulty.Medium: return I18NKeys.difficulty_medium;
-            case EDifficulty.Hard: return I18NKeys.difficulty_hard;
+            case EDifficulty.Easy: return R.String.difficulty_easy;
+            case EDifficulty.Medium: return R.String.difficulty_medium;
+            case EDifficulty.Hard: return R.String.difficulty_hard;
             default:
                 throw new UnityException("Unhandled difficulty: " + difficulty);
         }

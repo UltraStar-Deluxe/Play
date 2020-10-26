@@ -25,6 +25,6 @@ public class OrderSlider : TextItemSlider<ESongOrder>, INeedInjection
 
     protected override string GetDisplayString(ESongOrder value)
     {
-        return "Order: " + value;
+        return $"{I18NManager.GetTranslation(R.String.order)}: {I18NManager.GetTranslation("order_" + value.ToString())}";
     }
 }

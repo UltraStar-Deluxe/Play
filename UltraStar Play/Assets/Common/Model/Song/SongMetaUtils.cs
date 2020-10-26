@@ -16,9 +16,14 @@ public static class SongMetaUtils
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
     }
 
-    public static string GetAbsoluteSongFilePath(SongMeta songMeta)
+    public static string GetAbsoluteSongAudioPath(SongMeta songMeta)
     {
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
+    }
+
+    public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
+    {
+        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Filename;
     }
 
     public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)

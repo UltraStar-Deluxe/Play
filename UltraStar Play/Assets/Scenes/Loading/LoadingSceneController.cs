@@ -1,9 +1,9 @@
 ﻿using System.Collections;
+using UniInject;
 using UnityEngine;
 
 public class LoadingSceneController : MonoBehaviour
 {
-
     void Start()
     {
         // Keep mobile devices from turning off the screen while the game is running.
@@ -17,7 +17,13 @@ public class LoadingSceneController : MonoBehaviour
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         Debug.Log("started loading songs.");
 
-        // Loading completed, continue with next scene
+        // Extract StreamingAssets on Android from the JAR
+        AndroidStreamingAssets.Extract();
+
+        // Wait for Theme and I18N resources
+        I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
+        ThemeManager.Instance.ReloadThemes();
+
         FinishScene();
     }
 
@@ -34,6 +40,7 @@ public class LoadingSceneController : MonoBehaviour
 
     private void FinishScene()
     {
+        // Loading completed, continue with next scene
         SceneNavigator.Instance.LoadScene(EScene.MainScene);
     }
 
