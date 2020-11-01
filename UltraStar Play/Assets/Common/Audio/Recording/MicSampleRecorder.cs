@@ -30,6 +30,12 @@ public class MicSampleRecorder : MonoBehaviour
             {
                 Microphone.GetDeviceCaps(micProfile.Name, out int minFrequency, out int maxFrequency);
                 SampleRateHz = maxFrequency;
+                // a value of zero indicates, that the device supports any frequency
+                // https://docs.unity3d.com/ScriptReference/Microphone.GetDeviceCaps.html
+                if (SampleRateHz == 0)
+                {
+                    SampleRateHz = DefaultSampleRateHz;
+                }
                 MicSamples = new float[SampleRateHz];
                 if (restartPitchDetection)
                 {
