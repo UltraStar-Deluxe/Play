@@ -5663,11 +5663,11 @@ MonoBehaviour:
   anchorMin: {x: 0.00001046317, y: 0}
   anchorMax: {x: 0.13557066, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -108.05235, y: 0, z: 616.995}
+  localPosition: {x: -108.05234, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 62.525757, y: 34.30725, z: 0}
+  position: {x: 81.114624, y: 51.460815, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 33.890045, y: 18.540237}
+  size: {x: 33.890045, y: 21.43715}
 --- !u!114 &1616092804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6065,6 +6065,7 @@ GameObject:
   - component: {fileID: 1819432124}
   - component: {fileID: 1819432126}
   - component: {fileID: 1819432125}
+  - component: {fileID: 1819432127}
   m_Layer: 5
   m_Name: EmptySongListText
   m_TagString: Untagged
@@ -6124,12 +6125,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'No songs found.
-
-    Add a song folder in the settings
-
-    or add songs
-    to an existing song folder.'
+  m_Text: "Keine Songs gefunden.\nIn den Einstellungen kann ein Song-Archiv heruntergeladen
+    werden\noder ein existierender Order mit Songs hinzugef\xFCgt werden."
 --- !u!222 &1819432126
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6138,6 +6135,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1819432123}
   m_CullTransparentMesh: 0
+--- !u!114 &1819432127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819432123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_noSongsFound
 --- !u!1001 &1830530623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7769,9 +7779,9 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 108.049995, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 2897.2783, y: 34.239197, z: 0}
+  position: {x: 3758.631, y: 51.358765, z: 0}
   sizeDelta: {x: 0.000030517578, y: 0}
-  size: {x: 33.89006, y: 18.540237}
+  size: {x: 33.89006, y: 21.43715}
 --- !u!224 &6702459375939703474
 RectTransform:
   m_ObjectHideFlags: 0
