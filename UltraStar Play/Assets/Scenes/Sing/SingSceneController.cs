@@ -150,8 +150,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         // Associate LyricsDisplayer with one of the (duett) players
         if (!PlayerControllers.IsNullOrEmpty())
         {
-            LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-            lyricsDisplayer?.Init(PlayerControllers[0]);
+            FindObjectsOfType<LyricsDisplayer>().ForEach(it => InitLyricsDisplayer(it));
         }
 
         //Save information about the song being started into stats
@@ -164,6 +163,33 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
         // Rebuild whole UI
         LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+    }
+
+    private void InitLyricsDisplayer(LyricsDisplayer lyricsDisplayer)
+    {
+        bool needSecondLyricsDisplayer = SongMeta.GetVoices().Count > 1 && PlayerControllers.Count > 1;
+        if (lyricsDisplayer.isTop)
+        {
+            if (needSecondLyricsDisplayer)
+            {
+                lyricsDisplayer.Init(PlayerControllers[0]);
+            }
+            else
+            {
+                lyricsDisplayer.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            if (needSecondLyricsDisplayer)
+            {
+                lyricsDisplayer.Init(PlayerControllers[1]);
+            }
+            else
+            {
+                lyricsDisplayer.Init(PlayerControllers[0]);
+            }
+        }
     }
 
     private void InitTimeBar()
