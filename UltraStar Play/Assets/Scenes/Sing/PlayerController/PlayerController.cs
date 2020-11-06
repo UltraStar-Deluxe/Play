@@ -179,7 +179,7 @@ public class PlayerController : MonoBehaviour, INeedInjection
                     lineBreakIndex = -1;
                 }
             }
-            mutableSentence.AddNote(note);
+            mutableSentence.AddNote(note.Clone());
         }
 
         // Finish the last sentence
