@@ -128,7 +128,7 @@ public class SongMetaManager : MonoBehaviour
                 isSongScanFinished = true;
             }
             stopwatch.Stop();
-            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms.");
+            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {songMetas.Count} songs. Failed {SongsFailed} songs.");
             songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
         });
     }
@@ -188,7 +188,7 @@ public class SongMetaManager : MonoBehaviour
             }
             catch (SongMetaBuilderException e)
             {
-                Debug.LogWarning(path + "\n" + e.Message);
+                Debug.LogWarning("SongMetaBuilderException: " + path + "\n" + e.Message);
                 SongsFailed++;
             }
             catch (Exception ex)
