@@ -7,6 +7,16 @@ using UniRx;
 
 public class SongSelectPlayerProfileListController : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        lastPlayerProfileToMicProfileMap = null;
+    }
+
+    // Static reference to be persisted across scenes.
+    // Used to restore the player-microphone assignment.
+    private static PlayerProfileToMicProfileMap lastPlayerProfileToMicProfileMap;
+
     public SongSelectPlayerProfileListEntry listEntryPrefab;
     public GameObject scrollViewContent;
 
@@ -15,6 +25,7 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
     void Start()
     {
         UpdateListEntries();
+        LoadLastPlayerProfileToMicProfileMap();
     }
 
     private void UpdateListEntries()
@@ -114,5 +125,49 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
         {
             entry.SetSelected(true);
         }
+    }
+
+    private void LoadLastPlayerProfileToMicProfileMap()
+    {
+        if (lastPlayerProfileToMicProfileMap.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        // Restore the previously assigned microphones
+        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
+        foreach (KeyValuePair<PlayerProfile, MicProfile> playerProfileAndMicProfileEntry in lastPlayerProfileToMicProfileMap)
+        {
+            PlayerProfile playerProfile = playerProfileAndMicProfileEntry.Key;
+            MicProfile lastUsedMicProfile = playerProfileAndMicProfileEntry.Value;
+
+            if (!lastUsedMicProfile.IsConnected
+                || !lastUsedMicProfile.IsEnabled)
+            {
+                // Do not use this mic.
+                continue;
+            }
+
+            foreach (SongSelectPlayerProfileListEntry listEntry in listEntriesInScrollView)
+            {
+                if (listEntry.PlayerProfile == playerProfile)
+                {
+                    // Select the mic for this player
+                    listEntry.MicProfile = lastUsedMicProfile;
+                }
+                else if (listEntry.IsSelected
+                         && listEntry.MicProfile == lastUsedMicProfile)
+                {
+                    // Deselect lastUsedMicProfile from other player.
+                    listEntry.MicProfile = null;
+                }
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Remember the currently assigned microphones
+        lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
     }
 }
