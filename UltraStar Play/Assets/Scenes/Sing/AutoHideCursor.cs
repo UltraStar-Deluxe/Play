@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using UniInject;
-using UniRx;
-
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
+﻿using UnityEngine;
 
 /**
  * Hides the cursor when the mouse is not moved for a while.
  */
 public class AutoHideCursor : MonoBehaviour
 {
-    private readonly float defaultHideDelayInSeconds = 5f;
+    private static readonly float defaultHideDelayInSeconds = 5f;
+
+    public float initialHideDelayInSeconds = defaultHideDelayInSeconds;
+
     private float hideDelayInSeconds;
 
     private Vector3 lastMousePosition;
@@ -23,6 +16,7 @@ public class AutoHideCursor : MonoBehaviour
     private void Awake()
     {
         lastMousePosition = Input.mousePosition;
+        hideDelayInSeconds = initialHideDelayInSeconds;
     }
 
     private void Update()

@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2c8eb683f30664999301457ee47097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialHideDelayInSeconds: 0
 --- !u!4 &102941936
 Transform:
   m_ObjectHideFlags: 0
@@ -654,7 +655,7 @@ MonoBehaviour:
   m_ChildAlignment: 6
   m_StartCorner: 0
   m_StartAxis: 1
-  m_CellSize: {x: 780, y: 146.98872}
+  m_CellSize: {x: 780, y: 146.90706}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -779,11 +780,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 426.5, y: 240, z: 0}
-  anchoredPosition: {x: 426.5, y: 240}
-  position: {x: 426.5, y: 240, z: 0}
-  sizeDelta: {x: 800, y: 450.17587}
-  size: {x: 800, y: 450.17587}
+  localPosition: {x: 428.5, y: 241, z: 0}
+  anchoredPosition: {x: 428.5, y: 241}
+  position: {x: 428.5, y: 241, z: 0}
+  sizeDelta: {x: 800, y: 449.94168}
+  size: {x: 800, y: 449.94168}
 --- !u!1 &375955950
 GameObject:
   m_ObjectHideFlags: 0
@@ -1966,7 +1967,7 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 0, y: 0, z: 0}
   anchoredPosition: {x: 400, y: 0}
-  position: {x: 426.5, y: 463.36755, z: 0}
+  position: {x: 428.5, y: 465.29834, z: 0}
   sizeDelta: {x: 2, y: 36}
   size: {x: 2, y: 36}
 --- !u!114 &1377580035
@@ -2602,7 +2603,7 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 0, y: 0, z: 0}
   anchoredPosition: {x: 400, y: 0}
-  position: {x: 426.5, y: 61.633423, z: 0}
+  position: {x: 428.5, y: 61.890335, z: 0}
   sizeDelta: {x: 2, y: 36}
   size: {x: 2, y: 36}
 --- !u!1001 &1740204221145833707
