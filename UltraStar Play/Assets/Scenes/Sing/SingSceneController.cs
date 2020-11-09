@@ -42,6 +42,11 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     [InjectedInInspector]
     public PlayerUiArea playerUiArea;
 
+    [InjectedInInspector]
+    public LyricsDisplayer topLyricsDisplayer;
+    [InjectedInInspector]
+    public LyricsDisplayer bottomLyricsDisplayer;
+
     [Inject]
     private Injector sceneInjector;
 
@@ -148,10 +153,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
-        if (!PlayerControllers.IsNullOrEmpty())
-        {
-            FindObjectsOfType<LyricsDisplayer>().ForEach(it => InitLyricsDisplayer(it));
-        }
+        InitLyricsDisplayers();
 
         //Save information about the song being started into stats
         Statistics stats = StatsManager.Instance.Statistics;
@@ -165,30 +167,25 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
     }
 
-    private void InitLyricsDisplayer(LyricsDisplayer lyricsDisplayer)
+    private void InitLyricsDisplayers()
     {
-        bool needSecondLyricsDisplayer = SongMeta.GetVoices().Count > 1 && PlayerControllers.Count > 1;
-        if (lyricsDisplayer.isTop)
+        if (PlayerControllers.IsNullOrEmpty())
         {
-            if (needSecondLyricsDisplayer)
-            {
-                lyricsDisplayer.Init(PlayerControllers[0]);
-            }
-            else
-            {
-                lyricsDisplayer.gameObject.SetActive(false);
-            }
+            topLyricsDisplayer.gameObject.SetActive(false);
+            bottomLyricsDisplayer.gameObject.SetActive(false);
+            return;
+        }
+
+        bool needSecondLyricsDisplayer = SongMeta.GetVoices().Count > 1 && PlayerControllers.Count > 1;
+        if (needSecondLyricsDisplayer)
+        {
+            topLyricsDisplayer.Init(PlayerControllers[0]);
+            bottomLyricsDisplayer.Init(PlayerControllers[1]);
         }
         else
         {
-            if (needSecondLyricsDisplayer)
-            {
-                lyricsDisplayer.Init(PlayerControllers[1]);
-            }
-            else
-            {
-                lyricsDisplayer.Init(PlayerControllers[0]);
-            }
+            topLyricsDisplayer.gameObject.SetActive(false);
+            bottomLyricsDisplayer.Init(PlayerControllers[0]);
         }
     }
 

@@ -655,7 +655,7 @@ MonoBehaviour:
   m_ChildAlignment: 6
   m_StartCorner: 0
   m_StartAxis: 1
-  m_CellSize: {x: 780, y: 146.90706}
+  m_CellSize: {x: 780, y: 146.96786}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -780,11 +780,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 0}
   anchorMax: {x: 0, y: 0}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 428.5, y: 241, z: 0}
-  anchoredPosition: {x: 428.5, y: 241}
-  position: {x: 428.5, y: 241, z: 0}
-  sizeDelta: {x: 800, y: 449.94168}
-  size: {x: 800, y: 449.94168}
+  localPosition: {x: 431, y: 242.5, z: 0}
+  anchoredPosition: {x: 431, y: 242.5}
+  position: {x: 431, y: 242.5, z: 0}
+  sizeDelta: {x: 800, y: 450.11603}
+  size: {x: 800, y: 450.11603}
 --- !u!1 &375955950
 GameObject:
   m_ObjectHideFlags: 0
@@ -1967,7 +1967,7 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 0, y: 0, z: 0}
   anchoredPosition: {x: 400, y: 0}
-  position: {x: 428.5, y: 465.29834, z: 0}
+  position: {x: 431, y: 468.19434, z: 0}
   sizeDelta: {x: 2, y: 36}
   size: {x: 2, y: 36}
 --- !u!114 &1377580035
@@ -1990,6 +1990,18 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
+--- !u!114 &1377580038 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1570843823581990805, guid: 5ca122de3e6e3e046b5afdf99555504c,
+    type: 3}
+  m_PrefabInstance: {fileID: 1377580028}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377580033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87d83187f9944d34485e52a296f4aed0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1411281007 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1570843823581990794, guid: 5ca122de3e6e3e046b5afdf99555504c,
@@ -2032,6 +2044,8 @@ MonoBehaviour:
   songAudioPlayer: {fileID: 1098468898}
   songVideoPlayer: {fileID: 227833046}
   playerUiArea: {fileID: 245391955}
+  topLyricsDisplayer: {fileID: 1377580038}
+  bottomLyricsDisplayer: {fileID: 1570843824855908332}
 --- !u!4 &1427931089
 Transform:
   m_ObjectHideFlags: 0
@@ -2603,9 +2617,21 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 0, y: 0, z: 0}
   anchoredPosition: {x: 400, y: 0}
-  position: {x: 428.5, y: 61.890335, z: 0}
+  position: {x: 431, y: 62.27545, z: 0}
   sizeDelta: {x: 2, y: 36}
   size: {x: 2, y: 36}
+--- !u!114 &1570843824855908332 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1570843823581990805, guid: 5ca122de3e6e3e046b5afdf99555504c,
+    type: 3}
+  m_PrefabInstance: {fileID: 1570843824855908325}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570843824855908326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87d83187f9944d34485e52a296f4aed0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1740204221145833707
 PrefabInstance:
   m_ObjectHideFlags: 0
