@@ -42,6 +42,11 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
     [InjectedInInspector]
     public PlayerUiArea playerUiArea;
 
+    [InjectedInInspector]
+    public LyricsDisplayer topLyricsDisplayer;
+    [InjectedInInspector]
+    public LyricsDisplayer bottomLyricsDisplayer;
+
     [Inject]
     private Injector sceneInjector;
 
@@ -148,11 +153,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
-        if (!PlayerControllers.IsNullOrEmpty())
-        {
-            LyricsDisplayer lyricsDisplayer = FindObjectOfType<LyricsDisplayer>();
-            lyricsDisplayer?.Init(PlayerControllers[0]);
-        }
+        InitLyricsDisplayers();
 
         //Save information about the song being started into stats
         Statistics stats = StatsManager.Instance.Statistics;
@@ -164,6 +165,28 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
         // Rebuild whole UI
         LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+    }
+
+    private void InitLyricsDisplayers()
+    {
+        if (PlayerControllers.IsNullOrEmpty())
+        {
+            topLyricsDisplayer.gameObject.SetActive(false);
+            bottomLyricsDisplayer.gameObject.SetActive(false);
+            return;
+        }
+
+        bool needSecondLyricsDisplayer = SongMeta.GetVoices().Count > 1 && PlayerControllers.Count > 1;
+        if (needSecondLyricsDisplayer)
+        {
+            topLyricsDisplayer.Init(PlayerControllers[0]);
+            bottomLyricsDisplayer.Init(PlayerControllers[1]);
+        }
+        else
+        {
+            topLyricsDisplayer.gameObject.SetActive(false);
+            bottomLyricsDisplayer.Init(PlayerControllers[0]);
+        }
     }
 
     private void InitTimeBar()
