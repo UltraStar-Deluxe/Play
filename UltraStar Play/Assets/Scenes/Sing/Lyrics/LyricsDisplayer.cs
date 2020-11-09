@@ -13,8 +13,6 @@ public class LyricsDisplayer : MonoBehaviour, INeedInjection
     public Text currentSentenceText;
     public Text nextSentenceText;
 
-    public bool isTop;
-
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new List<Note>();
 
