@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -116,7 +116,9 @@ namespace UniInject
 
         private static int CheckInjectableFromBindings(MonoBehaviour script, Type type, List<IBinding> bindings, InjectionData injectionData)
         {
-            foreach (object key in injectionData.InjectionKeys)
+            // Injector type is created during scene injection.
+            HashSet<Type> ignoredTypes = new HashSet<Type> { typeof(Injector) };
+            foreach (object key in injectionData.InjectionKeys.Where(it => !ignoredTypes.Contains(it)))
             {
                 List<IBinding> matchingBindings = bindings.Where(binding => object.Equals(binding.GetKey(), key)).ToList();
                 if (matchingBindings.Count == 0)
