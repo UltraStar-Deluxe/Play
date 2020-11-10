@@ -20,6 +20,7 @@ git checkout c01db302f337205696585daa72e7d7baea922e44
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/FullSerializer/* ./
 rm -rf ./Assets
+rm -rf .git
 
 echo "Creating assembly definition for editor scripts"
 echo "{ \"name\": \"FullSerializerEditor\", \"includePlatforms\": [\"Editor\"], \"references\": [\"Plugins\"] }" >  "./Source/Aot/Editor/FullSerializerEditor.asmdef"
