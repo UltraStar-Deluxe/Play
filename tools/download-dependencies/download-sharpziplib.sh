@@ -26,6 +26,7 @@ git checkout d0efee019d5c1b21f8c6957cb6742d28fc60eef7
 echo "Moving downloaded files to correct position for this project..."
 mv -v src/* ./
 rm -rf ./src
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading SharpZipLib done"
