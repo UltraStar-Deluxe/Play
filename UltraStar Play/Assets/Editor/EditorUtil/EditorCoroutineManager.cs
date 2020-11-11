@@ -29,7 +29,8 @@ public static class EditorCoroutineManager
             coroutineManager = CoroutineManager.Instance;
         }
 
-        if (coroutineManager.CoroutinesInProgress.Count <= 0)
+        if (coroutineManager == null
+            || coroutineManager.CoroutinesInProgress.Count <= 0)
         {
             // No coroutines
             return;

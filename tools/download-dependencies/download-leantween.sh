@@ -24,6 +24,7 @@ git checkout ea745c3f94d8682327c912030dfc6b65cbe1ced5
 echo "Moving downloaded files to correct position for this project..."
 mv -v ./Assets/LeanTween/* ./
 rm -rf ./Assets
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading LeanTween done"

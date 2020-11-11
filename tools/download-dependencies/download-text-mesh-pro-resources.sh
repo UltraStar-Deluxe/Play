@@ -21,6 +21,7 @@ git checkout 24e67a6bc789d3e40946322ea7d253032e82541d
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/TextMesh\ Pro/* ./
 rm -rf ./Assets
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading TextMesh Pro done"
