@@ -21,6 +21,7 @@ git checkout 66205df49631860dd8f7c3314cb518b54c944d30
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/Plugins/UniRx/* ./
 rm -rf ./Assets
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading UniRx done"

@@ -20,6 +20,7 @@ git checkout 13f403f42388857fff347e6cc00824a5216ec754
 echo "Moving downloaded files to correct position for this project..."
 mv -v NLayer/* ./
 rm -rf ./NLayer
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading NLayer done"

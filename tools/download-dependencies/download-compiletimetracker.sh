@@ -21,6 +21,7 @@ git checkout 276095b3b212d7c33106b53d71b93b5a72d1e1d3
 echo "Moving downloaded files to correct position for this project..."
 mv -v CompileTimeTracker/* ./
 rm -rf ./CompileTimeTracker
+rm -rf .git
 
 echo "Creating assembly definition for editor scripts"
 echo "{ \"name\": \"CompileTimeTrackerEditor\", \"includePlatforms\": [\"Editor\"], \"references\": [\"Plugins\"] }" >  "./Editor/CompileTimeTrackerEditor.asmdef"

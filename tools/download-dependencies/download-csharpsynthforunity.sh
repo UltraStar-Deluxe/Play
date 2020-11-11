@@ -21,6 +21,7 @@ git checkout 0e1163517a9e5561cd6862ecd0d032803dea8f51
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/* ./
 rm -rf ./Assets
+rm -rf .git
 
 cd "$old_dir"
 echo "Downloading CSharpSynthForUnity done"
