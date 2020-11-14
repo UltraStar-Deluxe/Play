@@ -9,7 +9,6 @@ using System.Linq;
 public static class I18NFileSystemWatcher
 {
     private static bool triggerUpdate;
-    private static readonly FileSystemWatcher fileSystemWatcher;
     private static ConcurrentBag<string> changedFiles = new ConcurrentBag<string>();
     private static readonly string streamingAssetsPath;
 
@@ -18,7 +17,7 @@ public static class I18NFileSystemWatcher
         streamingAssetsPath = Application.streamingAssetsPath;
         string path = streamingAssetsPath + "/" + I18NManager.I18NFolder;
 
-        fileSystemWatcher = new FileSystemWatcher(path, "*.properties");
+        FileSystemWatcher fileSystemWatcher = new FileSystemWatcher(path, "*.properties");
         fileSystemWatcher.Changed += OnFileChanged;
         fileSystemWatcher.IncludeSubdirectories = true;
         fileSystemWatcher.EnableRaisingEvents = true;

@@ -9,7 +9,6 @@ using System.Linq;
 public static class ThemeFileSystemWatcher
 {
     private static bool triggerUpdate;
-    private static List<FileSystemWatcher> fileSystemWatchers = new List<FileSystemWatcher>();
     private static ConcurrentBag<string> changedFiles = new ConcurrentBag<string>();
     private static readonly string streamingAssetsPath;
 
@@ -25,8 +24,6 @@ public static class ThemeFileSystemWatcher
             fileSystemWatcher.Changed += OnFileChanged;
             fileSystemWatcher.IncludeSubdirectories = true;
             fileSystemWatcher.EnableRaisingEvents = true;
-
-            fileSystemWatchers.Add(fileSystemWatcher);
         }
 
         EditorApplication.update += OnEditorApplicationUpdate;
