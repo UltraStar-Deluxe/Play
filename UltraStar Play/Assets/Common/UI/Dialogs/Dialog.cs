@@ -17,6 +17,12 @@ public class Dialog : MonoBehaviour
         set
         {
             titleUiText.text = value;
+            // Do not use default translation from I18NText
+            I18NText i18NText = titleUiText.GetComponent<I18NText>();
+            if (i18NText != null)
+            {
+                Destroy(i18NText);
+            }
         }
     }
 

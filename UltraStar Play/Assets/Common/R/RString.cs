@@ -83,6 +83,12 @@ public static partial class R
         public static readonly string score_total = "score_total";
         public static readonly string search_placeholder = "search_placeholder";
         public static readonly string singingResultsScene_title = "singingResultsScene_title";
+        public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
+        public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string songSelectScene_noMicsFound = "songSelectScene_noMicsFound";
+        public static readonly string songSelectScene_noPlayerSelected_message = "songSelectScene_noPlayerSelected_message";
+        public static readonly string songSelectScene_noPlayerSelected_title = "songSelectScene_noPlayerSelected_title";
+        public static readonly string songSelectScene_noSongsFound = "songSelectScene_noSongsFound";
         public static readonly string songSelectScene_stats_localBest = "songSelectScene_stats_localBest";
         public static readonly string songSelectScene_stats_startedFinished = "songSelectScene_stats_startedFinished";
         public static readonly string songSelectScene_stats_webBest = "songSelectScene_stats_webBest";

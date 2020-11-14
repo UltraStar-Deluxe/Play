@@ -189,7 +189,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         List<PlayerProfile> selectedPlayerProfiles = playerProfileListController.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateWarningDialog("No player selected", "Select a player profile for singing.\n New player profiles can be create in the settings.");
+            UiManager.Instance.CreateWarningDialog(
+                I18NManager.GetTranslation(R.String.songSelectScene_noPlayerSelected_title),
+                I18NManager.GetTranslation(R.String.songSelectScene_noPlayerSelected_message));
             return null;
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
