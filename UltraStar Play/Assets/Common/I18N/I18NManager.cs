@@ -20,9 +20,9 @@ public class I18NManager : MonoBehaviour, INeedInjection
         fallbackMessages?.Clear();
     }
 
-    private const string I18NFolder = "I18N";
-    private const string PropertiesFileExtension = ".properties";
-    private const string PropertiesFileName = "messages";
+    public const string I18NFolder = "I18N";
+    public const string PropertiesFileExtension = ".properties";
+    public const string PropertiesFileName = "messages";
 
     public static I18NManager Instance
     {
@@ -74,6 +74,24 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public List<string> GetKeys()
     {
         return fallbackMessages.Keys.ToList();
+    }
+
+    public static string GetTranslation(string key, params string[] placeholderStrings)
+    {
+        if (placeholderStrings.Length % 2 != 0)
+        {
+            Debug.LogWarning($"Uneven number of placeholders for '{key}'. Format in array should be [key1, value1, key2, value2, ...]");
+        }
+
+        // Create dictionary from placeholderStrings
+        Dictionary<string, string> placeholders = new Dictionary<string, string>();
+        for (int i = 0; i < placeholderStrings.Length && i + 1 < placeholderStrings.Length; i += 2)
+        {
+            string placeholderKey = placeholderStrings[i];
+            string placeholderValue = placeholderStrings[i + 1];
+            placeholders[placeholderKey] = placeholderValue;
+        }
+        return GetTranslation(key, placeholders);
     }
 
     public static string GetTranslation(string key, Dictionary<string, string> placeholders)

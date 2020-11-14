@@ -13,9 +13,9 @@ public class ThemeManager : MonoBehaviour
         themeNameToTheme?.Clear();
     }
 
-    public static readonly string themesFolderName = "Themes";
-    public static readonly string themesFileName = "Themes.xml";
-    public static readonly string colorsFileName = "Colors.properties";
+    public const string ThemesFolderName = "Themes";
+    public const string ThemesFileName = "Themes.xml";
+    public const string ColorsFileName = "Colors.properties";
 
     public static ThemeManager Instance
     {
@@ -137,10 +137,28 @@ public class ThemeManager : MonoBehaviour
 
     public void ReloadThemes()
     {
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            ImageManager.ClearCache();
+            AudioManager.ClearCache();
+        }
+
+        string lastThemeName = CurrentTheme?.Name;
+
         themeNameToTheme = new Dictionary<string, Theme>();
-        string themesFilePath = ApplicationUtils.GetStreamingAssetsPath(themesFolderName + "/" + themesFileName);
+        string themesFilePath = ApplicationUtils.GetStreamingAssetsPath(ThemesFolderName + "/" + ThemesFileName);
         string themesFileContent = File.ReadAllText(themesFilePath);
         ReloadThemesFromXml(themesFileContent);
+
+        // Restore last selected theme
+        if (!lastThemeName.IsNullOrEmpty())
+        {
+            Theme theme = GetTheme(lastThemeName);
+            if (theme != null)
+            {
+                CurrentTheme = theme;
+            }
+        }
     }
 
     private void ReloadThemesFromXml(string xml)

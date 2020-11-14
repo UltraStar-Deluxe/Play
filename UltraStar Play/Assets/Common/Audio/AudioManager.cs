@@ -15,11 +15,7 @@ public class AudioManager : MonoBehaviour
     static void Init()
     {
         volumeBeforeMute = -1;
-        foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
-        {
-            RemoveCachedAudioClip(cachedAudioClip);
-        }
-        audioClipCache.Clear();
+        ClearCache();
     }
 
     private static readonly int criticalCacheSize = 10;
@@ -92,6 +88,15 @@ public class AudioManager : MonoBehaviour
             coroutineManager = CoroutineManager.Instance;
         }
         coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, doCacheAudioClipThenOnSuccess, onFailure));
+    }
+
+    public static void ClearCache()
+    {
+        foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
+        {
+            RemoveCachedAudioClip(cachedAudioClip);
+        }
+        audioClipCache.Clear();
     }
 
     private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)

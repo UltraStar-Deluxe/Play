@@ -11,11 +11,7 @@ public static class ImageManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
-        {
-            RemoveCachedSprite(cachedSprite);
-        }
-        spriteCache.Clear();
+        ClearCache();
     }
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
@@ -105,6 +101,15 @@ public static class ImageManager
         spriteCache[source] = cachedSprite;
     }
 
+    public static void ClearCache()
+    {
+        foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
+        {
+            RemoveCachedSprite(cachedSprite);
+        }
+        spriteCache.Clear();
+    }
+
     private static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new HashSet<Sprite>();
@@ -142,9 +147,9 @@ public static class ImageManager
         {
             if (cachedSprite.Sprite.texture != null)
             {
-                GameObject.Destroy(cachedSprite.Sprite.texture);
+                GameObjectUtils.Destroy(cachedSprite.Sprite.texture);
             }
-            GameObject.Destroy(cachedSprite.Sprite);
+            GameObjectUtils.Destroy(cachedSprite.Sprite);
         }
     }
 

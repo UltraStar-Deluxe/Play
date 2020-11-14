@@ -104,7 +104,7 @@ public class Theme
 
     private string GetStreamingAssetsPath(string resourceName)
     {
-        string resourcePath = ThemeManager.themesFolderName + "/" + Name + "/" + resourceName;
+        string resourcePath = ThemeManager.ThemesFolderName + "/" + Name + "/" + resourceName;
         return ApplicationUtils.GetStreamingAssetsPath(resourcePath);
     }
 
@@ -112,7 +112,7 @@ public class Theme
     private void LoadColors()
     {
         loadedColors.Clear();
-        string colorsFilePath = GetStreamingAssetsPath(ThemeManager.colorsFileName);
+        string colorsFilePath = GetStreamingAssetsPath(ThemeManager.ColorsFileName);
         string colorsFileContent = File.ReadAllText(colorsFilePath);
         LoadColorsFromText(colorsFileContent);
     }

@@ -78,4 +78,17 @@ public static class GameObjectUtils
 
         return component;
     }
+
+    public static void Destroy(UnityEngine.Object obj)
+    {
+        // Destroy may not be called from edit mode. Use DestroyImmediate in this case.
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            GameObject.DestroyImmediate(obj);
+        }
+        else
+        {
+            GameObject.Destroy(obj);
+        }
+    }
 }

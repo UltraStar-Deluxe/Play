@@ -149,7 +149,9 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         string playerNameCsv = string.Join(",", playerProfilesWithoutMic.Select(it => it.Name).ToList());
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateWarningDialog("Missing microphones", $"No microphone for player(s) {playerNameCsv}");
+            UiManager.Instance.CreateWarningDialog(
+                I18NManager.GetTranslation(R.String.singScene_missingMicrophones_title),
+                I18NManager.GetTranslation(R.String.singScene_missingMicrophones_message, "playerNameCsv", playerNameCsv));
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
