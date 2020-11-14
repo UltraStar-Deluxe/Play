@@ -20,9 +20,9 @@ public class I18NManager : MonoBehaviour, INeedInjection
         fallbackMessages?.Clear();
     }
 
-    private const string I18NFolder = "I18N";
-    private const string PropertiesFileExtension = ".properties";
-    private const string PropertiesFileName = "messages";
+    public const string I18NFolder = "I18N";
+    public const string PropertiesFileExtension = ".properties";
+    public const string PropertiesFileName = "messages";
 
     public static I18NManager Instance
     {
