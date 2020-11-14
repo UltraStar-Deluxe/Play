@@ -12,13 +12,12 @@ using System.Collections.Generic;
 public static class EditorCoroutineManager
 {
     private static CoroutineManager coroutineManager;
+    private static int currentExecute;
 
     static EditorCoroutineManager()
     {
         EditorApplication.update += ExecuteCoroutines;
     }
-
-    private static int currentExecute;
 
     private static void ExecuteCoroutines()
     {

@@ -120,7 +120,7 @@ public static class CreateConstantsMenuItems
 
     private static string GetFilePathRelativeToThemeFolder(string file)
     {
-        string themesFolderPrefix = "Assets/StreamingAssets/" + ThemeManager.themesFolderName + "/";
+        string themesFolderPrefix = "Assets/StreamingAssets/" + ThemeManager.ThemesFolderName + "/";
 
         string result = file.Replace("\\", "/");
         int indexOfThemesFolder = result.IndexOf(themesFolderPrefix, StringComparison.CurrentCulture);
