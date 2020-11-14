@@ -5119,6 +5119,7 @@ GameObject:
   - component: {fileID: 1524321710}
   - component: {fileID: 1524321712}
   - component: {fileID: 1524321711}
+  - component: {fileID: 1524321713}
   m_Layer: 5
   m_Name: EmptyMicProfileListText
   m_TagString: Untagged
@@ -5178,9 +5179,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'No microphones found.
+  m_Text: 'Kein Mikrofon gefunden.
 
-    Check the recording options.'
+    In den Einstellungen kann dies konfiguriert
+    werden.'
 --- !u!222 &1524321712
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5189,6 +5191,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524321709}
   m_CullTransparentMesh: 0
+--- !u!114 &1524321713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524321709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32e35146cc31ff24982efe531388b4f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: songSelectScene_noMicsFound
 --- !u!1001 &1535573297
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5663,11 +5678,11 @@ MonoBehaviour:
   anchorMin: {x: 0.00001046317, y: 0}
   anchorMax: {x: 0.13557066, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -108.05234, y: 0, z: 616.995}
+  localPosition: {x: -108.05235, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 81.114624, y: 51.460815, z: 0}
+  position: {x: 16.83551, y: 10.673355, z: 0}
   sizeDelta: {x: 0, y: 0}
-  size: {x: 33.890045, y: 21.43715}
+  size: {x: 33.890045, y: 21.42221}
 --- !u!114 &1616092804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6665,7 +6680,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1135768689}
   m_HandleRect: {fileID: 1135768688}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7779,9 +7794,9 @@ MonoBehaviour:
   pivot: {x: 0.5, y: 0.5}
   localPosition: {x: 108.049995, y: 0, z: 616.995}
   anchoredPosition: {x: 0, y: 0}
-  position: {x: 3758.631, y: 51.358765, z: 0}
+  position: {x: 780.1117, y: 10.652176, z: 0}
   sizeDelta: {x: 0.000030517578, y: 0}
-  size: {x: 33.89006, y: 21.43715}
+  size: {x: 33.89006, y: 21.42221}
 --- !u!224 &6702459375939703474
 RectTransform:
   m_ObjectHideFlags: 0
