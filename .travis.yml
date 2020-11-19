@@ -1,5 +1,4 @@
-sudo: required
-language: bash
+language: shell
 env:
   global:
   - BUILD_NAME="UltraStar Play"
@@ -28,15 +27,13 @@ before_install:
   - chmod +x ./tools/download-dependencies/*.sh
   - export -f travis_fold
   - (cd tools/download-dependencies/; sh download-dependencies.sh)
-  - export UNITY_LICENSE_CONTENT=`cat tools/travis/activat.ion`
-  - rm tools/travis/activat.ion
   - docker pull $IMAGE_NAME
 
 jobs:
   include:
   - stage: test
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=editmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
+    env: TEST_PLATFORM=editmode IMAGE_NAME=gableroux/unity3d:2020.1.5f1
     addons:
       artifacts:
         s3_region: "eu-west-1"
@@ -44,14 +41,14 @@ jobs:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2019.2.11f1
+    env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2020.1.5f1
     addons:
       artifacts:
         s3_region: "eu-west-1"
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: build
-    env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1
+    env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=gableroux/unity3d:2020.1.5f1
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
@@ -59,7 +56,7 @@ jobs:
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
-    env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=gableroux/unity3d:2019.2.11f1-mac
+    env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=gableroux/unity3d:2020.1.5f1-mac
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
@@ -67,7 +64,7 @@ jobs:
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
-    env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=gableroux/unity3d:2019.2.11f1-windows
+    env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=gableroux/unity3d:2020.1.5f1-windows
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
