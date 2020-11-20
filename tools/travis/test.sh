@@ -2,14 +2,14 @@
 
 set -x
 
-xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' \
-  /opt/Unity/Editor/Unity \
+/opt/Unity/Editor/Unity \
     -projectPath "$(pwd)/UltraStar Play" \
     -runTests \
     -testPlatform $TEST_PLATFORM \
     -testResults $(pwd)/$TEST_PLATFORM-results.xml \
     -logFile /dev/stdout \
-    -batchmode
+    -batchmode \
+    -nographics
 
 UNITY_EXIT_CODE=$?
 
