@@ -71,3 +71,19 @@ jobs:
         s3_region: "eu-west-1"
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
+  - stage: build
+    env: BUILD_TARGET=Android IMAGE_NAME=gableroux/unity3d:2020.1.5f1-android
+    script: "./tools/travis/docker_build.sh"
+    addons:
+      artifacts:
+        s3_region: "eu-west-1"
+        paths:
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
+  - stage: build
+    env: BUILD_TARGET=iOS IMAGE_NAME=gableroux/unity3d:2020.1.5f1-ios
+    script: "./tools/travis/docker_build.sh"
+    addons:
+      artifacts:
+        s3_region: "eu-west-1"
+        paths:
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
