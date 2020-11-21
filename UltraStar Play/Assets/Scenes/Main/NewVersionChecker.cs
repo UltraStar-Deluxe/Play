@@ -15,11 +15,20 @@ using System.Text.RegularExpressions;
 
 public class NewVersionChecker : MonoBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        isRemoteVersionFileDownloadDone = false;
+        remoteVersionFileContent = null;
+        closeButtonClicked = false;
+    }
+
     private static readonly string remoteVersionFileUrl = "https://raw.githubusercontent.com/UltraStar-Deluxe/Play/master/UltraStar%20Play/Assets/VERSION.txt";
 
     // Static variables, to persist these values across scene changes.
     private static bool isRemoteVersionFileDownloadDone;
     private static string remoteVersionFileContent;
+    private static bool closeButtonClicked;
 
     [InjectedInInspector]
     public TextAsset localVersionTextAsset;
@@ -29,6 +38,9 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public Text newVersionAvailableDialogMessage;
+
+    [InjectedInInspector]
+    public Button closeButton;
 
     [InjectedInInspector]
     public Button ignoreThisVersionButton;
@@ -43,7 +55,12 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        if (!isRemoteVersionFileDownloadDone)
+        if (closeButtonClicked)
+        {
+            // The dialog has been shown before in this run
+            gameObject.SetActive(false);
+        }
+        else if (!isRemoteVersionFileDownloadDone)
         {
             StartRemoteVersionFileDownload();
         }
@@ -104,20 +121,22 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         remoteVersionProperties.TryGetValue("build_timestamp", out string remoteBuildTimeStamp);
         localVersionProperties.TryGetValue("build_timestamp", out string localBuildTimeStamp);
 
-        // Remove all non-digit characters, then compare the resulting numbers
-        // This makes it possible to compare version names
-        // in multiple formats such as 2020-04-05, 2020-04-05-devbuild, 0.1.5, 2017.04+
-        int.TryParse(Regex.Replace(remoteRelease, @"[^\d]", ""), out int remoteReleaseNumber);
-        int.TryParse(Regex.Replace(localRelease, @"[^\d]", ""), out int localReleaseNumber);
+        localVersionProperties.TryGetValue("versionScheme", out string localVersionScheme);
+        remoteVersionProperties.TryGetValue("versionScheme", out string remoteVersionScheme);
 
-        int.TryParse(Regex.Replace(remoteBuildTimeStamp, @"[^\d]", ""), out int remoteBuildTimeStampNumber);
-        int.TryParse(Regex.Replace(localBuildTimeStamp, @"[^\d]", ""), out int localBuildTimeStampNumber);
-
-        if (localReleaseNumber < remoteReleaseNumber
-            || (localReleaseNumber == remoteReleaseNumber
-                && localBuildTimeStampNumber < remoteBuildTimeStampNumber))
+        // (localRelease is smaller), or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
+        try
         {
-            ShowNewVersionAvailableDialog(remoteVersionProperties);
+            if (CompareVersionString(localRelease, remoteRelease) < 0
+                || (CompareVersionString(localRelease, remoteRelease) == 0
+                    && CompareVersionString(localBuildTimeStamp, remoteBuildTimeStamp) < 0))
+            {
+                ShowNewVersionAvailableDialog(remoteVersionProperties);
+            }
+        }
+        catch (CompareVersionException ex)
+        {
+            Debug.LogException(ex);
         }
     }
 
@@ -146,7 +165,61 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         newVersionAvailableDialogMessage.text = $"UltraStar Play {remoteRelease} has been released.\n"
             + $"For more information visit <color=\"red\">{websiteLink}</color>";
 
+        closeButton.OnClickAsObservable()
+            .Subscribe(_ =>
+            {
+                closeButtonClicked = true;
+                newVersionAvailableDialog.SetActive(false);
+            });
+
         // Show dialog
         newVersionAvailableDialog.SetActive(true);
+    }
+
+    /**
+     * Compares the versions strings a and b.
+     * @return (-1 if a < b), (1 if b < a), (0 if a == b)
+     */
+    public static int CompareVersionString(string versionA, string versionB)
+    {
+        MatchCollection aMatches = Regex.Matches(versionA, @"\d+");
+        int[] aInts = aMatches.Cast<Match>().Select(match => int.Parse(match.Value)).ToArray();
+
+        MatchCollection bMatches = Regex.Matches(versionB, @"\d+");
+        int[] bInts = bMatches.Cast<Match>().Select(match => int.Parse(match.Value)).ToArray();
+
+        // Compare integers from left to right.
+        if (aInts.IsNullOrEmpty() || bInts.IsNullOrEmpty())
+        {
+            // The versions are broken.
+            throw new CompareVersionException($"Cannot compare '{versionA}' and '{versionB}'");
+        }
+
+        for (int i = 0; i < aInts.Length && i < bInts.Length; i++)
+        {
+            int aInt = aInts[i];
+            int bInt = bInts[i];
+
+            if (aInt < bInt)
+            {
+                return -1;
+            }
+            if (aInt > bInt)
+            {
+                return 1;
+            }
+        }
+
+        // "1.2.3" is smaller that "1.2.3.5"
+        if (aInts.Length < bInts.Length)
+        {
+            return -1;
+        }
+        if (aInts.Length > bInts.Length)
+        {
+            return 1;
+        }
+
+        return 0;
     }
 }
