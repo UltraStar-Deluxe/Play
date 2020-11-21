@@ -1,4 +1,4 @@
-@startuml
+@startuml "assembly-dependencies"
 
 ' ---------------------------
 ' Assets/Plugins
@@ -10,10 +10,10 @@ component [Plugins] {
     [NLayer]
     [SharpZipLib]
     [Threads]
+    [UniInject]
+    [UniRx]
+    [TextMesh Pro]
 }
-
-[UniInject]
-[UniRx]
 
 ' ---------------------------
 ' Assets/Common
@@ -28,6 +28,7 @@ component [Plugins] {
 ' ---------------------------
 ' Assets/Editor
 [USPlayEditor]
+[USPlayEditorTests]
 
 ' ---------------------------
 ' Unity environment
@@ -37,14 +38,15 @@ component [Plugins] {
 ' Dependencies
 
 Common --> Plugins
-Common --> UniRx
-Common --> UniInject
 
 Scenes --> Common
 SongEditorScene --> Common
 Demos --> Common
 
 USPlayEditor --> Common
-USPlayEditor --> NUnit
+
+USPlayEditorTests --> Common
+USPlayEditorTests --> Scenes
+USPlayEditorTests --> NUnit
 
 @enduml

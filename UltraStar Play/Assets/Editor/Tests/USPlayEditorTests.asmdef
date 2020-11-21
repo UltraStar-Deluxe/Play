@@ -1,12 +1,14 @@
 {
-    "name": "USPlayEditor",
+    "name": "USPlayEditorTests",
     "references": [
         "Plugins",
         "UniRx",
         "UniInject",
-        "Common"
+        "Common",
+        "Scenes"
     ],
     "optionalUnityReferences": [
+        "TestAssemblies"
     ],
     "includePlatforms": [
         "Editor"
