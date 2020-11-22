@@ -28,8 +28,20 @@ public class SongEditorPlaybackSpeedSlider : MonoBehaviour, INeedInjection
         songAudioPlayer.PlaybackSpeed = settings.SongEditorSettings.MusicPlaybackSpeed;
         slider.OnValueChangedAsObservable().Subscribe(newValue =>
         {
-            settings.SongEditorSettings.MusicPlaybackSpeed = newValue;
-            songAudioPlayer.PlaybackSpeed = newValue;
+            float newValueRounded = (float)Math.Round(newValue, 1);
+            if (Mathf.Abs(newValueRounded - 1) < 0.1)
+            {
+                // Round to exactly 1 to eliminate manipulation of playback speed. Otherwise there will be noise in the audio.
+                newValueRounded = 1;
+            }
+
+            settings.SongEditorSettings.MusicPlaybackSpeed = newValueRounded;
+            songAudioPlayer.PlaybackSpeed = newValueRounded;
+
+            if (newValueRounded != newValue)
+            {
+                slider.value = newValueRounded;
+            }
         });
     }
 }
