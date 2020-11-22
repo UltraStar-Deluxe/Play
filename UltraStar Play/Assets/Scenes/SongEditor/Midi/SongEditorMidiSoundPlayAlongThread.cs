@@ -6,14 +6,13 @@ using System.Threading;
 
 public class SongEditorMidiSoundPlayAlongThread
 {
-    private Settings settings;
-    private SongMeta songMeta;
-    private MidiManager midiManager;
+    private readonly Settings settings;
+    private readonly SongMeta songMeta;
+    private readonly MidiManager midiManager;
     private ThreadPool.PoolHandle poolHandle;
 
     private bool isStopped;
 
-    private int positionInSongInMillis;
     private List<Note> upcomingSortedNotes = new List<Note>();
 
     private DateTime playbackStartDateTime = DateTime.Now;
@@ -41,7 +40,7 @@ public class SongEditorMidiSoundPlayAlongThread
         }
 
         SynchronizeWithPlaybackPosition(positionInSongInMillis);
-        CalculateUpcomingSortedNotes();
+        CalculateUpcomingSortedNotes(positionInSongInMillis);
         poolHandle = ThreadPool.QueueUserWorkItem((handle) => Run());
     }
 
@@ -59,20 +58,16 @@ public class SongEditorMidiSoundPlayAlongThread
         }
     }
 
-    public void CalculateUpcomingSortedNotes()
+    public void CalculateUpcomingSortedNotes(int positionInSongInMillis)
     {
         upcomingSortedNotes = GetUpcomingSortedNotes(positionInSongInMillis);
     }
 
     private void UpdateMidiNotePlayback()
     {
-        // Assumption: There is not more than one note at a time.
-        // Calculate where time currently is now: inside the note or not.
-        // ------|Note1Start------NOW----Note1End|-----------|Note2Start------Note2End|----------
-
         Note awaitedNote = upcomingSortedNotes[0];
 
-        // Check if note should be played
+        // Calculate where time currently is now: inside the note or not.
         float playbackSpeedFactor = 1 / settings.SongEditorSettings.MusicPlaybackSpeed;
         int awaitedNoteStartInMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, awaitedNote.StartBeat);
         awaitedNoteStartDateTime = playbackStartDateTime.AddMilliseconds(awaitedNoteStartInMillis * playbackSpeedFactor);
