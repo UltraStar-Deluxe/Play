@@ -92,7 +92,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void InitIfNotDoneYet()
+    public void InitIfNotDoneYet()
     {
         if (isInitialized)
         {
