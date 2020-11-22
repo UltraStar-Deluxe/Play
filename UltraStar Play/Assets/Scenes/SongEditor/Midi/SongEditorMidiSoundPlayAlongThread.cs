@@ -16,8 +16,6 @@ public class SongEditorMidiSoundPlayAlongThread
     private List<Note> upcomingSortedNotes = new List<Note>();
 
     private DateTime playbackStartDateTime = DateTime.Now;
-    private DateTime awaitedNoteStartDateTime = DateTime.Now;
-    private DateTime awaitedNoteEndDateTime = DateTime.Now;
 
     private int lastPlayedMidiNote = -1;
 
@@ -70,13 +68,13 @@ public class SongEditorMidiSoundPlayAlongThread
         // Calculate where time currently is now: inside the note or not.
         float playbackSpeedFactor = 1 / settings.SongEditorSettings.MusicPlaybackSpeed;
         int awaitedNoteStartInMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, awaitedNote.StartBeat);
-        awaitedNoteStartDateTime = playbackStartDateTime.AddMilliseconds(awaitedNoteStartInMillis * playbackSpeedFactor);
+        DateTime awaitedNoteStartDateTime = playbackStartDateTime.AddMilliseconds(awaitedNoteStartInMillis * playbackSpeedFactor);
         DateTime now = DateTime.Now - new TimeSpan(0, 0, 0, 0, settings.SongEditorSettings.MidiPlaybackOffsetInMillis);
 
         if (awaitedNoteStartDateTime < now)
         {
             int awaitedNoteEndInMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, awaitedNote.EndBeat);
-            awaitedNoteEndDateTime = playbackStartDateTime.AddMilliseconds(awaitedNoteEndInMillis * playbackSpeedFactor);
+            DateTime awaitedNoteEndDateTime = playbackStartDateTime.AddMilliseconds(awaitedNoteEndInMillis * playbackSpeedFactor);
             if (now < awaitedNoteEndDateTime)
             {
                 // NOW is "inside" the note. Thus, play it.
@@ -137,10 +135,14 @@ public class SongEditorMidiSoundPlayAlongThread
         playbackStartDateTime = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, (int)(positionInSongInMillis * playbackSpeedFactor)));
     }
 
-    // Compute the upcoming notes, i.e., the notes that have not yet been finished at the playback position.
+    // Compute the upcoming notes, i.e., the visible notes that have not yet been finished at the playback position.
     private List<Note> GetUpcomingSortedNotes(double positionInSongInMillis)
     {
-        List<Note> result = SongMetaUtils.GetAllNotes(songMeta)
+        List<Note> result = songMeta.GetVoices()
+            .Where(voice => settings.SongEditorSettings.HideVoices.IsNullOrEmpty()
+                            || !settings.SongEditorSettings.HideVoices.Contains(voice.Name))
+            .SelectMany(voice => voice.Sentences)
+            .SelectMany(sentence => sentence.Notes)
             .Where(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat) > positionInSongInMillis)
             .ToList();
         result.Sort(Note.comparerByStartBeat);
