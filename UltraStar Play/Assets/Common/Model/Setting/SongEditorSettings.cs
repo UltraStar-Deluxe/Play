@@ -4,6 +4,9 @@ using System.Collections.Generic;
 [Serializable]
 public class SongEditorSettings
 {
+    public float MusicVolume { get; set; } = 1;
+    public float MusicPlaybackSpeed { get; set; } = 1;
+
     // Recording in SongEditorScene
     public ESongEditorRecordingSource RecordingSource { get; set; }
     public int MicOctaveOffset { get; set; }
@@ -17,6 +20,7 @@ public class SongEditorSettings
     // Gain is similar to volume and should be between 0 and 1 to make it more silent and above 1 to make it louder.
     public float MidiGain { get; set; } = 1;
     public bool MidiSoundPlayAlongEnabled { get; set; } = true;
+    public int MidiPlaybackOffsetInMillis { get; set; }
     public string MidiFilePath { get; set; } = "";
 
     // Option to show / hide voices.
