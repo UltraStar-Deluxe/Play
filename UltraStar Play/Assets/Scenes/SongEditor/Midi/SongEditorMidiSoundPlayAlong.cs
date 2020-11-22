@@ -50,7 +50,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
             if (songAudioPlayer.PositionInSongInMillis < positionInSongInMillisOld)
             {
                 // Jumped back, thus recalculate upcomingSortedNotes and stop any currently playing notes.
-                thread.CalculateUpcomingSortedNotes();
+                thread.CalculateUpcomingSortedNotes((int)songAudioPlayer.PositionInSongInMillis);
                 midiManager.StopAllMidiNotes();
             }
 
