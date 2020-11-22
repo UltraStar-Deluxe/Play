@@ -10,26 +10,30 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorPlaybackSpeedSlider : MonoBehaviour, INeedInjection
+public class SongEditorMusicVolumeSlider : MonoBehaviour, INeedInjection
 {
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Slider slider;
 
     [Inject]
-    private SongAudioPlayer songAudioPlayer;
+    private Settings settings;
 
     [Inject]
-    private Settings settings;
+    private SongAudioPlayer songAudioPlayer;
+
+    private AudioSource audioSource;
 
     void Start()
     {
-        slider.value = settings.SongEditorSettings.MusicPlaybackSpeed;
-        songAudioPlayer.PlaybackSpeed = settings.SongEditorSettings.MusicPlaybackSpeed;
+        audioSource = songAudioPlayer.GetComponent<AudioSource>();
+
+        audioSource.volume = settings.SongEditorSettings.MusicVolume;
+        slider.value = settings.SongEditorSettings.MusicVolume;
         slider.OnValueChangedAsObservable().Subscribe(newValue =>
         {
-            settings.SongEditorSettings.MusicPlaybackSpeed = newValue;
-            songAudioPlayer.PlaybackSpeed = newValue;
+            settings.SongEditorSettings.MusicVolume = newValue;
+            audioSource.volume = newValue;
         });
     }
 }
