@@ -87,10 +87,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         if (micProfile != null)
         {
             roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
-            audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
-            audioSamplesAnalyzer.Enable();
             micSampleRecorder.MicProfile = micProfile;
             micSampleRecorder.StartRecording();
+
+            // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
+            audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
+            audioSamplesAnalyzer.Enable();
         }
         else
         {

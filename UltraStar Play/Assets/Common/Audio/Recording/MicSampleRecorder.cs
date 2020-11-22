@@ -45,8 +45,10 @@ public class MicSampleRecorder : MonoBehaviour
         }
     }
 
-    public float[] MicSamples { get; private set; } = new float[DefaultSampleRateHz];
-    public int SampleRateHz { get; private set; } = DefaultSampleRateHz;
+    // SampleRateHz is available after the MicProfile has been set.
+    public int SampleRateHz { get; private set; }
+    // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
+    public float[] MicSamples { get; private set; }
 
     private Subject<RecordingEvent> recordingEventStream = new Subject<RecordingEvent>();
     public IObservable<RecordingEvent> RecordingEventStream
@@ -103,7 +105,7 @@ public class MicSampleRecorder : MonoBehaviour
             IsRecording = false;
             return;
         }
-        Debug.Log($"Starting recording with '{MicProfile.Name}'");
+        Debug.Log($"Starting recording with '{MicProfile.Name}' at {SampleRateHz} Hz");
 
         micAmplifyMultiplier = micProfile.AmplificationMultiplier();
 
@@ -119,6 +121,7 @@ public class MicSampleRecorder : MonoBehaviour
             if (stopwatch.ElapsedMilliseconds > 1000)
             {
                 IsRecording = false;
+                Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
                 return;
             }
         }
