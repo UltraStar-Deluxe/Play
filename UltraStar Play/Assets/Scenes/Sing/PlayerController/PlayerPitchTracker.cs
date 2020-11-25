@@ -115,12 +115,14 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         {
             // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
             PitchEvent pitchEvent = GetPitchEventOfBeat(BeatToAnalyze);
-            Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
+            Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty()
+                ? null
+                : currentAndUpcomingNotesInRecordingSentence[0];
             Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= BeatToAnalyze && BeatToAnalyze < currentOrUpcomingNote.EndBeat)
                 ? currentOrUpcomingNote
                 : null;
 
-            FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat);
+            FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
 
             GoToNextBeat();
         }
@@ -128,6 +130,11 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
     {
+        if (noteAtBeat == null)
+        {
+            return roundedMidiNote;
+        }
+
         // Earn a joker when singing correctly (without using a joker).
         // A failed beat can be undone via joker-rule.
         if (pitchEvent != null && roundedMidiNote == noteAtBeat.MidiNote)
@@ -152,7 +159,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         return roundedMidiNote;
     }
 
-    public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat)
+    public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, Sentence sentenceAtBeat)
     {
         int recordedMidiNote = pitchEvent != null
             ? pitchEvent.MidiNote
@@ -162,7 +169,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
             : -1;
         int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedRecordedMidiNote, noteAtBeat);
 
-        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
+        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
     }
 
     public void GoToNextBeat()
@@ -189,21 +196,26 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
             noteAnalyzedEventStream.OnNext(new NoteAnalyzedEvent(passedNote));
         }
 
-        // Check if there is still a current note that is analyzed. If not, skip to the next upcoming note.
+        // Check if there is still a current note that is analyzed.
         if (!currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty())
         {
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
-            if (currentOrUpcomingNote.StartBeat > BeatToAnalyze)
+            if (currentOrUpcomingNote.StartBeat > BeatToAnalyze
+                && !settings.GraphicSettings.analyzeBeatsWithoutTargetNote)
             {
                 // Next beat to analyze is at the next note
                 BeatToAnalyze = currentOrUpcomingNote.StartBeat;
             }
         }
+        else if (settings.GraphicSettings.analyzeBeatsWithoutTargetNote
+                 && BeatToAnalyze < RecordingSentence.MaxBeat)
+        {
+            BeatToAnalyze++;
+        }
         else
         {
             // All notes of the sentence analyzed. Go to next sentence.
             GoToNextRecordingSentence();
-            return;
         }
     }
 
@@ -252,6 +264,11 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     private int GetRoundedMidiNoteForRecordedMidiNote(Note targetNote, int recordedMidiNote)
     {
+        if (targetNote == null)
+        {
+            return recordedMidiNote;
+        }
+
         if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
         {
             // Rap notes accept any noise as correct note.
@@ -342,14 +359,21 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
         public PitchEvent PitchEvent { get; private set; }
         public int Beat { get; private set; }
         public Note NoteAtBeat { get; private set; }
+        public Sentence SentenceAtBeat { get; private set; }
         public int RoundedRecordedMidiNote { get; private set; }
         public int RecordedMidiNote { get; private set; }
 
-        public BeatAnalyzedEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, int recordedMidiNote, int roundedRecordedMidiNote)
+        public BeatAnalyzedEvent(PitchEvent pitchEvent,
+            int beat,
+            Note noteAtBeat,
+            Sentence sentenceAtBeat,
+            int recordedMidiNote,
+            int roundedRecordedMidiNote)
         {
             PitchEvent = pitchEvent;
             Beat = beat;
             NoteAtBeat = noteAtBeat;
+            SentenceAtBeat = sentenceAtBeat;
             RecordedMidiNote = recordedMidiNote;
             RoundedRecordedMidiNote = roundedRecordedMidiNote;
         }

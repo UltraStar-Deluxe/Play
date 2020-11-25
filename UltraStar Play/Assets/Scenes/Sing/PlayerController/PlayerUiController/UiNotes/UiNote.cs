@@ -16,9 +16,6 @@ public class UiNote : MonoBehaviour
     public Image image;
 
     [InjectedInInspector]
-    public ImageHueHelper imageHueHelper;
-
-    [InjectedInInspector]
     public Text lyricsUiText;
     [InjectedInInspector]
     public RectTransform lyricsUiTextRectTransform;
@@ -66,7 +63,7 @@ public class UiNote : MonoBehaviour
     {
         if (micProfile != null)
         {
-            imageHueHelper.SetHueByColor(micProfile.Color);
+            image.color = micProfile.Color;
         }
 
         // Make freestyle and rap notes transparent

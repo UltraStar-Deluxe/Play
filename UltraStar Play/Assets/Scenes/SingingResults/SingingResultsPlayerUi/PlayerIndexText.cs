@@ -28,7 +28,7 @@ public class PlayerIndexText : MonoBehaviour, INeedInjection, IInjectionFinished
         uiText.text = "P" + (playerProfileIndex + 1);
         if (micProfile != null)
         {
-            backgroundImage.GetComponent<ImageHueHelper>().SetHueByColor(micProfile.Color);
+            backgroundImage.GetComponent<Image>().color = micProfile.Color;
         }
     }
 }

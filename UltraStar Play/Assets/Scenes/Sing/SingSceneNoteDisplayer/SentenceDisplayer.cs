@@ -64,7 +64,9 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
     public override void DisplayRecordedNote(RecordedNote recordedNote)
     {
-        if (recordedNote.TargetNote.Sentence != currentSentence)
+        if (currentSentence == null
+            || recordedNote.TargetSentence != currentSentence
+            || (recordedNote.TargetNote != null && recordedNote.TargetNote.Sentence != currentSentence))
         {
             // This is probably a recorded note from the previous sentence that is still continued because of the mic delay.
             // Do not draw the recorded note, it is not in the displayed sentence.

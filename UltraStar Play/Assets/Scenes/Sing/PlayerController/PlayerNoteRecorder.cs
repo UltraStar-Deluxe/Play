@@ -57,7 +57,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
         else if (beatAnalyzedEvent.PitchEvent != null)
         {
-            StartNewRecordedNote(beatAnalyzedEvent.Beat, beatAnalyzedEvent.NoteAtBeat, beatAnalyzedEvent.PitchEvent.MidiNote, beatAnalyzedEvent.RoundedRecordedMidiNote);
+            StartNewRecordedNote(beatAnalyzedEvent.Beat, beatAnalyzedEvent.NoteAtBeat, beatAnalyzedEvent.SentenceAtBeat, beatAnalyzedEvent.PitchEvent.MidiNote, beatAnalyzedEvent.RoundedRecordedMidiNote);
         }
         else
         {
@@ -73,9 +73,9 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         recordedNoteContinuedEventStream.OnNext(new RecordedNoteContinuedEvent(lastRecordedNote));
     }
 
-    private void StartNewRecordedNote(int analyzedBeat, Note noteAtBeat, int recordedMidiNote, int roundedMidiNote)
+    private void StartNewRecordedNote(int analyzedBeat, Note noteAtBeat, Sentence sentenceAtBeat, int recordedMidiNote, int roundedMidiNote)
     {
-        RecordedNote newRecordedNote = new RecordedNote(recordedMidiNote, roundedMidiNote, analyzedBeat, analyzedBeat + 1, noteAtBeat);
+        RecordedNote newRecordedNote = new RecordedNote(recordedMidiNote, roundedMidiNote, analyzedBeat, analyzedBeat + 1, noteAtBeat, sentenceAtBeat);
         recordedNoteStartedEventStream.OnNext(new RecordedNoteStartedEvent(newRecordedNote));
         lastRecordedNote = newRecordedNote;
     }

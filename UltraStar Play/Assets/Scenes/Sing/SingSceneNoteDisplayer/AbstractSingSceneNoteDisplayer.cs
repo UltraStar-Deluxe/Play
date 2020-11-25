@@ -111,7 +111,8 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
     public virtual void DisplayRecordedNote(RecordedNote recordedNote)
     {
         // Freestyle notes are not drawn
-        if (recordedNote.TargetNote.IsFreestyle)
+        if (recordedNote.TargetNote != null
+            && recordedNote.TargetNote.IsFreestyle)
         {
             return;
         }
@@ -230,7 +231,8 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         // When notes are drawn far away from the target note because the pitch detection got the wrong octave then it looks wrong.
         // Thus, only the relative pitch of the roundedMidiNote is used and drawn on the octave of the target note.
         int midiNote;
-        if (useRoundedMidiNote)
+        if (useRoundedMidiNote
+            && recordedNote.TargetNote != null)
         {
             midiNote = MidiUtils.GetMidiNoteOnOctaveOfTargetMidiNote(recordedNote.RoundedMidiNote, recordedNote.TargetNote.MidiNote);
         }
