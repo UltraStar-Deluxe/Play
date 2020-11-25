@@ -57,7 +57,11 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
         else if (beatAnalyzedEvent.PitchEvent != null)
         {
-            StartNewRecordedNote(beatAnalyzedEvent.Beat, beatAnalyzedEvent.NoteAtBeat, beatAnalyzedEvent.SentenceAtBeat, beatAnalyzedEvent.PitchEvent.MidiNote, beatAnalyzedEvent.RoundedRecordedMidiNote);
+            StartNewRecordedNote(beatAnalyzedEvent.Beat,
+                beatAnalyzedEvent.NoteAtBeat,
+                beatAnalyzedEvent.SentenceAtBeat,
+                beatAnalyzedEvent.PitchEvent.MidiNote,
+                beatAnalyzedEvent.RoundedRecordedMidiNote);
         }
         else
         {
