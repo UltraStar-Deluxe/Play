@@ -5,6 +5,7 @@
         "UniRx",
         "UniInject",
         "Common",
-        "UnityUIExtensions"
+        "UnityUIExtensions",
+        "Unity.TextMeshPro"
     ]
 }
