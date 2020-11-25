@@ -1285,11 +1285,11 @@ MonoBehaviour:
   anchorMin: {x: 0.02164491, y: 0.8683094}
   anchorMax: {x: 0.9741354, y: 0.8736908}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: -0.49996948, y: 115.119415, z: 0}
+  localPosition: {x: -0.49996948, y: 115.045, z: 0}
   anchoredPosition: {x: 1.0769043, y: -0.20996094}
-  position: {x: 1284.4802, y: 1107.2568, z: 0}
+  position: {x: 432.0068, y: 372.16116, z: 0}
   sizeDelta: {x: -4.000001, y: -1.460968}
-  size: {x: 707.882, y: 0.21188354}
+  size: {x: 707.8821, y: 0.21081543}
 --- !u!114 &1386089905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1800,7 +1800,17 @@ PrefabInstance:
     - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.5849673
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.49019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb9224bf102ee4043b45de46c945dd74, type: 3}

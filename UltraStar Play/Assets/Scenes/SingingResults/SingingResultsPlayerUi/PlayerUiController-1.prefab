@@ -724,7 +724,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: score_notes
+  m_Text: Noten
 --- !u!114 &5860360922604501399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1047,7 +1047,6 @@ GameObject:
   - component: {fileID: 3913333330370229131}
   - component: {fileID: 3913333330370229128}
   - component: {fileID: 9143761839870114246}
-  - component: {fileID: 5431452244741580202}
   m_Layer: 5
   m_Name: AvatarImage
   m_TagString: Untagged
@@ -1095,7 +1094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 593952254e20edd418eca8e4bf533428, type: 2}
-  m_Color: {r: 0.25, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.29999995, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1124,20 +1123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 524934f0d648ac542b50c99a24d13dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5431452244741580202
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3913333330370229111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hue: 0.25
-  hueAsColor: {r: 0.5, g: 1, b: 0, a: 1}
 --- !u!1 &3913333330576636476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,7 +1355,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: score_phraseBonus
+  m_Text: Phrasenbonus
 --- !u!114 &4446103660583902570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1930,7 +1915,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: score_total
+  m_Text: Gesamt
 --- !u!114 &3797110703291053466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2135,7 +2120,6 @@ GameObject:
   - component: {fileID: 3913333331543700336}
   - component: {fileID: 3913333331543700341}
   - component: {fileID: 3913333331543700338}
-  - component: {fileID: 8770561368073812469}
   - component: {fileID: 2317145071568820891}
   m_Layer: 5
   m_Name: PlayerIndexText
@@ -2185,7 +2169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 593952254e20edd418eca8e4bf533428, type: 2}
-  m_Color: {r: 0.25, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.16666675, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2202,20 +2186,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8770561368073812469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3913333331543700337}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hue: 0.25
-  hueAsColor: {r: 0.5, g: 1, b: 0, a: 1}
 --- !u!114 &2317145071568820891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2309,7 +2279,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: score_goldenNotes
+  m_Text: Goldener Ton
 --- !u!114 &8401141698078116771
 MonoBehaviour:
   m_ObjectHideFlags: 0

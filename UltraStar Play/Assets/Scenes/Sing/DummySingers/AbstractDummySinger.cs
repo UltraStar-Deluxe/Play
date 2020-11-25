@@ -38,7 +38,7 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
         {
             Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
             PitchEvent pitchEvent = GetDummyPichtEvent(beatToAnalyze, noteAtBeat);
-            playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat);
+            playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
             playerController.PlayerPitchTracker.GoToNextBeat();
         }
     }

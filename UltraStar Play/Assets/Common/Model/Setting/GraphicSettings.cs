@@ -13,5 +13,6 @@ public class GraphicSettings
     public bool showPitchIndicator;
     public bool useImageAsCursor = true;
     public bool showLyricsOnNotes = true;
+    public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = "BaseTheme";
 }

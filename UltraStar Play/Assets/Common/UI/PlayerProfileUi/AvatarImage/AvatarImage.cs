@@ -14,9 +14,6 @@ public class AvatarImage : MonoBehaviour, INeedInjection, IExcludeFromSceneInjec
     [Inject(searchMethod = SearchMethods.GetComponent)]
     private Image image;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
-    private ImageHueHelper imageHueHelper;
-
     [Inject(optional = true)]
     private MicProfile micProfile;
 
@@ -37,7 +34,7 @@ public class AvatarImage : MonoBehaviour, INeedInjection, IExcludeFromSceneInjec
     {
         if (micProfile != null)
         {
-            imageHueHelper.SetHueByColor(micProfile.Color);
+            image.color = micProfile.Color;
         }
     }
 }
