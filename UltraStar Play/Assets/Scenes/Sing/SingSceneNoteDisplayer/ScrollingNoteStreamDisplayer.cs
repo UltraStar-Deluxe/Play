@@ -29,17 +29,23 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     private int micDelayInMillis;
     private int displayedBeats;
 
-    private void Start()
+    private int frameCount;
+
+    private void Update()
     {
         // For some reason, Unity seems to need some frames to finish the calculation of the lyricsBar position.
         // In the first frame, the lyrics positions are wrong. Thus, as a workaround, delay the Update code by one frame.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () =>
+        if (frameCount > 2)
         {
             RemoveNotesOutsideOfDisplayArea();
             CreateNotesInDisplayArea();
 
             UpdateUiNotePositions();
-        }));
+        }
+        else
+        {
+            frameCount++;
+        }
     }
 
     override public void Init(int lineCount)

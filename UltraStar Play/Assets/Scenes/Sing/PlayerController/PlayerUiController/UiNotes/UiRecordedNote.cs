@@ -8,8 +8,9 @@ public class UiRecordedNote : MonoBehaviour
 {
     [InjectedInInspector]
     public Text lyricsUiText;
+
     [InjectedInInspector]
-    public ImageHueHelper imageHueHelper;
+    public Image image;
 
     public RectTransform RectTransform { get; private set; }
     public int MidiNote { get; set; }
@@ -44,6 +45,10 @@ public class UiRecordedNote : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        imageHueHelper.SetHueByColor(color);
+        // If no target note, then remove saturation from color and make transparent
+        Color finalColor = (RecordedNote != null && RecordedNote.TargetNote == null)
+            ? color.RgbToHsv().WithGreen(0).HsvToRgb().WithAlpha(0.25f)
+            : color;
+        image.color = finalColor;
     }
 }

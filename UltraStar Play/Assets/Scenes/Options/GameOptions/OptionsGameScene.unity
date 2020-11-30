@@ -1009,11 +1009,11 @@ MonoBehaviour:
   anchorMin: {x: 0, y: 1}
   anchorMax: {x: 0, y: 1}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 259.643, y: -23, z: 0}
-  anchoredPosition: {x: 259.643, y: -23}
-  position: {x: 1228.5621, y: 663.29016, z: 0}
-  sizeDelta: {x: 503.286, y: 30}
-  size: {x: 503.286, y: 30}
+  localPosition: {x: 259.64304, y: -23, z: 0}
+  anchoredPosition: {x: 259.64304, y: -23}
+  position: {x: 413.19998, y: 222.93042, z: 0}
+  sizeDelta: {x: 503.28607, y: 30}
+  size: {x: 503.28607, y: 30}
 --- !u!1001 &1051339506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1998,9 +1998,9 @@ MonoBehaviour:
   anchorMin: {x: 0.02164491, y: 0.75349224}
   anchorMax: {x: 0.974187, y: 0.75349224}
   pivot: {x: 0.5, y: 0.5}
-  localPosition: {x: 0.569397, y: 46.464462, z: 0}
+  localPosition: {x: 0.569397, y: 46.434677, z: 0}
   anchoredPosition: {x: 1.7370605, y: 0.4000244}
-  position: {x: 1249.694, y: 745.4555, z: 0}
+  position: {x: 420.30722, y: 250.55624, z: 0}
   sizeDelta: {x: -4, y: 0.5999985}
   size: {x: 529.6903, y: 0.5999985}
 --- !u!114 &1386089905
@@ -2858,7 +2858,17 @@ PrefabInstance:
     - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.5849673
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.49019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 1213786968706131434, guid: eb9224bf102ee4043b45de46c945dd74,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb9224bf102ee4043b45de46c945dd74, type: 3}
