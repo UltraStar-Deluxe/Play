@@ -459,7 +459,9 @@ MonoBehaviour:
     Through
     Glass
 
-    Rockabye ft. Sean Paul & Anne-Marie'
+    Rockabye ft. Sean Paul & Anne-Marie
+
+    Kryptonite'
 --- !u!4 &242235910
 Transform:
   m_ObjectHideFlags: 0
@@ -2669,6 +2671,16 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1582229496865185234, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: hueAsColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1582229496865185234, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1740204220136321326, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -2834,6 +2846,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1740204221289640829, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1740204221501400868, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -2929,6 +2946,51 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5360637247800774178, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637247800774178, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637247800774178, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637247800774178, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637248488637181, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637248488637181, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637248488637181, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5360637248488637181, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6030829014014337956, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6072640694067168004, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
         type: 3}
       propertyPath: m_AnchorMin.y
@@ -2958,6 +3020,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8003288729340126178, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba, type: 3}

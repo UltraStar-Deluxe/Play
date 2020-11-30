@@ -22,7 +22,7 @@ public class TotalScoreDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
     {
         if (micProfile != null)
         {
-            GetComponentInChildren<ImageHueHelper>().SetHueByColor(micProfile.Color);
+            GetComponentInChildren<Image>().color = micProfile.Color;
         }
     }
 }

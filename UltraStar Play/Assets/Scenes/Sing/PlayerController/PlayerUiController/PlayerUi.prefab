@@ -549,7 +549,6 @@ GameObject:
   - component: {fileID: 1740204221289640830}
   - component: {fileID: 1740204221289640828}
   - component: {fileID: 1740204221289640829}
-  - component: {fileID: 5898889932114484011}
   m_Layer: 5
   m_Name: TotalScoreBackground
   m_TagString: Untagged
@@ -597,7 +596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 593952254e20edd418eca8e4bf533428, type: 2}
-  m_Color: {r: 0.25, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -614,20 +613,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5898889932114484011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1740204221289640831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hue: 0.25
-  hueAsColor: {r: 0.5, g: 1, b: 0, a: 1}
 --- !u!1 &1740204221501400869
 GameObject:
   m_ObjectHideFlags: 0
@@ -1499,8 +1484,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  textureWidth: -1
-  textureHeight: -1
 --- !u!114 &6351049752545418376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1946,8 +1929,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  textureWidth: -1
-  textureHeight: -1
 --- !u!114 &3332310857507389578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1987,7 +1968,6 @@ GameObject:
   - component: {fileID: 7109815388351327220}
   - component: {fileID: 6030829014014337956}
   - component: {fileID: 3965146247835791063}
-  - component: {fileID: 7977003149577279013}
   - component: {fileID: 681089762497222338}
   m_Layer: 5
   m_Name: PlayerAvatar
@@ -2036,7 +2016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 593952254e20edd418eca8e4bf533428, type: 2}
-  m_Color: {r: 0.25, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2065,20 +2045,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 524934f0d648ac542b50c99a24d13dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7977003149577279013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7323512225572867491}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85abb5276c45f2c4bb8146818e101049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hue: 0.25
-  hueAsColor: {r: 0.5, g: 1, b: 0, a: 1}
 --- !u!114 &681089762497222338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2158,8 +2124,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  textureWidth: -1
-  textureHeight: -1
 --- !u!114 &8660458100381655039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2246,8 +2210,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
-  textureWidth: -1
-  textureHeight: -1
 --- !u!114 &1413883871
 MonoBehaviour:
   m_ObjectHideFlags: 0

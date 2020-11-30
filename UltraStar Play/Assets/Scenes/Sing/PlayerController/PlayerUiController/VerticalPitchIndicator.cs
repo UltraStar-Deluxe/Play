@@ -56,6 +56,7 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
         arrowImage.color = micProfile.Color;
         samplesPerBeat = (int)(micSampleRecorder.SampleRateHz * BpmUtils.MillisecondsPerBeat(songMeta) / 1000);
         playerNoteRecorder.RecordedNoteContinuedEventStream
+            .Where(recordedNoteEvent => recordedNoteEvent.RecordedNote.TargetNote != null)
             .Subscribe(recordedNoteEvent =>
             {
                 lastRecordedRoundedMidiNote = MidiUtils.GetMidiNoteOnOctaveOfTargetMidiNote(
