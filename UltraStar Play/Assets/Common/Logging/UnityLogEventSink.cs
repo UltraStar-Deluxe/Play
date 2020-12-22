@@ -48,12 +48,10 @@ public sealed class UnityLogEventSink : ILogEventSink
 
     private UnityEngine.Object GetUnityEngineContextObject(LogEvent logEvent)
     {
-        if (logEvent.Properties.TryGetValue(UnityObjectEnricher.unityObjectPropertyName, out LogEventPropertyValue logEventPropertyValue))
+        if (logEvent.Properties.TryGetValue(UnityObjectEnricher.unityObjectPropertyName, out LogEventPropertyValue logEventPropertyValue)
+            && logEventPropertyValue is ScalarValue scalarValue)
         {
-            if (logEventPropertyValue is ScalarValue scalarValue)
-            {
-                return scalarValue.Value as UnityEngine.Object;
-            }
+            return scalarValue.Value as UnityEngine.Object;
         }
         return null;
     }

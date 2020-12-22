@@ -62,9 +62,6 @@ public static class Log
 
         switch (type)
         {
-            case LogType.Log:
-                loggerWithContext.Information(logString);
-                break;
             case LogType.Warning:
                 loggerWithContext.Warning(logString);
                 break;
@@ -72,6 +69,9 @@ public static class Log
             case LogType.Error:
             case LogType.Exception:
                 loggerWithContext.Error(logString + stackTrace);
+                break;
+            default:
+                loggerWithContext.Information(logString);
                 break;
         }
     }
