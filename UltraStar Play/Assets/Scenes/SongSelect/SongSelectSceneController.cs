@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Threading;
 using System.IO;
 using System;
+using TMPro;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -41,7 +42,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public ArtistText artistText;
     public Text songTitleText;
 
-    public Text songCountText;
+    public TMP_Text songCountText;
     public GameObject videoIndicator;
     public GameObject duetIndicator;
     public FavoriteIndicator favoriteIndicator;
@@ -63,6 +64,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     [Inject]
     private PlaylistManager playlistManager;
+
+    [Inject]
+    private Settings settings;
 
     public GameObject noSongsFoundMessage;
 
@@ -446,6 +450,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void UpdateFilteredSongs()
     {
         songRouletteController.SetSongs(GetFilteredSongMetas());
+
+        // Indicate filtered playlist via font style of song count
+        songCountText.fontStyle = playlistSlider.SelectedItem == null || playlistSlider.SelectedItem is UltraStarAllSongsPlaylist
+            ? FontStyles.Normal
+            : FontStyles.Underline;
     }
 
     private bool TryExecuteSpecialSearchSyntax(string searchText)
