@@ -1,6 +1,7 @@
 {
     "name": "Scenes",
     "references": [
+        "Serilog",
         "Plugins",
         "UniRx",
         "UniInject",

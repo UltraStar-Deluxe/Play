@@ -10,12 +10,12 @@ public class LoadingSceneController : MonoBehaviour
         Screen.sleepTimeout = (int)0f;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
         // The settings are loaded on access.
-        string jsonSettings = JsonConverter.ToJson(SettingsManager.Instance.Settings, true);
-        Debug.Log("loaded settings:" + jsonSettings);
+        string jsonSettings = JsonConverter.ToJson(SettingsManager.Instance.Settings, false);
+        Log.Logger.Information("loaded settings:" + jsonSettings);
 
         // The SongMetas are loaded on access.
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
-        Debug.Log("started loading songs.");
+        Log.Logger.Information("started loading songs.");
 
         // Extract StreamingAssets on Android from the JAR
         AndroidStreamingAssets.Extract();
