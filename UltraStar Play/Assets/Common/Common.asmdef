@@ -1,6 +1,7 @@
 {
     "name": "Common",
     "references": [
+        "Serilog",
         "Plugins",
         "UniRx",
         "UniInject",
