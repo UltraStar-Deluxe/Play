@@ -655,7 +655,11 @@ PlayerSettings:
   webGLLinkerTarget: 0
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    1: OS_MUTEX
+    4: OS_MUTEX
+    7: OS_MUTEX
+    13: OS_MUTEX
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}

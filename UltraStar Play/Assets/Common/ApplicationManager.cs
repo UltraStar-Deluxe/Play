@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +30,16 @@ public class ApplicationManager : MonoBehaviour
         {
             Application.targetFrameRate = targetFrameRate;
         }
+    }
+
+    void OnEnable()
+    {
+        Application.logMessageReceived += Log.HandleUnityLog;
+    }
+
+    void OnDisable()
+    {
+        Application.logMessageReceived -= Log.HandleUnityLog;
     }
 
     public bool HasCommandLineArgument(string argumentName)
