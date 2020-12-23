@@ -13,6 +13,7 @@ component [Plugins] {
     [UniInject]
     [UniRx]
     [TextMesh Pro]
+    [Serilog]
 }
 
 ' ---------------------------
