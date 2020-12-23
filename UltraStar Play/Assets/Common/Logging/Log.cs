@@ -68,7 +68,7 @@ public static class Log
             case LogType.Assert:
             case LogType.Error:
             case LogType.Exception:
-                loggerWithContext.Error(logString + stackTrace);
+                loggerWithContext.Error(logString + "\n" + stackTrace);
                 break;
             default:
                 loggerWithContext.Information(logString);
