@@ -1,5 +1,6 @@
 {
     "name": "Scenes",
+    "rootNamespace": "",
     "references": [
         "Serilog",
         "Plugins",
@@ -8,5 +9,14 @@
         "Common",
         "UnityUIExtensions",
         "Unity.TextMeshPro"
-    ]
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

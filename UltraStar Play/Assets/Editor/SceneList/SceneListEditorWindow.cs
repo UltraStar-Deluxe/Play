@@ -21,9 +21,14 @@ public class SceneListEditorWindow : EditorWindow
         EditorWindow.GetWindow(typeof(SceneListEditorWindow), false, "Scene List");
     }
 
+    private void Awake()
+    {
+        scenePaths = FindScenePaths(sortAlphabetically);
+    }
+
     void OnGUI()
     {
-        if (scenePaths == null || GUILayout.Button("Refresh"))
+        if (GUILayout.Button("Refresh"))
         {
             scenePaths = FindScenePaths(sortAlphabetically);
         }

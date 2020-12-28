@@ -33,7 +33,7 @@ jobs:
   include:
   - stage: test
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=editmode IMAGE_NAME=gableroux/unity3d:2020.1.5f1
+    env: TEST_PLATFORM=editmode IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-linux-il2cpp-0.7.0
     addons:
       artifacts:
         s3_region: "eu-west-1"
@@ -41,14 +41,15 @@ jobs:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
   - stage: test
     script: "./tools/travis/docker_test.sh"
-    env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2020.1.5f1
+    env: TEST_PLATFORM=playmode IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-linux-il2cpp-0.7.0
     addons:
       artifacts:
         s3_region: "eu-west-1"
         paths:
         - "$(pwd)/$TEST_PLATFORM-results.xml"
+  
   - stage: build
-    env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=gableroux/unity3d:2020.1.5f1
+    env: BUILD_TARGET=StandaloneLinux64 IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-linux-il2cpp-0.7.0
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
@@ -56,7 +57,7 @@ jobs:
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
-    env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=gableroux/unity3d:2020.1.5f1-mac
+    env: BUILD_TARGET=StandaloneOSX IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-mac-mono-0.7.0
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
@@ -64,7 +65,7 @@ jobs:
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
-    env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=gableroux/unity3d:2020.1.5f1-windows
+    env: BUILD_TARGET=StandaloneWindows64 IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-windows-mono-0.7.0
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
@@ -72,7 +73,15 @@ jobs:
         paths:
         - "$(pwd)/UltraStarPlay-build.tar.gz"
   - stage: build
-    env: BUILD_TARGET=iOS IMAGE_NAME=gableroux/unity3d:2020.1.5f1-ios
+    env: BUILD_TARGET=Android IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-android-0.7.0
+    script: "./tools/travis/docker_build.sh"
+    addons:
+      artifacts:
+        s3_region: "eu-west-1"
+        paths:
+        - "$(pwd)/UltraStarPlay-build.tar.gz"
+  - stage: build
+    env: BUILD_TARGET=iOS IMAGE_NAME=unityci/editor:ubuntu-2020.2.1f1-ios-0.7.0
     script: "./tools/travis/docker_build.sh"
     addons:
       artifacts:
