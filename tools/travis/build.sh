@@ -8,7 +8,7 @@ echo "Building for $BUILD_TARGET"
 export BUILD_PATH=/project/Builds/$BUILD_TARGET/
 mkdir -p $BUILD_PATH
 
-/opt/Unity/Editor/Unity \
+/opt/unity/Editor/Unity \
     -projectPath "$(pwd)/UltraStar Play" \
     -quit \
     -batchmode \
