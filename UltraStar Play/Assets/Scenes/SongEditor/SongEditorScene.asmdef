@@ -1,10 +1,20 @@
 {
     "name": "SongEditorScene",
+    "rootNamespace": "",
     "references": [
         "Plugins",
         "UniRx",
         "UniInject",
         "Common",
         "Unity.TextMeshPro"
-    ]
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

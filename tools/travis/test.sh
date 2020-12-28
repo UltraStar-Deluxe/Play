@@ -2,7 +2,7 @@
 
 set -x
 
-/opt/Unity/Editor/Unity \
+/opt/unity/Editor/Unity \
     -projectPath "$(pwd)/UltraStar Play" \
     -runTests \
     -testPlatform $TEST_PLATFORM \

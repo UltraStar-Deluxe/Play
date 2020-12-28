@@ -1,9 +1,19 @@
 {
     "name": "Demos",
+    "rootNamespace": "",
     "references": [
         "Plugins",
         "UniRx",
         "UniInject",
         "Common"
-    ]
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
