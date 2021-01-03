@@ -22,6 +22,8 @@ TagManager:
   - AudioManager
   - PlaylistManager
   - CoroutineManager
+  - UIDocument
+  - SceneInjectionManager
   layers:
   - Default
   - TransparentFX

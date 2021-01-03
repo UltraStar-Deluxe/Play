@@ -1,0 +1,84 @@
+.unity-label {
+    color: white;
+}
+
+.unity-button {
+    background-color: rgb(66, 163, 231);
+    color: rgb(255, 255, 255);
+    width: 120px;
+    height: 40px;
+    font-size: 18px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.unity-button:hover {
+    background-color: rgb(125, 198, 233);
+}
+
+.unity-button:focus {
+    background-color: rgb(125, 198, 233);
+}
+
+.unity-button:active {
+    background-color: rgb(99, 154, 183);
+}
+
+.titleImage {
+    margin-right: 10px;
+    width: 32px;
+    height: 32px;
+}
+
+.titleText {
+    font-size: 24px;
+}
+
+.titleSubText {
+    font-size: 18px;
+    color: rgb(180, 229, 255);
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialogTitle {
+    font-size: 20px;
+}
+
+.dialogMessage {
+    font-size: 16px;
+}
+
+.dialogTitleImage {
+    margin-right: 10px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dialogButton {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.dialogTextButton {
+    height: auto;
+    width: auto;
+    color: rgb(6, 170, 233);
+}
+
+.dialogTextButton:hover {
+    color: rgb(0, 102, 156);
+}

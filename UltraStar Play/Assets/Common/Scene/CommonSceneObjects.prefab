@@ -178,6 +178,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dialogUxml: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+    type: 3}
   warningDialogPrefab: {fileID: 6090808193284951113, guid: 26a11ce5964394349a3e18d9ffccf003,
     type: 3}
   questionDialogPrefab: {fileID: 8068263864902124345, guid: 7a92a57c453d28bfb9c4dd88c18f3c29,
@@ -1706,7 +1708,7 @@ GameObject:
   - component: {fileID: 2169182747885416814}
   m_Layer: 0
   m_Name: SceneInjectionManager
-  m_TagString: Untagged
+  m_TagString: SceneInjectionManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
