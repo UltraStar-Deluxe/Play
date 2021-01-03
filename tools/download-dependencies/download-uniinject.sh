@@ -17,9 +17,9 @@ echo "UniInject/Assets/Editor/UniInjectEditor.asmdef" >> .git/info/sparse-checko
 echo "UniInject/Assets/Editor/MenuItems/*" >> .git/info/sparse-checkout
 echo "README.md" >> .git/info/sparse-checkout
 echo "LICENSE" >> .git/info/sparse-checkout
-# commit from 21th November 2020: 913136b70cd712fc57d3831cfaedf2f4e4cd5f99
+# commit from 3th January 2021: 8e8488834e799225bd48af1a50cdf00fad950bd6
 git pull --depth=100 origin main
-git checkout 913136b70cd712fc57d3831cfaedf2f4e4cd5f99
+git checkout 8e8488834e799225bd48af1a50cdf00fad950bd6
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v UniInject/Assets/* ./

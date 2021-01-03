@@ -6,5 +6,6 @@
   <xs:import schemaLocation="Unity.Cloud.Collaborate.Views.xsd" namespace="Unity.Cloud.Collaborate.Views" />
   <xs:import schemaLocation="Unity.Cloud.Collaborate.Components.xsd" namespace="Unity.Cloud.Collaborate.Components" />
   <xs:import schemaLocation="Unity.Cloud.Collaborate.Components.ChangeListEntries.xsd" namespace="Unity.Cloud.Collaborate.Components.ChangeListEntries" />
+  <xs:import schemaLocation="Unity.UI.Builder.xsd" namespace="Unity.UI.Builder" />
   <xs:import schemaLocation="UnityEditor.PackageManager.UI.xsd" namespace="UnityEditor.PackageManager.UI" />
 </xs:schema>

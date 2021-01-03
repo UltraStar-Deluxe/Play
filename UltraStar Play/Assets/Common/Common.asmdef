@@ -6,7 +6,9 @@
         "Plugins",
         "UniRx",
         "UniInject",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UnityEngine.UIElementsModule",
+        "UnityEngine.UIElementsGameObjectsModule"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
