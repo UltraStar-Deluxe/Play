@@ -6,6 +6,7 @@ using UniInject;
 using UnityEngine;
 using UniRx;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -41,8 +42,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
     private static Dictionary<string, string> currentLanguageMessages;
     private static Dictionary<string, string> fallbackMessages;
 
-    private static CoroutineManager coroutineManager;
-
     private void Awake()
     {
         if (fallbackMessages.IsNullOrEmpty())
@@ -57,11 +56,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
         if (Application.isPlaying)
         {
             return;
-        }
-
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
         }
 
         if (fallbackMessages.IsNullOrEmpty())
@@ -141,11 +135,6 @@ public class I18NManager : MonoBehaviour, INeedInjection
             ? overwriteLanguage
             : SettingsManager.Instance.Settings.GameSettings.language;
 
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-
         // Load the default properties file
         string fallbackPropertiesFilePath = GetPropertiesFilePath(PropertiesFileName);
         string fallbackPropertiesFileContent = File.ReadAllText(fallbackPropertiesFilePath);
@@ -168,11 +157,40 @@ public class I18NManager : MonoBehaviour, INeedInjection
 
     private static void UpdateAllTranslationsInScene()
     {
-        I18NText[] i18nTexts = GameObject.FindObjectsOfType<I18NText>();
-        Debug.Log($"Updating I18NText instances in scene: {i18nTexts.Length}");
-        foreach (I18NText i18nText in i18nTexts)
+        LinkedList<ITranslator> translators = new LinkedList<ITranslator>();
+        Scene scene = SceneManager.GetActiveScene();
+        if (scene != null && scene.isLoaded)
         {
-            i18nText.UpdateTranslation();
+            GameObject[] rootObjects = scene.GetRootGameObjects();
+            foreach (GameObject rootObject in rootObjects)
+            {
+                UpdateTranslationsRecursively(rootObject, translators);
+            }
+            Debug.Log($"Updated ITranslator instances in scene: {translators.Count}");
+        }
+    }
+
+    private static void UpdateTranslationsRecursively(GameObject gameObject, LinkedList<ITranslator> translators)
+    {
+        MonoBehaviour[] scripts = gameObject.GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour script in scripts)
+        {
+            // The script can be null if it is a missing component.
+            if (script == null)
+            {
+                continue;
+            }
+
+            if (script is ITranslator translator)
+            {
+                translators.AddLast(translator);
+                translator.UpdateTranslation();
+            }
+        }
+
+        foreach (Transform child in gameObject.transform)
+        {
+            UpdateTranslationsRecursively(child.gameObject, translators);
         }
     }
 
