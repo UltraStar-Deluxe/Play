@@ -7,15 +7,17 @@ public class SimpleUxmlDialog
     private readonly VisualElement parentVisualElement;
 
     private readonly VisualElement buttonContainer;
-    private readonly Label dialogTitle;
-    private readonly Label dialogMessage;
 
-    public SimpleUxmlDialog(VisualTreeAsset dialogUxml, VisualElement parentVisualElement, string title, string message)
+    public SimpleUxmlDialog(
+        VisualTreeAsset dialogUxml,
+        VisualElement parentVisualElement,
+        string title,
+        string message)
     {
         dialogRootVisualElement = dialogUxml.CloneTree();
         buttonContainer = dialogRootVisualElement.Q<VisualElement>("dialogButtonContainer");
-        dialogTitle = dialogRootVisualElement.Q<Label>("dialogTitle");
-        dialogMessage = dialogRootVisualElement.Q<Label>("dialogMessage");
+        Label dialogTitle = dialogRootVisualElement.Q<Label>("dialogTitle");
+        Label dialogMessage = dialogRootVisualElement.Q<Label>("dialogMessage");
 
         dialogRootVisualElement.AddToClassList("overlay");
         dialogTitle.text = title;
