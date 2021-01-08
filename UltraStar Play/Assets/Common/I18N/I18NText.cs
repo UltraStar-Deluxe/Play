@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 [RequireComponent(typeof(Text))]
 [ExecuteInEditMode]
-public class I18NText : MonoBehaviour
+public class I18NText : MonoBehaviour, ITranslator
 {
     [Delayed]
     public string key;

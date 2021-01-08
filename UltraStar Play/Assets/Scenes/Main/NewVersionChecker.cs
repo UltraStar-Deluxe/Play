@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using UnityEngine.Networking;
@@ -20,7 +20,7 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     {
         isRemoteVersionFileDownloadDone = false;
         remoteVersionFileContent = null;
-        closeButtonClicked = false;
+        dialogWasShown = false;
     }
 
     private static readonly string remoteVersionFileUrl = "https://raw.githubusercontent.com/UltraStar-Deluxe/Play/master/UltraStar%20Play/Assets/VERSION.txt";
@@ -28,34 +28,28 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     // Static variables, to persist these values across scene changes.
     private static bool isRemoteVersionFileDownloadDone;
     private static string remoteVersionFileContent;
-    private static bool closeButtonClicked;
+    private static bool dialogWasShown;
 
     [InjectedInInspector]
     public TextAsset localVersionTextAsset;
 
     [InjectedInInspector]
-    public GameObject newVersionAvailableDialog;
-
-    [InjectedInInspector]
-    public Text newVersionAvailableDialogMessage;
-
-    [InjectedInInspector]
-    public Button closeButton;
-
-    [InjectedInInspector]
-    public Button ignoreThisVersionButton;
-
-    [InjectedInInspector]
-    public Button ignoreAllFutureVersionsButton;
+    public VisualTreeAsset newVersionDialogUxml;
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private UIDocument uiDoc;
 
     private UnityWebRequest webRequest;
 
     void Start()
     {
-        if (closeButtonClicked)
+        if (dialogWasShown)
         {
             // The dialog has been shown before in this run
             gameObject.SetActive(false);
@@ -131,7 +125,7 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
                 || (CompareVersionString(localRelease, remoteRelease) == 0
                     && CompareVersionString(localBuildTimeStamp, remoteBuildTimeStamp) < 0))
             {
-                ShowNewVersionAvailableDialog(remoteVersionProperties);
+                CreateNewVersionAvailableDialog(remoteVersionProperties);
             }
         }
         catch (CompareVersionException ex)
@@ -140,40 +134,13 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         }
     }
 
-    private void ShowNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
+    private void CreateNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
     {
-        remoteVersionProperties.TryGetValue("release", out string remoteRelease);
-        remoteVersionProperties.TryGetValue("website_link", out string websiteLink);
-
-        // Add callbacks to buttons
-        ignoreThisVersionButton.OnClickAsObservable()
-            .Subscribe(_ =>
-            {
-                settings.IgnoredReleases.AddIfNotContains(remoteRelease);
-                newVersionAvailableDialog.SetActive(false);
-            });
-
-        ignoreAllFutureVersionsButton.OnClickAsObservable()
-            .Subscribe(_ =>
-            {
-                settings.IgnoredReleases.Clear();
-                settings.IgnoredReleases.Add("all");
-                newVersionAvailableDialog.SetActive(false);
-            });
-
-        // Set message of the dialog
-        newVersionAvailableDialogMessage.text = $"UltraStar Play {remoteRelease} has been released.\n"
-            + $"For more information visit <color=\"red\">{websiteLink}</color>";
-
-        closeButton.OnClickAsObservable()
-            .Subscribe(_ =>
-            {
-                closeButtonClicked = true;
-                newVersionAvailableDialog.SetActive(false);
-            });
-
-        // Show dialog
-        newVersionAvailableDialog.SetActive(true);
+        VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree();
+        dialogRootVisualElement.AddToClassList("overlay");
+        NewVersionDialog newVersionDialog = new NewVersionDialog(dialogRootVisualElement, uiDoc.rootVisualElement, remoteVersionProperties);
+        injector.WithRootVisualElement(dialogRootVisualElement).Inject(newVersionDialog);
+        dialogWasShown = true;
     }
 
     /**

@@ -7,8 +7,9 @@
         "UniRx",
         "UniInject",
         "Common",
-        "UnityUIExtensions",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UnityEngine.UIElementsModule",
+        "UnityEngine.UIElementsGameObjectsModule"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
