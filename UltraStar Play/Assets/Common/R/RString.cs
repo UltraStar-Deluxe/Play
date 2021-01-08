@@ -46,6 +46,10 @@ public static partial class R
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
         public static readonly string mainScene_title = "mainScene_title";
         public static readonly string new_ = "new";
+        public static readonly string newVersionAvailableDialog_ignoreAllFutureVersions = "newVersionAvailableDialog_ignoreAllFutureVersions";
+        public static readonly string newVersionAvailableDialog_ignoreThisVersion = "newVersionAvailableDialog_ignoreThisVersion";
+        public static readonly string newVersionAvailableDialog_message = "newVersionAvailableDialog_message";
+        public static readonly string newVersionAvailableDialog_title = "newVersionAvailableDialog_title";
         public static readonly string no = "no";
         public static readonly string ok = "ok";
         public static readonly string open = "open";
