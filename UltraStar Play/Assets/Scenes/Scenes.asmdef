@@ -9,7 +9,8 @@
         "Common",
         "Unity.TextMeshPro",
         "UnityEngine.UIElementsModule",
-        "UnityEngine.UIElementsGameObjectsModule"
+        "UnityEngine.UIElementsGameObjectsModule",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
