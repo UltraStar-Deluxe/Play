@@ -51,8 +51,30 @@ public static class StringExtensions
         return txt != null && txt.Length > 0 && txt[txt.Length - 1] == c;
     }
 
-    public static void AppendLine(this StringBuilder sb, string line)
+    public static string ToLowerInvariantFirstChar(this string txt)
     {
+        if (txt.Length <= 1)
+        {
+            return txt.ToLowerInvariant();
+        }
+        return txt.Substring(0, 1).ToLowerInvariant() + txt.Substring(1, txt.Length - 1);
+    }
+    
+    public static string ToUpperInvariantFirstChar(this string txt)
+    {
+        if (txt.Length <= 1)
+        {
+            return txt.ToUpperInvariant();
+        }
+        return txt.Substring(0, 1).ToUpperInvariant() + txt.Substring(1, txt.Length - 1);
+    }
+    
+    public static void AppendLine(this StringBuilder sb, string line, int indentationInSpaces)
+    {
+        for (int i = 0; i < indentationInSpaces; i++)
+        {
+            sb.Append(" ");
+        }
         sb.Append(line);
         sb.Append("\n");
     }

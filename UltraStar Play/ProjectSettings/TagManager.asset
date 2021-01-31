@@ -24,6 +24,7 @@ TagManager:
   - CoroutineManager
   - UIDocument
   - SceneInjectionManager
+  - InputManager
   layers:
   - Default
   - TransparentFX
