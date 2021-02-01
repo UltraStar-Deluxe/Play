@@ -23,7 +23,7 @@ public class ChangeSceneButton : MonoBehaviour, INeedInjection
 
         if (triggerWithEscape)
         {
-            inputActions.USPlay.BackAction.PerformedAsObservable().Subscribe(OnBack);
+            inputActions.USPlay.Back.PerformedAsObservable().Subscribe(OnBack);
         }
     }
 

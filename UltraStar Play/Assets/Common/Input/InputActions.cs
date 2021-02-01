@@ -1,4 +1,6 @@
 ﻿// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.
+using UnityEngine;
+
 using UnityEngine.InputSystem;
 
 public class InputActions
@@ -6,49 +8,49 @@ public class InputActions
     public UIInputActions UI { get; private set; }
     public USPlayInputActions USPlay { get; private set; }
 
-    public InputActions(InputActionAsset inputActionAsset)
+    public InputActions(InputActionAsset inputActionAsset, GameObject owner)
     {
-        UI = new UIInputActions(inputActionAsset);
-        USPlay = new USPlayInputActions(inputActionAsset);
+        UI = new UIInputActions(inputActionAsset, owner);
+        USPlay = new USPlayInputActions(inputActionAsset, owner);
     }
 
     public class UIInputActions
     {
-        public InputAction NavigateAction { get; private set; }
-        public InputAction SubmitAction { get; private set; }
-        public InputAction CancelAction { get; private set; }
-        public InputAction TabAction { get; private set; }
-        public InputAction PointAction { get; private set; }
-        public InputAction ClickAction { get; private set; }
-        public InputAction ScrollWheelAction { get; private set; }
-        public InputAction MiddleClickAction { get; private set; }
-        public InputAction RightClickAction { get; private set; }
-        public InputAction TrackedDevicePositionAction { get; private set; }
-        public InputAction TrackedDeviceOrientationAction { get; private set; }
+        public ObservableInputAction Navigate { get; private set; }
+        public ObservableInputAction Submit { get; private set; }
+        public ObservableInputAction Cancel { get; private set; }
+        public ObservableInputAction Tab { get; private set; }
+        public ObservableInputAction Point { get; private set; }
+        public ObservableInputAction Click { get; private set; }
+        public ObservableInputAction ScrollWheel { get; private set; }
+        public ObservableInputAction MiddleClick { get; private set; }
+        public ObservableInputAction RightClick { get; private set; }
+        public ObservableInputAction TrackedDevicePosition { get; private set; }
+        public ObservableInputAction TrackedDeviceOrientation { get; private set; }
 
-        public UIInputActions(InputActionAsset inputActionAsset)
+        public UIInputActions(InputActionAsset inputActionAsset, GameObject owner)
         {
-            NavigateAction = inputActionAsset.FindAction("UI/Navigate", true);
-            SubmitAction = inputActionAsset.FindAction("UI/Submit", true);
-            CancelAction = inputActionAsset.FindAction("UI/Cancel", true);
-            TabAction = inputActionAsset.FindAction("UI/Tab", true);
-            PointAction = inputActionAsset.FindAction("UI/Point", true);
-            ClickAction = inputActionAsset.FindAction("UI/Click", true);
-            ScrollWheelAction = inputActionAsset.FindAction("UI/ScrollWheel", true);
-            MiddleClickAction = inputActionAsset.FindAction("UI/MiddleClick", true);
-            RightClickAction = inputActionAsset.FindAction("UI/RightClick", true);
-            TrackedDevicePositionAction = inputActionAsset.FindAction("UI/TrackedDevicePosition", true);
-            TrackedDeviceOrientationAction = inputActionAsset.FindAction("UI/TrackedDeviceOrientation", true);
+            Navigate = new ObservableInputAction(inputActionAsset.FindAction("UI/Navigate", true), owner);
+            Submit = new ObservableInputAction(inputActionAsset.FindAction("UI/Submit", true), owner);
+            Cancel = new ObservableInputAction(inputActionAsset.FindAction("UI/Cancel", true), owner);
+            Tab = new ObservableInputAction(inputActionAsset.FindAction("UI/Tab", true), owner);
+            Point = new ObservableInputAction(inputActionAsset.FindAction("UI/Point", true), owner);
+            Click = new ObservableInputAction(inputActionAsset.FindAction("UI/Click", true), owner);
+            ScrollWheel = new ObservableInputAction(inputActionAsset.FindAction("UI/ScrollWheel", true), owner);
+            MiddleClick = new ObservableInputAction(inputActionAsset.FindAction("UI/MiddleClick", true), owner);
+            RightClick = new ObservableInputAction(inputActionAsset.FindAction("UI/RightClick", true), owner);
+            TrackedDevicePosition = new ObservableInputAction(inputActionAsset.FindAction("UI/TrackedDevicePosition", true), owner);
+            TrackedDeviceOrientation = new ObservableInputAction(inputActionAsset.FindAction("UI/TrackedDeviceOrientation", true), owner);
         }
     }
 
     public class USPlayInputActions
     {
-        public InputAction BackAction { get; private set; }
+        public ObservableInputAction Back { get; private set; }
 
-        public USPlayInputActions(InputActionAsset inputActionAsset)
+        public USPlayInputActions(InputActionAsset inputActionAsset, GameObject owner)
         {
-            BackAction = inputActionAsset.FindAction("USPlay/Back", true);
+            Back = new ObservableInputAction(inputActionAsset.FindAction("USPlay/Back", true), owner);
         }
     }
 

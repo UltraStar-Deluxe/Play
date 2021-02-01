@@ -17,7 +17,6 @@ public class InputManager : MonoBehaviour, IBinder
             DeleteInputActionAssetFile(GetInputActionAssetFilePath());
         }
         inputActionAsset = null;
-        inputActions = null;
     }
     
     public static InputManager Instance
@@ -60,18 +59,17 @@ public class InputManager : MonoBehaviour, IBinder
         }
     }
 
-    // Static reference to be persisted across scenes.
-    private static InputActions inputActions;
     /**
      * Holds the loaded InputActions for easy access. This object is also available via Injection.
      */
+    private InputActions inputActions;
     public InputActions InputActions
     {
         get
         {
             if (inputActions == null)
             {
-                inputActions = new InputActions(InputActionAsset);
+                inputActions = new InputActions(InputActionAsset, this.gameObject);
             }
 
             return inputActions;
