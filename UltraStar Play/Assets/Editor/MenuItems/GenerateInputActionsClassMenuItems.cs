@@ -39,11 +39,11 @@ public static class GenerateInputActionsClassMenuItems
         string subClassName = $"{actionMap.name}InputActions";
         sb.AppendLine($"public class {subClassName}", indentWidth);
         sb.AppendLine("{", indentWidth);
-        actionMap.actions.ForEach(action => sb.AppendLine($"public ObservableInputAction {action.name} {{ get; private set; }}", indentWidth*2));
+        actionMap.actions.ForEach(action => sb.AppendLine($"public ObservableCancelablePriorityInputAction {action.name} {{ get; private set; }}", indentWidth*2));
         sb.AppendLine("");
         sb.AppendLine($"public {subClassName}(InputActionAsset inputActionAsset, GameObject owner)", indentWidth*2);
         sb.AppendLine("{", indentWidth*2);
-        actionMap.actions.ForEach(action => sb.AppendLine($"{action.name} = new ObservableInputAction(inputActionAsset.FindAction(\"{actionMap.name}/{action.name}\", true), owner);", indentWidth*3));
+        actionMap.actions.ForEach(action => sb.AppendLine($"{action.name} = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction(\"{actionMap.name}/{action.name}\", true), owner);", indentWidth*3));
         sb.AppendLine("}", indentWidth*2);
         sb.AppendLine("}", indentWidth);
         sb.AppendLine("");

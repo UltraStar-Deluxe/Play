@@ -16,41 +16,43 @@ public class InputActions
 
     public class UIInputActions
     {
-        public ObservableInputAction Navigate { get; private set; }
-        public ObservableInputAction Submit { get; private set; }
-        public ObservableInputAction Cancel { get; private set; }
-        public ObservableInputAction Tab { get; private set; }
-        public ObservableInputAction Point { get; private set; }
-        public ObservableInputAction Click { get; private set; }
-        public ObservableInputAction ScrollWheel { get; private set; }
-        public ObservableInputAction MiddleClick { get; private set; }
-        public ObservableInputAction RightClick { get; private set; }
-        public ObservableInputAction TrackedDevicePosition { get; private set; }
-        public ObservableInputAction TrackedDeviceOrientation { get; private set; }
+        public ObservableCancelablePriorityInputAction Navigate { get; private set; }
+        public ObservableCancelablePriorityInputAction Submit { get; private set; }
+        public ObservableCancelablePriorityInputAction Cancel { get; private set; }
+        public ObservableCancelablePriorityInputAction Tab { get; private set; }
+        public ObservableCancelablePriorityInputAction Point { get; private set; }
+        public ObservableCancelablePriorityInputAction Click { get; private set; }
+        public ObservableCancelablePriorityInputAction ScrollWheel { get; private set; }
+        public ObservableCancelablePriorityInputAction MiddleClick { get; private set; }
+        public ObservableCancelablePriorityInputAction RightClick { get; private set; }
+        public ObservableCancelablePriorityInputAction TrackedDevicePosition { get; private set; }
+        public ObservableCancelablePriorityInputAction TrackedDeviceOrientation { get; private set; }
 
         public UIInputActions(InputActionAsset inputActionAsset, GameObject owner)
         {
-            Navigate = new ObservableInputAction(inputActionAsset.FindAction("UI/Navigate", true), owner);
-            Submit = new ObservableInputAction(inputActionAsset.FindAction("UI/Submit", true), owner);
-            Cancel = new ObservableInputAction(inputActionAsset.FindAction("UI/Cancel", true), owner);
-            Tab = new ObservableInputAction(inputActionAsset.FindAction("UI/Tab", true), owner);
-            Point = new ObservableInputAction(inputActionAsset.FindAction("UI/Point", true), owner);
-            Click = new ObservableInputAction(inputActionAsset.FindAction("UI/Click", true), owner);
-            ScrollWheel = new ObservableInputAction(inputActionAsset.FindAction("UI/ScrollWheel", true), owner);
-            MiddleClick = new ObservableInputAction(inputActionAsset.FindAction("UI/MiddleClick", true), owner);
-            RightClick = new ObservableInputAction(inputActionAsset.FindAction("UI/RightClick", true), owner);
-            TrackedDevicePosition = new ObservableInputAction(inputActionAsset.FindAction("UI/TrackedDevicePosition", true), owner);
-            TrackedDeviceOrientation = new ObservableInputAction(inputActionAsset.FindAction("UI/TrackedDeviceOrientation", true), owner);
+            Navigate = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Navigate", true), owner);
+            Submit = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Submit", true), owner);
+            Cancel = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Cancel", true), owner);
+            Tab = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Tab", true), owner);
+            Point = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Point", true), owner);
+            Click = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/Click", true), owner);
+            ScrollWheel = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/ScrollWheel", true), owner);
+            MiddleClick = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/MiddleClick", true), owner);
+            RightClick = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/RightClick", true), owner);
+            TrackedDevicePosition = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/TrackedDevicePosition", true), owner);
+            TrackedDeviceOrientation = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("UI/TrackedDeviceOrientation", true), owner);
         }
     }
 
     public class USPlayInputActions
     {
-        public ObservableInputAction Back { get; private set; }
+        public ObservableCancelablePriorityInputAction Back { get; private set; }
+        public ObservableCancelablePriorityInputAction AnyKeyboardModifier { get; private set; }
 
         public USPlayInputActions(InputActionAsset inputActionAsset, GameObject owner)
         {
-            Back = new ObservableInputAction(inputActionAsset.FindAction("USPlay/Back", true), owner);
+            Back = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("USPlay/Back", true), owner);
+            AnyKeyboardModifier = new ObservableCancelablePriorityInputAction(inputActionAsset.FindAction("USPlay/AnyKeyboardModifier", true), owner);
         }
     }
 
