@@ -13,9 +13,6 @@ public class ChangeSceneButton : MonoBehaviour, INeedInjection
     public EScene targetScene;
     public bool triggerWithEscape;
 
-    [Inject]
-    private InputActions inputActions;
-    
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
@@ -23,7 +20,8 @@ public class ChangeSceneButton : MonoBehaviour, INeedInjection
 
         if (triggerWithEscape)
         {
-            inputActions.USPlay.Back.PerformedAsObservable().Subscribe(OnBack);
+            InputManager.GetInputAction(R.InputActions.usplay_back)
+                .PerformedAsObservable().Subscribe(OnBack);
         }
     }
 

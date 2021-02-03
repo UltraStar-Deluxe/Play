@@ -1,4 +1,4 @@
-// To update this file use the corresponding menu item in the Unity Editor.
+﻿// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.
 public static partial class R
 {
     public static class String

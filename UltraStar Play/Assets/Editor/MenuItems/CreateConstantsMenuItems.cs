@@ -28,9 +28,29 @@ public static class CreateConstantsMenuItems
         CreateConstantsForColors();
         CreateConstantsForImageFiles();
         CreateConstantsForAudioFiles();
-        GenerateInputActionsClassMenuItems.CreateInputActionsClass();
+        CreateConstantsInputActions();
     }
-    
+
+    [MenuItem("Generate/Create C# constants for InputActions")]
+    private static void CreateConstantsInputActions()
+    {
+        string subClassName = "InputActions";
+        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
+
+        List<string> inputActionPaths = InputManager.Instance.defaultInputActionAsset.actionMaps
+            .SelectMany(actionMap => actionMap.actions)
+            .Select(action => action.actionMap.name + "/" + action.name)
+            .ToList();
+
+        List<string> fieldNames = inputActionPaths
+            .Select(it => it.Replace("/", "_"))
+            .ToList();
+        
+        string classCode = CreateClassCode(subClassName, inputActionPaths, fieldNames);
+        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
+        Debug.Log("Generated file " + targetPath);
+    }
+
     [MenuItem("Generate/Create C# constants for I18N properties")]
     public static void CreateI18NConstants()
     {
@@ -132,7 +152,7 @@ public static class CreateConstantsMenuItems
         return result;
     }
 
-    private static string CreateClassCode(string subClassName, List<string> constantValues)
+    private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null)
     {
         string newline = System.Environment.NewLine;
 
@@ -140,17 +160,20 @@ public static class CreateConstantsMenuItems
         sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
         sb.AppendLine("public static partial class " + className + newline + "{");
         sb.AppendLine(indentation + "public static class " + subClassName + newline + indentation + "{");
-        AppendFieldDeclarations(sb, constantValues, indentation + indentation);
+        AppendFieldDeclarations(sb, constantValues, fieldNames, indentation + indentation);
         sb.AppendLine(indentation + "}");
         sb.AppendLine("}");
         return sb.ToString();
     }
 
-    private static void AppendFieldDeclarations(StringBuilder sb, List<string> values, string indentation)
+    private static void AppendFieldDeclarations(StringBuilder sb, List<string> values, List<string> fieldNames, string indentation)
     {
-        values.ForEach(value =>
+        for(int i = 0; i < values.Count; i++)
         {
-            string fieldName = value.Replace(".", "_");
+            string value = values[i];
+            string fieldName = fieldNames == null
+                ? value.Replace(".", "_")
+                : fieldNames[i];
             if (fieldName.Contains("/"))
             {
                 fieldName = Path.GetFileNameWithoutExtension(fieldName);
@@ -162,6 +185,6 @@ public static class CreateConstantsMenuItems
 
             sb.Append(indentation);
             sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
-        });
+        }
     }
 }
