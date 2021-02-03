@@ -350,23 +350,23 @@ MonoBehaviour:
   m_FallbackOnIMGUIKeyboardEvents: 0
   m_InputActionAsset: {fileID: -944628639613478452, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_NavigateAction: {fileID: 3710738434707379630, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_NavigateAction: {fileID: -7559488607194844441, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
   m_TabAction: {fileID: 1498379230643677496, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_SubmitAction: {fileID: 2064916234097673511, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_SubmitAction: {fileID: -6434979457687148703, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_CancelAction: {fileID: -1967631576421560919, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_CancelAction: {fileID: -2807014294644756913, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_PointAction: {fileID: 1054132383583890850, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_PointAction: {fileID: 2310183483462974582, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_ClickAction: {fileID: 8056856818456041789, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_ClickAction: {fileID: -6529645265718215429, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_ScrollWheelAction: {fileID: 4502412055082496612, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_ScrollWheelAction: {fileID: 1880177123186769444, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_MiddleClickAction: {fileID: 3279352641294131588, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_MiddleClickAction: {fileID: 1069912891353070939, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
-  m_RightClickAction: {fileID: 3837173908680883260, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+  m_RightClickAction: {fileID: -6486105351458445517, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
     type: 3}
 --- !u!114 &1203774099
 MonoBehaviour:

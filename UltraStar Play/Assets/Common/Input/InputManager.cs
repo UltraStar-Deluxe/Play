@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UniInject;
 
-public class InputManager : MonoBehaviour, IBinder
+public class InputManager : MonoBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -18,14 +16,22 @@ public class InputManager : MonoBehaviour, IBinder
         }
         inputActionAsset = null;
     }
-    
+
+    private static InputManager instance;
     public static InputManager Instance
     {
         get
         {
-            return GameObjectUtils.FindComponentWithTag<InputManager>("InputManager");
+            if (instance == null)
+            {
+                instance = GameObjectUtils.FindComponentWithTag<InputManager>("InputManager");
+            }
+
+            return instance;
         }
     }
+
+    private static Dictionary<string, ObservableCancelablePriorityInputAction> pathToInputAction = new Dictionary<string, ObservableCancelablePriorityInputAction>();
     
     /**
      * Default InputActionAsset is copied to streamingAssetsPath such that users can edit it to their preferences.
@@ -59,23 +65,6 @@ public class InputManager : MonoBehaviour, IBinder
         }
     }
 
-    /**
-     * Holds the loaded InputActions for easy access. This object is also available via Injection.
-     */
-    private InputActions inputActions;
-    public InputActions InputActions
-    {
-        get
-        {
-            if (inputActions == null)
-            {
-                inputActions = new InputActions(InputActionAsset, this.gameObject);
-            }
-
-            return inputActions;
-        }
-    }
-    
     private void SaveInputActionAssetToFile(InputActionAsset theInputActionAsset, string absoluteFilePath)
     {
         Debug.Log($"Saving InputActionAsset to '{absoluteFilePath}'");
@@ -122,11 +111,16 @@ public class InputManager : MonoBehaviour, IBinder
     {
         return ApplicationUtils.GetStreamingAssetsPath("Input/UltraStarPlayInputActions.inputactions");
     }
-    
-    public List<IBinding> GetBindings()
+
+    public static ObservableCancelablePriorityInputAction GetInputAction(string path)
     {
-        BindingBuilder bb = new BindingBuilder();
-        bb.BindExistingInstanceLazy(() => InputActions);
-        return bb.GetBindings();
+        if (pathToInputAction.TryGetValue(path, out ObservableCancelablePriorityInputAction observableInputAction))
+        {
+            return observableInputAction;
+        }
+
+        InputAction inputAction = Instance.InputActionAsset.FindAction(path, true);
+        observableInputAction = new ObservableCancelablePriorityInputAction(inputAction, Instance.gameObject);
+        return observableInputAction;
     }
 }
