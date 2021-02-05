@@ -11,7 +11,7 @@
                     "id": "6380c5aa-aa8e-4142-aa56-2a22bbbdcf16",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "RepeatedHold"
                 },
                 {
                     "name": "submit",
@@ -273,30 +273,8 @@
                 },
                 {
                     "name": "up",
-                    "id": "4168d234-c5d1-43ca-87ab-34421760eb97",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "navigate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "up",
                     "id": "78fafb37-b45b-4d7e-8d07-97c7666936ad",
                     "path": "<Keyboard>/upArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "navigate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "down",
-                    "id": "fae2d79a-adec-42eb-8984-d20e4caa686d",
-                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -317,30 +295,8 @@
                 },
                 {
                     "name": "left",
-                    "id": "880e7f6a-762c-49db-8257-e87a11a9df41",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "navigate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "left",
                     "id": "462bd2c2-3f27-41ab-b1da-5f11634acb89",
                     "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "navigate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "f3199cca-be99-4ace-abd4-191d94c3a17e",
-                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -575,6 +531,14 @@
             "id": "a0f8ca15-1413-4b20-8901-813756e966d3",
             "actions": [
                 {
+                    "name": "anyKeyboardModifier",
+                    "type": "Button",
+                    "id": "ab50d342-f483-45f0-8352-217b86dea75e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "back",
                     "type": "Button",
                     "id": "3e3292ca-119e-4227-9948-6a5c5f53ac16",
@@ -583,9 +547,49 @@
                     "interactions": ""
                 },
                 {
-                    "name": "anyKeyboardModifier",
+                    "name": "toggleSearch",
                     "type": "Button",
-                    "id": "ab50d342-f483-45f0-8352-217b86dea75e",
+                    "id": "41e6fe7e-d361-40fe-897f-152f177a881f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "toggleFavorite",
+                    "type": "Button",
+                    "id": "6227994f-ca76-4f05-917e-85d369edb5e7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "toggleFavoritePlaylistActive",
+                    "type": "Button",
+                    "id": "78ffc4f4-f4d2-468d-9e42-608b3b757ccf",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "randomSong",
+                    "type": "Button",
+                    "id": "aeb72133-9498-49d5-8b60-ab3a2a7620c7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "openSongEditor",
+                    "type": "Button",
+                    "id": "6174da8e-a478-4721-bd58-baaa42f52a8b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "togglePlayers",
+                    "type": "Button",
+                    "id": "90e5394f-9938-4877-bfc4-f3902339c4df",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -622,6 +626,237 @@
                     "processors": "",
                     "groups": "",
                     "action": "back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Ctrl+F",
+                    "id": "9eaa0d2e-d25a-4bb4-affa-0d45d32226db",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleSearch",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "0884258b-a94a-4ffc-a84f-be36e56a29c1",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "471b4685-3987-42b8-bac1-d80e3c4bcf3d",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Ctrl+D",
+                    "id": "a6cc8ce5-7344-4ad3-a513-d5185cb0ee0b",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavorite",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "4dc6868b-0a9e-4272-8e8b-d2480c945b8c",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavorite",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "12671323-bf0a-405d-941a-6c2e37f0522d",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavorite",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b3b71915-dddb-41fd-aa1f-9ef6d0a47006",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavorite",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Ctrl+R",
+                    "id": "23e7e1d1-5db6-4505-a405-fc5d6c67f3be",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "randomSong",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "4520ac87-040b-4fde-b05d-f6c96ac3e8d2",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "randomSong",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "638af520-632e-4f87-91f3-191ddc572032",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "randomSong",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Ctrl+E",
+                    "id": "9aaf14f1-f48a-4127-ab33-8c5f14b3f94b",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSongEditor",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "1c0eeae7-4ecd-4299-9f2d-cd4803262d9a",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSongEditor",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "9f8c5c12-2ab7-4f58-8912-ab3e7590848f",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSongEditor",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Ctrl+Tab",
+                    "id": "e35afe17-1ecb-4099-8165-9a92cdf29858",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePlayers",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "7a81a711-7b90-40b2-b13d-30a2e46f092f",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePlayers",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "c6180fe0-9f66-43a6-8bd0-d986ad5539cd",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePlayers",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Ctrl+Shift+D",
+                    "id": "25fdc418-5480-4b4d-93d9-e87f180b743e",
+                    "path": "ButtonWithTwoModifiers",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier1",
+                    "id": "f81b60fa-95ba-4835-9162-a0c606bbe759",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "modifier2",
+                    "id": "df835fe2-c3ab-4ef3-9472-28e958b4bc56",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "e2c18228-aa4a-43b9-90f0-873b07924af9",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "645332ca-6540-4231-a796-e7c78257a7e9",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -14,7 +14,13 @@ public static partial class R
         public static readonly string ui_rightClick = "ui/rightClick";
         public static readonly string ui_trackedDevicePosition = "ui/trackedDevicePosition";
         public static readonly string ui_trackedDeviceOrientation = "ui/trackedDeviceOrientation";
-        public static readonly string usplay_back = "usplay/back";
         public static readonly string usplay_anyKeyboardModifier = "usplay/anyKeyboardModifier";
+        public static readonly string usplay_back = "usplay/back";
+        public static readonly string usplay_toggleSearch = "usplay/toggleSearch";
+        public static readonly string usplay_toggleFavorite = "usplay/toggleFavorite";
+        public static readonly string usplay_toggleFavoritePlaylistActive = "usplay/toggleFavoritePlaylistActive";
+        public static readonly string usplay_randomSong = "usplay/randomSong";
+        public static readonly string usplay_openSongEditor = "usplay/openSongEditor";
+        public static readonly string usplay_togglePlayers = "usplay/togglePlayers";
     }
 }

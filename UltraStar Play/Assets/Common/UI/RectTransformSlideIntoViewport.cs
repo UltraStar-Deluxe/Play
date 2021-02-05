@@ -36,6 +36,7 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
 
     private bool isInside;
     private bool mouseOverTriggerArea;
+    private bool mouseWasOverTriggerArea;
 
     void Start()
     {
@@ -57,6 +58,7 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
         triggerAreaPointerEnterExitListener.onEnterAction = _ =>
         {
             mouseOverTriggerArea = true;
+            mouseWasOverTriggerArea = true;
             SlideIn();
         };
         triggerAreaPointerEnterExitListener.onExitAction = _ =>
@@ -67,12 +69,14 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
 
     void Update()
     {
-        // Slide out when mouse not over trigger area and not over this RectTransform itself
+        // Slide out when mouse not over trigger area and not over this RectTransform itself anymore.
         if (isInside
+            && mouseWasOverTriggerArea
             && !mouseOverTriggerArea
             && !RectTransformUtils.IsMouseOverRectTransform(rectTransform))
         {
             SlideOut();
+            mouseWasOverTriggerArea = false;
         }
     }
 

@@ -21,6 +21,7 @@ public class ObservableCancelablePriorityInputAction
     private int cancelledInFrame;
 
     private List<InputActionSubscriber> performedSubscribers;
+    private List<InputActionSubscriber> startedSubscribers;
     
     public ObservableCancelablePriorityInputAction(InputAction inputAction, GameObject owner)
     {
@@ -44,7 +45,7 @@ public class ObservableCancelablePriorityInputAction
             }
         }
         
-        void OnAddPerformedSubscriber(Action<InputAction.CallbackContext> onNext)
+        void OnAddSubscriber(Action<InputAction.CallbackContext> onNext)
         {
             // Add the one callback that will update all subscribers
             if (performedSubscribers == null)
@@ -59,14 +60,59 @@ public class ObservableCancelablePriorityInputAction
             performedSubscribers.Sort();
         }
 
-        return Observable.FromEvent<InputAction.CallbackContext>(OnAddPerformedSubscriber, OnRemoveSubscriber);
+        return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
     }
 
+    public IObservable<InputAction.CallbackContext> StartedAsObservable(int priority = 0)
+    {
+        void OnRemoveSubscriber(Action<InputAction.CallbackContext> onNext)
+        {
+            InputActionSubscriber subscriber = startedSubscribers
+                .FirstOrDefault(it => it.Priority == priority && it.OnNext == onNext);
+            startedSubscribers.Remove(subscriber);
+
+            // No subscriber left in event queue. Thus, remove the callback from the InputAction.
+            if (startedSubscribers.Count == 0)
+            {
+                InputAction.started -= NotifyStartedSubscribers;
+                startedSubscribers = null;
+            }
+        }
+        
+        void OnAddSubscriber(Action<InputAction.CallbackContext> onNext)
+        {
+            // Add the one callback that will update all subscribers
+            if (startedSubscribers == null)
+            {
+                startedSubscribers = new List<InputActionSubscriber>();
+                InputAction.started += NotifyStartedSubscribers;
+                Owner.OnDestroyAsObservable().Subscribe(_ => InputAction.started -= NotifyStartedSubscribers);
+            }
+
+            startedSubscribers.Add(new InputActionSubscriber(priority, onNext));
+            // Sort by priority
+            startedSubscribers.Sort();
+        }
+
+        return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
+    }
+    
     public void CancelForThisFrame()
     {
         cancelledInFrame = Time.frameCount;
     }
 
+    private void NotifyStartedSubscribers(InputAction.CallbackContext callbackContext)
+    {
+        startedSubscribers.ForEach(subscriber =>
+        {
+            if (cancelledInFrame != Time.frameCount)
+            {
+                subscriber.OnNext.Invoke(callbackContext);
+            }
+        });
+    }
+    
     private void NotifyPerformedSubscribers(InputAction.CallbackContext callbackContext)
     {
         performedSubscribers.ForEach(subscriber =>
