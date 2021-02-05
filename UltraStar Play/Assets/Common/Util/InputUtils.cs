@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public static class InputUtils
 {
@@ -61,34 +62,6 @@ public static class InputUtils
             result += new Vector2(0, -1);
         }
         return result;
-    }
-
-    // Alternative implementation of Input.inputString.
-    // Input.inputString does not work when combined with certain modifier keys (e.g. Ctrl and Alt).
-    public static string GetTypedLetter()
-    {
-        if (!Input.anyKey)
-        {
-            return "";
-        }
-
-        if (GetCurrentKeyboardModifier() == EKeyboardModifier.None)
-        {
-            return Input.inputString;
-        }
-
-        // Search in down keys for letters.
-        List<KeyCode> keyCodes = GetCurrentKeyDownKeyCodes();
-        if (keyCodes.Count != 1)
-        {
-            return "";
-        }
-        string typedLetter = GetCharacter(keyCodes[0]);
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-        {
-            typedLetter = typedLetter.ToUpperInvariant();
-        }
-        return typedLetter;
     }
 
     public static List<KeyCode> GetCurrentKeyDownKeyCodes()
