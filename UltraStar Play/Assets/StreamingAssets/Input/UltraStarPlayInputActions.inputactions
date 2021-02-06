@@ -969,28 +969,6 @@
                 },
                 {
                     "name": "",
-                    "id": "bd5c00c7-8c83-498a-9b68-6d868160b11d",
-                    "path": "<Mouse>/middleButton",
-                    "interactions": "RepeatedHold(fireImmediately=false,initialPause=0.7,repeatedPause=1000)",
-                    "processors": "",
-                    "groups": "",
-                    "action": "openContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0d42b6e9-0764-4cc7-97d2-b7f4c0c14c69",
-                    "path": "<Touchscreen>/primaryTouch/tap",
-                    "interactions": "RepeatedHold(initialPause=0.7,repeatedPause=1000)",
-                    "processors": "",
-                    "groups": "",
-                    "action": "openContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "8044878b-8d50-45c6-8e53-1194a31a94fa",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
@@ -1024,19 +1002,19 @@
                 },
                 {
                     "name": "",
-                    "id": "c4373cc9-a84b-4edd-b235-a42071372f27",
-                    "path": "<Pen>/tip",
-                    "interactions": "",
+                    "id": "2ce2303f-bceb-470e-b9eb-5892c5c9ddd6",
+                    "path": "<Pointer>/press",
+                    "interactions": "Tap",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse",
+                    "groups": "Touch",
                     "action": "closeContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "2ce2303f-bceb-470e-b9eb-5892c5c9ddd6",
-                    "path": "<Touchscreen>/touch*/press",
+                    "id": "d6b658a0-7faa-4111-9f46-6444158c7f91",
+                    "path": "<Touchscreen>/primaryTouch/tap",
                     "interactions": "",
                     "processors": "",
                     "groups": "Touch",
@@ -1046,19 +1024,19 @@
                 },
                 {
                     "name": "",
-                    "id": "0289dc0d-9ac0-4c78-ace0-f5e81aedf6c4",
-                    "path": "<XRController>/trigger",
+                    "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
+                    "path": "<Keyboard>/anyKey",
                     "interactions": "",
                     "processors": "",
-                    "groups": "XR",
+                    "groups": "",
                     "action": "closeContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
-                    "path": "<Keyboard>/anyKey",
+                    "id": "84c8c39d-e7d4-42cb-bcad-151a992606ed",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1261,6 +1239,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "showHelp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3ca49960-e864-4fd2-bd3c-91fc22956a67",
+                    "path": "<Pointer>/press",
+                    "interactions": "Hold(duration=0.7)",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "openContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d3247ab-32c0-4ed7-85d8-22b5bbf7e19f",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

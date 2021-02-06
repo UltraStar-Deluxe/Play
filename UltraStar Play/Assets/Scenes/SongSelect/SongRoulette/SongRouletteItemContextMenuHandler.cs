@@ -20,7 +20,7 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
 
     [Inject]
     private SongSelectSceneController songSelectSceneController;
-    
+
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_reloadSong),

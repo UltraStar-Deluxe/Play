@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UnityEngine.InputSystem;
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ContextMenu : AbstractPointerSensitivePopup
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        OpenContextMenus = new List<ContextMenu>();
+    }
+    
     public ContextMenuItem contextMenuItemPrefab;
     public ContextMenuSeparator contextMenuSeparatorPrefab;
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
     private bool wasNoButtonOrTouchPressed;
+
+    public static List<ContextMenu> OpenContextMenus { get; private set; } = new List<ContextMenu>();
+    public static bool IsAnyContextMenuOpen => OpenContextMenus.Count > 0;
     
     protected override void Awake()
     {
@@ -42,30 +50,15 @@ public class ContextMenu : AbstractPointerSensitivePopup
             }));
     }
 
+    private void Start()
+    {
+        OpenContextMenus.Add(this);
+    }
+
     void Update()
     {
         wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed
-                              || !(AnyMouseButtonPressed() || AnyTouchscreenPressed() || AnyKeyboardButtonPressed());
-    }
-
-    public bool AnyKeyboardButtonPressed()
-    {
-        return Keyboard.current != null
-               && Keyboard.current.anyKey.ReadValue() > 0;
-    }
-
-    public bool AnyMouseButtonPressed()
-    {
-        return Mouse.current != null
-               && (Mouse.current.leftButton.isPressed
-                   || Mouse.current.rightButton.isPressed
-                   || Mouse.current.middleButton.isPressed);
-    }
-    
-    public bool AnyTouchscreenPressed()
-    {
-        return Touchscreen.current != null
-               && Touchscreen.current.touches.Count > 0;
+                              || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
     }
     
     public ContextMenuSeparator AddSeparator()
@@ -91,5 +84,12 @@ public class ContextMenu : AbstractPointerSensitivePopup
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());
+        
+        // Remove this ContextMenu from the list of opened ContextMenus only after all Input has been released
+        // to avoid triggering additional actions (e.g. onClick of button).
+        CoroutineManager.Instance.StartCoroutineAlsoForEditor(
+            CoroutineUtils.ExecuteWhenConditionIsTrue(
+                () => !InputUtils.AnyKeyboardOrMouseOrTouchPressed(),
+                () => OpenContextMenus.Remove(this)));
     }
 }

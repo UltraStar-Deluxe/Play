@@ -65,6 +65,11 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        ContextMenu.OpenContextMenus.Clear();
+    }
+
     private void SaveInputActionAssetToFile(InputActionAsset theInputActionAsset, string absoluteFilePath)
     {
         Debug.Log($"Saving InputActionAsset to '{absoluteFilePath}'");

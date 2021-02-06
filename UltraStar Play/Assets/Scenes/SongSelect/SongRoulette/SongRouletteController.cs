@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using UniInject;
+using UniRx.Triggers;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -46,7 +47,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
     private readonly List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
 
     private bool isInitialized;
-
+    
     void Start()
     {
         activeRouletteItemPlaceholders = new List<RouletteItemPlaceholder>(rouletteItemPlaceholders);
@@ -141,7 +142,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         item.RectTransform.localScale = Vector3.zero;
 
         Button button = item.GetComponent<Button>();
-        button.onClick.AddListener(() => OnSongButtonClicked(songMeta));
+        button.OnClickAsObservable().Subscribe(_ => OnSongButtonClicked(songMeta));
         songMetaToButtonMap[songMeta] = button;
 
         songRouletteItems.Add(item);
@@ -298,7 +299,13 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
     private void OnSongButtonClicked(SongMeta songMeta)
     {
-        if (Selection.Value.SongMeta != null && Selection.Value.SongMeta == songMeta)
+        if (ContextMenu.IsAnyContextMenuOpen)
+        {
+            return;
+        }
+        
+        if (Selection.Value.SongMeta != null
+            && Selection.Value.SongMeta == songMeta)
         {
             selectionClickedEventStream.OnNext(Selection.Value);
         }
