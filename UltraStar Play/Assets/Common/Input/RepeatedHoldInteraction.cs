@@ -31,6 +31,8 @@ public class RepeatedHoldInteraction : IInputInteraction
     }
     
     private static readonly float defaultButtonPressPoint = 0.5f;
+
+    public bool fireImmediately = true;
     
     public float initialPause = 0.5f;
     public float repeatedPause = 0.2f;
@@ -41,20 +43,20 @@ public class RepeatedHoldInteraction : IInputInteraction
     private float RepeatedPauseOrDefault => repeatedPause > 0.0 ? repeatedPause : InputSystem.settings.defaultHoldTime;
     private float PressPointOrDefault => pressPoint > 0.0 ? pressPoint : defaultButtonPressPoint;
 
-    private double timePressed;
-
     /// <inheritdoc />
     public void Process(ref InputInteractionContext context)
     {
         switch (context.phase)
         {
             case InputActionPhase.Waiting:
+            case InputActionPhase.Canceled:
                 if (context.ControlIsActuated(PressPointOrDefault))
                 {
-                    timePressed = context.time;
-
                     context.Started();
-                    context.PerformedAndStayStarted();
+                    if (fireImmediately)
+                    {
+                        context.PerformedAndStayStarted();
+                    }
                     context.SetTimeout(InitialPauseOrDefault);
                 }
                 break;
@@ -64,12 +66,11 @@ public class RepeatedHoldInteraction : IInputInteraction
                 {
                     context.Canceled();
                 }
-                else if (context.time - timePressed >= RepeatedPauseOrDefault)
+                else
                 {
                     // Perform action but stay in the started phase, because we want to fire again after durationOrDefault 
                     context.PerformedAndStayStarted();
-                    // Reset time to fire again after durationOrDefault
-                    timePressed = context.time;
+                    // Fire again after durationOrDefault
                     context.SetTimeout(RepeatedPauseOrDefault);
                 }
                 break;
@@ -86,6 +87,5 @@ public class RepeatedHoldInteraction : IInputInteraction
     /// <inheritdoc />
     public void Reset()
     {
-        timePressed = 0;
     }
 }
