@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public static class InputUtils
 {
@@ -138,5 +139,31 @@ public static class InputUtils
 
             default: return (keyCode.ToString().Length == 1) ? keyCode.ToString() : "";
         }
+    }
+    
+    public static bool AnyKeyboardOrMouseOrTouchPressed()
+    {
+        return AnyKeyboardButtonPressed()
+               || AnyMouseButtonPressed()
+               || AnyTouchscreenPressed();
+    }
+    
+    public static bool AnyKeyboardButtonPressed()
+    {
+        return Keyboard.current != null
+               && Keyboard.current.anyKey.ReadValue() > 0;
+    }
+
+    public static bool AnyMouseButtonPressed()
+    {
+        return Mouse.current != null
+               && (Mouse.current.leftButton.isPressed
+                   || Mouse.current.rightButton.isPressed
+                   || Mouse.current.middleButton.isPressed);
+    }
+    
+    public static bool AnyTouchscreenPressed()
+    {
+        return Touch.activeFingers.Count > 0;
     }
 }
