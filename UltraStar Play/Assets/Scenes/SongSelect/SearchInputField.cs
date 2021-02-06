@@ -1,14 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SearchInputField : MonoBehaviour
-{
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
+public class SearchInputField : MonoBehaviour, INeedInjection
+{
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
+    
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    public RectTransformSlideIntoViewport RectTransformSlideIntoViewport { get; private set; }
+
+    [Inject]
+    public EventSystem eventSystem;
+    
     private Text placeholderText;
 
     public enum ESearchMode
@@ -44,10 +55,8 @@ public class SearchInputField : MonoBehaviour
 
     void Awake()
     {
-        inputField = GetComponentInChildren<InputField>();
         placeholderText = inputField.placeholder as Text;
         UpdatePlaceholderText();
-        Hide();
     }
 
     void Update()
@@ -57,21 +66,31 @@ public class SearchInputField : MonoBehaviour
         {
             inputField.caretPosition = Text.Length;
         }
+
+        if (eventSystem.currentSelectedGameObject == inputField.gameObject)
+        {
+            RectTransformSlideIntoViewport.SlideIn();
+        }
+        else if(!RectTransformUtils.IsMouseOverRectTransform(RectTransformSlideIntoViewport.triggerArea))
+        {
+            RectTransformSlideIntoViewport.SlideOut();
+        }
     }
 
     public void Show()
     {
-        gameObject.SetActive(true);
+        RectTransformSlideIntoViewport.SlideIn();
     }
 
     public void Hide()
     {
-        gameObject.SetActive(false);
+        RectTransformSlideIntoViewport.SlideOut();
+        eventSystem.SetSelectedGameObject(null);
     }
 
     public void RequestFocus()
     {
-        EventSystem.current.SetSelectedGameObject(gameObject, null);
+        inputField.Select();
         inputField.ActivateInputField();
     }
 

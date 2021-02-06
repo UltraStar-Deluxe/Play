@@ -396,7 +396,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     public bool IsSearchEnabled()
     {
-        return searchTextInputField.isActiveAndEnabled;
+        return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
     }
 
     public bool IsSearchTextInputHasFocus()
