@@ -4,6 +4,7 @@ public static partial class R
     public static class String
     {
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
+        public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_reloadSong = "action_reloadSong";
         public static readonly string action_removeFromPlaylist = "action_removeFromPlaylist";

@@ -22,5 +22,7 @@ public static partial class R
         public static readonly string usplay_randomSong = "usplay/randomSong";
         public static readonly string usplay_openSongEditor = "usplay/openSongEditor";
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";
+        public static readonly string usplay_openContextMenu = "usplay/openContextMenu";
+        public static readonly string usplay_closeContextMenu = "usplay/closeContextMenu";
     }
 }

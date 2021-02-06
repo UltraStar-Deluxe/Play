@@ -18,10 +18,16 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
     [Inject]
     private PlaylistManager playlistManager;
 
+    [Inject]
+    private SongSelectSceneController songSelectSceneController;
+    
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_reloadSong),
             () => SongMeta.Reload());
+
+        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongEditor),
+            () => songSelectSceneController.StartSongEditorScene());
 
         if (PlatformUtils.IsStandalone)
         {
