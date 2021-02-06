@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4725083428892299482}
-  - component: {fileID: 8385457548214155417}
+  - component: {fileID: 8493821838262217520}
   m_Layer: 0
-  m_Name: GlobalKeyboardShortcutManager
+  m_Name: GlobalInputControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 8069444317427349030}
   m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8385457548214155417
+--- !u!114 &8493821838262217520
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

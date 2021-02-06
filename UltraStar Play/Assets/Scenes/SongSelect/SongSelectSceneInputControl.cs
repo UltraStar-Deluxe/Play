@@ -54,9 +54,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_togglePlayers).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneController.ToggleSelectedPlayers());
         
-        // Open the sing scene via Submit-Action
+        // Open the sing scene
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(OnSubmit);
+        InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
+            .Subscribe(_ => songSelectSceneController.CheckAudioAndStartSingScene());
         
         // Select next / previous song with (hold) arrow keys or mouse wheel
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()

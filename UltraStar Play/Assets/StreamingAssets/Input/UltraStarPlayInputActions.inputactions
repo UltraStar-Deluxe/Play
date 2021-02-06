@@ -531,14 +531,6 @@
             "id": "a0f8ca15-1413-4b20-8901-813756e966d3",
             "actions": [
                 {
-                    "name": "anyKeyboardModifier",
-                    "type": "Button",
-                    "id": "ab50d342-f483-45f0-8352-217b86dea75e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "back",
                     "type": "Button",
                     "id": "3e3292ca-119e-4227-9948-6a5c5f53ac16",
@@ -606,6 +598,94 @@
                     "name": "closeContextMenu",
                     "type": "PassThrough",
                     "id": "dbcab40f-5fd7-49cc-b14c-5e3a764c0d8e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "skipToNextLyrics",
+                    "type": "Button",
+                    "id": "e96fdde6-5d6b-46db-ab56-4fd0d13c659b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "togglePause",
+                    "type": "Button",
+                    "id": "7d535b01-2668-4f38-b554-5e07b998f00f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "restartSong",
+                    "type": "Button",
+                    "id": "b6ffc08f-e68d-475f-b534-d1a4281cedc0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "toggleResultGraph",
+                    "type": "Button",
+                    "id": "63847a27-9fa3-4ff4-85a9-a4071a2981c1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "toggleFullscreen",
+                    "type": "Button",
+                    "id": "939bf79e-c8e1-4d45-b365-caa6e5ab3692",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "toggleMute",
+                    "type": "Button",
+                    "id": "c2ca0fd5-4768-4c18-ba7f-d3c644833394",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "showHelp",
+                    "type": "Button",
+                    "id": "ca0eb6ce-303d-4a5d-be18-89015231bef9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "anyKeyboardModifier",
+                    "type": "Button",
+                    "id": "ab50d342-f483-45f0-8352-217b86dea75e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "space",
+                    "type": "Button",
+                    "id": "0a9f81a5-3a55-4442-9b07-ee4731c6a3db",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "enter",
+                    "type": "Button",
+                    "id": "90501e44-8c12-4007-9d7f-639078dd0dc5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "start",
+                    "type": "Button",
+                    "id": "cfcdc7f7-069e-4570-a7ef-80d398fb76c8",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -878,39 +958,6 @@
                 },
                 {
                     "name": "",
-                    "id": "36f9fb07-3d1a-4d14-a934-68ff0b6bd72c",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "anyKeyboardModifier",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "926c3bc3-313d-47d5-9873-00489ca43ccf",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "anyKeyboardModifier",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "47552502-b47f-488e-aed5-cfa5441f57f9",
-                    "path": "<Keyboard>/alt",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "anyKeyboardModifier",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "479cc28f-605c-4269-b28b-007ff626e181",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
@@ -1016,6 +1063,204 @@
                     "processors": "",
                     "groups": "",
                     "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8323a2e9-14d9-444d-9bf8-0837fa72bb0b",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "skipToNextLyrics",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cd1f4b7b-6436-4bd7-a26c-b1b86a23f7cb",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7198d1fa-b887-4134-9e3c-159280edd95a",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5161fa02-8342-4384-ae54-13819a94b6f7",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "togglePause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5e2bcd36-2454-4a72-ac1b-a147411d2e29",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "restartSong",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9ccd4e70-f819-4f2b-918a-b1ca19844790",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "restartSong",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1701e82d-7311-47ba-84e5-f563fb3a1a7b",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleResultGraph",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "98f80ca2-4fbd-43c1-9af6-a6e39f903c7d",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleResultGraph",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "211544e7-06f3-4ffc-ba7e-ad189573dc9d",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleResultGraph",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c04deb39-2e96-4a9e-bd47-0fd3d4e58bbd",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "start",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "36f9fb07-3d1a-4d14-a934-68ff0b6bd72c",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "926c3bc3-313d-47d5-9873-00489ca43ccf",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "47552502-b47f-488e-aed5-cfa5441f57f9",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "40833f42-053d-47e0-852e-d0727a857602",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "space",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "797ad500-fe6c-406e-8f4c-ed742a84d460",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "enter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26e836a2-06c0-4275-bd48-10384238ad31",
+                    "path": "<Keyboard>/f11",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFullscreen",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e612168f-367f-45fc-a557-9d51142bbee8",
+                    "path": "<Keyboard>/f12",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleMute",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ee591cb6-3026-4f47-8a7b-e2675be1fac6",
+                    "path": "<Keyboard>/f1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "showHelp",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
