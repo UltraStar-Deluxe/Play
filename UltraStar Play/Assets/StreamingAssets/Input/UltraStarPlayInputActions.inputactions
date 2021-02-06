@@ -593,6 +593,22 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "openContextMenu",
+                    "type": "PassThrough",
+                    "id": "cac930d2-8155-45c9-8a3f-da3e293e3d1b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "closeContextMenu",
+                    "type": "PassThrough",
+                    "id": "dbcab40f-5fd7-49cc-b14c-5e3a764c0d8e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -890,6 +906,116 @@
                     "processors": "",
                     "groups": "",
                     "action": "anyKeyboardModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "479cc28f-605c-4269-b28b-007ff626e181",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bd5c00c7-8c83-498a-9b68-6d868160b11d",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "RepeatedHold(fireImmediately=false,initialPause=0.7,repeatedPause=1000)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0d42b6e9-0764-4cc7-97d2-b7f4c0c14c69",
+                    "path": "<Touchscreen>/primaryTouch/tap",
+                    "interactions": "RepeatedHold(initialPause=0.7,repeatedPause=1000)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8044878b-8d50-45c6-8e53-1194a31a94fa",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3359e4d4-3566-4f1c-9610-594f7ac92566",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "745a9841-f647-4866-9827-d295035a6689",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c4373cc9-a84b-4edd-b235-a42071372f27",
+                    "path": "<Pen>/tip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2ce2303f-bceb-470e-b9eb-5892c5c9ddd6",
+                    "path": "<Touchscreen>/touch*/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0289dc0d-9ac0-4c78-ace0-f5e81aedf6c4",
+                    "path": "<XRController>/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "XR",
+                    "action": "closeContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
+                    "path": "<Keyboard>/anyKey",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "closeContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

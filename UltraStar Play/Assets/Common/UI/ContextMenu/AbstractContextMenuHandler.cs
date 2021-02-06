@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using UniRx;
+using UnityEngine.InputSystem;
 
-abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickHandler
+public abstract class AbstractContextMenuHandler : MonoBehaviour
 {
     private Canvas canvas;
     private Canvas Canvas
@@ -19,15 +19,46 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
         }
     }
 
+    private RectTransform rectTransform;
+    private RectTransform RectTransform
+    {
+        get
+        {
+            if (rectTransform == null)
+            {
+                rectTransform = GetComponent<RectTransform>();
+            }
+
+            return rectTransform;
+        }
+    }
+    
     protected abstract void FillContextMenu(ContextMenu contextMenu);
 
-    public void OnPointerClick(PointerEventData ped)
+    private List<IDisposable> disposables = new List<IDisposable>();
+    
+    protected void Start()
     {
-        if (ped.button == PointerEventData.InputButton.Right)
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
+            .Subscribe(CheckOpenContextMenuFromInputAction));
+    }
+
+    private void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    {
+        if (Pointer.current == null
+            || !context.ReadValueAsButton())
         {
-            ContextMenu contextMenu = OpenContextMenu();
-            contextMenu.RectTransform.position = ped.position;
+            return;
         }
+
+        Vector2 position = new Vector2(Pointer.current.position.x.ReadValue(), Pointer.current.position.y.ReadValue());
+        if (!RectTransformUtility.RectangleContainsScreenPoint(RectTransform, position))
+        {
+            return;
+        }
+
+        ContextMenu contextMenu = OpenContextMenu();
+        contextMenu.RectTransform.position = position;
     }
 
     public ContextMenu OpenContextMenu()
@@ -41,5 +72,10 @@ abstract public class AbstractContextMenuHandler : MonoBehaviour, IPointerClickH
     private ContextMenu GetContextMenuPrefab()
     {
         return UiManager.Instance.contextMenuPrefab;
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 }
