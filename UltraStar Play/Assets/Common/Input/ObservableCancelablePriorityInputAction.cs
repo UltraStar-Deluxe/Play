@@ -30,40 +30,6 @@ public class ObservableCancelablePriorityInputAction
         this.Owner = owner;
     }
     
-    public IObservable<InputAction.CallbackContext> PerformedAsObservable(int priority = 0)
-    {
-        void OnRemoveSubscriber(Action<InputAction.CallbackContext> onNext)
-        {
-            InputActionSubscriber subscriber = performedSubscribers
-                .FirstOrDefault(it => it.Priority == priority && it.OnNext == onNext);
-            performedSubscribers.Remove(subscriber);
-
-            // No subscriber left in event queue. Thus, remove the callback from the InputAction.
-            if (performedSubscribers.Count == 0)
-            {
-                InputAction.performed -= NotifyPerformedSubscribers;
-                performedSubscribers = null;
-            }
-        }
-        
-        void OnAddSubscriber(Action<InputAction.CallbackContext> onNext)
-        {
-            // Add the one callback that will update all subscribers
-            if (performedSubscribers == null)
-            {
-                performedSubscribers = new List<InputActionSubscriber>();
-                InputAction.performed += NotifyPerformedSubscribers;
-                Owner.OnDestroyAsObservable().Subscribe(_ => InputAction.performed -= NotifyPerformedSubscribers);
-            }
-
-            performedSubscribers.Add(new InputActionSubscriber(priority, onNext));
-            // Sort by priority
-            performedSubscribers.Sort();
-        }
-
-        return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
-    }
-
     public IObservable<InputAction.CallbackContext> StartedAsObservable(int priority = 0)
     {
         void OnRemoveSubscriber(Action<InputAction.CallbackContext> onNext)
@@ -91,13 +57,45 @@ public class ObservableCancelablePriorityInputAction
             }
 
             startedSubscribers.Add(new InputActionSubscriber(priority, onNext));
-            // Sort by priority
-            startedSubscribers.Sort();
+            startedSubscribers.Sort(CompareByPriority);
         }
 
         return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
     }
     
+    public IObservable<InputAction.CallbackContext> PerformedAsObservable(int priority = 0)
+    {
+        void OnRemoveSubscriber(Action<InputAction.CallbackContext> onNext)
+        {
+            InputActionSubscriber subscriber = performedSubscribers
+                .FirstOrDefault(it => it.Priority == priority && it.OnNext == onNext);
+            performedSubscribers.Remove(subscriber);
+
+            // No subscriber left in event queue. Thus, remove the callback from the InputAction.
+            if (performedSubscribers.Count == 0)
+            {
+                InputAction.performed -= NotifyPerformedSubscribers;
+                performedSubscribers = null;
+            }
+        }
+        
+        void OnAddSubscriber(Action<InputAction.CallbackContext> onNext)
+        {
+            // Add the one callback that will update all subscribers
+            if (performedSubscribers == null)
+            {
+                performedSubscribers = new List<InputActionSubscriber>();
+                InputAction.performed += NotifyPerformedSubscribers;
+                Owner.OnDestroyAsObservable().Subscribe(_ => InputAction.performed -= NotifyPerformedSubscribers);
+            }
+
+            performedSubscribers.Add(new InputActionSubscriber(priority, onNext));
+            performedSubscribers.Sort(CompareByPriority);
+        }
+
+        return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
+    }
+
     public IObservable<InputAction.CallbackContext> CanceledAsObservable(int priority = 0)
     {
         void OnRemoveSubscriber(Action<InputAction.CallbackContext> onNext)
@@ -125,8 +123,7 @@ public class ObservableCancelablePriorityInputAction
             }
 
             canceledSubscribers.Add(new InputActionSubscriber(priority, onNext));
-            // Sort by priority
-            canceledSubscribers.Sort();
+            canceledSubscribers.Sort(CompareByPriority);
         }
 
         return Observable.FromEvent<InputAction.CallbackContext>(OnAddSubscriber, OnRemoveSubscriber);
@@ -142,10 +139,14 @@ public class ObservableCancelablePriorityInputAction
         // Iteration over index to enable removing subscribers as part of the callback (i.e., during iteration).
         for (int i = 0; startedSubscribers != null && i < startedSubscribers.Count; i++)
         {
-            InputActionSubscriber subscriber = startedSubscribers[i];
             if (notifyCancelledInFrame != Time.frameCount)
             {
+                InputActionSubscriber subscriber = startedSubscribers[i];
                 subscriber.OnNext.Invoke(callbackContext);
+            }
+            else
+            {
+                return;
             }
         }
     }
@@ -155,10 +156,14 @@ public class ObservableCancelablePriorityInputAction
         // Iteration over index to enable removing subscribers as part of the callback (i.e., during iteration).
         for (int i = 0; performedSubscribers != null && i < performedSubscribers.Count; i++)
         {
-            InputActionSubscriber subscriber = performedSubscribers[i];
             if (notifyCancelledInFrame != Time.frameCount)
             {
+                InputActionSubscriber subscriber = performedSubscribers[i];
                 subscriber.OnNext.Invoke(callbackContext);
+            }
+            else
+            {
+                return;
             }
         }
     }
@@ -168,15 +173,36 @@ public class ObservableCancelablePriorityInputAction
         // Iteration over index to enable removing subscribers as part of the callback (i.e., during iteration).
         for (int i = 0; canceledSubscribers != null && i < canceledSubscribers.Count; i++)
         {
-            InputActionSubscriber subscriber = canceledSubscribers[i];
             if (notifyCancelledInFrame != Time.frameCount)
             {
+                InputActionSubscriber subscriber = canceledSubscribers[i];
                 subscriber.OnNext.Invoke(callbackContext);
+            }
+            else
+            {
+                return;
             }
         }
     }
+    
+    public TValue ReadValue<TValue>()
+        where TValue : struct
+    {
+        return InputAction.ReadValue<TValue>();
+    }
 
-    private class InputActionSubscriber : IComparable<InputActionSubscriber>
+    public object ReadValueAsObject()
+    {
+        return InputAction.ReadValueAsObject();
+    }
+
+    private int CompareByPriority(InputActionSubscriber a, InputActionSubscriber b)
+    {
+        // Sort descending: compare b to a
+        return b.Priority.CompareTo(a.Priority);
+    }
+    
+    private class InputActionSubscriber
     {
         public int Priority { get; private set; }
         public Action<InputAction.CallbackContext> OnNext { get; private set; }
@@ -185,11 +211,6 @@ public class ObservableCancelablePriorityInputAction
         {
             Priority = priority;
             OnNext = onNext;
-        }
-
-        public int CompareTo(InputActionSubscriber other)
-        {
-            return Priority.CompareTo(other.Priority);
         }
     }
 }
