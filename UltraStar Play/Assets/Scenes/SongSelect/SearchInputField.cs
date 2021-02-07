@@ -53,7 +53,7 @@ public class SearchInputField : MonoBehaviour, INeedInjection
         }
     }
 
-    void Awake()
+    void Start()
     {
         placeholderText = inputField.placeholder as Text;
         UpdatePlaceholderText();
