@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -105,7 +106,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         if (keyboardButtonRecordingEnabled)
         {
             double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-            if (Input.GetKey(KeyCode.F8))
+            if (Keyboard.current != null && Keyboard.current.f8Key.isPressed)
             {
                 RecordNote(EditorSettings.MidiNoteForButtonRecording, positionInSongInMillis, ESongEditorLayer.ButtonRecording);
             }

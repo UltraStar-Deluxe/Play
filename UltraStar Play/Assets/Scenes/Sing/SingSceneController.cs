@@ -293,6 +293,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         songEditorSceneData.PreviousScene = EScene.SingScene;
         songEditorSceneData.PositionInSongInMillis = PositionInSongInMillis;
         songEditorSceneData.SelectedSongMeta = SongMeta;
+        songEditorSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+        songEditorSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 

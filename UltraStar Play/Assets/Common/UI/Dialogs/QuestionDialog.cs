@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using UniRx;
 using UnityEngine;
@@ -13,6 +14,8 @@ public class QuestionDialog : Dialog
 
     public bool noOnEscape = true;
     public bool focusYesOnStart = true;
+
+    private List<IDisposable> disposables = new List<IDisposable>();
     
     private void Start()
     {
@@ -31,14 +34,18 @@ public class QuestionDialog : Dialog
         {
             yesButton.Select();
         }
-    }
 
-    private void Update()
-    {
-        if (noOnEscape && Input.GetKeyDown(KeyCode.Escape))
+        if (noOnEscape)
         {
-            noAction?.Invoke();
-            Close();
+            InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+                .Subscribe(context =>
+                {
+                    Close();
+                    noAction?.Invoke();
+                    
+                    // Do not perform further actions, only close the dialog. This action has a higher priority to do so.
+                    InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+                });
         }
     }
 

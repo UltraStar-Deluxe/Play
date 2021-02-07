@@ -75,6 +75,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         }
     }
 
+    private float lastClickTime;
+
     void Start()
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
@@ -424,7 +426,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     public void OnPointerClick(PointerEventData ped)
     {
         // Only listen to left mouse button. Right mouse button is for context menu.
-        if (ped.button != PointerEventData.InputButton.Left)
+        if (ped.button == PointerEventData.InputButton.Right)
         {
             return;
         }
@@ -437,6 +439,16 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             return;
         }
 
+        // Toggle play pause with double click / double tap
+        bool isDoubleClick = Time.time - lastClickTime < 0.3f;
+        lastClickTime = Time.time;
+        if (isDoubleClick)
+        {
+            songEditorSceneController.ToggleAudioPlayPause();
+            return;
+        }
+
+        
         RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
                                                                 ped.position,
                                                                 ped.pressEventCamera,

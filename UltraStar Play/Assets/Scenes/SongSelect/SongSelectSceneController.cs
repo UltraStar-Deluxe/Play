@@ -225,14 +225,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
         if (singSceneData != null)
         {
-            editorSceneData.PreviousSceneData = singSceneData;
-            editorSceneData.PreviousScene = EScene.SingScene;
+            editorSceneData.PlayerProfileToMicProfileMap = singSceneData.PlayerProfileToMicProfileMap;
+            editorSceneData.SelectedPlayerProfiles = singSceneData.SelectedPlayerProfiles;
         }
-        else
-        {
-            editorSceneData.PreviousSceneData = sceneData;
-            editorSceneData.PreviousScene = EScene.SongSelectScene;
-        }
+        editorSceneData.PreviousSceneData = sceneData;
+        editorSceneData.PreviousScene = EScene.SongSelectScene;
 
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, editorSceneData);
     }

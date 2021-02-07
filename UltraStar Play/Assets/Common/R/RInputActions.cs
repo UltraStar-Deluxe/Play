@@ -34,5 +34,30 @@ public static partial class R
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_enter = "usplay/enter";
         public static readonly string usplay_start = "usplay/start";
+        public static readonly string songEditor_jumpToStartOfSong = "songEditor/jumpToStartOfSong";
+        public static readonly string songEditor_jumpToEndOfSong = "songEditor/jumpToEndOfSong";
+        public static readonly string songEditor_togglePlayPause = "songEditor/togglePlayPause";
+        public static readonly string songEditor_playSelectedNotes = "songEditor/playSelectedNotes";
+        public static readonly string songEditor_selectAll = "songEditor/selectAll";
+        public static readonly string songEditor_delete = "songEditor/delete";
+        public static readonly string songEditor_undo = "songEditor/undo";
+        public static readonly string songEditor_redo = "songEditor/redo";
+        public static readonly string songEditor_cut = "songEditor/cut";
+        public static readonly string songEditor_copy = "songEditor/copy";
+        public static readonly string songEditor_paste = "songEditor/paste";
+        public static readonly string songEditor_save = "songEditor/save";
+        public static readonly string songEditor_selectNextNote = "songEditor/selectNextNote";
+        public static readonly string songEditor_selectPreviousNote = "songEditor/selectPreviousNote";
+        public static readonly string songEditor_editLyrics = "songEditor/editLyrics";
+        public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";
+        public static readonly string songEditor_toggleNoteTypeGolden = "songEditor/toggleNoteTypeGolden";
+        public static readonly string songEditor_toggleNoteTypeFreestyle = "songEditor/toggleNoteTypeFreestyle";
+        public static readonly string songEditor_toggleNoteTypeRap = "songEditor/toggleNoteTypeRap";
+        public static readonly string songEditor_toggleNoteTypeRapGolden = "songEditor/toggleNoteTypeRapGolden";
+        public static readonly string songEditor_zoomInVertical = "songEditor/zoomInVertical";
+        public static readonly string songEditor_zoomOutVertical = "songEditor/zoomOutVertical";
+        public static readonly string songEditor_zoomInHorizontal = "songEditor/zoomInHorizontal";
+        public static readonly string songEditor_zoomOutHorizontal = "songEditor/zoomOutHorizontal";
+        public static readonly string songEditor_anyKeyboardKey = "songEditor/anyKeyboardKey";
     }
 }

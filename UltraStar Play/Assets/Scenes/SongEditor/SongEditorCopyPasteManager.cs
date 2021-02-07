@@ -47,27 +47,16 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     void Start()
     {
         songAudioPlayer.PositionInSongEventStream.Subscribe(newMillis => MoveCopiedNotesToMillisInSong(newMillis));
-    }
 
-    void Update()
-    {
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
-        {
-            return;
-        }
-
-        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
-        if (modifier == EKeyboardModifier.Ctrl)
-        {
-            if (Input.GetKeyUp(KeyCode.C))
-            {
-                CopySelectedNotes();
-            }
-            else if (Input.GetKeyUp(KeyCode.V))
-            {
-                PasteCopiedNotes();
-            }
-        }
+        // Copy action
+        InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => CopySelectedNotes());
+        
+        // Paste action
+        InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => PasteCopiedNotes());
     }
 
     private void MoveCopiedNotesToMillisInSong(double newMillis)
