@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -131,6 +132,11 @@ public class InputManager : MonoBehaviour
         return observableInputAction;
     }
 
+    public static List<ObservableCancelablePriorityInputAction> GetBoundInputActions()
+    {
+        return pathToInputAction.Values.Where(it => it.HasAnySubscribers()).ToList();
+    }
+    
     private void OnDestroy()
     {
         pathToInputAction.Clear();
