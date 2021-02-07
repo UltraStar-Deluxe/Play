@@ -869,6 +869,17 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "",
+                    "id": "3aee06e2-86e8-40cb-9655-cf88e960c878",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSongEditor",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "Ctrl+Tab",
                     "id": "e35afe17-1ecb-4099-8165-9a92cdf29858",
                     "path": "ButtonWithOneModifier",
@@ -1026,17 +1037,6 @@
                     "name": "",
                     "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
                     "path": "<Keyboard>/anyKey",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "closeContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "84c8c39d-e7d4-42cb-bcad-151a992606ed",
-                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1249,17 +1249,6 @@
                     "interactions": "Hold(duration=1)",
                     "processors": "",
                     "groups": "Touch",
-                    "action": "openContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8d3247ab-32c0-4ed7-85d8-22b5bbf7e19f",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "Hold",
-                    "processors": "",
-                    "groups": "",
                     "action": "openContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
