@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 #pragma warning disable CS0649
 
@@ -107,6 +109,8 @@ public class EditorUiNote : MonoBehaviour,
     void Start()
     {
         UpdateHandles();
+        disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
+            .Subscribe(_ => UpdateHandles()));
         disposables.Add(noteArea.ViewportEventStream.Subscribe(_ => UpdateFontSize()));
         disposables.Add(uiManager.MousePositionChangeEventStream.Subscribe(_ => OnMousePositionChanged()));
     }
@@ -123,10 +127,7 @@ public class EditorUiNote : MonoBehaviour,
             OnPointerOver();
         }
 
-        if (IsKeyDownOrUp(KeyCode.LeftControl) || IsKeyDownOrUp(KeyCode.LeftAlt) || IsKeyDownOrUp(KeyCode.LeftShift))
-        {
-            UpdateHandles();
-        }
+        UpdateHandles();
     }
 
     private void UpdateFontSize()
@@ -137,11 +138,6 @@ public class EditorUiNote : MonoBehaviour,
         {
             uiText.FontSize = fontSize;
         }
-    }
-
-    private bool IsKeyDownOrUp(KeyCode keyCode)
-    {
-        return Input.GetKeyDown(keyCode) || Input.GetKeyUp(keyCode);
     }
 
     private void OnPointerOver()
@@ -192,7 +188,7 @@ public class EditorUiNote : MonoBehaviour,
 
     private void SetCursorForGestureOrMusicNoteCursor(ECursor cursor)
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (InputUtils.IsKeyboardControlPressed())
         {
             // LeftControl is used to play midi sound, indicate this via a custom cursor.
             cursorManager.SetCursorMusicNote();
@@ -206,11 +202,18 @@ public class EditorUiNote : MonoBehaviour,
     {
         bool isSelected = (selectionController != null) && selectionController.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
-            || (isSelected && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift)));
+            || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));
+        if (leftHandle.gameObject.activeSelf != isLeftHandleVisible)
+        {
+            leftHandle.gameObject.SetActive(isLeftHandleVisible);
+        }
+        
         bool isRightHandleVisible = IsPointerOverRightHandle
-            || (isSelected && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftShift)));
-        leftHandle.gameObject.SetActive(isLeftHandleVisible);
-        rightHandle.gameObject.SetActive(isRightHandleVisible);
+            || (isSelected && (InputUtils.IsKeyboardAltPressed() || InputUtils.IsKeyboardShiftPressed()));
+        if (rightHandle.gameObject.activeSelf != isRightHandleVisible)
+        {
+            rightHandle.gameObject.SetActive(isRightHandleVisible);
+        }
     }
 
     public bool IsPositionOverLeftHandle(Vector2 position)
@@ -248,7 +251,7 @@ public class EditorUiNote : MonoBehaviour,
         if (ped.clickCount == 1)
         {
             // Select / deselect notes via Shift.
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (InputUtils.IsKeyboardShiftPressed())
             {
                 if (selectionController.IsSelected(Note))
                 {
@@ -259,7 +262,7 @@ public class EditorUiNote : MonoBehaviour,
                     selectionController.AddToSelection(this);
                 }
             }
-            else if (!Input.GetKey(KeyCode.LeftControl))
+            else if (!InputUtils.IsKeyboardControlPressed())
             {
                 // Move the playback position to the start of the note
                 double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
@@ -341,7 +344,7 @@ public class EditorUiNote : MonoBehaviour,
     public void OnPointerDown(PointerEventData eventData)
     {
         // Play midi sound via Ctrl
-        if (!isPlayingMidiSound && Input.GetKey(KeyCode.LeftControl))
+        if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed())
         {
             isPlayingMidiSound = true;
             midiManager.PlayMidiNote(Note.MidiNote);

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -25,13 +26,18 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
     public RectTransform targetRectTransform;
 
-    void Update()
+    private List<IDisposable> disposables = new List<IDisposable>();
+    
+    void Start()
     {
-        // Cancel drag via Escape key
-        if (isDragging && Input.GetKeyUp(KeyCode.Escape))
-        {
-            CancelDrag();
-        }
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
+            .Where(_ => isDragging)
+            .Subscribe(_ =>
+            {
+                CancelDrag();
+                // Cancel other callbacks. To do so, this subscription has a higher priority. 
+                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+            });
     }
 
     public void AddListener(IDragListener<EVENT> listener)
@@ -65,7 +71,8 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (ignoreDrag)
+        if (ignoreDrag
+            || !isDragging)
         {
             return;
         }
@@ -96,6 +103,11 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
                 action(listener);
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 
     abstract protected EVENT CreateDragEventStart(PointerEventData eventData);

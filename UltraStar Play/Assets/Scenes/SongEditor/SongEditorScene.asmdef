@@ -6,7 +6,8 @@
         "UniRx",
         "UniInject",
         "Common",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

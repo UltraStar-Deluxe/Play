@@ -36,6 +36,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     [InjectedInInspector]
     public NoteAreaDragHandler noteAreaDragHandler;
+    
+    [InjectedInInspector]
+    public NoteAreaContextMenuHandler noteAreaContextMenuHandler;
 
     [InjectedInInspector]
     public EditorNoteDisplayer editorNoteDisplayer;
@@ -102,6 +105,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteArea);
         bb.BindExistingInstance(noteAreaDragHandler);
+        bb.BindExistingInstance(noteAreaContextMenuHandler);
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
@@ -221,7 +225,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public void OnBackButtonClicked()
     {
-        ContinueToSingScene();
+        ReturnToLastScene();
     }
 
     public void OnSaveButtonClicked()
@@ -279,11 +283,56 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     public void ContinueToSingScene()
     {
+        SingSceneData singSceneData;
         if (sceneData.PreviousSceneData is SingSceneData)
         {
-            SingSceneData singSceneData = sceneData.PreviousSceneData as SingSceneData;
-            singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+            singSceneData = sceneData.PreviousSceneData as SingSceneData;
         }
-        SceneNavigator.Instance.LoadScene(sceneData.PreviousScene, sceneData.PreviousSceneData);
+        else
+        {
+            singSceneData = new SingSceneData();
+            singSceneData.SelectedSongMeta = sceneData.SelectedSongMeta;
+            singSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
+            singSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+        }
+        singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+        SceneNavigator.Instance.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);
+    }
+
+    public void ContinueToSongSelectScene()
+    {
+        SongSelectSceneData songSelectSceneData;
+        if (sceneData.PreviousSceneData is SongSelectSceneData)
+        {
+            songSelectSceneData = sceneData.PreviousSceneData as SongSelectSceneData;
+        }
+        else
+        {
+            songSelectSceneData = new SongSelectSceneData();
+            songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
+        }
+        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+    }
+
+    public void ReturnToLastScene()
+    {
+        if (sceneData.PreviousSceneData is SingSceneData)
+        {
+            ContinueToSingScene();
+            return;
+        }
+        ContinueToSongSelectScene();
+    }
+    
+    public void ToggleAudioPlayPause()
+    {
+        if (songAudioPlayer.IsPlaying)
+        {
+            songAudioPlayer.PauseAudio();
+        }
+        else
+        {
+            songAudioPlayer.PlayAudio();
+        }
     }
 }

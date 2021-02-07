@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using UniInject;
 using UnityEngine;
 using UniRx;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public abstract class AbstractContextMenuHandler : MonoBehaviour
+public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler
 {
     private Canvas canvas;
     private Canvas Canvas
@@ -32,19 +36,28 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour
             return rectTransform;
         }
     }
+
+    [Inject(optional = true)]
+    protected GraphicRaycaster graphicRaycaster;
+    
+    [Inject(optional = true)]
+    protected EventSystem eventSystem;
     
     protected abstract void FillContextMenu(ContextMenu contextMenu);
 
     private List<IDisposable> disposables = new List<IDisposable>();
+
+    public bool IsDrag { get; private set; }
     
     protected void Start()
     {
         disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
+            .Where(_ => !IsDrag)
             .Where(context => context.ReadValueAsButton())
             .Subscribe(CheckOpenContextMenuFromInputAction));
     }
 
-    private void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    protected virtual void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         if (Pointer.current == null
             || !context.ReadValueAsButton())
@@ -58,18 +71,30 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour
             return;
         }
 
-        ContextMenu contextMenu = OpenContextMenu();
-        contextMenu.RectTransform.position = position;
+        if (graphicRaycaster != null && eventSystem != null)
+        {
+            List<RaycastResult> raycastResults = new List<RaycastResult>();
+            PointerEventData pointerEventData = new PointerEventData(eventSystem);
+            pointerEventData.position = position;
+            graphicRaycaster.Raycast(pointerEventData, raycastResults);
+            if (raycastResults.FirstOrDefault().gameObject != this.gameObject)
+            {
+                // ContextMenu opened on some other element
+                return;
+            }
+        }
+        
+        OpenContextMenu(position);
     }
 
-    public ContextMenu OpenContextMenu()
+    public void OpenContextMenu(Vector2 position)
     {
         ContextMenu.CloseAllOpenContextMenus();
         
         ContextMenu contextMenuPrefab = GetContextMenuPrefab();
         ContextMenu contextMenu = Instantiate(contextMenuPrefab, Canvas.transform);
+        contextMenu.RectTransform.position = position;
         FillContextMenu(contextMenu);
-        return contextMenu;
     }
     
     private ContextMenu GetContextMenuPrefab()
@@ -80,5 +105,15 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        IsDrag = true;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        IsDrag = false;
     }
 }

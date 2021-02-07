@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UniRx;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ContextMenu : AbstractPointerSensitivePopup
 {
@@ -22,6 +24,21 @@ public class ContextMenu : AbstractPointerSensitivePopup
 
     public static List<ContextMenu> OpenContextMenus { get; private set; } = new List<ContextMenu>();
     public static bool IsAnyContextMenuOpen => OpenContextMenus.Count > 0;
+
+    private static Canvas canvas;
+    private static Canvas Canvas
+    {
+        get
+        {
+            if (canvas == null)
+            {
+                canvas = CanvasUtils.FindCanvas();
+            }
+            return canvas;
+        }
+    }
+
+    private bool isMovedIntoCanvas;
     
     protected override void Awake()
     {
@@ -61,6 +78,14 @@ public class ContextMenu : AbstractPointerSensitivePopup
     {
         wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed
                               || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
+
+        if (!isMovedIntoCanvas
+            && RectTransform.rect.width > 0
+            && RectTransform.rect.height > 0)
+        {
+            isMovedIntoCanvas = true;
+            MoveInsideCanvas();
+        }
     }
     
     public ContextMenuSeparator AddSeparator()
@@ -71,6 +96,9 @@ public class ContextMenu : AbstractPointerSensitivePopup
 
     public ContextMenuItem AddItem(string label, Action action)
     {
+        // Could be out of screen
+        isMovedIntoCanvas = false;
+        
         ContextMenuItem contextMenuItem = Instantiate(contextMenuItemPrefab, this.transform);
         contextMenuItem.Text = label;
         contextMenuItem.ContextMenu = this;
@@ -122,6 +150,33 @@ public class ContextMenu : AbstractPointerSensitivePopup
         {
             ContextMenu openContextMenu = OpenContextMenus[i];
             openContextMenu.CloseContextMenu();
+        }
+    }
+
+    public void MoveInsideCanvas()
+    {
+        // Make sure that all items are visible
+        // corners of item in world space
+        Vector3[] corners = new Vector3[4];
+        RectTransform.GetWorldCorners(corners);
+
+        Vector3[] canvasCorners = new Vector3[4];
+        Canvas.GetComponent<RectTransform>().GetWorldCorners(canvasCorners);
+        
+        float right = corners.Select(it => it.x).Max();
+        float canvasRight = canvasCorners.Select(it => it.x).Max();
+        if (right > canvasRight)
+        {
+            float overlapX = right - canvasRight;
+            RectTransform.position = new Vector3(RectTransform.position.x - overlapX, RectTransform.position.y, RectTransform.position.z);
+        }
+        
+        float bottom = corners.Select(it => it.y).Min();
+        float canvasBottom = canvasCorners.Select(it => it.y).Min();
+        if (bottom < canvasBottom)
+        {
+            float overlapY = canvasBottom - bottom;
+            RectTransform.position = new Vector3(RectTransform.position.x, RectTransform.position.y + overlapY, RectTransform.position.z);
         }
     }
 }

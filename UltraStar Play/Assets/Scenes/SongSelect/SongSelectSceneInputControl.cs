@@ -194,7 +194,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private bool IsFuzzySearchActive()
     {
-        // Check that no modifier is pressed
-        return InputManager.GetInputAction(R.InputActions.usplay_anyKeyboardModifier).InputAction.ReadValue<float>() == 0;
+        return !InputUtils.AnyKeyboardModifierPressed();
     }
 }

@@ -5149,6 +5149,7 @@ MonoBehaviour:
   audioWaveFormVisualizer: {fileID: 1604233039}
   noteArea: {fileID: 1582763823}
   noteAreaDragHandler: {fileID: 1582763827}
+  noteAreaContextMenuHandler: {fileID: 1582763826}
   editorNoteDisplayer: {fileID: 191584246}
   micPitchTracker: {fileID: 906383520}
   canvas: {fileID: 1225693715}
@@ -5541,8 +5542,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 697563422}
   m_HandleRect: {fileID: 697563421}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.99999994
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10084,7 +10085,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 178.7747, y: -13.018015}
+  m_AnchoredPosition: {x: 178.77472, y: -13.018066}
   m_SizeDelta: {x: 357.5494, y: 26.03603}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &924317908

@@ -68,13 +68,13 @@ public class NumberSpinner : MonoBehaviour, INeedInjection
 
     private void SelectPreviousValue()
     {
-        double stepValue = Input.GetKey(KeyCode.LeftShift) ? step * 10 : step;
+        double stepValue = InputUtils.IsKeyboardShiftPressed() ? step * 10 : step;
         SetNewValueWithinLimits(selectedValue - stepValue);
     }
 
     private void SelectNextValue()
     {
-        double stepValue = Input.GetKey(KeyCode.LeftShift) ? step * 10 : step;
+        double stepValue = InputUtils.IsKeyboardShiftPressed() ? step * 10 : step;
         SetNewValueWithinLimits(selectedValue + stepValue);
     }
 

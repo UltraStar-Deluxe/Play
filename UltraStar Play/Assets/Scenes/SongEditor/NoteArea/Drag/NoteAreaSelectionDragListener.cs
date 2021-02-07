@@ -92,9 +92,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         // Add to selection via Shift. Remove from selection via Ctrl+Shift. Without modifier, set selection.
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (InputUtils.IsKeyboardShiftPressed())
         {
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (InputUtils.IsKeyboardControlPressed())
             {
                 selectionController.RemoveFromSelection(selectedUiNotes);
             }
