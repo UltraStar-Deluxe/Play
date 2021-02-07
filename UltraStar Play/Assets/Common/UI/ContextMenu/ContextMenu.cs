@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UniRx;
 using UnityEngine.InputSystem;
@@ -34,7 +35,8 @@ public class ContextMenu : AbstractPointerSensitivePopup
             .Subscribe(context =>
             {
                 // Only close when the mouse / touchscreen has been fully released in the mean time.
-                if (!wasNoButtonOrTouchPressed)
+                if (!wasNoButtonOrTouchPressed
+                    || !context.ReadValueAsButton())
                 {
                     return;
                 }
@@ -78,18 +80,48 @@ public class ContextMenu : AbstractPointerSensitivePopup
 
     public void CloseContextMenu()
     {
-        Destroy(gameObject);
+        if (this != null
+            && gameObject != null)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            OpenContextMenus.Remove(this);
+        }
     }
 
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());
-        
+
         // Remove this ContextMenu from the list of opened ContextMenus only after all Input has been released
         // to avoid triggering additional actions (e.g. onClick of button).
-        CoroutineManager.Instance.StartCoroutineAlsoForEditor(
-            CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => !InputUtils.AnyKeyboardOrMouseOrTouchPressed(),
-                () => OpenContextMenus.Remove(this)));
+        if (CoroutineManager.Instance != null)
+        {
+            CoroutineManager.Instance.StartCoroutineAlsoForEditor(
+                CoroutineUtils.ExecuteWhenConditionIsTrue(
+                    () => !InputUtils.AnyKeyboardOrMouseOrTouchPressed(),
+                    () => RemoveOpenContextMenuFromList(this)));
+        }
+        else
+        {
+            RemoveOpenContextMenuFromList(this);            
+        }
+    }
+
+    private static void RemoveOpenContextMenuFromList(ContextMenu contextMenu)
+    {
+        OpenContextMenus.Remove(contextMenu);
+    }
+
+    public static void CloseAllOpenContextMenus()
+    {
+        // Iteration over index because elements are removed during iteration.
+        for (int i = 0; i < OpenContextMenus.Count; i++)
+        {
+            ContextMenu openContextMenu = OpenContextMenus[i];
+            openContextMenu.CloseContextMenu();
+        }
     }
 }

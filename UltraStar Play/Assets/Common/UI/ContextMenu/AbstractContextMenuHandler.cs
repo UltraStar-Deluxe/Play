@@ -40,6 +40,7 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour
     protected void Start()
     {
         disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
+            .Where(context => context.ReadValueAsButton())
             .Subscribe(CheckOpenContextMenuFromInputAction));
     }
 
@@ -63,12 +64,14 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour
 
     public ContextMenu OpenContextMenu()
     {
+        ContextMenu.CloseAllOpenContextMenus();
+        
         ContextMenu contextMenuPrefab = GetContextMenuPrefab();
         ContextMenu contextMenu = Instantiate(contextMenuPrefab, Canvas.transform);
         FillContextMenu(contextMenu);
         return contextMenu;
     }
-
+    
     private ContextMenu GetContextMenuPrefab()
     {
         return UiManager.Instance.contextMenuPrefab;
