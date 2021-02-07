@@ -67,6 +67,21 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         UpdateTranslation();
 
         sceneSubtitle.text = I18NManager.GetTranslation(R.String.mainScene_button_sing_description);
+
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+            .Subscribe(_ => ToggleCloseGameDialog());
+    }
+
+    private void ToggleCloseGameDialog()
+    {
+        if (closeGameDialog != null)
+        {
+            CloseQuitGameDialog();
+        }
+        else
+        {
+            OpenQuitGameDialog();
+        }
     }
 
     private void InitButtonDescription(Button button, string i18nCode)
@@ -85,21 +100,6 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         settingsButton.text = I18NManager.GetTranslation(R.String.mainScene_button_settings_label);
         aboutButton.text = I18NManager.GetTranslation(R.String.mainScene_button_about_label);
         quitButton.text = I18NManager.GetTranslation(R.String.mainScene_button_quit_label);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (closeGameDialog != null)
-            {
-                CloseQuitGameDialog();
-            }
-            else
-            {
-                OpenQuitGameDialog();
-            }
-        }
     }
 
     private void UpdateVersionInfoText()
@@ -131,7 +131,8 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
 
         closeGameDialog.CloseDialog();
         closeGameDialog = null;
-        quitButton.Focus();
+        // Must not immediately focus next button or it will trigger as well
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
     }
 
     private void OpenQuitGameDialog()
