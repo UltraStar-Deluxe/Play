@@ -213,4 +213,11 @@ public class ObservableCancelablePriorityInputAction
             OnNext = onNext;
         }
     }
+
+    public bool HasAnySubscribers()
+    {
+        return !(startedSubscribers.IsNullOrEmpty()
+                 && performedSubscribers.IsNullOrEmpty()
+                 && canceledSubscribers.IsNullOrEmpty());
+    }
 }
