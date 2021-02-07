@@ -28,6 +28,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     [Inject]
     private NoteAreaDragHandler noteAreaDragHandler;
 
+    [Inject]
+    private Canvas canvas;
+
     bool isCanceled;
 
     void Start()
@@ -134,20 +137,25 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private void UpdateSelectionFrame(NoteAreaDragEvent dragEvent)
     {
+        Vector3 canvasScale = canvas.transform.localScale;
+        if (canvasScale.x == 0 || canvasScale.y == 0)
+        {
+            return;
+        }
         float x = dragEvent.GeneralDragEvent.StartPositionInPixels.x;
         float y = dragEvent.GeneralDragEvent.StartPositionInPixels.y;
-        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x;
-        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y;
+        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x / canvasScale.x;
+        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y / canvasScale.y;
 
         if (width < 0)
         {
             width = -width;
-            x -= width;
+            x -= (width * canvasScale.x);
         }
         if (height < 0)
         {
             height = -height;
-            y += height;
+            y += (height * canvasScale.x);
         }
         selectionFrame.position = new Vector2(x, y);
         selectionFrame.sizeDelta = new Vector2(width, height);
