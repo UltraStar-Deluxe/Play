@@ -47,6 +47,9 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     [Inject]
     private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
     
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
+    
     private EditorUiNote uiNote;
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
@@ -73,6 +76,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
 
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
 
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneController.StartEditingNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);

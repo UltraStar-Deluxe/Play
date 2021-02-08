@@ -335,4 +335,18 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
             songAudioPlayer.PlayAudio();
         }
     }
+    
+    public void StartEditingNoteText()
+    {
+        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        if (selectedNotes.Count == 1)
+        {
+            Note selectedNote = selectedNotes.FirstOrDefault();
+            EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(selectedNote);
+            if (uiNote != null)
+            {
+                uiNote.StartEditingNoteText();
+            }
+        }
+    }
 }
