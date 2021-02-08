@@ -106,7 +106,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
-            .Subscribe(_ => StartEditingNoteText());
+            .Subscribe(_ => songEditorSceneController.StartEditingNoteText());
         
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -411,20 +411,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         else
         {
             return new List<Note>();
-        }
-    }
-    
-    private void StartEditingNoteText()
-    {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        if (selectedNotes.Count == 1)
-        {
-            Note selectedNote = selectedNotes.FirstOrDefault();
-            EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(selectedNote);
-            if (uiNote != null)
-            {
-                uiNote.StartEditingNoteText();
-            }
         }
     }
 }
