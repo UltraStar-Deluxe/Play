@@ -7,6 +7,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler
 {
@@ -52,7 +53,7 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     protected void Start()
     {
         disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
-            .Where(_ => !IsDrag)
+            .Where(_ => !IsDrag && Touch.activeTouches.Count < 2)
             .Where(context => context.ReadValueAsButton())
             .Subscribe(CheckOpenContextMenuFromInputAction));
     }

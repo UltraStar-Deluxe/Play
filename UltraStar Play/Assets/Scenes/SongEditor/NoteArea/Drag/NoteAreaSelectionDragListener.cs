@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -61,6 +63,11 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     {
         UpdateSelectionFrame(dragEvent);
         UpdateSelection(dragEvent);
+
+        if (Touch.activeTouches.Count > 1)
+        {
+            CancelDrag();
+        }
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)

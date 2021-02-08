@@ -23,12 +23,13 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     private bool ignoreDrag;
 
     private EVENT dragStartEvent;
-
+    private int pointerId;
+    
     public RectTransform targetRectTransform;
 
     private List<IDisposable> disposables = new List<IDisposable>();
     
-    void Start()
+    protected virtual void Start()
     {
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => isDragging)
@@ -52,19 +53,26 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (isDragging)
+        {
+            return;
+        }
+
         ignoreDrag = false;
         isDragging = true;
+        pointerId = eventData.pointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (ignoreDrag)
+        if (ignoreDrag
+            || !isDragging
+            || eventData.pointerId != pointerId)
         {
             return;
         }
-
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
@@ -72,7 +80,8 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     public void OnEndDrag(PointerEventData eventData)
     {
         if (ignoreDrag
-            || !isDragging)
+            || !isDragging
+            || eventData.pointerId != pointerId)
         {
             return;
         }
