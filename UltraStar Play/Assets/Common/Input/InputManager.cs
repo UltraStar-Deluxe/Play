@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 public class InputManager : MonoBehaviour
 {
@@ -69,6 +70,12 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
+        if (Touchscreen.current != null
+            && !EnhancedTouchSupport.enabled)
+        {
+            // Enable EnhancedTouchSupport to make use of EnhancedTouch.Touch struct etc.
+            EnhancedTouchSupport.Enable();
+        }
         ContextMenu.OpenContextMenus.Clear();
     }
 
