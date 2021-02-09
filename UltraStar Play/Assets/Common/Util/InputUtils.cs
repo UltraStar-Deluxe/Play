@@ -1,9 +1,12 @@
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public static class InputUtils
 {
+    public const float DoubleClickThresholdInSeconds = 0.3f;
+    
     public static EKeyboardModifier GetCurrentKeyboardModifier()
     {
         if (Keyboard.current == null)
@@ -101,5 +104,10 @@ public static class InputUtils
     public static bool WasPressedOrReleasedInThisFrame(KeyControl key)
     {
         return key.wasPressedThisFrame || key.wasReleasedThisFrame;
+    }
+
+    public static Vector2 GetMousePosition()
+    {
+        return Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
     }
 }
