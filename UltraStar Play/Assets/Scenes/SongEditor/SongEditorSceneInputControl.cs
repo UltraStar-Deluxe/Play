@@ -9,6 +9,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UniRx;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
 
@@ -56,6 +58,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private bool inputFieldHasFocusOld;
 
+    private Vector2[] zoomStartTouchPositions;
+    private Vector2 zoomStartTouchDistancePerDimension;
+    private float pinchGestureMagnitudeThresholdInPixels = 100f;
+    
     private void Start()
     {
         // Jump to start / end of song
@@ -299,9 +305,68 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Use the shortcuts that are also used in the YASS song editor.
         UpdateInputForYassShortcuts();
 
+        UpdateTouchInputForZoom();
+
         inputFieldHasFocusOld = inputFieldHasFocus;
     }
 
+    private void UpdateTouchInputForZoom()
+    {
+        if (Touchscreen.current == null)
+        {
+            return;
+        }
+
+        bool isTwoFingerTouchGestureInProgress = zoomStartTouchPositions != null;
+        if (Touch.activeFingers.Count < 2)
+        {
+            // End of gesture
+            if (isTwoFingerTouchGestureInProgress)
+            {
+                zoomStartTouchPositions = null;
+            }
+        }
+        else if (Touch.activeFingers.Count == 2)
+        {
+            Finger firstFinger = Touch.activeFingers[0];
+            Finger secondFinger = Touch.activeFingers[1];
+            if (isTwoFingerTouchGestureInProgress)
+            {
+                // Continued gesture
+                
+                // Zoom when difference to start distance is above threshold.
+                Vector2 distancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
+                Vector2 distanceDifference = distancePerDimension - zoomStartTouchDistancePerDimension;
+                if (Math.Abs(distanceDifference.x) > pinchGestureMagnitudeThresholdInPixels
+                    || Math.Abs(distanceDifference.y) > pinchGestureMagnitudeThresholdInPixels)
+                {
+                    if (Math.Abs(distanceDifference.x) > pinchGestureMagnitudeThresholdInPixels)
+                    {
+                        noteArea.ZoomHorizontal(Math.Sign(distanceDifference.x));
+                    }
+                    if (Math.Abs(distanceDifference.y) > pinchGestureMagnitudeThresholdInPixels)
+                    {
+                        noteArea.ZoomVertical(Math.Sign(distanceDifference.y));
+                    }
+            
+                    zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
+                    zoomStartTouchDistancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
+                }
+            }
+            else
+            {
+                // New gesture
+                zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
+                zoomStartTouchDistancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
+            }
+        }
+    }
+
+    private Vector2 DistancePerDimension(Vector2 a, Vector2 b)
+    {
+        return new Vector2(Math.Abs(a.x - b.x), Math.Abs(a.y - b.y));
+    }
+    
     // Implements keyboard shortcuts similar to Yass.
     // See: https://github.com/UltraStar-Deluxe/Play/issues/111
     private void UpdateInputForYassShortcuts()
