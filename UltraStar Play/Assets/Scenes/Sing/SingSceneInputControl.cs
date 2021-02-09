@@ -29,5 +29,8 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => singSceneController.FinishScene(false));
+        
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
     }
 }

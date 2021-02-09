@@ -48,7 +48,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
         if (!isInitialized)
         {
             isInitialized = true;
-            inputActionInfo = GetAvailableInputActionInfo();
+            inputActionInfo = string.Join("\n\n",GetAvailableInputActionInfos().Select(it => $"{it.ActionName}: {it.InfoText}"));
             if (uiText != null)
             {
                 // Additional line break for better scrolling
@@ -57,9 +57,9 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
         }
 	}
 
-    private string GetAvailableInputActionInfo()
+    private List<InputActionInfo> GetAvailableInputActionInfos()
     {
-        List<string> infos = new List<string>();
+        List<InputActionInfo> infos = new List<InputActionInfo>();
         foreach (ObservableCancelablePriorityInputAction observableInputAction in InputManager.GetBoundInputActions())
         {
             if (ignoredInputActions.Contains(observableInputAction.InputAction.name))
@@ -74,11 +74,25 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
             }
 
             string actionNameDisplayString = CamelCaseToDisplayName(observableInputAction.InputAction.name);
-            string infoOfThisAction = $"{actionNameDisplayString}: {GetBindingDisplayString(observableInputAction.InputAction)}";
-            infos.Add(infoOfThisAction);
+            string infoOfThisAction = GetBindingDisplayString(observableInputAction.InputAction);
+            infos.Add(new InputActionInfo(actionNameDisplayString, infoOfThisAction));
         }
+
+        foreach (InputActionInfo additionalInputActionInfo in InputManager.AdditionalInputActionInfos)
+        {
+            InputActionInfo existingInfo = infos.FirstOrDefault(it => it.ActionName == additionalInputActionInfo.ActionName);
+            if (existingInfo == null)
+            {
+                infos.Add(additionalInputActionInfo);
+            }
+            else
+            {
+                existingInfo.AddInfoText(additionalInputActionInfo.InfoText);
+            }
+        }
+        
         infos.Sort();
-        return string.Join("\n", infos);
+        return infos;
     }
 
     private string CamelCaseToDisplayName(string text)
