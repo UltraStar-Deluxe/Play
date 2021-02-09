@@ -86,6 +86,8 @@ public class EditorUiNote : MonoBehaviour,
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
+    private float lastClickTime;
+    
     public void Init(Note note)
     {
         this.Note = note;
@@ -243,35 +245,38 @@ public class EditorUiNote : MonoBehaviour,
         }
 
         // Only listen to left mouse button. Right mouse button is for context menu.
-        if (ped.button != PointerEventData.InputButton.Left)
+        if (ped.button != PointerEventData.InputButton.Left
+            && Touch.activeTouches.Count == 0)
         {
             return;
         }
 
-        if (ped.clickCount == 1)
-        {
-            // Select / deselect notes via Shift.
-            if (InputUtils.IsKeyboardShiftPressed())
-            {
-                if (selectionController.IsSelected(Note))
-                {
-                    selectionController.RemoveFromSelection(this);
-                }
-                else
-                {
-                    selectionController.AddToSelection(this);
-                }
-            }
-            else if (!InputUtils.IsKeyboardControlPressed())
-            {
-                // Move the playback position to the start of the note
-                double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
-            }
-        }
-        else if (ped.clickCount == 2)
+        // Check double click to edit lyrics
+        bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
+        lastClickTime = Time.time;
+        if (isDoubleClick)
         {
             StartEditingNoteText();
+            return;
+        }
+        
+        // Select / deselect notes via Shift.
+        if (InputUtils.IsKeyboardShiftPressed())
+        {
+            if (selectionController.IsSelected(Note))
+            {
+                selectionController.RemoveFromSelection(this);
+            }
+            else
+            {
+                selectionController.AddToSelection(this);
+            }
+        }
+        else if (!InputUtils.IsKeyboardControlPressed())
+        {
+            // Move the playback position to the start of the note
+            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }
 
