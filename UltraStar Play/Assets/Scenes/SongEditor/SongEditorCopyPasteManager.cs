@@ -36,7 +36,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     private Voice copiedVoice;
 
-    private List<Note> CopiedNotes
+    public List<Note> CopiedNotes
     {
         get
         {
@@ -87,7 +87,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
     }
 
-    private void PasteCopiedNotes()
+    public void PasteCopiedNotes()
     {
         int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
         Sentence sentenceAtBeatWithVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, minBeat)
@@ -135,7 +135,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CopySelectedNotes()
+    public void CopySelectedNotes()
     {
         // Remove any old copied notes from the Ui.
         foreach (Note note in CopiedNotes)
