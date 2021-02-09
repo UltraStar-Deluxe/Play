@@ -9,6 +9,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
 
@@ -134,8 +135,7 @@ public class EditorUiNote : MonoBehaviour,
 
     private void UpdateFontSize()
     {
-        float rectTransformWidthInPt = Mathf.Floor(RectTransform.rect.width * 72 / Screen.dpi) - 2;
-        int fontSize = (int)Mathf.Max(2, Mathf.Min(20f, rectTransformWidthInPt));
+        int fontSize = (int)Mathf.Max(5, Mathf.Min(20f, RectTransform.rect.width / 2f));
         if (fontSize != uiText.FontSize)
         {
             uiText.FontSize = fontSize;
