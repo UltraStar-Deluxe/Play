@@ -18,6 +18,7 @@ public class InputManager : MonoBehaviour
         }
         inputActionAsset = null;
         pathToInputAction.Clear();
+        AdditionalInputActionInfos.Clear();
     }
 
     private static InputManager instance;
@@ -35,6 +36,7 @@ public class InputManager : MonoBehaviour
     }
 
     private static readonly Dictionary<string, ObservableCancelablePriorityInputAction> pathToInputAction = new Dictionary<string, ObservableCancelablePriorityInputAction>();
+    public static List<InputActionInfo> AdditionalInputActionInfos { get; private set; }= new List<InputActionInfo>();
     
     /**
      * Default InputActionAsset is copied to streamingAssetsPath such that users can edit it to their preferences.
@@ -147,5 +149,6 @@ public class InputManager : MonoBehaviour
     private void OnDestroy()
     {
         pathToInputAction.Clear();
+        AdditionalInputActionInfos.Clear();
     }
 }
