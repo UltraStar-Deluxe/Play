@@ -5157,6 +5157,7 @@ MonoBehaviour:
   historyManager: {fileID: 1903150256}
   songEditorLayerManager: {fileID: 29095450}
   midiFileImporter: {fileID: 488892134}
+  songEditorCopyPasteManager: {fileID: 1171513817}
   lyricsArea: {fileID: 1170985176}
 --- !u!4 &524897707
 Transform:
