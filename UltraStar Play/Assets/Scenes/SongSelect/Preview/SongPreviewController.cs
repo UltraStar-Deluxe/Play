@@ -92,6 +92,12 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     private void OnSelectedSongChanged(SongSelection songSelection)
     {
+        if (songRouletteController.IsDrag
+            || songRouletteController.IsFlickGesture)
+        {
+            return;
+        }
+        
         StopSongPreview();
 
         if (songSelection.SongIndex != 0)
@@ -144,7 +150,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         return noteStartBeatInMillis;
     }
 
-    private void StopSongPreview()
+    public void StopSongPreview()
     {
         StopAllCoroutines();
         songAudioPlayer.PauseAudio();

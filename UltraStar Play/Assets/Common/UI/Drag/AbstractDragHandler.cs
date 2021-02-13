@@ -28,7 +28,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     public RectTransform targetRectTransform;
 
     private List<IDisposable> disposables = new List<IDisposable>();
-    
+
     protected virtual void Start()
     {
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
@@ -126,16 +126,19 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     {
         float xDistanceInPixels = eventData.position.x - dragStartEvent.StartPositionInPixels.x;
         float yDistanceInPixels = eventData.position.y - dragStartEvent.StartPositionInPixels.y;
-
+        Vector2 distanceInPixels = new Vector2(xDistanceInPixels, yDistanceInPixels);
+        
         float widthInPixels = targetRectTransform.rect.width;
         float heightInPixels = targetRectTransform.rect.height;
         float xDistanceInPercent = xDistanceInPixels / widthInPixels;
         float yDistanceInPercent = yDistanceInPixels / heightInPixels;
+        Vector2 distanceInPercent = new Vector2(xDistanceInPercent, yDistanceInPercent);
 
         GeneralDragEvent result = new GeneralDragEvent(dragStartEvent.StartPositionInPixels,
             dragStartEvent.StartPositionInPercent,
-            new Vector2(xDistanceInPixels, yDistanceInPixels),
-            new Vector2(xDistanceInPercent, yDistanceInPercent),
+            distanceInPixels,
+            distanceInPercent,
+            eventData.delta,
             dragStartEvent.RaycastResultsDragStart,
             dragStartEvent.InputButton);
         return result;
@@ -145,6 +148,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     {
         float xDragStartInPixels = eventData.pressPosition.x;
         float yDragStartInPixels = eventData.pressPosition.y;
+        Vector2 dragStartInPixels = new Vector2(xDragStartInPixels, yDragStartInPixels);
         float xDistanceInPixels = 0;
         float yDistanceInPixels = 0;
 
@@ -162,14 +166,16 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         float heightInPixels = targetRectTransform.rect.height;
         float xDragStartInPercent = (localPoint.x + (widthInPixels / 2)) / widthInPixels;
         float yDragStartInPercent = (localPoint.y + (heightInPixels / 2)) / heightInPixels;
+        Vector2 dragStartInPercent = new Vector2(xDragStartInPercent, yDragStartInPercent);
 
         float xDistanceInPercent = 0;
         float yDistanceInPercent = 0;
 
-        GeneralDragEvent result = new GeneralDragEvent(new Vector2(xDragStartInPixels, yDragStartInPixels),
-            new Vector2(xDragStartInPercent, yDragStartInPercent),
+        GeneralDragEvent result = new GeneralDragEvent(dragStartInPixels,
+            dragStartInPercent,
             new Vector2(xDistanceInPixels, yDistanceInPixels),
             new Vector2(xDistanceInPercent, yDistanceInPercent),
+            Vector2.zero, 
             raycastResults,
             eventData.button);
         return result;
