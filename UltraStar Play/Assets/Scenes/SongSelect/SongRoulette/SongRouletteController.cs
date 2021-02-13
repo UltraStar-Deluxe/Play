@@ -471,7 +471,8 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             flickGestureWasNoTouchscreenPressed = false;
             // Calculate final velocity of dragged element. The flick-gesture will continue with this velocity.
             dragDuration += Time.deltaTime;
-            Vector2 dragDistance = DragSongRouletteItem.GetPosition() - dragStartPosition;
+            Vector2 finalPosition = DragSongRouletteItem.GetPosition() + dragDeltaInPixels;
+            Vector2 dragDistance = finalPosition - dragStartPosition;
             dragVelocity = dragDistance / dragDuration;
         }
     }

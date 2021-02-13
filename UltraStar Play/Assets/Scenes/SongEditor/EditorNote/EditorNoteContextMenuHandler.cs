@@ -48,6 +48,9 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
     
     [Inject]
+    private NoteAreaDragHandler noteAreaDragHandler;
+    
+    [Inject]
     private SongEditorSceneController songEditorSceneController;
     
     private EditorUiNote uiNote;
@@ -55,7 +58,8 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         // This ContextMenu could open although a drag is in progress.
-        if (noteAreaContextMenuHandler.IsDrag)
+        if (noteAreaContextMenuHandler.IsDrag
+            || noteAreaDragHandler.IsDragging)
         {
             return;
         }

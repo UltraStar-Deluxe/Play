@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -36,6 +37,21 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     [Inject]
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
     
+    [Inject]
+    private NoteAreaDragHandler noteAreaDragHandler;
+    
+    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    {
+        // This ContextMenu could open although a drag is in progress.
+        if (IsDrag
+            || noteAreaDragHandler.IsDragging)
+        {
+            return;
+        }
+        
+        base.CheckOpenContextMenuFromInputAction(context);
+    }
+        
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
