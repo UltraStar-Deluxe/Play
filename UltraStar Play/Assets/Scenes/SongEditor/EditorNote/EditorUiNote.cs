@@ -14,7 +14,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 #pragma warning disable CS0649
 
 public class EditorUiNote : MonoBehaviour,
-    INeedInjection, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+    INeedInjection, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public static readonly IComparer<EditorUiNote> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
@@ -44,6 +45,9 @@ public class EditorUiNote : MonoBehaviour,
     [InjectedInInspector]
     public ShowWhiteSpaceText uiText;
 
+    [Inject]
+    public NoteAreaDragHandler noteAreaDragHandler;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -371,5 +375,20 @@ public class EditorUiNote : MonoBehaviour,
         {
             return Note.comparerByStartBeat.Compare(x.Note, y.Note);
         }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnBeginDrag(eventData);
+    }
+    
+    public void OnDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnDrag(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnEndDrag(eventData);
     }
 }
