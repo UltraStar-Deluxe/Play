@@ -77,7 +77,7 @@ public static class InputUtils
     
     public static bool AnyTouchscreenPressed()
     {
-        return Touch.activeFingers.Count > 0;
+        return Touch.activeTouches.Count > 0;
     }
 
     public static bool IsKeyboardShiftPressed()

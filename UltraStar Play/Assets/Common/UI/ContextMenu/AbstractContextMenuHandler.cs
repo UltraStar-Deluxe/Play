@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
-public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler
+public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     private Canvas canvas;
     private Canvas Canvas
@@ -49,19 +49,21 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     private List<IDisposable> disposables = new List<IDisposable>();
 
     public bool IsDrag { get; private set; }
+    private Vector2 dragStartPosition;
+    private float dragDistanceThreshold = 10f;
     
     protected void Start()
     {
         disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
-            .Where(_ => !IsDrag && Touch.activeTouches.Count < 2)
-            .Where(context => context.ReadValueAsButton())
             .Subscribe(CheckOpenContextMenuFromInputAction));
     }
 
     protected virtual void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         if (Pointer.current == null
-            || !context.ReadValueAsButton())
+            || !context.ReadValueAsButton()
+            || IsDrag
+            || Touch.activeTouches.Count >= 2)
         {
             return;
         }
@@ -110,9 +112,17 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        IsDrag = true;
+        dragStartPosition = eventData.position;
     }
-
+    
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (Vector2.Distance(eventData.position, dragStartPosition) > dragDistanceThreshold)
+        {
+            IsDrag = true;
+        }
+    }
+    
     public void OnEndDrag(PointerEventData eventData)
     {
         IsDrag = false;

@@ -44,6 +44,12 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     
     [InjectedInInspector]
     public SongSelectSceneControlNavigator songSelectSceneControlNavigator;
+
+    [InjectedInInspector]
+    public GraphicRaycaster graphicRaycaster;
+
+    [InjectedInInspector]
+    public SongPreviewController songPreviewController;
     
     public ArtistText artistText;
     public Text songTitleText;
@@ -418,6 +424,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         bb.BindExistingInstance(characterQuickJumpBar);
         bb.BindExistingInstance(playerProfileListController);
         bb.BindExistingInstance(songSelectSceneControlNavigator);
+        bb.BindExistingInstance(graphicRaycaster);
+        bb.BindExistingInstance(songPreviewController);
         return bb.GetBindings();
     }
 
