@@ -16,7 +16,9 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 {
-
+    [InjectedInInspector]
+    public GameObject inputActionInfoOverlay;
+    
     [Inject(searchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorSceneController songEditorSceneController;
 
@@ -64,6 +66,25 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel | 2 Finger Pinch-gesture"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Vertical", "Ctrl+Shift+Mouse Wheel | 2 Finger Pinch-gesture"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Scroll Horizontal", "Mouse Wheel | Arrow Keys | 2 Finger Drag | Middle Mouse Button+Drag"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Scroll Vertical", "Shift+Mouse Wheel | Shift+Arrow Keys | 2 Finger Drag | Middle Mouse Button+Drag"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Horizontal", "Shift+Arrow Keys | 1 (Numpad) | 3 (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Vertical", "Shift+Arrow Keys | Minus (Numpad) | Plus (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Vertical One Octave", "Ctrl+Shift+Arrow Keys"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Left Side of Note", "Ctrl+Arrow Keys | Divide (Numpad) | Multiply (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Right side of Note", "Alt+Arrow Keys | 7 (Numpad) | 8 (Numpad) | 9 (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Select Next Note", "6 (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Select Previous Note", "4 (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Play Selected Notes", "5 (Numpad)"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Play Pause", "Double Click"));
+        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Play MIDI Sound of Note", "Ctrl+Click Note"));
+        
+        // Show / hide help
+        InputManager.GetInputAction(R.InputActions.usplay_toggleHelp).PerformedAsObservable()
+            .Subscribe(_ => inputActionInfoOverlay.SetActive(!inputActionInfoOverlay.activeSelf));
+        
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
             .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = 0);
@@ -433,10 +454,17 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             moveNotesAction.MoveNotesVerticalAndNotify(-1, selectedNotes, followingNotes);
         }
 
-        // 5 plays the current selected note
+        // 5 plays the current selected notes (if any)
         if (Keyboard.current.numpad5Key.wasReleasedThisFrame)
         {
-            PlayAudioInRangeOfNotes(selectedNotes);
+            if (selectedNotes.IsNullOrEmpty())
+            {
+                songEditorSceneController.ToggleAudioPlayPause();
+            }
+            else
+            {
+                PlayAudioInRangeOfNotes(selectedNotes);
+            }
         }
 
         // scroll left with h, scroll right with j

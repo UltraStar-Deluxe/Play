@@ -48,7 +48,13 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
         if (!isInitialized)
         {
             isInitialized = true;
-            inputActionInfo = string.Join("\n\n",GetAvailableInputActionInfos().Select(it => $"{it.ActionName}: {it.InfoText}"));
+            List<string> availableInputActionInfosRichText = GetAvailableInputActionInfos()
+                .Select(it =>
+                {
+                    string actionNameDisplayString = CamelCaseToDisplayName(it.ActionName.Replace(" ", ""));
+                    return $"<color=\"orange\">{actionNameDisplayString}:</color> {it.InfoText}";
+                }).ToList();
+            inputActionInfo = string.Join("\n\n", availableInputActionInfosRichText);
             if (uiText != null)
             {
                 // Additional line break for better scrolling
@@ -80,7 +86,12 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
 
         foreach (InputActionInfo additionalInputActionInfo in InputManager.AdditionalInputActionInfos)
         {
-            InputActionInfo existingInfo = infos.FirstOrDefault(it => it.ActionName == additionalInputActionInfo.ActionName);
+            InputActionInfo existingInfo = infos.FirstOrDefault(it =>
+            {
+                string actionNameToLowerNoSpace = it.ActionName.ToLowerInvariant().Replace(" ", "");
+                string additionalInputActionNameToLowerNoSpace = additionalInputActionInfo.ActionName.ToLowerInvariant().Replace(" ", "");
+                return actionNameToLowerNoSpace == additionalInputActionNameToLowerNoSpace;
+            });
             if (existingInfo == null)
             {
                 infos.Add(additionalInputActionInfo);
