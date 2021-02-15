@@ -29,7 +29,7 @@ public static partial class R
         public static readonly string usplay_toggleResultGraph = "usplay/toggleResultGraph";
         public static readonly string usplay_toggleFullscreen = "usplay/toggleFullscreen";
         public static readonly string usplay_toggleMute = "usplay/toggleMute";
-        public static readonly string usplay_showHelp = "usplay/showHelp";
+        public static readonly string usplay_toggleHelp = "usplay/toggleHelp";
         public static readonly string usplay_anyKeyboardModifier = "usplay/anyKeyboardModifier";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_enter = "usplay/enter";

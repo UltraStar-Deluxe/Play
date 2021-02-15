@@ -651,7 +651,7 @@
                     "interactions": ""
                 },
                 {
-                    "name": "showHelp",
+                    "name": "toggleHelp",
                     "type": "Button",
                     "id": "ca0eb6ce-303d-4a5d-be18-89015231bef9",
                     "expectedControlType": "Button",
@@ -1238,7 +1238,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "showHelp",
+                    "action": "toggleHelp",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

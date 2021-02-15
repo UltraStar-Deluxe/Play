@@ -10,6 +10,9 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SingSceneController singSceneController;
 
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+    
     private void Start()
     {
         InputManager.GetInputAction(R.InputActions.usplay_skipToNextLyrics).PerformedAsObservable()
@@ -28,7 +31,17 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => singSceneController.TogglePlayPause());
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => singSceneController.FinishScene(false));
+            .Subscribe(_ =>
+            {
+                if (!songAudioPlayer.IsPlaying)
+                {
+                    singSceneController.TogglePlayPause();   
+                }
+                else
+                {
+                    singSceneController.FinishScene(false);
+                }
+            });
         
         InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
         InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
