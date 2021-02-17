@@ -24,7 +24,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
     [TextArea(3, 8)]
     public string inputActionInfo;
     
-    private List<string> ignoredInputActions = new List<string> {
+    private readonly List<string> ignoredInputActions = new List<string> {
         "navigate",
         "scrollWheel",
         "middleClick",
@@ -102,7 +102,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
             }
         }
         
-        infos.Sort();
+        infos.Sort(InputActionInfo.CompareByActionName);
         return infos;
     }
 

@@ -10,7 +10,7 @@ public class SlotListControl
 
     public List<ISlotListItem> ListItems { get; private set; } = new List<ISlotListItem>();
 
-    private Subject<SlotChangeEvent> slotChangeEventStream = new Subject<SlotChangeEvent>();
+    private readonly Subject<SlotChangeEvent> slotChangeEventStream = new Subject<SlotChangeEvent>();
     public IObservable<SlotChangeEvent> SlotChangeEventStream => slotChangeEventStream;
     
     public void OnDrag(ISlotListItem listItem, Vector2 dragDelta)
@@ -128,15 +128,15 @@ public class SlotListControl
             case ESlotListDirection.None : return null;
             case ESlotListDirection.TowardsNextSlot : return listItem.GetCurrentSlot().GetNextSlot();
             case ESlotListDirection.TowardsPreviousSlot : return listItem.GetCurrentSlot().GetPreviousSlot();
+            default: return null;
         }
-        return null;
     }
 
     private void InterpolateSize(ISlotListItem listItem, ISlotListSlot targetSlot, float offsetPercent)
     {
         Vector2 currentSlotSize = listItem.GetCurrentSlot().GetSize();
         if (targetSlot == null
-            || offsetPercent == 0)
+            || offsetPercent.NearlyEquals(0, 0.001f))
         {
             listItem.SetSize(currentSlotSize);
             return;

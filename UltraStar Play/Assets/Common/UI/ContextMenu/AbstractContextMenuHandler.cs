@@ -11,6 +11,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
+    private const float DragDistanceThreshold = 10f;
+    
     private Canvas canvas;
     private Canvas Canvas
     {
@@ -46,11 +48,10 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     
     protected abstract void FillContextMenu(ContextMenu contextMenu);
 
-    private List<IDisposable> disposables = new List<IDisposable>();
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
 
     public bool IsDrag { get; private set; }
     private Vector2 dragStartPosition;
-    private float dragDistanceThreshold = 10f;
     
     protected void Start()
     {
@@ -117,7 +118,7 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     
     public void OnDrag(PointerEventData eventData)
     {
-        if (Vector2.Distance(eventData.position, dragStartPosition) > dragDistanceThreshold)
+        if (Vector2.Distance(eventData.position, dragStartPosition) > DragDistanceThreshold)
         {
             IsDrag = true;
         }

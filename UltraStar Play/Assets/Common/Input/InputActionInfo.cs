@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class InputActionInfo : IComparable<InputActionInfo>
+public class InputActionInfo
 {
     public const string InfoSeparator = " | ";
     
@@ -25,8 +25,8 @@ public class InputActionInfo : IComparable<InputActionInfo>
             : InfoText + InfoSeparator + infoText;
     }
 
-    public int CompareTo(InputActionInfo other)
+    public static int CompareByActionName(InputActionInfo a, InputActionInfo b)
     {
-        return string.Compare(ActionName, other.ActionName, StringComparison.InvariantCulture);
+        return string.Compare(a.ActionName, b.ActionName, StringComparison.InvariantCulture);
     }
 }

@@ -15,6 +15,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
+    private const float TouchGestureMoveInSameDirectionThreshold = 100f;
+    
     [Inject]
     private NoteArea noteArea;
 
@@ -28,8 +30,6 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
 
     private float twoFingerGestureStartDistance;
 
-    private float touchGestureMoveInSameDirectionThreshold = 100f;
-    
     void Start()
     {
         noteAreaDragHandler.AddListener(this);
@@ -68,7 +68,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
             {
                 // The touches must all move in the same direction. Thus, their distance to each other must be (near) constant.
                 float distance = Vector2.Distance(Touch.activeTouches[0].screenPosition, Touch.activeTouches[1].screenPosition);
-                if (Math.Abs(distance - twoFingerGestureStartDistance) > touchGestureMoveInSameDirectionThreshold)
+                if (Math.Abs(distance - twoFingerGestureStartDistance) > TouchGestureMoveInSameDirectionThreshold)
                 {
                     CancelDrag();
                     return;

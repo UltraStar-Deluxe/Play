@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class RouletteItemPlaceholder : MonoBehaviour, ISlotListSlot
 {
-    public int renderOrder;
-
     private RectTransform rectTransform;
     public RectTransform RectTransform
     {
