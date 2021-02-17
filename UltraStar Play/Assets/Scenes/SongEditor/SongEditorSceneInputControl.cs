@@ -16,6 +16,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 {
+    private const float PinchGestureMagnitudeThresholdInPixels = 100f;
+    
     [InjectedInInspector]
     public GameObject inputActionInfoOverlay;
     
@@ -62,7 +64,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private Vector2[] zoomStartTouchPositions;
     private Vector2 zoomStartTouchDistancePerDimension;
-    private float pinchGestureMagnitudeThresholdInPixels = 100f;
     
     private void Start()
     {
@@ -354,25 +355,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             if (isTwoFingerTouchGestureInProgress)
             {
                 // Continued gesture
-                
-                // Zoom when difference to start distance is above threshold.
-                Vector2 distancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
-                Vector2 distanceDifference = distancePerDimension - zoomStartTouchDistancePerDimension;
-                if (Math.Abs(distanceDifference.x) > pinchGestureMagnitudeThresholdInPixels
-                    || Math.Abs(distanceDifference.y) > pinchGestureMagnitudeThresholdInPixels)
-                {
-                    if (Math.Abs(distanceDifference.x) > pinchGestureMagnitudeThresholdInPixels)
-                    {
-                        noteArea.ZoomHorizontal(Math.Sign(distanceDifference.x));
-                    }
-                    if (Math.Abs(distanceDifference.y) > pinchGestureMagnitudeThresholdInPixels)
-                    {
-                        noteArea.ZoomVertical(Math.Sign(distanceDifference.y));
-                    }
-            
-                    zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
-                    zoomStartTouchDistancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
-                }
+                UpdateTouchInputForZoomContinuedGesture(firstFinger, secondFinger);
             }
             else
             {
@@ -380,6 +363,28 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                 zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
                 zoomStartTouchDistancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
             }
+        }
+    }
+
+    private void UpdateTouchInputForZoomContinuedGesture(Finger firstFinger, Finger secondFinger)
+    {
+        // Zoom when difference to start distance is above threshold.
+        Vector2 distancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
+        Vector2 distanceDifference = distancePerDimension - zoomStartTouchDistancePerDimension;
+        if (Math.Abs(distanceDifference.x) > PinchGestureMagnitudeThresholdInPixels
+            || Math.Abs(distanceDifference.y) > PinchGestureMagnitudeThresholdInPixels)
+        {
+            if (Math.Abs(distanceDifference.x) > PinchGestureMagnitudeThresholdInPixels)
+            {
+                noteArea.ZoomHorizontal(Math.Sign(distanceDifference.x));
+            }
+            if (Math.Abs(distanceDifference.y) > PinchGestureMagnitudeThresholdInPixels)
+            {
+                noteArea.ZoomVertical(Math.Sign(distanceDifference.y));
+            }
+            
+            zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
+            zoomStartTouchDistancePerDimension = DistancePerDimension(firstFinger.screenPosition, secondFinger.screenPosition);
         }
     }
 

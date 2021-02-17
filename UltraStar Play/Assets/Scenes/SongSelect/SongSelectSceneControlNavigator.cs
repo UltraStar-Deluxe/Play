@@ -111,6 +111,9 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
                 DeselectSearchControl();
                 SelectOrderSliderControl();
                 break;
+            default:
+                // Do nothing
+                break;
         }
     }
 
@@ -154,6 +157,9 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
                 DeselectSearchControl();
                 SelectSongRouletteControl();
                 break;
+            default:
+                // Do nothing
+                break;
         }
     }
 
@@ -179,6 +185,12 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
                 break;
             case SongSelectSceneControls.Search:
                 songSelectSceneController.UpdateFilteredSongs();
+                break;
+            case SongSelectSceneControls.CharacterQuickJump:
+                // Do nothing. The event is handled by the CharacterQuickJump itself.
+                break;
+            default:
+                // Do nothing.
                 break;
         }
     }

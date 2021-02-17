@@ -14,6 +14,9 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class SongRouletteController : MonoBehaviour, INeedInjection
 {
+    private const float FlickGestureThresholdInPixels = 20f;
+    private const float FlickAcceleration = 0.98f;
+    
     [InjectedInInspector]
     public RectTransform songRouletteItemContainer;
     
@@ -74,9 +77,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
     public float MaxAnimTimeInSeconds { get; private set; } = 0.2f;
     public float AnimTimeInSeconds { get; set; }
 
-    private float flickGestureThresholdInPixels = 20f;
     private bool flickGestureWasNoTouchscreenPressed;
-    private float flickAcceleration = 0.98f;
     private Vector2 dragVelocity;
     private float dragDuration;
     private Vector2 dragStartPosition;
@@ -119,7 +120,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
                     : null;
             }
             
-            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex - (int)(activeRouletteItemPlaceholders.Count / 2), songs.Count);
+            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex - (activeRouletteItemPlaceholders.Count / 2), songs.Count);
             CreateSongRouletteItem(songs[newlyCreatedSongIndex], activeRouletteItemPlaceholders.First());
         }
         else if (slotChangeEvent.Direction == ESlotListDirection.TowardsPreviousSlot)
@@ -133,7 +134,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
                     : null;
             }
 
-            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex + (int)(activeRouletteItemPlaceholders.Count / 2), songs.Count);
+            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex + (activeRouletteItemPlaceholders.Count / 2), songs.Count);
             CreateSongRouletteItem(songs[newlyCreatedSongIndex], activeRouletteItemPlaceholders.Last());
         }
         Selection.Value = new SongSelection(songs[newSelectedSongIndex] , newSelectedSongIndex, songs.Count);
@@ -465,7 +466,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
     
     private void CheckStartFlickGesture(Vector2 dragDeltaInPixels)
     {
-        if (dragDeltaInPixels.magnitude > flickGestureThresholdInPixels)
+        if (dragDeltaInPixels.magnitude > FlickGestureThresholdInPixels)
         {
             IsFlickGesture = true;
             flickGestureWasNoTouchscreenPressed = false;
@@ -485,8 +486,8 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
         
         // Slowdown a little.
-        dragVelocity *= flickAcceleration;
-        if ((dragVelocity.magnitude * Time.deltaTime) < flickGestureThresholdInPixels
+        dragVelocity *= FlickAcceleration;
+        if ((dragVelocity.magnitude * Time.deltaTime) < FlickGestureThresholdInPixels
             || songRouletteItems.IsNullOrEmpty()
             || InputUtils.AnyMouseButtonPressed()
             || (flickGestureWasNoTouchscreenPressed && InputUtils.AnyTouchscreenPressed()))

@@ -81,11 +81,18 @@ public class RepeatedHoldInteraction : IInputInteraction
                     context.Canceled();
                 }
                 break;
+            default:
+                if (!context.ControlIsActuated(PressPointOrDefault))
+                {
+                    context.Canceled();
+                }
+                break;
         }
     }
     
     /// <inheritdoc />
     public void Reset()
     {
+        // Method needed to implement interface
     }
 }

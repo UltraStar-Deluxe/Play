@@ -28,7 +28,7 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
 
     public string character;
 
-    private List<IDisposable> disposables = new List<IDisposable>();
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
     
     public bool Interactable
     {
