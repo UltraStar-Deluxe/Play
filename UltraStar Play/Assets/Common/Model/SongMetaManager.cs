@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
-public class SongMetaManager : MonoBehaviour
+public class SongMetaManager : MonoBehaviour, INeedInjection
 {
     private static readonly object scanLock = new object();
 
@@ -20,9 +20,8 @@ public class SongMetaManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        songMetas = new ConcurrentBag<SongMeta>();
-        isSongScanStarted = false;
-        isSongScanFinished = false;
+        ResetSongMetas();
+        lastSongDirs = null;
     }
 
     public static SongMetaManager Instance
@@ -33,6 +32,8 @@ public class SongMetaManager : MonoBehaviour
         }
     }
 
+    // Static to be persisted across scenes.
+    private static List<string> lastSongDirs;
     private static bool isSongScanStarted;
     private static bool isSongScanFinished;
     public static bool IsSongScanFinished
@@ -49,6 +50,41 @@ public class SongMetaManager : MonoBehaviour
     public int SongsFound { get; private set; }
     public int SongsSuccess { get; private set; }
     public int SongsFailed { get; private set; }
+
+    [Inject]
+    private Settings settings;
+    
+    public static void ResetSongMetas()
+    {
+        lock (scanLock)
+        {
+            songMetas = new ConcurrentBag<SongMeta>();
+            isSongScanStarted = false;
+            isSongScanFinished = false;
+        }
+    }
+    
+    private void Start()
+    {
+        RescanIfSongFoldersChanged();
+    }
+
+    private void RescanIfSongFoldersChanged()
+    {
+        if (lastSongDirs == null)
+        {
+            lastSongDirs = new List<string>(settings.GameSettings.songDirs);
+        }
+
+        if (isSongScanFinished
+            && !lastSongDirs.SequenceEqual(settings.GameSettings.songDirs))
+        {
+            Debug.Log("SongDirs have changed since last scan. Start rescan.");
+            lastSongDirs = new List<string>(settings.GameSettings.songDirs);
+            ResetSongMetas();
+            ScanFilesIfNotDoneYet();
+        }
+    }
 
     public void Add(SongMeta songMeta)
     {

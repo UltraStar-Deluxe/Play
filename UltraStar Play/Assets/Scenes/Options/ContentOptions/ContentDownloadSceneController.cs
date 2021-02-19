@@ -28,6 +28,15 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private UnityWebRequest downloadRequest;
 
+    [Inject]
+    private SettingsManager settingsManager;
+    
+    [Inject]
+    private Settings settings;
+    
+    [Inject]
+    private SongMetaManager songMetaManager;
+    
     void Start()
     {
         startDownloadButton.OnClickAsObservable().Subscribe(_ => StartDownload());
@@ -289,11 +298,18 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
             AddToDebugAndUiLog($"Finished unpacking the song package to {songsPath}");
             SetFinishedStatus();
             downloadPath.text = "";
-            List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
+            List<string> songDirs = settings.GameSettings.songDirs;
             if (!songDirs.Contains(songsPath))
             {
                 songDirs.Add(songsPath);
-                SettingsManager.Instance.Save();
+                settingsManager.Save();
+            }
+            // Reload SongMetas if they had been loaded already.
+            if (SongMetaManager.IsSongScanFinished)
+            {
+                Debug.Log("Rescan songs after successful download.");
+                SongMetaManager.ResetSongMetas();
+                songMetaManager.ScanFilesIfNotDoneYet();
             }
         }
         else
