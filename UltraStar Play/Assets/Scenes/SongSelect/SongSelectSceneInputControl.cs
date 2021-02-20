@@ -20,10 +20,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
 
+    private ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
+    public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
-    private string fuzzySearchText = "";
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
-
+    
     void Start()
     {
         // Toggle Search
@@ -172,14 +173,29 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         if (IsFuzzySearchActive())
         {
             // When there was no keyboard input for a while, then reset the search term.
-            if (fuzzySearchLastInputTimeInSeconds + fuzzySearchResetTimeInSeconds < Time.time)
-            {
-                fuzzySearchText = "";
-            }
+            CheckResetFuzzySearchText();
             
             fuzzySearchLastInputTimeInSeconds = Time.time;
-            fuzzySearchText += newChar;
-            songSelectSceneController.JumpToSongWhereTitleStartsWith(fuzzySearchText);
+            if (newChar == '\b' && fuzzySearchText.Value.Length > 0)
+            {
+                // Backspace. Remove last character.
+                fuzzySearchText.Value = fuzzySearchText.Value.Substring(0, fuzzySearchText.Value.Length - 1);
+            }
+            else
+            {
+                fuzzySearchText.Value += newChar;
+            }
+            songSelectSceneController.DoFuzzySearch(fuzzySearchText.Value);
+
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText()));
+        }
+    }
+
+    private void CheckResetFuzzySearchText()
+    {
+        if (fuzzySearchLastInputTimeInSeconds + fuzzySearchResetTimeInSeconds < Time.time)
+        {
+            fuzzySearchText.Value = "";
         }
     }
 
@@ -194,6 +210,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private bool IsFuzzySearchActive()
     {
-        return !InputUtils.AnyKeyboardModifierPressed();
+        return !InputUtils.AnyKeyboardModifierPressed()
+               && !GameObjectUtils.InputFieldHasFocus(eventSystem);
     }
 }
