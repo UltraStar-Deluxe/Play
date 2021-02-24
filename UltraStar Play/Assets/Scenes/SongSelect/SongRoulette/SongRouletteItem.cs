@@ -41,6 +41,10 @@ public class SongRouletteItem : GeneralDragHandler, INeedInjection, IDragListene
         }
         set
         {
+            if (targetRouletteItem == value)
+            {
+                return;
+            }
             targetRouletteItem = value;
             if (targetRouletteItem != null)
             {

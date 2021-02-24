@@ -7,8 +7,11 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
  
-public class GlobalInputControl : MonoBehaviour
+public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
+    [Inject]
+    private Settings settings;
+    
     private void Start()
     {
         // Toggle full-screen mode via F11
@@ -24,8 +27,12 @@ public class GlobalInputControl : MonoBehaviour
     {
         Debug.Log("Toggle full-screen mode");
         Screen.fullScreen = !Screen.fullScreen;
-        // Screen.fullScreenMode is updated after this frame. Thus, delay updating the settings a bit.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.1f,
-            () => SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode = Screen.fullScreenMode));
+        // A full-screen switch does not happen immediately; it will actually happen when the current frame is finished.
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
+            () =>
+            {
+                settings.GraphicSettings.fullScreenMode = Screen.fullScreenMode;
+                Debug.Log("New full-screen mode " + settings.GraphicSettings.fullScreenMode);
+            }));
     }
 }
