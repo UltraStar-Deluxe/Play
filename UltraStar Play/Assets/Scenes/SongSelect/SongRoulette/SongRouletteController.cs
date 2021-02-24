@@ -209,10 +209,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             }
 
             // Update target
-            if (songRouletteItem.TargetRouletteItem != placeholder)
-            {
-                songRouletteItem.TargetRouletteItem = placeholder;
-            }
+            songRouletteItem.TargetRouletteItem = placeholder;
             usedSongRouletteItems.Add(songRouletteItem);
         }
 
