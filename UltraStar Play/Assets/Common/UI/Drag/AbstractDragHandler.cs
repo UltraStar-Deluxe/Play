@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,20 +19,26 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     [Inject]
     public GraphicRaycaster graphicRaycaster;
 
-    private bool isDragging;
+    public bool IsDragging { get; private set; }
     private bool ignoreDrag;
 
     private EVENT dragStartEvent;
-
+    private int pointerId;
+    
     public RectTransform targetRectTransform;
 
-    void Update()
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+
+    protected virtual void Start()
     {
-        // Cancel drag via Escape key
-        if (isDragging && Input.GetKeyUp(KeyCode.Escape))
-        {
-            CancelDrag();
-        }
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
+            .Where(_ => IsDragging)
+            .Subscribe(_ =>
+            {
+                CancelDrag();
+                // Cancel other callbacks. To do so, this subscription has a higher priority. 
+                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+            }));
     }
 
     public void AddListener(IDragListener<EVENT> listener)
@@ -46,33 +53,42 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsDragging)
+        {
+            return;
+        }
+
         ignoreDrag = false;
-        isDragging = true;
+        IsDragging = true;
+        pointerId = eventData.pointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (ignoreDrag)
+        if (ignoreDrag
+            || !IsDragging
+            || eventData.pointerId != pointerId)
         {
             return;
         }
-
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (ignoreDrag)
+        if (ignoreDrag
+            || !IsDragging
+            || eventData.pointerId != pointerId)
         {
             return;
         }
 
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
-        isDragging = false;
+        IsDragging = false;
     }
 
     private void CancelDrag()
@@ -82,7 +98,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
             return;
         }
 
-        isDragging = false;
+        IsDragging = false;
         ignoreDrag = true;
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
@@ -98,6 +114,11 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         }
     }
 
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
+    }
+
     abstract protected EVENT CreateDragEventStart(PointerEventData eventData);
     abstract protected EVENT CreateDragEvent(PointerEventData eventData, EVENT dragStartEvent);
 
@@ -105,16 +126,19 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     {
         float xDistanceInPixels = eventData.position.x - dragStartEvent.StartPositionInPixels.x;
         float yDistanceInPixels = eventData.position.y - dragStartEvent.StartPositionInPixels.y;
-
+        Vector2 distanceInPixels = new Vector2(xDistanceInPixels, yDistanceInPixels);
+        
         float widthInPixels = targetRectTransform.rect.width;
         float heightInPixels = targetRectTransform.rect.height;
         float xDistanceInPercent = xDistanceInPixels / widthInPixels;
         float yDistanceInPercent = yDistanceInPixels / heightInPixels;
+        Vector2 distanceInPercent = new Vector2(xDistanceInPercent, yDistanceInPercent);
 
         GeneralDragEvent result = new GeneralDragEvent(dragStartEvent.StartPositionInPixels,
             dragStartEvent.StartPositionInPercent,
-            new Vector2(xDistanceInPixels, yDistanceInPixels),
-            new Vector2(xDistanceInPercent, yDistanceInPercent),
+            distanceInPixels,
+            distanceInPercent,
+            eventData.delta,
             dragStartEvent.RaycastResultsDragStart,
             dragStartEvent.InputButton);
         return result;
@@ -124,8 +148,8 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     {
         float xDragStartInPixels = eventData.pressPosition.x;
         float yDragStartInPixels = eventData.pressPosition.y;
-        float xDistanceInPixels = 0;
-        float yDistanceInPixels = 0;
+        Vector2 dragStartInPixels = new Vector2(xDragStartInPixels, yDragStartInPixels);
+        
 
         List<RaycastResult> raycastResults = new List<RaycastResult>();
         PointerEventData eventDataForRaycast = new PointerEventData(EventSystem.current);
@@ -141,14 +165,16 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         float heightInPixels = targetRectTransform.rect.height;
         float xDragStartInPercent = (localPoint.x + (widthInPixels / 2)) / widthInPixels;
         float yDragStartInPercent = (localPoint.y + (heightInPixels / 2)) / heightInPixels;
+        Vector2 dragStartInPercent = new Vector2(xDragStartInPercent, yDragStartInPercent);
 
-        float xDistanceInPercent = 0;
-        float yDistanceInPercent = 0;
+        Vector2 distanceInPixels = Vector2.zero;
+        Vector2 distanceInPercent = Vector2.zero;
 
-        GeneralDragEvent result = new GeneralDragEvent(new Vector2(xDragStartInPixels, yDragStartInPixels),
-            new Vector2(xDragStartInPercent, yDragStartInPercent),
-            new Vector2(xDistanceInPixels, yDistanceInPixels),
-            new Vector2(xDistanceInPercent, yDistanceInPercent),
+        GeneralDragEvent result = new GeneralDragEvent(dragStartInPixels,
+            dragStartInPercent,
+            distanceInPixels,
+            distanceInPercent,
+            Vector2.zero, 
             raycastResults,
             eventData.button);
         return result;

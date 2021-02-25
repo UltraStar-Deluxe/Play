@@ -6,21 +6,36 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using UniInject;
+using UnityEngine.InputSystem;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class SongRouletteController : MonoBehaviour, INeedInjection
 {
+    private const float FlickGestureThresholdInPixels = 20f;
+    private const float FlickAcceleration = 0.98f;
+    
+    [InjectedInInspector]
+    public RectTransform songRouletteItemContainer;
+    
     [InjectedInInspector]
     public SongRouletteItem songRouletteItemPrefab;
+    
     [InjectedInInspector]
     public List<RouletteItemPlaceholder> rouletteItemPlaceholders;
 
+    [InjectedInInspector]
     public bool showRouletteItemPlaceholders;
 
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private SongPreviewController songPreviewController;
+    
+    public SlotListControl SlotListControl { get; private set; } = new SlotListControl();
 
     private List<RouletteItemPlaceholder> activeRouletteItemPlaceholders = new List<RouletteItemPlaceholder>();
     private RouletteItemPlaceholder centerItem;
@@ -43,12 +58,40 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
     }
 
+    private SongMeta SelectedSongMeta
+    {
+        get
+        {
+            return Selection.Value.SongMeta;
+        }
+    }
+    
     private readonly List<SongRouletteItem> songRouletteItems = new List<SongRouletteItem>();
 
     private bool isInitialized;
 
+    public bool IsDrag { get; private set; }
+    public bool IsFlickGesture { get; private set; }
+    public SongRouletteItem DragSongRouletteItem { get; private set; }
+    
+    public float MaxAnimTimeInSeconds { get; private set; } = 0.2f;
+    public float AnimTimeInSeconds { get; set; }
+
+    private bool flickGestureWasNoTouchscreenPressed;
+    private Vector2 dragVelocity;
+    private float dragDuration;
+    private Vector2 dragStartPosition;
+    
     void Start()
     {
+        for (int i = 0; i < rouletteItemPlaceholders.Count; i++)
+        {
+            ISlotListSlot previousSlot = 0 <= (i - 1) ? rouletteItemPlaceholders[i - 1] : null;
+            ISlotListSlot nextSlot = (i + 1) <= (rouletteItemPlaceholders.Count - 1) ? rouletteItemPlaceholders[i + 1] : null;
+            rouletteItemPlaceholders[i].SetNeighborSlots(previousSlot, nextSlot);
+        }
+        SlotListControl.SlotChangeEventStream.Subscribe(OnSongRouletteItemChangedSlot);
+        
         activeRouletteItemPlaceholders = new List<RouletteItemPlaceholder>(rouletteItemPlaceholders);
         centerItemIndex = (int)Math.Floor(rouletteItemPlaceholders.Count / 2f);
         centerItem = rouletteItemPlaceholders[centerItemIndex];
@@ -63,6 +106,40 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
     }
 
+    private void OnSongRouletteItemChangedSlot(SlotChangeEvent slotChangeEvent)
+    {
+        int newSelectedSongIndex = SelectedSongIndex;
+        if (slotChangeEvent.Direction == ESlotListDirection.TowardsNextSlot)
+        {
+            newSelectedSongIndex = NumberUtils.Mod(SelectedSongIndex - 1, songs.Count);
+            foreach (SongRouletteItem songRouletteItem in songRouletteItems)
+            {
+                RouletteItemPlaceholder nextPlaceholder = songRouletteItem.GetCurrentSlot().GetNextSlot() as RouletteItemPlaceholder;
+                songRouletteItem.TargetRouletteItem = nextPlaceholder != null && activeRouletteItemPlaceholders.Contains(nextPlaceholder)
+                    ? nextPlaceholder
+                    : null;
+            }
+            
+            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex - (activeRouletteItemPlaceholders.Count / 2), songs.Count);
+            CreateSongRouletteItem(songs[newlyCreatedSongIndex], activeRouletteItemPlaceholders.First());
+        }
+        else if (slotChangeEvent.Direction == ESlotListDirection.TowardsPreviousSlot)
+        {
+            newSelectedSongIndex = NumberUtils.Mod(SelectedSongIndex + 1, songs.Count);
+            foreach (SongRouletteItem songRouletteItem in songRouletteItems)
+            {
+                RouletteItemPlaceholder previousPlaceholder = songRouletteItem.GetCurrentSlot().GetPreviousSlot() as RouletteItemPlaceholder;
+                songRouletteItem.TargetRouletteItem = previousPlaceholder != null && activeRouletteItemPlaceholders.Contains(previousPlaceholder)
+                    ? previousPlaceholder
+                    : null;
+            }
+
+            int newlyCreatedSongIndex = NumberUtils.Mod(newSelectedSongIndex + (activeRouletteItemPlaceholders.Count / 2), songs.Count);
+            CreateSongRouletteItem(songs[newlyCreatedSongIndex], activeRouletteItemPlaceholders.Last());
+        }
+        Selection.Value = new SongSelection(songs[newSelectedSongIndex] , newSelectedSongIndex, songs.Count);
+    }
+
     void Update()
     {
         if (songs.Count == 0)
@@ -70,8 +147,19 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             return;
         }
 
-        UpdateSongRouletteItems();
+        if (!IsDrag
+            && !IsFlickGesture)
+        {
+            UpdateSongRouletteItems();
+        }
+        
+        AnimTimeInSeconds += Time.deltaTime;
+        AnimTimeInSeconds = NumberUtils.Limit(AnimTimeInSeconds, 0, MaxAnimTimeInSeconds);
 
+        UpdateDrawOrder();
+
+        UpdateFlickGesture();
+        
         // Initially, let all items start with full size
         if (!isInitialized)
         {
@@ -83,15 +171,32 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
     }
 
+    private void UpdateDrawOrder()
+    {
+        // Drawing order is defined by child order in the RectTransform.
+        // Thus, sort children by distance to center.
+        Vector2 centerPosition = centerItem.GetPosition();
+        songRouletteItems.Sort((a, b) =>
+        {
+            float distanceA = Vector2.Distance(a.GetPosition(), centerPosition);
+            float distanceB = Vector2.Distance(b.GetPosition(), centerPosition);
+            return distanceB.CompareTo(distanceA);
+        });
+        for (int i = 0; i < songRouletteItems.Count; i++)
+        {
+            songRouletteItems[i].RectTransform.SetSiblingIndex(i);
+        }
+    }
+
     private void UpdateSongRouletteItems()
     {
         List<SongRouletteItem> usedSongRouletteItems = new List<SongRouletteItem>();
 
         // Spawn roulette items for songs to be displayed (i.e. selected song and its surrounding songs)
         int activeCenterIndex = activeRouletteItemPlaceholders.IndexOf(centerItem);
-        foreach (RouletteItemPlaceholder rouletteItem in activeRouletteItemPlaceholders)
+        foreach (RouletteItemPlaceholder placeholder in activeRouletteItemPlaceholders)
         {
-            int index = activeRouletteItemPlaceholders.IndexOf(rouletteItem);
+            int index = activeRouletteItemPlaceholders.IndexOf(placeholder);
             int activeCenterDistance = index - activeCenterIndex;
             int songIndex = SelectedSongIndex + activeCenterDistance;
             SongMeta songMeta = GetSongAtIndex(songIndex);
@@ -100,14 +205,11 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             SongRouletteItem songRouletteItem = songRouletteItems.Where(it => it.SongMeta == songMeta).FirstOrDefault();
             if (songRouletteItem == null)
             {
-                songRouletteItem = CreateSongRouletteItem(songMeta, rouletteItem);
+                songRouletteItem = CreateSongRouletteItem(songMeta, placeholder);
             }
 
             // Update target
-            if (songRouletteItem.TargetRouletteItem != rouletteItem)
-            {
-                songRouletteItem.TargetRouletteItem = rouletteItem;
-            }
+            songRouletteItem.TargetRouletteItem = placeholder;
             usedSongRouletteItems.Add(songRouletteItem);
         }
 
@@ -121,30 +223,31 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
     }
 
-    private void RemoveSongRouletteItem(SongRouletteItem songRouletteItem)
+    public void RemoveSongRouletteItem(SongRouletteItem songRouletteItem)
     {
         songRouletteItem.TargetRouletteItem = null;
         songRouletteItems.Remove(songRouletteItem);
+        SlotListControl.ListItems.Remove(songRouletteItem);
     }
 
     private SongRouletteItem CreateSongRouletteItem(SongMeta songMeta, RouletteItemPlaceholder rouletteItem)
     {
-        SongRouletteItem item = Instantiate(songRouletteItemPrefab);
+        SongRouletteItem item = Instantiate(songRouletteItemPrefab, songRouletteItemContainer);
         injector.InjectAllComponentsInChildren(item);
-        item.transform.SetParent(transform);
+        item.name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
         item.RectTransform.anchorMin = rouletteItem.RectTransform.anchorMin;
         item.RectTransform.anchorMax = rouletteItem.RectTransform.anchorMax;
         item.RectTransform.sizeDelta = Vector2.zero;
         item.RectTransform.anchoredPosition = Vector2.zero;
         item.TargetRouletteItem = rouletteItem;
-        item.RectTransform.localScale = Vector3.zero;
 
         Button button = item.GetComponent<Button>();
-        button.onClick.AddListener(() => OnSongButtonClicked(songMeta));
+        button.OnClickAsObservable().Subscribe(_ => OnSongButtonClicked(songMeta));
         songMetaToButtonMap[songMeta] = button;
 
         songRouletteItems.Add(item);
+        SlotListControl.ListItems.Add(item);
         return item;
     }
 
@@ -195,7 +298,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             // Try to restore song selection
             if (lastSelectedSongMeta != null)
             {
-                int songIndex = songs.IndexOf(lastSelectedSongMeta);
+                int songIndex = GetSongIndex(lastSelectedSongMeta);
                 if (songIndex >= 0)
                 {
                     lastSelectedSongIndex = songIndex;
@@ -211,6 +314,11 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             Selection.Value = new SongSelection(null, -1, 0);
             RemoveAllSongRouletteItems();
         }
+    }
+
+    private int GetSongIndex(SongMeta songMeta)
+    {
+        return songs.IndexOf(songMeta);
     }
 
     private void RemoveAllSongRouletteItems()
@@ -243,6 +351,14 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
         SongMeta nextSong = GetSongAtIndex(index);
         SelectSong(nextSong);
+
+        ResetAnimationTimeTowardsTargetRouletteItem();
+    }
+
+    private void ResetAnimationTimeTowardsTargetRouletteItem()
+    {
+        // Animate towards target. Thereby, keep already finished part of previous animation.
+        AnimTimeInSeconds = MaxAnimTimeInSeconds - AnimTimeInSeconds;
     }
 
     public SongMeta Find(Predicate<SongMeta> predicate)
@@ -298,7 +414,15 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
     private void OnSongButtonClicked(SongMeta songMeta)
     {
-        if (Selection.Value.SongMeta != null && Selection.Value.SongMeta == songMeta)
+        if (ContextMenu.IsAnyContextMenuOpen
+            || IsDrag
+            || IsFlickGesture)
+        {
+            return;
+        }
+        
+        if (Selection.Value.SongMeta != null
+            && Selection.Value.SongMeta == songMeta)
         {
             selectionClickedEventStream.OnNext(Selection.Value);
         }
@@ -306,5 +430,77 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         {
             SelectSong(songMeta);
         }
+    }
+
+    public void OnDrag(SongRouletteItem songRouletteItem, Vector2 dragDelta)
+    {
+        dragDuration += Time.deltaTime;
+        SlotListControl.OnDrag(songRouletteItem, dragDelta);
+        songRouletteItems.ForEach(it => SlotListControl.InterpolateSize(it));
+    }
+    
+    public void OnEndDrag(Vector2 dragDeltaInPixels)
+    {
+        CheckStartFlickGesture(dragDeltaInPixels);
+        
+        IsDrag = false;
+        DragSongRouletteItem = null;
+        songRouletteItems.ForEach(it => it.StartAnimationTowardsTargetRouletteItem());
+        ResetAnimationTimeTowardsTargetRouletteItem();
+    }
+    
+    public void OnBeginDrag(SongRouletteItem songRouletteItem)
+    {
+        IsDrag = true;
+        DragSongRouletteItem = songRouletteItem;
+        songRouletteItems.ForEach(it => it.StartAnimationTowardsTargetRouletteItem());
+        songPreviewController.StopSongPreview();
+        
+        // For velocity calculation
+        dragStartPosition = songRouletteItem.GetPosition();
+        dragDuration = 0;
+    }
+    
+    private void CheckStartFlickGesture(Vector2 dragDeltaInPixels)
+    {
+        if (dragDeltaInPixels.magnitude > FlickGestureThresholdInPixels)
+        {
+            IsFlickGesture = true;
+            flickGestureWasNoTouchscreenPressed = false;
+            // Calculate final velocity of dragged element. The flick-gesture will continue with this velocity.
+            dragDuration += Time.deltaTime;
+            Vector2 finalPosition = DragSongRouletteItem.GetPosition() + dragDeltaInPixels;
+            Vector2 dragDistance = finalPosition - dragStartPosition;
+            dragVelocity = dragDistance / dragDuration;
+        }
+    }
+    
+    private void UpdateFlickGesture()
+    {
+        if (!IsFlickGesture)
+        {
+            return;
+        }
+        
+        // Slowdown a little.
+        dragVelocity *= FlickAcceleration;
+        if ((dragVelocity.magnitude * Time.deltaTime) < FlickGestureThresholdInPixels
+            || songRouletteItems.IsNullOrEmpty()
+            || InputUtils.AnyMouseButtonPressed()
+            || (flickGestureWasNoTouchscreenPressed && InputUtils.AnyTouchscreenPressed()))
+        {
+            // End flick-gesture
+            IsFlickGesture = false;
+            dragVelocity = Vector2.zero;
+            OnEndDrag(Vector2.zero);
+            return;
+        }
+
+        // Stop flick when the touchscreen was pressed again (i.e., a rising flank).
+        flickGestureWasNoTouchscreenPressed = flickGestureWasNoTouchscreenPressed || !InputUtils.AnyTouchscreenPressed();
+        
+        // Simulate drag in flick direction.
+        SongRouletteItem flickSongRouletteItem = songRouletteItems.FirstOrDefault(it => it.SongMeta == SelectedSongMeta);
+        OnDrag(flickSongRouletteItem, dragVelocity * Time.deltaTime);
     }
 }

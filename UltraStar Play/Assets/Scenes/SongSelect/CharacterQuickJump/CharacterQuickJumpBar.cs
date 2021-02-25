@@ -6,14 +6,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.EventSystems;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
 {
-    // Quick jump letters that are also found on an Android contacts list.
-    // Q, X, Y and Z are skipped (probably because nearly never used).
     private static readonly string characters = "&ABCDEFGHIJKLMNOPQRSTUVWXYZ#";
 
     public CharacterQuickJump characterQuickJumpPrefab;
@@ -29,9 +28,20 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongMetaManager songMetaManager;
+    
+    [Inject]
+    private EventSystem eventSystem;
 
     private bool isSongMetasOutdated;
 
+    public List<CharacterQuickJump> CharacterQuickJumpEntries => GetComponentsInChildren<CharacterQuickJump>().ToList();
+    public List<CharacterQuickJump> InteractableCharacterQuickJumpEntries => CharacterQuickJumpEntries
+        .Where(it => it.Interactable)
+        .ToList();
+    public CharacterQuickJump FocusedInteractableCharacterQuickJumpEntry => InteractableCharacterQuickJumpEntries
+        .FirstOrDefault(it => eventSystem.currentSelectedGameObject == it.UiButton.gameObject);
+    public int FocusedInteractableCharacterQuickJumpEntryIndex => InteractableCharacterQuickJumpEntries.IndexOf(FocusedInteractableCharacterQuickJumpEntry);
+    
     void Start()
     {
         UpdateCharacters();
@@ -53,8 +63,7 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
 
     private void UpdateCharacters()
     {
-        GetComponentsInChildren<CharacterQuickJump>().ForEach(it => Destroy(it.gameObject));
-
+        CharacterQuickJumpEntries.ForEach(it => Destroy(it.gameObject));
         foreach (char c in characters.ToLowerInvariant())
         {
             CreateCharacter(c);
@@ -72,5 +81,47 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
         {
             characterQuickJump.Interactable = false;
         }
+    }
+    
+    public bool TrySelectNextControl()
+    {
+        if ((eventSystem.currentSelectedGameObject == null
+             || eventSystem.currentSelectedGameObject.GetComponentInParent<CharacterQuickJump>() == null)
+            && InteractableCharacterQuickJumpEntries.Count > 0)
+        {
+            InteractableCharacterQuickJumpEntries.First().UiButton.Select();
+            GetComponent<RectTransformSlideIntoViewport>().SlideIn();
+            return true;
+        }
+            
+        CharacterQuickJump nextEntry = InteractableCharacterQuickJumpEntries.GetElementAfter(FocusedInteractableCharacterQuickJumpEntry, false);
+        if (nextEntry != null)
+        {
+            nextEntry.UiButton.Select();
+            return true;
+        }
+
+        return false;
+    }
+    
+    public bool TrySelectPreviousControl()
+    {
+        if ((eventSystem.currentSelectedGameObject == null
+             || eventSystem.currentSelectedGameObject.GetComponentInParent<CharacterQuickJump>() == null)
+            && InteractableCharacterQuickJumpEntries.Count > 0)
+        {
+            InteractableCharacterQuickJumpEntries.Last().UiButton.Select();
+            GetComponent<RectTransformSlideIntoViewport>().SlideIn();
+            return true;
+        }
+        
+        CharacterQuickJump nextEntry = InteractableCharacterQuickJumpEntries.GetElementBefore(FocusedInteractableCharacterQuickJumpEntry, false);
+        if (nextEntry != null)
+        {
+            nextEntry.UiButton.Select();
+            return true;
+        }
+        
+        return false;
     }
 }

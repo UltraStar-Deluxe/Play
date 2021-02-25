@@ -7,6 +7,8 @@ using UniInject;
 using UniRx;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.InputSystem;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
 
@@ -16,6 +18,10 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     // A piano has 88 keys.
     public const int ViewportMaxHeight = 88;
 
+    // 1000 milliseconds
+    public const int ViewportMinWidth = 1000;
+    public int ViewportMaxWidth => (int)songAudioPlayer.DurationOfSongInMillis;
+    
     // The first midi note that is visible in the viewport
     public int ViewportY { get; private set; }
     // The number of midi notes that are visible in the viewport
@@ -74,6 +80,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             return viewportEventStream;
         }
     }
+
+    private float lastClickTime;
 
     void Start()
     {
@@ -239,13 +247,25 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         double viewportChangeInPercent = 0.25;
 
-        Vector2 mouseLocalPosition = rectTransform.InverseTransformPoint(Input.mousePosition);
+        Vector2 zoomPosition = Touch.activeTouches.Count == 2
+                // Center position of the touches
+                ? (Touch.activeTouches[0].screenPosition + Touch.activeTouches[1].screenPosition) / 2f
+                // Mouse position
+                : InputUtils.GetMousePosition();
+        Vector2 localZoomPosition = rectTransform.InverseTransformPoint(zoomPosition);
         float width = rectTransform.rect.width;
-        double xPercent = (mouseLocalPosition.x + (width / 2)) / width;
+        double xPercent = (localZoomPosition.x + (width / 2)) / width;
 
         double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportWidth = (int)(ViewportWidth * zoomFactor);
-
+        newViewportWidth = NumberUtils.Limit(newViewportWidth, ViewportMinWidth, ViewportMaxWidth);
+        
+        // Already reached min or max zoom. 
+        if (newViewportWidth == ViewportWidth)
+        {
+            return;
+        }
+        
         int viewportChange = ViewportWidth - newViewportWidth;
         int viewportChangeLeftSide = (int)(viewportChange * xPercent);
         int newViewportX = ViewportX + viewportChangeLeftSide;
@@ -345,9 +365,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         {
             newViewportX = 0;
         }
-        if (newViewportX >= songAudioPlayer.DurationOfSongInMillis)
+        if (newViewportX >= ViewportMaxWidth)
         {
-            newViewportX = (int)songAudioPlayer.DurationOfSongInMillis;
+            newViewportX = ViewportMaxWidth;
         }
 
         ViewportX = newViewportX;
@@ -391,13 +411,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     private void SetViewportWidthWithoutChangeEvent(int newViewportWidth)
     {
-        if (newViewportWidth < 1000)
+        if (newViewportWidth < ViewportMinWidth)
         {
-            newViewportWidth = 1000;
+            newViewportWidth = ViewportMinWidth;
         }
-        if (newViewportWidth >= songAudioPlayer.DurationOfSongInMillis)
+        if (newViewportWidth >= ViewportMaxWidth)
         {
-            newViewportWidth = (int)songAudioPlayer.DurationOfSongInMillis;
+            newViewportWidth = ViewportMaxWidth;
         }
 
         ViewportWidth = newViewportWidth;
@@ -424,7 +444,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     public void OnPointerClick(PointerEventData ped)
     {
         // Only listen to left mouse button. Right mouse button is for context menu.
-        if (ped.button != PointerEventData.InputButton.Left)
+        if (ped.button == PointerEventData.InputButton.Right)
         {
             return;
         }
@@ -437,6 +457,15 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             return;
         }
 
+        // Toggle play pause with double click / double tap
+        bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
+        lastClickTime = Time.time;
+        if (isDoubleClick)
+        {
+            songEditorSceneController.ToggleAudioPlayPause();
+            return;
+        }
+        
         RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform,
                                                                 ped.position,
                                                                 ped.pressEventCamera,

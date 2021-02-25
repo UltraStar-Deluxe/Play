@@ -1,11 +1,25 @@
 ﻿using System.Collections;
-using UniInject;
 using UnityEngine;
+using UniRx;
 
 public class LoadingSceneController : MonoBehaviour
 {
     void Start()
     {
+        // The next scene should show up automatically.
+        // However, in case of an Exception (e.g. song folder not found)
+        // it might be useful to continue via button.
+        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
+            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
+            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        InputManager.GetInputAction(R.InputActions.ui_click).PerformedAsObservable()
+            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
+            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
+            .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -27,27 +41,16 @@ public class LoadingSceneController : MonoBehaviour
         FinishScene();
     }
 
-    void Update()
-    {
-        // The next scene should show up automatically.
-        // However, in case of an Exception (e.g. song folder not found)
-        // it might be useful to continue via button.
-        if (Input.anyKeyDown)
-        {
-            StartCoroutine(FinishAfterDelay(2));
-        }
-    }
-
     private void FinishScene()
     {
         // Loading completed, continue with next scene
         SceneNavigator.Instance.LoadScene(EScene.MainScene);
     }
 
-    private IEnumerator FinishAfterDelay(float delay)
+    private IEnumerator FinishAfterDelay()
     {
         // Wait delay in case loading just didn't finish yet.
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(2);
         FinishScene();
     }
 }

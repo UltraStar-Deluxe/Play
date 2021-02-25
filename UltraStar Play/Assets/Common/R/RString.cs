@@ -1,12 +1,17 @@
-// To update this file use the corresponding menu item in the Unity Editor.
+﻿// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.
 public static partial class R
 {
     public static class String
     {
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
+        public static readonly string action_exitSong = "action_exitSong";
+        public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_reloadSong = "action_reloadSong";
         public static readonly string action_removeFromPlaylist = "action_removeFromPlaylist";
+        public static readonly string action_restart = "action_restart";
+        public static readonly string action_skipToNextLyrics = "action_skipToNextLyrics";
+        public static readonly string action_togglePause = "action_togglePause";
         public static readonly string add = "add";
         public static readonly string back = "back";
         public static readonly string cancel = "cancel";

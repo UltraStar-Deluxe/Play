@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class StringExtensions
@@ -51,9 +52,45 @@ public static class StringExtensions
         return txt != null && txt.Length > 0 && txt[txt.Length - 1] == c;
     }
 
-    public static void AppendLine(this StringBuilder sb, string line)
+    public static string ToLowerInvariantFirstChar(this string txt)
     {
+        if (txt.Length <= 1)
+        {
+            return txt.ToLowerInvariant();
+        }
+        return txt.Substring(0, 1).ToLowerInvariant() + txt.Substring(1, txt.Length - 1);
+    }
+    
+    public static string ToUpperInvariantFirstChar(this string txt)
+    {
+        if (txt.Length <= 1)
+        {
+            return txt.ToUpperInvariant();
+        }
+        return txt.Substring(0, 1).ToUpperInvariant() + txt.Substring(1, txt.Length - 1);
+    }
+    
+    public static void AppendLine(this StringBuilder sb, string line, int indentationInSpaces)
+    {
+        for (int i = 0; i < indentationInSpaces; i++)
+        {
+            sb.Append(" ");
+        }
         sb.Append(line);
         sb.Append("\n");
+    }
+    
+    // https://stackoverflow.com/questions/5796383/insert-spaces-between-words-on-a-camel-cased-token
+    public static string SplitCamelCase( this string str )
+    {
+        return Regex.Replace( 
+            Regex.Replace( 
+                str, 
+                @"(\P{Ll})(\P{Ll}\p{Ll})", 
+                "$1 $2" 
+            ), 
+            @"(\p{Ll})(\P{Ll})", 
+            "$1 $2" 
+        );
     }
 }

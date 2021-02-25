@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -20,11 +17,17 @@ public class ChangeSceneButton : MonoBehaviour, INeedInjection
     {
         GetComponent<Button>().OnClickAsObservable()
             .Subscribe(_ => SceneNavigator.Instance.LoadScene(targetScene));
+
+        if (triggerWithEscape)
+        {
+            InputManager.GetInputAction(R.InputActions.usplay_back)
+                .PerformedAsObservable().Subscribe(OnBack);
+        }
     }
 
-    private void Update()
+    private void OnBack(InputAction.CallbackContext context)
     {
-        if (triggerWithEscape && Input.GetKeyDown(KeyCode.Escape) && !UiManager.Instance.DialogOpen)
+        if (!UiManager.Instance.DialogOpen)
         {
             SceneNavigator.Instance.LoadScene(targetScene);
         }
