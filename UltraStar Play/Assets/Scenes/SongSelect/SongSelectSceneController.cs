@@ -39,6 +39,18 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     [InjectedInInspector]
     public OrderSlider orderSlider;
 
+    [InjectedInInspector]
+    public CharacterQuickJumpBar characterQuickJumpBar;
+    
+    [InjectedInInspector]
+    public SongSelectSceneControlNavigator songSelectSceneControlNavigator;
+
+    [InjectedInInspector]
+    public GraphicRaycaster graphicRaycaster;
+
+    [InjectedInInspector]
+    public SongPreviewController songPreviewController;
+    
     public ArtistText artistText;
     public Text songTitleText;
 
@@ -65,11 +77,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     [Inject]
     private PlaylistManager playlistManager;
 
-    [Inject]
-    private Settings settings;
-
     public GameObject noSongsFoundMessage;
-
+    
     private SongMeta SelectedSong
     {
         get
@@ -79,7 +88,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     }
 
     void Start()
-    {
+    {   
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
@@ -222,14 +231,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
         if (singSceneData != null)
         {
-            editorSceneData.PreviousSceneData = singSceneData;
-            editorSceneData.PreviousScene = EScene.SingScene;
+            editorSceneData.PlayerProfileToMicProfileMap = singSceneData.PlayerProfileToMicProfileMap;
+            editorSceneData.SelectedPlayerProfiles = singSceneData.SelectedPlayerProfiles;
         }
-        else
-        {
-            editorSceneData.PreviousSceneData = sceneData;
-            editorSceneData.PreviousScene = EScene.SongSelectScene;
-        }
+        editorSceneData.PreviousSceneData = sceneData;
+        editorSceneData.PreviousScene = EScene.SongSelectScene;
 
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, editorSceneData);
     }
@@ -393,7 +399,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
 
     public bool IsSearchEnabled()
     {
-        return searchTextInputField.isActiveAndEnabled;
+        return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
     }
 
     public bool IsSearchTextInputHasFocus()
@@ -415,6 +421,11 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(playlistSlider);
         bb.BindExistingInstance(orderSlider);
+        bb.BindExistingInstance(characterQuickJumpBar);
+        bb.BindExistingInstance(playerProfileListController);
+        bb.BindExistingInstance(songSelectSceneControlNavigator);
+        bb.BindExistingInstance(graphicRaycaster);
+        bb.BindExistingInstance(songPreviewController);
         return bb.GetBindings();
     }
 

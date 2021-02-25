@@ -124,6 +124,49 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &432840293
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 432840294}
+  - component: {fileID: 432840295}
+  m_Layer: 0
+  m_Name: MainSceneInputControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &432840294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432840293}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 945.81537, y: 462.9968, z: -34.92855}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &432840295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432840293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca0893b0e4b785a429208e7b4757bcd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &891474970
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +308,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1194741001
 GameObject:
@@ -325,7 +368,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1203774100}
   - component: {fileID: 1203774099}
-  - component: {fileID: 1203774098}
+  - component: {fileID: 1203774097}
   m_Layer: 5
   m_Name: UIDocument
   m_TagString: UIDocument
@@ -333,7 +376,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1203774098
+--- !u!114 &1203774097
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -345,12 +388,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afe6c4600f907e64ca01409d01326a60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
+  m_RepeatRate: 0.05
+  m_FallbackOnIMGUIKeyboardEvents: 0
+  m_InputActionAsset: {fileID: -944628639613478452, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_NavigateAction: {fileID: -7559488607194844441, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_TabAction: {fileID: 1498379230643677496, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_SubmitAction: {fileID: -6434979457687148703, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_CancelAction: {fileID: -2807014294644756913, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_PointAction: {fileID: 2310183483462974582, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_ClickAction: {fileID: -6529645265718215429, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_ScrollWheelAction: {fileID: 1880177123186769444, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_MiddleClickAction: {fileID: 1069912891353070939, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
+  m_RightClickAction: {fileID: -6486105351458445517, guid: 9ef4ceae37b276541ac8c07f67a9c0d6,
+    type: 3}
 --- !u!114 &1203774099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,7 +487,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7070348881521034251
 PrefabInstance:
@@ -440,21 +500,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CommonSceneObjects
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: overwriteLanguage
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: isOverwriteLanguage
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4353274562695227665, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: isOverwriteSystemLanguage
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8069444317427349030, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
@@ -510,11 +555,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9158773460734947099, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: currentThemeName
-      value: ChristmasTheme
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}

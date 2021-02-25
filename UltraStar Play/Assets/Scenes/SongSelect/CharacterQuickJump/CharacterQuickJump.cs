@@ -2,10 +2,9 @@
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
-using UniRx.Triggers;
 using UnityEngine.EventSystems;
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,23 +17,28 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
     [Inject]
     private SongRouletteController songRouletteController;
 
+    [Inject]
+    private EventSystem eventSystem;
+    
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
-    private Button uiButton;
+    public Button UiButton { get; private set; }
 
     public string character;
 
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    
     public bool Interactable
     {
         get
         {
-            return uiButton.interactable;
+            return UiButton.interactable;
         }
         set
         {
-            uiButton.interactable = value;
+            UiButton.interactable = value;
         }
     }
 
@@ -42,10 +46,14 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
     {
         uiText.text = character.ToUpperInvariant();
 
-        uiButton.OnClickAsObservable()
+        UiButton.OnClickAsObservable()
             .Subscribe(_ => DoCharacterQuickJump());
         this.ObserveEveryValueChanged(me => me.character).WhereNotNull()
             .Subscribe(newCharacter => uiText.text = newCharacter.ToUpperInvariant());
+
+        disposables.Add(InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
+            .Where(_ => eventSystem.currentSelectedGameObject == UiButton.gameObject)
+            .Subscribe(_ => DoCharacterQuickJump()));
     }
 
     private void DoCharacterQuickJump()
@@ -58,5 +66,10 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
                 songRouletteController.SelectSong(match);
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 }

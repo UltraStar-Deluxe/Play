@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -33,6 +34,24 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     [Inject]
     private SetMusicGapAction setMusicGapAction;
 
+    [Inject]
+    private SongEditorCopyPasteManager songEditorCopyPasteManager;
+    
+    [Inject]
+    private NoteAreaDragHandler noteAreaDragHandler;
+    
+    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    {
+        // This ContextMenu could open although a drag is in progress.
+        if (IsDrag
+            || noteAreaDragHandler.IsDragging)
+        {
+            return;
+        }
+        
+        base.CheckOpenContextMenuFromInputAction(context);
+    }
+        
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
@@ -56,6 +75,21 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
             contextMenu.AddItem("Fit horizontal to selection", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
         }
 
+        if (selectedNotes.Count > 0
+            || songEditorCopyPasteManager.CopiedNotes.Count > 0)
+        {
+            contextMenu.AddSeparator();
+            if (selectedNotes.Count > 0)
+            {
+                contextMenu.AddItem("Copy notes", () => songEditorCopyPasteManager.CopySelectedNotes());
+            }
+
+            if (songEditorCopyPasteManager.CopiedNotes.Count > 0)
+            {
+                contextMenu.AddItem("Paste notes", () => songEditorCopyPasteManager.PasteCopiedNotes());
+            }
+        }
+        
         contextMenu.AddSeparator();
         contextMenu.AddItem("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
 

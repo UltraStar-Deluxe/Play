@@ -25,6 +25,8 @@ public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         playerProfiles.Add(playerProfile);
         singSceneData.SelectedPlayerProfiles = playerProfiles;
 
+        defaultSceneData.PlayerProfileToMicProfileMap = singSceneData.PlayerProfileToMicProfileMap;
+        defaultSceneData.SelectedPlayerProfiles = singSceneData.SelectedPlayerProfiles;
         defaultSceneData.PreviousSceneData = singSceneData;
 
         return defaultSceneData;

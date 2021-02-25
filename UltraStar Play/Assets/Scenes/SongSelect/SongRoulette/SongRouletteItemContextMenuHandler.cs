@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.IO;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,10 +19,19 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
     [Inject]
     private PlaylistManager playlistManager;
 
+    [Inject]
+    private SongSelectSceneController songSelectSceneController;
+
+    [Inject]
+    private SongRouletteController songRouletteController;
+    
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_reloadSong),
             () => SongMeta.Reload());
+
+        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongEditor),
+            () => songSelectSceneController.StartSongEditorScene());
 
         if (PlatformUtils.IsStandalone)
         {
@@ -31,6 +41,17 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
         }
 
         contextMenu.AddSeparator();
+    }
+
+    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    {
+        if (songRouletteController.IsDrag
+            || songRouletteController.IsFlickGesture)
+        {
+            // Do not open when drag-gesture is in progress.
+            return;
+        }
+        base.CheckOpenContextMenuFromInputAction(context);
     }
 
     private void AddPlaylistContextMenuItems(ContextMenu contextMenu)

@@ -36,7 +36,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     private Voice copiedVoice;
 
-    private List<Note> CopiedNotes
+    public List<Note> CopiedNotes
     {
         get
         {
@@ -47,27 +47,16 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     void Start()
     {
         songAudioPlayer.PositionInSongEventStream.Subscribe(newMillis => MoveCopiedNotesToMillisInSong(newMillis));
-    }
 
-    void Update()
-    {
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
-        {
-            return;
-        }
-
-        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
-        if (modifier == EKeyboardModifier.Ctrl)
-        {
-            if (Input.GetKeyUp(KeyCode.C))
-            {
-                CopySelectedNotes();
-            }
-            else if (Input.GetKeyUp(KeyCode.V))
-            {
-                PasteCopiedNotes();
-            }
-        }
+        // Copy action
+        InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => CopySelectedNotes());
+        
+        // Paste action
+        InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => PasteCopiedNotes());
     }
 
     private void MoveCopiedNotesToMillisInSong(double newMillis)
@@ -98,7 +87,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
     }
 
-    private void PasteCopiedNotes()
+    public void PasteCopiedNotes()
     {
         int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
         Sentence sentenceAtBeatWithVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, minBeat)
@@ -146,7 +135,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CopySelectedNotes()
+    public void CopySelectedNotes()
     {
         // Remove any old copied notes from the Ui.
         foreach (Note note in CopiedNotes)

@@ -7,11 +7,15 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
 
 public class EditorUiNote : MonoBehaviour,
-    INeedInjection, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+    INeedInjection, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public static readonly IComparer<EditorUiNote> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
@@ -41,6 +45,9 @@ public class EditorUiNote : MonoBehaviour,
     [InjectedInInspector]
     public ShowWhiteSpaceText uiText;
 
+    [Inject]
+    public NoteAreaDragHandler noteAreaDragHandler;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -84,6 +91,8 @@ public class EditorUiNote : MonoBehaviour,
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
+    private float lastClickTime;
+    
     public void Init(Note note)
     {
         this.Note = note;
@@ -107,6 +116,8 @@ public class EditorUiNote : MonoBehaviour,
     void Start()
     {
         UpdateHandles();
+        disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
+            .Subscribe(_ => UpdateHandles()));
         disposables.Add(noteArea.ViewportEventStream.Subscribe(_ => UpdateFontSize()));
         disposables.Add(uiManager.MousePositionChangeEventStream.Subscribe(_ => OnMousePositionChanged()));
     }
@@ -123,25 +134,16 @@ public class EditorUiNote : MonoBehaviour,
             OnPointerOver();
         }
 
-        if (IsKeyDownOrUp(KeyCode.LeftControl) || IsKeyDownOrUp(KeyCode.LeftAlt) || IsKeyDownOrUp(KeyCode.LeftShift))
-        {
-            UpdateHandles();
-        }
+        UpdateHandles();
     }
 
     private void UpdateFontSize()
     {
-        float rectTransformWidthInPt = Mathf.Floor(RectTransform.rect.width * 72 / Screen.dpi) - 2;
-        int fontSize = (int)Mathf.Max(2, Mathf.Min(20f, rectTransformWidthInPt));
+        int fontSize = (int)Mathf.Max(5, Mathf.Min(20f, RectTransform.rect.width / 2f));
         if (fontSize != uiText.FontSize)
         {
             uiText.FontSize = fontSize;
         }
-    }
-
-    private bool IsKeyDownOrUp(KeyCode keyCode)
-    {
-        return Input.GetKeyDown(keyCode) || Input.GetKeyUp(keyCode);
     }
 
     private void OnPointerOver()
@@ -192,7 +194,7 @@ public class EditorUiNote : MonoBehaviour,
 
     private void SetCursorForGestureOrMusicNoteCursor(ECursor cursor)
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (InputUtils.IsKeyboardControlPressed())
         {
             // LeftControl is used to play midi sound, indicate this via a custom cursor.
             cursorManager.SetCursorMusicNote();
@@ -206,11 +208,18 @@ public class EditorUiNote : MonoBehaviour,
     {
         bool isSelected = (selectionController != null) && selectionController.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
-            || (isSelected && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift)));
+            || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));
+        if (leftHandle.gameObject.activeSelf != isLeftHandleVisible)
+        {
+            leftHandle.gameObject.SetActive(isLeftHandleVisible);
+        }
+        
         bool isRightHandleVisible = IsPointerOverRightHandle
-            || (isSelected && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.LeftShift)));
-        leftHandle.gameObject.SetActive(isLeftHandleVisible);
-        rightHandle.gameObject.SetActive(isRightHandleVisible);
+            || (isSelected && (InputUtils.IsKeyboardAltPressed() || InputUtils.IsKeyboardShiftPressed()));
+        if (rightHandle.gameObject.activeSelf != isRightHandleVisible)
+        {
+            rightHandle.gameObject.SetActive(isRightHandleVisible);
+        }
     }
 
     public bool IsPositionOverLeftHandle(Vector2 position)
@@ -240,35 +249,38 @@ public class EditorUiNote : MonoBehaviour,
         }
 
         // Only listen to left mouse button. Right mouse button is for context menu.
-        if (ped.button != PointerEventData.InputButton.Left)
+        if (ped.button != PointerEventData.InputButton.Left
+            && Touch.activeTouches.Count == 0)
         {
             return;
         }
 
-        if (ped.clickCount == 1)
-        {
-            // Select / deselect notes via Shift.
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                if (selectionController.IsSelected(Note))
-                {
-                    selectionController.RemoveFromSelection(this);
-                }
-                else
-                {
-                    selectionController.AddToSelection(this);
-                }
-            }
-            else if (!Input.GetKey(KeyCode.LeftControl))
-            {
-                // Move the playback position to the start of the note
-                double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
-                songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
-            }
-        }
-        else if (ped.clickCount == 2)
+        // Check double click to edit lyrics
+        bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
+        lastClickTime = Time.time;
+        if (isDoubleClick)
         {
             StartEditingNoteText();
+            return;
+        }
+        
+        // Select / deselect notes via Shift.
+        if (InputUtils.IsKeyboardShiftPressed())
+        {
+            if (selectionController.IsSelected(Note))
+            {
+                selectionController.RemoveFromSelection(this);
+            }
+            else
+            {
+                selectionController.AddToSelection(this);
+            }
+        }
+        else if (!InputUtils.IsKeyboardControlPressed())
+        {
+            // Move the playback position to the start of the note
+            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+            songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }
 
@@ -341,7 +353,7 @@ public class EditorUiNote : MonoBehaviour,
     public void OnPointerDown(PointerEventData eventData)
     {
         // Play midi sound via Ctrl
-        if (!isPlayingMidiSound && Input.GetKey(KeyCode.LeftControl))
+        if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed())
         {
             isPlayingMidiSound = true;
             midiManager.PlayMidiNote(Note.MidiNote);
@@ -363,5 +375,20 @@ public class EditorUiNote : MonoBehaviour,
         {
             return Note.comparerByStartBeat.Compare(x.Note, y.Note);
         }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnBeginDrag(eventData);
+    }
+    
+    public void OnDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnDrag(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        noteAreaDragHandler.OnEndDrag(eventData);
     }
 }

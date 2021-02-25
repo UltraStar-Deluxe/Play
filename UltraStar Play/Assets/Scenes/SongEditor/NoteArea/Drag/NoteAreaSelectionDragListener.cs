@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -27,6 +29,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     [Inject]
     private NoteAreaDragHandler noteAreaDragHandler;
+
+    [Inject]
+    private Canvas canvas;
 
     bool isCanceled;
 
@@ -58,6 +63,11 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     {
         UpdateSelectionFrame(dragEvent);
         UpdateSelection(dragEvent);
+
+        if (Touch.activeTouches.Count > 1)
+        {
+            CancelDrag();
+        }
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)
@@ -89,9 +99,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         // Add to selection via Shift. Remove from selection via Ctrl+Shift. Without modifier, set selection.
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (InputUtils.IsKeyboardShiftPressed())
         {
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (InputUtils.IsKeyboardControlPressed())
             {
                 selectionController.RemoveFromSelection(selectedUiNotes);
             }
@@ -134,20 +144,25 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private void UpdateSelectionFrame(NoteAreaDragEvent dragEvent)
     {
+        Vector3 canvasScale = canvas.transform.localScale;
+        if (canvasScale.x == 0 || canvasScale.y == 0)
+        {
+            return;
+        }
         float x = dragEvent.GeneralDragEvent.StartPositionInPixels.x;
         float y = dragEvent.GeneralDragEvent.StartPositionInPixels.y;
-        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x;
-        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y;
+        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x / canvasScale.x;
+        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y / canvasScale.y;
 
         if (width < 0)
         {
             width = -width;
-            x -= width;
+            x -= (width * canvasScale.x);
         }
         if (height < 0)
         {
             height = -height;
-            y += height;
+            y += (height * canvasScale.x);
         }
         selectionFrame.position = new Vector2(x, y);
         selectionFrame.sizeDelta = new Vector2(width, height);

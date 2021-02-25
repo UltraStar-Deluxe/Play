@@ -16,6 +16,9 @@ public class NoteAreaDragHandler : AbstractDragHandler<NoteAreaDragEvent>
     [Inject]
     private NoteArea noteArea;
 
+    [Inject]
+    private Canvas canvas;
+    
     void Start()
     {
         targetRectTransform = noteArea.GetComponent<RectTransform>();
@@ -46,14 +49,16 @@ public class NoteAreaDragHandler : AbstractDragHandler<NoteAreaDragEvent>
     {
         GeneralDragEvent generalDragEvent = CreateGeneralDragEvent(eventData, dragStartEvent.GeneralDragEvent);
 
+        Vector3 canvasScale = canvas.transform.localScale; 
+        
         int midiNoteDragStart = dragStartEvent.MidiNoteDragStart;
-        int midiNoteDistance = (int)(generalDragEvent.DistanceInPercent.y * noteArea.ViewportHeight);
+        int midiNoteDistance = (int)(generalDragEvent.DistanceInPercent.y / canvasScale.x * noteArea.ViewportHeight);
 
         int positionInSongInMillisDragStart = dragStartEvent.PositionInSongInMillisDragStart;
-        int millisDistance = (int)(generalDragEvent.DistanceInPercent.x * noteArea.ViewportWidth);
+        int millisDistance = (int)(generalDragEvent.DistanceInPercent.x / canvasScale.x * noteArea.ViewportWidth);
 
         int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
-        int beatDistance = (int)(generalDragEvent.DistanceInPercent.x * noteArea.ViewportWidthInBeats);
+        int beatDistance = (int)(generalDragEvent.DistanceInPercent.x / canvasScale.x * noteArea.ViewportWidthInBeats);
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,

@@ -23,6 +23,8 @@ public class ContextMenuItem : MonoBehaviour
         }
     }
 
+    public ContextMenu ContextMenu { get; set; }
+
     void Awake()
     {
         uiText = GetComponentInChildren<Text>();
@@ -38,7 +40,12 @@ public class ContextMenuItem : MonoBehaviour
         }
         if (action != null)
         {
-            actionSubscriptionDisposable = button.OnClickAsObservable().Subscribe(_ => action());
+            actionSubscriptionDisposable = button.OnClickAsObservable().Subscribe(_ =>
+            {
+                Debug.Log("ContextMenuItem triggered");
+                action();
+                ContextMenu.CloseContextMenu();
+            });
         }
     }
 }

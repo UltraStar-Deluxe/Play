@@ -7,20 +7,15 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.Text;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInjection
+public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
 {
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
-
-    [Inject]
     private SongMeta songMeta;
-
-    [Inject]
-    private SongEditorLayerManager layerManager;
 
     [Inject]
     private SongEditorSelectionController selectionController;
@@ -41,7 +36,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     private SetNoteTypeAction setNoteTypeAction;
 
     [Inject]
-    private MoveNoteToAjacentSentenceAction moveNoteToAjacentSentenceAction;
+    private MoveNoteToAjacentSentenceAction moveNoteToAdjacentSentenceAction;
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
@@ -49,13 +44,28 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
-    private enum EVoices
-    {
-        Voice0,
-        Voice1,
-    }
-
+    [Inject]
+    private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
+    
+    [Inject]
+    private NoteAreaDragHandler noteAreaDragHandler;
+    
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
+    
     private EditorUiNote uiNote;
+
+    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    {
+        // This ContextMenu could open although a drag is in progress.
+        if (noteAreaContextMenuHandler.IsDrag
+            || noteAreaDragHandler.IsDragging)
+        {
+            return;
+        }
+        
+        base.CheckOpenContextMenuFromInputAction(context);
+    }
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
@@ -70,6 +80,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
         List<Note> selectedNotes = selectionController.GetSelectedNotes();
 
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneController.StartEditingNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
@@ -176,13 +187,13 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
 
     private void FillContextMenuToMoveToOtherSentence(ContextMenu contextMenu, List<Note> selectedNotes)
     {
-        bool canMoveToPreviousSentence = moveNoteToAjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, uiNote.Note);
-        bool canMoveToNextSentence = moveNoteToAjacentSentenceAction.CanMoveToNextSentence(selectedNotes, uiNote.Note);
+        bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, uiNote.Note);
+        bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, uiNote.Note);
         if (canMoveToPreviousSentence)
         {
             contextMenu.AddSeparator();
             contextMenu.AddItem("Move to previous sentence",
-                () => moveNoteToAjacentSentenceAction.MoveToPreviousSentenceAndNotify(uiNote.Note));
+                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(uiNote.Note));
         }
         if (!canMoveToPreviousSentence && canMoveToNextSentence)
         {
@@ -191,7 +202,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler, INeedInj
         if (canMoveToNextSentence)
         {
             contextMenu.AddItem("Move to next sentence",
-                () => moveNoteToAjacentSentenceAction.MoveToNextSentenceAndNotify(uiNote.Note));
+                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(uiNote.Note));
         }
     }
 }

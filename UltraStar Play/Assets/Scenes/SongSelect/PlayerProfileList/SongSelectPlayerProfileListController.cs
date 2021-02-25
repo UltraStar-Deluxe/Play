@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UniRx;
+using UnityEngine.EventSystems;
 
-public class SongSelectPlayerProfileListController : MonoBehaviour
+public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -17,11 +19,20 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
     // Used to restore the player-microphone assignment.
     private static PlayerProfileToMicProfileMap lastPlayerProfileToMicProfileMap;
 
+    [Inject]
+    private EventSystem eventSystem;
+    
     public SongSelectPlayerProfileListEntry listEntryPrefab;
     public GameObject scrollViewContent;
 
     private readonly List<SongSelectPlayerProfileListEntry> listEntries = new List<SongSelectPlayerProfileListEntry>();
+    public List<SongSelectPlayerProfileListEntry> PlayerProfileControls => listEntries;
 
+    public SongSelectPlayerProfileListEntry FocusedPlayerProfileControl => PlayerProfileControls
+        .FirstOrDefault(it => eventSystem.currentSelectedGameObject == it.isSelectedToggle.gameObject);
+
+    public int FocusedPlayerProfileControlIndex => PlayerProfileControls.IndexOf(FocusedPlayerProfileControl);
+    
     void Start()
     {
         UpdateListEntries();
@@ -169,5 +180,45 @@ public class SongSelectPlayerProfileListController : MonoBehaviour
     {
         // Remember the currently assigned microphones
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+    }
+
+    public bool TrySelectNextControl()
+    {
+        if ((eventSystem.currentSelectedGameObject == null
+            || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerProfileListEntry>() == null)
+            && PlayerProfileControls.Count > 0)
+        {
+            PlayerProfileControls.First().isSelectedToggle.Select();
+            return true;
+        }
+            
+        SongSelectPlayerProfileListEntry nextEntry = PlayerProfileControls.GetElementAfter(FocusedPlayerProfileControl, false);
+        if (nextEntry != null)
+        {
+            nextEntry.isSelectedToggle.Select();
+            return true;
+        }
+
+        return false;
+    }
+    
+    public bool TrySelectPreviousControl()
+    {
+        if ((eventSystem.currentSelectedGameObject == null
+            || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerProfileListEntry>() == null)
+            && PlayerProfileControls.Count > 0)
+        {
+            PlayerProfileControls.Last().isSelectedToggle.Select();
+            return true;
+        }
+        
+        SongSelectPlayerProfileListEntry nextEntry = PlayerProfileControls.GetElementBefore(FocusedPlayerProfileControl, false);
+        if (nextEntry != null)
+        {
+            nextEntry.isSelectedToggle.Select();
+            return true;
+        }
+        
+        return false;
     }
 }
