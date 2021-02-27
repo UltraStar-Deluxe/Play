@@ -20,7 +20,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
 
-    private ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
+    private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
