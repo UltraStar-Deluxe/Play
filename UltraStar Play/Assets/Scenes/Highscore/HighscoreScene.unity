@@ -478,6 +478,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 1
+--- !u!114 &141673550 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5124115183525111794, guid: be0e3235464c346458a464603cce47c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 141673545}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141673547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &335886005
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1130,6 +1142,7 @@ GameObject:
   - component: {fileID: 1335080095}
   - component: {fileID: 1335080094}
   - component: {fileID: 1335080093}
+  - component: {fileID: 1335080097}
   m_Layer: 5
   m_Name: ContinueButton
   m_TagString: Untagged
@@ -1251,6 +1264,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1335080091}
   m_CullTransparentMesh: 1
+--- !u!114 &1335080097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335080091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da2105757e00a18428ad1ed75c8d427b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1380486259
 GameObject:
   m_ObjectHideFlags: 0
@@ -1926,7 +1951,7 @@ GameObject:
   - component: {fileID: 2064943531}
   - component: {fileID: 2064943530}
   m_Layer: 0
-  m_Name: HighscoreSceneKeyboardController
+  m_Name: HighscoreSceneInputController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1944,6 +1969,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62443f1661c7f0c459f62338ddb09f17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  continueButton: {fileID: 1335080094}
+  nextDifficultyButton: {fileID: 141673550}
 --- !u!4 &2064943531
 Transform:
   m_ObjectHideFlags: 0
