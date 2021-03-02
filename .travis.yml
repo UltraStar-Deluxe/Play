@@ -27,6 +27,7 @@ before_install:
   - chmod +x ./tools/download-dependencies/*.sh
   - export -f travis_fold
   - (cd tools/download-dependencies/; sh download-dependencies.sh)
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull $IMAGE_NAME
 
 jobs:
