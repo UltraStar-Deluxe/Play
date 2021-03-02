@@ -3,21 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using EventSystem = UnityEngine.EventSystems.EventSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
+    public Button continueButton;
+    
+    [InjectedInInspector]
+    public Button nextDifficultyButton;
+    
     [Inject]
     private HighscoreSceneController highscoreSceneController;
-
+    
+    [Inject]
+    private EventSystem eventSystem;
+    
     private void Start()
     {
+        // Custom navigation implementation in this scene
+        eventSystem.sendNavigationEvents = false;
+        
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => highscoreSceneController.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
@@ -27,6 +42,9 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
         
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Subscribe(context => OnNavigate(context));
+        
+        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
+            .Subscribe(_ => OnSubmit());
     }
 
     private void OnNavigate(InputAction.CallbackContext context)
@@ -40,5 +58,30 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
         {
             highscoreSceneController.ShowNextDifficulty(-1);
         }
+
+        if (direction.y != 0)
+        {
+            // Toggle between buttons
+            if (eventSystem.currentSelectedGameObject == nextDifficultyButton.gameObject)
+            {
+                continueButton.Select();
+                return;
+            }
+            nextDifficultyButton.Select();
+        }
+    }
+    
+    private void OnSubmit()
+    {
+        if (eventSystem.currentSelectedGameObject == null)
+        {
+            return;
+        }
+        Button selectedButton = eventSystem.currentSelectedGameObject.GetComponent<Button>();
+        if (selectedButton == null)
+        {
+            return;
+        }
+        selectedButton.OnSubmit(new BaseEventData(eventSystem));
     }
 }
