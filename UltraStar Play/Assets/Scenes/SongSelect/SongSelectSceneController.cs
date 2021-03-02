@@ -25,6 +25,9 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     }
 
     [InjectedInInspector]
+    public SongSelectSceneInputControl songSelectSceneInputControl;
+    
+    [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
 
     [InjectedInInspector]
@@ -179,18 +182,45 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         duetIndicator.SetActive(isDuet);
     }
 
-    public void JumpToSongWhereTitleStartsWith(string text)
+    public void DoFuzzySearch(string text)
     {
-        string textToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
-        SongMeta match = songRouletteController.Find(it =>
+        string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
+        
+        // Search title that starts with the text
+        SongMeta titleStartsWithMatch = songRouletteController.Find(it =>
         {
             string titleToLowerNoWhitespace = it.Title.ToLowerInvariant().Replace(" ", "");
-            return titleToLowerNoWhitespace.StartsWith(textToLowerNoWhitespace);
+            return titleToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
         });
-
-        if (match != null)
+        if (titleStartsWithMatch != null)
         {
-            songRouletteController.SelectSong(match);
+            songRouletteController.SelectSong(titleStartsWithMatch);
+            return;
+        }
+        
+        // Search artist that starts with the text
+        SongMeta artistStartsWithMatch = songRouletteController.Find(it =>
+        {
+            string artistToLowerNoWhitespace = it.Artist.ToLowerInvariant().Replace(" ", "");
+            return artistToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
+        });
+        if (artistStartsWithMatch != null)
+        {
+            songRouletteController.SelectSong(artistStartsWithMatch);
+            return;
+        }
+        
+        // Search title or artist contains the text
+        SongMeta artistOrTitleContainsMatch = songRouletteController.Find(it =>
+        {
+            string artistToLowerNoWhitespace = it.Artist.ToLowerInvariant().Replace(" ", "");
+            string titleToLowerNoWhitespace = it.Title.ToLowerInvariant().Replace(" ", "");
+            return artistToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace)
+                || titleToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace);
+        });
+        if (artistOrTitleContainsMatch != null)
+        {
+            songRouletteController.SelectSong(artistOrTitleContainsMatch);
         }
     }
 
@@ -417,6 +447,7 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         BindingBuilder bb = new BindingBuilder();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(songRouletteController);
+        bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(playlistSlider);
