@@ -112,18 +112,10 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
         localVersionProperties.TryGetValue("release", out string localRelease);
 
-        remoteVersionProperties.TryGetValue("build_timestamp", out string remoteBuildTimeStamp);
-        localVersionProperties.TryGetValue("build_timestamp", out string localBuildTimeStamp);
-
-        localVersionProperties.TryGetValue("versionScheme", out string localVersionScheme);
-        remoteVersionProperties.TryGetValue("versionScheme", out string remoteVersionScheme);
-
         // (localRelease is smaller), or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
         try
         {
-            if (CompareVersionString(localRelease, remoteRelease) < 0
-                || (CompareVersionString(localRelease, remoteRelease) == 0
-                    && CompareVersionString(localBuildTimeStamp, remoteBuildTimeStamp) < 0))
+            if (CompareVersionString(localRelease, remoteRelease) < 0)
             {
                 CreateNewVersionAvailableDialog(remoteVersionProperties);
             }
