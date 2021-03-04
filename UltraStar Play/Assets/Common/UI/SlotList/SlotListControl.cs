@@ -65,6 +65,11 @@ public class SlotListControl
 
     private ESlotListDirection CalculateOffsetDirection(ISlotListItem listItem, Vector2 dragDelta)
     {
+        if (listItem == null)
+        {
+            return ESlotListDirection.None;
+        }
+        
         Vector2 listItemPosition = listItem.GetPosition() + dragDelta;
         ISlotListSlot currentSlot = listItem.GetCurrentSlot();
         if (currentSlot == null)
