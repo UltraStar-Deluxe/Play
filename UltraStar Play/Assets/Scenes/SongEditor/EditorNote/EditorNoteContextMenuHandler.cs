@@ -59,7 +59,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     {
         // This ContextMenu could open although a drag is in progress.
         if (noteAreaContextMenuHandler.IsDrag
-            || noteAreaDragHandler.IsDragging)
+            || noteAreaDragHandler.DragDistance.magnitude > AbstractContextMenuHandler.DragDistanceThreshold)
         {
             return;
         }

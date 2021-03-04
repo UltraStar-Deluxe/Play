@@ -11,7 +11,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    private const float DragDistanceThreshold = 10f;
+    public const float DragDistanceThreshold = 10f;
     
     private Canvas canvas;
     private Canvas Canvas

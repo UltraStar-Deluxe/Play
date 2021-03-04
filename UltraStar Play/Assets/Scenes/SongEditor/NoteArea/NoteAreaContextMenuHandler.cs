@@ -43,8 +43,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         // This ContextMenu could open although a drag is in progress.
-        if (IsDrag
-            || noteAreaDragHandler.IsDragging)
+        if (noteAreaDragHandler.DragDistance.magnitude > AbstractContextMenuHandler.DragDistanceThreshold)
         {
             return;
         }

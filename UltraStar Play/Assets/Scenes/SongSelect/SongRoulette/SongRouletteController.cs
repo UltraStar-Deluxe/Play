@@ -73,6 +73,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
     public bool IsDrag { get; private set; }
     public bool IsFlickGesture { get; private set; }
     public SongRouletteItem DragSongRouletteItem { get; private set; }
+    public Vector2 DragDistance { get; private set; }
     
     public float MaxAnimTimeInSeconds { get; private set; } = 0.2f;
     public float AnimTimeInSeconds { get; set; }
@@ -432,11 +433,13 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
     }
 
-    public void OnDrag(SongRouletteItem songRouletteItem, Vector2 dragDelta)
+    public void OnDrag(SongRouletteItem songRouletteItem, Vector2 dragDeltaInPixels)
     {
         dragDuration += Time.deltaTime;
-        SlotListControl.OnDrag(songRouletteItem, dragDelta);
+        SlotListControl.OnDrag(songRouletteItem, dragDeltaInPixels);
         songRouletteItems.ForEach(it => SlotListControl.InterpolateSize(it));
+        
+        DragDistance = DragSongRouletteItem.GetPosition() - dragStartPosition;
     }
     
     public void OnEndDrag(Vector2 dragDeltaInPixels)
@@ -445,6 +448,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         
         IsDrag = false;
         DragSongRouletteItem = null;
+        DragDistance = Vector2.zero;
         songRouletteItems.ForEach(it => it.StartAnimationTowardsTargetRouletteItem());
         ResetAnimationTimeTowardsTargetRouletteItem();
     }
@@ -469,9 +473,9 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             flickGestureWasNoTouchscreenPressed = false;
             // Calculate final velocity of dragged element. The flick-gesture will continue with this velocity.
             dragDuration += Time.deltaTime;
-            Vector2 finalPosition = DragSongRouletteItem.GetPosition() + dragDeltaInPixels;
-            Vector2 dragDistance = finalPosition - dragStartPosition;
-            dragVelocity = dragDistance / dragDuration;
+            Vector2 finalRouletteItemPosition = DragSongRouletteItem.GetPosition() + dragDeltaInPixels;
+            Vector2 finalDragDistance = finalRouletteItemPosition - dragStartPosition;
+            dragVelocity = finalDragDistance / dragDuration;
         }
     }
     
