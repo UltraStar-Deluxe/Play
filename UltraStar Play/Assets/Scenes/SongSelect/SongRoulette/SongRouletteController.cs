@@ -339,6 +339,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
 
         Selection.Value = new SongSelection(songMeta, songs.IndexOf(songMeta), songs.Count);
+        ResetAnimationTimeTowardsTargetRouletteItem();
     }
 
     public void SelectSongByIndex(int index, bool wrapAround = true)
@@ -352,8 +353,6 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
         SongMeta nextSong = GetSongAtIndex(index);
         SelectSong(nextSong);
-
-        ResetAnimationTimeTowardsTargetRouletteItem();
     }
 
     private void ResetAnimationTimeTowardsTargetRouletteItem()
@@ -438,8 +437,11 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         dragDuration += Time.deltaTime;
         SlotListControl.OnDrag(songRouletteItem, dragDeltaInPixels);
         songRouletteItems.ForEach(it => SlotListControl.InterpolateSize(it));
-        
-        DragDistance = DragSongRouletteItem.GetPosition() - dragStartPosition;
+
+        if (DragSongRouletteItem != null)
+        {
+            DragDistance = DragSongRouletteItem.GetPosition() - dragStartPosition;
+        }
     }
     
     public void OnEndDrag(Vector2 dragDeltaInPixels)
