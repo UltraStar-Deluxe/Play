@@ -45,7 +45,7 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
-        if (songRouletteController.IsDrag
+        if (songRouletteController.DragDistance.magnitude > DragDistanceThreshold
             || songRouletteController.IsFlickGesture)
         {
             // Do not open when drag-gesture is in progress.

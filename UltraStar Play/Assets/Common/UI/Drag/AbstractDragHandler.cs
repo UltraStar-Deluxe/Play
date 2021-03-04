@@ -20,10 +20,13 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     public GraphicRaycaster graphicRaycaster;
 
     public bool IsDragging { get; private set; }
+    public Vector2 DragDistance { get; private set; }
     private bool ignoreDrag;
 
     private EVENT dragStartEvent;
     private int pointerId;
+
+    private Vector2 dragStartPosition;
     
     public RectTransform targetRectTransform;
 
@@ -60,6 +63,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
         ignoreDrag = false;
         IsDragging = true;
+        dragStartPosition = eventData.position;
         pointerId = eventData.pointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
@@ -73,6 +77,8 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         {
             return;
         }
+
+        DragDistance = eventData.position - dragStartPosition;
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
@@ -89,6 +95,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
         IsDragging = false;
+        DragDistance = Vector2.zero;
     }
 
     private void CancelDrag()
