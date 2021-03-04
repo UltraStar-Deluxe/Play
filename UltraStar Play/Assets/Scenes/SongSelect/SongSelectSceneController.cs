@@ -185,6 +185,12 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void DoFuzzySearch(string text)
     {
         string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
+
+        // Try to jump to song-index
+        if (TryExecuteSpecialSearchSyntax(text))
+        {
+            return;
+        }
         
         // Search title that starts with the text
         SongMeta titleStartsWithMatch = songRouletteController.Find(it =>
