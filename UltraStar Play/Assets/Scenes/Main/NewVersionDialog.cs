@@ -34,6 +34,7 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
 
     private readonly string remoteRelease;
     private readonly string websiteLink;
+    private readonly string releaseName;
 
     private readonly VisualElement dialogRootVisualElement;
     private readonly VisualElement parentVisualElement;
@@ -44,8 +45,9 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
     {
         this.dialogRootVisualElement = dialogRootVisualElement;
         this.parentVisualElement = parentVisualElement;
-        remoteRelease = remoteVersionProperties["release"];
-        websiteLink = remoteVersionProperties["website_link"];
+        remoteVersionProperties.TryGetValue("release", out remoteRelease);
+        remoteVersionProperties.TryGetValue("name", out releaseName);
+        remoteVersionProperties.TryGetValue("website_link", out websiteLink);
     }
 
     public void OnInjectionFinished()
@@ -81,7 +83,8 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
 
     public void UpdateTranslation()
     {
-        dialogMessage.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_message, "remoteRelease", remoteRelease, "websiteLink", websiteLink);
+        string displayName = releaseName.IsNullOrEmpty() ? remoteRelease : releaseName;
+        dialogMessage.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink);
         dialogTitle.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_title);
         ignoreThisVersionButton.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_ignoreThisVersion);
         ignoreAllFutureVersionsButton.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_ignoreAllFutureVersions);

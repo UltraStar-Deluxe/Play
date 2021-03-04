@@ -42,6 +42,12 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
     [Inject(key = "#sceneSubtitle")]
     private Label sceneSubtitle;
 
+    [Inject(key = "#releaseInfoText")]
+    private Label releaseInfoText;
+    
+    [Inject(key = "#buildInfoText")]
+    private Label buildInfoText;
+    
     private SimpleUxmlDialog closeGameDialog;
 
     private void Start()
@@ -108,17 +114,19 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
 
         // Show the release number (e.g. release date, or some version number)
         versionProperties.TryGetValue("release", out string release);
-        uiDoc.rootVisualElement.Q<Label>("releaseInfoText").text = "Release: " + release;
+        versionProperties.TryGetValue("name", out string releaseName);
+        string displayName = releaseName.IsNullOrEmpty() ? release : releaseName;
+        releaseInfoText.text = "Version: " + displayName;
 
         // Show the build timestamp only for development builds
         if (Debug.isDebugBuild)
         {
             versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-            uiDoc.rootVisualElement.Q<Label>("buildInfoText").text = "Build: " + buildTimeStamp;
+            buildInfoText.text = "Build: " + buildTimeStamp;
         }
         else
         {
-            uiDoc.rootVisualElement.Q<Label>("buildInfoText").text = "";
+            buildInfoText.text = "";
         }
     }
 
