@@ -8,3 +8,4 @@ sh download-text-mesh-pro-resources.sh
 sh download-sharpziplib.sh
 sh download-uniinject.sh
 sh download-serilog.sh
+sh download-mlapi.sh

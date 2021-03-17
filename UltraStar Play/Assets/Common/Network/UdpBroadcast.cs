@@ -14,7 +14,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NetHost : MonoBehaviour, INeedInjection
+public class UdpBroadcast : MonoBehaviour, INeedInjection
 {
     private UdpClient udpClientListener;
     private UdpClient udpClientSender;

@@ -31,6 +31,9 @@ Plugins/TexMesh Pro.meta
 Plugins/UniInject/
 Plugins/UniInject.meta
 
+Plugins/MLAPI/
+Plugins/MLAPI.meta
+
 Plugins/Serilog/Serilog/
 Plugins/Serilog/Serilog.meta
 Plugins/Serilog/Serilog.Sinks.File/
