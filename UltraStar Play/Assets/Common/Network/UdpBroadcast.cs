@@ -16,12 +16,21 @@ using UniRx;
 
 public class UdpBroadcast : MonoBehaviour, INeedInjection
 {
+    private static UdpBroadcast instance;
+    
     private UdpClient udpClientListener;
     private UdpClient udpClientSender;
     private const int ListenPort = 11006;
 
     private void Start()
     {
+        if (instance != null)
+        {
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+        
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
             Listen();
