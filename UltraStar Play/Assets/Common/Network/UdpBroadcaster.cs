@@ -14,21 +14,23 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UdpBroadcast : MonoBehaviour, INeedInjection
+public class UdpBroadcaster : MonoBehaviour, INeedInjection
 {
-    private static UdpBroadcast instance;
-    
+    public static UdpBroadcaster Instance { get; private set; }
+
     private UdpClient udpClientListener;
     private UdpClient udpClientSender;
     private const int ListenPort = 11006;
 
+    private bool hasBeenDestroyed;
+    
     private void Start()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             return;
         }
-        instance = this;
+        Instance = this;
         DontDestroyOnLoad(gameObject);
         
         ThreadPool.QueueUserWorkItem(poolHandle =>
@@ -44,6 +46,13 @@ public class UdpBroadcast : MonoBehaviour, INeedInjection
     
     private void Listen()
     {
+        if (udpClientListener != null
+            || udpClientSender != null)
+        {
+            Debug.LogError("Already listening for UDP broadcast");
+            return;
+        }
+        
         try
         {
             udpClientListener = new UdpClient(ListenPort);
@@ -76,11 +85,5 @@ public class UdpBroadcast : MonoBehaviour, INeedInjection
         {
             Debug.LogException(e);
         }
-    }
-
-    private void OnDestroy()
-    {
-        udpClientListener.Close();
-        udpClientSender.Close();
     }
 }
