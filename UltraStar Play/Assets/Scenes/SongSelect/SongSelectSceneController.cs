@@ -296,16 +296,6 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SelectRandomSong();
     }
 
-    public void OnNextSong()
-    {
-        songRouletteController.SelectNextSong();
-    }
-
-    public void OnPreviousSong()
-    {
-        songRouletteController.SelectPreviousSong();
-    }
-
     public void CheckAudioAndStartSingScene()
     {
         if (SelectedSong != null)

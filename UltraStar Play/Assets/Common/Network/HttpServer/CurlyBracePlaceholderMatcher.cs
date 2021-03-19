@@ -10,18 +10,23 @@ public class CurlyBracePlaceholderMatcher
     
     public CurlyBracePlaceholderMatcher(string pattern)
     {
-        string regexPattern = pattern;
         MatchCollection placeholderMatches = Regex.Matches(pattern, @"\{[^/]+\}");
+        
+        string patternNoCurlyBraces = pattern
+            .Replace("{", "CURLY_OPEN")
+            .Replace("}", "CURLY_CLOSE");
+        string regexPattern = Regex.Escape(patternNoCurlyBraces);
+        
         placeholderNames = new List<string>(placeholderMatches.Count);
         foreach(Match match in placeholderMatches)
         {
             // Remove curly braces from the placeholder name
             string placeholderName = match.Value.Substring(1, match.Length - 2);
             placeholderNames.Add(placeholderName);
-            regexPattern = regexPattern.Replace(match.Value, "(?<" + placeholderName + ">[^/]+)");
+            // Replace the placeholder with a match group
+            regexPattern = regexPattern.Replace("CURLY_OPEN" + placeholderName + "CURLY_CLOSE", "(?<" + placeholderName + ">[^/]+)");
         }
 
-        Debug.Log(regexPattern);
         regex = new Regex(regexPattern);
     }
 
@@ -35,12 +40,11 @@ public class CurlyBracePlaceholderMatcher
             return false;
         }
         
-        // Start from group 1 because group 0 is the complete text.
+        // Start from group 1 because group 0 is the complete match.
         placeholderValues = new Dictionary<string, string>();
         for (int i = 1; i < match.Groups.Count; i++)
         {
             Group group = match.Groups[i];
-            Debug.Log($"placeholder: {group.Name}, value: {group.Value}");
             placeholderValues[group.Name] = group.Value;
         }
         return true;
