@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +8,11 @@ public class UltraStarPlayHttpServer : HttpServer
 {
     protected override void Awake()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+        
         InitSingleInstance();
         if (Instance != this)
         {

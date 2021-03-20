@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,6 +13,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEditor;
 using AddressFamily = SimpleHttpServerForUnity.AddressFamily;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -19,6 +21,12 @@ using AddressFamily = SimpleHttpServerForUnity.AddressFamily;
 
 public class UdpBroadcaster : MonoBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void InitOnLoad()
+    {
+        Instance = null;
+    }
+    
     public static UdpBroadcaster Instance { get; private set; }
 
     private UdpClient serverUdpClient;
@@ -74,17 +82,10 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
             return;
         }
         isListeningForConnectRequest = true;
-        
-        try
+    
+        while (!hasBeenDestroyed)
         {
-            while (!hasBeenDestroyed)
-            {
-                ServerAcceptMessageFromClient();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
+            ServerAcceptMessageFromClient();
         }
     }
 
@@ -94,12 +95,19 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
         {
             Debug.Log("Server listening for connect request on " + ConnectPortOnServer);
             IPEndPoint clientIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            byte[] receive = serverUdpClient.Receive(ref clientIpEndPoint);
-            string message = Encoding.UTF8.GetString(receive);
+            byte[] receivedBytes = serverUdpClient.Receive(ref clientIpEndPoint);
+            string message = Encoding.UTF8.GetString(receivedBytes);
             HandleClientMessage(clientIpEndPoint, message);
         }
         catch (Exception e)
         {
+            if (e is SocketException se
+                && se.SocketErrorCode == SocketError.Interrupted
+                && hasBeenDestroyed)
+            {
+                // Dont log error when closing the socket has interrupted the wait for requests.
+                return;
+            }
             Debug.LogException(e);
         }
     }
@@ -112,16 +120,51 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
         {
             Debug.LogWarning("Malformed ConnectRequest: missing clientId.");
         }
+
+        if (connectRequestDto.microphoneSampleRate > 0)
+        {
+            HandleClientMessageWithMicrophone(clientIpEndPoint, connectRequestDto);
+        }
+        else
+        {
+            HandleClientMessageWithNoMicrophone(clientIpEndPoint, connectRequestDto);
+        }
+    }
+
+    private void HandleClientMessageWithNoMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
+    {
+        ConnectResponseDto connectResponseDto = new ConnectResponseDto
+        {
+            clientId = connectRequestDto.clientId,
+        };
+        serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
+    }
+
+    private void HandleClientMessageWithMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
+    {
+        ConnectedClientHandler newConnectedClientHandler;
+        try
+        {
+            newConnectedClientHandler = ClientConnectionManager.RegisterClient(connectRequestDto.clientId, connectRequestDto.microphoneSampleRate);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            serverUdpClient.Send(new ErrorMessageDto
+            {
+                errorMessage = e.Message
+            }.ToJson(), clientIpEndPoint);
+            return;
+        }
         
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             clientId = connectRequestDto.clientId,
-            microphonePort = 0,
+            microphonePort = newConnectedClientHandler.MicrophoneUdpClient.GetPort(),
         };
-        byte[] responseBytes = Encoding.UTF8.GetBytes(connectResponseDto.ToJson());
-        serverUdpClient.Send(responseBytes, responseBytes.Length, clientIpEndPoint);
+        serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
-    
+
     private void ClientListenForConnectResponse()
     {
         if (isListeningForConnectResponse)
@@ -130,17 +173,10 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
             return;
         }
         isListeningForConnectResponse = true;
-        
-        try
+    
+        while (!hasBeenDestroyed)
         {
-            while (!hasBeenDestroyed)
-            {
-                ClientAcceptMessageFromServer();
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
+            ClientAcceptMessageFromServer();
         }
     }
 
@@ -150,12 +186,19 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
         {
             Debug.Log("Client listening for connect response on " + ConnectPortOnClient);
             IPEndPoint serverIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            byte[] receive = clientUdpClient.Receive(ref serverIpEndPoint);
-            string message = Encoding.UTF8.GetString(receive);
+            byte[] receivedBytes = clientUdpClient.Receive(ref serverIpEndPoint);
+            string message = Encoding.UTF8.GetString(receivedBytes);
             HandleServerMessage(serverIpEndPoint, message);
         }
         catch (Exception e)
         {
+            if (e is SocketException se
+                && se.SocketErrorCode == SocketError.Interrupted
+                && hasBeenDestroyed)
+            {
+                // Dont log error when closing the socket has interrupted the wait for requests.
+                return;
+            }
             Debug.LogException(e);
         }
     }
@@ -166,7 +209,24 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
         ConnectResponseDto connectResponseDto = JsonConverter.FromJson<ConnectResponseDto>(message);
         if (connectResponseDto.clientId.IsNullOrEmpty())
         {
-            Debug.LogWarning("Malformed ConnectResponse: missing clientId.");
+            throw new ConnectRequestException("Malformed ConnectResponse: missing clientId.");
+        }
+
+        if (connectResponseDto.microphonePort > 0)
+        {
+            IPEndPoint serverMicDataEndpoint = new IPEndPoint(serverIpEndPoint.Address, connectResponseDto.microphonePort);
+            byte[] dummyMicData = new byte[100];
+            ThreadPool.QueueUserWorkItem(poolHandle =>
+            {
+                Thread.Sleep(100);
+                clientUdpClient.Send(dummyMicData, dummyMicData.Length, serverMicDataEndpoint);
+                Thread.Sleep(100);
+                clientUdpClient.Send(dummyMicData, dummyMicData.Length, serverMicDataEndpoint);
+                Thread.Sleep(100);
+                clientUdpClient.Send(dummyMicData, dummyMicData.Length, serverMicDataEndpoint);
+                Thread.Sleep(100);
+                clientUdpClient.Send(dummyMicData, dummyMicData.Length, serverMicDataEndpoint);
+            });
         }
     }
     
@@ -177,7 +237,7 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
             byte[] requestBytes = Encoding.UTF8.GetBytes(new ConnectRequestDto
             {
                 clientId = defaultClientId,
-                requireMicrophonePort = false
+                microphoneSampleRate = 22050,
             }.ToJson());
             // UDP Broadcast (255.255.255.255)
             clientUdpClient.Send(requestBytes, requestBytes.Length, "255.255.255.255", ConnectPortOnServer);
@@ -194,5 +254,6 @@ public class UdpBroadcaster : MonoBehaviour, INeedInjection
         hasBeenDestroyed = true;
         serverUdpClient?.Close();
         clientUdpClient?.Close();
+        ClientConnectionManager.RemoveAllLocalClients();
     }
 }

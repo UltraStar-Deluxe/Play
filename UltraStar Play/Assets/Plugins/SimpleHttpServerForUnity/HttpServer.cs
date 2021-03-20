@@ -153,6 +153,13 @@ namespace SimpleHttpServerForUnity
             }
             catch (Exception e)
             {
+                if (e is HttpListenerException hle
+                    && hle.ErrorCode == 500
+                    && hasBeenDestroyed)
+                {
+                    // Dont log error when closing the HttpListener has interrupted a blocking call.
+                    return;
+                }
                 Debug.LogException(e);
             }
         }
@@ -206,6 +213,11 @@ namespace SimpleHttpServerForUnity
 
         protected void InitSingleInstance()
         {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+            
             if (instance != null)
             {
                 // This instance is not needed.
@@ -215,7 +227,7 @@ namespace SimpleHttpServerForUnity
             instance = this;
             
             // Move object to top level in scene hierarchy.
-            // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
+            // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used.
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
