@@ -9,6 +9,12 @@ namespace SimpleHttpServerForUnity
 {
     public class HttpServer : MonoBehaviour
     {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            Instance = null;
+        }
+        
         public static HttpServer Instance { get; private set; }
 
         public string scheme = "http";
@@ -17,27 +23,29 @@ namespace SimpleHttpServerForUnity
         public string host = "localhost";
         public int port = 6789;
 
+        public Action<EndpointRequestData> NoEndpointFoundCallback { get; set; } = DefaultNoEndpointFoundCallback;
+        
         private HttpListener httpListener;
         private bool hasBeenDestroyed;
 
-        private readonly Dictionary<string, EndpointHandler> idToEndpointHandlerMap =
-            new Dictionary<string, EndpointHandler>();
-
+        private readonly Dictionary<string, EndpointHandler> idToEndpointHandlerMap = new Dictionary<string, EndpointHandler>();
         private readonly List<EndpointHandler> sortedEndpointHandlers = new List<EndpointHandler>();
 
-        private readonly ConcurrentQueue<HttpListenerContext> requestContextQueue =
-            new ConcurrentQueue<HttpListenerContext>();
-
-        public Action<EndpointRequestData> NoEndpointFoundCallback { get; set; } = DefaultNoEndpointFoundCallback;
+        private readonly ConcurrentQueue<HttpListenerContext> requestQueue = new ConcurrentQueue<HttpListenerContext>();
 
         private void Awake()
         {
             if (Instance != null)
             {
+                // This instance is not needed.
+                Destroy(gameObject);
                 return;
             }
 
             Instance = this;
+            // Move object to top level in scene hierarchy.
+            // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
             if (!HttpListener.IsSupported)
@@ -65,7 +73,7 @@ namespace SimpleHttpServerForUnity
         public void Update()
         {
             // Process the requests in Update. Update is called from Unity's main thread which allows access to all Unity API.
-            while (requestContextQueue.TryDequeue(out HttpListenerContext context))
+            while (requestQueue.TryDequeue(out HttpListenerContext context))
             {
                 HandleRequest(context);
             }
@@ -78,19 +86,20 @@ namespace SimpleHttpServerForUnity
                 return;
             }
 
-            if (idToEndpointHandlerMap.ContainsKey(GetEndpointId(endpointHandler.HttpMethod, endpointHandler.Pattern)))
+            string endpointId = GetEndpointId(endpointHandler.HttpMethod, endpointHandler.UrlPattern);
+            if (idToEndpointHandlerMap.ContainsKey(endpointId))
             {
                 this.RemoveEndpoint(endpointHandler);
             }
 
-            idToEndpointHandlerMap[endpointHandler.Pattern] = endpointHandler;
+            idToEndpointHandlerMap.Add(endpointId, endpointHandler);
             sortedEndpointHandlers.Add(endpointHandler);
             sortedEndpointHandlers.Sort(EndpointHandler.CompareDescendingByPlaceholderCount);
         }
 
-        public void RemoveEndpoint(HttpMethod httpMethod, string pattern)
+        public void RemoveEndpoint(HttpMethod httpMethod, string urlPattern)
         {
-            string endpointId = GetEndpointId(httpMethod, pattern);
+            string endpointId = GetEndpointId(httpMethod, urlPattern);
             if (idToEndpointHandlerMap.TryGetValue(endpointId, out EndpointHandler endpointHandler))
             {
                 idToEndpointHandlerMap.Remove(endpointId);
@@ -107,7 +116,7 @@ namespace SimpleHttpServerForUnity
                 context = listener.GetContext();
                 // The Request is enqueued and processed on the main thread (i.e. in Update).
                 // This enables access to all Unity API in the callback.
-                requestContextQueue.Enqueue(context);
+                requestQueue.Enqueue(context);
             }
             catch (Exception e)
             {

@@ -11,7 +11,7 @@ namespace SimpleHttpServerForUnity
             (a, b) => b.GetPlaceholderCount().CompareTo(a.GetPlaceholderCount());
 
         public HttpMethod HttpMethod { get; private set; }
-        public string Pattern => patternMatcher.Pattern;
+        public string UrlPattern => patternMatcher.Pattern;
 
         private readonly Action<EndpointRequestData> requestCallback;
         private readonly CurlyBracePlaceholderMatcher patternMatcher;
