@@ -12,15 +12,17 @@ namespace SimpleHttpServerForUnity
 
         public HttpMethod HttpMethod { get; private set; }
         public string UrlPattern => patternMatcher.Pattern;
+        public string Description { get; private set; }
 
         private readonly Action<EndpointRequestData> requestCallback;
         private readonly CurlyBracePlaceholderMatcher patternMatcher;
 
-        public EndpointHandler(HttpMethod httpMethod, string urlPattern, Action<EndpointRequestData> requestCallback)
+        public EndpointHandler(HttpMethod httpMethod, string urlPattern, string description, Action<EndpointRequestData> requestCallback)
         {
             this.patternMatcher = new CurlyBracePlaceholderMatcher(urlPattern);
             this.requestCallback = requestCallback;
             this.HttpMethod = httpMethod;
+            this.Description = description;
         }
 
         public int GetPlaceholderCount()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using UnityEngine;
@@ -132,6 +133,13 @@ namespace SimpleHttpServerForUnity
             }
         }
 
+        public List<Endpoint> GetRegisteredEndpoints()
+        {
+            return sortedEndpointHandlers
+                .Select(it => new Endpoint(it.HttpMethod, it.UrlPattern, it.Description))
+                .ToList();
+        }
+        
         private void AcceptRequest(HttpListener listener)
         {
             HttpListenerContext context;

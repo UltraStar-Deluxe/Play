@@ -18,10 +18,8 @@ public class SongSelectSceneRestControl : MonoBehaviour, INeedInjection
     private SongRouletteController songRouletteController;
     
 	private void Start() {
-        HttpServer.Instance.AddEndpoint(gameObject, HttpMethod.Get, "/api/rest/hello/{name}",
-            requestData => requestData.Context.Response.SendResponse("Hello " + requestData.PathParameters["name"]));
-
-        HttpServer.Instance.AddEndpoint(gameObject, HttpMethod.Post, "api/rest/selectNextSong",
+        HttpServer.Instance.RegisterEndpoint(gameObject, HttpMethod.Post, "api/rest/selectNextSong",
+            "Select the next song",
             _ => songRouletteController.SelectNextSong());
 	}
 }

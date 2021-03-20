@@ -6,9 +6,9 @@ namespace SimpleHttpServerForUnity
 {
     public static class HttpServerExtensions
     {
-        public static void AddEndpoint(this HttpServer httpServer, GameObject gameObject, HttpMethod httpMethod, string urlPattern, Action<EndpointRequestData> requestCallback)
+        public static void RegisterEndpoint(this HttpServer httpServer, GameObject gameObject, HttpMethod httpMethod, string urlPattern, string description, Action<EndpointRequestData> requestCallback)
         {
-            httpServer.RegisterEndpoint(new EndpointHandler(httpMethod, urlPattern, requestCallback));
+            httpServer.RegisterEndpoint(new EndpointHandler(httpMethod, urlPattern, description, requestCallback));
             
             RemoveEndpointOnDestroy removeEndpointOnDestroy = gameObject.AddComponent<RemoveEndpointOnDestroy>();
             removeEndpointOnDestroy.httpMethod = httpMethod;
@@ -16,9 +16,9 @@ namespace SimpleHttpServerForUnity
             removeEndpointOnDestroy.httpServer = httpServer;
         }
         
-        public static void AddEndpoint(this HttpServer httpServer, HttpMethod httpMethod, string urlPattern, Action<EndpointRequestData> requestCallback)
+        public static void RegisterEndpoint(this HttpServer httpServer, HttpMethod httpMethod, string urlPattern, string description, Action<EndpointRequestData> requestCallback)
         {
-            httpServer.RegisterEndpoint(new EndpointHandler(httpMethod, urlPattern, requestCallback));
+            httpServer.RegisterEndpoint(new EndpointHandler(httpMethod, urlPattern, description, requestCallback));
         }
 
         public static void RemoveEndpoint(this HttpServer httpServer, EndpointHandler endpointHandler)
