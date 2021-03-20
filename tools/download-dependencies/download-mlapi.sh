@@ -25,6 +25,10 @@ rm -rf MLAPI-Editor/Properties/AssemblyInfo.cs
 rm -rf docs/
 rm -rf .git
 
+echo "Creating asmdef"
+echo "{ \"name\": \"MLAPI\" }" >> MLAPI/MLAPI.asmdef
+echo "{ \"name\": \"MLAPI-Editor\", \"references\": [ \"MLAPI\" ], \"includePlatforms\": [ \"Editor\" ]}" >> MLAPI-Editor/MLAPI-Editor.asmdef
+
 cd "$old_dir"
 echo "Downloading MLAPI done"
 echo ""

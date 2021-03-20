@@ -6,6 +6,8 @@
         "Plugins",
         "UniRx",
         "UniInject",
+		"MLAPI",
+		"SimpleHttpServerForUnity",
         "Unity.TextMeshPro",
         "UnityEngine.UIElementsModule",
         "UnityEngine.UIElementsGameObjectsModule",
