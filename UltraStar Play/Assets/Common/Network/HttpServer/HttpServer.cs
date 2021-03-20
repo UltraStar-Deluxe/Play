@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using UnityEngine;
 
 public class HttpServer : MonoBehaviour
@@ -17,10 +15,12 @@ public class HttpServer : MonoBehaviour
     private HttpListener httpServer;
     private bool hasBeenDestroyed;
 
-    private readonly Dictionary<string, RouteHandler> patternToRouteHandlerMap = new Dictionary<string, RouteHandler>();
-    private readonly List<RouteHandler> sortedRouteHandlers = new List<RouteHandler>();
+    private readonly Dictionary<string, EndpointHandler> idToEndpointHandlerMap = new Dictionary<string, EndpointHandler>();
+    private readonly List<EndpointHandler> sortedEndpointHandlers = new List<EndpointHandler>();
 
     private readonly ConcurrentQueue<HttpListenerContext> requestContextQueue = new ConcurrentQueue<HttpListenerContext>();
+    
+    public Action<EndpointRequestData> NoEndpointFoundCallback { get; set; } = DefaultNoEndpointFoundCallback;
     
     private void Awake()
     {
@@ -37,9 +37,6 @@ public class HttpServer : MonoBehaviour
             return;
         }
         Debug.Log("Starting HttpListener");
-
-        AddRouteHandler(HttpMethod.Get, "/api/rest/hello/{name}",
-            routeRequestData => "Hello " + routeRequestData.PlaceholderValues["name"]);
         
         httpServer = new HttpListener();
         httpServer.Prefixes.Add($"{Scheme}://{Host}:{Port}/");
@@ -50,34 +47,73 @@ public class HttpServer : MonoBehaviour
             // Serve Http Requests, while this gameObject has not been destroyed.
             while (!hasBeenDestroyed)
             {
-                ServerHttpRequest(httpServer);
+                AcceptRequest(httpServer);
             }
         });
     }
 
     public void Update()
     {
-        if (!requestContextQueue.TryDequeue(out HttpListenerContext context))
+        // Process the requests in Update. Update is called from Unity's main thread which allows access to all Unity API.
+        while (requestContextQueue.TryDequeue(out HttpListenerContext context))
+        {
+            HandleRequest(context);
+        }
+    }
+    
+    public void RegisterEndpoint(EndpointHandler endpointHandler)
+    {
+        if (!HttpListener.IsSupported)
         {
             return;
         }
-        
+
+        if (idToEndpointHandlerMap.ContainsKey(GetEndpointId(endpointHandler.HttpMethod, endpointHandler.Pattern)))
+        {
+            this.RemoveEndpoint(endpointHandler);
+        }
+
+        idToEndpointHandlerMap[endpointHandler.Pattern] = endpointHandler;
+        sortedEndpointHandlers.Add(endpointHandler);
+        sortedEndpointHandlers.Sort(EndpointHandler.CompareDescendingByPlaceholderCount);
+    }
+
+    public void RemoveEndpoint(HttpMethod httpMethod, string pattern)
+    {
+        string endpointId = GetEndpointId(httpMethod, pattern);
+        if (idToEndpointHandlerMap.TryGetValue(endpointId, out EndpointHandler endpointHandler))
+        {
+            idToEndpointHandlerMap.Remove(endpointId);
+            sortedEndpointHandlers.Remove(endpointHandler);
+        }
+    }
+
+    private void AcceptRequest(HttpListener listener)
+    {
+        HttpListenerContext context;
         try
         {
-            // Find best matching route handler.
-            // The list is already sorted. Thus, the first matching handler is the best matching handler.
-            foreach (RouteHandler routeHandler in sortedRouteHandlers)
+            // Note: The GetContext method blocks while waiting for a request.
+            context = listener.GetContext();
+            // The Request is enqueued and processed on the main thread (i.e. in Update).
+            // This enables access to all Unity API in the callback.
+            requestContextQueue.Enqueue(context);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+
+    private void HandleRequest(HttpListenerContext context)
+    {
+        try
+        {
+            if (TryHandleRequestByMatchingEndpointHandler(context))
             {
-                if (routeHandler.TryHandle(context.Request, out string responseText))
-                {
-                    WriteResponseText(context.Response.OutputStream, responseText);
-                    return;
-                }
+                return;
             }
-            
-            string errorMessage = $"Found no matching RouteHandler for '{context.Request.HttpMethod}' with URL: {context.Request.Url}";
-            WriteJsonErrorResponse(context.Response, errorMessage);
-            Debug.LogWarning(errorMessage);
+            NoEndpointFoundCallback(new EndpointRequestData(context, null));
         }
         catch (Exception e)
         {
@@ -85,7 +121,7 @@ public class HttpServer : MonoBehaviour
         }
         finally
         {
-            // You must close the output stream.
+            // Close the output stream.
             try
             {
                 if (context != null)
@@ -95,68 +131,35 @@ public class HttpServer : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogError("Exception while trying to close the OutputStream");
+                Debug.LogError("Exception while trying to close the HttpListenerContext.Response.OutputStream");
                 Debug.LogException(e);
             }
         }
     }
 
-    public void AddRouteHandler(HttpMethod httpMethod, string pattern, Func<RouteRequestData, string> responseTextProvider)
+    private bool TryHandleRequestByMatchingEndpointHandler(HttpListenerContext context)
     {
-        if (!HttpListener.IsSupported)
+        // The list is already sorted. Thus, the first matching handler is the best matching handler.
+        foreach (EndpointHandler handler in sortedEndpointHandlers)
         {
-            return;
+            if (handler.TryHandle(context))
+            {
+                return true;
+            }
         }
-
-        if (patternToRouteHandlerMap.ContainsKey(pattern))
-        {
-            RemoveRouteHandler(pattern);
-        }
-
-        RouteHandler routeHandler = new RouteHandler(httpMethod, pattern, responseTextProvider);
-        patternToRouteHandlerMap[pattern] = routeHandler;
-        sortedRouteHandlers.Add(routeHandler);
-        sortedRouteHandlers.Sort(RouteHandler.CompareDescendingByPlaceholderCount);
+        return false;
     }
 
-    private void RemoveRouteHandler(string pattern)
+    private static string GetEndpointId(HttpMethod method, string pattern)
     {
-        if (patternToRouteHandlerMap.TryGetValue(pattern, out RouteHandler routeHandler))
-        {
-            patternToRouteHandlerMap.Remove(pattern);
-            sortedRouteHandlers.Remove(routeHandler);
-        }
+        return method.Method + "|" + pattern;
     }
 
-    private void ServerHttpRequest(HttpListener listener)
+    private static void DefaultNoEndpointFoundCallback(EndpointRequestData requestData)
     {
-        HttpListenerContext context = null;
-        try
-        {
-            // Note: The GetContext method blocks while waiting for a request.
-            context = listener.GetContext();
-            requestContextQueue.Enqueue(context);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
+        requestData.Context.Response.SendResponse("", HttpStatusCode.NotFound);
     }
-
-    private void WriteResponseText(Stream responseOutputStream, string response)
-    {
-        byte[] responseBytes = Encoding.UTF8.GetBytes(response);
-        responseOutputStream.Write(responseBytes, 0,responseBytes.Length);
-    }
-
-    private void WriteJsonErrorResponse(HttpListenerResponse response, string errorMessage)
-    {
-        string responseJsonString = "{\"errorMessage\":\"" + errorMessage + "\"}";
-        // Casting enum to int to get the StatusCode
-        response.StatusCode = (int)HttpStatusCode.NotFound;
-        WriteResponseText(response.OutputStream, responseJsonString);
-    }
-
+    
     private void OnDestroy()
     {
         hasBeenDestroyed = true;

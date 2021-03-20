@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class CurlyBracePlaceholderMatcher
 {
-    private Regex regex;
-    private List<string> placeholderNames;
+    public string Pattern { get; private set; }
+    private readonly Regex regex;
+    private readonly List<string> placeholderNames;
     
     public CurlyBracePlaceholderMatcher(string pattern)
     {
-        MatchCollection placeholderMatches = Regex.Matches(pattern, @"\{[^/]+\}");
+        Pattern = pattern;
         
+        MatchCollection placeholderMatches = Regex.Matches(pattern, @"\{[^/]+\}");
         string patternNoCurlyBraces = pattern
             .Replace("{", "CURLY_OPEN")
             .Replace("}", "CURLY_CLOSE");
