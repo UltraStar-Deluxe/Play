@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,6 +23,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(StatsManager.Instance);
         bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
+        bb.BindExistingInstance(HttpServer.Instance);
 
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);

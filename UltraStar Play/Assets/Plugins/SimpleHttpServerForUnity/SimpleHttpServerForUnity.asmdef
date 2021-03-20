@@ -1,18 +1,9 @@
 {
-    "name": "Scenes",
+    "name": "SimpleHttpServerForUnity",
     "rootNamespace": "",
     "references": [
-        "Serilog",
-        "Plugins",
-        "UniRx",
-        "UniInject",
-        "Common",
-		"SimpleHttpServerForUnity",
-        "Unity.TextMeshPro",
-        "UnityEngine.UIElementsModule",
-        "UnityEngine.UIElementsGameObjectsModule",
-        "Unity.InputSystem"
-    ],
+		"Plugins"
+	],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

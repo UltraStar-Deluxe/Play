@@ -14,7 +14,7 @@ namespace SimpleHttpServerForUnity
                 return null;
             }
 
-            string output = "";
+            string output = "localhost";
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -28,7 +28,8 @@ namespace SimpleHttpServerForUnity
                     foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                     {
                         //IPv4
-                        if (addressFamily == AddressFamily.IPv4)
+                        if (addressFamily == AddressFamily.IPv4
+                            && ip.Address.ToString() != "127.0.0.1")
                         {
                             if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                             {
@@ -39,7 +40,8 @@ namespace SimpleHttpServerForUnity
                         //IPv6
                         else if (addressFamily == AddressFamily.IPv6)
                         {
-                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6
+                                && ip.Address.ToString() != "127.0.0.1")
                             {
                                 output = ip.Address.ToString();
                             }

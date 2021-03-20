@@ -10,15 +10,28 @@ namespace SimpleHttpServerForUnity
     public class HttpServer : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
+        static void InitOnLoad()
         {
-            Instance = null;
+            instance = null;
         }
-        
-        public static HttpServer Instance { get; private set; }
+
+        private static HttpServer instance;
+        public static HttpServer Instance {
+            get
+            {
+                if (instance == null)
+                {
+                    HttpServer instanceInScene = FindObjectOfType<HttpServer>();
+                    if (instanceInScene != null)
+                    {
+                        instanceInScene.InitSingleInstance();
+                    }
+                }
+                return instance;
+            }
+        }
 
         public string scheme = "http";
-
         // Note: IP address of the current device is available via IpAddressUtils.GetIpAddress(AddressFamily.IPv4)
         public string host = "localhost";
         public int port = 6789;
@@ -33,44 +46,18 @@ namespace SimpleHttpServerForUnity
 
         private readonly ConcurrentQueue<HttpListenerContext> requestQueue = new ConcurrentQueue<HttpListenerContext>();
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            if (Instance != null)
-            {
-                // This instance is not needed.
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            // Move object to top level in scene hierarchy.
-            // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
-            transform.SetParent(null);
-            DontDestroyOnLoad(gameObject);
-
-            if (!HttpListener.IsSupported)
-            {
-                Debug.Log("HttpListener not supported on this platform");
-                return;
-            }
-
-            Debug.Log("Starting HttpListener");
-
-            httpListener = new HttpListener();
-            httpListener.Prefixes.Add($"{scheme}://{host}:{port}/");
-            httpListener.Start();
-
-            ThreadPool.QueueUserWorkItem(poolHandle =>
-            {
-                // Serve Http Requests, while this gameObject has not been destroyed.
-                while (!hasBeenDestroyed)
-                {
-                    AcceptRequest(httpListener);
-                }
-            });
+            InitSingleInstance();
         }
 
-        public void Update()
+        protected virtual void OnDestroy()
+        {
+            hasBeenDestroyed = true;
+            httpListener?.Close();
+        }
+        
+        protected virtual void Update()
         {
             // Process the requests in Update. Update is called from Unity's main thread which allows access to all Unity API.
             while (requestQueue.TryDequeue(out HttpListenerContext context))
@@ -79,6 +66,44 @@ namespace SimpleHttpServerForUnity
             }
         }
 
+        public void StartHttpListener()
+        {
+            if (httpListener != null && httpListener.IsListening)
+            {
+                Debug.LogWarning("HttpServer already listening");
+                return;
+            }
+            
+            if (httpListener == null)
+            {
+                httpListener = new HttpListener();
+                httpListener.Prefixes.Add($"{scheme}://{host}:{port}/");                
+            }
+            
+            Debug.Log($"Starting HttpListener on {host}:{port}");
+            httpListener.Start();
+
+            ThreadPool.QueueUserWorkItem(poolHandle =>
+            {
+                while (!hasBeenDestroyed && httpListener != null && httpListener.IsListening)
+                {
+                    AcceptRequest(httpListener);
+                }
+            });
+        }
+
+        public void StopHttpListener()
+        {
+            if (httpListener == null || !httpListener.IsListening)
+            {
+                Debug.LogWarning("HttpServer already not listening");
+                return;
+            }
+            
+            Debug.Log($"Stopping HttpListener on {host}:{port}");
+            httpListener?.Close();
+        }
+        
         public void RegisterEndpoint(EndpointHandler endpointHandler)
         {
             if (!HttpListener.IsSupported)
@@ -171,6 +196,28 @@ namespace SimpleHttpServerForUnity
             return false;
         }
 
+        protected void InitSingleInstance()
+        {
+            if (instance != null)
+            {
+                // This instance is not needed.
+                Destroy(gameObject);
+                return;
+            }
+            instance = this;
+            
+            // Move object to top level in scene hierarchy.
+            // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+
+            if (!HttpListener.IsSupported)
+            {
+                Debug.Log("HttpListener not supported on this platform");
+                return;
+            }
+        }
+
         private static string GetEndpointId(HttpMethod method, string pattern)
         {
             return method.Method + "|" + pattern;
@@ -179,12 +226,6 @@ namespace SimpleHttpServerForUnity
         private static void DefaultNoEndpointFoundCallback(EndpointRequestData requestData)
         {
             requestData.Context.Response.SendResponse("", HttpStatusCode.NotFound);
-        }
-
-        private void OnDestroy()
-        {
-            hasBeenDestroyed = true;
-            httpListener?.Close();
         }
     }
 }
