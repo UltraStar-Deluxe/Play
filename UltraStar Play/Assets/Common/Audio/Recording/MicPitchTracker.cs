@@ -98,7 +98,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
     private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Detect the pitch of the sample
-        int newSampleLength = recordingEvent.NewSamplesEndIndex - recordingEvent.NewSamplesStartIndex;
+        int newSampleLength = recordingEvent.NewSampleCount;
         bufferedNotAnalyzedSampleCount += newSampleLength;
 
         // Wait until enough new samples are buffered

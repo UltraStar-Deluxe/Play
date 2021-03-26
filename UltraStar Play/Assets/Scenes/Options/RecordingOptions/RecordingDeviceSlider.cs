@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 
-public class RecordingDeviceSlider : TextItemSlider<MicProfile>
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
 {
     protected override void Awake()
     {
@@ -30,14 +34,26 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>
         List<string> connectedMicNames = Microphone.devices.ToList();
         List<MicProfile> loadedMicProfiles = SettingsManager.Instance.Settings.MicProfiles;
         List<MicProfile> micProfiles = new List<MicProfile>(loadedMicProfiles);
+        List<ConnectedClientHandler> connectedClientHandlers = ClientConnectionManager.GetConnectedClientHandlers();
 
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
         {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName);
+            bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName && !it.IsInputFromConnectedClient);
             if (!alreadyInList)
             {
                 MicProfile micProfile = new MicProfile(connectedMicName);
+                micProfiles.Add(micProfile);
+            }
+        }
+        
+        // Create mic profiles for connected companion apps that are not yet in the list
+        foreach (ConnectedClientHandler connectedClientHandler in connectedClientHandlers)
+        {
+            bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
+            if (!alreadyInList)
+            {
+                MicProfile micProfile = new MicProfile(connectedClientHandler.ClientName, connectedClientHandler.ClientId);
                 micProfiles.Add(micProfile);
             }
         }

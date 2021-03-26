@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
@@ -11,26 +12,46 @@ public static class ClientConnectionManager
 {
     private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
 
+    private static Subject<ClientConnectedEvent> clientConnectedEventStream = new Subject<ClientConnectedEvent>();
+    public static IObservable<ClientConnectedEvent> ClientConnectedEventStream => clientConnectedEventStream;
+    
     public static void RemoveAllLocalClients()
     {
         idToConnectedClientMap.Values.ForEach(it => it.Dispose());
         idToConnectedClientMap.Clear();
     }
-    
-    public static bool HasConnectedClient(string clientId)
+
+    public static ConnectedClientHandler RegisterClient(
+        IPEndPoint clientIpEndPoint,
+        string clientName,
+        int microphoneSampleRate)
     {
-        return idToConnectedClientMap.ContainsKey(clientId);
+        // Dispose any currently registered client with the same IP-Address.
+        if (idToConnectedClientMap.TryGetValue(GetClientId(clientIpEndPoint), out ConnectedClientHandler existingConnectedClientHandler))
+        {
+            existingConnectedClientHandler.Dispose();
+        }
+        
+        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(clientIpEndPoint, clientName, microphoneSampleRate);
+        idToConnectedClientMap[GetClientId(clientIpEndPoint)] = connectedClientHandler;
+        
+        clientConnectedEventStream.OnNext(new ClientConnectedEvent(connectedClientHandler));
+        
+        return connectedClientHandler;
     }
 
-    public static ConnectedClientHandler RegisterClient(string clientId, int microphoneSampleRate)
+    public static List<ConnectedClientHandler> GetConnectedClientHandlers()
     {
-        if (idToConnectedClientMap.ContainsKey(clientId))
-        {
-            throw new ConnectRequestException($"Client '{clientId}' already connected. Try using a different ClientId.");
-        }
+        return idToConnectedClientMap.Values.ToList();
+    }
+    
+    public static bool TryGetConnectedClientHandler(string clientIpEndPointId, out ConnectedClientHandler connectedClientHandler)
+    {
+        return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
+    }
 
-        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(clientId, microphoneSampleRate);
-        idToConnectedClientMap.Add(clientId, connectedClientHandler);
-        return connectedClientHandler;
+    public static string GetClientId(IPEndPoint clientIpEndPoint)
+    {
+        return clientIpEndPoint.Address.ToString();
     }
 }

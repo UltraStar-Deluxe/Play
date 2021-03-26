@@ -1,5 +1,6 @@
 ﻿public class ConnectRequestDto : JsonSerializable
 {
-    public string clientId;
+    public int protocolVersion; 
+    public string clientName;
     public int microphoneSampleRate;
 }

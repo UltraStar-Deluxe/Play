@@ -50,6 +50,16 @@ namespace SimpleHttpServerForUnity
         protected virtual void Awake()
         {
             InitSingleInstance();
+            if (instance != this)
+            {
+                return;
+            }
+            
+            if (!HttpListener.IsSupported)
+            {
+                Debug.Log("HttpListener not supported on this platform");
+                return;
+            }
         }
 
         protected virtual void OnDestroy()
@@ -218,7 +228,8 @@ namespace SimpleHttpServerForUnity
                 return;
             }
             
-            if (instance != null)
+            if (instance != null
+                && instance != this)
             {
                 // This instance is not needed.
                 Destroy(gameObject);
@@ -230,12 +241,6 @@ namespace SimpleHttpServerForUnity
             // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used.
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
-
-            if (!HttpListener.IsSupported)
-            {
-                Debug.Log("HttpListener not supported on this platform");
-                return;
-            }
         }
 
         private static string GetEndpointId(HttpMethod method, string pattern)
