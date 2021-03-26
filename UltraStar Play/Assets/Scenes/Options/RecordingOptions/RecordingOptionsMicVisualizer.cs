@@ -9,7 +9,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
     public Text currentNoteLabel;
     public MicPitchTracker micPitchTracker;
 
-    public int displayedSampleCount = 8096;
+    private const int DisplayedSampleCount = 44100;
 
     private IDisposable pitchEventStreamDisposable;
 
@@ -50,7 +50,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
             }
         }
 
-        audioWaveFormVisualizer.DrawWaveFormValues(displayData, micData.Length - displayedSampleCount, displayedSampleCount);
+        audioWaveFormVisualizer.DrawWaveFormValues(displayData, 0, micData.Length);
     }
 
     public void SetMicProfile(MicProfile micProfile)
@@ -60,14 +60,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }
-        micAmplifyMultiplier = micProfile.AmplificationMultiplier();
+        micAmplifyMultiplier = micProfile.AmplificationMultiplier;
 
         if (disposable != null)
         {
             disposable.Dispose();
         }
         disposable = micProfile.ObserveEveryValueChanged(it => it.Amplification)
-            .Subscribe(newAmplification => micAmplifyMultiplier = micProfile.AmplificationMultiplier());
+            .Subscribe(newAmplification => micAmplifyMultiplier = micProfile.AmplificationMultiplier);
     }
 
     void OnEnable()

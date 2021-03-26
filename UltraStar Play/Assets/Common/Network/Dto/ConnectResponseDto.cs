@@ -1,5 +1,5 @@
 ﻿public class ConnectResponseDto : JsonSerializable
 {
-    public string clientId;
+    public string clientName;
     public int microphonePort;
 }
