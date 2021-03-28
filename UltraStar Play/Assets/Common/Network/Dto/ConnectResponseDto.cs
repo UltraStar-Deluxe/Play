@@ -2,4 +2,5 @@
 {
     public string clientName;
     public int microphonePort;
+    public string errorMessage;
 }
