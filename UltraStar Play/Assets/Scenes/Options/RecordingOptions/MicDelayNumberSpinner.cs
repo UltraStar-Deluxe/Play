@@ -21,6 +21,7 @@ public class MicDelayNumberSpinner : NumberSpinner, INeedInjection
             disposable.Dispose();
         }
 
+        step = 10;
         SelectedValue = micProfile.DelayInMillis;
         disposable = SelectedValueStream.Subscribe(newValue => micProfile.DelayInMillis = (int)newValue);
     }
