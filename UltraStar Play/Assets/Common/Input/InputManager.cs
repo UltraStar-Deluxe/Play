@@ -87,6 +87,8 @@ public class InputManager : MonoBehaviour
         
         try
         {
+            // Create parent directories recursively.
+            Directory.CreateDirectory(Path.Combine(absoluteFilePath, ".."));
             File.WriteAllText(absoluteFilePath, theInputActionAsset.ToJson(), Encoding.UTF8);
         }
         catch (Exception ex)
@@ -115,7 +117,10 @@ public class InputManager : MonoBehaviour
     {
         try
         {
-            File.Delete(absoluteFilePath);
+            if (File.Exists(absoluteFilePath))
+            {
+                File.Delete(absoluteFilePath);
+            }
         }
         catch (Exception ex)
         {
@@ -125,7 +130,7 @@ public class InputManager : MonoBehaviour
 
     private static string GetInputActionAssetFilePath()
     {
-        return ApplicationUtils.GetStreamingAssetsPath("Input/UltraStarPlayInputActions.inputactions");
+        return Application.persistentDataPath + "/Input/UltraStarPlayInputActions.inputactions";
     }
 
     public static ObservableCancelablePriorityInputAction GetInputAction(string path)
