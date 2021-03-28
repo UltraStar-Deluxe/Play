@@ -126,11 +126,11 @@ public class ConnectedClientHandler : IDisposable
                 receivedByteCountTotal += receivedByteCount;
             }
 
-            if (receivedByteCountTotal > 0)
-            {
-                DateTime now = DateTime.Now; 
-                Debug.Log($"Received data: {receivedByteCountTotal} bytes ({receivedByteCountTotal / sizeof(float)} samples) at {now}:{now.Millisecond}");
-            }
+            // if (receivedByteCountTotal > 0)
+            // {
+            //     DateTime now = DateTime.Now; 
+            //     Debug.Log($"Received data: {receivedByteCountTotal} bytes ({receivedByteCountTotal / sizeof(float)} samples) at {now}:{now.Millisecond}");
+            // }
         }
         catch (Exception e)
         {
@@ -161,12 +161,7 @@ public class ConnectedClientHandler : IDisposable
             foreach (float sample in receivedSamples)
             {
                 micSampleBuffer[writePositionInMicBuffer] = sample;
-                int lastWritePositionInMicBuffer = writePositionInMicBuffer;
                 writePositionInMicBuffer = (writePositionInMicBuffer + 1) % micSampleBuffer.Length;
-                if (writePositionInMicBuffer != (lastWritePositionInMicBuffer + 1))
-                {
-                    Debug.Log("Wrapped write pos in mic buffer: " + writePositionInMicBuffer);
-                }
             }
         
             newSamplesInMicBuffer += receivedSamples.Length;
