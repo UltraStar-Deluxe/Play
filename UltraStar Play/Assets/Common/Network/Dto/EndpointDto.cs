@@ -1,6 +1,6 @@
 ﻿public class EndpointDto : JsonSerializable
 {
-    public string httpMethod;
-    public string urlPattern;
-    public string description;
+    public string HttpMethod { get; set; }
+    public string UrlPattern { get; set; }
+    public string Description { get; set; }
 }

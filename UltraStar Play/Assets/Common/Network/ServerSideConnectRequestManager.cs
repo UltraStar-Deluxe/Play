@@ -144,16 +144,16 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         try
         {
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
-            if (connectRequestDto.protocolVersion != ProtocolVersion)
+            if (connectRequestDto.ProtocolVersion != ProtocolVersion)
             {
-                throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.protocolVersion}).");
+                throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
-            if (connectRequestDto.clientName.IsNullOrEmpty())
+            if (connectRequestDto.ClientName.IsNullOrEmpty())
             {
                 throw new ConnectRequestException("Malformed ConnectRequest: missing clientName.");
             }
 
-            if (connectRequestDto.microphoneSampleRate > 0)
+            if (connectRequestDto.MicrophoneSampleRate > 0)
             {
                 HandleClientMessageWithMicrophone(clientIpEndPoint, connectRequestDto);
             }
@@ -167,7 +167,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
             Debug.LogException(e);
             serverUdpClient.Send(new ConnectResponseDto
             {
-                errorMessage = e.Message
+                ErrorMessage = e.Message
             }.ToJson(), clientIpEndPoint);
         }
     }
@@ -176,20 +176,20 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     {
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
-            clientName = connectRequestDto.clientName,
+            ClientName = connectRequestDto.ClientName,
         };
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
 
     private void HandleClientMessageWithMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
-        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.clientName, connectRequestDto.microphoneSampleRate);
+        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.MicrophoneSampleRate);
         clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
         
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
-            clientName = connectRequestDto.clientName,
-            microphonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
+            ClientName = connectRequestDto.ClientName,
+            MicrophonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);

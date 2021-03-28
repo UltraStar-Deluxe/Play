@@ -40,7 +40,7 @@ public class UltraStarPlayHttpServer : HttpServer
     {
         requestData.Context.Response.SendResponse(new MessageDto
         {
-            message = "Hello " + requestData.PathParameters["name"]
+            Message = "Hello " + requestData.PathParameters["name"]
         }.ToJson());
     }
 
@@ -48,12 +48,12 @@ public class UltraStarPlayHttpServer : HttpServer
     {
         requestData.Context.Response.SendResponse(new EndpointListDto()
         {
-            endpoints = GetRegisteredEndpoints()
+            Endpoints = GetRegisteredEndpoints()
                 .Select(endpoint => new EndpointDto
                 {
-                    httpMethod = endpoint.HttpMethod.Method,
-                    urlPattern = endpoint.UrlPattern,
-                    description = endpoint.Description
+                    HttpMethod = endpoint.HttpMethod.Method,
+                    UrlPattern = endpoint.UrlPattern,
+                    Description = endpoint.Description
                 })
                 .ToList()
         }.ToJson());
@@ -64,14 +64,14 @@ public class UltraStarPlayHttpServer : HttpServer
         SongMetaManager songMetaManager = SongMetaManager.Instance;
         requestData.Context.Response.SendResponse(new LoadedSongsDto
         {
-            isSongScanFinished = SongMetaManager.IsSongScanFinished,
-            songCount = songMetaManager.GetSongMetas().Count,
-            songList = songMetaManager.GetSongMetas()
+            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
+            SongCount = songMetaManager.GetSongMetas().Count,
+            SongList = songMetaManager.GetSongMetas()
                 .Select(songMeta => new SongDto
                 {
-                    artist = songMeta.Artist,
-                    title = songMeta.Title,
-                    hash = songMeta.SongHash,
+                    Artist = songMeta.Artist,
+                    Title = songMeta.Title,
+                    Hash = songMeta.SongHash,
                 })
                 .ToList()
         }.ToJson());
@@ -81,7 +81,7 @@ public class UltraStarPlayHttpServer : HttpServer
     {
         requestData.Context.Response.SendResponse(new ErrorMessageDto
         {
-            errorMessage = $"No endpoint found for '{requestData.Context.Request.HttpMethod}' on '{requestData.Context.Request.RawUrl}'. "
+            ErrorMessage = $"No endpoint found for '{requestData.Context.Request.HttpMethod}' on '{requestData.Context.Request.RawUrl}'. "
                 + "Try 'GET' on 'api/rest/endpoints' to get the available endpoints."
         }.ToJson(), HttpStatusCode.NotFound);
     }

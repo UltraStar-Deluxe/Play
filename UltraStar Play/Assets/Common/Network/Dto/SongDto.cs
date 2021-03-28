@@ -1,6 +1,6 @@
 ﻿public class SongDto
 {
-    public string artist;
-    public string title;
-    public string hash;
+    public string Artist { get; set; }
+    public string Title { get; set; }
+    public string Hash { get; set; }
 }
