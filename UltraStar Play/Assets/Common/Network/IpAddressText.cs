@@ -18,6 +18,6 @@ public class IpAddressText : MonoBehaviour, INeedInjection
     
 	private void Start()
     {
-        uiText.text = "IP: " + HttpServer.Instance.host;
+        uiText.text = "IP-Address: " + HttpServer.Instance.host;
     }
 }

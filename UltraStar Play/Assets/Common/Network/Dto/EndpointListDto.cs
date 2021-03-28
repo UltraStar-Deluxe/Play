@@ -2,5 +2,5 @@
 
 public class EndpointListDto : JsonSerializable
 {
-    public List<EndpointDto> endpoints;
+    public List<EndpointDto> Endpoints { get; set; }
 }
