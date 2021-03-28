@@ -25,7 +25,7 @@ public class MicProfile
     {
         get
         {
-            return (IsInputFromConnectedClient && ClientConnectionManager.TryGetConnectedClientHandler(ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
+            return (IsInputFromConnectedClient && ServerSideConnectRequestManager.TryGetConnectedClientHandler(ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
                 || (!IsInputFromConnectedClient && Microphone.devices.Contains(Name));
         }
     }

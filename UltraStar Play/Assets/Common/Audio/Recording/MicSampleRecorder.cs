@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
 [RequireComponent(typeof(AudioSource))]
-public class MicSampleRecorder : MonoBehaviour
+public class MicSampleRecorder : MonoBehaviour, INeedInjection
 {
     private const int DefaultSampleRateHz = 44100;
 
     public bool playRecordedAudio;
 
-    private int micAmplifyMultiplier;
     private MicProfile micProfile;
     public MicProfile MicProfile
     {
@@ -39,39 +42,29 @@ public class MicSampleRecorder : MonoBehaviour
             }
         }
     }
-
+    
+    public bool IsRecording { get; private set; }
+    
     // SampleRateHz is available after the MicProfile has been set.
     public int SampleRateHz { get; private set; }
     // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
     public float[] MicSamples { get; private set; }
 
-    private Subject<RecordingEvent> recordingEventStream = new Subject<RecordingEvent>();
-    public IObservable<RecordingEvent> RecordingEventStream
-    {
-        get
-        {
-            return recordingEventStream;
-        }
-    }
+    private readonly Subject<RecordingEvent> recordingEventStream = new Subject<RecordingEvent>();
+    public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
+    [Inject(searchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
     private int lastSamplePosition;
 
-    public bool IsRecording { get; private set; }
-
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
-
-    void OnDisable()
+    private void OnDisable()
     {
         StopRecording();
     }
 
-    void Update()
+    private void Update()
     {
         UpdateMicrophoneAudioPlayback();
         UpdateRecording();
@@ -99,8 +92,6 @@ public class MicSampleRecorder : MonoBehaviour
         }
 
         Debug.Log($"Starting recording with '{MicProfile.Name}' at {SampleRateHz} Hz");
-
-        micAmplifyMultiplier = micProfile.AmplificationMultiplier;
 
         if (!micProfile.IsInputFromConnectedClient)
         {
@@ -139,6 +130,12 @@ public class MicSampleRecorder : MonoBehaviour
         {
             Microphone.End(MicProfile.Name);
         }
+        // Reset mic buffer
+        for (int i = 0; i < MicSamples.Length; i++)
+        {
+            MicSamples[i] = 0;
+        }
+        
         IsRecording = false;
     }
 
@@ -171,17 +168,22 @@ public class MicSampleRecorder : MonoBehaviour
         // Fill buffer with raw sample data from microphone
         int currentSamplePosition = Microphone.GetPosition(MicProfile.Name);
         micAudioClip.GetData(MicSamples, currentSamplePosition);
+        if (currentSamplePosition == lastSamplePosition)
+        {
+            // No new samples yet (or all samples changed, which is unlikely because the buffer has a length of 1 second and FPS should be > 1).
+            return;
+        }
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
-        lastSamplePosition = currentSamplePosition;
+        ApplyAmplificationAndNotifyListeners(newSamplesCount);
         
-        ApplyAmplificationToNewSamplesAndNotifyListeners(newSamplesCount);
+        lastSamplePosition = currentSamplePosition;
     }
 
     private void UpdateRecordingWithInputFromConnectedClient()
     {
         // Use the sample data that is sent by the connected client
-        if (!ClientConnectionManager.TryGetConnectedClientHandler(MicProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
+        if (!ServerSideConnectRequestManager.TryGetConnectedClientHandler(MicProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
         {
             Debug.Log($"Client disconnected: {micProfile.Name}. Stopping recording.");
             StopRecording();
@@ -189,18 +191,22 @@ public class MicSampleRecorder : MonoBehaviour
         }
         
         int newSamplesCount = connectedClientHandler.GetNewMicSamples(MicSamples);
-        ApplyAmplificationToNewSamplesAndNotifyListeners(newSamplesCount);
+        ApplyAmplificationAndNotifyListeners(newSamplesCount);
     }
 
-    private void ApplyAmplificationToNewSamplesAndNotifyListeners(int newSamplesCount)
+    private void ApplyAmplificationAndNotifyListeners(int newSamplesCount)
     {
-        // Process the portion that has been buffered by Unity since the last frame.
+        // The buffer is always overwritten completely by Unity. Thus, amplification has to be applied to the whole buffer again.
         // The buffer is filled "from the right", i.e., highest index holds the newest sample.
+        ApplyAmplification(MicSamples, 0, MicSamples.Length - 1, micProfile.AmplificationMultiplier);
+        
+        // Notify listeners
+        if (newSamplesCount <= 0)
+        {
+            return;
+        }
         int newSamplesStartIndex = MicSamples.Length - newSamplesCount;
         int newSamplesEndIndex = MicSamples.Length - 1;
-        ApplyAmplification(MicSamples, newSamplesStartIndex, newSamplesEndIndex, micAmplifyMultiplier);
-
-        // Notify listeners
         RecordingEvent recordingEvent = new RecordingEvent(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
         recordingEventStream.OnNext(recordingEvent);
     }
@@ -211,19 +217,16 @@ public class MicSampleRecorder : MonoBehaviour
         {
             return;
         }
+
         float newSample;
         for (int index = startIndex; index < endIndex; index++)
         {
             newSample = buffer[index] * amplification;
-            if (newSample > 1)
-            {
-                newSample = 1;
-            }
-            else if (newSample < -1)
-            {
-                newSample = -1;
-            }
-            buffer[index] = newSample;
+            buffer[index] = newSample > 1
+                ? 1
+                : newSample < -1
+                    ? -1
+                    : newSample;
         }
     }
 
@@ -256,7 +259,7 @@ public class MicSampleRecorder : MonoBehaviour
     {
         if (micProfile.IsInputFromConnectedClient)
         {
-            return ClientConnectionManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler)
+            return ServerSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler)
                 ? connectedClientHandler.SampleRateHz
                 : DefaultSampleRateHz;
         }
@@ -275,9 +278,9 @@ public class MicSampleRecorder : MonoBehaviour
     {
         if (localMicProfile.IsInputFromConnectedClient)
         {
-            if (!ClientConnectionManager.TryGetConnectedClientHandler(localMicProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
+            if (!ServerSideConnectRequestManager.TryGetConnectedClientHandler(localMicProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
             {
-                Debug.LogWarning($"Client for mic-input disconnected: '{localMicProfile.ConnectedClientId}'. Stopping recording.");
+                Debug.LogWarning($"Client for mic-input not connected: '{localMicProfile.ConnectedClientId}'.");
                 return true;
             }
         }
