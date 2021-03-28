@@ -4,8 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System;
+using UniInject;
 
-public class RecordingOptionsSceneController : MonoBehaviour
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class RecordingOptionsSceneController : MonoBehaviour, INeedInjection
 {
     public RecordingDeviceSlider recordingDeviceSlider;
     public AmplificationSlider amplificationSlider;
@@ -20,6 +25,13 @@ public class RecordingOptionsSceneController : MonoBehaviour
 
     public RecordingOptionsMicVisualizer micVisualizer;
 
+    private MicProfile SelectedMicProfile => recordingDeviceSlider.SelectedItem;
+    
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    
     void Start()
     {
         recordingDeviceSlider.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
@@ -27,6 +39,11 @@ public class RecordingOptionsSceneController : MonoBehaviour
         deleteButton.OnClickAsObservable().Subscribe(_ => DeleteSelectedRecordingDevice());
 
         recordingDeviceSlider.Selection.Value = recordingDeviceSlider.Items[0];
+        
+        // Reselect recording device of connected client, when the client has now connected
+        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
+            .Where(clientConnectedEvent => recordingDeviceSlider.SelectedItem?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
+            .Subscribe(newValue => OnRecordingDeviceSelected(recordingDeviceSlider.SelectedItem)));
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool enabled)
@@ -76,11 +93,8 @@ public class RecordingOptionsSceneController : MonoBehaviour
         }
     }
 
-    private MicProfile SelectedMicProfile
+    private void OnDestroy()
     {
-        get
-        {
-            return recordingDeviceSlider.SelectedItem;
-        }
+        disposables.ForEach(it => it.Dispose());
     }
 }

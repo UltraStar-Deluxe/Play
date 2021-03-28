@@ -24,6 +24,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
+        bb.BindExistingInstance(ServerSideConnectRequestManager.Instance);
 
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);

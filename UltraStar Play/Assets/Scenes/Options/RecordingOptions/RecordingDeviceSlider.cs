@@ -3,16 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
 {
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
     protected override void Awake()
     {
         base.Awake();
         UpdateItems();
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Where(clientConnectedEvent => clientConnectedEvent.IsConnected)
+            .Subscribe(clientConnectedEvent => UpdateMicProfileNames(clientConnectedEvent));
+    }
+
+    private void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
+    {
+        Items.ForEach(micProfile => UpdateMicProfileName(clientConnectionEvent, micProfile));
+    }
+
+    private void UpdateMicProfileName(ClientConnectionEvent clientConnectionEvent, MicProfile micProfile)
+    {
+        if (micProfile.IsInputFromConnectedClient
+            && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
+        {
+            micProfile.Name = clientConnectionEvent.ConnectedClientHandler.ClientName;
+
+            if (SelectedItem == micProfile)
+            {
+                uiItemText.text = micProfile.Name;
+            }
+        }
     }
 
     protected override string GetDisplayString(MicProfile value)
@@ -34,7 +65,7 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         List<string> connectedMicNames = Microphone.devices.ToList();
         List<MicProfile> loadedMicProfiles = SettingsManager.Instance.Settings.MicProfiles;
         List<MicProfile> micProfiles = new List<MicProfile>(loadedMicProfiles);
-        List<ConnectedClientHandler> connectedClientHandlers = ClientConnectionManager.GetConnectedClientHandlers();
+        List<ConnectedClientHandler> connectedClientHandlers = ServerSideConnectRequestManager.GetConnectedClientHandlers();
 
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)

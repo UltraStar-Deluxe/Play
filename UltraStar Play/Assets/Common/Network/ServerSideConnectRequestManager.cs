@@ -25,6 +25,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     static void InitOnLoad()
     {
         instance = null;
+        idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
     }
 
     public static ServerSideConnectRequestManager instance;
@@ -44,6 +45,13 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         }
     }
 
+    private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
+
+    private ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new ConcurrentQueue<ClientConnectionEvent>();
+    
+    private Subject<ClientConnectionEvent> clientConnectedEventStream = new Subject<ClientConnectionEvent>();
+    public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
+
     /**
      * This version number must to be increased when introducing breaking changes.
      */
@@ -53,39 +61,46 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private const int ConnectPortOnServer = 34567;
     private const int ConnectPortOnClient = 34568;
 
-    private bool isListeningForConnectRequest;
-
     private bool hasBeenDestroyed;
     
     private void Start()
     {
         InitSingleInstance();
-        if (instance != this)
+        if (!Application.isPlaying || instance != this)
         {
             return;
         }
         
-        serverUdpClient = new UdpClient(ConnectPortOnServer);
-
-        // Move object to top level in scene hierarchy.
-        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
-        transform.SetParent(null);
-        DontDestroyOnLoad(gameObject);
+        GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
         
+        serverUdpClient = new UdpClient(ConnectPortOnServer);
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
-            ServerListenForConnectRequest();
+            while (!hasBeenDestroyed)
+            {
+                ServerAcceptMessageFromClient();
+            }
         });
     }
-    
+
+    private void Update()
+    {
+        // Fire events on the main thread.
+        while (clientConnectedEventQueue.TryDequeue(out ClientConnectionEvent clientConnectedEvent))
+        {
+            clientConnectedEventStream.OnNext(clientConnectedEvent);
+        }
+    }
+
     private void InitSingleInstance()
     {
         if (!Application.isPlaying)
         {
             return;
         }
-            
-        if (instance != null)
+
+        if (instance != null
+            && instance != this)
         {
             // This instance is not needed.
             Destroy(gameObject);
@@ -99,27 +114,13 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         DontDestroyOnLoad(gameObject);
     }
 
-    private void ServerListenForConnectRequest()
-    {
-        if (isListeningForConnectRequest)
-        {
-            Debug.LogError("Already listening for connect request.");
-            return;
-        }
-        isListeningForConnectRequest = true;
-    
-        while (!hasBeenDestroyed)
-        {
-            ServerAcceptMessageFromClient();
-        }
-    }
-
     private void ServerAcceptMessageFromClient()
     {
         try
         {
-            Debug.Log("Server listening for connect request on " + ConnectPortOnServer);
+            Debug.Log("Server listening for connect request on " + serverUdpClient.GetPort());
             IPEndPoint clientIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            // Receive is a blocking call.
             byte[] receivedBytes = serverUdpClient.Receive(ref clientIpEndPoint);
             string message = Encoding.UTF8.GetString(receivedBytes);
             HandleClientMessage(clientIpEndPoint, message);
@@ -174,7 +175,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         ConnectedClientHandler newConnectedClientHandler;
         try
         {
-            newConnectedClientHandler = ClientConnectionManager.RegisterClient(clientIpEndPoint, connectRequestDto.clientName, connectRequestDto.microphoneSampleRate);
+            newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.clientName, connectRequestDto.microphoneSampleRate);
+            clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
         }
         catch (Exception e)
         {
@@ -189,8 +191,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             clientName = connectRequestDto.clientName,
-            microphonePort = newConnectedClientHandler.MicrophoneUdpClient.GetPort(),
+            microphonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
         };
+        Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
 
@@ -200,7 +203,61 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         serverUdpClient?.Close();
         if (instance == this)
         {
-            ClientConnectionManager.RemoveAllLocalClients();
+            RemoveAllConnectedClients();
         }
+    }
+    
+    private void RemoveAllConnectedClients()
+    {
+        idToConnectedClientMap.Values.ForEach(connectedClientHandler =>
+        {
+            clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(connectedClientHandler, false));
+            connectedClientHandler.Dispose();
+        });
+        idToConnectedClientMap.Clear();
+    }
+
+    public void RemoveConnectedClientHandler(ConnectedClientHandler connectedClientHandler)
+    {
+        if (idToConnectedClientMap.ContainsKey(connectedClientHandler.ClientId))
+        {
+            idToConnectedClientMap.Remove(connectedClientHandler.ClientId);
+        }
+        clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(connectedClientHandler, false));
+        connectedClientHandler.Dispose();
+    }
+    
+    private ConnectedClientHandler RegisterClient(
+        IPEndPoint clientIpEndPoint,
+        string clientName,
+        int microphoneSampleRate)
+    {
+        // Dispose any currently registered client with the same IP-Address.
+        if (idToConnectedClientMap.TryGetValue(GetClientId(clientIpEndPoint), out ConnectedClientHandler existingConnectedClientHandler))
+        {
+            existingConnectedClientHandler.Dispose();
+        }
+        
+        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(this, clientIpEndPoint, clientName, microphoneSampleRate);
+        idToConnectedClientMap[GetClientId(clientIpEndPoint)] = connectedClientHandler;
+
+        Debug.Log("New number of connected clients: " + idToConnectedClientMap.Count);
+        
+        return connectedClientHandler;
+    }
+
+    public static List<ConnectedClientHandler> GetConnectedClientHandlers()
+    {
+        return idToConnectedClientMap.Values.ToList();
+    }
+    
+    public static bool TryGetConnectedClientHandler(string clientIpEndPointId, out ConnectedClientHandler connectedClientHandler)
+    {
+        return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
+    }
+
+    public static string GetClientId(IPEndPoint clientIpEndPoint)
+    {
+        return clientIpEndPoint.Address.ToString();
     }
 }
