@@ -35,7 +35,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         {
             if (instance == null)
             {
-                ServerSideConnectRequestManager instanceInScene = FindObjectOfType<ServerSideConnectRequestManager>();
+                ServerSideConnectRequestManager instanceInScene = GameObjectUtils.FindComponentWithTag<ServerSideConnectRequestManager>("ServerSideConnectRequestManager");
                 if (instanceInScene != null)
                 {
                     instanceInScene.InitSingleInstance();

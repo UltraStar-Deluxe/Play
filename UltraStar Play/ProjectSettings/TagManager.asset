@@ -25,6 +25,7 @@ TagManager:
   - UIDocument
   - SceneInjectionManager
   - InputManager
+  - ServerSideConnectRequestManager
   layers:
   - Default
   - TransparentFX

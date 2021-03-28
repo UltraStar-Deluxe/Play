@@ -27,6 +27,9 @@ public class ConnectedClientHandler : IDisposable
     private readonly byte[] stillAliveRequestByteArray;
 
     private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    private Thread receiveDataThread;
+    private Thread clientStillAliveCheckThread;
     
     public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, int microphoneSampleRate)
     {
@@ -48,26 +51,48 @@ public class ConnectedClientHandler : IDisposable
         MicTcpListener.Start();
         
         Debug.Log($"Started TcpListener on port {MicTcpListener.GetPort()} to receive mic samples at {microphoneSampleRate} Hz");
-        ThreadPool.QueueUserWorkItem(poolHandle =>
+        receiveDataThread = new Thread(() =>
         {
             while (!isDisposed)
             {
-                if (micTcpClient == null)
+                try
                 {
-                    micTcpClient = MicTcpListener.AcceptTcpClient();
-                    micTcpClientStream = micTcpClient.GetStream();
+                    if (micTcpClient == null)
+                    {
+                        micTcpClient = MicTcpListener.AcceptTcpClient();
+                        micTcpClientStream = micTcpClient.GetStream();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    Debug.LogError("Error when accepting TcpClient for mic input. Closing TcpListener.");
+                    this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+                    return;
                 }
                 
-                if (CheckClientStillAlive())
-                {
-                    AcceptMicrophoneData();
-                }
+                AcceptMicrophoneData();
                 Thread.Sleep(10);
             }
         });
+        receiveDataThread.Start();
+        
+        clientStillAliveCheckThread = new Thread(() =>
+        {
+            while (!isDisposed)
+            {
+                if (micTcpClient != null
+                    && micTcpClientStream != null)
+                {
+                    CheckClientStillAlive();
+                }
+                Thread.Sleep(250);
+            }
+        });
+        clientStillAliveCheckThread.Start();
     }
-
-    private bool CheckClientStillAlive()
+    
+    private void CheckClientStillAlive()
     {
         try
         {
@@ -78,14 +103,12 @@ public class ConnectedClientHandler : IDisposable
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
                 micTcpClientStream.Write(stillAliveRequestByteArray, 0, stillAliveRequestByteArray.Length);
             }
-            return true;
         }
         catch (Exception e)
         {
             Debug.LogException(e);
             Debug.LogError("Failed sending data to client. Removing ConnectedClientHandler.");
             serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
-            return false;
         }
     }
 
@@ -94,11 +117,19 @@ public class ConnectedClientHandler : IDisposable
         try
         {
             // Loop to receive all the data sent by the client.
+            int receivedByteCountTotal = 0;
             int receivedByteCount;
             while (micTcpClientStream.DataAvailable
                    && (receivedByteCount = micTcpClientStream.Read(receivedByteBuffer, 0, receivedByteBuffer.Length)) > 0)
             {
                 FillMicBuffer(receivedByteBuffer, receivedByteCount);
+                receivedByteCountTotal += receivedByteCount;
+            }
+
+            if (receivedByteCountTotal > 0)
+            {
+                DateTime now = DateTime.Now; 
+                Debug.Log($"Received data: {receivedByteCountTotal} bytes ({receivedByteCountTotal / sizeof(float)} samples) at {now}:{now.Millisecond}");
             }
         }
         catch (Exception e)
@@ -143,8 +174,6 @@ public class ConnectedClientHandler : IDisposable
             {
                 newSamplesInMicBuffer = micSampleBuffer.Length;
             }
-            DateTime now = DateTime.Now; 
-            Debug.Log($"Received data: {receivedByteCount} bytes ({receivedSamples.Length} samples) at {now}:{now.Millisecond}");
         }
     }
 

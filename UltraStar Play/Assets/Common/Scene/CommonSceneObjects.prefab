@@ -803,8 +803,8 @@ GameObject:
   - component: {fileID: 4351641984961804500}
   - component: {fileID: 7313716740902211290}
   m_Layer: 0
-  m_Name: ConnectRequestManager
-  m_TagString: Untagged
+  m_Name: ServerSideConnectRequestManager
+  m_TagString: ServerSideConnectRequestManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
