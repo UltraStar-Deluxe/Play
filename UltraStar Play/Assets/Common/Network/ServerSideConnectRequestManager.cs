@@ -62,6 +62,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private const int ConnectPortOnClient = 34568;
 
     private bool hasBeenDestroyed;
+
+    [Inject]
+    private HttpServer httpServer;
     
     private void Start()
     {
@@ -177,6 +180,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             ClientName = connectRequestDto.ClientName,
+            HttpServerPort = httpServer.port,
         };
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
@@ -189,6 +193,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             ClientName = connectRequestDto.ClientName,
+            HttpServerPort = httpServer.port,
             MicrophonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
