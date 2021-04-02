@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
@@ -13,6 +14,8 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    
     protected override void Awake()
     {
         base.Awake();
@@ -22,8 +25,8 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
     protected override void Start()
     {
         base.Start();
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(UpdateMicProfileNames);
+        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(UpdateMicProfileNames));
     }
 
     private void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
@@ -95,5 +98,10 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         }
 
         Items = micProfiles;
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 }
