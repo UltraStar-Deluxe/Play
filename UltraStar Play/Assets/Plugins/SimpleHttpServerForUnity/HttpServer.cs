@@ -31,7 +31,9 @@ namespace SimpleHttpServerForUnity
                 return instance;
             }
         }
-
+        
+        public static bool IsSupported => HttpListener.IsSupported;
+        
         public string scheme = "http";
         // Note: IP address of the current device is available via IpAddressUtils.GetIpAddress(AddressFamily.IPv4)
         public string host = "localhost";
@@ -55,7 +57,7 @@ namespace SimpleHttpServerForUnity
                 return;
             }
             
-            if (!HttpListener.IsSupported)
+            if (!IsSupported)
             {
                 Debug.Log("HttpListener not supported on this platform");
                 return;
@@ -117,7 +119,7 @@ namespace SimpleHttpServerForUnity
         
         public void RegisterEndpoint(EndpointHandler endpointHandler)
         {
-            if (!HttpListener.IsSupported)
+            if (!IsSupported)
             {
                 return;
             }

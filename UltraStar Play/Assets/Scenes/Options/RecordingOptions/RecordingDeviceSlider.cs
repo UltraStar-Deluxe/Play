@@ -23,13 +23,16 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
     {
         base.Start();
         serverSideConnectRequestManager.ClientConnectedEventStream
-            .Where(clientConnectedEvent => clientConnectedEvent.IsConnected)
-            .Subscribe(clientConnectedEvent => UpdateMicProfileNames(clientConnectedEvent));
+            .Subscribe(UpdateMicProfileNames);
     }
 
     private void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
     {
-        Items.ForEach(micProfile => UpdateMicProfileName(clientConnectionEvent, micProfile));
+        if (clientConnectionEvent.IsConnected)
+        {
+            Items.ForEach(micProfile => UpdateMicProfileName(clientConnectionEvent, micProfile));
+        }
+        uiItemText.text = GetDisplayString(SelectedItem);
     }
 
     private void UpdateMicProfileName(ClientConnectionEvent clientConnectionEvent, MicProfile micProfile)
@@ -46,15 +49,17 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         }
     }
 
-    protected override string GetDisplayString(MicProfile value)
+    protected override string GetDisplayString(MicProfile micProfile)
     {
-        if (value == null)
+        if (micProfile == null)
         {
             return "";
         }
         else
         {
-            return value.Name;
+            return micProfile.IsInputFromConnectedClient && micProfile.IsConnected
+                ? micProfile.Name + $"\n({micProfile.ConnectedClientId})"
+                : micProfile.Name;
         }
     }
 

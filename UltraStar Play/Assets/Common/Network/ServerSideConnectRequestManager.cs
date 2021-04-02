@@ -46,7 +46,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     }
 
     private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
-
+    public static int ConnectedClientCount => idToConnectedClientMap.Count;
+    
     private ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new ConcurrentQueue<ClientConnectionEvent>();
     
     private Subject<ClientConnectionEvent> clientConnectedEventStream = new Subject<ClientConnectionEvent>();
