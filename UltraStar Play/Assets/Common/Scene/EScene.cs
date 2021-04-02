@@ -23,6 +23,7 @@ public enum EScene
     PlayerProfileSetupScene = 7,
     ContentDownloadScene = 16,
     ThemeOptionsScene = 17,
+    NetworkOptionsScene = 18,
 
     // sing
     SingScene = 11,
