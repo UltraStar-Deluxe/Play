@@ -46,7 +46,7 @@ public class UltraStarPlayHttpServer : HttpServer
 
     private void SendRegisteredEndpoints(EndpointRequestData requestData)
     {
-        requestData.Context.Response.SendResponse(new EndpointListDto()
+        requestData.Context.Response.SendResponse(new EndpointListDto
         {
             Endpoints = GetRegisteredEndpoints()
                 .Select(endpoint => new EndpointDto

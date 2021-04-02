@@ -28,7 +28,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
     }
 
-    public static ServerSideConnectRequestManager instance;
+    private static ServerSideConnectRequestManager instance;
     public static ServerSideConnectRequestManager Instance
     {
         get
@@ -48,9 +48,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
     
-    private ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new ConcurrentQueue<ClientConnectionEvent>();
+    private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new ConcurrentQueue<ClientConnectionEvent>();
     
-    private Subject<ClientConnectionEvent> clientConnectedEventStream = new Subject<ClientConnectionEvent>();
+    private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new Subject<ClientConnectionEvent>();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
 
     /**
@@ -150,7 +150,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
             if (connectRequestDto.ProtocolVersion != ProtocolVersion)
             {
-                throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
+                throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match"
+                    + $" (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
             if (connectRequestDto.ClientName.IsNullOrEmpty())
             {

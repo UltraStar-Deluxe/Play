@@ -13,8 +13,6 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
 
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
 
-    private IDisposable disposable;
-
     void Awake()
     {
         audioWaveFormVisualizer = GetComponentInChildren<AudioWaveFormVisualizer>();
@@ -49,11 +47,6 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         if (!string.IsNullOrEmpty(micProfile.Name))
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
-        }
-
-        if (disposable != null)
-        {
-            disposable.Dispose();
         }
     }
 
