@@ -198,7 +198,10 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     {
         // The buffer is always overwritten completely by Unity. Thus, amplification has to be applied to the whole buffer again.
         // The buffer is filled "from the right", i.e., highest index holds the newest sample.
-        ApplyAmplification(MicSamples, 0, MicSamples.Length - 1, micProfile.AmplificationMultiplier);
+        if (micProfile.Amplification > 0)
+        {
+            ApplyAmplification(MicSamples, 0, MicSamples.Length - 1, micProfile.AmplificationMultiplier);
+        }
         
         // Notify listeners
         if (newSamplesCount <= 0)
@@ -211,22 +214,11 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         recordingEventStream.OnNext(recordingEvent);
     }
     
-    private static void ApplyAmplification(float[] buffer, int startIndex, int endIndex, float amplification)
+    private static void ApplyAmplification(float[] buffer, int startIndex, int endIndex, float amplificationMultiplier)
     {
-        if (amplification == 0)
-        {
-            return;
-        }
-
-        float newSample;
         for (int index = startIndex; index < endIndex; index++)
         {
-            newSample = buffer[index] * amplification;
-            buffer[index] = newSample > 1
-                ? 1
-                : newSample < -1
-                    ? -1
-                    : newSample;
+            buffer[index] *= amplificationMultiplier;
         }
     }
 
