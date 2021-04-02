@@ -28,8 +28,8 @@ public class ConnectedClientHandler : IDisposable
 
     private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private Thread receiveDataThread;
-    private Thread clientStillAliveCheckThread;
+    private readonly Thread receiveDataThread;
+    private readonly Thread clientStillAliveCheckThread;
     
     public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, int microphoneSampleRate)
     {
@@ -117,20 +117,12 @@ public class ConnectedClientHandler : IDisposable
         try
         {
             // Loop to receive all the data sent by the client.
-            int receivedByteCountTotal = 0;
             int receivedByteCount;
             while (micTcpClientStream.DataAvailable
                    && (receivedByteCount = micTcpClientStream.Read(receivedByteBuffer, 0, receivedByteBuffer.Length)) > 0)
             {
                 FillMicBuffer(receivedByteBuffer, receivedByteCount);
-                receivedByteCountTotal += receivedByteCount;
             }
-
-            // if (receivedByteCountTotal > 0)
-            // {
-            //     DateTime now = DateTime.Now; 
-            //     Debug.Log($"Received data: {receivedByteCountTotal} bytes ({receivedByteCountTotal / sizeof(float)} samples) at {now}:{now.Millisecond}");
-            // }
         }
         catch (Exception e)
         {
