@@ -39,8 +39,8 @@ public class I18NManager : MonoBehaviour, INeedInjection
     public SystemLanguage overwriteLanguage;
 
     // Fields are static to be persisted across scenes
-    private static Dictionary<string, string> currentLanguageMessages;
-    private static Dictionary<string, string> fallbackMessages;
+    private static Dictionary<string, string> currentLanguageMessages = new Dictionary<string, string>();
+    private static Dictionary<string, string> fallbackMessages = new Dictionary<string, string>();
 
     private void Awake()
     {
