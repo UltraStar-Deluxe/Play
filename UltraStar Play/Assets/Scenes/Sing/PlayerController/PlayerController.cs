@@ -59,6 +59,8 @@ public class PlayerController : MonoBehaviour, INeedInjection
     [Inject]
     private PlayerUiArea playerUiArea;
 
+    public PlayerUiController PlayerUiController { get { return playerUiController; } }
+
     // The PlayerUiController is instantiated by the PlayerController as a child of the PlayerUiArea.
     private PlayerUiController playerUiController;
 
