@@ -6,5 +6,5 @@ using UnityEngine;
 public class GameSettings
 {
     public SystemLanguage language = SystemLanguage.English;
-    public List<string> songDirs = new List<string>() { "./Songs" };
+    public List<string> songDirs = new List<string> { Application.persistentDataPath + "/Songs" };
 }

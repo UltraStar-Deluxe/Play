@@ -9,15 +9,9 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
     public Text currentNoteLabel;
     public MicPitchTracker micPitchTracker;
 
-    public int displayedSampleCount = 8096;
-
     private IDisposable pitchEventStreamDisposable;
 
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
-
-    private float micAmplifyMultiplier = 1;
-
-    private IDisposable disposable;
 
     void Awake()
     {
@@ -37,20 +31,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
             return;
         }
 
+        // Consider noise suppression when displaying the the buffer
         float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
-
-        // Apply noise suppression and amplification to the buffer
-        float[] displayData = new float[micData.Length];
         float noiseThreshold = micProfile.NoiseSuppression / 100f;
-        if (micData.AnyMatch(sample => sample >= noiseThreshold))
-        {
-            for (int i = 0; i < micData.Length; i++)
-            {
-                displayData[i] = NumberUtils.Limit(micData[i] * micAmplifyMultiplier, -1, 1);
-            }
-        }
-
-        audioWaveFormVisualizer.DrawWaveFormValues(displayData, micData.Length - displayedSampleCount, displayedSampleCount);
+        bool micSampleBufferIsAboveThreshold = micData.AnyMatch(sample => sample >= noiseThreshold);
+        float[] displayData = micSampleBufferIsAboveThreshold
+            ? micData
+            : new float[micData.Length];
+        audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(displayData);
     }
 
     public void SetMicProfile(MicProfile micProfile)
@@ -60,14 +48,6 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }
-        micAmplifyMultiplier = micProfile.AmplificationMultiplier();
-
-        if (disposable != null)
-        {
-            disposable.Dispose();
-        }
-        disposable = micProfile.ObserveEveryValueChanged(it => it.Amplification)
-            .Subscribe(newAmplification => micAmplifyMultiplier = micProfile.AmplificationMultiplier());
     }
 
     void OnEnable()

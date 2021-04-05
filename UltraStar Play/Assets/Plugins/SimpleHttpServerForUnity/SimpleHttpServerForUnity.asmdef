@@ -1,0 +1,16 @@
+{
+    "name": "SimpleHttpServerForUnity",
+    "rootNamespace": "",
+    "references": [
+		"Plugins"
+	],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
