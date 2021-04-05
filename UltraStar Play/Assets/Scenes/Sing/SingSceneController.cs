@@ -202,19 +202,30 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     private void RecomputeCrowns()
     {
+        // Find best player with score > 0
         PlayerController bestScoreController = null;
-        foreach (PlayerController pc in PlayerControllers)
+        foreach (PlayerController playerController in PlayerControllers)
         {
-            if(bestScoreController == null || pc.PlayerScoreController.TotalScore > bestScoreController.PlayerScoreController.TotalScore)
+            if ((bestScoreController == null && playerController.PlayerScoreController.TotalScore > 0)
+               || (bestScoreController != null && playerController.PlayerScoreController.TotalScore > bestScoreController.PlayerScoreController.TotalScore))
             {
-                bestScoreController = pc;
-            }
-            else
-            {
-                pc.PlayerUiController.PlayerCrownDisplayer.ShowCrown(false);
+                bestScoreController = playerController;
             }
         }
-        bestScoreController.PlayerUiController.PlayerCrownDisplayer.ShowCrown(true);
+
+        // Show crown on best player
+        if (bestScoreController != null)
+        {
+            bestScoreController.PlayerUiController.PlayerCrownDisplayer.ShowCrown(true);
+        }
+        // Hide crown on other players
+        foreach (PlayerController playerController in PlayerControllers)
+        {
+            if (playerController != bestScoreController)
+            {
+                playerController.PlayerUiController.PlayerCrownDisplayer.ShowCrown(false);        
+            }
+        }
     }
 
     private void InitTimeBar()
