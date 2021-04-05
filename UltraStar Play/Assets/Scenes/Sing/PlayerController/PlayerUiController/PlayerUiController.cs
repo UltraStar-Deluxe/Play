@@ -34,6 +34,9 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private AvatarImage avatarImage;
 
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    public PlayerCrownDisplayer PlayerCrownDisplayer { get; private set; }
+
     [Inject]
     private Settings settings;
 
