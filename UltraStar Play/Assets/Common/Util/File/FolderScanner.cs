@@ -47,7 +47,10 @@ public class FolderScanner
         {
             foreach (FileInfo file in dirInfo.GetFiles(fileExtensionPattern))
             {
-                if (!file.Name.ToLowerInvariant().Equals("license.txt"))
+                // Ignore hidden files (notably on MacOS) and licenses.
+                string lowerFileName = file.Name.ToLowerInvariant();
+                if (!lowerFileName.StartsWith(".")
+                    && !lowerFileName.Equals("license.txt"))
                 {
                     result.Add(file.FullName);
                 }
