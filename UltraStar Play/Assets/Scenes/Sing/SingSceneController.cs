@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -125,6 +126,14 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             {
                 playerController.PlayerScoreController.ScoreData = scoreData;
             }
+
+            // Handle crown display
+            if (SceneData.SelectedPlayerProfiles.Count > 1)
+            {
+                playerController.PlayerScoreController.NoteScoreEventStream.Subscribe(noteScoreEvent => { RecomputeCrowns(); });
+                playerController.PlayerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent => { RecomputeCrowns(); });
+            }
+            playerController.PlayerUiController.PlayerCrownDisplayer.ShowCrown(false);
         }
 
         // Handle dummy singers
@@ -189,6 +198,23 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             topLyricsDisplayer.gameObject.SetActive(false);
             bottomLyricsDisplayer.Init(PlayerControllers[0]);
         }
+    }
+
+    private void RecomputeCrowns()
+    {
+        PlayerController bestScoreController = null;
+        foreach (PlayerController pc in PlayerControllers)
+        {
+            if(bestScoreController == null || pc.PlayerScoreController.TotalScore > bestScoreController.PlayerScoreController.TotalScore)
+            {
+                bestScoreController = pc;
+            }
+            else
+            {
+                pc.PlayerUiController.PlayerCrownDisplayer.ShowCrown(false);
+            }
+        }
+        bestScoreController.PlayerUiController.PlayerCrownDisplayer.ShowCrown(true);
     }
 
     private void InitTimeBar()
