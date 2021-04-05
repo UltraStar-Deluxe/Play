@@ -20,6 +20,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
 
+    [Inject]
+    private SongRouletteController songRouletteController;
+    
     private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
@@ -95,11 +98,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         if (context.ReadValue<Vector2>().y < 0) 
         {
-            songSelectSceneController.OnNextSong();
+            songRouletteController.SelectNextSong();
         }
         if (context.ReadValue<Vector2>().y > 0)
         {
-            songSelectSceneController.OnPreviousSong();
+            songRouletteController.SelectPreviousSong();
         }
     }
 
@@ -108,12 +111,12 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         if (context.ReadValue<Vector2>().x > 0
             && !songSelectSceneController.IsSearchEnabled()) 
         {
-            songSelectSceneController.OnNextSong();
+            songRouletteController.SelectNextSong();
         }
         if (context.ReadValue<Vector2>().x < 0
             && !songSelectSceneController.IsSearchEnabled())
         {
-            songSelectSceneController.OnPreviousSong();
+            songRouletteController.SelectPreviousSong();
         }
 
         if (context.ReadValue<Vector2>().y > 0)

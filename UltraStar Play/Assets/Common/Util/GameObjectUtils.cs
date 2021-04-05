@@ -91,4 +91,12 @@ public static class GameObjectUtils
             GameObject.Destroy(obj);
         }
     }
+    
+    public static void SetTopLevelGameObjectAndDontDestroyOnLoad(GameObject gameObject)
+    {
+        // Move object to top level in scene hierarchy.
+        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used. 
+        gameObject.transform.SetParent(null);
+        GameObject.DontDestroyOnLoad(gameObject);
+    }
 }

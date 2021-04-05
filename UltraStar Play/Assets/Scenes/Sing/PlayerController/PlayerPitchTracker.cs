@@ -4,8 +4,6 @@ using UnityEngine;
 using UniRx;
 using UniInject;
 using System.Linq;
-using CSharpSynth.Wave;
-using CircularBuffer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -35,6 +33,9 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    
     // The rounding distance of the PlayerProfile
     private int roundingDistance;
 
@@ -53,34 +54,24 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     public int usedJokerCount;
 
     private Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new Subject<BeatAnalyzedEvent>();
-    public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream
-    {
-        get
-        {
-            return beatAnalyzedEventStream;
-        }
-    }
+    public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream => beatAnalyzedEventStream;
 
     private Subject<NoteAnalyzedEvent> noteAnalyzedEventStream = new Subject<NoteAnalyzedEvent>();
-    public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream
-    {
-        get
-        {
-            return noteAnalyzedEventStream;
-        }
-    }
+    public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream => noteAnalyzedEventStream;
 
     private Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new Subject<SentenceAnalyzedEvent>();
-    public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream
-    {
-        get
-        {
-            return sentenceAnalyzedEventStream;
-        }
-    }
-
+    public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
+    
     void Start()
     {
+        // Restart recording if companion app for mic input has reconnected
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Where(clientConnectionEvent => clientConnectionEvent.IsConnected
+                                            && !micSampleRecorder.IsRecording
+                                            && micProfile != null
+                                            && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
+            .Subscribe(_ => micSampleRecorder.StartRecording());
+        
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 

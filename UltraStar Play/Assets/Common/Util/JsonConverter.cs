@@ -17,12 +17,7 @@ public static class JsonConverter
         return newSerializer;
     }
 
-    public static string ToJson<T>(T obj)
-    {
-        return ToJson<T>(obj, false);
-    }
-
-    public static string ToJson<T>(T obj, bool prettyPrint)
+    public static string ToJson<T>(T obj, bool prettyPrint = false)
     {
         serializer.TrySerialize(typeof(T), obj, out fsData data).AssertSuccessWithoutWarnings();
         string json = fsJsonPrinter.CompressedJson(data);
