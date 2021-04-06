@@ -6941,7 +6941,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: FuuzySearchText
+  m_Text: FuzzySearchText
 --- !u!222 &1853751361
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7340,7 +7340,7 @@ PrefabInstance:
     - target: {fileID: 4408495303239637785, guid: b6505b8c22170f843ae5035fdf38f492,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 35
+      value: 36.1667
       objectReference: {fileID: 0}
     - target: {fileID: 4408495303239637785, guid: b6505b8c22170f843ae5035fdf38f492,
         type: 3}
