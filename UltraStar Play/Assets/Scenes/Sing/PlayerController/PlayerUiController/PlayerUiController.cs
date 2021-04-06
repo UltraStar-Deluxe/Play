@@ -24,6 +24,9 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
+    
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private PlayerMessageDisplayer playerMessageDisplayer;
 
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
@@ -43,7 +46,12 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
     private ISingSceneNoteDisplayer noteDisplayer;
+
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
 
     void Start()
     {
@@ -64,6 +72,12 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
             }
         });
 
+        // Show message when mic (dis)connects.
+        if (micProfile != null && micProfile.IsInputFromConnectedClient)
+        {
+            disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+        }
+
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         playerScoreController.SentenceScoreEventStream.Buffer(2, 1)
@@ -71,6 +85,24 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
             .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.Perfect))
             // Create an effect for these.
             .Subscribe(xs => CreatePerfectSentenceEffect());
+    }
+
+    private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
+    {
+        if (micProfile == null
+            || connectionEvent.ConnectedClientHandler.ClientId != micProfile.ConnectedClientId)
+        {
+            return;
+        }
+        
+        if (connectionEvent.IsConnected)
+        {
+            playerMessageDisplayer.ShowMessage("Mic reconnected", Colors.green, 3);
+        }
+        else
+        {
+            playerMessageDisplayer.ShowMessage("Mic disconnected", Colors.red, 3);
+        }
     }
 
     public void OnInjectionFinished()
@@ -127,5 +159,10 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
                 singSceneNoteDisplayer.GetGameObject().SetActive(false);
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 }

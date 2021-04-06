@@ -1,0 +1,41 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+using UniInject;
+using UniRx;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class PlayerMessageDisplayer : MonoBehaviour, INeedInjection
+{
+    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    private Text uiText;
+
+    private void Start()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void ShowMessage(string text, Color color, float showMessageDurationInSeconds)
+    {
+        gameObject.SetActive(true);
+        uiText.text = text;
+        uiText.color = color;
+        
+        float hideMessageTime = Time.time + showMessageDurationInSeconds;
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showMessageDurationInSeconds,
+            () => HideMessage(hideMessageTime)));
+    }
+
+    private void HideMessage(float hideMessageTime)
+    {
+        if (Time.time >= hideMessageTime)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+}
