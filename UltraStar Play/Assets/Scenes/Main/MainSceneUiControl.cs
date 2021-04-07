@@ -119,15 +119,8 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         releaseInfoText.text = "Version: " + displayName;
 
         // Show the build timestamp only for development builds
-        if (Debug.isDebugBuild)
-        {
-            versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-            buildInfoText.text = "Build: " + buildTimeStamp;
-        }
-        else
-        {
-            buildInfoText.text = "";
-        }
+        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
+        buildInfoText.text = "Build timestamp: " + buildTimeStamp;
     }
 
     private void CloseQuitGameDialog()
