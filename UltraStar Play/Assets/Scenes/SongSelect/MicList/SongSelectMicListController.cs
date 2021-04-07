@@ -66,12 +66,6 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         }
     }
 
-    private void RemoveListEntry(SongSelectMicListEntry listEntry)
-    {
-        Destroy(listEntry.gameObject);
-        listEntries.Remove(listEntry);
-    }
-
     public void OnHotSwapFinished()
     {
         UpdateListEntries();
@@ -109,8 +103,20 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         listEntry.MicProfile = micProfile;
 
         listEntries.Add(listEntry);
+        
+        emptyListLabel.SetActive(false);
     }
 
+    private void RemoveListEntry(SongSelectMicListEntry listEntry)
+    {
+        Destroy(listEntry.gameObject);
+        listEntries.Remove(listEntry);
+        if (listEntries.IsNullOrEmpty())
+        {
+            emptyListLabel.SetActive(true);
+        }
+    }
+    
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());
