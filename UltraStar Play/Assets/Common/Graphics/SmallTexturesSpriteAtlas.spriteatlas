@@ -28,6 +28,7 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 0
       enableTightPacking: 0
+      enableAlphaDilation: 0
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
@@ -35,7 +36,6 @@ SpriteAtlas:
     - {fileID: 102900000, guid: 6bc1d9ad819e6184fa5a33e186a677b9, type: 3}
     - {fileID: 102900000, guid: 9058f218a30b4ca499aa3608584c4cc5, type: 3}
     - {fileID: 102900000, guid: b25a54fc37b9389438e58e08c751d7d4, type: 3}
-    totalSpriteSurfaceArea: 623641
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -62,6 +62,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: fc9005b45ccd7424fbb9fbe707e57f7b, type: 3}
   - {fileID: 21300000, guid: 3320a9c41743da34690ecfd21f6181c3, type: 3}
   - {fileID: 21300000, guid: caa92ed4b08666749a91f4258c0e22ec, type: 3}
+  - {fileID: 21300000, guid: 3a770ae44a43b6e4c8f744668b0fb921, type: 3}
   - {fileID: 21300000, guid: 97edaf255cd31ad44bd8783a17d1f302, type: 3}
   - {fileID: 21300000, guid: 3406fac525d9a894b9906cb27b4def17, type: 3}
   - {fileID: 21300000, guid: 9980dbf5e3842134fb87698ef7219f1a, type: 3}
@@ -128,6 +129,7 @@ SpriteAtlas:
   - FavoriteIconEmpty
   - GradientTopWhiteBottomTransparent
   - NotePlain
+  - '[icon]leader_crown'
   - LyricAreaVoiceButton
   - '[score]rating_1'
   - '[button]13'
