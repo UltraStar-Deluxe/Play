@@ -16,8 +16,6 @@ public class QuestionDialog : Dialog
     public bool noOnEscape = true;
     public bool focusYesOnStart = true;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     private void Start()
     {
         yesButton.OnClickAsObservable().Subscribe(_ =>
@@ -38,14 +36,14 @@ public class QuestionDialog : Dialog
 
         if (noOnEscape)
         {
-            disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-                .Subscribe(OnBack));
+            InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+                .Subscribe(OnBack)
+                .AddTo(gameObject);
         }
     }
 
     public void Close()
     {
-        disposables.ForEach(it => it.Dispose());
         Destroy(gameObject);
     }
     

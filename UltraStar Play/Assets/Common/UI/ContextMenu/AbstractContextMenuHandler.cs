@@ -48,15 +48,14 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     
     protected abstract void FillContextMenu(ContextMenu contextMenu);
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-
     public bool IsDrag { get; private set; }
     private Vector2 dragStartPosition;
     
     protected void Start()
     {
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
-            .Subscribe(CheckOpenContextMenuFromInputAction));
+        InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
+            .Subscribe(CheckOpenContextMenuFromInputAction)
+            .AddTo(gameObject);
     }
 
     protected virtual void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
@@ -104,11 +103,6 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
     private ContextMenu GetContextMenuPrefab()
     {
         return UiManager.Instance.contextMenuPrefab;
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 
     public void OnBeginDrag(PointerEventData eventData)

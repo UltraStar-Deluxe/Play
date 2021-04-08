@@ -31,14 +31,14 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
 
     private readonly List<SongSelectMicListEntry> listEntries = new List<SongSelectMicListEntry>();
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         UpdateListEntries();
         
         // Remove/add MicProfile when Client (dis)connects.
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(HandleClientConnectedEvent)
+            .AddTo(gameObject);
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -115,10 +115,5 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         {
             emptyListLabel.SetActive(true);
         }
-    }
-    
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

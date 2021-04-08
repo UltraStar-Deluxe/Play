@@ -45,15 +45,15 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     [Inject]
     private Settings settings;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         UpdateListEntries();
         LoadLastPlayerProfileToMicProfileMap();
         
         // Remove/add MicProfile when Client (dis)connects.
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(HandleClientConnectedEvent)
+            .AddTo(gameObject);
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -249,7 +249,6 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     {
         // Remember the currently assigned microphones
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
-        disposables.ForEach(it => it.Dispose());
     }
 
     public bool TrySelectNextControl()

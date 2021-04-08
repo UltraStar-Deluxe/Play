@@ -18,8 +18,6 @@ public class ContextMenu : AbstractPointerSensitivePopup
     public ContextMenuItem contextMenuItemPrefab;
     public ContextMenuSeparator contextMenuSeparatorPrefab;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-
     private bool wasNoButtonOrTouchPressed;
 
     public static List<ContextMenu> OpenContextMenus { get; private set; } = new List<ContextMenu>();
@@ -48,7 +46,7 @@ public class ContextMenu : AbstractPointerSensitivePopup
         transform.DestroyAllDirectChildren();
         
         // Close with next click or tap
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_closeContextMenu).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_closeContextMenu).PerformedAsObservable()
             .Subscribe(context =>
             {
                 // Only close when the mouse / touchscreen has been fully released in the mean time.
@@ -66,7 +64,8 @@ public class ContextMenu : AbstractPointerSensitivePopup
                 }
                 
                 CloseContextMenu();
-            }));
+            })
+            .AddTo(gameObject);
     }
 
     private void Start()
@@ -121,8 +120,6 @@ public class ContextMenu : AbstractPointerSensitivePopup
 
     private void OnDestroy()
     {
-        disposables.ForEach(it => it.Dispose());
-
         // Remove this ContextMenu from the list of opened ContextMenus only after all Input has been released
         // to avoid triggering additional actions (e.g. onClick of button).
         if (CoroutineManager.Instance != null)

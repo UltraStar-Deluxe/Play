@@ -51,8 +51,6 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
 
     private ISingSceneNoteDisplayer noteDisplayer;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-
     void Start()
     {
         // Show rating and score after each sentence
@@ -75,7 +73,9 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         // Show message when mic (dis)connects.
         if (micProfile != null && micProfile.IsInputFromConnectedClient)
         {
-            disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+            serverSideConnectRequestManager.ClientConnectedEventStream
+                .Subscribe(HandleClientConnectedEvent)
+                .AddTo(gameObject);
         }
 
         // Create effect when there are at least two perfect sentences in a row.
@@ -159,10 +159,5 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
                 singSceneNoteDisplayer.GetGameObject().SetActive(false);
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

@@ -10,8 +10,6 @@ public class WarningDialog : Dialog
 
     public bool focusOkButtonOnStart = true;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         okButton.OnClickAsObservable().Subscribe(_ => Close());
@@ -20,13 +18,13 @@ public class WarningDialog : Dialog
             okButton.Select();
         }
         
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(6)
-            .Subscribe(OnBack));
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(6)
+            .Subscribe(OnBack)
+            .AddTo(gameObject);
     }
 
     public void Close()
     {
-        disposables.ForEach(it => it.Dispose());
         Destroy(gameObject);
     }
 
