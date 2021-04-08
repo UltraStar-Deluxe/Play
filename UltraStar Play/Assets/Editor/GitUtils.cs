@@ -55,8 +55,9 @@ public static class GitUtils
 
         return output; // Return the output from git.
     }
-    
-    public static string GetCurrentCommitShortHash() {
+
+    public static string GetCurrentCommitShortHash()
+    {
         string result = RunGitCommand("rev-parse --short --verify HEAD");
         // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
         result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
