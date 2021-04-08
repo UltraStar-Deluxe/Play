@@ -30,18 +30,17 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
     
     public RectTransform targetRectTransform;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-
     protected virtual void Start()
     {
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
             .Subscribe(_ =>
             {
                 CancelDrag();
                 // Cancel other callbacks. To do so, this subscription has a higher priority. 
                 InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
-            }));
+            })
+            .AddTo(gameObject);
     }
 
     public void AddListener(IDragListener<EVENT> listener)
@@ -119,11 +118,6 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
                 action(listener);
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 
     abstract protected EVENT CreateDragEventStart(PointerEventData eventData);
