@@ -26,8 +26,11 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-            <ui:Label text="Version: xx.yy.zz" display-tooltip-when-elided="true" name="releaseInfoText" />
-            <ui:Label text="Build timestamp: yyMMddHHmm" display-tooltip-when-elided="true" name="buildInfoText" />
+            <ui:Label text="Version: xx.yy.zz" display-tooltip-when-elided="true" name="semanticVersionText" />
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                <ui:Label text="Commit: 5e07588" display-tooltip-when-elided="true" name="commitHashText" />
+                <ui:Label text="Build timestamp: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="NewVersionAvailableDialog" name="newVersionDialogRoot" class="overlay" style="display: none;" />
     </ui:VisualElement>
