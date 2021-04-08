@@ -53,8 +53,9 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         
         SongSelectMicListEntry matchingListEntry = listEntries.FirstOrDefault(listEntry => 
                listEntry.MicProfile != null
-            && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
-        if (connectionEvent.IsConnected && matchingListEntry == null)
+            && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId
+            && listEntry.MicProfile.IsEnabled);
+        if (connectionEvent.IsConnected && matchingListEntry == null && micProfile.IsEnabled)
         {
             // Add to UI
             CreateListEntry(micProfile);
