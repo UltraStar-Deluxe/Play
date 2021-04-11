@@ -59,9 +59,7 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         }
         else
         {
-            return micProfile.IsInputFromConnectedClient && micProfile.IsConnected
-                ? micProfile.Name + $"\n({micProfile.ConnectedClientId})"
-                : micProfile.Name;
+            return micProfile.Name;
         }
     }
 
