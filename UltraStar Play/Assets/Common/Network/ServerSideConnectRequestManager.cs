@@ -56,7 +56,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     /**
      * This version number must to be increased when introducing breaking changes.
      */
-    public const int ProtocolVersion = 1;
+    public const int ProtocolVersion = 2;
     
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
@@ -155,7 +155,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
             }
             if (connectRequestDto.ClientName.IsNullOrEmpty())
             {
-                throw new ConnectRequestException("Malformed ConnectRequest: missing clientName.");
+                throw new ConnectRequestException("Malformed ConnectRequest: missing ClientName.");
+            }
+            if (connectRequestDto.ClientId.IsNullOrEmpty())
+            {
+                throw new ConnectRequestException("Malformed ConnectRequest: missing ClientId.");
             }
 
             if (connectRequestDto.MicrophoneSampleRate > 0)
@@ -182,6 +186,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             ClientName = connectRequestDto.ClientName,
+            ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
         };
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
@@ -189,12 +194,13 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private void HandleClientMessageWithMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
-        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.MicrophoneSampleRate);
+        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId, connectRequestDto.MicrophoneSampleRate);
         clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
         
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             ClientName = connectRequestDto.ClientName,
+            ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
             MicrophonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
         };
@@ -235,16 +241,17 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private ConnectedClientHandler RegisterClient(
         IPEndPoint clientIpEndPoint,
         string clientName,
+        string clientId,
         int microphoneSampleRate)
     {
         // Dispose any currently registered client with the same IP-Address.
-        if (idToConnectedClientMap.TryGetValue(GetClientId(clientIpEndPoint), out ConnectedClientHandler existingConnectedClientHandler))
+        if (idToConnectedClientMap.TryGetValue(clientId, out ConnectedClientHandler existingConnectedClientHandler))
         {
             existingConnectedClientHandler.Dispose();
         }
         
-        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(this, clientIpEndPoint, clientName, microphoneSampleRate);
-        idToConnectedClientMap[GetClientId(clientIpEndPoint)] = connectedClientHandler;
+        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(this, clientIpEndPoint, clientName, clientId, microphoneSampleRate);
+        idToConnectedClientMap[clientId] = connectedClientHandler;
 
         Debug.Log("New number of connected clients: " + idToConnectedClientMap.Count);
         
@@ -259,10 +266,5 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     public static bool TryGetConnectedClientHandler(string clientIpEndPointId, out ConnectedClientHandler connectedClientHandler)
     {
         return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
-    }
-
-    public static string GetClientId(IPEndPoint clientIpEndPoint)
-    {
-        return clientIpEndPoint.Address.ToString();
     }
 }
