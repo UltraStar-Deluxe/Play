@@ -45,15 +45,15 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     [Inject]
     private Settings settings;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         UpdateListEntries();
         LoadLastPlayerProfileToMicProfileMap();
         
         // Remove/add MicProfile when Client (dis)connects.
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(HandleClientConnectedEvent)
+            .AddTo(gameObject);
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -109,6 +109,12 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
 
     private void UseMicProfileWhereNeeded(MicProfile micProfile)
     {
+        if (micProfile == null
+            || !micProfile.IsEnabled)
+        {
+            return;
+        }
+        
         SongSelectPlayerProfileListEntry listEntryWithMatchingMicProfile = listEntries.FirstOrDefault(it => 
                it.MicProfile != null
             && it.MicProfile.ConnectedClientId == micProfile.ConnectedClientId);
@@ -156,9 +162,15 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
 
     private List<MicProfile> FindUnusedMicProfiles()
     {
-        List<MicProfile> usedMicProfiles = listEntries.Where(it => it.MicProfile != null).Select(it => it.MicProfile).ToList();
-        List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).ToList();
-        List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles.Where(it => !usedMicProfiles.Contains(it)).ToList();
+        List<MicProfile> usedMicProfiles = listEntries.Where(it => it.MicProfile != null)
+            .Select(it => it.MicProfile)
+            .ToList();
+        List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles
+            .Where(it => it.IsEnabled && it.IsConnected)
+            .ToList();
+        List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
+            .Where(it => !usedMicProfiles.Contains(it))
+            .ToList();
         return unusedMicProfiles;
     }
 
@@ -249,7 +261,6 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     {
         // Remember the currently assigned microphones
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
-        disposables.ForEach(it => it.Dispose());
     }
 
     public bool TrySelectNextControl()

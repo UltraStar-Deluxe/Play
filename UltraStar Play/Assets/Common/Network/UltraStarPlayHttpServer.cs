@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
 
 public class UltraStarPlayHttpServer : HttpServer
@@ -19,7 +20,7 @@ public class UltraStarPlayHttpServer : HttpServer
             return;
         }
         
-        host = IpAddressUtils.GetIpAddress(AddressFamily.IPv4);
+        host = IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
         

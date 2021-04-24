@@ -89,8 +89,6 @@ public class EditorUiNote : MonoBehaviour,
 
     public Note Note { get; private set; }
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-
     private float lastClickTime;
     
     public void Init(Note note)
@@ -116,15 +114,15 @@ public class EditorUiNote : MonoBehaviour,
     void Start()
     {
         UpdateHandles();
-        disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
-            .Subscribe(_ => UpdateHandles()));
-        disposables.Add(noteArea.ViewportEventStream.Subscribe(_ => UpdateFontSize()));
-        disposables.Add(uiManager.MousePositionChangeEventStream.Subscribe(_ => OnMousePositionChanged()));
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
+        InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
+            .Subscribe(_ => UpdateHandles())
+            .AddTo(gameObject);
+        noteArea.ViewportEventStream
+            .Subscribe(_ => UpdateFontSize())
+            .AddTo(gameObject);
+        uiManager.MousePositionChangeEventStream
+            .Subscribe(_ => OnMousePositionChanged())
+            .AddTo(gameObject);
     }
 
     private void OnMousePositionChanged()

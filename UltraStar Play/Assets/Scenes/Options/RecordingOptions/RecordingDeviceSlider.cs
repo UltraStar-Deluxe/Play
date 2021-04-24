@@ -14,8 +14,6 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     protected override void Awake()
     {
         base.Awake();
@@ -25,8 +23,9 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
     protected override void Start()
     {
         base.Start();
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(UpdateMicProfileNames));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(UpdateMicProfileNames)
+            .AddTo(gameObject);
     }
 
     private void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
@@ -60,9 +59,7 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         }
         else
         {
-            return micProfile.IsInputFromConnectedClient && micProfile.IsConnected
-                ? micProfile.Name + $"\n({micProfile.ConnectedClientId})"
-                : micProfile.Name;
+            return micProfile.Name;
         }
     }
 
@@ -98,10 +95,5 @@ public class RecordingDeviceSlider : TextItemSlider<MicProfile>, INeedInjection
         }
 
         Items = micProfiles;
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }
