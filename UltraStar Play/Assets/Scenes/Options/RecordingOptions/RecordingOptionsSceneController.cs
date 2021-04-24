@@ -30,8 +30,6 @@ public class RecordingOptionsSceneController : MonoBehaviour, INeedInjection
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         recordingDeviceSlider.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
@@ -41,9 +39,10 @@ public class RecordingOptionsSceneController : MonoBehaviour, INeedInjection
         recordingDeviceSlider.Selection.Value = recordingDeviceSlider.Items[0];
         
         // Reselect recording device of connected client, when the client has now connected
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
+        serverSideConnectRequestManager.ClientConnectedEventStream
             .Where(clientConnectedEvent => recordingDeviceSlider.SelectedItem?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
-            .Subscribe(newValue => OnRecordingDeviceSelected(recordingDeviceSlider.SelectedItem)));
+            .Subscribe(newValue => OnRecordingDeviceSelected(recordingDeviceSlider.SelectedItem))
+            .AddTo(gameObject);
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool enabled)
@@ -91,10 +90,5 @@ public class RecordingOptionsSceneController : MonoBehaviour, INeedInjection
             recordingDeviceSlider.UpdateItems();
             recordingDeviceSlider.Selection.Value = recordingDeviceSlider.Items[0];
         }
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

@@ -41,12 +41,15 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
 
     [Inject(key = "#sceneSubtitle")]
     private Label sceneSubtitle;
-
-    [Inject(key = "#releaseInfoText")]
-    private Label releaseInfoText;
     
-    [Inject(key = "#buildInfoText")]
-    private Label buildInfoText;
+    [Inject(key = "#semanticVersionText")]
+    private Label semanticVersionText;
+    
+    [Inject(key = "#commitHashText")]
+    private Label commitHashText;
+    
+    [Inject(key = "#buildTimeStampText")]
+    private Label buildTimeStampText;
     
     private SimpleUxmlDialog closeGameDialog;
 
@@ -116,17 +119,21 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         versionProperties.TryGetValue("release", out string release);
         versionProperties.TryGetValue("name", out string releaseName);
         string displayName = releaseName.IsNullOrEmpty() ? release : releaseName;
-        releaseInfoText.text = "Version: " + displayName;
+        semanticVersionText.text = "Version: " + displayName;
 
+        // Show the commit hash of the build
+        versionProperties.TryGetValue("commit_hash", out string commitHash);
+        commitHashText.text = "Commit: " + commitHash;
+        
         // Show the build timestamp only for development builds
         if (Debug.isDebugBuild)
         {
             versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-            buildInfoText.text = "Build: " + buildTimeStamp;
+            buildTimeStampText.text = "Build timestamp: " + buildTimeStamp;
         }
         else
         {
-            buildInfoText.text = "";
+            buildTimeStampText.text = "";
         }
     }
 

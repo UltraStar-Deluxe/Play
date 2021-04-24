@@ -28,8 +28,6 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
 
     public string character;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     public bool Interactable
     {
         get
@@ -51,9 +49,10 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
         this.ObserveEveryValueChanged(me => me.character).WhereNotNull()
             .Subscribe(newCharacter => uiText.text = newCharacter.ToUpperInvariant());
 
-        disposables.Add(InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Where(_ => eventSystem.currentSelectedGameObject == UiButton.gameObject)
-            .Subscribe(_ => DoCharacterQuickJump()));
+            .Subscribe(_ => DoCharacterQuickJump())
+            .AddTo(gameObject);
     }
 
     private void DoCharacterQuickJump()
@@ -66,10 +65,5 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
                 songRouletteController.SelectSong(match);
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

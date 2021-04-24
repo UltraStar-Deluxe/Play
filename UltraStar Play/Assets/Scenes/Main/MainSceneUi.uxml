@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="NewVersionAvailableDialog" src="/Assets/Scenes/UIDocuments/NewVersionAvailableDialog.uxml" />
     <Style src="/Assets/Scenes/MainStyles.uss" />
-    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg&apos;);">
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg#[bg-main]blue_plain&apos;);">
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
             <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
                 <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;/Assets/Common/Graphics/Icons/[icon]main.png&apos;);" />
+                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;/Assets/Common/Graphics/Icons/[icon]main.png#[icon]main&apos;);" />
                     <ui:VisualElement name="titleAndDescription">
                         <ui:Label text="Main Menu" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
                         <ui:Label text="Button description" display-tooltip-when-elided="true" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
@@ -26,8 +26,11 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-            <ui:Label text="Build: yyMMddHHmm" display-tooltip-when-elided="true" name="buildInfoText" />
-            <ui:Label text="Release: yyyy-MM-dd" display-tooltip-when-elided="true" name="releaseInfoText" />
+            <ui:Label text="Version: xx.yy.zz" display-tooltip-when-elided="true" name="semanticVersionText" />
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                <ui:Label text="Commit: 5e07588" display-tooltip-when-elided="true" name="commitHashText" />
+                <ui:Label text="Build timestamp: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="NewVersionAvailableDialog" name="newVersionDialogRoot" class="overlay" style="display: none;" />
     </ui:VisualElement>

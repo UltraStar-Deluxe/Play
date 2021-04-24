@@ -18,13 +18,12 @@ public class ConnectedClientCountText : MonoBehaviour, INeedInjection
     [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     private void Start()
     {
         UpdateConnectedClientCountText();
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(_ => UpdateConnectedClientCountText()));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(_ => UpdateConnectedClientCountText())
+            .AddTo(gameObject);
     }
 
     private void UpdateConnectedClientCountText()
@@ -36,10 +35,5 @@ public class ConnectedClientCountText : MonoBehaviour, INeedInjection
             : "";
         uiText.text = $"Connected Clients: {ServerSideConnectRequestManager.ConnectedClientCount}\n"
             + connectedClientNamesCsv;
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

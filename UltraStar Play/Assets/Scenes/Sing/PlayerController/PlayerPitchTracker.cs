@@ -62,17 +62,16 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     private Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new Subject<SentenceAnalyzedEvent>();
     public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         // Restart recording if companion app for mic input has reconnected
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream
+        serverSideConnectRequestManager.ClientConnectedEventStream
             .Where(clientConnectionEvent => clientConnectionEvent.IsConnected
                                             && !micSampleRecorder.IsRecording
                                             && micProfile != null
                                             && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
-            .Subscribe(_ => micSampleRecorder.StartRecording()));
+            .Subscribe(_ => micSampleRecorder.StartRecording())
+            .AddTo(gameObject);
         
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
@@ -392,10 +391,5 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
             Sentence = sentence;
             IsLastSentence = isLastSentence;
         }
-    }
-
-    private void OnDestroy()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

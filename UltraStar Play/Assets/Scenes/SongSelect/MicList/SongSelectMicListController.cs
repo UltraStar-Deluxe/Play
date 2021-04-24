@@ -31,14 +31,14 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
 
     private readonly List<SongSelectMicListEntry> listEntries = new List<SongSelectMicListEntry>();
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
-    
     void Start()
     {
         UpdateListEntries();
         
         // Remove/add MicProfile when Client (dis)connects.
-        disposables.Add(serverSideConnectRequestManager.ClientConnectedEventStream.Subscribe(HandleClientConnectedEvent));
+        serverSideConnectRequestManager.ClientConnectedEventStream
+            .Subscribe(HandleClientConnectedEvent)
+            .AddTo(gameObject);
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -53,8 +53,9 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         
         SongSelectMicListEntry matchingListEntry = listEntries.FirstOrDefault(listEntry => 
                listEntry.MicProfile != null
-            && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
-        if (connectionEvent.IsConnected && matchingListEntry == null)
+            && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId
+            && listEntry.MicProfile.IsEnabled);
+        if (connectionEvent.IsConnected && matchingListEntry == null && micProfile.IsEnabled)
         {
             // Add to UI
             CreateListEntry(micProfile);
@@ -64,12 +65,6 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
             // Remove from UI
             RemoveListEntry(matchingListEntry);
         }
-    }
-
-    private void RemoveListEntry(SongSelectMicListEntry listEntry)
-    {
-        Destroy(listEntry.gameObject);
-        listEntries.Remove(listEntry);
     }
 
     public void OnHotSwapFinished()
@@ -109,10 +104,17 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
         listEntry.MicProfile = micProfile;
 
         listEntries.Add(listEntry);
+        
+        emptyListLabel.SetActive(false);
     }
 
-    private void OnDestroy()
+    private void RemoveListEntry(SongSelectMicListEntry listEntry)
     {
-        disposables.ForEach(it => it.Dispose());
+        Destroy(listEntry.gameObject);
+        listEntries.Remove(listEntry);
+        if (listEntries.IsNullOrEmpty())
+        {
+            emptyListLabel.SetActive(true);
+        }
     }
 }

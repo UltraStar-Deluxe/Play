@@ -10,8 +10,8 @@ public class ConnectedClientHandler : IDisposable
 
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
+    public string ClientId { get; private set; }
     public TcpListener MicTcpListener { get; private set; }
-    public string ClientId => ServerSideConnectRequestManager.GetClientId(ClientIpEndPoint);
     public int SampleRateHz => micSampleBuffer.Length;
     
     private bool isDisposed;
@@ -31,15 +31,19 @@ public class ConnectedClientHandler : IDisposable
     private readonly Thread receiveDataThread;
     private readonly Thread clientStillAliveCheckThread;
     
-    public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, int microphoneSampleRate)
+    public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, string clientId, int microphoneSampleRate)
     {
         this.serverSideConnectRequestManager = serverSideConnectRequestManager;
         ClientIpEndPoint = clientIpEndPoint;
         ClientName = clientName;
+        ClientId = clientId;
+        if (ClientId.IsNullOrEmpty())
+        {
+            throw new ArgumentException("Attempt to create ConnectedClientHandler without ClientId");
+        }
         if (microphoneSampleRate <= 0)
         {
-            Debug.LogWarning("Attempt to create ConnectedClientHandler without microphoneSampleRate");
-            return;
+            throw new ArgumentException("Attempt to create ConnectedClientHandler without microphoneSampleRate");
         }
 
         micSampleBuffer = new float[microphoneSampleRate];
