@@ -7,16 +7,19 @@ using UniInject;
 
 public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
 {
+    [Inject]
+    private I18NManager i18nManager;
+    
     protected override void Start()
     {
         base.Start();
-        Items = EnumUtils.GetValuesAsList<SystemLanguage>();
+        Items = i18nManager.GetTranslatedLanguages();
         SystemLanguage currentLanguage = SettingsManager.Instance.Settings.GameSettings.language;
-        Selection.Value = currentLanguage;
+        Selection.Value = Items.Contains(currentLanguage) ? currentLanguage : SystemLanguage.English;
         Selection.Subscribe(newValue =>
         {
             SettingsManager.Instance.Settings.GameSettings.language = newValue;
-            I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
+            i18nManager.UpdateCurrentLanguageAndTranslations();
         });
     }
 
