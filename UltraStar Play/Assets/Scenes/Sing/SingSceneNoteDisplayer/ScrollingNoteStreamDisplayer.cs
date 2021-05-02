@@ -115,7 +115,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         lyricsRectTransform.anchorMax = new Vector2(lyricsRectTransform.anchorMax.x, 1);
         lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
         lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
-        uiNote.lyricsUiText.transform.SetParent(uiNote.RectTransform, true);
+        uiNote.lyricsUiText.transform.SetParent(lyricsBar, true);
     }
 
     private double GetNoteStartBeatOfFollowingNote(Note note)
@@ -152,7 +152,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     {
         foreach (UiNote uiNote in noteToUiNoteMap.Values)
         {
+            Vector3 lastPosition = uiNote.RectTransform.position;
             PositionUiNote(uiNote.RectTransform, uiNote.Note.MidiNote, uiNote.Note.StartBeat, uiNote.Note.EndBeat);
+            Vector3 positionDelta = uiNote.RectTransform.position - lastPosition;
+            uiNote.lyricsUiTextRectTransform.Translate(positionDelta);
         }
 
         foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
