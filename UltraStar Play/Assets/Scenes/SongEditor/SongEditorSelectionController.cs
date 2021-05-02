@@ -34,6 +34,12 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         return new List<Note>(selectedNotes);
     }
 
+    public bool HasSelectedNotes()
+    {
+        return selectedNotes != null
+               && selectedNotes.Count > 0;
+    }
+    
     public bool IsSelected(Note note)
     {
         return selectedNotes.Contains(note);
