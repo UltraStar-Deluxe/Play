@@ -42,6 +42,9 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
 
     [Inject]
+    private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
+
+    [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject]
@@ -182,6 +185,11 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         {
             contextMenu.AddItem("Move to player 2",
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceName));
+        }
+
+        if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
+        {
+            contextMenu.AddItem("Move to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
     }
 
