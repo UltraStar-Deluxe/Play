@@ -336,13 +336,17 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             && (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             && selectionController.GetSelectedNotes().IsNullOrEmpty())
         {
+            int stepInMillis = InputUtils.IsKeyboardShiftPressed()
+                ? 1
+                : 10;
+            
             if (Keyboard.current.leftArrowKey.isPressed)
             {
-                songAudioPlayer.PositionInSongInMillis -= 1;
+                songAudioPlayer.PositionInSongInMillis -= stepInMillis;
             }
             else if (Keyboard.current.rightArrowKey.isPressed)
             {
-                songAudioPlayer.PositionInSongInMillis += 1;
+                songAudioPlayer.PositionInSongInMillis += stepInMillis;
             }
         }
         
