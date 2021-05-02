@@ -393,7 +393,7 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
             return Voice.soloVoiceName;
         }
 
-        List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Values);
+        List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Keys);
         int voiceNameCount = voiceNames.Count;
         if (voiceNameCount > 1)
         {
