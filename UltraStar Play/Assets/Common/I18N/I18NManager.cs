@@ -218,4 +218,21 @@ public class I18NManager : MonoBehaviour, INeedInjection
         path = ApplicationUtils.GetStreamingAssetsPath(path);
         return path;
     }
+    
+    public List<SystemLanguage> GetTranslatedLanguages()
+    {
+        HashSet<SystemLanguage> translatedLanguages = new HashSet<SystemLanguage> { SystemLanguage.English };
+        foreach (SystemLanguage systemLanguage in EnumUtils.GetValuesAsList<SystemLanguage>())
+        {
+            string suffix = GetCountryCodeSuffixForPropertiesFile(systemLanguage);
+            string propertiesFilePath = GetPropertiesFilePath(PropertiesFileName + suffix);
+            if (File.Exists(propertiesFilePath))
+            {
+                translatedLanguages.Add(systemLanguage);
+            }
+        }
+        return translatedLanguages
+            .OrderBy(it => it.ToString())
+            .ToList();
+    }
 }
