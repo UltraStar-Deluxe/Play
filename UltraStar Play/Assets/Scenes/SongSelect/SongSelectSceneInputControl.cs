@@ -108,13 +108,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnNavigate(InputAction.CallbackContext context)
     {   
-        if (context.ReadValue<Vector2>().x > 0
-            && !songSelectSceneController.IsSearchEnabled()) 
+        if (context.ReadValue<Vector2>().x > 0) 
         {
             songRouletteController.SelectNextSong();
         }
-        if (context.ReadValue<Vector2>().x < 0
-            && !songSelectSceneController.IsSearchEnabled())
+        if (context.ReadValue<Vector2>().x < 0)
         {
             songRouletteController.SelectPreviousSong();
         }
