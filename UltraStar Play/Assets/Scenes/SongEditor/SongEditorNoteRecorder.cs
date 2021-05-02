@@ -169,7 +169,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void CreateNewRecordedNote(int midiNote, int currentBeat, ESongEditorLayer targetLayer)
     {
-        lastRecordedNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, " ");
+        lastRecordedNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, "");
         songEditorLayerManager.AddNoteToLayer(targetLayer, lastRecordedNote);
 
         // EndBeat of new note is currentBeat + 1. Overwrite notes that start before this beat.
