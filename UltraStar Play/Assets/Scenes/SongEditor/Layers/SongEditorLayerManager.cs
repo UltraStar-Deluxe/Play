@@ -17,6 +17,9 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
+    [Inject]
+    private Settings settings;
+    
     public void OnSceneInjectionFinished()
     {
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
@@ -24,21 +27,14 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
-        if (!(changeEvent is MovedNotesToVoiceEvent))
+        if (changeEvent is MovedNotesToVoiceEvent mntve)
         {
-            return;
-        }
-
-        IReadOnlyCollection<Note> notes = (changeEvent as MovedNotesToVoiceEvent).notes;
-        foreach (Note note in notes)
-        {
-            if (note.Sentence != null)
-            {
-                RemoveNoteFromAllLayers(note);
-            }
+            mntve.notes
+                .Where(note => note.Sentence != null)
+                .ForEach(note => RemoveNoteFromAllLayers(note));
         }
     }
-
+    
     public void AddNoteToLayer(ESongEditorLayer layerKey, Note note)
     {
         layerKeyToLayerMap[layerKey].AddNote(note);
@@ -106,5 +102,11 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             layer.RemoveNote(note);
         }
+    }
+
+    public bool IsVisible(Note note)
+    {
+        return note.Sentence?.Voice == null
+            || !settings.SongEditorSettings.HideVoices.Contains(note.Sentence.Voice.Name);
     }
 }

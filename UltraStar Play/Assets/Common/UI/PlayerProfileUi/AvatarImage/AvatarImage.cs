@@ -17,24 +17,28 @@ public class AvatarImage : MonoBehaviour, INeedInjection, IExcludeFromSceneInjec
     [Inject(optional = true)]
     private MicProfile micProfile;
 
-    public void SetPlayerProfile(PlayerProfile playerProfile)
-    {
-        AvatarImageReference imageRef = FindObjectsOfType<AvatarImageReference>().Where(it => it.avatar == playerProfile.Avatar).FirstOrDefault();
-        if (imageRef != null)
-        {
-            image.sprite = imageRef.Sprite;
-        }
-        else
-        {
-            Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
-        }
-    }
-
+    [Inject(optional = true)]
+    private PlayerProfile playerProfile;
+    
     public void OnInjectionFinished()
     {
         if (micProfile != null)
         {
             image.color = micProfile.Color;
+        }
+
+        if (playerProfile != null)
+        {
+            AvatarImageReference imageRef = FindObjectsOfType<AvatarImageReference>()
+                .FirstOrDefault(it => it.avatar == playerProfile.Avatar);
+            if (imageRef != null)
+            {
+                image.sprite = imageRef.Sprite;
+            }
+            else
+            {
+                Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
+            }
         }
     }
 }

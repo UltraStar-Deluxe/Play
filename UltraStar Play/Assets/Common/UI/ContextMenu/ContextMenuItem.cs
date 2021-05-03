@@ -42,7 +42,6 @@ public class ContextMenuItem : MonoBehaviour
         {
             actionSubscriptionDisposable = button.OnClickAsObservable().Subscribe(_ =>
             {
-                Debug.Log("ContextMenuItem triggered");
                 action();
                 ContextMenu.CloseContextMenu();
             });

@@ -78,7 +78,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
                 .Subscribe(_ => UpdateNotes());
         }
 
-        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.HideVoices.Count).Subscribe(_ => OnHideVoicesChanged());
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.HideVoices.Count)
+            .Subscribe(_ => OnHideVoicesChanged())
+            .AddTo(this);
     }
 
     private void OnHideVoicesChanged()
@@ -182,7 +185,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
 
     public void UpdateNotes()
     {
-        if (!gameObject.activeInHierarchy)
+        if (gameObject == null 
+            || !gameObject.activeInHierarchy)
         {
             return;
         }

@@ -23,7 +23,9 @@ public static class LanguageHelper
             case SystemLanguage.Belarusian: return "BY";
             case SystemLanguage.Bulgarian: return "BG";
             case SystemLanguage.Catalan: return "CA";
-            case SystemLanguage.Chinese: return "ZH";
+            case SystemLanguage.Chinese:
+            case SystemLanguage.ChineseSimplified:
+            case SystemLanguage.ChineseTraditional: return "ZH";
             case SystemLanguage.Czech: return "CS";
             case SystemLanguage.Danish: return "DA";
             case SystemLanguage.Dutch: return "NL";

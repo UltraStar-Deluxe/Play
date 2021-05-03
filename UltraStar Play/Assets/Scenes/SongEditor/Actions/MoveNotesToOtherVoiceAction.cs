@@ -21,6 +21,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
     public void MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
     {
         Voice voice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
+        Sentence createdSentence = null;
         List<Sentence> changedSentences = new List<Sentence>();
         foreach (Note note in selectedNotes)
         {
@@ -35,9 +36,14 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                 {
                     sentenceForNote = new Sentence(note.Sentence.MinBeat, note.Sentence.MaxBeat);
                 }
+                else if (createdSentence != null)
+                {
+                    sentenceForNote = createdSentence;
+                }
                 else
                 {
-                    sentenceForNote = new Sentence();
+                    createdSentence = new Sentence();
+                    sentenceForNote = createdSentence;
                 }
                 sentenceForNote.SetVoice(voice);
             }

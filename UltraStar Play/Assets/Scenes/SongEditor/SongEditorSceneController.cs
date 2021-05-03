@@ -200,6 +200,18 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         result.AddRange(notesInLayers);
         return result;
     }
+    
+    public List<Note> GetAllVisibleNotes()
+    {
+        List<Note> result = new List<Note>();
+        List<Note> notesInVoices = SongMetaUtils.GetAllNotes(SongMeta)
+            .Where(note => songEditorLayerManager.IsVisible(note))
+            .ToList();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        result.AddRange(notesInVoices);
+        result.AddRange(notesInLayers);
+        return result;
+    }
 
     private void CreateVoiceToColorMap()
     {

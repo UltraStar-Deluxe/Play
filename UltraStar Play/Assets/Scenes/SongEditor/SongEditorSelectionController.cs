@@ -27,6 +27,9 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private SongEditorLayerManager layerManager;
+    
     private readonly NoteHashSet selectedNotes = new NoteHashSet();
 
     public List<Note> GetSelectedNotes()
@@ -34,6 +37,12 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         return new List<Note>(selectedNotes);
     }
 
+    public bool HasSelectedNotes()
+    {
+        return selectedNotes != null
+               && selectedNotes.Count > 0;
+    }
+    
     public bool IsSelected(Note note)
     {
         return selectedNotes.Contains(note);
@@ -51,7 +60,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
     public void SelectAll()
     {
-        List<Note> allNotes = songEditorSceneController.GetAllNotes();
+        List<Note> allNotes = songEditorSceneController.GetAllVisibleNotes();
         SetSelection(allNotes);
     }
 
@@ -85,6 +94,10 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         ClearSelection();
         foreach (Note note in notes)
         {
+            if (!layerManager.IsVisible(note))
+            {
+                continue;
+            }
             selectedNotes.Add(note);
 
             EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
@@ -135,7 +148,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneController.GetAllNotes();
+        List<Note> notes = songEditorSceneController.GetAllVisibleNotes();
         int maxEndBeat = selectedNotes.Select(it => it.EndBeat).Max();
 
         // Find the next note, i.e., the note right of maxEndBeat with the smallest distance to it.
@@ -174,7 +187,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneController.GetAllNotes();
+        List<Note> notes = songEditorSceneController.GetAllVisibleNotes();
         int minStartBeat = selectedNotes.Select(it => it.StartBeat).Min();
 
         // Find the previous note, i.e., the note left of minStartBeat with the smallest distance to it.

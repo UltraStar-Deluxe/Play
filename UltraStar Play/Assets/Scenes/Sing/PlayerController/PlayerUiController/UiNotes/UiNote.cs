@@ -57,6 +57,7 @@ public class UiNote : MonoBehaviour
     void OnDestroy()
     {
         DestroyStars();
+        DestroyLyrics();
     }
 
     public void SetColorOfMicProfile(MicProfile micProfile)
@@ -100,6 +101,20 @@ public class UiNote : MonoBehaviour
         stars.Clear();
     }
 
+    private void DestroyLyrics()
+    {
+        if (lyricsUiText != null
+            && lyricsUiText.gameObject != null)
+        {
+            Destroy(lyricsUiText.gameObject);
+        }
+        if (lyricsUiTextRectTransform != null
+            && lyricsUiTextRectTransform.gameObject != null)
+        {
+            Destroy(lyricsUiTextRectTransform.gameObject);
+        }
+    }
+    
     private void CreateGoldenNoteEffect()
     {
         // Create several particles. Longer notes require more particles because they have more space to fill.

@@ -34,6 +34,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private EventSystem eventSystem;
 
+    [Inject]
+    private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
+    
     private Voice copiedVoice;
 
     public List<Note> CopiedNotes
@@ -57,6 +60,16 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Subscribe(_ => PasteCopiedNotes());
+        
+        // Cancel copy
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(SongEditorSceneInputControl.cancelCopyPriority)
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => HasCopiedNotes())
+            .Subscribe(_ =>
+            {
+                ClearCopiedNotes();
+                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+            });
     }
 
     private void MoveCopiedNotesToMillisInSong(double newMillis)
@@ -84,11 +97,23 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     private void ClearCopiedNotes()
     {
+        List<Note> notes = layerManager.GetNotes(ESongEditorLayer.CopyPaste);
+        notes.ForEach(note => editorNoteDisplayer.DeleteNote(note));
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
     }
 
+    public bool HasCopiedNotes()
+    {
+        return !layerManager.GetNotes(ESongEditorLayer.CopyPaste).IsNullOrEmpty();
+    }
+    
     public void PasteCopiedNotes()
     {
+        if (!HasCopiedNotes())
+        {
+            return;
+        }
+        
         int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
         Sentence sentenceAtBeatWithVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, minBeat)
             .Where(it => it.Voice != null).FirstOrDefault();
@@ -109,30 +134,10 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
 
         // Add the notes to the voice
-        foreach (Note note in CopiedNotes)
-        {
-            InsertNote(note, voice);
-        }
+        moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, CopiedNotes, voice.Name);
         ClearCopiedNotes();
 
         songMetaChangeEventStream.OnNext(new NotesAddedEvent());
-    }
-
-    private void InsertNote(Note note, Voice voice)
-    {
-        Sentence sentenceAtBeatOfVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, note.StartBeat)
-            .Where(sentence => sentence.Voice == voice).FirstOrDefault();
-        if (sentenceAtBeatOfVoice == null)
-        {
-            // Add sentence with note
-            Sentence newSentence = new Sentence(new List<Note> { note }, note.EndBeat);
-            newSentence.SetVoice(voice);
-        }
-        else
-        {
-            // Add note to existing sentence
-            note.SetSentence(sentenceAtBeatOfVoice);
-        }
     }
 
     public void CopySelectedNotes()
@@ -155,7 +160,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             layerManager.AddNoteToLayer(ESongEditorLayer.CopyPaste, noteCopy);
         }
 
-        selectionController.SetSelection(CopiedNotes);
+        selectionController.ClearSelection();
 
         editorNoteDisplayer.UpdateNotes();
     }
