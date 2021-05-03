@@ -46,8 +46,9 @@ public static class SongMetaUtils
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
     {
         Voice matchingVoice = songMeta.GetVoices()
-            .Where(it => it.Name == voiceName || (voiceName.IsNullOrEmpty() && it.Name == Voice.soloVoiceName))
-            .FirstOrDefault();
+            .FirstOrDefault(voice => voice.Name == voiceName
+                                     || (voiceName.IsNullOrEmpty() && voice.Name == Voice.firstVoiceName)
+                                     || (voiceName == Voice.firstVoiceName && voice.Name.IsNullOrEmpty()));
         if (matchingVoice != null)
         {
             return matchingVoice;

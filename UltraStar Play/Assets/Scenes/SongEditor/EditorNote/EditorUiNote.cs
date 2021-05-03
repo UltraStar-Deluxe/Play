@@ -109,6 +109,7 @@ public class EditorUiNote : MonoBehaviour,
             Color color = songEditorSceneController.GetColorForVoice(Note.Sentence.Voice);
             SetColor(color);
         }
+        UpdateFontSize();
     }
 
     void Start()

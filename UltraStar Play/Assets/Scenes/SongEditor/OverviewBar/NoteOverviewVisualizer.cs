@@ -77,6 +77,11 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInjec
     private void DrawNotes(int songDurationInMillis, SongMeta songMeta, Voice voice, Color color)
     {
         List<Note> notes = voice.Sentences.SelectMany(sentence => sentence.Notes).ToList();
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         // constant offset to
         // (a) ensure that midiNoteRange > 0,
         // (b) have some space to the border of the texture.
