@@ -7,7 +7,7 @@
         "UniRx",
         "UniInject",
 		"MLAPI",
-		"SimpleHttpServerForUnity",
+		"com.achimmihca.simplehttpserverforunity",
         "Unity.TextMeshPro",
         "UnityEngine.UIElementsModule",
         "UnityEngine.UIElementsGameObjectsModule",

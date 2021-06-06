@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.achimmihca.simplehttpserverforunity": {
+      "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#dca59973cd6eccc68f353d1489b50196c926e665",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
