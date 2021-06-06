@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UniInject;
 using UnityEngine.EventSystems;
+using ProTrans;
 
 public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -42,7 +43,7 @@ public class TooltipHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (!i18nKey.IsNullOrEmpty()
             && tooltipText.IsNullOrEmpty())
         {
-            tooltipText = I18NManager.GetTranslation(i18nKey);
+            tooltipText = TranslationManager.GetTranslation(i18nKey);
         }
     }
 

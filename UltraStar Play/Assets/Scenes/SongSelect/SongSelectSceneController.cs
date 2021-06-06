@@ -10,6 +10,7 @@ using System.Threading;
 using System.IO;
 using System;
 using TMPro;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -239,8 +240,8 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
             UiManager.Instance.CreateWarningDialog(
-                I18NManager.GetTranslation(R.String.songSelectScene_noPlayerSelected_title),
-                I18NManager.GetTranslation(R.String.songSelectScene_noPlayerSelected_message));
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title),
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
             return null;
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -37,7 +38,7 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist)
         {
-            return I18NManager.GetTranslation(R.String.filter_allSongs);
+            return TranslationManager.GetTranslation(R.Messages.filter_allSongs);
         }
         else
         {

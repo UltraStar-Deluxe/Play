@@ -1,11 +1,18 @@
 {
   "dependencies": {
     "com.achimmihca.primeinputactions": {
-      "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#3e338c7cbf22ac7df71d3949ee94855720899e59",
+      "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
       "hash": "3e338c7cbf22ac7df71d3949ee94855720899e59"
+    },
+    "com.achimmihca.protrans": {
+      "version": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#v1.0.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9d50e260346432ca05b6508b09e21f530ba3bae0"
     },
     "com.achimmihca.simplehttpserverforunity": {
       "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",

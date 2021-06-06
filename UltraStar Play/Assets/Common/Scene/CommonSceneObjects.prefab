@@ -472,9 +472,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4190377001124415443}
   - component: {fileID: 4353274562695227665}
+  - component: {fileID: 4981419925086120133}
   m_Layer: 0
-  m_Name: I18NManager
-  m_TagString: I18NManager
+  m_Name: TranslationManager
+  m_TagString: TranslationManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -505,9 +506,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9568d536d865a945b0c564a5a1c07c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logInfo: 1
-  isOverwriteLanguage: 0
-  overwriteLanguage: 10
+  propertiesFolderRelativeToResourcesFolder: Translations
+  propertiesFileName: messages
+  logInfoInEditMode: 0
+  logInfoInPlayMode: 1
+  generatedConstantsFolder: Assets/Common/R
+  generateConstantsOnResourceChange: 1
+  useFallbackIfNotInCurrentLanguage: 1
+  currentLanguage: 10
+  defaultPropertiesFileLanguage: 10
+--- !u!114 &4981419925086120133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102298807685021119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e3eb005d367f354988932948bc73960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1182483571995992771
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,7 +1855,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onlyInjectScriptsWithMarkerInterface: 1
-  logTime: 1
+  logTime: 0
 --- !u!1 &6032929594356007782
 GameObject:
   m_ObjectHideFlags: 0

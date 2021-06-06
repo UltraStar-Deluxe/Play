@@ -1,7 +1,7 @@
 ﻿// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.
 public static partial class R
 {
-    public static class String
+    public static class Messages
     {
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_exitSong = "action_exitSong";

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UniRx;
 using PrimeInputActions;
+using ProTrans; 
 
 public class LoadingSceneController : MonoBehaviour
 {
@@ -36,7 +37,7 @@ public class LoadingSceneController : MonoBehaviour
         AndroidStreamingAssets.Extract();
 
         // Wait for Theme and I18N resources
-        I18NManager.Instance.UpdateCurrentLanguageAndTranslations();
+        TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
         ThemeManager.Instance.ReloadThemes();
 
         FinishScene();
