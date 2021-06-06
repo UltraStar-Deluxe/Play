@@ -14,7 +14,7 @@ git remote add origin https://github.com/serilog/serilog.git
 git config core.sparsecheckout true
 echo "LICENSE" >> .git/info/sparse-checkout
 echo "src/Serilog/*" >> .git/info/sparse-checkout
-git pull --depth=200 origin master
+git pull --depth=500 origin main
 # Commit from 13 October 2019 (release 2.9.0): 655778f74384f682d2c8705ab4883c39ef17e44d
 git checkout 655778f74384f682d2c8705ab4883c39ef17e44d
 
