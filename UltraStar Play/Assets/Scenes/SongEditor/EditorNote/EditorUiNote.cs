@@ -9,6 +9,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using PrimeInputActions;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649

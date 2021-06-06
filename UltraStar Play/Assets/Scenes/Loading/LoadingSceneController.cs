@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UniRx;
+using PrimeInputActions;
 
 public class LoadingSceneController : MonoBehaviour
 {

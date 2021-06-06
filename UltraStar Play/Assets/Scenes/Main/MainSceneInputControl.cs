@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

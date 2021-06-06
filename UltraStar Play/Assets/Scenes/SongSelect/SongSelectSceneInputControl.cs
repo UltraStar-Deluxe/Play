@@ -6,6 +6,7 @@ using UniInject;
 using UnityEngine.EventSystems;
 using UniRx;
 using UnityEngine.InputSystem;
+using PrimeInputActions;
 
 #pragma warning disable CS0649
 

@@ -53,6 +53,7 @@
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
     "com.achimmihca.uniinject": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v1.0.0",
+    "com.achimmihca.primeinputactions": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#3e338c7cbf22ac7df71d3949ee94855720899e59",
     "com.achimmihca.simplehttpserverforunity": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0"
   }
 }
