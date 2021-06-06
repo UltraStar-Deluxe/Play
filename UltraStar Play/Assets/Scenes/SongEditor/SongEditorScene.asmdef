@@ -4,7 +4,7 @@
     "references": [
         "Plugins",
         "UniRx",
-        "UniInject",
+        "com.achimmihca.uniinject",
         "Common",
         "Unity.TextMeshPro",
         "Unity.InputSystem"

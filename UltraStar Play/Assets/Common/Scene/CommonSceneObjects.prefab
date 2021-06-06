@@ -1810,7 +1810,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5675655531140774825}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 179.8129, y: -26.477509, z: -440.07968}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8069444317427349030}
@@ -1825,11 +1825,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5675655531140774825}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73da825f684a4eb44aada2756bdb6549, type: 3}
+  m_Script: {fileID: 11500000, guid: 4da9e59d126f9424c8aab18761b8a434, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onlyInjectScriptsWithMarkerInterface: 1
-  logTime: 0
+  logTime: 1
 --- !u!1 &6032929594356007782
 GameObject:
   m_ObjectHideFlags: 0
