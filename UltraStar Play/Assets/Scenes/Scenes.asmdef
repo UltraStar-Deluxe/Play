@@ -5,7 +5,7 @@
         "Serilog",
         "Plugins",
         "UniRx",
-        "UniInject",
+        "com.achimmihca.uniinject",
         "Common",
 		"com.achimmihca.simplehttpserverforunity",
         "Unity.TextMeshPro",
