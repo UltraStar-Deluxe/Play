@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -25,6 +26,6 @@ public class OrderSlider : TextItemSlider<ESongOrder>, INeedInjection
 
     protected override string GetDisplayString(ESongOrder value)
     {
-        return $"{I18NManager.GetTranslation(R.String.order)}: {I18NManager.GetTranslation("order_" + value.ToString())}";
+        return $"{TranslationManager.GetTranslation(R.Messages.order)}: {TranslationManager.GetTranslation("order_" + value.ToString())}";
     }
 }

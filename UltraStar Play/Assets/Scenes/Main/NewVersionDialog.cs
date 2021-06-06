@@ -8,6 +8,7 @@ using UniInject;
 using UniRx;
 using UnityEngine.Networking;
 using System.Text.RegularExpressions;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -84,9 +85,9 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
     public void UpdateTranslation()
     {
         string displayName = releaseName.IsNullOrEmpty() ? remoteRelease : releaseName;
-        dialogMessage.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink);
-        dialogTitle.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_title);
-        ignoreThisVersionButton.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_ignoreThisVersion);
-        ignoreAllFutureVersionsButton.text = I18NManager.GetTranslation(R.String.newVersionAvailableDialog_ignoreAllFutureVersions);
+        dialogMessage.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink);
+        dialogTitle.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_title);
+        ignoreThisVersionButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
+        ignoreAllFutureVersionsButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);
     }
 }

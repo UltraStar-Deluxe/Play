@@ -2,6 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UniInject;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -22,7 +23,7 @@ public class MenuButtonDescriptionSelectHandler : MonoBehaviour, ISelectHandler,
 
         string description = buttonDescriptionI18nKey.IsNullOrEmpty()
             ? ""
-            : I18NManager.GetTranslation(buttonDescriptionI18nKey);
+            : TranslationManager.GetTranslation(buttonDescriptionI18nKey);
         uiButtonDescriptionText.SetText(description);
     }
 }

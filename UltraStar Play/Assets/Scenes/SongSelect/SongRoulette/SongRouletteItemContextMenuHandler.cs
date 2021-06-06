@@ -8,6 +8,7 @@ using UniInject;
 using UniRx;
 using System.IO;
 using UnityEngine.InputSystem;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -27,15 +28,15 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
     
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_reloadSong),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_reloadSong),
             () => SongMeta.Reload());
 
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongEditor),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => songSelectSceneController.StartSongEditorScene());
 
         if (PlatformUtils.IsStandalone)
         {
-            contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongFolder),
+            contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongFolder),
                 () => SongMetaUtils.OpenDirectory(SongMeta));
             AddPlaylistContextMenuItems(contextMenu);
         }
@@ -62,12 +63,12 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
             Dictionary<string, string> placeholders = new Dictionary<string, string> { ["playlist"] = playlistName };
             if (playlist.HasSongEntry(SongMeta.Artist, SongMeta.Title))
             {
-                contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_removeFromPlaylist, placeholders),
+                contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_removeFromPlaylist, placeholders),
                     () => playlistManager.RemoveSongFromPlaylist(playlist, SongMeta));
             }
             else
             {
-                contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_addToPlaylist, placeholders),
+                contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_addToPlaylist, placeholders),
                     () => playlistManager.AddSongToPlaylist(playlist, SongMeta));
             }
         }
