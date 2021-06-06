@@ -5,6 +5,7 @@
         "Plugins",
         "UniRx",
         "com.achimmihca.uniinject",
+        "com.achimmihca.primeinputactions",
         "Common",
         "Unity.TextMeshPro",
         "Unity.InputSystem"

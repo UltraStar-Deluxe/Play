@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.achimmihca.primeinputactions": {
+      "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#3e338c7cbf22ac7df71d3949ee94855720899e59",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "3e338c7cbf22ac7df71d3949ee94855720899e59"
+    },
     "com.achimmihca.simplehttpserverforunity": {
       "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",
       "depth": 0,

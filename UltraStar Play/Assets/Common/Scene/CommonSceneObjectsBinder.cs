@@ -3,6 +3,7 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using PrimeInputActions;
 
 public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {

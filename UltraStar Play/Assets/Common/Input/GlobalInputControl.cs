@@ -15,11 +15,11 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
     private void Start()
     {
         // Toggle full-screen mode via F11
-        InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
+        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
             .Subscribe(_ => ToggleFullscreen());
 
         // Mute / unmute audio via F12
-        InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
+        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => AudioManager.ToggleMuteAudio());
     }
 

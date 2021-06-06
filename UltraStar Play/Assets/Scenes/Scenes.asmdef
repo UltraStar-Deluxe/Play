@@ -8,6 +8,7 @@
         "com.achimmihca.uniinject",
         "Common",
 		"com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
         "UnityEngine.UIElementsModule",
         "UnityEngine.UIElementsGameObjectsModule",
