@@ -4,7 +4,11 @@
     "references": [
         "Plugins",
         "UniRx",
-        "UniInject",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.Editor.protrans",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.Editor.primeinputactions",
         "Common",
         "Unity.InputSystem"
     ],

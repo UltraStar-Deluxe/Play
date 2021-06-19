@@ -5,6 +5,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using System;
 using System.Collections.Generic;
+using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

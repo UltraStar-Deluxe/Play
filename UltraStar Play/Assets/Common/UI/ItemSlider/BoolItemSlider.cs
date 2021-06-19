@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ProTrans;
 
 public class BoolItemSlider : TextItemSlider<bool>
 {
-    private readonly string i18nCodeTrue = R.String.yes;
-    private readonly string i18nCodeFalse = R.String.no;
+    private readonly string i18nCodeTrue = R.Messages.yes;
+    private readonly string i18nCodeFalse = R.Messages.no;
 
     protected override void Start()
     {
@@ -18,6 +19,6 @@ public class BoolItemSlider : TextItemSlider<bool>
 
     protected override string GetDisplayString(bool item)
     {
-        return I18NManager.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
+        return TranslationManager.GetTranslation(item ? i18nCodeTrue : i18nCodeFalse);
     }
 }

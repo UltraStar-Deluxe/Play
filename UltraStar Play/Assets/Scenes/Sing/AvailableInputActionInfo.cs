@@ -10,6 +10,7 @@ using UniRx;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UIElements;
+using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -66,7 +67,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
     private List<InputActionInfo> GetAvailableInputActionInfos()
     {
         List<InputActionInfo> infos = new List<InputActionInfo>();
-        foreach (ObservableCancelablePriorityInputAction observableInputAction in InputManager.GetBoundInputActions())
+        foreach (ObservableCancelablePriorityInputAction observableInputAction in InputManager.GetInputActionsWithSubscribers())
         {
             if (ignoredInputActions.Contains(observableInputAction.InputAction.name))
             {
@@ -84,7 +85,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
             infos.Add(new InputActionInfo(actionNameDisplayString, infoOfThisAction));
         }
 
-        foreach (InputActionInfo additionalInputActionInfo in InputManager.AdditionalInputActionInfos)
+        foreach (InputActionInfo additionalInputActionInfo in UltraStarPlayInputManager.AdditionalInputActionInfos)
         {
             InputActionInfo existingInfo = infos.FirstOrDefault(it =>
             {

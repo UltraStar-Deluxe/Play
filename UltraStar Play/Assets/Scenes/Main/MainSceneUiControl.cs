@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using PrimeInputActions;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -64,18 +66,18 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
 
-        InitButtonDescription(startButton, R.String.mainScene_button_sing_description);
-        InitButtonDescription(settingsButton, R.String.mainScene_button_settings_description);
-        InitButtonDescription(aboutButton, R.String.mainScene_button_about_description);
-        InitButtonDescription(quitButton, R.String.mainScene_button_quit_description);
-        InitButtonDescription(jukeboxButton, R.String.mainScene_button_description_noImplementation);
-        InitButtonDescription(partyButton, R.String.mainScene_button_description_noImplementation);
+        InitButtonDescription(startButton, R.Messages.mainScene_button_sing_description);
+        InitButtonDescription(settingsButton, R.Messages.mainScene_button_settings_description);
+        InitButtonDescription(aboutButton, R.Messages.mainScene_button_about_description);
+        InitButtonDescription(quitButton, R.Messages.mainScene_button_quit_description);
+        InitButtonDescription(jukeboxButton, R.Messages.mainScene_button_description_noImplementation);
+        InitButtonDescription(partyButton, R.Messages.mainScene_button_description_noImplementation);
 
         UpdateVersionInfoText();
 
         UpdateTranslation();
 
-        sceneSubtitle.text = I18NManager.GetTranslation(R.String.mainScene_button_sing_description);
+        sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => ToggleCloseGameDialog());
@@ -95,8 +97,8 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
 
     private void InitButtonDescription(Button button, string i18nCode)
     {
-        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = I18NManager.GetTranslation(i18nCode));
-        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = I18NManager.GetTranslation(i18nCode));
+        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
+        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
     }
 
     public void UpdateTranslation()
@@ -105,10 +107,10 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        startButton.text = I18NManager.GetTranslation(R.String.mainScene_button_sing_label);
-        settingsButton.text = I18NManager.GetTranslation(R.String.mainScene_button_settings_label);
-        aboutButton.text = I18NManager.GetTranslation(R.String.mainScene_button_about_label);
-        quitButton.text = I18NManager.GetTranslation(R.String.mainScene_button_quit_label);
+        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+        settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
+        aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
+        quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
     }
 
     private void UpdateVersionInfoText()
@@ -160,11 +162,11 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         closeGameDialog = new SimpleUxmlDialog(
             quitGameDialogUxml,
             uiDoc.rootVisualElement,
-            I18NManager.GetTranslation(R.String.mainScene_quitDialog_title),
-            I18NManager.GetTranslation(R.String.mainScene_quitDialog_message));
-        Button yesButton = closeGameDialog.AddButton(I18NManager.GetTranslation(R.String.yes), () => ApplicationUtils.QuitOrStopPlayMode());
+            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title),
+            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message));
+        Button yesButton = closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
-        closeGameDialog.AddButton(I18NManager.GetTranslation(R.String.no), () => CloseQuitGameDialog());
+        closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
     }
 
     public List<UniInject.IBinding> GetBindings()

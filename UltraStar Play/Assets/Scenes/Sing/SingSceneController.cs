@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -159,8 +160,8 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
             UiManager.Instance.CreateWarningDialog(
-                I18NManager.GetTranslation(R.String.singScene_missingMicrophones_title),
-                I18NManager.GetTranslation(R.String.singScene_missingMicrophones_message, "playerNameCsv", playerNameCsv));
+                TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title),
+                TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message, "playerNameCsv", playerNameCsv));
         }
 
         // Associate LyricsDisplayer with one of the (duett) players

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using ProTrans;
+using UnityEngine;
 using UniRx;
 using UniInject;
 
@@ -8,18 +9,22 @@ using UniInject;
 public class LanguageItemSlider : TextItemSlider<SystemLanguage>, INeedInjection
 {
     [Inject]
-    private I18NManager i18nManager;
+    private Settings settings;
+    
+    [Inject]
+    private TranslationManager translationManager;
     
     protected override void Start()
     {
         base.Start();
-        Items = i18nManager.GetTranslatedLanguages();
+        Items = translationManager.GetTranslatedLanguages();
         SystemLanguage currentLanguage = SettingsManager.Instance.Settings.GameSettings.language;
         Selection.Value = Items.Contains(currentLanguage) ? currentLanguage : SystemLanguage.English;
         Selection.Subscribe(newValue =>
         {
-            SettingsManager.Instance.Settings.GameSettings.language = newValue;
-            i18nManager.UpdateCurrentLanguageAndTranslations();
+            settings.GameSettings.language = newValue;
+            translationManager.currentLanguage = settings.GameSettings.language;
+            translationManager.ReloadTranslationsAndUpdateScene();
         });
     }
 

@@ -4,8 +4,10 @@
     "references": [
         "Plugins",
         "UniRx",
-        "UniInject",
         "Common",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
         "Unity.InputSystem"
     ],
