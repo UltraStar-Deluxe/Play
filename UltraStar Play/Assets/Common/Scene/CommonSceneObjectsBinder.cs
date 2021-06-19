@@ -3,6 +3,8 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using PrimeInputActions;
+using ProTrans;
 
 public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
@@ -18,7 +20,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
-        bb.BindExistingInstance(I18NManager.Instance);
+        bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
         bb.BindExistingInstance(CoroutineManager.Instance);

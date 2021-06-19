@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PrimeInputActions;
 
 public class QuestionDialog : Dialog
 {

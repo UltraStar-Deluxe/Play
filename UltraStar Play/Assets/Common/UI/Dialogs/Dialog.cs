@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using ProTrans;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ public class Dialog : MonoBehaviour
         {
             titleUiText.text = value;
             // Do not use default translation from I18NText
-            I18NText i18NText = titleUiText.GetComponent<I18NText>();
+            TranslatedText i18NText = titleUiText.GetComponent<TranslatedText>();
             if (i18NText != null)
             {
                 Destroy(i18NText);

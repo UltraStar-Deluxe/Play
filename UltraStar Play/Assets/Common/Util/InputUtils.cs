@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using PrimeInputActions;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public static class InputUtils

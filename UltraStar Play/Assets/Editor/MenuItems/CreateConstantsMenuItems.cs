@@ -24,50 +24,11 @@ public static class CreateConstantsMenuItems
     {
         EditorUtils.RefreshAssetsInStreamingAssetsFolder();
 
-        CreateI18NConstants();
         CreateConstantsForColors();
         CreateConstantsForImageFiles();
         CreateConstantsForAudioFiles();
-        CreateConstantsInputActions();
-    }
-
-    [MenuItem("Generate/Create C# constants for InputActions")]
-    private static void CreateConstantsInputActions()
-    {
-        string subClassName = "InputActions";
-        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
-        List<string> inputActionPaths = InputManager.Instance.defaultInputActionAsset.actionMaps
-            .SelectMany(actionMap => actionMap.actions)
-            .Select(action => action.actionMap.name + "/" + action.name)
-            .ToList();
-
-        List<string> fieldNames = inputActionPaths
-            .Select(it => it.Replace("/", "_"))
-            .ToList();
-        
-        string classCode = CreateClassCode(subClassName, inputActionPaths, fieldNames);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
-    }
-
-    [MenuItem("Generate/Create C# constants for I18N properties")]
-    public static void CreateI18NConstants()
-    {
-        string subClassName = "String";
-        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
-        List<string> i18nKeys = I18NManager.Instance.GetKeys();
-        if (i18nKeys.IsNullOrEmpty())
-        {
-            Debug.LogWarning("No i18n keys found.");
-            return;
-        }
-
-        i18nKeys.Sort();
-        string classCode = CreateClassCode(subClassName, i18nKeys);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
+        ProTrans.CreateTranslationConstantsMenuItems.CreateTranslationConstants();
+        PrimeInputActions.CreateInputActionConstantsMenuItems.CreateInputActionConstants();
     }
 
     [MenuItem("Generate/Create C# constants for theme colors")]

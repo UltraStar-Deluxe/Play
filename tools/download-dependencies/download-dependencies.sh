@@ -6,5 +6,4 @@ sh download-nlayer.sh
 sh download-csharpsynthforunity.sh
 sh download-text-mesh-pro-resources.sh
 sh download-sharpziplib.sh
-sh download-uniinject.sh
 sh download-serilog.sh

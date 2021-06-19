@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UniRx;
 using UnityEngine.InputSystem;
+using PrimeInputActions;
 
 public class WarningDialog : Dialog
 {

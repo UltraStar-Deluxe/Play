@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.Globalization;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -53,7 +54,7 @@ public class HighscoreSceneController : MonoBehaviour, INeedInjection, IBinder
     private void ShowHighscores(SongMeta songMeta, EDifficulty difficulty)
     {
         currentDifficulty = difficulty;
-        difficultyText.text = I18NManager.GetTranslation(R.String.difficulty) + ": " + difficulty.GetTranslatedName();
+        difficultyText.text = TranslationManager.GetTranslation(R.Messages.difficulty) + ": " + difficulty.GetTranslatedName();
         titleAndArtistText.text = $"{songMeta.Title} - {songMeta.Artist}";
 
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);

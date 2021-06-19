@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using EventSystem = UnityEngine.EventSystems.EventSystem;
+using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

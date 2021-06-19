@@ -1,6 +1,7 @@
 ﻿using UniInject;
 using UnityEngine;
 using UniRx;
+using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -43,7 +44,7 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
                 }
             });
         
-        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
-        InputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
+        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
+        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
     }
 }

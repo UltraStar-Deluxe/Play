@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using ProTrans;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -17,15 +18,15 @@ public class SingSceneContextMenuHandler : AbstractContextMenuHandler, INeedInje
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_togglePause),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
             () => singSceneController.TogglePlayPause());
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_restart),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => singSceneController.Restart());
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_skipToNextLyrics),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
             () => singSceneController.SkipToNextSingableNote());
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_exitSong),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => singSceneController.FinishScene(false));
-        contextMenu.AddItem(I18NManager.GetTranslation(R.String.action_openSongEditor),
+        contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => singSceneController.OpenSongInEditor());
     }
 }
