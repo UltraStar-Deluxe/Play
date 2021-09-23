@@ -43,7 +43,7 @@ git remote add origin https://github.com/serilog/serilog-sinks-file.git
 git config core.sparsecheckout true
 echo "LICENSE" >> .git/info/sparse-checkout
 echo "src/Serilog.Sinks.File/*" >> .git/info/sparse-checkout
-git pull --depth=500 origin master
+git pull --depth=500 origin main
 # Commit from 17 October 2019 (release 4.1.0): 272085f4c9440e62448b65829ad35cc3dea15ab1
 git checkout 272085f4c9440e62448b65829ad35cc3dea15ab1
 
