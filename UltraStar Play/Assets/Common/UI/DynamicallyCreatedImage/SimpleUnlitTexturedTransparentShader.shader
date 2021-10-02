@@ -22,6 +22,16 @@
         ZWrite Off
         ZTest [unity_GUIZTestMode]
         Cull Off
+
+        // Fixing UI mask
+        Stencil
+        {
+            Ref[_Stencil]
+            Comp[_StencilComp]
+            Pass[_StencilOp]
+            ReadMask[_StencilReadMask]
+            WriteMask[_StencilWriteMask]
+        }
         
         Pass
         {
