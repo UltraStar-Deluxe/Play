@@ -108,6 +108,8 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
             SceneInjectionManager.Instance.DoInjection();
         }
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+        partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
+        jukeboxButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
         aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
