@@ -34,12 +34,12 @@ public class ApplicationManager : MonoBehaviour
 
     void OnEnable()
     {
-        Application.logMessageReceived += Log.HandleUnityLog;
+        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
     }
 
     void OnDisable()
     {
-        Application.logMessageReceived -= Log.HandleUnityLog;
+        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 
     public bool HasCommandLineArgument(string argumentName)
