@@ -27,6 +27,7 @@ public class Note
     public bool IsGolden { get; private set; }
     public bool IsNormal { get; private set; }
     public bool IsFreestyle { get; private set; }
+    public bool IsRap { get; private set; }
 
     public Note()
     {
@@ -68,6 +69,7 @@ public class Note
         IsNormal = other.IsNormal;
         IsGolden = other.IsGolden;
         IsFreestyle = other.IsFreestyle;
+        IsRap = other.IsRap;
         Text = other.Text;
     }
 
@@ -112,6 +114,7 @@ public class Note
         IsGolden = (Type == ENoteType.Golden || Type == ENoteType.RapGolden);
         IsNormal = (Type == ENoteType.Normal || Type == ENoteType.Rap);
         IsFreestyle = (Type == ENoteType.Freestyle);
+        IsRap = (Type == ENoteType.Rap || Type == ENoteType.RapGolden);
     }
 
     public void SetStartBeat(int newStartBeat)
