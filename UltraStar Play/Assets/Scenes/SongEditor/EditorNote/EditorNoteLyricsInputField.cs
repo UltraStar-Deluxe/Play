@@ -14,6 +14,8 @@ using System.Text.RegularExpressions;
 
 public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 {
+    public EditorUiNote EditorUiNote => uiEditorNote;
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
@@ -77,6 +79,16 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     private void OnEndEdit(string inputFieldText)
     {
         string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(inputFieldText);
+
+        // Replace multiple control characters with a single character
+        newText = Regex.Replace(newText, @"\s+", " ");
+        newText = Regex.Replace(newText, @";+", ";");
+
+        // Replace any text after control characters.
+        // Otherwise the text would mess up following notes when using the LyricsArea.
+        newText = Regex.Replace(newText, @" .+", " ");
+        newText = Regex.Replace(newText, @";.+", ";");
+
         if (!IsOnlyWhitespace(inputFieldText))
         {
             uiEditorNote.Note.SetText(newText);
