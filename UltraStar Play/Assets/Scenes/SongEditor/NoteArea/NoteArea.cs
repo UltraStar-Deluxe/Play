@@ -87,19 +87,12 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
 
-        // Initialize Viewport
-        int x = 0;
-        int width = 5000;
-        int y = MidiUtils.SingableNoteMin + (MidiUtils.SingableNoteRange / 4);
-        int height = MidiUtils.SingableNoteRange / 2;
-        SetViewport(x, y, width, height);
+        InitializeViewport();
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
         SetPositionInSongInMillis(songAudioPlayer.PositionInSongInMillis);
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
-
-        FitViewportVerticalToNotes();
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
@@ -123,7 +116,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         if (minMidiNoteInSong > 0 && maxMidiNoteInSong > 0)
         {
             int newViewportY = minMidiNoteInSong - 1;
-            int newViewportHeight = maxMidiNoteInSong - minMidiNoteInSong + 1;
+            int newViewportHeight = (maxMidiNoteInSong - minMidiNoteInSong) + 2;
             SetViewportVertical(newViewportY, newViewportHeight);
         }
     }
@@ -475,5 +468,20 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         double xPercent = (localPoint.x + (rectWidth / 2)) / rectWidth;
         double positionInSongInMillis = ViewportX + (ViewportWidth * xPercent);
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+    }
+
+    private void InitializeViewport()
+    {
+        int minMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Min();
+        int maxMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Max();
+        // 10 seconds
+        int width = 8000;
+        // Start at the beginning
+        int x = 0;
+        // Full range of notes. At least one octave
+        int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
+        // Center the notes
+        int y = minMidiNote - 1;
+        SetViewport(x, y, width, height);
     }
 }
