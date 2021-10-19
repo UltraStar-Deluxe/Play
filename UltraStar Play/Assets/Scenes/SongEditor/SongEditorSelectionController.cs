@@ -112,6 +112,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         }
     }
 
+    public void AddToSelection(List<Note> notes)
+    {
+        notes.ForEach(AddToSelection);
+    }
+
     public void AddToSelection(Note note)
     {
         selectedNotes.Add(note);
@@ -126,6 +131,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
     {
         uiNote.SetSelected(true);
         selectedNotes.Add(uiNote.Note);
+    }
+
+    public void RemoveFromSelection(List<Note> notes)
+    {
+        notes.ForEach(RemoveFromSelection);
     }
 
     public void RemoveFromSelection(Note note)
