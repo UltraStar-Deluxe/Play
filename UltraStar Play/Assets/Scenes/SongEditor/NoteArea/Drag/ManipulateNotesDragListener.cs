@@ -164,11 +164,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
     private DragAction GetDragAction(EditorUiNote dragStartUiNote, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.StartPositionInPixels))
+        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchLeft;
         }
-        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.StartPositionInPixels))
+        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchRight;
         }
@@ -177,7 +177,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
     private DragDirection GetDragDirection(NoteAreaDragEvent dragEvent)
     {
-        if (Math.Abs(dragEvent.GeneralDragEvent.DistanceInPixels.y) > Math.Abs(dragEvent.GeneralDragEvent.DistanceInPixels.x))
+        if (Math.Abs(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.y) > Math.Abs(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.x))
         {
             return DragDirection.Vertical;
         }

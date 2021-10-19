@@ -8,37 +8,24 @@ public class GeneralDragEvent
 
     public List<RaycastResult> RaycastResultsDragStart { get; private set; }
 
-    /**
-     * Position where the drag-gesture started.
-     */
-    public Vector2 StartPositionInPixels { get; private set; }
-    public Vector2 StartPositionInPercent { get; private set; }
+    public DragCoordinate ScreenCoordinateInPixels { get; private set; }
+    public DragCoordinate ScreenCoordinateInPercent { get; private set; }
+    public DragCoordinate RectTransformCoordinateInPixels { get; private set; }
+    public DragCoordinate RectTransformCoordinateInPercent { get; private set; }
 
-    /**
-     * Distance to the original drag start position.
-     */
-    public Vector2 DistanceInPixels { get; private set; }
-    public Vector2 DistanceInPercent { get; private set; }
-
-    /**
-     * Position difference compared to the previous event.
-     */
-    public Vector2 DragDeltaInPixels { get; private set; }
-    
-    public GeneralDragEvent(Vector2 dragStartInPixels,
-        Vector2 dragStartInPercent,
-        Vector2 distanceInPixels,
-        Vector2 distanceInPercent,
-        Vector2 dragDeltaInPixels,
+    public GeneralDragEvent(
+        DragCoordinate screenCoordinateInPixels,
+        DragCoordinate screenCoordinateInPercent,
+        DragCoordinate rectTransformCoordinateInPixels,
+        DragCoordinate rectTransformCoordinateInPercent,
         List<RaycastResult> raycastResultsDragStart,
         PointerEventData.InputButton inputButton)
     {
-        StartPositionInPixels = dragStartInPixels;
-        StartPositionInPercent = dragStartInPercent;
+        ScreenCoordinateInPixels = screenCoordinateInPixels;
+        ScreenCoordinateInPercent = screenCoordinateInPercent;
 
-        DistanceInPixels = distanceInPixels;
-        DistanceInPercent = distanceInPercent;
-        DragDeltaInPixels = dragDeltaInPixels;
+        RectTransformCoordinateInPixels = rectTransformCoordinateInPixels;
+        RectTransformCoordinateInPercent = rectTransformCoordinateInPercent;
 
         RaycastResultsDragStart = raycastResultsDragStart;
 

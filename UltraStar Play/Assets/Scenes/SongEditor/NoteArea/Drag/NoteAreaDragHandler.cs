@@ -28,13 +28,13 @@ public class NoteAreaDragHandler : AbstractDragHandler<NoteAreaDragEvent>
     {
         GeneralDragEvent generalDragEvent = CreateGeneralDragEventStart(eventData);
 
-        int midiNoteDragStart = (int)(noteArea.ViewportY + generalDragEvent.StartPositionInPercent.y * noteArea.ViewportHeight);
+        int midiNoteDragStart = (int)(noteArea.ViewportY + generalDragEvent.RectTransformCoordinateInPercent.StartPosition.y * noteArea.ViewportHeight);
         int midiNoteDistance = 0;
 
-        int positionInSongInMillisDragStart = (int)(noteArea.ViewportX + generalDragEvent.StartPositionInPercent.x * noteArea.ViewportWidth);
+        int positionInSongInMillisDragStart = (int)(noteArea.ViewportX + generalDragEvent.RectTransformCoordinateInPercent.StartPosition.x * noteArea.ViewportWidth);
         int millisDistance = 0;
 
-        int positionInSongInBeatsDragStart = (int)(noteArea.MinBeatInViewport + generalDragEvent.StartPositionInPercent.x * noteArea.ViewportWidthInBeats);
+        int positionInSongInBeatsDragStart = (int)(noteArea.MinBeatInViewport + generalDragEvent.RectTransformCoordinateInPercent.StartPosition.x * noteArea.ViewportWidthInBeats);
         int beatDistance = 0;
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,
@@ -52,13 +52,13 @@ public class NoteAreaDragHandler : AbstractDragHandler<NoteAreaDragEvent>
         Vector3 canvasScale = canvas.transform.localScale; 
         
         int midiNoteDragStart = dragStartEvent.MidiNoteDragStart;
-        int midiNoteDistance = (int)(generalDragEvent.DistanceInPercent.y / canvasScale.x * noteArea.ViewportHeight);
+        int midiNoteDistance = (int)(generalDragEvent.RectTransformCoordinateInPercent.Distance.y * noteArea.ViewportHeight);
 
         int positionInSongInMillisDragStart = dragStartEvent.PositionInSongInMillisDragStart;
-        int millisDistance = (int)(generalDragEvent.DistanceInPercent.x / canvasScale.x * noteArea.ViewportWidth);
+        int millisDistance = (int)(generalDragEvent.RectTransformCoordinateInPercent.Distance.x * noteArea.ViewportWidth);
 
         int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
-        int beatDistance = (int)(generalDragEvent.DistanceInPercent.x / canvasScale.x * noteArea.ViewportWidthInBeats);
+        int beatDistance = (int)(generalDragEvent.RectTransformCoordinateInPercent.Distance.x * noteArea.ViewportWidthInBeats);
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,
