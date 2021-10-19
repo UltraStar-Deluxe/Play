@@ -149,10 +149,10 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         {
             return;
         }
-        float x = dragEvent.GeneralDragEvent.StartPositionInPixels.x;
-        float y = dragEvent.GeneralDragEvent.StartPositionInPixels.y;
-        float width = dragEvent.GeneralDragEvent.DistanceInPixels.x / canvasScale.x;
-        float height = -dragEvent.GeneralDragEvent.DistanceInPixels.y / canvasScale.y;
+        float x = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition.x;
+        float y = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition.y;
+        float width = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.x / canvasScale.x;
+        float height = -dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.y / canvasScale.y;
 
         if (width < 0)
         {
