@@ -96,6 +96,13 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return notes;
     }
 
+    public List<Note> GetAllVisibleNotes()
+    {
+        return GetAllNotes()
+            .Where(IsVisible)
+            .ToList();
+    }
+
     public void RemoveNoteFromAllLayers(Note note)
     {
         foreach (SongEditorLayer layer in layerKeyToLayerMap.Values)
