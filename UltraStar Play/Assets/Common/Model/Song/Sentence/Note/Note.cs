@@ -131,7 +131,7 @@ public class Note
             Length = EndBeat - StartBeat;
 
             // Update the sentence's min beat
-            if (Sentence != null && Sentence.MinBeat == oldStartBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMinBeat();
             }
@@ -152,7 +152,7 @@ public class Note
             Length = EndBeat - StartBeat;
 
             // Update the sentence's max beat
-            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMaxBeat();
             }
@@ -173,7 +173,7 @@ public class Note
             EndBeat = StartBeat + Length;
 
             // Update the sentence's max beat
-            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMaxBeat();
             }
@@ -208,14 +208,8 @@ public class Note
             // Update the sentence's min and max beat
             if (Sentence != null)
             {
-                if (Sentence.MinBeat == oldStartBeat)
-                {
-                    Sentence.UpdateMinBeat();
-                }
-                if (Sentence.MaxBeat == oldEndBeat)
-                {
-                    Sentence.UpdateMaxBeat();
-                }
+                Sentence.UpdateMinBeat();
+                Sentence.UpdateMaxBeat();
             }
         }
     }
