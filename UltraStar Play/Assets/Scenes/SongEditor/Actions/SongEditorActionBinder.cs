@@ -26,6 +26,7 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(DeleteSentencesAction));
         bb.BindTypeToNewInstances(typeof(MergeSentencesAction));
         bb.BindTypeToNewInstances(typeof(SentenceFitToNoteAction));
+        bb.BindTypeToNewInstances(typeof(ChangeLinebreakBeatAction));
 
         bb.BindTypeToNewInstances(typeof(SetMusicGapAction));
         bb.BindTypeToNewInstances(typeof(SetVideoGapAction));
