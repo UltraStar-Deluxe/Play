@@ -45,7 +45,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private NoteAreaDragEvent startDragEvent;
     private NoteAreaDragEvent lastDragEvent;
-    private Vector2 scrollDistanceSinceDragStart;
 
     void Start()
     {
@@ -62,7 +61,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         isCanceled = false;
         lastDragEvent = dragEvent;
         startDragEvent = dragEvent;
-        scrollDistanceSinceDragStart = Vector2.zero;
         if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Left)
         {
             CancelDrag();
@@ -114,11 +112,10 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private void UpdateSelection(NoteAreaDragEvent currentDragEvent)
     {
-        int startBeat = startDragEvent.PositionInSongInBeatsDragStart;
-        int endBeat = startBeat + currentDragEvent.BeatDistance + (int) (scrollDistanceSinceDragStart.x / BpmUtils.MillisecondsPerBeat(songMeta));
-
-        int startMidiNote = startDragEvent.MidiNoteDragStart;
-        int endMidiNote = startMidiNote + currentDragEvent.MidiNoteDistance + ((int) scrollDistanceSinceDragStart.y);
+        int startBeat = GetDragStartBeat();
+        int endBeat = GetDragEndBeat(currentDragEvent);
+        int startMidiNote = GetDragStartMidiNote();
+        int endMidiNote = GetDragEndMidiNote(currentDragEvent);
 
         List<Note> visibleNotes = songEditorSceneController.GetAllVisibleNotes();
         List<Note> selectedNotes = visibleNotes
@@ -141,6 +138,26 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         {
             selectionController.SetSelection(selectedNotes);
         }
+    }
+
+    private int GetDragStartBeat()
+    {
+        return startDragEvent.PositionInSongInBeatsDragStart;
+    }
+
+    private int GetDragEndBeat(NoteAreaDragEvent currentDragEvent)
+    {
+        return noteArea.PixelsToBeat(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.x);
+    }
+
+    private int GetDragStartMidiNote()
+    {
+        return startDragEvent.MidiNoteDragStart;
+    }
+
+    private int GetDragEndMidiNote(NoteAreaDragEvent currentDragEvent)
+    {
+        return noteArea.PixelsToMidiNote(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.y);
     }
 
     private bool IsInSelectionFrame(
@@ -169,29 +186,54 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
             && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote);
     }
 
-    private void UpdateSelectionFrame(NoteAreaDragEvent dragEvent)
+    private void UpdateSelectionFrame(NoteAreaDragEvent currentDragEvent)
     {
         Vector3 canvasScale = canvas.transform.localScale;
         if (canvasScale.x == 0 || canvasScale.y == 0)
         {
             return;
         }
-        float x = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition.x;
-        float y = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition.y;
-        float width = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.x / canvasScale.x;
-        float height = -dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.y / canvasScale.y;
 
-        if (width < 0)
+        // Coordinates in milliseconds and midi-note
+        int startBeat = GetDragStartBeat();
+        int endBeat = GetDragEndBeat(currentDragEvent);
+        int startMidiNote = GetDragStartMidiNote();
+        int endMidiNote = GetDragEndMidiNote(currentDragEvent);
+
+        // Min and max coordinates in pixels
+        float minX = noteArea.BeatToPixels(noteArea.MinBeatInViewport);
+        float maxX = noteArea.BeatToPixels(noteArea.MinBeatInViewport + noteArea.ViewportWidthInBeats);
+        float minY = noteArea.MidiNoteToPixels(noteArea.MinMidiNoteInViewport);
+        float maxY = noteArea.MidiNoteToPixels(noteArea.MinMidiNoteInViewport + noteArea.ViewportHeight);
+
+        // Calculate selection frame start
+        float fromX = noteArea.BeatToPixels(startBeat);
+        fromX = NumberUtils.Limit(fromX, minX, maxX);
+        float fromY = noteArea.MidiNoteToPixels(startMidiNote);
+        fromY = NumberUtils.Limit(fromY, minY, maxY);
+
+        // Calculate selection frame end
+        float toX = noteArea.BeatToPixels(endBeat);
+        toX = NumberUtils.Limit(toX, minX, maxX);
+        float toY = noteArea.MidiNoteToPixels(endMidiNote);
+        toY = NumberUtils.Limit(toY, minY, maxY);
+
+        // fromY = Screen.height - fromY;
+        // toY = Screen.height - toY;
+
+        if (toX < fromX)
         {
-            width = -width;
-            x -= (width * canvasScale.x);
+            ObjectUtils.Swap(ref toX, ref fromX);
         }
-        if (height < 0)
+        if (toY < fromY)
         {
-            height = -height;
-            y += (height * canvasScale.x);
+            ObjectUtils.Swap(ref toY, ref fromY);
         }
-        selectionFrame.position = new Vector2(x, y);
+
+        float width = (toX - fromX) / canvasScale.x;
+        float height = (toY - fromY) / canvasScale.y;
+
+        selectionFrame.position = new Vector2(fromX, fromY);
         selectionFrame.sizeDelta = new Vector2(width, height);
     }
 
@@ -236,7 +278,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         if (scrollAmount.x != 0)
         {
             noteArea.SetViewportX(noteArea.ViewportX + (int)(scrollAmount.x));
-            scrollDistanceSinceDragStart = new Vector2(scrollDistanceSinceDragStart.x + scrollAmount.x, scrollDistanceSinceDragStart.y);
         }
 
         if (scrollAmount.y != 0
@@ -244,7 +285,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         {
             lastScrollVerticalTime = Time.time;
             noteArea.SetViewportY(noteArea.ViewportY + (int)(scrollAmount.y));
-            scrollDistanceSinceDragStart = new Vector2(scrollDistanceSinceDragStart.x, scrollDistanceSinceDragStart.y + scrollAmount.y);
         }
 
         if (scrollAmount.x != 0

@@ -484,4 +484,40 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         int y = minMidiNote - 1;
         SetViewport(x, y, width, height);
     }
+
+    public float MillisecondsToPixels(int millis)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return rect.x + rect.width * ((float)(millis - MinMillisecondsInViewport) / ViewportWidth);
+    }
+
+    public float BeatToPixels(int beat)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return rect.x + rect.width * ((float)(beat - MinBeatInViewport) / ViewportWidthInBeats);
+    }
+
+    public float MidiNoteToPixels(int midiNote)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return rect.y + rect.height * ((float)(midiNote - MinMidiNoteInViewport) / ViewportHeight);
+    }
+
+    public int PixelsToMilliseconds(float x)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return (int)(MinMillisecondsInViewport + ViewportWidth * ((x - rect.x) / rect.width));
+    }
+
+    public int PixelsToBeat(float x)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return (int)(MinBeatInViewport + ViewportWidthInBeats * ((x - rect.x) / rect.width));
+    }
+
+    public int PixelsToMidiNote(float y)
+    {
+        Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
+        return (int)(MinMidiNoteInViewport + ViewportHeight * ((y - rect.y) / rect.height));
+    }
 }
