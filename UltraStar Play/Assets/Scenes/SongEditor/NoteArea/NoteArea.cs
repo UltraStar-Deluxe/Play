@@ -176,12 +176,20 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public double GetVerticalPositionForMidiNote(int midiNote)
     {
+        if (ViewportHeight == 0)
+        {
+            return 0;
+        }
         int indexInViewport = midiNote - ViewportY;
         return (double)indexInViewport / ViewportHeight;
     }
 
     public double GetHorizontalPositionForMillis(double positionInSongInMillis)
     {
+        if (ViewportWidth == 0)
+        {
+            return 0;
+        }
         return (positionInSongInMillis - ViewportX) / ViewportWidth;
     }
 
