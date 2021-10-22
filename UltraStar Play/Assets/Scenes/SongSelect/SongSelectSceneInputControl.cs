@@ -92,11 +92,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (songSelectSceneController.IsSearchEnabled())
-        {
-            return;
-        }
-        
         if (context.ReadValue<Vector2>().y < 0) 
         {
             songRouletteController.SelectNextSong();
