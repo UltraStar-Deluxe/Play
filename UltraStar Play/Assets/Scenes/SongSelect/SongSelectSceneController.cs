@@ -186,6 +186,10 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void DoFuzzySearch(string text)
     {
         string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
+        if (searchTextToLowerNoWhitespace.IsNullOrEmpty())
+        {
+            return;
+        }
 
         // Try to jump to song-index
         if (TryExecuteSpecialSearchSyntax(text))
