@@ -50,12 +50,6 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
         StretchRight
     }
 
-    private enum DragDirection
-    {
-        Horizontal,
-        Vertical
-    }
-
     void Start()
     {
         if (editorUiSentenceDragHandler != null)
@@ -155,15 +149,6 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
             return DragAction.StretchRight;
         }
         return DragAction.Move;
-    }
-
-    private DragDirection GetDragDirection(NoteAreaDragEvent dragEvent)
-    {
-        if (Math.Abs(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.y) > Math.Abs(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.Distance.x))
-        {
-            return DragDirection.Vertical;
-        }
-        return DragDirection.Horizontal;
     }
 
     private void MoveNotesHorizontal(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
