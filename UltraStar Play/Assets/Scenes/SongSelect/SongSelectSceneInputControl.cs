@@ -134,6 +134,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneController.DisableSearch();
         }
+        else if (songSelectSceneController.IsPlaylistActive())
+        {
+            songSelectSceneController.ResetPlaylistSelection();
+        }
         else
         {
             SceneNavigator.Instance.LoadScene(EScene.MainScene);
