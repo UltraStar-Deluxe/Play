@@ -198,9 +198,6 @@ public class Note
         }
         if (StartBeat != newStartBeat || EndBeat != newEndBeat)
         {
-            int oldStartBeat = StartBeat;
-            int oldEndBeat = EndBeat;
-
             StartBeat = newStartBeat;
             EndBeat = newEndBeat;
             Length = EndBeat - StartBeat;
