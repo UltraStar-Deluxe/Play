@@ -94,7 +94,6 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
         switch (dragAction)
         {
             case DragAction.Move:
-                DragDirection dragDirection = GetDragDirection(dragEvent);
                 MoveNotesHorizontal(dragEvent, selectedNotes, true);
                 break;
 

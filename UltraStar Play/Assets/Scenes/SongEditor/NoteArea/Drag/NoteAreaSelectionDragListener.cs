@@ -36,7 +36,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     [Inject]
     private SongMeta songMeta;
 
-    private float scrollBorderPercent = 0.05f;
+    private readonly float scrollBorderPercent = 0.05f;
 
     private bool isCanceled;
 
@@ -217,9 +217,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         toX = NumberUtils.Limit(toX, minX, maxX);
         float toY = noteArea.MidiNoteToPixels(endMidiNote);
         toY = NumberUtils.Limit(toY, minY, maxY);
-
-        // fromY = Screen.height - fromY;
-        // toY = Screen.height - toY;
 
         if (toX < fromX)
         {
