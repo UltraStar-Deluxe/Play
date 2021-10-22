@@ -146,7 +146,6 @@ public class Note
 
         if (EndBeat != newEndBeat)
         {
-            int oldEndBeat = EndBeat;
             EndBeat = newEndBeat;
             Length = EndBeat - StartBeat;
 
