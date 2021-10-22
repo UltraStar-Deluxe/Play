@@ -18,6 +18,11 @@ public class DeleteSentencesAction : INeedInjection
 
     public void Execute(List<Sentence> selectedSentences)
     {
+        if (selectedSentences.IsNullOrEmpty())
+        {
+            return;
+        }
+
         foreach (Sentence sentence in selectedSentences)
         {
             deleteNotesAction.Execute(new List<Note>(sentence.Notes));
@@ -28,6 +33,9 @@ public class DeleteSentencesAction : INeedInjection
     public void ExecuteAndNotify(List<Sentence> selectedSentences)
     {
         Execute(selectedSentences);
-        songMetaChangeEventStream.OnNext(new SentencesDeletedEvent());
+        songMetaChangeEventStream.OnNext(new SentencesDeletedEvent
+        {
+            Sentences = selectedSentences
+        });
     }
 }

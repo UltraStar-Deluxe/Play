@@ -75,6 +75,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             UpdateNotesAndSentences();
         });
 
+        songMetaChangeEventStream
+            .Subscribe(evt =>
+            {
+                if (evt is SentencesDeletedEvent sde)
+                {
+                    DestroyUiSentences(sde.Sentences);
+                }
+            });
+
         foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
         {
             songEditorLayerManager
@@ -86,6 +95,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             .ObserveEveryValueChanged(it => it.HideVoices.Count)
             .Subscribe(_ => OnHideVoicesChanged())
             .AddTo(this);
+    }
+
+    private void DestroyUiSentences(List<Sentence> sentences)
+    {
+        sentences.ForEach(sentence =>
+        {
+            if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+            {
+                Destroy(uiSentence.gameObject);
+                sentenceToEditorUiSentenceMap.Remove(sentence);
+            }
+        });
     }
 
     private void OnHideVoicesChanged()
@@ -321,14 +342,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         string label = (sentenceIndex + 1).ToString();
         uiSentence.SetText(label);
 
-        // Make sentence rectangles alternating light/dark
-        bool isDark = (sentenceIndex % 2) == 0;
-        if (isDark)
+        // Update color
+        if (sentence.Voice != null)
         {
-            if (sentence.Voice != null)
+            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
+            uiSentence.SetColor(color);
+
+            // Make sentence rectangles alternating light/dark
+            bool isDark = (sentenceIndex % 2) == 0;
+            if (isDark)
             {
-                Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
-                uiSentence.SetColor(color);
                 uiSentence.backgroundImage.MultiplyColor(0.66f);
             }
         }
