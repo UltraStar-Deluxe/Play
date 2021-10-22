@@ -158,8 +158,9 @@ public class Sentence : ISerializationCallbackReceiver
     {
         if (notes.Count > 0)
         {
-            int lastMaxBeat = MaxBeat;
-            int lastLinebreakBeatOverhang = LinebreakBeat - MaxBeat;
+            // MaxBeat might still be 0 at this time. Thus, use the maximum of MaxBeat and LinebreakBeat.
+            int lastMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
+            int lastLinebreakBeatOverhang = LinebreakBeat - lastMaxBeat;
             MaxBeat = notes.Select(it => it.EndBeat).Max();
 
             // Keep distance from MaxBeat to LinebreakBeat when moving notes
