@@ -56,8 +56,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(_ =>
+        songMetaChangeEventStream.Subscribe(evt =>
         {
+            if (evt is LoadedMementoEvent)
+            {
+                // The object instances have changed. All maps must be cleared.
+                noteContainer.DestroyAllDirectChildren();
+                noteToEditorUiNoteMap.Clear();
+                sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+                sentenceToEditorUiSentenceMap.Clear();
+            }
             ReloadSentences();
             UpdateNotesAndSentences();
         });
@@ -66,7 +74,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     void Start()
     {
         noteContainer.DestroyAllDirectChildren();
+        noteToEditorUiNoteMap.Clear();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+        sentenceToEditorUiSentenceMap.Clear();
 
         ReloadSentences();
 
@@ -80,7 +90,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             {
                 if (evt is SentencesDeletedEvent sde)
                 {
-                    DestroyUiSentences(sde.Sentences);
+                    sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
                 }
             });
 
@@ -97,28 +107,28 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             .AddTo(this);
     }
 
-    private void DestroyUiSentences(List<Sentence> sentences)
+    private void DeleteSentence(Sentence sentence)
     {
-        sentences.ForEach(sentence =>
+        if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
         {
-            if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
-            {
-                Destroy(uiSentence.gameObject);
-                sentenceToEditorUiSentenceMap.Remove(sentence);
-            }
-        });
+            Destroy(uiSentence.gameObject);
+            sentenceToEditorUiSentenceMap.Remove(sentence);
+        }
     }
 
     private void OnHideVoicesChanged()
     {
         // Remove notes of hidden voices
-        foreach (EditorUiNote uiNote in new List<EditorUiNote>(noteToEditorUiNoteMap.Values))
-        {
-            if (!IsVoiceVisible(uiNote.Note.Sentence?.Voice))
-            {
-                DeleteUiNote(uiNote);
-            }
-        }
+        List<Note> notVisibleNotes = noteToEditorUiNoteMap.Keys
+            .Where(note => !IsVoiceVisible(note.Sentence?.Voice))
+            .ToList();
+        notVisibleNotes.ForEach(note => DeleteNote(note));
+
+        // Remove sentences of hidden voices
+        List<Sentence> notVisibleSentences = sentenceToEditorUiSentenceMap.Keys
+            .Where(sentence => !IsVoiceVisible(sentence.Voice))
+            .ToList();
+        notVisibleSentences.ForEach(sentence => DeleteSentence(sentence));
 
         // Draw any notes that are now (again) visible.
         UpdateNotesAndSentences();

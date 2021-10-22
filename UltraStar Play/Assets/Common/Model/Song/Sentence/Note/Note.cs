@@ -126,7 +126,6 @@ public class Note
 
         if (StartBeat != newStartBeat)
         {
-            int oldStartBeat = StartBeat;
             StartBeat = newStartBeat;
             Length = EndBeat - StartBeat;
 
@@ -168,7 +167,6 @@ public class Note
 
         if (Length != newLength)
         {
-            int oldEndBeat = EndBeat;
             Length = newLength;
             EndBeat = StartBeat + Length;
 
