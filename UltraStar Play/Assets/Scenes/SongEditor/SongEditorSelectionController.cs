@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.EventSystems;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -14,6 +15,9 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public RectTransform uiNoteContainer;
+
+    [Inject]
+    private EventSystem eventSystem;
 
     [Inject]
     private SongEditorSceneController songEditorSceneController;
@@ -108,6 +112,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
         }
     }
 
+    public void AddToSelection(List<Note> notes)
+    {
+        notes.ForEach(AddToSelection);
+    }
+
     public void AddToSelection(Note note)
     {
         selectedNotes.Add(note);
@@ -122,6 +131,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
     {
         uiNote.SetSelected(true);
         selectedNotes.Add(uiNote.Note);
+    }
+
+    public void RemoveFromSelection(List<Note> notes)
+    {
+        notes.ForEach(RemoveFromSelection);
     }
 
     public void RemoveFromSelection(Note note)
@@ -142,6 +156,19 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
     public void SelectNextNote(bool updatePositionInSong = true)
     {
+        bool wasEditingLyrics = false;
+        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        {
+            // Finish this lyrics editing and select following note directly in lyrics editing mode.
+            GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
+            EditorNoteLyricsInputField lyricsInputField = selectedGameObject.GetComponentInChildren<EditorNoteLyricsInputField>();
+            if (lyricsInputField != null)
+            {
+                wasEditingLyrics = true;
+                SetSelection(new List<EditorUiNote> { lyricsInputField.EditorUiNote });
+            }
+        }
+
         if (selectedNotes.Count == 0)
         {
             SelectFirstVisibleNote();
@@ -176,11 +203,33 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
                 double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
             }
+
+            if (wasEditingLyrics)
+            {
+                songEditorSceneController.StartEditingNoteText();
+                // When the newly selected note has not been drawn yet (because it is not in the current viewport),
+                // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                    () => songEditorSceneController.StartEditingNoteText()));
+            }
         }
     }
 
     public void SelectPreviousNote(bool updatePositionInSong = true)
     {
+        bool wasEditingLyrics = false;
+        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        {
+            // Finish this lyrics editing and select following note directly in lyrics editing mode.
+            GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
+            EditorNoteLyricsInputField lyricsInputField = selectedGameObject.GetComponentInChildren<EditorNoteLyricsInputField>();
+            if (lyricsInputField != null)
+            {
+                wasEditingLyrics = true;
+                SetSelection(new List<EditorUiNote> { lyricsInputField.EditorUiNote });
+            }
+        }
+
         if (selectedNotes.Count == 0)
         {
             SelectLastVisibleNote();
@@ -214,6 +263,15 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
             {
                 double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
+            }
+
+            if (wasEditingLyrics)
+            {
+                songEditorSceneController.StartEditingNoteText();
+                // When the newly selected note has not been drawn yet (because it is not in the current viewport),
+                // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                    () => songEditorSceneController.StartEditingNoteText()));
             }
         }
     }

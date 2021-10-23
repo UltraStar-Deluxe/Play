@@ -121,26 +121,53 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         }
     }
 
-    abstract protected EVENT CreateDragEventStart(PointerEventData eventData);
-    abstract protected EVENT CreateDragEvent(PointerEventData eventData, EVENT dragStartEvent);
+    protected abstract EVENT CreateDragEventStart(PointerEventData eventData);
+    protected abstract EVENT CreateDragEvent(PointerEventData eventData, EVENT dragStartEvent);
 
     protected GeneralDragEvent CreateGeneralDragEvent(PointerEventData eventData, GeneralDragEvent dragStartEvent)
     {
-        float xDistanceInPixels = eventData.position.x - dragStartEvent.StartPositionInPixels.x;
-        float yDistanceInPixels = eventData.position.y - dragStartEvent.StartPositionInPixels.y;
-        Vector2 distanceInPixels = new Vector2(xDistanceInPixels, yDistanceInPixels);
-        
-        float widthInPixels = targetRectTransform.rect.width;
-        float heightInPixels = targetRectTransform.rect.height;
-        float xDistanceInPercent = xDistanceInPixels / widthInPixels;
-        float yDistanceInPercent = yDistanceInPixels / heightInPixels;
-        Vector2 distanceInPercent = new Vector2(xDistanceInPercent, yDistanceInPercent);
+        // Screen coordinates in pixels
+        Vector2 screenPosInPixels = eventData.position;
+        Vector2 screenDistanceInPixels = screenPosInPixels - dragStartEvent.ScreenCoordinateInPixels.StartPosition;
+        Vector2 deltaInPixels = eventData.delta;
 
-        GeneralDragEvent result = new GeneralDragEvent(dragStartEvent.StartPositionInPixels,
-            dragStartEvent.StartPositionInPercent,
-            distanceInPixels,
-            distanceInPercent,
-            eventData.delta,
+        // Target RectTransform coordinates in pixels
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            targetRectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPoint);
+
+        float rectTransformWidthInPixels = targetRectTransform.rect.width;
+        float rectTransformHeightInPixels = targetRectTransform.rect.height;
+        Vector2 rectTransformPosInPixels = new Vector2(
+            localPoint.x + (rectTransformWidthInPixels / 2),
+            localPoint.y + (rectTransformHeightInPixels / 2));
+
+        float rectTransformXDistanceInPixels = rectTransformPosInPixels.x - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
+        float rectTransformYDistanceInPixels = rectTransformPosInPixels.y - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
+        Vector2 rectTransformDistanceInPixels = new Vector2(rectTransformXDistanceInPixels, rectTransformYDistanceInPixels);
+
+        GeneralDragEvent result = new GeneralDragEvent(
+            new DragCoordinate(
+                dragStartEvent.ScreenCoordinateInPixels.StartPosition,
+                screenDistanceInPixels,
+                deltaInPixels),
+            CreateDragCoordinateInPercent(
+                dragStartEvent.ScreenCoordinateInPixels.StartPosition,
+                screenDistanceInPixels,
+                deltaInPixels,
+                new Vector2(Screen.width, Screen.height)),
+            new DragCoordinate(
+                dragStartEvent.RectTransformCoordinateInPixels.StartPosition,
+                rectTransformDistanceInPixels,
+                deltaInPixels),
+            CreateDragCoordinateInPercent(
+                dragStartEvent.RectTransformCoordinateInPixels.StartPosition,
+                rectTransformDistanceInPixels,
+                deltaInPixels,
+                new Vector2(targetRectTransform.rect.width,
+                    targetRectTransform.rect.height)),
             dragStartEvent.RaycastResultsDragStart,
             dragStartEvent.InputButton);
         return result;
@@ -148,37 +175,57 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
     protected GeneralDragEvent CreateGeneralDragEventStart(PointerEventData eventData)
     {
-        float xDragStartInPixels = eventData.pressPosition.x;
-        float yDragStartInPixels = eventData.pressPosition.y;
-        Vector2 dragStartInPixels = new Vector2(xDragStartInPixels, yDragStartInPixels);
-        
+        // Screen coordinate in pixels
+        Vector2 screenPosInPixels = eventData.pressPosition;
 
+        // Target RectTransform coordinate in pixels
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            targetRectTransform,
+            screenPosInPixels,
+            eventData.pressEventCamera,
+            out Vector2 localPoint);
+
+        float rectTransformWidthInPixels = targetRectTransform.rect.width;
+        float rectTransformHeightInPixels = targetRectTransform.rect.height;
+        Vector2 rectTransformPosInPixels = new Vector2(
+            localPoint.x + (rectTransformWidthInPixels / 2),
+            localPoint.y + (rectTransformHeightInPixels / 2));
+
+        // Raycast
         List<RaycastResult> raycastResults = new List<RaycastResult>();
         PointerEventData eventDataForRaycast = new PointerEventData(EventSystem.current);
-        eventDataForRaycast.position = eventData.pressPosition;
+        eventDataForRaycast.position = screenPosInPixels;
         graphicRaycaster.Raycast(eventDataForRaycast, raycastResults);
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(targetRectTransform,
-                                                                eventData.pressPosition,
-                                                                eventData.pressEventCamera,
-                                                                out Vector2 localPoint);
-
-        float widthInPixels = targetRectTransform.rect.width;
-        float heightInPixels = targetRectTransform.rect.height;
-        float xDragStartInPercent = (localPoint.x + (widthInPixels / 2)) / widthInPixels;
-        float yDragStartInPercent = (localPoint.y + (heightInPixels / 2)) / heightInPixels;
-        Vector2 dragStartInPercent = new Vector2(xDragStartInPercent, yDragStartInPercent);
-
-        Vector2 distanceInPixels = Vector2.zero;
-        Vector2 distanceInPercent = Vector2.zero;
-
-        GeneralDragEvent result = new GeneralDragEvent(dragStartInPixels,
-            dragStartInPercent,
-            distanceInPixels,
-            distanceInPercent,
-            Vector2.zero, 
+        GeneralDragEvent result = new GeneralDragEvent(
+            new DragCoordinate(
+                screenPosInPixels,
+                Vector2.zero,
+                Vector2.zero),
+            CreateDragCoordinateInPercent(
+                screenPosInPixels,
+                Vector2.zero,
+                Vector2.zero,
+                new Vector2(Screen.width, Screen.height)),
+            new DragCoordinate(
+                rectTransformPosInPixels,
+                Vector2.zero,
+                Vector2.zero),
+            CreateDragCoordinateInPercent(
+                rectTransformPosInPixels,
+                Vector2.zero,
+                Vector2.zero,
+                new Vector2(rectTransformWidthInPixels, rectTransformHeightInPixels)),
             raycastResults,
             eventData.button);
         return result;
+    }
+
+    private DragCoordinate CreateDragCoordinateInPercent(Vector2 startPosInPixels, Vector2 distanceInPixels, Vector2 deltaInPixels, Vector2 fullSize)
+    {
+        Vector2 startPosInPercent = startPosInPixels / fullSize;
+        Vector2 distanceInPercent = distanceInPixels / fullSize;
+        Vector2 deltaInPercent = deltaInPixels / fullSize;
+        return new DragCoordinate(startPosInPercent, distanceInPercent, deltaInPercent);
     }
 }

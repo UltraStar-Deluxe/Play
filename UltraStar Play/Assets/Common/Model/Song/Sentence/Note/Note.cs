@@ -27,6 +27,7 @@ public class Note
     public bool IsGolden { get; private set; }
     public bool IsNormal { get; private set; }
     public bool IsFreestyle { get; private set; }
+    public bool IsRap { get; private set; }
 
     public Note()
     {
@@ -68,6 +69,7 @@ public class Note
         IsNormal = other.IsNormal;
         IsGolden = other.IsGolden;
         IsFreestyle = other.IsFreestyle;
+        IsRap = other.IsRap;
         Text = other.Text;
     }
 
@@ -112,6 +114,7 @@ public class Note
         IsGolden = (Type == ENoteType.Golden || Type == ENoteType.RapGolden);
         IsNormal = (Type == ENoteType.Normal || Type == ENoteType.Rap);
         IsFreestyle = (Type == ENoteType.Freestyle);
+        IsRap = (Type == ENoteType.Rap || Type == ENoteType.RapGolden);
     }
 
     public void SetStartBeat(int newStartBeat)
@@ -123,12 +126,11 @@ public class Note
 
         if (StartBeat != newStartBeat)
         {
-            int oldStartBeat = StartBeat;
             StartBeat = newStartBeat;
             Length = EndBeat - StartBeat;
 
             // Update the sentence's min beat
-            if (Sentence != null && Sentence.MinBeat == oldStartBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMinBeat();
             }
@@ -144,12 +146,11 @@ public class Note
 
         if (EndBeat != newEndBeat)
         {
-            int oldEndBeat = EndBeat;
             EndBeat = newEndBeat;
             Length = EndBeat - StartBeat;
 
             // Update the sentence's max beat
-            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMaxBeat();
             }
@@ -165,12 +166,11 @@ public class Note
 
         if (Length != newLength)
         {
-            int oldEndBeat = EndBeat;
             Length = newLength;
             EndBeat = StartBeat + Length;
 
             // Update the sentence's max beat
-            if (Sentence != null && Sentence.MaxBeat == oldEndBeat)
+            if (Sentence != null)
             {
                 Sentence.UpdateMaxBeat();
             }
@@ -195,9 +195,6 @@ public class Note
         }
         if (StartBeat != newStartBeat || EndBeat != newEndBeat)
         {
-            int oldStartBeat = StartBeat;
-            int oldEndBeat = EndBeat;
-
             StartBeat = newStartBeat;
             EndBeat = newEndBeat;
             Length = EndBeat - StartBeat;
@@ -205,14 +202,8 @@ public class Note
             // Update the sentence's min and max beat
             if (Sentence != null)
             {
-                if (Sentence.MinBeat == oldStartBeat)
-                {
-                    Sentence.UpdateMinBeat();
-                }
-                if (Sentence.MaxBeat == oldEndBeat)
-                {
-                    Sentence.UpdateMaxBeat();
-                }
+                Sentence.UpdateMinBeat();
+                Sentence.UpdateMaxBeat();
             }
         }
     }

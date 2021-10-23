@@ -143,6 +143,7 @@ public class SongEditorMidiSoundPlayAlongThread
                             || !settings.SongEditorSettings.HideVoices.Contains(voice.Name))
             .SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes)
+            .Where(note => !note.IsFreestyle && !note.IsRap)
             .Where(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat) > positionInSongInMillis)
             .ToList();
         result.Sort(Note.comparerByStartBeat);
