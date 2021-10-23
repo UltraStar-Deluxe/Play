@@ -45,4 +45,9 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
             return playlistManager.GetPlaylistName(playlist);
         }
     }
+
+    public void Reset()
+    {
+        Selection.Value = Items[0];
+    }
 }

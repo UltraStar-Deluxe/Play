@@ -19,8 +19,13 @@ public class DeleteNotesAction : INeedInjection
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
     
-    public void Execute(IReadOnlyCollection<Note> selectedNotes)
+    public List<Sentence> Execute(IReadOnlyCollection<Note> selectedNotes)
     {
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return new List<Sentence>();
+        }
+
         HashSet<Sentence> affectedSentences = new HashSet<Sentence>();
         foreach (Note note in selectedNotes)
         {
@@ -34,14 +39,26 @@ public class DeleteNotesAction : INeedInjection
         }
 
         List<Sentence> affectedSentencesWithoutNotes = affectedSentences
-            .Where(sentence => sentence.Notes.Count == 0)
+            .Where(sentence => sentence.Notes.IsNullOrEmpty())
             .ToList();
         deleteSentencesAction.Execute(affectedSentencesWithoutNotes);
+        return affectedSentencesWithoutNotes;
     }
 
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes)
     {
-        Execute(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesDeletedEvent());
+        List<Sentence> deletedSentences = Execute(selectedNotes);
+        songMetaChangeEventStream.OnNext(new NotesDeletedEvent
+        {
+            Notes = selectedNotes
+        });
+
+        if (!deletedSentences.IsNullOrEmpty())
+        {
+            songMetaChangeEventStream.OnNext(new SentencesDeletedEvent
+            {
+                Sentences = deletedSentences
+            });
+        }
     }
 }

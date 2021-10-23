@@ -82,7 +82,7 @@ public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDra
 
     private float GetNewVideoGap(GeneralDragEvent dragEvent)
     {
-        float videoGapDistance = dragEvent.DistanceInPercent.x * 0.5f;
+        float videoGapDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2f;
 
         // Round to 2 decimal places
         float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);

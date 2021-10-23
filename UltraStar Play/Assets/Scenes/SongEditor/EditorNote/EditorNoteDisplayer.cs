@@ -44,16 +44,28 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SongEditorSceneController songEditorSceneController;
+
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
+    private readonly Dictionary<Sentence, EditorUiSentence> sentenceToEditorUiSentenceMap = new Dictionary<Sentence, EditorUiSentence>();
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(_ =>
+        songMetaChangeEventStream.Subscribe(evt =>
         {
+            if (evt is LoadedMementoEvent)
+            {
+                // The object instances have changed. All maps must be cleared.
+                noteContainer.DestroyAllDirectChildren();
+                noteToEditorUiNoteMap.Clear();
+                sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+                sentenceToEditorUiSentenceMap.Clear();
+            }
             ReloadSentences();
             UpdateNotesAndSentences();
         });
@@ -62,7 +74,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     void Start()
     {
         noteContainer.DestroyAllDirectChildren();
+        noteToEditorUiNoteMap.Clear();
         sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
+        sentenceToEditorUiSentenceMap.Clear();
 
         ReloadSentences();
 
@@ -70,6 +84,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         {
             UpdateNotesAndSentences();
         });
+
+        songMetaChangeEventStream
+            .Subscribe(evt =>
+            {
+                if (evt is SentencesDeletedEvent sde)
+                {
+                    sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
+                }
+            });
 
         foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
         {
@@ -84,16 +107,28 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             .AddTo(this);
     }
 
+    private void DeleteSentence(Sentence sentence)
+    {
+        if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+        {
+            Destroy(uiSentence.gameObject);
+            sentenceToEditorUiSentenceMap.Remove(sentence);
+        }
+    }
+
     private void OnHideVoicesChanged()
     {
         // Remove notes of hidden voices
-        foreach (EditorUiNote uiNote in new List<EditorUiNote>(noteToEditorUiNoteMap.Values))
-        {
-            if (!IsVoiceVisible(uiNote.Note.Sentence?.Voice))
-            {
-                DeleteUiNote(uiNote);
-            }
-        }
+        List<Note> notVisibleNotes = noteToEditorUiNoteMap.Keys
+            .Where(note => !IsVoiceVisible(note.Sentence?.Voice))
+            .ToList();
+        notVisibleNotes.ForEach(note => DeleteNote(note));
+
+        // Remove sentences of hidden voices
+        List<Sentence> notVisibleSentences = sentenceToEditorUiSentenceMap.Keys
+            .Where(sentence => !IsVoiceVisible(sentence.Voice))
+            .ToList();
+        notVisibleSentences.ForEach(sentence => DeleteSentence(sentence));
 
         // Draw any notes that are now (again) visible.
         UpdateNotesAndSentences();
@@ -143,7 +178,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             return;
         }
         sentenceLinesImage.ClearTexture();
-        sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
 
         IEnumerable<Voice> voices = songMeta.GetVoices();
 
@@ -177,7 +211,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
                     CreateSentenceMarkerLine(xEndPercent, Colors.black, 20);
                 }
 
-                CreateUiSentence(sentence, xStartPercent, xEndPercent, sentenceIndex);
+                UpdateOrCreateUiSentence(sentence, xStartPercent, xEndPercent, sentenceIndex);
+            }
+            else
+            {
+                if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+                {
+                    Destroy(uiSentence.gameObject);
+                }
+                sentenceToEditorUiSentenceMap.Remove(sentence);
             }
             sentenceIndex++;
         }
@@ -258,7 +300,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         Color layerColor = songEditorLayerManager.GetColor(layerKey);
         foreach (Note note in notesInViewport)
         {
-            EditorUiNote uiNote = UpdateOrCreateNote(note);
+            EditorUiNote uiNote = UpdateOrCreateUiNote(note);
             if (uiNote != null)
             {
                 uiNote.SetColor(layerColor);
@@ -292,25 +334,36 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
 
         foreach (Note note in notesInViewport)
         {
-            UpdateOrCreateNote(note);
+            UpdateOrCreateUiNote(note);
         }
     }
 
-    private void CreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, int sentenceIndex)
+    private void UpdateOrCreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, int sentenceIndex)
     {
-        EditorUiSentence uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
+        if (!sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+        {
+            uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
+            sentenceToEditorUiSentenceMap[sentence] = uiSentence;
 
-        injector.Inject(uiSentence);
-        injector.Inject(uiSentence.GetComponent<EditorSentenceContextMenuHandler>());
-        uiSentence.Init(sentence);
+            injector.InjectAllComponentsInChildren(uiSentence);
+            uiSentence.Init(sentence);
+        }
+
         string label = (sentenceIndex + 1).ToString();
         uiSentence.SetText(label);
 
-        // Make sentence rectangles alternating light/dark
-        bool isDark = (sentenceIndex % 2) == 0;
-        if (isDark)
+        // Update color
+        if (sentence.Voice != null)
         {
-            uiSentence.backgroundImage.MultiplyColor(0.66f);
+            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
+            uiSentence.SetColor(color);
+
+            // Make sentence rectangles alternating light/dark
+            bool isDark = (sentenceIndex % 2) == 0;
+            if (isDark)
+            {
+                uiSentence.backgroundImage.MultiplyColor(0.66f);
+            }
         }
 
         PositionUiSentence(uiSentence.RectTransform, xStartPercent, xEndPercent);
@@ -348,7 +401,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         }
     }
 
-    private EditorUiNote UpdateOrCreateNote(Note note)
+    private EditorUiNote UpdateOrCreateUiNote(Note note)
     {
         if (!noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote editorUiNote))
         {

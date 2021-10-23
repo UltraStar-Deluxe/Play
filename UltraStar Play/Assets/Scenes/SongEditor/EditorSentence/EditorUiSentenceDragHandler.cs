@@ -11,13 +11,17 @@ using UnityEngine.EventSystems;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaDragHandler : AbstractDragHandler<NoteAreaDragEvent>
+public class EditorUiSentenceDragHandler : AbstractDragHandler<NoteAreaDragEvent>
 {
     [Inject]
     private NoteArea noteArea;
 
-    void Start()
+    [Inject]
+    private Canvas canvas;
+
+    protected override void Start()
     {
+        base.Start();
         targetRectTransform = noteArea.GetComponent<RectTransform>();
     }
 

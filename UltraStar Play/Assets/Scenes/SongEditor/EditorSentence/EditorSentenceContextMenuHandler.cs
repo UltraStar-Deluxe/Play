@@ -18,6 +18,9 @@ public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INee
     [Inject]
     private SentenceFitToNoteAction sentenceFitToNoteAction;
 
+    [Inject]
+    private SongMeta songMeta;
+
     private EditorUiSentence uiSentence;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
@@ -30,6 +33,7 @@ public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INee
         List<Sentence> selectedSentences = new List<Sentence> { uiSentence.Sentence };
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
+        contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }

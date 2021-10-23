@@ -58,8 +58,10 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         voice = songMeta.GetVoices()[0];
         UpdateLyrics();
         inputField.onSelect.AsObservable().Subscribe(_ => OnBeginEdit());
-        inputField.onEndEdit.AsObservable().Subscribe(OnEndEdit);
         inputField.onValidateInput += OnValidateInput;
+        inputField.onDeselect.AsObservable()
+            .Where(onNext => lyricsAreaMode == LyricsAreaMode.EditMode)
+            .Subscribe(onNext => OnEndEdit(inputField.text));
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
@@ -141,6 +143,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
         string editModeText = GetEditModeText();
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
+        ShowCaret();
 
         lyricsAreaMode = LyricsAreaMode.EditMode;
     }
@@ -151,6 +154,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
 
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
         SetInputFieldText(newInputFieldText);
+        HideCaret();
 
         lyricsAreaMode = LyricsAreaMode.ViewMode;
     }
@@ -355,5 +359,16 @@ public class LyricsArea : MonoBehaviour, INeedInjection
             return null;
         }
         return sortedNotes[noteIndex];
+    }
+
+    private void HideCaret()
+    {
+        inputField.customCaretColor = true;
+        inputField.caretColor = new Color(0, 0, 0, 0);
+    }
+
+    private void ShowCaret()
+    {
+        inputField.customCaretColor = false;
     }
 }

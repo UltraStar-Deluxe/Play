@@ -91,11 +91,14 @@ public class EditorUiNote : MonoBehaviour,
     public Note Note { get; private set; }
 
     private float lastClickTime;
-    
+
     public void Init(Note note)
     {
         this.Note = note;
         SyncWithNote();
+
+        // Delay Update of FontSize (Unity UI system does not know the final width yet).
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => UpdateFontSize()));
     }
 
     public void SyncWithNote()
@@ -213,7 +216,7 @@ public class EditorUiNote : MonoBehaviour,
         {
             leftHandle.gameObject.SetActive(isLeftHandleVisible);
         }
-        
+
         bool isRightHandleVisible = IsPointerOverRightHandle
             || (isSelected && (InputUtils.IsKeyboardAltPressed() || InputUtils.IsKeyboardShiftPressed()));
         if (rightHandle.gameObject.activeSelf != isRightHandleVisible)
@@ -263,7 +266,7 @@ public class EditorUiNote : MonoBehaviour,
             StartEditingNoteText();
             return;
         }
-        
+
         // Select / deselect notes via Shift.
         if (InputUtils.IsKeyboardShiftPressed())
         {
@@ -381,7 +384,7 @@ public class EditorUiNote : MonoBehaviour,
     {
         noteAreaDragHandler.OnBeginDrag(eventData);
     }
-    
+
     public void OnDrag(PointerEventData eventData)
     {
         noteAreaDragHandler.OnDrag(eventData);

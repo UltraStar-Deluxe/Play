@@ -134,12 +134,12 @@ public class SongRouletteItem : GeneralDragHandler, INeedInjection, IDragListene
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
-        songRouletteController.OnDrag(this, dragEvent.DragDeltaInPixels);
+        songRouletteController.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)
     {
-        songRouletteController.OnEndDrag(dragEvent != null ? dragEvent.DragDeltaInPixels : Vector2.zero);
+        songRouletteController.OnEndDrag(dragEvent != null ? dragEvent.ScreenCoordinateInPixels.DragDelta : Vector2.zero);
     }
 
     public void CancelDrag()

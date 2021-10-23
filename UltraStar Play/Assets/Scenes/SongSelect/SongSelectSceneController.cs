@@ -186,6 +186,10 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
     public void DoFuzzySearch(string text)
     {
         string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
+        if (searchTextToLowerNoWhitespace.IsNullOrEmpty())
+        {
+            return;
+        }
 
         // Try to jump to song-index
         if (TryExecuteSpecialSearchSyntax(text))
@@ -491,9 +495,20 @@ public class SongSelectSceneController : MonoBehaviour, IOnHotSwapFinishedListen
         songRouletteController.SetSongs(GetFilteredSongMetas());
 
         // Indicate filtered playlist via font style of song count
-        songCountText.fontStyle = playlistSlider.SelectedItem == null || playlistSlider.SelectedItem is UltraStarAllSongsPlaylist
-            ? FontStyles.Normal
-            : FontStyles.Underline;
+        songCountText.fontStyle = IsPlaylistActive()
+            ? FontStyles.Underline
+            : FontStyles.Normal;
+    }
+
+    public bool IsPlaylistActive()
+    {
+        return playlistSlider.SelectedItem != null
+               && !(playlistSlider.SelectedItem is UltraStarAllSongsPlaylist);
+    }
+
+    public void ResetPlaylistSelection()
+    {
+        playlistSlider.Reset();
     }
 
     private bool TryExecuteSpecialSearchSyntax(string searchText)
