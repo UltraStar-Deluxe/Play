@@ -14,6 +14,9 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    private const float ViewportAutomaticScrollingBoarderPercent = 0.0333f;
+    private const float ViewportAutomaticScrollingJumpPercent = 0.333f;
+
     public const int ViewportMinHeight = 12;
     // A piano has 88 keys.
     public const int ViewportMaxHeight = 88;
@@ -21,7 +24,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     // 1000 milliseconds
     public const int ViewportMinWidth = 1000;
     public int ViewportMaxWidth => (int)songAudioPlayer.DurationOfSongInMillis;
-    
+
     // The first midi note that is visible in the viewport
     public int ViewportY { get; private set; }
     // The number of midi notes that are visible in the viewport
@@ -134,8 +137,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
     {
-        float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * 0.1f;
-        float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * 0.9f;
+        float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * ViewportAutomaticScrollingBoarderPercent;
+        float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * (1 - ViewportAutomaticScrollingBoarderPercent);
         if (positionInSongInMillis < ViewportX || positionInSongInMillis > (ViewportX + ViewportWidth))
         {
             // Center viewport to position in song
@@ -145,13 +148,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
         {
             // Scroll left to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * 0.25;
+            double newViewportX = positionInSongInMillis - ViewportWidth * ViewportAutomaticScrollingJumpPercent;
             SetViewportX((int)newViewportX);
         }
         else if (positionInSongInMillis > viewportAutomaticScrollingRight)
         {
             // Scroll right to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * 0.75;
+            double newViewportX = positionInSongInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
             SetViewportX((int)newViewportX);
         }
     }
