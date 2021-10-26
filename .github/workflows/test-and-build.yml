@@ -3,7 +3,7 @@ name: Test and Build Unity Project
 on:
   push:
     branches:
-      - main
+      - master
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}

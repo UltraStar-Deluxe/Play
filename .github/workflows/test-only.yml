@@ -3,7 +3,7 @@ name: Test Unity Project
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
