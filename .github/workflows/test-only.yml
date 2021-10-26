@@ -7,7 +7,7 @@ on:
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  PROJECT_PATH: "UltraStar Play"
+  PROJECT_PATH: UltraStar Play
 
 jobs:
   test-and-build:
