@@ -1,0 +1,58 @@
+name: Test Unity Project
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  PROJECT_PATH: "UltraStar Play"
+
+jobs:
+  test-and-build:
+    name: Running tests for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2021.1.1f1
+        targetPlatform:
+          - StandaloneLinux64
+    steps:
+      # Clone repo and restore cache
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.PROJECT_PATH }}/Library
+          key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
+          restore-keys: |
+            Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-
+            Library-${{ env.PROJECT_PATH }}-
+            Library-
+      
+      # Run "Download Dependencies"
+      - name: Download Dependencies
+        working-directory: tools/download-dependencies
+        run: sh download-dependencies.sh
+      
+      # Test Unity project
+      - uses: game-ci/unity-test-runner@v2
+        id: testRunner
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          projectPath: ${{ env.PROJECT_PATH }}
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: all
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: "-nographics"
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Test results (all modes)
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
