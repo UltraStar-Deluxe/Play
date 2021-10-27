@@ -1,7 +1,10 @@
-name: Test and Build Unity Project
+name: Test Unity Project
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 
@@ -10,8 +13,8 @@ env:
   PROJECT_PATH: UltraStar Play
 
 jobs:
-  test-and-build:
-    name: Build for ${{ matrix.targetPlatform }}
+  test-job:
+    name: Test for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,12 +22,8 @@ jobs:
         unityVersion:
           - 2021.1.1f1
         targetPlatform:
-          - StandaloneWindows64
-          # - StandaloneLinux64
-          # - StandaloneOSX
-          # - Android
-          # - iOS
-          # - WebGL
+          # At the moment, tests are target platform independent. Thus only build one.
+          - StandaloneLinux64
     steps:
       # Clone repo and restore cache
       - uses: actions/checkout@v2
@@ -61,18 +60,3 @@ jobs:
         with:
           name: Test results (all modes)
           path: ${{ steps.testRunner.outputs.artifactsPath }}
-      
-      # Build Executables
-      - uses: game-ci/unity-builder@v2
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          projectPath: ${{ env.PROJECT_PATH }}
-          unityVersion: ${{ matrix.unityVersion }}
-          targetPlatform: ${{ matrix.targetPlatform }}
-          customParameters: '-myParameter myValue -myBoolean -ThirdParameter andItsValue'
-          allowDirtyBuild: true
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Build
-          path: build

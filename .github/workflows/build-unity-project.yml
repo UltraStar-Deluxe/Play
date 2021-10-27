@@ -1,7 +1,7 @@
-name: Test Unity Project
+name: Build Unity Project
 
 on:
-  pull_request:
+  push:
     branches:
       - master
 
@@ -10,8 +10,8 @@ env:
   PROJECT_PATH: UltraStar Play
 
 jobs:
-  test-and-build:
-    name: Running tests for ${{ matrix.targetPlatform }}
+  build-job:
+    name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,7 +19,12 @@ jobs:
         unityVersion:
           - 2021.1.1f1
         targetPlatform:
+          - StandaloneWindows64
           - StandaloneLinux64
+          - StandaloneOSX
+          - Android
+          - iOS
+          # - WebGL
     steps:
       # Clone repo and restore cache
       - uses: actions/checkout@v2
@@ -40,19 +45,17 @@ jobs:
         working-directory: tools/download-dependencies
         run: sh download-dependencies.sh
       
-      # Test Unity project
-      - uses: game-ci/unity-test-runner@b88af19d7fb34dadb854cd21a412a69c7fc448f6
-        id: testRunner
+      # Build Executables
+      - uses: game-ci/unity-builder@v2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
-          testMode: all
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          customParameters: "-nographics"
+          targetPlatform: ${{ matrix.targetPlatform }}
+          customParameters: '-myParameter myValue -myBoolean -ThirdParameter andItsValue'
+          allowDirtyBuild: true
       - uses: actions/upload-artifact@v2
-        if: always()
         with:
-          name: Test results (all modes)
-          path: ${{ steps.testRunner.outputs.artifactsPath }}
+          name: Build
+          path: build
