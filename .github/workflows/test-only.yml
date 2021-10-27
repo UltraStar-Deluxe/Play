@@ -41,7 +41,7 @@ jobs:
         run: sh download-dependencies.sh
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@v2
+      - uses: game-ci/unity-test-runner@b88af19d7fb34dadb854cd21a412a69c7fc448f6
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
