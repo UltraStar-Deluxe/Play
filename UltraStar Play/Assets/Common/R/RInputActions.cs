@@ -36,7 +36,6 @@ public static partial class R
         public static readonly string ui_rightClick = "ui/rightClick";
         public static readonly string ui_scrollWheel = "ui/scrollWheel";
         public static readonly string ui_submit = "ui/submit";
-        public static readonly string ui_tab = "ui/tab";
         public static readonly string ui_trackedDeviceOrientation = "ui/trackedDeviceOrientation";
         public static readonly string ui_trackedDevicePosition = "ui/trackedDevicePosition";
         public static readonly string usplay_anyKeyboardModifier = "usplay/anyKeyboardModifier";

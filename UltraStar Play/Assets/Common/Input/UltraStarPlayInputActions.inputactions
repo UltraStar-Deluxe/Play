@@ -11,7 +11,8 @@
                     "id": "6380c5aa-aa8e-4142-aa56-2a22bbbdcf16",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "RepeatedHold"
+                    "interactions": "RepeatedHold",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "submit",
@@ -19,7 +20,8 @@
                     "id": "393297a2-e0f9-4387-a046-6d0443f90c1e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "cancel",
@@ -27,15 +29,8 @@
                     "id": "f88fcdd1-b9d2-424d-a2dc-9e057367479e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "tab",
-                    "type": "Button",
-                    "id": "f47727c6-2010-4f27-9623-2eaba801c004",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "point",
@@ -43,7 +38,8 @@
                     "id": "a02bcba9-d98f-4357-95d7-55bce8841aa0",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "click",
@@ -51,7 +47,8 @@
                     "id": "7957afff-e7a9-4c95-abc7-81e4f7b2915d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "scrollWheel",
@@ -59,7 +56,8 @@
                     "id": "ed3b1af7-6128-4755-9f4c-f3edca5481c1",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "middleClick",
@@ -67,7 +65,8 @@
                     "id": "50d63dd8-8fb2-48a8-a7a4-1a47835d6d52",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "rightClick",
@@ -75,7 +74,8 @@
                     "id": "edbc1453-2b13-4d03-8fcf-e731fdcf6e90",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "trackedDevicePosition",
@@ -83,7 +83,8 @@
                     "id": "d3e811ff-b199-4b86-a14b-8673b962c99a",
                     "expectedControlType": "Vector3",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "trackedDeviceOrientation",
@@ -91,7 +92,8 @@
                     "id": "a1448685-143c-4390-a028-790d2d3e3927",
                     "expectedControlType": "Quaternion",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -468,61 +470,6 @@
                     "action": "trackedDeviceOrientation",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b3939fd4-4963-4c2b-ba78-a752fb726226",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "Invert",
-                    "groups": "Gamepad",
-                    "action": "tab",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6f88107e-aa3d-4df5-beee-7d9b56894924",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "tab",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Button With Sign Modifier",
-                    "id": "4b181bc4-3512-41ad-9da5-41e9750e5e32",
-                    "path": "ButtonWithSignModifier",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "tab",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier",
-                    "id": "d8fb78cc-25d7-4e71-92d8-01be003655da",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "tab",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "button",
-                    "id": "6177fb33-6a07-49ea-bc46-e3cee8c99746",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "tab",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 }
             ]
         },
@@ -536,7 +483,8 @@
                     "id": "3e3292ca-119e-4227-9948-6a5c5f53ac16",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleSearch",
@@ -544,7 +492,8 @@
                     "id": "41e6fe7e-d361-40fe-897f-152f177a881f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleFavorite",
@@ -552,7 +501,8 @@
                     "id": "6227994f-ca76-4f05-917e-85d369edb5e7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleFavoritePlaylistActive",
@@ -560,7 +510,8 @@
                     "id": "78ffc4f4-f4d2-468d-9e42-608b3b757ccf",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "randomSong",
@@ -568,7 +519,8 @@
                     "id": "aeb72133-9498-49d5-8b60-ab3a2a7620c7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "openSongEditor",
@@ -576,7 +528,8 @@
                     "id": "6174da8e-a478-4721-bd58-baaa42f52a8b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "togglePlayers",
@@ -584,7 +537,8 @@
                     "id": "90e5394f-9938-4877-bfc4-f3902339c4df",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "openContextMenu",
@@ -592,7 +546,8 @@
                     "id": "cac930d2-8155-45c9-8a3f-da3e293e3d1b",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "closeContextMenu",
@@ -600,7 +555,8 @@
                     "id": "dbcab40f-5fd7-49cc-b14c-5e3a764c0d8e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "skipToNextLyrics",
@@ -608,7 +564,8 @@
                     "id": "e96fdde6-5d6b-46db-ab56-4fd0d13c659b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "togglePause",
@@ -616,7 +573,8 @@
                     "id": "7d535b01-2668-4f38-b554-5e07b998f00f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "restartSong",
@@ -624,7 +582,8 @@
                     "id": "b6ffc08f-e68d-475f-b534-d1a4281cedc0",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleResultGraph",
@@ -632,7 +591,8 @@
                     "id": "63847a27-9fa3-4ff4-85a9-a4071a2981c1",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleFullscreen",
@@ -640,7 +600,8 @@
                     "id": "939bf79e-c8e1-4d45-b365-caa6e5ab3692",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleMute",
@@ -648,7 +609,8 @@
                     "id": "c2ca0fd5-4768-4c18-ba7f-d3c644833394",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleHelp",
@@ -656,7 +618,8 @@
                     "id": "ca0eb6ce-303d-4a5d-be18-89015231bef9",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "anyKeyboardModifier",
@@ -664,7 +627,8 @@
                     "id": "ab50d342-f483-45f0-8352-217b86dea75e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "space",
@@ -672,7 +636,8 @@
                     "id": "0a9f81a5-3a55-4442-9b07-ee4731c6a3db",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "enter",
@@ -680,7 +645,8 @@
                     "id": "90501e44-8c12-4007-9d7f-639078dd0dc5",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "start",
@@ -688,7 +654,8 @@
                     "id": "cfcdc7f7-069e-4570-a7ef-80d398fb76c8",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1265,7 +1232,8 @@
                     "id": "f2bd7a1a-5c8f-4fef-89d6-60aaa36b9cd0",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "jumpToEndOfSong",
@@ -1273,7 +1241,8 @@
                     "id": "5895feff-c320-4de8-a969-317bd9afe452",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "togglePlayPause",
@@ -1281,7 +1250,8 @@
                     "id": "4e6aa313-73d8-48ae-bf17-d1034a2f5517",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "playSelectedNotes",
@@ -1289,7 +1259,8 @@
                     "id": "5ebd702b-4e0c-4c96-859d-49294001b889",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "selectAll",
@@ -1297,7 +1268,8 @@
                     "id": "f2f98172-2ed2-40f5-a3f6-41395f43b4c9",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "delete",
@@ -1305,7 +1277,8 @@
                     "id": "e452893a-d6da-47bd-8538-4287c1dad340",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "undo",
@@ -1313,7 +1286,8 @@
                     "id": "8cd708d1-bb7f-4668-b1ac-fcaa7f70d557",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "redo",
@@ -1321,7 +1295,8 @@
                     "id": "7cfad8c4-1ee1-495f-9426-807ef8db0cd6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "cut",
@@ -1329,7 +1304,8 @@
                     "id": "8e400928-46be-4a21-9c51-202961782d0d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "copy",
@@ -1337,7 +1313,8 @@
                     "id": "d84222a4-9d1c-4777-b995-77f199b69f47",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "paste",
@@ -1345,7 +1322,8 @@
                     "id": "b0d5ced7-77e6-4d8f-a827-330a5023bce2",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "save",
@@ -1353,7 +1331,8 @@
                     "id": "04c3e463-663b-4087-89b0-45c7b13fe6f1",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "selectNextNote",
@@ -1361,7 +1340,8 @@
                     "id": "2f18f4c5-9751-42e6-9058-e4d3cb87d882",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "selectPreviousNote",
@@ -1369,7 +1349,8 @@
                     "id": "fc91ed53-392d-4d48-b779-20a395e63e9e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "editLyrics",
@@ -1377,7 +1358,8 @@
                     "id": "c50ccc1f-1f32-436b-864c-6c27cdd2606a",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleNoteTypeNormal",
@@ -1385,7 +1367,8 @@
                     "id": "2b17f574-6759-4ab4-a758-3a7375e2d31e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleNoteTypeGolden",
@@ -1393,7 +1376,8 @@
                     "id": "beae83aa-5003-42fc-81ca-f6a1b14b8732",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleNoteTypeFreestyle",
@@ -1401,7 +1385,8 @@
                     "id": "aa8c0ad5-c4b0-47b8-a07a-9eacab8882e8",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleNoteTypeRap",
@@ -1409,7 +1394,8 @@
                     "id": "66667cb6-8b56-4645-a7ed-633351a9f840",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "toggleNoteTypeRapGolden",
@@ -1417,7 +1403,8 @@
                     "id": "330b6440-2034-4844-b2f6-9b36e3aa684c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "zoomInVertical",
@@ -1425,7 +1412,8 @@
                     "id": "913acc92-f1cf-484a-a2aa-77e2357275c7",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "zoomOutVertical",
@@ -1433,7 +1421,8 @@
                     "id": "43c0b518-2250-4acf-bcef-b1b3bbf9f234",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "zoomInHorizontal",
@@ -1441,7 +1430,8 @@
                     "id": "1cf1c4fe-5c46-44cd-87e5-e24804230a56",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "zoomOutHorizontal",
@@ -1449,7 +1439,8 @@
                     "id": "1e03d248-658a-4025-93dd-38e61ec0d750",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "anyKeyboardKey",
@@ -1457,7 +1448,8 @@
                     "id": "41b84b84-f352-4238-a37f-9a402b6bcd62",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [

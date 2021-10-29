@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2021.1.1f1
+          - 2021.2.0f1
         targetPlatform:
           # At the moment, tests are target platform independent. Thus only build one.
           - StandaloneLinux64

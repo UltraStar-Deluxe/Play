@@ -8,11 +8,9 @@
         "MLAPI",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
-		"com.achimmihca.primeinputactions",
+        "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
         "Unity.TextMeshPro",
-        "UnityEngine.UIElementsModule",
-        "UnityEngine.UIElementsGameObjectsModule",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],
