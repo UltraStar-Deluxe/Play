@@ -8,17 +8,43 @@ using System.Linq;
 public class SongMeta
 {
     // required helper fields
+    /**
+     * Path of the directory of the song's txt file.
+     */
     public string Directory { get; set; }
+    /**
+     * File name of the song's txt file (not including any directories).
+     */
     public string Filename { get; set; }
+    /**
+     * Hash for the song's txt file, used to uniquely identify it.
+     */
     public string SongHash { get; private set; }
 
     // required 
+    /**
+     * Artist of the song.
+     */
     public string Artist { get; set; }
+    /**
+     * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
+     * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
+     */
     public float Bpm { get; set; }
+    /**
+     * Path to the audio file.
+     */
     public string Mp3 { get; set; }
+    /**
+     * Title of the song.
+     */
     public string Title { get; set; }
 
     // required special fields
+    /**
+     * Mapping from generic singer names ("P1", "P2", "P3", ...)
+     * to custom names ("Elvis Presley", "Shakira")
+     */
     private Dictionary<string, string> voiceNames;
     public Dictionary<string, string> VoiceNames
     {
@@ -38,21 +64,60 @@ public class SongMeta
         }
     }
 
+    /**
+     * Encoding of the song's txt file.
+     * Default is UTF-8.
+     */
     public Encoding Encoding { get; private set; }
 
     // optional fields
+    /**
+     * Path to an image file that should be displayed as background when singing.
+     */
     public string Background { get; set; }
+    /**
+     * Path to an image file that should be displayed as preview in song selection.
+     */
     public string Cover { get; set; }
+    /**
+     * Edition of the song, usually either the game it was ripped from or the TV show it was featured in.
+     */
     public string Edition { get; set; }
     public float End { get; set; }
+    /**
+     * Shift in millisecond for the lyrics relative to the audio file.
+     */
     public float Gap { get; set; }
+    /**
+     * Genre of the music.
+     */
     public string Genre { get; set; }
+    /**
+     * The language of the lyrics.
+     */
     public string Language { get; set; }
+    /**
+     * Whether the note timestamps are relative to the previous note (true) or to the start of the song (false).
+     * Default is false.
+     */
     public bool Relative { get; set; }
     public float Start { get; set; }
+    /**
+     * Beat at which a preview of the song should begin.
+     * Thus, this beat should start the most memorable part of a song as a preview.
+     */
     public float PreviewStart { get; set; }
+    /**
+     * Beat at which the preview should end.
+     */
     public float PreviewEnd { get; set; }
+    /**
+     * The video file.
+     */
     public string Video { get; set; }
+    /**
+     * Delay in seconds for the video playback relative to the audio file.
+     */
     public float VideoGap { get; set; }
     public uint Year { get; set; }
 
