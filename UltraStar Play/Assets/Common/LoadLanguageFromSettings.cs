@@ -11,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class LoadLanguageFromSettings : MonoBehaviour, INeedInjection
+public class LoadLanguageFromSettings : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     [Inject]
     private Settings settings;
@@ -19,7 +19,7 @@ public class LoadLanguageFromSettings : MonoBehaviour, INeedInjection
     [Inject]
     private TranslationManager translationManager;
     
-    private void Start()
+    public void OnSceneInjectionFinished()
     {
         if (translationManager.currentLanguage != settings.GameSettings.language)
         {
