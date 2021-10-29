@@ -124,6 +124,11 @@ public class Note
             throw new UnityException("StartBeat must be less or equal to EndBeat");
         }
 
+        if (newStartBeat == EndBeat)
+        {
+            newStartBeat = EndBeat - 1;
+        }
+
         if (StartBeat != newStartBeat)
         {
             StartBeat = newStartBeat;
@@ -144,6 +149,11 @@ public class Note
             throw new UnityException("EndBeat must be greater or equal to StartBeat");
         }
 
+        if (newEndBeat == StartBeat)
+        {
+            newEndBeat = StartBeat + 1;
+        }
+
         if (EndBeat != newEndBeat)
         {
             EndBeat = newEndBeat;
@@ -162,6 +172,11 @@ public class Note
         if (newLength < 0)
         {
             throw new UnityException("Length cannot be negative");
+        }
+
+        if (newLength == 0)
+        {
+            newLength = 1;
         }
 
         if (Length != newLength)
@@ -197,6 +212,12 @@ public class Note
         {
             StartBeat = newStartBeat;
             EndBeat = newEndBeat;
+
+            if (StartBeat == EndBeat)
+            {
+                EndBeat = StartBeat + 1;
+            }
+
             Length = EndBeat - StartBeat;
 
             // Update the sentence's min and max beat
