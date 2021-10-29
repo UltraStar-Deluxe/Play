@@ -8,11 +8,9 @@
         "Common",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
-		"com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
-        "UnityEngine.UIElementsModule",
-        "UnityEngine.UIElementsGameObjectsModule",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

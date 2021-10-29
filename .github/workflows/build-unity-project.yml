@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2021.1.1f1
+          - 2021.2.0f1
         targetPlatform:
           - StandaloneWindows64
           - StandaloneLinux64
@@ -45,7 +45,7 @@ jobs:
         working-directory: tools/download-dependencies
         run: sh download-dependencies.sh
       
-      # Build Executables
+      # Build Executables.
       - uses: game-ci/unity-builder@v2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
