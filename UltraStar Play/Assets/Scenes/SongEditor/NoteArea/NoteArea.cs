@@ -14,6 +14,10 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    private const float ViewportAutomaticScrollingBoarderPercent = 0.0333f;
+    private const float ViewportAutomaticScrollingJumpPercent = 0.333f;
+    private const int DefaultViewportWidthInMillis = 8000;
+
     public const int ViewportMinHeight = 12;
     // A piano has 88 keys.
     public const int ViewportMaxHeight = 88;
@@ -21,7 +25,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     // 1000 milliseconds
     public const int ViewportMinWidth = 1000;
     public int ViewportMaxWidth => (int)songAudioPlayer.DurationOfSongInMillis;
-    
+
     // The first midi note that is visible in the viewport
     public int ViewportY { get; private set; }
     // The number of midi notes that are visible in the viewport
@@ -87,10 +91,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
 
+        if (songAudioPlayer.PositionInSongInMillis == 0)
+        {
+            songAudioPlayer.PositionInSongInMillis = songMeta.Gap - DefaultViewportWidthInMillis * 0.25f;
+        }
         InitializeViewport();
 
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
-        SetPositionInSongInMillis(songAudioPlayer.PositionInSongInMillis);
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
@@ -134,8 +141,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
 
     public void SetPositionInSongInMillis(double positionInSongInMillis)
     {
-        float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * 0.1f;
-        float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * 0.9f;
+        float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * ViewportAutomaticScrollingBoarderPercent;
+        float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * (1 - ViewportAutomaticScrollingBoarderPercent);
         if (positionInSongInMillis < ViewportX || positionInSongInMillis > (ViewportX + ViewportWidth))
         {
             // Center viewport to position in song
@@ -145,13 +152,13 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         else if (positionInSongInMillis < viewportAutomaticScrollingLeft)
         {
             // Scroll left to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * 0.25;
+            double newViewportX = positionInSongInMillis - ViewportWidth * ViewportAutomaticScrollingJumpPercent;
             SetViewportX((int)newViewportX);
         }
         else if (positionInSongInMillis > viewportAutomaticScrollingRight)
         {
             // Scroll right to new position
-            double newViewportX = positionInSongInMillis - ViewportWidth * 0.75;
+            double newViewportX = positionInSongInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
             SetViewportX((int)newViewportX);
         }
     }
@@ -483,9 +490,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         int minMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Min();
         int maxMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Max();
         // 10 seconds
-        int width = 8000;
+        int width = DefaultViewportWidthInMillis;
         // Start at the beginning
-        int x = 0;
+        int x = Math.Max(0, (int)songAudioPlayer.PositionInSongInMillis - 1000);
         // Full range of notes. At least one octave
         int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
         // Center the notes

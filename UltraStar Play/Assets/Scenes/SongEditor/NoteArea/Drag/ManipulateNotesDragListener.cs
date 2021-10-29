@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -110,11 +111,25 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
                 break;
 
             case DragAction.StretchLeft:
-                StretchNotesLeft(dragEvent, selectedNotes);
+                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
+                {
+                    StretchNotesLeft(dragEvent, selectedNotes);
+                }
+                else
+                {
+                    ExtendNotesLeft(dragEvent, selectedNotes);
+                }
                 break;
 
             case DragAction.StretchRight:
-                StretchNotesRight(dragEvent, selectedNotes, true);
+                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
+                {
+                    StretchNotesRight(dragEvent, selectedNotes, true);
+                }
+                else
+                {
+                    ExtendNotesRight(dragEvent, selectedNotes, true);
+                }
                 break;
             default:
                 throw new UnityException("Unkown drag action: " + dragAction);
@@ -217,7 +232,7 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
         }
     }
 
-    private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
+    private void ExtendNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
         foreach (Note note in notes)
         {
@@ -235,16 +250,62 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
         }
     }
 
-    private void StretchNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
+    private void ExtendNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
     {
         foreach (Note note in notes)
         {
             Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            // Extend/trim StartBeat
             int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
             if (newStartBeat < noteSnapshot.EndBeat)
             {
                 note.SetStartBeat(newStartBeat);
             }
+        }
+    }
+
+    private void StretchNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
+    {
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
+        int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
+        int anchorBeatInSelection = maxBeatInSelection;
+        int currentPointerBeat = dragEvent.PositionInSongInBeatsDragStart + dragEvent.BeatDistance;
+        float dragPercentRelativeToSelection = (float)(dragEvent.PositionInSongInBeatsDragStart - currentPointerBeat)
+                                               / (maxBeatInSelection - minBeatInSelection);
+
+        foreach (Note note in notes)
+        {
+            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            // Stretch/shrink StartBeat and EndBeat relative to selection
+            float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
+        }
+    }
+
+    private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
+    {
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
+        int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
+        int anchorBeatInSelection = minBeatInSelection;
+        int currentPointerBeat = dragEvent.PositionInSongInBeatsDragStart + dragEvent.BeatDistance;
+        float dragPercentRelativeToSelection = (float)(currentPointerBeat - dragEvent.PositionInSongInBeatsDragStart)
+                                               / (maxBeatInSelection - minBeatInSelection);
+
+        foreach (Note note in notes)
+        {
+            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            // Stretch/shrink StartBeat and EndBeat relative to selection
+            float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
+        }
+
+        if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
+        {
+            MoveNotesHorizontal(dragEvent, followingNotes, false);
         }
     }
 }
