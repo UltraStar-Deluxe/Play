@@ -23,34 +23,34 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
     [InjectedInInspector]
     public VisualTreeAsset quitGameDialogUxml;
 
-    [Inject(key = "#startButton")]
+    [Inject(key = R.UxmlNames.startButtonHashed)]
     private Button startButton;
 
-    [Inject(key = "#settingsButton")]
+    [Inject(key = R.UxmlNames.settingsButtonHashed)]
     private Button settingsButton;
 
-    [Inject(key = "#aboutButton")]
+    [Inject(key = R.UxmlNames.aboutButtonHashed)]
     private Button aboutButton;
 
-    [Inject(key = "#quitButton")]
+    [Inject(key = R.UxmlNames.quitButtonHashed)]
     private Button quitButton;
 
-    [Inject(key = "#partyButton")]
+    [Inject(key = R.UxmlNames.partyButtonHashed)]
     private Button partyButton;
 
-    [Inject(key = "#jukeboxButton")]
+    [Inject(key = R.UxmlNames.jukeboxButtonHashed)]
     private Button jukeboxButton;
 
-    [Inject(key = "#sceneSubtitle")]
+    [Inject(key = R.UxmlNames.sceneSubtitleHashed)]
     private Label sceneSubtitle;
     
-    [Inject(key = "#semanticVersionText")]
+    [Inject(key = R.UxmlNames.semanticVersionTextHashed)]
     private Label semanticVersionText;
     
-    [Inject(key = "#commitHashText")]
+    [Inject(key = R.UxmlNames.commitHashTextHashed)]
     private Label commitHashText;
     
-    [Inject(key = "#buildTimeStampText")]
+    [Inject(key = R.UxmlNames.buildTimeStampTextHashed)]
     private Label buildTimeStampText;
     
     private SimpleUxmlDialog closeGameDialog;

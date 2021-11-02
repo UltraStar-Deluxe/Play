@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,6 +30,7 @@ public static class CreateConstantsMenuItems
         CreateConstantsForColors();
         CreateConstantsForImageFiles();
         CreateConstantsForAudioFiles();
+        CreateConstantsForUxmlNamesAndClasses();
         ProTrans.CreateTranslationConstantsMenuItems.CreateTranslationConstants();
         PrimeInputActions.CreateInputActionConstantsMenuItems.CreateInputActionConstants();
     }
@@ -60,6 +64,100 @@ public static class CreateConstantsMenuItems
         CreateConstantsForAudioFiles();
     }
 
+    [MenuItem("Generate/Create C# constants for UXML names and classes")]
+    private static void CreateConstantsForUxmlNamesAndClasses()
+    {
+        CreateConstantsForUxmlNames();
+        CreateConstantsForUxmlClasses();
+    }
+
+    private static void CreateConstantsForUxmlNames()
+    {
+        string subClassName = "UxmlNames";
+        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
+
+        List<string> files = GetFilesInFolder("Assets", "*.uxml");
+
+        HashSet<string> uxmlNames = new HashSet<string>();
+        files.ForEach(file => FindUxmlNames(file).ForEach(uxmlName =>
+        {
+            uxmlNames.Add(uxmlName);
+            uxmlNames.Add("#" + uxmlName);
+        }));
+        List<string> uxmlNamesList = uxmlNames.ToList();
+        uxmlNamesList.Sort(new IgnoreCssSelectorPrefixComparer());
+
+        // Use suffix in fieldName for CSS selector version
+        List<string> fieldNames = uxmlNamesList
+            .Select(nameValue => nameValue.StartsWith("#") ? (nameValue[1..] + "Hashed") : nameValue)
+            .ToList();
+
+        string classCode = CreateClassCode(subClassName, uxmlNamesList, fieldNames, true);
+        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
+        Debug.Log("Generated file " + targetPath);
+    }
+
+    private static void CreateConstantsForUxmlClasses()
+    {
+        string subClassName = "UxmlClasses";
+        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
+
+        List<string> files = GetFilesInFolder("Assets", "*.uxml");
+
+        HashSet<string> uxmlClasses = new HashSet<string>();
+        files.ForEach(file => FindUxmlClasses(file).ForEach(uxmlClass =>
+        {
+            uxmlClasses.Add(uxmlClass);
+            uxmlClasses.Add("." + uxmlClass);
+        }));
+        List<string> uxmlClassesList = uxmlClasses.ToList();
+        uxmlClassesList.Sort(new IgnoreCssSelectorPrefixComparer());
+
+        // Use suffix in fieldName for CSS selector version
+        List<string> fieldNames = uxmlClassesList
+            .Select(uxmlClass => uxmlClass.StartsWith(".") ? (uxmlClass[1..] + "Dotted") : uxmlClass)
+            .ToList();
+
+        string classCode = CreateClassCode(subClassName, uxmlClassesList, fieldNames, true);
+        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
+        Debug.Log("Generated file " + targetPath);
+    }
+
+    private static IEnumerable<string> FindUxmlNames(string uxmlFile)
+    {
+        HashSet<string> result = new HashSet<string>();
+        string content = File.ReadAllText(uxmlFile);
+        XElement xroot = XElement.Parse(content);
+        xroot.DescendantsAndSelf()
+            .ForEach(xelement =>
+            {
+                string nameAttribute = xelement.Attribute("name").String();
+                if (!nameAttribute.IsNullOrEmpty())
+                {
+                    result.Add(nameAttribute.Trim());
+                }
+            });
+        return result;
+    }
+
+    private static IEnumerable<string> FindUxmlClasses(string uxmlFile)
+    {
+        HashSet<string> result = new HashSet<string>();
+        string content = File.ReadAllText(uxmlFile);
+        XElement xroot = XElement.Parse(content);
+        xroot.DescendantsAndSelf()
+            .ForEach(xelement =>
+            {
+                string classAttributeList = xelement.Attribute("class").String();
+                if (!classAttributeList.IsNullOrEmpty())
+                {
+                    string[] classAttributes = classAttributeList.Split(" ");
+                    classAttributes.ForEach(classAttribute => result.Add(classAttribute.Trim()));
+                }
+            });
+        return result;
+    }
+
     private static void CreateConstantsForAudioFiles()
     {
         string subClassName = "Audio";
@@ -86,18 +184,21 @@ public static class CreateConstantsMenuItems
         Debug.Log("Generated file " + targetPath);
     }
 
-    private static List<string> GetFilesInStreamingAssetsFolder(params string[] fileExtensions)
+    private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
         List<string> result = new List<string>();
         foreach (string fileExtension in fileExtensions)
         {
-            string[] files = Directory.GetFiles("Assets/StreamingAssets/", fileExtension, SearchOption.AllDirectories);
-            foreach (string file in files)
-            {
-                result.Add(GetFilePathRelativeToThemeFolder(file));
-            }
+            string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
+            result.AddRange(files);
         }
         return result.Distinct().ToList();
+    }
+
+    private static List<string> GetFilesInStreamingAssetsFolder(params string[] fileExtensions)
+    {
+        List<string> result = GetFilesInFolder("Assets/StreamingAssets/", fileExtensions);
+        return result.Select(file => GetFilePathRelativeToThemeFolder(file)).ToList();
     }
 
     private static string GetFilePathRelativeToThemeFolder(string file)
@@ -113,7 +214,7 @@ public static class CreateConstantsMenuItems
         return result;
     }
 
-    private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null)
+    private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)
     {
         string newline = System.Environment.NewLine;
 
@@ -121,13 +222,13 @@ public static class CreateConstantsMenuItems
         sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
         sb.AppendLine("public static partial class " + className + newline + "{");
         sb.AppendLine(indentation + "public static class " + subClassName + newline + indentation + "{");
-        AppendFieldDeclarations(sb, constantValues, fieldNames, indentation + indentation);
+        AppendFieldDeclarations(sb, constantValues, fieldNames, indentation + indentation, useConst);
         sb.AppendLine(indentation + "}");
         sb.AppendLine("}");
         return sb.ToString();
     }
 
-    private static void AppendFieldDeclarations(StringBuilder sb, List<string> values, List<string> fieldNames, string indentation)
+    private static void AppendFieldDeclarations(StringBuilder sb, List<string> values, List<string> fieldNames, string indentation, bool useConst = false)
     {
         for(int i = 0; i < values.Count; i++)
         {
@@ -145,7 +246,38 @@ public static class CreateConstantsMenuItems
             }
 
             sb.Append(indentation);
-            sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
+            if (useConst)
+            {
+                sb.AppendLine($"public const string {fieldName} = \"{value}\";");
+            }
+            else
+            {
+                sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
+            }
+        }
+    }
+
+    private class IgnoreCssSelectorPrefixComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            if (x == null && y == null)
+            {
+                return 0;
+            }
+            else if (x == null)
+            {
+                return -1;
+            }
+            else if (y == null)
+            {
+                return 1;
+            }
+
+            return String.Compare(
+                    x.Replace(".", "").Replace("#", ""),
+                    y.Replace(".", "").Replace("#", ""),
+                    StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
