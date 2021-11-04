@@ -3,6 +3,8 @@ public static partial class R
 {
     public static class UxmlClasses
     {
+        public const string backButton = "backButton";
+        public const string backButtonDotted = ".backButton";
         public const string dialogButtonDotted = ".dialogButton";
         public const string dialogButton = "dialogButton";
         public const string dialogMessageDotted = ".dialogMessage";
@@ -13,6 +15,10 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImageDotted = ".dialogTitleImage";
         public const string dialogTitleImage = "dialogTitleImage";
+        public const string optionsOverviewButtonDotted = ".optionsOverviewButton";
+        public const string optionsOverviewButton = "optionsOverviewButton";
+        public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
+        public const string optionsOverviewButtonRowDotted = ".optionsOverviewButtonRow";
         public const string overlayDotted = ".overlay";
         public const string overlay = "overlay";
         public const string startButtonClassDotted = ".startButtonClass";

@@ -75,8 +75,6 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
 
         UpdateVersionInfoText();
 
-        UpdateTranslation();
-
         sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
