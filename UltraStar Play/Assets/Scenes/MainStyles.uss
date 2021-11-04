@@ -84,3 +84,16 @@
 .dialogTextButton:hover {
     color: rgb(0, 102, 156);
 }
+
+.optionsOverviewButtonRow {
+    height: 25%;
+    justify-content: space-around;
+    flex-direction: row;
+    align-items: center;
+}
+
+.optionsOverviewButton
+{
+    height: 60px;
+    width: 180px;
+}

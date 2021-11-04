@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 50px; width: 100%;">
+            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%;">
+                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
+                    <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <ui:VisualElement name="titleAndDescription">
+                            <ui:Label text="Options" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="startButtonClass backButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="width: 100%; margin-top: 12px;">
+                <ui:Button text="Game" display-tooltip-when-elided="true" name="gameOptionsButton" class="optionsOverviewButton" />
+                <ui:Button text="Graphics" display-tooltip-when-elided="true" name="graphicsOptionsButton" class="optionsOverviewButton"/>
+                <ui:Button text="Sound" display-tooltip-when-elided="true" name="soundOptionsButton" class="optionsOverviewButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
+                <ui:Button text="Recording" display-tooltip-when-elided="true" name="recordingOptionsButton" style="display: flex;" class="optionsOverviewButton"/>
+                <ui:Button text="Player Profiles" display-tooltip-when-elided="true" name="profileOptionsButton" class="optionsOverviewButton"/>
+                <ui:Button text="Design" display-tooltip-when-elided="true" name="designOptionsButton" class="optionsOverviewButton"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
+                <ui:Button text="Internet" display-tooltip-when-elided="true" name="internetOptionsButton" style="display: flex;" class="optionsOverviewButton"/>
+                <ui:Button text="Connected Apps" display-tooltip-when-elided="true" name="appOptionsButton" class="optionsOverviewButton"/>
+                <ui:Button text="Developer" display-tooltip-when-elided="true" name="developerOptionsButton" class="optionsOverviewButton"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
