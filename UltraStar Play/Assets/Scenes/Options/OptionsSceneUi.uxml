@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
-        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 50px; width: 100%;">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 20px; width: 100%;">
             <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%;">
-                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
+                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
@@ -11,22 +11,35 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="startButtonClass backButton" />
+                <ui:VisualElement name="languageContainer" style="height: 30px; width: 50%; flex-direction: row; align-items: center; justify-content: flex-end; flex-grow: 1;">
+                    <ui:VisualElement name="languageImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/language_black_24dp.svg?fileID=7388822144124034973&amp;guid=1900ef20b8528d644b92809130c3c01a&amp;type=3#language_black_24dp&apos;); width: 20px; height: 20px; flex-direction: row; margin-right: 5px;" />
+                    <ui:Label text="Language" display-tooltip-when-elided="true" name="languageLabel" style="font-size: 18px; width: auto; flex-direction: row; flex-shrink: 1;" />
+                    <ui:DropdownField index="0" name="languageChooser" choices="English" style="width: 60%; height: 100%; justify-content: flex-start; flex-shrink: 1;" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="width: 100%; margin-top: 12px;">
                 <ui:Button text="Game" display-tooltip-when-elided="true" name="gameOptionsButton" class="optionsOverviewButton" />
-                <ui:Button text="Graphics" display-tooltip-when-elided="true" name="graphicsOptionsButton" class="optionsOverviewButton"/>
+                <ui:Button text="Songs" display-tooltip-when-elided="true" name="songsOptionsButton" class="optionsOverviewButton" />
+                <ui:Button text="Graphics" display-tooltip-when-elided="true" name="graphicsOptionsButton" class="optionsOverviewButton" />
                 <ui:Button text="Sound" display-tooltip-when-elided="true" name="soundOptionsButton" class="optionsOverviewButton" />
             </ui:VisualElement>
-            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
-                <ui:Button text="Recording" display-tooltip-when-elided="true" name="recordingOptionsButton" style="display: flex;" class="optionsOverviewButton"/>
-                <ui:Button text="Player Profiles" display-tooltip-when-elided="true" name="profileOptionsButton" class="optionsOverviewButton"/>
-                <ui:Button text="Design" display-tooltip-when-elided="true" name="designOptionsButton" class="optionsOverviewButton"/>
+            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; margin-top: 48px;">
+                <ui:Button text="Recording" display-tooltip-when-elided="true" name="recordingOptionsButton" class="optionsOverviewButton" style="display: flex;" />
+                <ui:Button text="Players" display-tooltip-when-elided="true" name="profileOptionsButton" class="optionsOverviewButton" />
+                <ui:Button text="Design" display-tooltip-when-elided="true" name="designOptionsButton" class="optionsOverviewButton" />
+                <ui:Button text="Internet" display-tooltip-when-elided="true" name="internetOptionsButton" class="optionsOverviewButton" style="display: flex;" />
             </ui:VisualElement>
-            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
-                <ui:Button text="Internet" display-tooltip-when-elided="true" name="internetOptionsButton" style="display: flex;" class="optionsOverviewButton"/>
-                <ui:Button text="Connected Apps" display-tooltip-when-elided="true" name="appOptionsButton" class="optionsOverviewButton"/>
-                <ui:Button text="Developer" display-tooltip-when-elided="true" name="developerOptionsButton" class="optionsOverviewButton"/>
+            <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow" style="align-items: flex-start; width: 100%; flex-direction: row; margin-top: 48px;">
+                <ui:Button text="Apps" display-tooltip-when-elided="true" name="appOptionsButton" class="optionsOverviewButton" />
+                <ui:Button display-tooltip-when-elided="true" name="developerOptionsButton" class="optionsOverviewButton" style="margin-left: 5px; margin-right: 5px; margin-bottom: 5px; margin-top: 5px; justify-content: space-around;">
+                    <ui:VisualElement name="bugImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/bug_report_black_24dp.svg?fileID=7388822144124034973&amp;guid=9bef7197907abbe47932ade9224d0516&amp;type=3#bug_report_black_24dp&apos;); width: 20px; height: 20px; max-height: 100%; max-width: 100%; justify-content: flex-start;" />
+                    <ui:Label text="Developer" display-tooltip-when-elided="true" name="developerButtonLabel" />
+                </ui:Button>
+                <ui:Button display-tooltip-when-elided="true" name="backButton" class="startButtonClass backButton optionsOverviewButton">
+                    <ui:VisualElement name="backImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/arrow_back_black_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_black_24dp&apos;); width: 20px; height: 20px;" />
+                    <ui:Label text="Back" display-tooltip-when-elided="true" name="backButtonLabel" />
+                </ui:Button>
+                <ui:VisualElement class="optionsOverviewButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

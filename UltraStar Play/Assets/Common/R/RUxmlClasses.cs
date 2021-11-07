@@ -3,8 +3,8 @@ public static partial class R
 {
     public static class UxmlClasses
     {
-        public const string backButton = "backButton";
         public const string backButtonDotted = ".backButton";
+        public const string backButton = "backButton";
         public const string dialogButtonDotted = ".dialogButton";
         public const string dialogButton = "dialogButton";
         public const string dialogMessageDotted = ".dialogMessage";

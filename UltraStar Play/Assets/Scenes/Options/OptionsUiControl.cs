@@ -6,7 +6,9 @@ using ProTrans;
 using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UIElements.Button;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -43,8 +45,17 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(key = R.UxmlNames.developerOptionsButtonHashed)]
     private Button developerOptionsButton;
 
+    [Inject(key = R.UxmlNames.languageChooserHashed)]
+    private DropdownField languageChooser;
+
     [Inject]
     private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private TranslationManager translationManager;
+
+    [Inject]
+    private Settings settings;
 
 	private void Start()
     {
@@ -57,6 +68,17 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         profileOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.PlayerProfileSetupScene));
         designOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ThemeOptionsScene));
         internetOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.NetworkOptionsScene));
+
+        InitLanguageChooser();
+    }
+
+    private void InitLanguageChooser()
+    {
+        languageChooser.choices = translationManager.GetTranslatedLanguages()
+            .Select(lang => lang.ToString())
+            .ToList();
+        languageChooser.SetValueWithoutNotify(settings.GameSettings.language.ToString());
+        languageChooser.RegisterValueChangedCallback(evt => SetLanguage(evt.newValue));
     }
 
     public void UpdateTranslation()
@@ -65,6 +87,16 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        backButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.back);
+    }
+
+    private void SetLanguage(string newLanguageString)
+    {
+        if (Enum.TryParse(newLanguageString, true, out SystemLanguage newLanguageEnum))
+        {
+            settings.GameSettings.language = newLanguageEnum;
+            translationManager.currentLanguage = settings.GameSettings.language;
+            translationManager.ReloadTranslationsAndUpdateScene();
+        }
     }
 }
