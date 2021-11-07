@@ -4,6 +4,51 @@
     padding: 0;
 }
 
+.unity-base-popup-field__text {
+    color: white;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    font-size: 18px;
+}
+
+.unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: white;
+    border-width: 0;
+}
+
+.unity-base-popup-field__input {
+    background-color: rgb(66, 163, 231);
+    padding: 0 5px;
+    border-width: 0;
+}
+
+.unity-base-dropdown__container-outer {
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    margin-top: 2px;
+}
+
+.unity-base-dropdown__container-inner {
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.unity-base-dropdown__item {
+    background-color: rgb(66, 163, 231);
+    padding: 0 5px;
+    margin: 0;
+    border-width: 0;
+    border-bottom-width: 2px;
+    border-color: white;
+}
+
+.unity-base-dropdown__label {
+    font-size: 18px;
+}
+
 .unity-button {
     background-color: rgb(66, 163, 231);
     color: rgb(255, 255, 255);
@@ -18,6 +63,8 @@
     border-bottom-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    align-items: center;
+    justify-content: center;
 }
 
 .unity-button:hover {
@@ -87,13 +134,14 @@
 
 .optionsOverviewButtonRow {
     height: 25%;
-    justify-content: space-around;
+    justify-content: space-between;
     flex-direction: row;
     align-items: center;
 }
 
-.optionsOverviewButton
-{
-    height: 60px;
-    width: 180px;
+.optionsOverviewButton {
+    height: 100%;
+    width: 20%;
+    justify-content: space-around;
+    align-items: center;
 }
