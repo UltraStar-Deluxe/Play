@@ -12,16 +12,16 @@ using ProTrans;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, UniInject.IBinder
+public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
-    public UIDocument uiDoc;
-
-    [InjectedInInspector]
     public VisualTreeAsset quitGameDialogUxml;
+
+    [Inject]
+    private UIDocument uiDoc;
 
     [Inject(key = R.UxmlNames.startButtonHashed)]
     private Button startButton;
@@ -52,7 +52,7 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
     
     [Inject(key = R.UxmlNames.buildTimeStampTextHashed)]
     private Label buildTimeStampText;
-    
+
     private SimpleUxmlDialog closeGameDialog;
 
     private void Start()
@@ -167,12 +167,5 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         Button yesButton = closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
         closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
-    }
-
-    public List<UniInject.IBinding> GetBindings()
-    {
-        BindingBuilder bb = new BindingBuilder();
-        bb.BindExistingInstance(uiDoc);
-        return bb.GetBindings();
     }
 }

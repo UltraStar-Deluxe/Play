@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UnityEngine;
 using UniInject;
 using UniRx;
 using UnityEditor.UIElements;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 
@@ -57,8 +59,14 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private Settings settings;
 
+    [Inject]
+    public UIDocument uiDoc;
+
 	private void Start()
     {
+        uiDoc.rootVisualElement.Query<Button>().ForEach(button => button.focusable = true);
+        gameOptionsButton.Focus();
+
         gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
         gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
@@ -70,6 +78,9 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         internetOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.NetworkOptionsScene));
 
         InitLanguageChooser();
+
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+            .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
     }
 
     private void InitLanguageChooser()
