@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using PrimeInputActions;
 using ProTrans;
+using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
@@ -31,10 +33,23 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);
 
+        // Lazy binding of UIDocument, because it does not exist in every scene (yet)
+        bb.BindExistingInstanceLazy(() => GetUiDocument());
+
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
 
         return bb.GetBindings();
+    }
+
+    private static UIDocument GetUiDocument()
+    {
+        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
+        if (uiDocGameObject != null)
+        {
+            return uiDocGameObject.GetComponent<UIDocument>();
+        }
+        return null;
     }
 }
