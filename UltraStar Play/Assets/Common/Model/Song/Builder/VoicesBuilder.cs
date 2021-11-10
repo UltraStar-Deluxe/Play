@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class VoicesBuilder
 {
+    private readonly string path;
+    private readonly Encoding encoding;
     private Voice currentVoice;
     private Sentence currentSentence;
     private bool endFound;
@@ -17,13 +19,15 @@ public class VoicesBuilder
     // The last beat is only relevant for relative song files. Any beat will be relative to this.
     private int lastBeat;
 
-    public VoicesBuilder(string path, Encoding enc, bool isRelativeSongFile)
+    public VoicesBuilder(string path, Encoding encoding, bool isRelativeSongFile)
     {
+        this.path = path;
+        this.encoding = encoding;
         this.isRelativeSongFile = isRelativeSongFile;
         currentVoice = new Voice(Voice.soloVoiceName);
         voiceNameToVoiceMap.Add(Voice.soloVoiceName, currentVoice);
 
-        using (StreamReader reader = TxtReader.GetFileStreamReader(path, enc))
+        using (StreamReader reader = TxtReader.GetFileStreamReader(path, encoding))
         {
             ParseStreamReader(reader);
         }
@@ -105,7 +109,8 @@ public class VoicesBuilder
     {
         if (currentSentence == null)
         {
-            ThrowLineError(lineNumber, "Linebreak encountered without preceding notes");
+            LogLineWarning(lineNumber, "Linebreak encountered without preceding notes");
+            return;
         }
 
         try
@@ -230,9 +235,20 @@ public class VoicesBuilder
         return res;
     }
 
-    private static void ThrowLineError(uint lineNumber, string message)
+    private void ThrowLineError(uint lineNumber, string message)
     {
-        throw new VoicesBuilderException("Error at line " + lineNumber + ": " + message);
+        throw new VoicesBuilderException(message
+                                         + " (path: '" + path + "', " +
+                                         "line: " + lineNumber + ", " +
+                                         "encoding: " + encoding + ")");
+    }
+
+    private void LogLineWarning(uint lineNumber, string message)
+    {
+        Debug.LogWarning(message
+                         + " (path: '" + path + "', " +
+                         "line: " + lineNumber + ", " +
+                         "encoding: " + encoding + ")");
     }
 
     private static int ConvertToInt32(string s)
