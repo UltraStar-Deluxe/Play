@@ -225,3 +225,10 @@ ItemPicker {
     padding: 0;
     -unity-text-align: middle-center;
 }
+
+.optionsLabelAndItemPicker {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 20px;
+}

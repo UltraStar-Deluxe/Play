@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using ProTrans;
 
-public class BoolItemPickerControl : TextItemPickerControl<bool>
+public class BoolPickerControl : LabeledItemPickerControl<bool>
 {
-    public BoolItemPickerControl(ItemPicker itemPicker)
+    public BoolPickerControl(ItemPicker itemPicker)
         : base(itemPicker, new List<bool> { false, true })
     {
     }
 
-    protected override string GetDisplayText(bool item)
+    protected override string GetLabelText(bool item)
     {
         if (item)
         {

@@ -22,7 +22,7 @@
       "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
     },
     "com.achimmihca.uniinject": {
-      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#c184f447bb3868d9ecee104901b7c01839967ae2",
+      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v3.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},

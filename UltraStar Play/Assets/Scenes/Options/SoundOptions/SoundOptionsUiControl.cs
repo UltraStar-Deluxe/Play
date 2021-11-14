@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SoundOptionsUiControl : MonoBehaviour, INeedInjection
+public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -23,8 +23,23 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDoc;
 
-    [Inject(UxmlName = R.UxmlNames.backgroundMusicChooser)]
-    private ItemPicker backgroundMusicChooser;
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
+
+    [Inject(UxmlName = R.UxmlNames.backgroundMusicEnabledLabel)]
+    private Label backgroundMusicEnabledLabel;
+
+    [Inject(UxmlName = R.UxmlNames.backgroundMusicEnabledChooser)]
+    private ItemPicker backgroundMusicEnabledChooser;
+
+    [Inject(UxmlName = R.UxmlNames.previewVolumeLabel)]
+    private Label previewVolumeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.previewVolumeChooser)]
+    private ItemPicker previewVolumeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.backButton)]
+    private Button backButton;
 
     [Inject]
     private Settings settings;
@@ -33,11 +48,31 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection
     {
         uiDoc.rootVisualElement.Query<Button>().ForEach(button => button.focusable = true);
 
-        new BoolItemPickerControl(backgroundMusicChooser)
+        new BoolPickerControl(backgroundMusicEnabledChooser)
             .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
                   newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);
 
+        new PercentNumberPickerControl(previewVolumeChooser)
+            .Bind(() => settings.AudioSettings.PreviewVolumePercent,
+                newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
+
+        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+
+        backgroundMusicEnabledChooser.PreviousItemButton.Focus();
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+    }
+
+    public void UpdateTranslation()
+    {
+        if (!Application.isPlaying && backgroundMusicEnabledLabel == null)
+        {
+            SceneInjectionManager.Instance.DoInjection();
+        }
+        backgroundMusicEnabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
+        previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
+        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.soundOptionsScene_title);
     }
 }
