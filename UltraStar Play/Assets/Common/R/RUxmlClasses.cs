@@ -15,10 +15,16 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImageDotted = ".dialogTitleImage";
         public const string dialogTitleImage = "dialogTitleImage";
-        public const string optionsOverviewButtonDotted = ".optionsOverviewButton";
+        public const string itemChooser = "itemChooser";
+        public const string itemChooserDotted = ".itemChooser";
+        public const string itemChooserButton = "itemChooserButton";
+        public const string itemChooserButtonDotted = ".itemChooserButton";
+        public const string itemChooserItemLabelDotted = ".itemChooserItemLabel";
+        public const string itemChooserItemLabel = "itemChooserItemLabel";
         public const string optionsOverviewButton = "optionsOverviewButton";
-        public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
+        public const string optionsOverviewButtonDotted = ".optionsOverviewButton";
         public const string optionsOverviewButtonRowDotted = ".optionsOverviewButtonRow";
+        public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
         public const string overlayDotted = ".overlay";
         public const string overlay = "overlay";
         public const string startButtonClassDotted = ".startButtonClass";
@@ -27,7 +33,7 @@ public static partial class R
         public const string titleImage = "titleImage";
         public const string titleSubTextDotted = ".titleSubText";
         public const string titleSubText = "titleSubText";
-        public const string titleTextDotted = ".titleText";
         public const string titleText = "titleText";
+        public const string titleTextDotted = ".titleText";
     }
 }
