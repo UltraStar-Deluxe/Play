@@ -1,11 +1,19 @@
+:root {
+    --text-color: white;
+    --text-color-accent1: lightgrey;
+    --control-color: rgb(66, 163, 231);
+    --control-color-accent1: rgb(125, 198, 233);
+    --control-color-accent2: rgb(99, 154, 183);
+}
+
 .unity-label {
-    color: white;
+    color: var(--text-color);
     margin: 0;
     padding: 0;
 }
 
 .unity-base-popup-field__text {
-    color: white;
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     border-width: 0;
@@ -13,20 +21,20 @@
 }
 
 .unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: white;
+    -unity-background-image-tint-color: var(--text-color);
     border-width: 0;
 }
 
 .unity-base-popup-field {
-    background-color: rgb(66, 163, 231);
+    background-color: var(--control-color);
 }
 
 .unity-base-popup-field:hover {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent1);
 }
 
 .unity-base-popup-field:focus {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent1);
 }
 
 .unity-base-popup-field .unity-base-popup-field__input {
@@ -36,11 +44,11 @@
 }
 
 .unity-base-popup-field:hover .unity-base-popup-field__input {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent1);
 }
 
 .unity-base-popup-field:focus .unity-base-popup-field__input {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent2);
 }
 
 .unity-base-dropdown__container-outer {
@@ -57,12 +65,12 @@
 }
 
 .unity-base-dropdown__item {
-    background-color: rgb(66, 163, 231);
+    background-color: var(--control-color);
     padding: 0 5px;
     margin: 0;
     border-width: 0;
     border-bottom-width: 2px;
-    border-color: white;
+    border-color: var(--text-color);
 }
 
 .unity-base-dropdown__item:hover {
@@ -74,7 +82,7 @@
 }
 
 .unity-button {
-    background-color: rgb(66, 163, 231);
+    background-color: var(--control-color);
     color: rgb(255, 255, 255);
     width: 120px;
     height: 40px;
@@ -92,15 +100,26 @@
 }
 
 .unity-button:hover {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent1);
 }
 
 .unity-button:focus {
-    background-color: rgb(125, 198, 233);
+    background-color: var(--control-color-accent1);
 }
 
 .unity-button:active {
-    background-color: rgb(99, 154, 183);
+    background-color: var(--control-color-accent2);
+}
+
+.middleCenterText {
+    -unity-text-align: middle-center;
+}
+
+.controlLabel {
+    -unity-text-align: middle-center;
+    width: 300px;
+    -unity-font-style: bold;
+    font-size: 18px;
 }
 
 .titleImage {
@@ -171,5 +190,38 @@
 }
 
 .optionsOverviewButton VisualElement {
-    -unity-background-image-tint-color: white;
+    -unity-background-image-tint-color: var(--text-color);
+}
+
+ItemPicker {
+    width: 300px;
+    height: 30px;
+}
+
+.itemPickerButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 60px;
+    height: 100%;
+    min-width: 30px;
+    min-height: 30px;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.itemPickerItemLabel {
+    background-color: var(--control-color-accent2);
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 30px;
+    min-height: 30px;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
 }
