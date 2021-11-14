@@ -20,6 +20,7 @@ public static partial class R
         public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string designOptionsScene_title = "designOptionsScene_title";
+        public static readonly string developmentOptionsScene_title = "developmentOptionsScene_title";
         public static readonly string difficulty = "difficulty";
         public static readonly string difficulty_easy = "difficulty_easy";
         public static readonly string difficulty_hard = "difficulty_hard";
@@ -63,13 +64,19 @@ public static partial class R
         public static readonly string ok = "ok";
         public static readonly string open = "open";
         public static readonly string options = "options";
+        public static readonly string options_analyzeBeatsWithoutTargetNote = "options_analyzeBeatsWithoutTargetNote";
         public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
         public static readonly string options_combineDuetScores = "options_combineDuetScores";
         public static readonly string options_fullscreenMode = "options_fullscreenMode";
+        public static readonly string options_httpServerNotSupported = "options_httpServerNotSupported";
+        public static readonly string options_httpServerPortWithExampleUri = "options_httpServerPortWithExampleUri";
+        public static readonly string options_ipAddress = "options_ipAddress";
         public static readonly string options_noteDisplayMode = "options_noteDisplayMode";
+        public static readonly string options_pitchDetectionAlgorithm = "options_pitchDetectionAlgorithm";
         public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string options_ratePlayers = "options_ratePlayers";
         public static readonly string options_resolution = "options_resolution";
+        public static readonly string options_showFps = "options_showFps";
         public static readonly string options_showLyricsOnNotes = "options_showLyricsOnNotes";
         public static readonly string options_showPitchIndicator = "options_showPitchIndicator";
         public static readonly string options_targetFps = "options_targetFps";

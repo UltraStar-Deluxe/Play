@@ -59,6 +59,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/NetworkOptions/NetworkOptionsScene.unity
     guid: 2c3c687e37cd4174c99cb45b42bacc69
+  - enabled: 1
+    path: Assets/Scenes/Options/DevelopmentOptions/DevelopmentOptionsScene.unity
+    guid: 98c8b71f12960164881704e7a7c90561
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

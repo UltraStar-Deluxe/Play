@@ -116,7 +116,7 @@
 }
 
 .controlLabel {
-    -unity-text-align: middle-center;
+    -unity-text-align: middle-left;
     width: 300px;
     -unity-font-style: bold;
     font-size: 18px;
@@ -230,7 +230,7 @@ ItemPicker {
 
 .optionsLabelAndItemPicker {
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
 }
