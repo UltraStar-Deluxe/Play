@@ -13,7 +13,7 @@
    fill="#000000"
    version="1.1"
    id="svg6"
-   sodipodi:docname="arrow_back_black_24dp.svg"
+   sodipodi:docname="desktop_windows_black_24dp.svg"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
   <metadata
      id="metadata12">
@@ -23,6 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,23 +38,24 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1645"
-     inkscape:window-height="890"
+     inkscape:window-width="1825"
+     inkscape:window-height="1046"
      id="namedview8"
      showgrid="false"
+     inkscape:pagecheckerboard="true"
      inkscape:zoom="35.333333"
      inkscape:cx="12"
      inkscape:cy="12"
-     inkscape:window-x="2760"
-     inkscape:window-y="497"
-     inkscape:window-maximized="0"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg6" />
   <path
      d="M0 0h24v24H0z"
      fill="none"
      id="path2" />
   <path
-     d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+     d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"
      id="path4"
-     style="fill:#ececec" />
+     style="fill:#ffffff" />
 </svg>
