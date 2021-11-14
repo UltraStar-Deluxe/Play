@@ -17,37 +17,37 @@ using Button = UnityEngine.UIElements.Button;
 
 public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    [Inject(Key = R.UxmlNames.backButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
-    [Inject(Key = R.UxmlNames.gameOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
     private Button gameOptionsButton;
 
-    [Inject(Key = R.UxmlNames.graphicsOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.graphicsOptionsButton)]
     private Button graphicsOptionsButton;
 
-    [Inject(Key = R.UxmlNames.soundOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.soundOptionsButton)]
     private Button soundOptionsButton;
 
-    [Inject(Key = R.UxmlNames.recordingOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.recordingOptionsButton)]
     private Button recordingOptionsButton;
 
-    [Inject(Key = R.UxmlNames.profileOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.profileOptionsButton)]
     private Button profileOptionsButton;
 
-    [Inject(Key = R.UxmlNames.designOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.designOptionsButton)]
     private Button designOptionsButton;
 
-    [Inject(Key = R.UxmlNames.internetOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.internetOptionsButton)]
     private Button internetOptionsButton;
 
-    [Inject(Key = R.UxmlNames.appOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.appOptionsButton)]
     private Button appOptionsButton;
 
-    [Inject(Key = R.UxmlNames.developerOptionsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.developerOptionsButton)]
     private Button developerOptionsButton;
 
-    [Inject(Key = R.UxmlNames.languageChooserHashed)]
+    [Inject(UxmlName = R.UxmlNames.languageChooser)]
     private DropdownField languageChooser;
 
     [Inject]

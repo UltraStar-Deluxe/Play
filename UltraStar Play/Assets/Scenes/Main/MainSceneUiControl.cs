@@ -23,34 +23,34 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private UIDocument uiDoc;
 
-    [Inject(Key = R.UxmlNames.startButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
 
-    [Inject(Key = R.UxmlNames.settingsButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.settingsButton)]
     private Button settingsButton;
 
-    [Inject(Key = R.UxmlNames.aboutButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.aboutButton)]
     private Button aboutButton;
 
-    [Inject(Key = R.UxmlNames.quitButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.quitButton)]
     private Button quitButton;
 
-    [Inject(Key = R.UxmlNames.partyButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.partyButton)]
     private Button partyButton;
 
-    [Inject(Key = R.UxmlNames.jukeboxButtonHashed)]
+    [Inject(UxmlName = R.UxmlNames.jukeboxButton)]
     private Button jukeboxButton;
 
-    [Inject(Key = R.UxmlNames.sceneSubtitleHashed)]
+    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
     private Label sceneSubtitle;
     
-    [Inject(Key = R.UxmlNames.semanticVersionTextHashed)]
+    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
     
-    [Inject(Key = R.UxmlNames.commitHashTextHashed)]
+    [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
     
-    [Inject(Key = R.UxmlNames.buildTimeStampTextHashed)]
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
     private SimpleUxmlDialog closeGameDialog;
