@@ -32,6 +32,7 @@ public static partial class R
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
         public static readonly string graph_legend_perfect = "graph_legend_perfect";
+        public static readonly string graphicOptionsScene_title = "graphicOptionsScene_title";
         public static readonly string highscoreScene_title = "highscoreScene_title";
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
@@ -63,8 +64,11 @@ public static partial class R
         public static readonly string options = "options";
         public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
         public static readonly string options_combineDuetScores = "options_combineDuetScores";
+        public static readonly string options_fullscreenMode = "options_fullscreenMode";
         public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string options_ratePlayers = "options_ratePlayers";
+        public static readonly string options_resolution = "options_resolution";
+        public static readonly string options_targetFps = "options_targetFps";
         public static readonly string options_volume = "options_volume";
         public static readonly string optionsScene_button_apps = "optionsScene_button_apps";
         public static readonly string optionsScene_button_design = "optionsScene_button_design";

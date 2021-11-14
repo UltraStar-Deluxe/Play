@@ -30,6 +30,8 @@ public static partial class R
         public const string dialogTitleImage = "dialogTitleImage";
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dummyButton = "dummyButton";
+        public const string fpsContainer = "fpsContainer";
+        public const string fullscreenContainer = "fullscreenContainer";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
@@ -55,6 +57,7 @@ public static partial class R
         public const string profileOptionsButton = "profileOptionsButton";
         public const string quitButton = "quitButton";
         public const string recordingOptionsButton = "recordingOptionsButton";
+        public const string resolutionContainer = "resolutionContainer";
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string semanticVersionText = "semanticVersionText";
