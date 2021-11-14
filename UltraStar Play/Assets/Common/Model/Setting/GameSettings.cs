@@ -7,4 +7,6 @@ public class GameSettings
 {
     public SystemLanguage language = SystemLanguage.English;
     public List<string> songDirs = new List<string>();
+    public bool RatePlayers { get; set; } = true;
+    public bool CombineDuetScores { get; set; } = true;
 }

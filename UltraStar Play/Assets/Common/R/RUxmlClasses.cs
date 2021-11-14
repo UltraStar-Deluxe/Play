@@ -4,6 +4,7 @@ public static partial class R
     public static class UxmlClasses
     {
         public const string backButton = "backButton";
+        public const string backgroundImage = "backgroundImage";
         public const string controlLabel = "controlLabel";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";
@@ -16,6 +17,10 @@ public static partial class R
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
+        public const string optionsSceneMainContainer = "optionsSceneMainContainer";
+        public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";
+        public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
+        public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string overlay = "overlay";
         public const string startButtonClass = "startButtonClass";
         public const string titleImage = "titleImage";

@@ -27,6 +27,7 @@ public static partial class R
         public static readonly string favoritesIcon_tooltip = "favoritesIcon_tooltip";
         public static readonly string filter = "filter";
         public static readonly string filter_allSongs = "filter_allSongs";
+        public static readonly string gameOptionsScene_title = "gameOptionsScene_title";
         public static readonly string graph_button_label = "graph_button_label";
         public static readonly string graph_legend_good = "graph_legend_good";
         public static readonly string graph_legend_missed = "graph_legend_missed";
@@ -61,7 +62,9 @@ public static partial class R
         public static readonly string open = "open";
         public static readonly string options = "options";
         public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
+        public static readonly string options_combineDuetScores = "options_combineDuetScores";
         public static readonly string options_previewVolume = "options_previewVolume";
+        public static readonly string options_ratePlayers = "options_ratePlayers";
         public static readonly string options_volume = "options_volume";
         public static readonly string optionsScene_button_apps = "optionsScene_button_apps";
         public static readonly string optionsScene_button_design = "optionsScene_button_design";
