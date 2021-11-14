@@ -38,6 +38,12 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.previewVolumeChooser)]
     private ItemPicker previewVolumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.volumeLabel)]
+    private Label volumeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.volumeChooser)]
+    private ItemPicker volumeChooser;
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
@@ -56,6 +62,10 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
             .Bind(() => settings.AudioSettings.PreviewVolumePercent,
                 newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
 
+        new PercentNumberPickerControl(volumeChooser)
+            .Bind(() => settings.AudioSettings.VolumePercent,
+                newValue => settings.AudioSettings.VolumePercent = (int)newValue);
+
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
 
         backgroundMusicEnabledChooser.PreviousItemButton.Focus();
@@ -72,6 +82,7 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         }
         backgroundMusicEnabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
+        volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.soundOptionsScene_title);
     }
