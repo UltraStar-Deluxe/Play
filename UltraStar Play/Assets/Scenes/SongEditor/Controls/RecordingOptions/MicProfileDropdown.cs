@@ -14,7 +14,7 @@ using static UnityEngine.UI.Dropdown;
 public class MicProfileDropdown : MonoBehaviour, INeedInjection
 {
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Dropdown dropdown;
 
     [Inject]

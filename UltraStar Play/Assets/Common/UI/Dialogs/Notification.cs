@@ -15,7 +15,7 @@ public class Notification : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     public RectTransform RectTransform { get; private set; }
 
     [InjectedInInspector]

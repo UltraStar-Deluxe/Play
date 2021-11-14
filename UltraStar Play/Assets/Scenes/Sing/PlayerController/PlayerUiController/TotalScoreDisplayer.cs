@@ -7,10 +7,10 @@ using UnityEngine.UI;
 
 public class TotalScoreDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private CountingNumberText countingNumberText;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
     public void ShowTotalScore(int score)

@@ -13,7 +13,7 @@ using UniRx;
 public class SongEditorMusicVolumeSlider : MonoBehaviour, INeedInjection
 {
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Slider slider;
 
     [Inject]

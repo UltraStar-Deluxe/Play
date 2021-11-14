@@ -25,10 +25,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public GameObject inputActionInfoOverlay;
     
-    [Inject(searchMethod = SearchMethods.FindObjectOfType)]
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorSceneController songEditorSceneController;
 
-    [Inject(searchMethod = SearchMethods.FindObjectOfType)]
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private NoteArea noteArea;
 
     [Inject]

@@ -15,7 +15,7 @@ public class MultiplyBpmButton : MonoBehaviour, INeedInjection
     [Range(2, 3)]
     public int factor = 2;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

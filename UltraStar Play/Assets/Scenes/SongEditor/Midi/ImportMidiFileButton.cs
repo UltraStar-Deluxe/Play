@@ -12,7 +12,7 @@ using UniRx;
 
 public class ImportMidiFileButton : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

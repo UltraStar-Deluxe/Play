@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 public class PlayerNameText : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text text;
 
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
     public void OnInjectionFinished()

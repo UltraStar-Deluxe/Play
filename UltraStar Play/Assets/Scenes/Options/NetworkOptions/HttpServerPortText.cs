@@ -14,7 +14,7 @@ using UniRx;
 
 public class HttpServerPortText : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
     
 	private void Start()

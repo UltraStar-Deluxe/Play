@@ -15,7 +15,7 @@ public class ApplyBpmAndAdjustNoteLengthButton : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public InputField newBpmInputField;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

@@ -25,7 +25,7 @@ public class RectTransformSlideIntoViewport : MonoBehaviour, INeedInjection
 
     public float animTimeInSeconds = 0.2f;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     private Vector2 insideAnchorMin;

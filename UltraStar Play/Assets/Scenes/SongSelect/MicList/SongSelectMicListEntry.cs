@@ -29,9 +29,9 @@ public class SongSelectMicListEntry : MonoBehaviour, INeedInjection
         }
     }
     
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private MicPitchTracker micPitchTracker;
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioWaveFormVisualizer audioWaveFormVisualizer;
     
     void Update()

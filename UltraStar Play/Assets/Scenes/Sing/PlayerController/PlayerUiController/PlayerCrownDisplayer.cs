@@ -16,7 +16,7 @@ public class PlayerCrownDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
     [InjectedInInspector]
     public StarParticle crownChangePrefab;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
 

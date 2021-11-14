@@ -12,7 +12,7 @@ using UniRx;
 
 public class SongSelectFuzzySearchText : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
     
     [Inject]

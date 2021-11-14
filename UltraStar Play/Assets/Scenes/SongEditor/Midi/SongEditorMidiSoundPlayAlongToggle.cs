@@ -12,7 +12,7 @@ using UniRx;
 
 public class SongEditorMidiSoundPlayAlongToggle : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Toggle toggle;
 
     [Inject]

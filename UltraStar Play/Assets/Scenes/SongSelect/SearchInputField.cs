@@ -11,10 +11,10 @@ using UnityEngine.UI;
 
 public class SearchInputField : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
     
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public RectTransformSlideIntoViewport RectTransformSlideIntoViewport { get; private set; }
 
     [Inject]

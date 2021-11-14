@@ -23,7 +23,7 @@ public class EditorUiIssue : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Image uiTextBackgroundImage;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private TooltipHandler tooltipHandler;
 
     public void Init(SongIssue songIssue)

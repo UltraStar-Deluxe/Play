@@ -14,7 +14,7 @@ using static UnityEngine.UI.Dropdown;
 [RequireComponent(typeof(Dropdown))]
 public class SongEditorRecordingSourceDropdown : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Dropdown dropdown;
 
     [Inject]
@@ -40,4 +40,3 @@ public class SongEditorRecordingSourceDropdown : MonoBehaviour, INeedInjection
         }
     }
 }
-

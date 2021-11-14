@@ -21,7 +21,7 @@ public class NoteAreaRulerVertical : MonoBehaviour, INeedInjection, ISceneInject
     public Color lineNormalColor = Color.gray;
     public Color lineHighlightColor = Color.white;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
     private readonly NoteArea noteArea;
 
     private ViewportEvent lastViewportEvent;

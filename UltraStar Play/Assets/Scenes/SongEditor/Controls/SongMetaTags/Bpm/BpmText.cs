@@ -10,7 +10,7 @@ using UniRx;
 
 public class BpmText : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Text uiText;
 
     [Inject]

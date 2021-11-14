@@ -23,7 +23,7 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDoc;
 
-    [Inject(key = R.UxmlNames.backgroundMusicChooserHashed)]
+    [Inject(Key = R.UxmlNames.backgroundMusicChooserHashed)]
     private ItemPicker backgroundMusicChooser;
 
     [Inject]

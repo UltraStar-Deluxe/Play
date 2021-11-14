@@ -15,19 +15,19 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
     public Transform referencedTransform;
 
     // Inject field via GetComponentInChildren
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private ChildOfScriptThatNeedsInjection child;
 
     // Inject property via GetComponentInParent
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
     private ParentOfScriptThatNeedsInjection Parent { get; set; }
 
     // Inject readonly field via GetComponentInParent
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
     private readonly OtherComponentOfScriptThatNeedsInjection siblingComponent;
 
     // Inject readonly property via FindObjectOfType
-    [Inject(searchMethod = SearchMethods.FindObjectOfType)]
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private readonly Canvas canvas;
 
     // Inject property
@@ -39,14 +39,14 @@ public class ScriptThatNeedsInjection : MonoBehaviour, INeedInjection
     private Settings settings;
 
     // Inject optional
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private SceneNavigator sceneNavigator;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren, optional = true)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren, Optional = true)]
     private Text uiText;
 
     // Inject property using a specific key instead of the type.
-    [Inject(key = "author")]
+    [Inject(Key = "author")]
     private string NameOfAuthor { get; set; }
 
     // The instance of this field is created during injection.

@@ -15,7 +15,7 @@ public class CountBpmButton : MonoBehaviour, INeedInjection
     private int clickCount;
     private float startTime;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     public Text uiText;

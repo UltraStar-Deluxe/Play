@@ -11,7 +11,7 @@ public class SongEditorUndoButton : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     void Start()
