@@ -6,7 +6,7 @@ public abstract class AbstractItemPickerControl<T>
 {
     public ItemPicker ItemPicker { get; private set; }
 
-    public AbstractItemPickerControl(ItemPicker itemPicker)
+    protected AbstractItemPickerControl(ItemPicker itemPicker)
     {
         itemPicker.InitControl(this);
         this.ItemPicker = itemPicker;

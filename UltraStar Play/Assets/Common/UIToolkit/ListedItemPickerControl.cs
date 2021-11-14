@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UniRx;
 
-abstract public class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
+public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 {
     public bool WrapAround => ItemPicker.wrapAround;
 
-    public ListedItemPickerControl(ItemPicker itemPicker)
+    protected ListedItemPickerControl(ItemPicker itemPicker)
         : base(itemPicker)
     {
     }
