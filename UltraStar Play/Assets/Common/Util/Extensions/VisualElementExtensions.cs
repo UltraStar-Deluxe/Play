@@ -8,12 +8,5 @@ public static class VisualElementExtensions
     {
         button.RegisterCallback<ClickEvent>(_ => callback());
         button.RegisterCallback<NavigationSubmitEvent>(_ => callback());
-        button.RegisterCallback<KeyDownEvent>(e =>
-        {
-            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
-            {
-                callback();
-            }
-        });
     }
 }
