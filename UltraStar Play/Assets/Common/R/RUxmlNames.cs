@@ -37,6 +37,7 @@ public static partial class R
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
+        public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
@@ -46,10 +47,13 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
         public const string languageLabel = "languageLabel";
+        public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
+        public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string partyButton = "partyButton";
+        public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";
         public const string previewVolumeLabel = "previewVolumeLabel";
@@ -65,6 +69,7 @@ public static partial class R
         public const string songsOptionsButton = "songsOptionsButton";
         public const string soundOptionsButton = "soundOptionsButton";
         public const string startButton = "startButton";
+        public const string themeContainer = "themeContainer";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
         public const string titleImage = "titleImage";

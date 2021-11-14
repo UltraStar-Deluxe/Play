@@ -55,12 +55,6 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
             .Subscribe(_ => ApplyGraphicSettingsAndExitScene());
     }
 
-    private void ApplyGraphicSettingsAndExitScene()
-    {
-        ApplyGraphicSettings();
-        sceneNavigator.LoadScene(EScene.OptionsScene);
-    }
-
     public void UpdateTranslation()
     {
         if (!Application.isPlaying && resolutionContainer == null)
@@ -74,7 +68,13 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.graphicOptionsScene_title);
     }
 
-    void ApplyGraphicSettings()
+    private void ApplyGraphicSettingsAndExitScene()
+    {
+        ApplyGraphicSettings();
+        sceneNavigator.LoadScene(EScene.OptionsScene);
+    }
+
+    private void ApplyGraphicSettings()
     {
         ScreenResolution res = SettingsManager.Instance.Settings.GraphicSettings.resolution;
         FullScreenMode fullScreenMode = SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode;
