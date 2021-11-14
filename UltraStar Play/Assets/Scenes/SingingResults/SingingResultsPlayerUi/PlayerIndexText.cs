@@ -17,10 +17,10 @@ public class PlayerIndexText : MonoBehaviour, INeedInjection, IInjectionFinished
     [InjectedInInspector]
     public Image backgroundImage;
 
-    [Inject(key = "playerProfileIndex")]
+    [Inject(Key = "playerProfileIndex")]
     private int playerProfileIndex;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
     public void OnInjectionFinished()

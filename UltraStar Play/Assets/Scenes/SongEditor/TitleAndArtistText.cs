@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class TitleAndArtistText : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Text uiText;
 
     [Inject]

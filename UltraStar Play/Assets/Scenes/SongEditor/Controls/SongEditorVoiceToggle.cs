@@ -16,7 +16,7 @@ public class SongEditorVoiceToggle : MonoBehaviour, INeedInjection
 
     private string voiceName;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Toggle toggle;
 
     [Inject]

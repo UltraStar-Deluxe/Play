@@ -33,7 +33,7 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
     [Inject]

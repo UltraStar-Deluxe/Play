@@ -21,10 +21,10 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
 
     // The audio clips and midi notes that are played for calibration.

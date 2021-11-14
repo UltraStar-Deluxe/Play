@@ -10,10 +10,10 @@ public class NoteAreaPositionInSongIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
     private NoteArea noteArea;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     void Start()

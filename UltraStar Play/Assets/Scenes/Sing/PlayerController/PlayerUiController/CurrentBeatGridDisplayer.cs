@@ -17,7 +17,7 @@ public class CurrentBeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectio
     [Inject]
     private SingSceneController singSceneController;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     private Sentence currentSentence;

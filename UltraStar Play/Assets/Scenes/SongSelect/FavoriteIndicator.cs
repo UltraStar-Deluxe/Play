@@ -18,7 +18,7 @@ public class FavoriteIndicator : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Sprite noFavoriteSprite;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Image image;
 
     [Inject]

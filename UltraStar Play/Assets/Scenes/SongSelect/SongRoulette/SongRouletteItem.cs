@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class SongRouletteItem : GeneralDragHandler, INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private SongRouletteItemContextMenuHandler songRouletteItemContextMenuHandler;
 
     [Inject]

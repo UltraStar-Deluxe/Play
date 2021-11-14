@@ -30,10 +30,10 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private EditorUiSentence uiSentence;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private EditorUiSentenceDragHandler editorUiSentenceDragHandler;
 
     private List<Note> selectedNotes = new List<Note>();

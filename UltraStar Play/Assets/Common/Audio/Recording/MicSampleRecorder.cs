@@ -53,7 +53,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     private readonly Subject<RecordingEvent> recordingEventStream = new Subject<RecordingEvent>();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 

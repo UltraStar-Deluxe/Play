@@ -13,7 +13,7 @@ using UniRx;
 
 public class IpAddressText : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
     
 	private void Start()

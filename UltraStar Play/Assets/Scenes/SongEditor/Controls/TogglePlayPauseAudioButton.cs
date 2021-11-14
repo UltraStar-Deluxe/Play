@@ -11,7 +11,7 @@ public class TogglePlayPauseAudioButton : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSceneController songEditorSceneController;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     void Start()

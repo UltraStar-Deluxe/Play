@@ -22,11 +22,11 @@
       "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
     },
     "com.achimmihca.uniinject": {
-      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v2.0.1",
+      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#c184f447bb3868d9ecee104901b7c01839967ae2",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "69ea5dc297c980e7a000aceaca302072784ccf09"
+      "hash": "c184f447bb3868d9ecee104901b7c01839967ae2"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",

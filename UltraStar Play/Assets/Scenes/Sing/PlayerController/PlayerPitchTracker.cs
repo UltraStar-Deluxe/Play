@@ -24,10 +24,10 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private MicSampleRecorder micSampleRecorder;
 
     [Inject]

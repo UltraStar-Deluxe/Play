@@ -15,7 +15,7 @@ public class SongEditorButtonPitchInputField : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     void Start()

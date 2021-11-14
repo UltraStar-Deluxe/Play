@@ -47,7 +47,7 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     public MicSampleRecorder MicSampleRecorder { get; private set; }
 
     private readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();

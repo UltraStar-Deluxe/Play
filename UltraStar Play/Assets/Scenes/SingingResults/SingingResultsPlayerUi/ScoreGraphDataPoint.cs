@@ -13,10 +13,10 @@ using UnityEngine.EventSystems;
 
 public class ScoreGraphDataPoint : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IPointerEnterHandler, IPointerExitHandler
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     public RectTransform RectTransform { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private TooltipHandler tooltipHandler;
 
     public string CoordinateDetails { get; set; } = "";

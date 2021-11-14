@@ -23,10 +23,10 @@ public class EditorUiSentence : MonoBehaviour, INeedInjection, IPointerEnterHand
 
     public Sentence Sentence { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     public RectTransform RectTransform { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public Text uiText;
 
     [Inject]

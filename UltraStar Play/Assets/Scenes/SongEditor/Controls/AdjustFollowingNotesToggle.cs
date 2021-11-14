@@ -13,7 +13,7 @@ using UniRx;
 public class AdjustFollowingNotesToggle : MonoBehaviour, INeedInjection
 {
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Toggle toggle;
 
     [Inject]

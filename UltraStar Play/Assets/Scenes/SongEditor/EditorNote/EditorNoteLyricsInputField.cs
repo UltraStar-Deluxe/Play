@@ -19,7 +19,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     private EditorUiNote uiEditorNote;
