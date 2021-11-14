@@ -59,6 +59,8 @@ public static partial class R
         public static readonly string ok = "ok";
         public static readonly string open = "open";
         public static readonly string options = "options";
+        public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
+        public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string order = "order";
         public static readonly string order_Artist = "order_Artist";
         public static readonly string order_CountFinished = "order_CountFinished";
@@ -103,6 +105,7 @@ public static partial class R
         public static readonly string songSelectScene_stats_webBest = "songSelectScene_stats_webBest";
         public static readonly string songSelectScene_subTitle = "songSelectScene_subTitle";
         public static readonly string songSelectScene_title = "songSelectScene_title";
+        public static readonly string soundOptionsScene_title = "soundOptionsScene_title";
         public static readonly string start = "start";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string warning = "warning";

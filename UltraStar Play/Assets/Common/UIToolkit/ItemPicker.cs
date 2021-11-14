@@ -4,6 +4,9 @@ using UnityEngine.UIElements;
 public class ItemPicker : VisualElement
 {
     public bool wrapAround;
+    public double minValue;
+    public double maxValue;
+    public double stepValue;
 
     private Button nextItemButton;
     public Button NextItemButton
@@ -46,7 +49,7 @@ public class ItemPicker : VisualElement
 
     private object control;
 
-    public virtual void InitControl<T>(ItemPickerControl<T> itemPickerControl)
+    public virtual void InitControl(object itemPickerControl)
     {
         if (control != null)
         {
@@ -62,6 +65,9 @@ public class ItemPicker : VisualElement
     {
         // Additional XML attributes
         private readonly UxmlBoolAttributeDescription wrapAround = new UxmlBoolAttributeDescription { name = "wrapAround", defaultValue = false};
+        private readonly UxmlDoubleAttributeDescription minValue = new UxmlDoubleAttributeDescription { name = "minValue", defaultValue = double.MinValue};
+        private readonly UxmlDoubleAttributeDescription maxValue = new UxmlDoubleAttributeDescription { name = "maxValue", defaultValue = double.MaxValue};
+        private readonly UxmlDoubleAttributeDescription stepValue = new UxmlDoubleAttributeDescription { name = "stepValue", defaultValue = 1};
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
@@ -70,6 +76,9 @@ public class ItemPicker : VisualElement
 
             // Read additional attributes from XML
             target.wrapAround = wrapAround.GetValueFromBag(bag, cc);
+            target.minValue = minValue.GetValueFromBag(bag, cc);
+            target.maxValue = maxValue.GetValueFromBag(bag, cc);
+            target.stepValue = stepValue.GetValueFromBag(bag, cc);
 
             // Load UXML and add as child element
             string path = "UIDocuments/ItemPicker";

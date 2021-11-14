@@ -2,24 +2,13 @@
 using System.Collections.Generic;
 using UniRx;
 
-public class ItemPickerControl<T>
+abstract public class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 {
-    public ItemPicker ItemPicker { get; private set; }
-
     public bool WrapAround => ItemPicker.wrapAround;
 
-    public ItemPickerControl(ItemPicker itemPicker)
+    public ListedItemPickerControl(ItemPicker itemPicker)
+        : base(itemPicker)
     {
-        itemPicker.InitControl(this);
-        this.ItemPicker = itemPicker;
-        if (itemPicker.PreviousItemButton != null)
-        {
-            itemPicker.PreviousItemButton.RegisterCallbackButtonTriggered(() => SelectPreviousItem());
-        }
-        if (itemPicker.NextItemButton != null)
-        {
-            itemPicker.NextItemButton.RegisterCallbackButtonTriggered(() => SelectNextItem());
-        }
     }
 
     private List<T> items = new List<T>();
@@ -49,16 +38,6 @@ public class ItemPickerControl<T>
         }
     }
 
-    public IReactiveProperty<T> Selection { get; private set; } = new ReactiveProperty<T>();
-
-    public T SelectedItem
-    {
-        get
-        {
-            return Selection.Value;
-        }
-    }
-
     public virtual bool HasSelectedItem
     {
         get
@@ -77,18 +56,7 @@ public class ItemPickerControl<T>
         }
     }
 
-    public void Bind(Func<T> getter, Action<T> setter)
-    {
-        Selection.Value = getter.Invoke();
-        Selection.Subscribe(newValue => setter.Invoke(newValue));
-    }
-
-    public void SelectItem(T item)
-    {
-        Selection.Value = item;
-    }
-
-    public void SelectPreviousItem()
+    public override void SelectPreviousItem()
     {
         if (HasSelectedItem)
         {
@@ -103,7 +71,7 @@ public class ItemPickerControl<T>
         }
     }
 
-    public void SelectNextItem()
+    public override void SelectNextItem()
     {
         if (HasSelectedItem)
         {

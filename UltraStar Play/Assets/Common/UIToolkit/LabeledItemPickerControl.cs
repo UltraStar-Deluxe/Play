@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UniRx;
 
-public class TextItemPickerControl<T> : ItemPickerControl<T>
+public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
 {
-    public TextItemPickerControl(ItemPicker itemPicker, List<T> items)
+    public LabeledItemPickerControl(ItemPicker itemPicker, List<T> items)
         : base(itemPicker)
     {
         Selection.Subscribe(UpdateLabelText);
@@ -13,10 +13,10 @@ public class TextItemPickerControl<T> : ItemPickerControl<T>
 
     public void UpdateLabelText(T item)
     {
-        ItemPicker.ItemLabel.text = GetDisplayText(item);
+        ItemPicker.ItemLabel.text = GetLabelText(item);
     }
 
-    protected virtual string GetDisplayText(T item)
+    protected virtual string GetLabelText(T item)
     {
         return item != null
             ? item.ToString()

@@ -8,9 +8,9 @@ public static partial class R
         public const string backButton = "backButton";
         public const string backButtonLabel = "backButtonLabel";
         public const string background = "background";
-        public const string backgroundMusicChooser = "backgroundMusicChooser";
-        public const string backgroundMusicContainer = "backgroundMusicContainer";
-        public const string backgroundMusicLabel = "backgroundMusicLabel";
+        public const string backgroundMusicEnabledChooser = "backgroundMusicEnabledChooser";
+        public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
+        public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
         public const string backImage = "backImage";
         public const string bugImage = "bugImage";
         public const string buildTimeStampText = "buildTimeStampText";
@@ -44,6 +44,9 @@ public static partial class R
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
         public const string partyButton = "partyButton";
+        public const string previewVolumeChooser = "previewVolumeChooser";
+        public const string previewVolumeContainer = "previewVolumeContainer";
+        public const string previewVolumeLabel = "previewVolumeLabel";
         public const string previousItemButton = "previousItemButton";
         public const string profileOptionsButton = "profileOptionsButton";
         public const string quitButton = "quitButton";
