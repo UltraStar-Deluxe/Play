@@ -79,20 +79,11 @@ public static class CreateConstantsMenuItems
         List<string> files = GetFilesInFolder("Assets", "*.uxml");
 
         HashSet<string> uxmlNames = new HashSet<string>();
-        files.ForEach(file => FindUxmlNames(file).ForEach(uxmlName =>
-        {
-            uxmlNames.Add(uxmlName);
-            uxmlNames.Add("#" + uxmlName);
-        }));
+        files.ForEach(file => FindUxmlNames(file).ForEach(uxmlName => uxmlNames.Add(uxmlName)));
         List<string> uxmlNamesList = uxmlNames.ToList();
-        uxmlNamesList.Sort(new IgnoreCssSelectorPrefixComparer());
+        uxmlNamesList.Sort();
 
-        // Use suffix in fieldName for CSS selector version
-        List<string> fieldNames = uxmlNamesList
-            .Select(nameValue => nameValue.StartsWith("#") ? (nameValue[1..] + "Hashed") : nameValue)
-            .ToList();
-
-        string classCode = CreateClassCode(subClassName, uxmlNamesList, fieldNames, true);
+        string classCode = CreateClassCode(subClassName, uxmlNamesList, null, true);
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
         Debug.Log("Generated file " + targetPath);
     }
@@ -105,20 +96,11 @@ public static class CreateConstantsMenuItems
         List<string> files = GetFilesInFolder("Assets", "*.uxml");
 
         HashSet<string> uxmlClasses = new HashSet<string>();
-        files.ForEach(file => FindUxmlClasses(file).ForEach(uxmlClass =>
-        {
-            uxmlClasses.Add(uxmlClass);
-            uxmlClasses.Add("." + uxmlClass);
-        }));
+        files.ForEach(file => FindUxmlClasses(file).ForEach(uxmlClass => uxmlClasses.Add(uxmlClass)));
         List<string> uxmlClassesList = uxmlClasses.ToList();
-        uxmlClassesList.Sort(new IgnoreCssSelectorPrefixComparer());
+        uxmlClassesList.Sort();
 
-        // Use suffix in fieldName for CSS selector version
-        List<string> fieldNames = uxmlClassesList
-            .Select(uxmlClass => uxmlClass.StartsWith(".") ? (uxmlClass[1..] + "Dotted") : uxmlClass)
-            .ToList();
-
-        string classCode = CreateClassCode(subClassName, uxmlClassesList, fieldNames, true);
+        string classCode = CreateClassCode(subClassName, uxmlClassesList, null, true);
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
         Debug.Log("Generated file " + targetPath);
     }
@@ -254,30 +236,6 @@ public static class CreateConstantsMenuItems
             {
                 sb.AppendLine($"public static readonly string {fieldName} = \"{value}\";");
             }
-        }
-    }
-
-    private class IgnoreCssSelectorPrefixComparer : IComparer<string>
-    {
-        public int Compare(string x, string y)
-        {
-            if (x == null && y == null)
-            {
-                return 0;
-            }
-            else if (x == null)
-            {
-                return -1;
-            }
-            else if (y == null)
-            {
-                return 1;
-            }
-
-            return String.Compare(
-                    x.Replace(".", "").Replace("#", ""),
-                    y.Replace(".", "").Replace("#", ""),
-                    StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
