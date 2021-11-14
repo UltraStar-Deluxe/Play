@@ -5,6 +5,7 @@ public static partial class R
     {
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
+        public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
         public const string backButton = "backButton";
         public const string backButtonLabel = "backButtonLabel";
@@ -17,6 +18,7 @@ public static partial class R
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
         public const string centerContent = "centerContent";
+        public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
         public const string designOptionsButton = "designOptionsButton";
         public const string developerOptionsButton = "developerOptionsButton";
@@ -34,15 +36,19 @@ public static partial class R
         public const string fullscreenContainer = "fullscreenContainer";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
+        public const string httpServerPortLabel = "httpServerPortLabel";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
         public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string internetOptionsButton = "internetOptionsButton";
+        public const string ipAddressLabel = "ipAddressLabel";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
+        public const string ItemPicker = "ItemPicker";
         public const string jukeboxButton = "jukeboxButton";
         public const string label = "label";
+        public const string Label = "Label";
         public const string languageChooser = "languageChooser";
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
@@ -53,6 +59,7 @@ public static partial class R
         public const string nextItemButton = "nextItemButton";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string partyButton = "partyButton";
+        public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";
@@ -60,12 +67,14 @@ public static partial class R
         public const string previousItemButton = "previousItemButton";
         public const string profileOptionsButton = "profileOptionsButton";
         public const string quitButton = "quitButton";
+        public const string ratePlayersContainer = "ratePlayersContainer";
         public const string recordingOptionsButton = "recordingOptionsButton";
         public const string resolutionContainer = "resolutionContainer";
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
+        public const string showFpsContainer = "showFpsContainer";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string soundOptionsButton = "soundOptionsButton";
         public const string startButton = "startButton";
