@@ -191,6 +191,8 @@
 
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
+    width: 20px;
+    height: 20px;
 }
 
 ItemPicker {

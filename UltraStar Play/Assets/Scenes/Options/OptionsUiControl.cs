@@ -7,8 +7,6 @@ using ProTrans;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEditor.UIElements;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 
@@ -22,6 +20,9 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
     private Button gameOptionsButton;
+
+    [Inject(UxmlName = R.UxmlNames.songsOptionsButton)]
+    private Button songsOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.graphicsOptionsButton)]
     private Button graphicsOptionsButton;
@@ -99,6 +100,15 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.back);
+        gameOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_game);
+        songsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_songs);
+        graphicsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_graphics);
+        recordingOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_recording);
+        profileOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_profiles);
+        designOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_design);
+        internetOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_internet);
+        appOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_apps);
+        developerOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_development);
     }
 
     private void SetLanguage(string newLanguageString)

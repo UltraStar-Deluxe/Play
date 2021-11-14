@@ -12,12 +12,10 @@ public static partial class R
         public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
         public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
         public const string backImage = "backImage";
-        public const string bugImage = "bugImage";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
         public const string commitHashText = "commitHashText";
         public const string designOptionsButton = "designOptionsButton";
-        public const string developerButtonLabel = "developerButtonLabel";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
@@ -33,9 +31,11 @@ public static partial class R
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
+        public const string image = "image";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string itemLabel = "itemLabel";
         public const string jukeboxButton = "jukeboxButton";
+        public const string label = "label";
         public const string languageChooser = "languageChooser";
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
@@ -64,5 +64,8 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string topRow = "topRow";
         public const string versionInfoContainer = "versionInfoContainer";
+        public const string volumeChooser = "volumeChooser";
+        public const string volumeContainer = "volumeContainer";
+        public const string volumeLabel = "volumeLabel";
     }
 }
