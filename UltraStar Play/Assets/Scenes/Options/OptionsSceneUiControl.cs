@@ -15,6 +15,9 @@ using Button = UnityEngine.UIElements.Button;
 
 public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
@@ -101,6 +104,8 @@ public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
+
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
         backButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.back);
         gameOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_game);
         songsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_songs);
