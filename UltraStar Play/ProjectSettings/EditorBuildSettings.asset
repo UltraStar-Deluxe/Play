@@ -48,9 +48,6 @@ EditorBuildSettings:
     path: Assets/Scenes/SongEditor/SongEditorScene.unity
     guid: 1b6a6dcadb95d264ebd70baedd7dcec5
   - enabled: 1
-    path: Assets/Scenes/Credits/CreditsScene.unity
-    guid: 10a5c18050b77b640aababd3342f6081
-  - enabled: 1
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
   - enabled: 1
