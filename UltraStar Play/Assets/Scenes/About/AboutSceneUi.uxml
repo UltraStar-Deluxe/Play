@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 20px; width: 100%;">
+            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
+                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
+                    <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
+                        <ui:VisualElement name="titleAndDescription">
+                            <ui:Label text="About" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                            <ui:Label text="UltraStar Play" display-tooltip-when-elided="true" name="sceneTitle" class="titleSubText" style="width: auto;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button text="&lt;" display-tooltip-when-elided="true" name="previousItemButton" />
+                <ui:Label text="1 / 2" display-tooltip-when-elided="true" name="itemIndexLabel" class="middleCenterText" style="font-size: 18px;" />
+                <ui:Button text="&gt;" display-tooltip-when-elided="true" name="nextItemButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; background-color: rgba(0, 0, 0, 0.25);">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" focusable="true" style="flex-grow: 1; height: 400px;">
+                    <ui:TextField picking-mode="Ignore" text="This is the about text&#10;on multiple lines." name="aboutText" readonly="true" multiline="true" style="padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; white-space: normal;" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement name="bottomContent" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
+                <ui:Button display-tooltip-when-elided="true" name="backButton" value="This is the about text on multiple lines." />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

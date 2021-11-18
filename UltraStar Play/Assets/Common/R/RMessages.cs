@@ -3,6 +3,7 @@ public static partial class R
 {
     public static class Messages
     {
+        public static readonly string aboutScene_title = "aboutScene_title";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_exitSong = "action_exitSong";
         public static readonly string action_openSongEditor = "action_openSongEditor";

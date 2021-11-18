@@ -33,7 +33,4 @@ public enum EScene
 
     // song editor
     SongEditorScene = 13,
-
-    // credits 
-    CreditsScene = 14,
 }
