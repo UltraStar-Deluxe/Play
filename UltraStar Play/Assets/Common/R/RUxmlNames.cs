@@ -4,6 +4,7 @@ public static partial class R
     public static class UxmlNames
     {
         public const string aboutButton = "aboutButton";
+        public const string aboutText = "aboutText";
         public const string appOptionsButton = "appOptionsButton";
         public const string backButton = "backButton";
         public const string backButtonLabel = "backButtonLabel";
@@ -12,8 +13,10 @@ public static partial class R
         public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
         public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
         public const string backImage = "backImage";
+        public const string bottomContent = "bottomContent";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
+        public const string centerContent = "centerContent";
         public const string commitHashText = "commitHashText";
         public const string designOptionsButton = "designOptionsButton";
         public const string developerOptionsButton = "developerOptionsButton";
@@ -33,6 +36,7 @@ public static partial class R
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
         public const string internetOptionsButton = "internetOptionsButton";
+        public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
         public const string jukeboxButton = "jukeboxButton";
         public const string label = "label";

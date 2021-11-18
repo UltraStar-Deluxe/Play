@@ -12,6 +12,7 @@ public static partial class R
         public const string dialogTitleImage = "dialogTitleImage";
         public const string itemPickerButton = "itemPickerButton";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
+        public const string middleCenterText = "middleCenterText";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";

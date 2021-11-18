@@ -234,3 +234,11 @@ ItemPicker {
     width: 100%;
     margin-bottom: 20px;
 }
+
+#aboutText TextInput
+{
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--text-color);
+    font-size: 14px;
+    border-width: 0;
+}
