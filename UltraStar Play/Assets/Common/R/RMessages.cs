@@ -17,6 +17,7 @@ public static partial class R
         public static readonly string back = "back";
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
+        public static readonly string companionAppOptionsScene_title = "companionAppOptionsScene_title";
         public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string designOptionsScene_title = "designOptionsScene_title";
@@ -55,6 +56,7 @@ public static partial class R
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
         public static readonly string mainScene_title = "mainScene_title";
+        public static readonly string networkOptionsScene_title = "networkOptionsScene_title";
         public static readonly string new_ = "new";
         public static readonly string newVersionAvailableDialog_ignoreAllFutureVersions = "newVersionAvailableDialog_ignoreAllFutureVersions";
         public static readonly string newVersionAvailableDialog_ignoreThisVersion = "newVersionAvailableDialog_ignoreThisVersion";
@@ -67,6 +69,7 @@ public static partial class R
         public static readonly string options_analyzeBeatsWithoutTargetNote = "options_analyzeBeatsWithoutTargetNote";
         public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
         public static readonly string options_combineDuetScores = "options_combineDuetScores";
+        public static readonly string options_connectedClientCount = "options_connectedClientCount";
         public static readonly string options_fullscreenMode = "options_fullscreenMode";
         public static readonly string options_httpServerNotSupported = "options_httpServerNotSupported";
         public static readonly string options_httpServerPortWithExampleUri = "options_httpServerPortWithExampleUri";

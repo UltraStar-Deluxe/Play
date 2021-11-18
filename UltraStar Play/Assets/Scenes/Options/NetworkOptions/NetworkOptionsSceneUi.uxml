@@ -7,25 +7,11 @@
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer" style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Development Options" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                            <ui:Label text="Network Options" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="showFpsContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Show FPS" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="pitchDetectionAlgorithmContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Pitch Detection Algorithm" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" class="multiline" />
-            </ui:VisualElement>
-            <ui:VisualElement name="analyzeBeatsWithoutTargetNoteContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Analyze Beats Without Target Note" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:Label text="IP Address: aaa.bbb.ccc.ddd" display-tooltip-when-elided="true" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" style="width: 100%;" />
-            <ui:Label text="Http Server Port: ????" display-tooltip-when-elided="true" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="width: 100%;" />
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
             </ui:VisualElement>

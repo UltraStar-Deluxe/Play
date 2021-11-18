@@ -5,6 +5,7 @@ public static partial class R
     {
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
+        public const string adminRightsContainer = "adminRightsContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
         public const string backButton = "backButton";
@@ -20,6 +21,9 @@ public static partial class R
         public const string centerContent = "centerContent";
         public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
+        public const string connectedClientCountLabel = "connectedClientCountLabel";
+        public const string connectedClientList = "connectedClientList";
+        public const string container = "container";
         public const string designOptionsButton = "designOptionsButton";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string dialogButtonContainer = "dialogButtonContainer";
@@ -54,6 +58,7 @@ public static partial class R
         public const string languageImage = "languageImage";
         public const string languageLabel = "languageLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
+        public const string nameLabel = "nameLabel";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
@@ -75,6 +80,7 @@ public static partial class R
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string songQueueRights = "songQueueRights";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string soundOptionsButton = "soundOptionsButton";
         public const string startButton = "startButton";
@@ -83,6 +89,7 @@ public static partial class R
         public const string titleContainer = "titleContainer";
         public const string titleImage = "titleImage";
         public const string titleImageAndText = "titleImageAndText";
+        public const string toggle = "toggle";
         public const string topRow = "topRow";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string volumeChooser = "volumeChooser";
