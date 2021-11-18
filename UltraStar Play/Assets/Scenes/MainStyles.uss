@@ -10,6 +10,7 @@
     color: var(--text-color);
     margin: 0;
     padding: 0;
+    font-size: 18px;
 }
 
 .unity-base-popup-field__text {
@@ -198,6 +199,10 @@
 ItemPicker {
     width: 300px;
     height: 30px;
+}
+
+ItemPicker.multiline Label {
+    font-size: 14px;
 }
 
 .itemPickerButton {

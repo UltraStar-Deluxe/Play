@@ -13,7 +13,7 @@ using Button = UnityEngine.UIElements.Button;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
@@ -77,6 +77,7 @@ public class OptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         profileOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.PlayerProfileSetupScene));
         designOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ThemeOptionsScene));
         internetOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.NetworkOptionsScene));
+        appOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CompanionAppOptionsScene));
         developerOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene));
 
         InitLanguageChooser();
