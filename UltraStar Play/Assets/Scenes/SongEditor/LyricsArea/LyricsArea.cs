@@ -16,7 +16,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     private static readonly char sentenceSeparator = '\n';
     private static readonly char spaceCharacter = ' ';
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private TMP_InputField inputField;
 
     [Inject]
@@ -28,7 +28,7 @@ public class LyricsArea : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private ScrollRect scrollRect;
 
     private Voice voice;

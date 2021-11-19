@@ -17,7 +17,7 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private SingSceneController singSceneController;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     private double velocityPerSecond;

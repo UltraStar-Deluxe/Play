@@ -12,7 +12,7 @@ using UniRx;
 
 public class PlayerMessageDisplayer : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
     private void Start()

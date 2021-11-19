@@ -15,19 +15,19 @@ using ProTrans;
 
 public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITranslator
 {
-    [Inject(key = "#dialogTitle")]
+    [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
 
-    [Inject(key = "#dialogMessage")]
+    [Inject(UxmlName = R.UxmlNames.dialogMessage)]
     private Label dialogMessage;
 
-    [Inject(key = "#dialogCloseButton")]
+    [Inject(UxmlName = R.UxmlNames.dialogCloseButton)]
     private Button closeButton;
 
-    [Inject(key = "#ignoreThisVersionButton")]
+    [Inject(UxmlName = R.UxmlNames.ignoreThisVersionButton)]
     private Button ignoreThisVersionButton;
 
-    [Inject(key = "#ignoreAllFutureVersionsButton")]
+    [Inject(UxmlName = R.UxmlNames.ignoreAllFutureVersionsButton)]
     private Button ignoreAllFutureVersionsButton;
 
     [Inject]

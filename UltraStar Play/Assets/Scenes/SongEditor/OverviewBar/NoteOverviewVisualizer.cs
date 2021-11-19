@@ -14,7 +14,7 @@ public class NoteOverviewVisualizer : MonoBehaviour, INeedInjection, ISceneInjec
     [InjectedInInspector]
     public DynamicallyCreatedImage dynImage;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     [Inject]

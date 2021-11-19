@@ -19,11 +19,11 @@ public enum EScene
     OptionsGameScene = 4,
     OptionsGraphicsScene = 5,
     OptionsSoundScene = 6,
-    RecordingOptionsScene = 15,
+    RecordingOptionsScene = 14,
     PlayerProfileSetupScene = 7,
-    ContentDownloadScene = 16,
-    ThemeOptionsScene = 17,
-    NetworkOptionsScene = 18,
+    ContentDownloadScene = 15,
+    ThemeOptionsScene = 16,
+    NetworkOptionsScene = 17,
 
     // sing
     SingScene = 11,
@@ -33,7 +33,4 @@ public enum EScene
 
     // song editor
     SongEditorScene = 13,
-
-    // credits 
-    CreditsScene = 14,
 }

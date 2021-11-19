@@ -21,10 +21,10 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
     [Inject]
     private EventSystem eventSystem;
     
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public Button UiButton { get; private set; }
 
     public string character;

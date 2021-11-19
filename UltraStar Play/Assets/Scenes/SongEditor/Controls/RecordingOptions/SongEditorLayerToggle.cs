@@ -18,7 +18,7 @@ public class SongEditorLayerToggle : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Toggle toggle;
 
     void Start()

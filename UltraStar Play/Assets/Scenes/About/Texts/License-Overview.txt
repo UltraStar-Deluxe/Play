@@ -1,0 +1,42 @@
+UltraStar Play is an open source project.
+Its original assets and code are under MIT license.
+
+However, UltraStar Play uses third-party assets, code and libraries under different licenses.
+This includes the Unity platform and related assets under the terms of Unity Technologies (https://unity3d.com/legal).
+Further, UltraStar Play includes software of the following projects, without claim on completeness:
+
+MIT License
+-----------
+- CSharpSynthForUnity
+    - https://github.com/UltraStar-Deluxe/CSharpSynthForUnity
+    
+- FullSerializer
+    - https://github.com/jacobdufault/fullserializer
+    
+- LeanTween
+    - https://github.com/UltraStar-Deluxe/LeanTween
+    
+- NLayer
+    - https://github.com/naudio/NLayer
+    
+- SharpZipLib
+    - https://github.com/icsharpcode/SharpZipLib
+    
+- UniRX
+    - https://github.com/neuecc/UniRx
+
+- Unity Builder (GitHub Actions, not included in build)
+    - https://github.com/game-ci/unity-builder
+
+- Unity Test Runner (GitHub Actions, not included in build)
+    - https://github.com/game-ci/unity-test-runner
+
+Apache License 2.0
+------------------
+- Material Design Icons
+    - https://fonts.google.com/icons
+
+- Serilog
+    - https://github.com/serilog/serilog
+
+

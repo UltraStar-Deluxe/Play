@@ -15,7 +15,7 @@ public class LineDisplayer : MonoBehaviour, INeedInjection
 
     public Color lineColor;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     private int currentLineCount;

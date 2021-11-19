@@ -15,7 +15,7 @@ public class SpaceBetweenNotesButton : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public InputField numberOfBeatsInputField;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Button button;
 
     [Inject]

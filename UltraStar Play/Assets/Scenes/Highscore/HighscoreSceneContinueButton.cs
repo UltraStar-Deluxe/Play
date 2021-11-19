@@ -15,7 +15,7 @@ public class HighscoreSceneContinueButton : MonoBehaviour, INeedInjection
     [Inject]
     private HighscoreSceneController highscoreSceneController;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button uiButton;
 
     private void Start()

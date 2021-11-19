@@ -34,10 +34,10 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
     [Inject]
     protected PlayerNoteRecorder playerNoteRecorder;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     protected MicProfile micProfile;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     protected LineDisplayer lineDisplayer;
 
     protected double beatsPerSecond;

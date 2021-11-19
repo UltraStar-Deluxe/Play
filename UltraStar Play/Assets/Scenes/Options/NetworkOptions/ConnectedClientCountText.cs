@@ -15,7 +15,7 @@ public class ConnectedClientCountText : MonoBehaviour, INeedInjection
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager; 
     
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text uiText;
 
     private void Start()

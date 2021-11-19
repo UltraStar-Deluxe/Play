@@ -3,6 +3,7 @@ public static partial class R
 {
     public static class Messages
     {
+        public static readonly string aboutScene_title = "aboutScene_title";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
         public static readonly string action_exitSong = "action_exitSong";
         public static readonly string action_openSongEditor = "action_openSongEditor";
@@ -59,6 +60,18 @@ public static partial class R
         public static readonly string ok = "ok";
         public static readonly string open = "open";
         public static readonly string options = "options";
+        public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
+        public static readonly string options_previewVolume = "options_previewVolume";
+        public static readonly string options_volume = "options_volume";
+        public static readonly string optionsScene_button_apps = "optionsScene_button_apps";
+        public static readonly string optionsScene_button_design = "optionsScene_button_design";
+        public static readonly string optionsScene_button_development = "optionsScene_button_development";
+        public static readonly string optionsScene_button_game = "optionsScene_button_game";
+        public static readonly string optionsScene_button_graphics = "optionsScene_button_graphics";
+        public static readonly string optionsScene_button_internet = "optionsScene_button_internet";
+        public static readonly string optionsScene_button_profiles = "optionsScene_button_profiles";
+        public static readonly string optionsScene_button_recording = "optionsScene_button_recording";
+        public static readonly string optionsScene_button_songs = "optionsScene_button_songs";
         public static readonly string order = "order";
         public static readonly string order_Artist = "order_Artist";
         public static readonly string order_CountFinished = "order_CountFinished";
@@ -103,6 +116,7 @@ public static partial class R
         public static readonly string songSelectScene_stats_webBest = "songSelectScene_stats_webBest";
         public static readonly string songSelectScene_subTitle = "songSelectScene_subTitle";
         public static readonly string songSelectScene_title = "songSelectScene_title";
+        public static readonly string soundOptionsScene_title = "soundOptionsScene_title";
         public static readonly string start = "start";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string warning = "warning";

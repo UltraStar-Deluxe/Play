@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement style="justify-content: center; align-items: center; flex-direction: row; width: 100%; height: 100%;">
+        <ui:Button text="&lt;" display-tooltip-when-elided="true" name="previousItemButton" class="dialogButton itemPickerButton" />
+        <ui:Label name="itemLabel" text="SomeValue" class="itemPickerItemLabel" />
+        <ui:Button text="&gt;" display-tooltip-when-elided="true" name="nextItemButton" class="dialogButton itemPickerButton" />
+    </ui:VisualElement>
+</ui:UXML>

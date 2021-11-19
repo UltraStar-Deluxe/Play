@@ -22,11 +22,11 @@
       "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
     },
     "com.achimmihca.uniinject": {
-      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v1.0.0",
+      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v3.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "33df491128c22ddd654a69258f7bfb3a4a12786d"
+      "hash": "c184f447bb3868d9ecee104901b7c01839967ae2"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -218,6 +218,25 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.vectorgraphics": {
+      "version": "2.0.0-preview.18",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.2d.sprite": "1.0.0",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.imageconversion": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.physics2d": "1.0.0",
+        "com.unity.modules.ui": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.unitywebrequesttexture": "1.0.0",
+        "com.unity.modules.unitywebrequestwww": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.legacyinputhelpers": {
