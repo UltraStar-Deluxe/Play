@@ -49,6 +49,7 @@ public class CompanionAppOptionsUiControl : MonoBehaviour, INeedInjection, ITran
             .AddTo(gameObject);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));

@@ -75,6 +75,7 @@ public static partial class R
         public static readonly string options_httpServerPortWithExampleUri = "options_httpServerPortWithExampleUri";
         public static readonly string options_ipAddress = "options_ipAddress";
         public static readonly string options_noteDisplayMode = "options_noteDisplayMode";
+        public static readonly string options_openDownloadSceneButton = "options_openDownloadSceneButton";
         public static readonly string options_pitchDetectionAlgorithm = "options_pitchDetectionAlgorithm";
         public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string options_ratePlayers = "options_ratePlayers";
@@ -130,6 +131,7 @@ public static partial class R
         public static readonly string singingResultsScene_title = "singingResultsScene_title";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
+        public static readonly string songLibraryOptionsScene_title = "songLibraryOptionsScene_title";
         public static readonly string songSelectScene_noMicsFound = "songSelectScene_noMicsFound";
         public static readonly string songSelectScene_noPlayerSelected_message = "songSelectScene_noPlayerSelected_message";
         public static readonly string songSelectScene_noPlayerSelected_title = "songSelectScene_noPlayerSelected_title";

@@ -67,8 +67,7 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
                 newValue => settings.AudioSettings.VolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-
-        backgroundMusicEnabledChooser.PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -76,7 +75,7 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backgroundMusicEnabledLabel == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }

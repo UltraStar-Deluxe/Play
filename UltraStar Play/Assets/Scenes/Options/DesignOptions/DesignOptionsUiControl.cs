@@ -66,8 +66,7 @@ public class DesignOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
                 newValue => settings.GraphicSettings.useImageAsCursor = newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-
-        themeContainer.Q<ItemPicker>().PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -75,7 +74,7 @@ public class DesignOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && themeContainer == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }

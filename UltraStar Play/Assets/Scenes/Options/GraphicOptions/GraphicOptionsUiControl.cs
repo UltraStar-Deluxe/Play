@@ -48,8 +48,7 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
         new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>());
 
         backButton.RegisterCallbackButtonTriggered(() => ApplyGraphicSettingsAndExitScene());
-
-        resolutionContainer.Q<ItemPicker>().PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => ApplyGraphicSettingsAndExitScene());
@@ -57,7 +56,7 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && resolutionContainer == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }

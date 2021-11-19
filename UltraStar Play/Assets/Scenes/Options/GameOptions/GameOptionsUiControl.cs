@@ -42,8 +42,7 @@ public class GameOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
                 newValue => settings.GameSettings.CombineDuetScores = newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-
-        ratePlayersContainer.Q<ItemPicker>().PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -51,7 +50,7 @@ public class GameOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && ratePlayersContainer == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }

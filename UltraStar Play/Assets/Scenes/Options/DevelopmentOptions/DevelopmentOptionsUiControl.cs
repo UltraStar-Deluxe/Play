@@ -70,8 +70,7 @@ public class DevelopmentOptionsUiControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-
-        showFpsContainer.Q<ItemPicker>().PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -79,7 +78,7 @@ public class DevelopmentOptionsUiControl : MonoBehaviour, INeedInjection, ITrans
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && showFpsContainer == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }
