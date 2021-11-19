@@ -65,6 +65,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Options/CompanionAppOptions/CompanionAppOptionsScene.unity
     guid: 761d9b3dcae421f4dbb93ef19dca5f09
+  - enabled: 1
+    path: Assets/Scenes/Options/SongLibraryOptions/SongLibraryOptionsScene.unity
+    guid: 429ddcd5c7d10f84d92048db969ff373
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

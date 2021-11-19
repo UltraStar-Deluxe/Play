@@ -26,6 +26,7 @@ public enum EScene
     NetworkOptionsScene = 17,
     DevelopmentOptionsScene = 18,
     CompanionAppOptionsScene = 19,
+    SongLibraryOptionsScene = 20,
 
     // sing
     SingScene = 11,

@@ -73,7 +73,7 @@ public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 
         gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
-        gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
+        songsOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
         graphicsOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGraphicsScene));
         soundOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsSoundScene));
         recordingOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.RecordingOptionsScene));
@@ -100,7 +100,7 @@ public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && gameOptionsButton == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }

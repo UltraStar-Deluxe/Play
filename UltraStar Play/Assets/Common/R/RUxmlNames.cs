@@ -5,6 +5,7 @@ public static partial class R
     {
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
+        public const string addButton = "addButton";
         public const string adminRightsContainer = "adminRightsContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
@@ -15,6 +16,7 @@ public static partial class R
         public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
         public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
         public const string backImage = "backImage";
+        public const string bottomButtonRow = "bottomButtonRow";
         public const string bottomContent = "bottomContent";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
@@ -24,6 +26,7 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
+        public const string deleteButton = "deleteButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string dialogButtonContainer = "dialogButtonContainer";
@@ -35,6 +38,7 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImage = "dialogTitleImage";
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
+        public const string downloadSceneButton = "downloadSceneButton";
         public const string dummyButton = "dummyButton";
         public const string fpsContainer = "fpsContainer";
         public const string fullscreenContainer = "fullscreenContainer";
@@ -64,6 +68,7 @@ public static partial class R
         public const string nextItemButton = "nextItemButton";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string partyButton = "partyButton";
+        public const string pathTextField = "pathTextField";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string previewVolumeChooser = "previewVolumeChooser";
@@ -80,6 +85,8 @@ public static partial class R
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string songList = "songList";
+        public const string songListContainer = "songListContainer";
         public const string songQueueRights = "songQueueRights";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string soundOptionsButton = "soundOptionsButton";
