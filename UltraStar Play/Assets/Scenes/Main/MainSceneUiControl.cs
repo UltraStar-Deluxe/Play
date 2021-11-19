@@ -12,47 +12,47 @@ using ProTrans;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, UniInject.IBinder
+public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
-    public UIDocument uiDoc;
-
-    [InjectedInInspector]
     public VisualTreeAsset quitGameDialogUxml;
 
-    [Inject(key = "#startButton")]
+    [Inject]
+    private UIDocument uiDoc;
+
+    [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
 
-    [Inject(key = "#settingsButton")]
+    [Inject(UxmlName = R.UxmlNames.settingsButton)]
     private Button settingsButton;
 
-    [Inject(key = "#aboutButton")]
+    [Inject(UxmlName = R.UxmlNames.aboutButton)]
     private Button aboutButton;
 
-    [Inject(key = "#quitButton")]
+    [Inject(UxmlName = R.UxmlNames.quitButton)]
     private Button quitButton;
 
-    [Inject(key = "#partyButton")]
+    [Inject(UxmlName = R.UxmlNames.partyButton)]
     private Button partyButton;
 
-    [Inject(key = "#jukeboxButton")]
+    [Inject(UxmlName = R.UxmlNames.jukeboxButton)]
     private Button jukeboxButton;
 
-    [Inject(key = "#sceneSubtitle")]
+    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
     private Label sceneSubtitle;
     
-    [Inject(key = "#semanticVersionText")]
+    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
     
-    [Inject(key = "#commitHashText")]
+    [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
     
-    [Inject(key = "#buildTimeStampText")]
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
-    
+
     private SimpleUxmlDialog closeGameDialog;
 
     private void Start()
@@ -74,8 +74,6 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         InitButtonDescription(partyButton, R.Messages.mainScene_button_description_noImplementation);
 
         UpdateVersionInfoText();
-
-        UpdateTranslation();
 
         sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
@@ -169,12 +167,5 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator, Un
         Button yesButton = closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
         closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
-    }
-
-    public List<UniInject.IBinding> GetBindings()
-    {
-        BindingBuilder bb = new BindingBuilder();
-        bb.BindExistingInstance(uiDoc);
-        return bb.GetBindings();
     }
 }

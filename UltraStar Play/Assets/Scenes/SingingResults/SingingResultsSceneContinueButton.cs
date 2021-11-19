@@ -12,7 +12,7 @@ using UniRx;
 
 public class SingingResultsSceneContinueButton : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button uiButton;
 
     [Inject]

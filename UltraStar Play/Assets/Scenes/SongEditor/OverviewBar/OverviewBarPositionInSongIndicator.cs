@@ -13,7 +13,7 @@ public class OverviewBarPositionInSongIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     void Start()

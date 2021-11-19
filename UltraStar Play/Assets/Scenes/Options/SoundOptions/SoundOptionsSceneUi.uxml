@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 20px; width: 100%;">
+            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
+                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
+                    <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <ui:VisualElement name="titleAndDescription">
+                            <ui:Label text="Sound Options" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="volumeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Volume" display-tooltip-when-elided="true" name="volumeLabel" class="controlLabel" />
+                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="volumeChooser" />
+            </ui:VisualElement>
+            <ui:VisualElement name="previewVolumeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Preview Volume" display-tooltip-when-elided="true" name="previewVolumeLabel" class="controlLabel" />
+                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="previewVolumeChooser" />
+            </ui:VisualElement>
+            <ui:VisualElement name="backgroundMusicEnabledContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Background Music" display-tooltip-when-elided="true" name="backgroundMusicEnabledLabel" class="controlLabel" />
+                <ItemPicker wrapAround="true" name="backgroundMusicEnabledChooser" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

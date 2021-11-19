@@ -14,7 +14,7 @@ using CSharpSynth.Wave;
 [RequireComponent(typeof(PlayerPitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerPitchTracker PlayerPitchTracker { get; private set; }
 
     private RecordedNote lastRecordedNote;

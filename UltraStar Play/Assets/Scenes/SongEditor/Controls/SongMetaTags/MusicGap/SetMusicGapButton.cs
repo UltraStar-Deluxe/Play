@@ -13,7 +13,7 @@ using UniRx;
 public class SetMusicGapButton : MonoBehaviour, INeedInjection
 {
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

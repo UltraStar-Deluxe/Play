@@ -44,7 +44,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        if (settings.AudioSettings.PreviewVolumePercent <= 0)
+        if (GetFinalPreviewVolume() <= 0)
         {
             songVideoPlayer.gameObject.SetActive(false);
             songAudioPlayer.gameObject.SetActive(false);
@@ -62,7 +62,7 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         {
             float audioPercent = (Time.time - fadeInStartInSeconds) / audioFadeInDurationInSeconds;
             audioPercent = NumberUtils.Limit(audioPercent, 0, 1);
-            float maxVolume = settings.AudioSettings.PreviewVolumePercent / 100f;
+            float maxVolume = GetFinalPreviewVolume();
             songAudioPlayer.audioPlayer.volume = audioPercent * maxVolume;
 
             // The video has an additional delay to load.
@@ -200,5 +200,10 @@ public class SongPreviewController : MonoBehaviour, INeedInjection
         {
             uiManager.CreateNotification("Audio could not be loaded.", Colors.red);
         }
+    }
+
+    private float GetFinalPreviewVolume()
+    {
+        return (settings.AudioSettings.PreviewVolumePercent / 100.0f) * (settings.AudioSettings.VolumePercent / 100.0f);
     }
 }

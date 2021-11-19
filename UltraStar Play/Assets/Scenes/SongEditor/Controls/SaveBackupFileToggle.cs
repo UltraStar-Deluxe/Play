@@ -15,7 +15,7 @@ public class SaveBackupFileToggle : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Toggle toggle;
 
     void Start()

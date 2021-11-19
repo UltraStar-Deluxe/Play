@@ -12,7 +12,7 @@ using UniRx;
 
 public class MidiFilePathInputField : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
     [Inject]

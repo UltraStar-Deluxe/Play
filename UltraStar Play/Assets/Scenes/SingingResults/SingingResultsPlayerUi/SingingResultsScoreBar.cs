@@ -7,7 +7,7 @@ using UniInject;
 
 public class SingingResultsScoreBar : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private RectTransform rectTransform;
 
     [Inject]

@@ -12,7 +12,7 @@ using UniRx;
 
 public class SongEditorMidiVelocitySlider : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Slider slider;
 
     [Inject]

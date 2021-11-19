@@ -12,7 +12,7 @@ abstract public class AbstractSongMetaTagText : MonoBehaviour, INeedInjection
     [Inject]
     protected SongMeta songMeta;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     protected Text uiText;
 
     abstract protected string GetUiTextPrefix();

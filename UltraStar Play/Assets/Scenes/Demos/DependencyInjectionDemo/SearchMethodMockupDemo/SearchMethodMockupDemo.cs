@@ -31,7 +31,7 @@ public class SearchMethodMockupDemo : MonoBehaviour
 
     private class ScriptThatNeedsInjectionOfTextHolder : MonoBehaviour
     {
-        [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+        [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
         private readonly ITextHolder textHolder;
 
         public string GetText()
@@ -40,4 +40,3 @@ public class SearchMethodMockupDemo : MonoBehaviour
         }
     }
 }
-

@@ -25,7 +25,7 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
     public Color lineNormalColor = Color.gray;
     public Color lineHighlightColor = Color.white;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInParent)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
     private NoteArea noteArea;
 
     [Inject]

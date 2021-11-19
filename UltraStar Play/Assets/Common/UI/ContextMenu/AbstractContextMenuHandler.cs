@@ -41,10 +41,10 @@ public abstract class AbstractContextMenuHandler : MonoBehaviour, INeedInjection
         }
     }
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     protected GraphicRaycaster graphicRaycaster;
     
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     protected EventSystem eventSystem;
     
     protected abstract void FillContextMenu(ContextMenu contextMenu);

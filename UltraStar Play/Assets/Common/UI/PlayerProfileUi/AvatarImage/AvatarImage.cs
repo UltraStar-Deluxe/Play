@@ -11,13 +11,13 @@ using UniInject;
 [RequireComponent(typeof(Image))]
 public class AvatarImage : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private Image image;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private PlayerProfile playerProfile;
     
     public void OnInjectionFinished()

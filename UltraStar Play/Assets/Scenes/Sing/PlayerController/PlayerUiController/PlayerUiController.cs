@@ -16,28 +16,28 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject]
     private PlayerScoreController playerScoreController;
 
-    [Inject(optional = true)]
+    [Inject(Optional = true)]
     private MicProfile micProfile;
 
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
     
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerMessageDisplayer playerMessageDisplayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerNameText playerNameText;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AvatarImage avatarImage;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerCrownDisplayer PlayerCrownDisplayer { get; private set; }
 
     [Inject]

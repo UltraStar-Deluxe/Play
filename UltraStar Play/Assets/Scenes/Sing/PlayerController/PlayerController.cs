@@ -17,16 +17,16 @@ public class PlayerController : MonoBehaviour, INeedInjection
     public PlayerProfile PlayerProfile { get; private set; }
     public MicProfile MicProfile { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerNoteRecorder PlayerNoteRecorder { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerPitchTracker PlayerPitchTracker { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public MicSampleRecorder MicSampleRecorder { get; private set; }
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerScoreController PlayerScoreController { get; private set; }
 
     private Voice voice;

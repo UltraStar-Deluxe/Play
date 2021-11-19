@@ -11,7 +11,7 @@ using UniInject;
 [RequireComponent(typeof(Image))]
 public class SongRatingImage : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Image image;
 
     [Inject]

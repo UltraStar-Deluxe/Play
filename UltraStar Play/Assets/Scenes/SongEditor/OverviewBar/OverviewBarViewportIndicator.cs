@@ -15,7 +15,7 @@ public class OverviewBarViewportIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private NoteArea noteArea;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     void Start()

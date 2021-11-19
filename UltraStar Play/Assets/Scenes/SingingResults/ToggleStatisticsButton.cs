@@ -12,7 +12,7 @@ using UniRx;
 
 public class ToggleStatisticsButton : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

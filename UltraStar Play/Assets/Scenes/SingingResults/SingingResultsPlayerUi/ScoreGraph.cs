@@ -42,7 +42,7 @@ public class ScoreGraph : MonoBehaviour, INeedInjection, IExcludeFromSceneInject
     [Inject]
     private SingingResultsSceneData sceneData;
 
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private DynamicallyCreatedImage dynamicallyCreatedImage;
 
     public void OnInjectionFinished()

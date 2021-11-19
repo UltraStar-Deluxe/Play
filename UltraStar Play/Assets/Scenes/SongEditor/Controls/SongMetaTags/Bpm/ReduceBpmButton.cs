@@ -12,7 +12,7 @@ using UniRx;
 
 public class ReduceBpmButton : MonoBehaviour, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     [Inject]

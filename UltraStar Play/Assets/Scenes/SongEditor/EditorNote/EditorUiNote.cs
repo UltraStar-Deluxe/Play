@@ -58,7 +58,7 @@ public class EditorUiNote : MonoBehaviour,
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     public RectTransform RectTransform { get; private set; }
 
     [Inject]

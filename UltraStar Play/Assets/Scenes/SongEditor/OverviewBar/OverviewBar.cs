@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 public class OverviewBar : MonoBehaviour, IPointerDownHandler, IDragHandler, INeedInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponent)]
+    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
 
     private float rectWidth;

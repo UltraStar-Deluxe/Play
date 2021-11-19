@@ -10,7 +10,7 @@ using UniInject;
 [RequireComponent(typeof(Text))]
 public class SongRatingText : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
-    [Inject(searchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Text text;
 
     [Inject]
