@@ -4,7 +4,7 @@ using UniRx;
 using PrimeInputActions;
 using ProTrans; 
 
-public class LoadingSceneController : MonoBehaviour
+public class LoadingSceneUiControl : MonoBehaviour
 {
     void Start()
     {
