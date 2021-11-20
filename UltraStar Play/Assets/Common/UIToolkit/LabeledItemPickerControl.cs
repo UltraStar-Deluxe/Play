@@ -11,7 +11,7 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
         Items = items;
     }
 
-    public void UpdateLabelText(T item)
+    public virtual void UpdateLabelText(T item)
     {
         ItemPicker.ItemLabel.text = GetLabelText(item);
     }

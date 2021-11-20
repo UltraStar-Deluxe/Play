@@ -9,6 +9,7 @@ public static partial class R
         public const string adminRightsContainer = "adminRightsContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
+        public const string avatarPicker = "avatarPicker";
         public const string backButton = "backButton";
         public const string backButtonLabel = "backButtonLabel";
         public const string background = "background";
@@ -21,6 +22,7 @@ public static partial class R
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
         public const string centerContent = "centerContent";
+        public const string column = "column";
         public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
@@ -38,8 +40,12 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImage = "dialogTitleImage";
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
+        public const string difficultyPicker = "difficultyPicker";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string dummyButton = "dummyButton";
+        public const string enabledContainer = "enabledContainer";
+        public const string enabledLabel = "enabledLabel";
+        public const string enabledToggle = "enabledToggle";
         public const string fpsContainer = "fpsContainer";
         public const string fullscreenContainer = "fullscreenContainer";
         public const string gameOptionsButton = "gameOptionsButton";
@@ -63,6 +69,7 @@ public static partial class R
         public const string languageLabel = "languageLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
         public const string nameLabel = "nameLabel";
+        public const string nameTextField = "nameTextField";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
@@ -75,6 +82,7 @@ public static partial class R
         public const string previewVolumeContainer = "previewVolumeContainer";
         public const string previewVolumeLabel = "previewVolumeLabel";
         public const string previousItemButton = "previousItemButton";
+        public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
         public const string quitButton = "quitButton";
         public const string ratePlayersContainer = "ratePlayersContainer";
