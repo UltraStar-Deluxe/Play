@@ -14,6 +14,7 @@ public static partial class R
         public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string middleCenterText = "middleCenterText";
         public const string multiline = "multiline";
+        public const string noBackground = "noBackground";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
@@ -22,6 +23,7 @@ public static partial class R
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string overlay = "overlay";
+        public const string smallFont = "smallFont";
         public const string startButtonClass = "startButtonClass";
         public const string titleImage = "titleImage";
         public const string titleSubText = "titleSubText";

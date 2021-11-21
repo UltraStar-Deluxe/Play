@@ -19,6 +19,13 @@ public static partial class R
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
         public static readonly string companionAppOptionsScene_title = "companionAppOptionsScene_title";
+        public static readonly string contentDownloadScene_archiveUrlLabel = "contentDownloadScene_archiveUrlLabel";
+        public static readonly string contentDownloadScene_cancelDownloadButton = "contentDownloadScene_cancelDownloadButton";
+        public static readonly string contentDownloadScene_startDownloadButton = "contentDownloadScene_startDownloadButton";
+        public static readonly string contentDownloadScene_status_canceled = "contentDownloadScene_status_canceled";
+        public static readonly string contentDownloadScene_status_failed = "contentDownloadScene_status_failed";
+        public static readonly string contentDownloadScene_status_finished = "contentDownloadScene_status_finished";
+        public static readonly string contentDownloadScene_title = "contentDownloadScene_title";
         public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
         public static readonly string designOptionsScene_title = "designOptionsScene_title";

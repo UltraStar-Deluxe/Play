@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.IO;
@@ -11,22 +10,55 @@ using UnityEngine.Networking;
 using ICSharpCode.SharpZipLib.Tar;
 using static ThreadPool;
 using System.Text;
+using PrimeInputActions;
+using ProTrans;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
+public class ContentDownloadSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    public Text statusLabel;
-    public Text logText;
-    public InputField downloadPath;
-    public Text fileSize;
-    public Button startDownloadButton;
-    public Button cancelDownloadButton;
+    private static readonly List<string> defaultArchiveUrls = new List<string>
+    {
+        "https://42.usplay.net/ultrastar-songs-cc.tar"
+    };
 
-    private string DownloadUrl => downloadPath.text.Trim();
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
-    private UnityWebRequest downloadRequest;
+    [Inject]
+    private TranslationManager translationManager;
+
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
+
+    [Inject(UxmlName = R.UxmlNames.backButton)]
+    private Button backButton;
+
+    [Inject(UxmlName = R.UxmlNames.statusLabel)]
+    private Label statusLabel;
+
+    [Inject(UxmlName = R.UxmlNames.outputTextField)]
+    private TextField logText;
+
+    [Inject(UxmlName = R.UxmlNames.urlLabel)]
+    private Label urlLabel;
+
+    [Inject(UxmlName = R.UxmlNames.urlChooser)]
+    private DropdownField urlChooser;
+
+    [Inject(UxmlName = R.UxmlNames.urlTextField)]
+    private TextField downloadPath;
+
+    [Inject(UxmlName = R.UxmlNames.sizeLabel)]
+    private Label fileSize;
+
+    [Inject(UxmlName = R.UxmlNames.startButton)]
+    private Button startDownloadButton;
+
+    [Inject(UxmlName = R.UxmlNames.cancelButton)]
+    private Button cancelDownloadButton;
 
     [Inject]
     private SettingsManager settingsManager;
@@ -36,16 +68,46 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
     
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
+    private string DownloadUrl => downloadPath.value.Trim();
+
+    private UnityWebRequest downloadRequest;
+
     void Start()
     {
-        startDownloadButton.OnClickAsObservable().Subscribe(_ => StartDownload());
-        cancelDownloadButton.OnClickAsObservable().Subscribe(_ => CancelDownload());
-        downloadPath.OnEndEditAsObservable().Subscribe(_ => FetchFileSize());
+        statusLabel.text = "";
+        urlChooser.choices = new List<string>(defaultArchiveUrls);
+        urlChooser.value = urlChooser.choices[0];
+        downloadPath.value = defaultArchiveUrls[0];
+
+        urlChooser.RegisterValueChangedCallback(evt => downloadPath.value = evt.newValue);
+
+        startDownloadButton.RegisterCallbackButtonTriggered(() => StartDownload());
+        cancelDownloadButton.RegisterCallbackButtonTriggered(() => CancelDownload());
+        downloadPath.RegisterValueChangedCallback(evt => FetchFileSize());
         if (!DownloadUrl.IsNullOrEmpty())
         {
             FetchFileSize();
         }
+
+        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+        backButton.Focus();
+
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+            .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+    }
+
+    public void UpdateTranslation()
+    {
+        if (!Application.isPlaying && backButton == null)
+        {
+            SceneInjectionManager.Instance.DoInjection();
+        }
+        urlLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
+        startDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_startDownloadButton);
+        cancelDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_cancelDownloadButton);
+        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_title);
     }
 
     void Update()
@@ -184,7 +246,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private void AddToUiLog(string message)
     {
-        logText.text = message + "\n" + logText.text;
+        logText.value = message + "\n" + logText.value;
     }
 
     public void UpdateFileSize()
@@ -209,8 +271,8 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
             if (request.isNetworkError || request.isHttpError)
             {
 
-                Debug.LogError($"Error fetching size: <color='red'>{request.error}</color>");
-                AddToUiLog($"Error fetching size: <color='red'>{request.error}</color>");
+                Debug.LogError($"Error fetching size: {request.error}");
+                AddToUiLog($"Error fetching size: {request.error}");
                 ResetFileSizeText();
             }
             else
@@ -249,7 +311,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
                     }
                     catch (Exception ex)
                     {
-                        AddToDebugAndUiLog($"Unpacking failed: <color='red'>{ex.Message}</color>");
+                        AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
                         SetErrorStatus();
                     }
                 }
@@ -297,7 +359,7 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
         {
             AddToDebugAndUiLog($"Finished unpacking the song package to {songsPath}");
             SetFinishedStatus();
-            downloadPath.text = "";
+            downloadPath.value = "";
             List<string> songDirs = settings.GameSettings.songDirs;
             if (!songDirs.Contains(songsPath))
             {
@@ -325,21 +387,21 @@ public class ContentDownloadSceneController : MonoBehaviour, INeedInjection
 
     private void SetFinishedStatus()
     {
-        statusLabel.text = "Finished";
+        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_finished);
     }
 
     private void SetErrorStatus()
     {
-        statusLabel.text = "Failed";
+        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_failed);
     }
 
     private void SetCanceledStatus()
     {
-        statusLabel.text = "Canceled";
+        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_canceled);
     }
 
     private void ResetFileSizeText()
     {
-        fileSize.text = "Unknown file size";
+        fileSize.text = "??? MB";
     }
 }

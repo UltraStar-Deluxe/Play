@@ -51,7 +51,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
   - enabled: 1
-    path: Assets/Scenes/Options/ContentOptions/ContentDownloadScene.unity
+    path: Assets/Scenes/Options/ContentDownload/ContentDownloadScene.unity
     guid: 10cb82cf2be19ee46b443c17c2efc000
   - enabled: 1
     path: Assets/Scenes/Options/DesignOptions/DesignOptionsScene.unity
