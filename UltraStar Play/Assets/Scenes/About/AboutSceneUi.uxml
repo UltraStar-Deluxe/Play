@@ -7,14 +7,14 @@
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="About" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
-                            <ui:Label text="UltraStar Play" display-tooltip-when-elided="true" name="sceneTitle" class="titleSubText" style="width: auto;" />
+                            <ui:Label text="About" name="sceneTitle" class="titleText"/>
+                            <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button text="&lt;" display-tooltip-when-elided="true" name="previousItemButton" />
-                <ui:Label text="1 / 2" display-tooltip-when-elided="true" name="itemIndexLabel" class="middleCenterText" style="font-size: 18px;" />
-                <ui:Button text="&gt;" display-tooltip-when-elided="true" name="nextItemButton" />
+                <ui:Button text="&lt;" name="previousItemButton" />
+                <ui:Label text="1 / 2" name="itemIndexLabel" class="middleCenterText" style="font-size: 18px;" />
+                <ui:Button text="&gt;" name="nextItemButton" />
             </ui:VisualElement>
             <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; background-color: rgba(0, 0, 0, 0.25);">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" focusable="true" style="flex-grow: 1; height: 400px;">
@@ -22,7 +22,7 @@
                 </ui:ScrollView>
             </ui:VisualElement>
             <ui:VisualElement name="bottomContent" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button display-tooltip-when-elided="true" name="backButton" value="This is the about text on multiple lines." />
+                <ui:Button name="backButton" value="This is the about text on multiple lines." />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

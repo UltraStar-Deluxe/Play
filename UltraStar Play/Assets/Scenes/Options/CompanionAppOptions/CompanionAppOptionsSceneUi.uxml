@@ -4,18 +4,18 @@
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer" style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Companion Apps" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                            <ui:Label text="Companion Apps" name="sceneTitle" class="titleText"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="Connected Apps: 99" display-tooltip-when-elided="true" name="connectedClientCountLabel" class="controlLabel" style="width: 100%; margin-bottom: 20px; margin-top: 20px;" />
+            <ui:Label text="Connected Apps: 99" name="connectedClientCountLabel" class="controlLabel" style="width: 100%; margin-bottom: 20px; margin-top: 20px;" />
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="connectedClientList" style="width: 100%; min-height: 50px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; flex-grow: 1; margin-bottom: 20px;" />
             <ui:VisualElement style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
+                <ui:Button text="Back" name="backButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

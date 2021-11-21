@@ -13,6 +13,7 @@ public static partial class R
         public static readonly string action_restart = "action_restart";
         public static readonly string action_skipToNextLyrics = "action_skipToNextLyrics";
         public static readonly string action_togglePause = "action_togglePause";
+        public static readonly string active = "active";
         public static readonly string add = "add";
         public static readonly string back = "back";
         public static readonly string cancel = "cancel";
@@ -26,6 +27,7 @@ public static partial class R
         public static readonly string difficulty_easy = "difficulty_easy";
         public static readonly string difficulty_hard = "difficulty_hard";
         public static readonly string difficulty_medium = "difficulty_medium";
+        public static readonly string enabled = "enabled";
         public static readonly string exit = "exit";
         public static readonly string favoritesIcon_tooltip = "favoritesIcon_tooltip";
         public static readonly string filter = "filter";
@@ -105,6 +107,7 @@ public static partial class R
         public static readonly string order_Language = "order_Language";
         public static readonly string order_Title = "order_Title";
         public static readonly string order_Year = "order_Year";
+        public static readonly string playerProfileOptionsScene_title = "playerProfileOptionsScene_title";
         public static readonly string quit = "quit";
         public static readonly string rating_sentence_awful = "rating_sentence_awful";
         public static readonly string rating_sentence_bad = "rating_sentence_bad";

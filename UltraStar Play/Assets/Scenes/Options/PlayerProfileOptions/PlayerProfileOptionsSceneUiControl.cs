@@ -61,7 +61,7 @@ public class PlayerProfileOptionsSceneUiControl : MonoBehaviour, INeedInjection,
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        // sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songLibraryOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.playerProfileOptionsScene_title);
     }
 
     private void UpdatePlayerProfileList()
@@ -95,6 +95,7 @@ public class PlayerProfileOptionsSceneUiControl : MonoBehaviour, INeedInjection,
         Toggle enabledToggle = result.Q<Toggle>(R.UxmlNames.enabledToggle);
         enabledToggle.value = playerProfile.IsEnabled;
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
+        result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
         new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker))
             .Bind(() => playerProfile.Avatar,
