@@ -1,13 +1,13 @@
 # UltraStar Play Development README
 
-[![Travis Build Status](https://travis-ci.org/UltraStar-Deluxe/Play.svg?branch=master)](https://travis-ci.org/UltraStar-Deluxe/Play)
+[![Build Status](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-unity-project.yml/badge.svg)](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-unity-project.yml)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5eeefc3773e8405aac7332ce0e57ec86)](https://www.codacy.com/app/UltraStar-Deluxe/Play?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UltraStar-Deluxe/Play&amp;utm_campaign=Badge_Grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/UltraStar-Deluxe/Play/blob/master/LICENSE) 
 [![Join the chat at https://gitter.im/UltraStar-Deluxe/Play](https://badges.gitter.im/UltraStar-Deluxe/Play.svg)](https://gitter.im/UltraStar-Deluxe/Play?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Sponsor this project](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/achimmihca)
 
 ### 1. About
-UltraStar Play is a free and open source singing game.
+[UltraStar Play](https://usplay.net/) is a free and open source singing game.
 The game plays an audio file, displays lyrics, notes, and optionally a background video or image, while the players sing along to earn points.
 
 UltraStar Play is built with the [Unity](https://unity.com/) game engine and mostly C# as programming language.
