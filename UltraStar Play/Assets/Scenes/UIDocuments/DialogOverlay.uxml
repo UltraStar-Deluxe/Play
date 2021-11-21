@@ -3,13 +3,13 @@
     <ui:VisualElement name="dialogContent" style="position: absolute; background-color: rgb(14, 28, 42); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 450px; height: 250px; justify-content: flex-start; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
         <ui:VisualElement name="dialogTitleImageAndTextContainer" style="width: 100%; flex-direction: row; justify-content: flex-start; align-items: center; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px;">
             <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage" style="background-image: url(&apos;/Assets/Common/Graphics/Icons/MaterialDesignIcons/round_warning_white_48dp.png&apos;); display: none;" />
-            <ui:Label text="Dialog Title" display-tooltip-when-elided="true" name="dialogTitle" class="dialogTitle" />
+            <ui:Label text="Dialog Title" name="dialogTitle" class="dialogTitle" />
         </ui:VisualElement>
         <ui:VisualElement name="dialogMessageContainer" style="max-width: 100%; align-items: center; justify-content: center; flex-grow: 1;">
-            <ui:Label text="This is the message of the dialog." display-tooltip-when-elided="true" name="dialogMessage" class="dialogMessage" />
+            <ui:Label text="This is the message of the dialog." name="dialogMessage" class="dialogMessage" />
         </ui:VisualElement>
         <ui:VisualElement name="dialogButtonContainer" style="flex-direction: row; justify-content: center; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: center;">
-            <ui:Button text="OK" display-tooltip-when-elided="true" name="dummyButton" class="dialogButton" style="display: none;" />
+            <ui:Button text="OK" name="dummyButton" class="dialogButton" style="display: none;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

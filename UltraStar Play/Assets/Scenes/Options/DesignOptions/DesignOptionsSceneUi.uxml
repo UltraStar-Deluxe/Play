@@ -4,36 +4,36 @@
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer" style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Design" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
+                            <ui:Label text="Design" name="sceneTitle" class="titleText"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="themeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Theme" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
+                <ui:Label text="Theme" name="Label" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement name="noteDisplayModeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Note Display Mode" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
+                <ui:Label text="Note Display Mode" name="Label" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement name="lyricsOnNotesContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Show Lyrics on Notes" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
+                <ui:Label text="Show Lyrics on Notes" name="Label" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement name="pitchIndicatorContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Show Pitch Indicator" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
+                <ui:Label text="Show Pitch Indicator" name="Label" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement name="imageAsCursorContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Use Image as Cursor" display-tooltip-when-elided="true" name="Label" class="controlLabel" />
+                <ui:Label text="Use Image as Cursor" name="Label" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
+                <ui:Button text="Back" name="backButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

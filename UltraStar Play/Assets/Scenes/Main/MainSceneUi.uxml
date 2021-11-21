@@ -7,30 +7,30 @@
                 <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
                     <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
                     <ui:VisualElement name="titleAndDescription">
-                        <ui:Label text="Main Menu" display-tooltip-when-elided="true" name="sceneTitle" class="titleText" style="width: auto;" />
-                        <ui:Label text="Button description" display-tooltip-when-elided="true" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
+                        <ui:Label text="Main Menu" name="sceneTitle" class="titleText"/>
+                        <ui:Label text="Button description" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 12px;">
-                <ui:Button text="Sing" display-tooltip-when-elided="true" name="startButton" class="startButtonClass" />
-                <ui:Button text="Party" display-tooltip-when-elided="true" name="partyButton" />
-                <ui:Button text="Jukebox" display-tooltip-when-elided="true" name="jukeboxButton" />
-                <ui:Button text="Settings" display-tooltip-when-elided="true" name="settingsButton" />
+                <ui:Button text="Sing" name="startButton" class="startButtonClass" />
+                <ui:Button text="Party" name="partyButton" />
+                <ui:Button text="Jukebox" name="jukeboxButton" />
+                <ui:Button text="Settings" name="settingsButton" />
             </ui:VisualElement>
             <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
                 <ui:VisualElement style="width: 126px;" />
                 <ui:VisualElement style="width: 126px;" />
-                <ui:Button text="Info" display-tooltip-when-elided="true" name="aboutButton" />
-                <ui:Button text="Quit" display-tooltip-when-elided="true" name="quitButton" style="display: flex;" />
+                <ui:Button text="Info" name="aboutButton" />
+                <ui:Button text="Quit" name="quitButton" style="display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="NewVersionAvailableDialog" name="newVersionDialogRoot" class="overlay" style="display: none;" />
         <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-            <ui:Label text="Version: xx.yy.zz" display-tooltip-when-elided="true" name="semanticVersionText" />
+            <ui:Label text="Version: xx.yy.zz" name="semanticVersionText" />
             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
-                <ui:Label text="Commit: 5e07588" display-tooltip-when-elided="true" name="commitHashText" />
-                <ui:Label text="Build timestamp: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
+                <ui:Label text="Commit: 5e07588" name="commitHashText" />
+                <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampText" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

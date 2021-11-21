@@ -3,7 +3,6 @@ public static partial class R
 {
     public static class UxmlClasses
     {
-        public const string backButton = "backButton";
         public const string backgroundImage = "backgroundImage";
         public const string controlLabel = "controlLabel";
         public const string dialogButton = "dialogButton";
