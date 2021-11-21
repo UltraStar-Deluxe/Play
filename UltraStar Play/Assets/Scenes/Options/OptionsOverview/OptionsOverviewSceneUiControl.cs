@@ -13,7 +13,7 @@ using Button = UnityEngine.UIElements.Button;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -64,7 +64,7 @@ public class OptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
     private Settings settings;
 
     [Inject]
-    public UIDocument uiDoc;
+    private UIDocument uiDoc;
 
 	private void Start()
     {
