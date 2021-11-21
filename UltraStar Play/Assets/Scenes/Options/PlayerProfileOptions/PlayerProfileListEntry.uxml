@@ -10,8 +10,8 @@
         </ui:VisualElement>
         <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around;">
             <ui:VisualElement name="enabledContainer" style="flex-direction: row; width: 100%;">
-                <ui:Label text="Enabled" name="enabledLabel" class="middleCenterText" />
-                <ui:Toggle name="enabledToggle" style="border-left-width: 20px;" />
+                <ui:Label text="Enabled" name="enabledLabel" class="middleCenterText" style="margin-right: 20px;" />
+                <ui:Toggle name="enabledToggle" />
             </ui:VisualElement>
             <ui:Button name="deleteButton" text="Delete" style="width: 100%;" />
         </ui:VisualElement>

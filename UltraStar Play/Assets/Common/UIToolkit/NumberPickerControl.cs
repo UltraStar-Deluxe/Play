@@ -3,6 +3,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniRx;
+using UnityEngine.InputSystem;
 
 public class NumberPickerControl : ComputedItemPickerControl<double>
 {
@@ -34,7 +35,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
             return;
         }
 
-        double nextValue = currentValue + StepValue;
+        double nextValue = currentValue + GetModifiedStepValue();
         if (nextValue > MaxValue)
         {
             nextValue = MaxValue;
@@ -44,6 +45,14 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         {
             SelectItem(nextValue);
         }
+    }
+
+    private double GetModifiedStepValue()
+    {
+        return Keyboard.current != null
+               && Keyboard.current.shiftKey.isPressed
+            ? StepValue * 10
+            : StepValue;
     }
 
     public override void SelectPreviousItem()
@@ -58,7 +67,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
             return;
         }
 
-        double nextValue = currentValue - StepValue;
+        double nextValue = currentValue - GetModifiedStepValue();
         if (nextValue < MinValue)
         {
             nextValue = MinValue;
