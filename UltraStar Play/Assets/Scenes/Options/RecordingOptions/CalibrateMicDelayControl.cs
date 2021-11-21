@@ -10,13 +10,22 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
+public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public MicPitchTracker micPitchTracker;
 
+    // The audio clips and midi notes that are played for calibration.
     [InjectedInInspector]
-    public MicDelayNumberSpinner micDelaySpinner;
+    public List<AudioClip> audioClips;
+
+    [InjectedInInspector]
+    public List<string> midiNoteNames;
+
+    public MicProfile MicProfile { get; set; }
+
+    private Subject<CalibrationResult> calibrationResultEventStream = new Subject<CalibrationResult>();
+    public IObservable<CalibrationResult> CalibrationResultEventStream => calibrationResultEventStream;
 
     [Inject]
     private UiManager uiManager;
@@ -27,10 +36,6 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
 
-    // The audio clips and midi notes that are played for calibration.
-    public List<AudioClip> audioClips;
-    public List<string> midiNoteNames;
-
     private bool isCalibrationInProgress;
 
     private float startTimeInSeconds;
@@ -39,8 +44,6 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
 
     private List<int> delaysInMillis = new List<int>();
     private int currentIteration;
-
-    public MicProfile MicProfile { get; set; }
 
     void Awake()
     {
@@ -118,7 +121,10 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
         if (MicProfile != null)
         {
             MicProfile.DelayInMillis = (int)delaysInMillis.Average();
-            micDelaySpinner.SetMicProfile(MicProfile);
+            calibrationResultEventStream.OnNext(new CalibrationResult
+            {
+                DelaysInMilliseconds = new List<int>(delaysInMillis)
+            });
         }
     }
 
@@ -160,5 +166,10 @@ public class CalibrateMicDelayButton : MonoBehaviour, INeedInjection
         {
             Debug.Log("Mic delay calibration - wrong pitch: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
         }
+    }
+
+    public class CalibrationResult
+    {
+        public List<int> DelaysInMilliseconds { get; set; }
     }
 }

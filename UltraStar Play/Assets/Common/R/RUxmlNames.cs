@@ -7,6 +7,7 @@ public static partial class R
         public const string aboutText = "aboutText";
         public const string addButton = "addButton";
         public const string adminRightsContainer = "adminRightsContainer";
+        public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
         public const string avatarPicker = "avatarPicker";
@@ -22,17 +23,21 @@ public static partial class R
         public const string bottomContent = "bottomContent";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
+        public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
         public const string centerContent = "centerContent";
+        public const string colorContainer = "colorContainer";
         public const string column = "column";
         public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
+        public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string developerOptionsButton = "developerOptionsButton";
+        public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
         public const string dialogContent = "dialogContent";
@@ -46,6 +51,7 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string dummyButton = "dummyButton";
+        public const string enabledAndNotConnectedContainer = "enabledAndNotConnectedContainer";
         public const string enabledContainer = "enabledContainer";
         public const string enabledLabel = "enabledLabel";
         public const string enabledToggle = "enabledToggle";
@@ -71,12 +77,18 @@ public static partial class R
         public const string languageImage = "languageImage";
         public const string languageLabel = "languageLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
+        public const string micVisualization = "micVisualization";
+        public const string micVisualizationContainer = "micVisualizationContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
+        public const string noiseSuppressionContainer = "noiseSuppressionContainer";
+        public const string notConnectedContainer = "notConnectedContainer";
+        public const string notConnectedLabel = "notConnectedLabel";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
+        public const string noteLabel = "noteLabel";
         public const string outputTextField = "outputTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
@@ -122,5 +134,6 @@ public static partial class R
         public const string volumeChooser = "volumeChooser";
         public const string volumeContainer = "volumeContainer";
         public const string volumeLabel = "volumeLabel";
+        public const string warningIcon = "warningIcon";
     }
 }
