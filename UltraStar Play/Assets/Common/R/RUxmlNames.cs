@@ -11,6 +11,7 @@ public static partial class R
         public const string appOptionsButton = "appOptionsButton";
         public const string avatarPicker = "avatarPicker";
         public const string backButton = "backButton";
+        public const string backButtonContainer = "backButtonContainer";
         public const string backButtonLabel = "backButtonLabel";
         public const string background = "background";
         public const string backgroundMusicEnabledChooser = "backgroundMusicEnabledChooser";
@@ -21,6 +22,7 @@ public static partial class R
         public const string bottomContent = "bottomContent";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
+        public const string cancelButton = "cancelButton";
         public const string centerContent = "centerContent";
         public const string column = "column";
         public const string combineDuetScoresContainer = "combineDuetScoresContainer";
@@ -41,6 +43,7 @@ public static partial class R
         public const string dialogTitleImage = "dialogTitleImage";
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyPicker = "difficultyPicker";
+        public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string dummyButton = "dummyButton";
         public const string enabledContainer = "enabledContainer";
@@ -74,6 +77,7 @@ public static partial class R
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
+        public const string outputTextField = "outputTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
@@ -93,12 +97,15 @@ public static partial class R
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string sizeLabel = "sizeLabel";
         public const string songList = "songList";
         public const string songListContainer = "songListContainer";
         public const string songQueueRights = "songQueueRights";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string soundOptionsButton = "soundOptionsButton";
         public const string startButton = "startButton";
+        public const string statusLabel = "statusLabel";
+        public const string textFieldContainer = "textFieldContainer";
         public const string themeContainer = "themeContainer";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
@@ -106,6 +113,11 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string toggle = "toggle";
         public const string topRow = "topRow";
+        public const string urlChooser = "urlChooser";
+        public const string urlContainer = "urlContainer";
+        public const string urlLabel = "urlLabel";
+        public const string urlTextField = "urlTextField";
+        public const string urlTextFieldContainer = "urlTextFieldContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string volumeChooser = "volumeChooser";
         public const string volumeContainer = "volumeContainer";

@@ -13,21 +13,17 @@
     font-size: 18px;
 }
 
-.unity-base-popup-field__text {
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    border-width: 0;
-    font-size: 18px;
-}
-
-.unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: var(--text-color);
-    border-width: 0;
+.unity-base-text-field {
+    height: 30px;
+    -unity-text-align: middle-left;
 }
 
 .unity-base-popup-field {
     background-color: var(--control-color);
+    height: 30px;
+    -unity-text-align: middle-left;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .unity-base-popup-field:hover {
@@ -50,6 +46,19 @@
 
 .unity-base-popup-field:focus .unity-base-popup-field__input {
     background-color: var(--control-color-accent2);
+}
+
+.unity-base-popup-field__text {
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    font-size: 18px;
+}
+
+.unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: var(--text-color);
+    border-width: 0;
 }
 
 .unity-base-dropdown__container-outer {
@@ -202,6 +211,16 @@ TextInput {
     -unity-background-image-tint-color: var(--text-color);
     width: 20px;
     height: 20px;
+}
+
+.noBackground TextInput {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--text-color);
+    border-width: 0;
+}
+
+.smallFont TextInput {
+    font-size: 14px;
 }
 
 ItemPicker {
