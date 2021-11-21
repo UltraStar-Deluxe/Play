@@ -1,19 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="container" style="flex-direction: row; width: auto; justify-content: space-between; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-        <ui:VisualElement name="column" style="width: auto; flex-grow: 1;">
+        <ui:VisualElement name="column" style="width: auto; flex-grow: 1; margin-right: 20px; justify-content: space-around;">
             <ItemPicker name="avatarPicker" style="width: 100%; height: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1;">
+        <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; margin-right: 20px; justify-content: space-around;">
             <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="flex-shrink: 1; width: 100%;" />
             <ItemPicker name="difficultyPicker" style="width: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="column" style="width: auto; align-items: flex-end; flex-grow: 1;">
-            <ui:VisualElement name="enabledContainer" style="flex-direction: row;">
+        <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around;">
+            <ui:VisualElement name="enabledContainer" style="flex-direction: row; width: 100%;">
                 <ui:Label text="Enabled" display-tooltip-when-elided="true" name="enabledLabel" class="middleCenterText" />
                 <ui:Toggle name="enabledToggle" style="border-left-width: 20px;" />
             </ui:VisualElement>
-            <ui:Button text="Delete" display-tooltip-when-elided="true" name="deleteButton" />
+            <ui:Button display-tooltip-when-elided="true" name="deleteButton" text="Delete" style="width: 100%;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
