@@ -112,6 +112,13 @@
     background-color: var(--control-color-accent2);
 }
 
+TextInput
+{
+    font-size: 18px;
+    padding: 2px;
+    border-width: 2px;
+}
+
 .middleCenterText {
     -unity-text-align: middle-center;
 }

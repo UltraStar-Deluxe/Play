@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -88,8 +89,8 @@ public class ItemPicker : VisualElement
                 Debug.LogError("Could not load " + path);
                 return;
             }
-            TemplateContainer itemPickerVisualElement = visualTreeAsset.CloneTree();
-            target.Add(itemPickerVisualElement);
+            TemplateContainer itemPickerTemplateContainer = visualTreeAsset.CloneTree();
+            target.Add(itemPickerTemplateContainer.Children().First());
         }
     }
 }

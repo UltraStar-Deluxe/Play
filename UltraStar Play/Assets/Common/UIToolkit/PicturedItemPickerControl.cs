@@ -14,6 +14,7 @@ abstract public class PicturedItemPickerControl<T> : ListedItemPickerControl<T>
 
     public virtual void UpdateImageElement(T item)
     {
+        ItemPicker.ItemLabel.text = "";
         ItemPicker.ItemLabel.style.backgroundImage = GetBackgroundImageValue(item);
     }
 
