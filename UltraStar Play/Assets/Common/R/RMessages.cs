@@ -89,6 +89,7 @@ public static partial class R
         public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string options_ratePlayers = "options_ratePlayers";
         public static readonly string options_resolution = "options_resolution";
+        public static readonly string options_sampleRate_auto = "options_sampleRate_auto";
         public static readonly string options_showFps = "options_showFps";
         public static readonly string options_showLyricsOnNotes = "options_showLyricsOnNotes";
         public static readonly string options_showPitchIndicator = "options_showPitchIndicator";
@@ -132,6 +133,7 @@ public static partial class R
         public static readonly string rating_song_toneDeaf = "rating_song_toneDeaf";
         public static readonly string rating_song_ultraStar = "rating_song_ultraStar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
+        public static readonly string recordingOptionsScene_title = "recordingOptionsScene_title";
         public static readonly string save = "save";
         public static readonly string score_goldenNotes = "score_goldenNotes";
         public static readonly string score_notes = "score_notes";

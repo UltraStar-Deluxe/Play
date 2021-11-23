@@ -10,6 +10,7 @@ public static partial class R
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
+        public const string audioWaveForm = "audioWaveForm";
         public const string avatarPicker = "avatarPicker";
         public const string backButton = "backButton";
         public const string backButtonContainer = "backButtonContainer";
@@ -21,6 +22,7 @@ public static partial class R
         public const string backImage = "backImage";
         public const string bottomButtonRow = "bottomButtonRow";
         public const string bottomContent = "bottomContent";
+        public const string bottomRow = "bottomRow";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
         public const string calibrateDelayButton = "calibrateDelayButton";
@@ -51,7 +53,6 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string dummyButton = "dummyButton";
-        public const string enabledAndNotConnectedContainer = "enabledAndNotConnectedContainer";
         public const string enabledContainer = "enabledContainer";
         public const string enabledLabel = "enabledLabel";
         public const string enabledToggle = "enabledToggle";
@@ -77,7 +78,6 @@ public static partial class R
         public const string languageImage = "languageImage";
         public const string languageLabel = "languageLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
-        public const string micVisualization = "micVisualization";
         public const string micVisualizationContainer = "micVisualizationContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
@@ -104,6 +104,7 @@ public static partial class R
         public const string ratePlayersContainer = "ratePlayersContainer";
         public const string recordingOptionsButton = "recordingOptionsButton";
         public const string resolutionContainer = "resolutionContainer";
+        public const string sampleRateContainer = "sampleRateContainer";
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string semanticVersionText = "semanticVersionText";

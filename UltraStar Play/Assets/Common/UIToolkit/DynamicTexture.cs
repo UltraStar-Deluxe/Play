@@ -56,9 +56,8 @@ public class DynamicTexture : MonoBehaviour
             ? (float)ApplicationUtils.GetCurrentAppResolution().Height / panelSettings.referenceResolution.y
             : 1;
 
-        int width = (int)(visualElement.resolvedStyle.width * scaleX);
-        int height = (int)(visualElement.resolvedStyle.height * scaleY);
-        Init(width, height);
+        Vector2 visualElementSize = new PanelHelper(FindObjectOfType<UIDocument>()).PanelToScreen(visualElement.worldBound).size;
+        Init((int)visualElementSize.x, (int)visualElementSize.y);
         visualElement.style.backgroundImage = new StyleBackground(texture);
     }
 
