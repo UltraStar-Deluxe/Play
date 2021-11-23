@@ -17,6 +17,9 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     private static readonly List<int> amplificationItems = new List<int> { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new List<int> { 0, 5, 10, 15, 20, 25, 30 };
 
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private RecordingOptionsMicVisualizer micVisualizer;
+
     [Inject]
     private Settings settings;
 
@@ -62,14 +65,19 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.notConnectedLabel)]
     private VisualElement notConnectedLabel;
 
+    [Inject(UxmlName = R.UxmlNames.sampleRateContainer)]
+    private VisualElement sampleRateContainer;
+
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
 
-    [Inject(UxmlName = R.UxmlNames.micVisualization)]
-    private VisualElement micVisualization;
+    [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
+    private VisualElement audioWaveForm;
 
-    // public RecordingOptionsMicVisualizer micVisualizer;
+    [Inject(UxmlName = R.UxmlNames.noteLabel)]
+    private Label noteLabel;
 
+    private SampleRatePickerControl sampleRatePickerControl;
     private RecordingDevicePickerControl devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
     private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
@@ -78,7 +86,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
 
-    void Start()
+    private void Start()
     {
         devicePickerControl = new RecordingDevicePickerControl(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
         devicePickerControl.Selection.Value = devicePickerControl.Items[0];
@@ -86,6 +94,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
         noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
         delayPickerControl = new NumberPickerControl(delayContainer.Q<ItemPicker>());
         colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), GetColorItems());
+        sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
 
@@ -94,6 +103,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
         noiseSuppressionPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.NoiseSuppression = newValue);
         delayPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.DelayInMillis = (int)newValue);
         colorPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.Color = newValue);
+        sampleRatePickerControl.Selection.Subscribe(newValue => SelectedMicProfile.SampleRate = newValue);
 
         // Reselect recording device of connected client, when the client has now connected
         serverSideConnectRequestManager.ClientConnectedEventStream
@@ -146,6 +156,10 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
             .FirstOrDefault(it => it.ColorEquals(micProfile.Color))
             .OrIfNull(GetColorItems()[0]);
 
+        sampleRatePickerControl.Selection.Value = sampleRatePickerControl.Items
+            .FirstOrDefault(it => micProfile.SampleRate == it)
+            .OrIfNull(0);
+
         enabledToggle.value = micProfile.IsEnabled;
 
         if (micProfile.IsConnected)
@@ -159,7 +173,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
             deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
         }
 
-        // micVisualizer.SetMicProfile(micProfile);
+        micVisualizer.SetMicProfile(micProfile);
     }
 
     private void DeleteSelectedRecordingDevice()
@@ -187,7 +201,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        // sceneTitle.text = TranslationManager.GetTranslation(R.Messages.recordingOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.recordingOptionsScene_title);
     }
 
     private List<MicProfile> CreateMicProfiles()
@@ -220,6 +234,8 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
                 micProfiles.Add(micProfile);
             }
         }
+
+        micProfiles.Sort(MicProfile.compareByName);
 
         return micProfiles;
     }

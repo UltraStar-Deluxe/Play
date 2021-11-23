@@ -15,39 +15,43 @@
                     <ItemPicker wrapAround="false" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" class="multiline" style="width: 100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="micVisualizationContainer" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 100%; min-height: 10px; flex-grow: 1; margin-bottom: 5px; align-items: flex-start; justify-content: center; flex-direction: row; flex-shrink: 1;">
-                <ui:Label text="Note: ???" display-tooltip-when-elided="true" name="noteLabel" style="margin-right: 20px; -unity-text-align: middle-left; height: 100%; margin-left: 5px;" />
-                <ui:VisualElement name="micVisualization" style="flex-grow: 1; height: 100%; flex-direction: row; width: auto;" />
+            <ui:VisualElement name="micVisualizationContainer" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 100%; min-height: 10%; flex-grow: 1; margin-bottom: 5px; align-items: flex-start; justify-content: center; flex-direction: row; flex-shrink: 1; height: 10%;">
+                <ui:Label text="Note: ???" display-tooltip-when-elided="true" name="noteLabel" style="margin-right: 20px; -unity-text-align: middle-left; height: 100%; margin-left: 5px; width: 90px;" />
+                <ui:VisualElement name="audioWaveForm" style="flex-grow: 1; height: 100%; flex-direction: row; width: auto;" />
             </ui:VisualElement>
-            <ui:VisualElement name="amplificationContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                <ui:Label text="Amplification" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="noiseSuppressionContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                <ui:Label text="Noise Suppression" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="delayContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                <ui:Label text="Delay" name="Label" class="controlLabel" style="width: 100px;" />
-                <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" style="width: 200px;" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="1000" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="colorContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                <ui:Label text="Color" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="false" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="enabledAndNotConnectedContainer" class="optionsLabelAndItemPicker" style="justify-content: space-between; align-items: center; flex-direction: row-reverse; margin-bottom: 10px;">
-                <ui:VisualElement name="enabledContainer" style="width: 300px; flex-direction: row; justify-content: flex-end; align-items: center;">
+            <ui:ScrollView style="width: 100%; flex-grow: 4; height: 10%; margin-bottom: 20px;">
+                <ui:VisualElement name="enabledContainer" style="width: 100%; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 5px;">
                     <ui:Label text="Use for Singing" display-tooltip-when-elided="true" name="enabledLabel" style="margin-right: 20px;" />
                     <ui:Toggle name="enabledToggle" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
+                <ui:VisualElement name="colorContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
+                    <ui:Label text="Color" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="false" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="delayContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
+                    <ui:Label text="Delay" name="Label" class="controlLabel" style="width: 100px;" />
+                    <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" style="width: 200px;" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="1000" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="amplificationContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
+                    <ui:Label text="Amplification" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="noiseSuppressionContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
+                    <ui:Label text="Noise Suppression" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="sampleRateContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
+                    <ui:Label text="Sample Rate" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row-reverse;">
+                <ui:Button text="Back" name="backButton" />
                 <ui:VisualElement name="notConnectedContainer" style="width: 300px; flex-direction: row; align-items: center;">
                     <ui:VisualElement name="warningIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 32px; height: 32px; -unity-background-image-tint-color: rgb(219, 214, 20); margin-right: 20px;" />
                     <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" />
                 </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="bottomButtonRow" style="width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row-reverse;">
-                <ui:Button text="Back" name="backButton" />
                 <ui:Button text="Delete" name="deleteButton" style="visibility: visible; display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>

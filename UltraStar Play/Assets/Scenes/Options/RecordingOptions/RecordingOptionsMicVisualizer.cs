@@ -1,22 +1,22 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UniRx;
 using System;
 using System.Collections;
+using UniInject;
+using UnityEngine.UIElements;
 
-public class RecordingOptionsMicVisualizer : MonoBehaviour
+public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
-    public Text currentNoteLabel;
+    [Inject(UxmlName = R.UxmlNames.noteLabel)]
+    public Label currentNoteLabel;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private AudioWaveFormVisualization audioWaveFormVisualization;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     public MicPitchTracker micPitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
-
-    private AudioWaveFormVisualizer audioWaveFormVisualizer;
-
-    void Awake()
-    {
-        audioWaveFormVisualizer = GetComponentInChildren<AudioWaveFormVisualizer>();
-    }
 
     void Update()
     {
@@ -38,7 +38,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour
         float[] displayData = micSampleBufferIsAboveThreshold
             ? micData
             : new float[micData.Length];
-        audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(displayData);
+        audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(displayData);
     }
 
     public void SetMicProfile(MicProfile micProfile)

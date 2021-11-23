@@ -156,6 +156,21 @@
     height: 100%;
 }
 
+.roundButton {
+    width: 120px;
+    border-radius: 60px;
+}
+
+.roundCorners {
+    border-radius: 5px;
+}
+
+ScrollView #unity-content-container {
+    /* Some distance to the scroll bars */
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
 TextInput {
     font-size: 18px;
     padding: 2px;
@@ -209,6 +224,15 @@ TextInput {
     width: 32px;
     height: 32px;
     background-color: rgba(0, 0, 0, 0);
+}
+
+#dummyButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mainSceneButton {
+    width: 130px;
+    height: 50px;
 }
 
 .dialogButton {
