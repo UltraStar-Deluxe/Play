@@ -15,17 +15,8 @@ public class SampleRatePickerControl : LabeledItemPickerControl<int>
     public SampleRatePickerControl(ItemPicker itemPicker)
         : base(itemPicker, new List<int>{0, 48000, 44100, 22050, 16000 })
     {
-    }
-
-    protected override string GetLabelText(int item)
-    {
-        if (item <= 0)
-        {
-            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto);
-        }
-        else
-        {
-            return item.ToString();
-        }
+        GetLabelTextFunction = item => item <= 0
+            ? TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto)
+            : item.ToString();
     }
 }

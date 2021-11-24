@@ -2,6 +2,7 @@
 using UniRx;
 using System;
 using System.Collections;
+using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 
@@ -65,11 +66,13 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         // Show the note that has been detected
         if (pitchEvent != null && pitchEvent.MidiNote > 0)
         {
-            currentNoteLabel.text = "Note: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
+            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+                "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
         }
         else
         {
-            currentNoteLabel.text = "Note: ?";
+            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+                "value", "?");
         }
     }
 }

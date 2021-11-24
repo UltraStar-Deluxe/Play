@@ -58,12 +58,14 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
             .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
                   newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);
 
-        new PercentNumberPickerControl(previewVolumeChooser)
-            .Bind(() => settings.AudioSettings.PreviewVolumePercent,
+        NumberPickerControl previewVolumePickerControl = new NumberPickerControl(previewVolumeChooser);
+        previewVolumePickerControl.GetLabelTextFunction = item => item + " %";
+        previewVolumePickerControl.Bind(() => settings.AudioSettings.PreviewVolumePercent,
                 newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
 
-        new PercentNumberPickerControl(volumeChooser)
-            .Bind(() => settings.AudioSettings.VolumePercent,
+        NumberPickerControl volumePickerControl = new NumberPickerControl(volumeChooser);
+        volumePickerControl.GetLabelTextFunction = item => item + " %";
+        volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
                 newValue => settings.AudioSettings.VolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 
@@ -12,9 +12,6 @@ using UniRx;
 
 public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 {
-    [InjectedInInspector]
-    public MicPitchTracker micPitchTracker;
-
     // The audio clips and midi notes that are played for calibration.
     [InjectedInInspector]
     public List<AudioClip> audioClips;
@@ -30,11 +27,14 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button button;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicPitchTracker micPitchTracker;
 
     private bool isCalibrationInProgress;
 
@@ -64,7 +64,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        button.OnClickAsObservable().Subscribe(_ => OnStartCalibration());
+        button.RegisterCallbackButtonTriggered(() => OnStartCalibration());
         micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
     }
 
@@ -114,18 +114,14 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     private void OnEndCalibration()
     {
-        Debug.Log($"Mic delay calibration - avg delay of {delaysInMillis.Count} values: {delaysInMillis.Average()}");
+        Debug.Log($"Mic delay calibration - median delay of {delaysInMillis.Count} values: {delaysInMillis[delaysInMillis.Count/2]}");
         audioSource.Stop();
         isCalibrationInProgress = false;
 
-        if (MicProfile != null)
+        calibrationResultEventStream.OnNext(new CalibrationResult
         {
-            MicProfile.DelayInMillis = (int)delaysInMillis.Average();
-            calibrationResultEventStream.OnNext(new CalibrationResult
-            {
-                DelaysInMilliseconds = new List<int>(delaysInMillis)
-            });
-        }
+            DelaysInMilliseconds = new List<int>(delaysInMillis)
+        });
     }
 
     private void StartIteration()

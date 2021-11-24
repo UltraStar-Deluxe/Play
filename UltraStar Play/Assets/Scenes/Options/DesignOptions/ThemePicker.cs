@@ -16,6 +16,10 @@ public class ThemeSliderControl : LabeledItemPickerControl<Theme>
     public ThemeSliderControl(ItemPicker itemPicker)
         : base(itemPicker, new List<Theme>())
     {
+        GetLabelTextFunction = item => item != null
+            ? item.Name
+            : "";
+
         if (ThemeManager.GetThemes().IsNullOrEmpty())
         {
             ThemeManager.Instance.ReloadThemes();
@@ -49,12 +53,5 @@ public class ThemeSliderControl : LabeledItemPickerControl<Theme>
             ThemeManager.CurrentTheme = newValue;
             ThemeManager.Instance.UpdateThemeResources();
         });
-    }
-
-    protected override string GetLabelText(Theme item)
-    {
-        return item != null
-            ? item.Name
-            : "";
     }
 }
