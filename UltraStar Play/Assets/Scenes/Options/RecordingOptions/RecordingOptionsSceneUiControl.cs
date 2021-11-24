@@ -32,6 +32,9 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     [Inject]
     private TranslationManager translationManager;
 
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private CalibrateMicDelayControl calibrateMicDelayControl;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -57,7 +60,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     private Toggle enabledToggle;
 
     [Inject(UxmlName = R.UxmlNames.enabledLabel)]
-    private VisualElement enabledLabel;
+    private Label enabledLabel;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -77,8 +80,11 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
     private Label noteLabel;
 
+    [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
+    private Button calibrateDelayButton;
+
     private SampleRatePickerControl sampleRatePickerControl;
-    private RecordingDevicePickerControl devicePickerControl;
+    private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
     private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
     private NumberPickerControl delayPickerControl;
@@ -88,13 +94,20 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
 
     private void Start()
     {
-        devicePickerControl = new RecordingDevicePickerControl(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
         devicePickerControl.Selection.Value = devicePickerControl.Items[0];
         amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationContainer.Q<ItemPicker>(), amplificationItems);
+        amplificationPickerControl.GetLabelTextFunction = item => item + " %";
         noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
+        noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
         delayPickerControl = new NumberPickerControl(delayContainer.Q<ItemPicker>());
+        delayPickerControl.GetLabelTextFunction = item => item + " ms";
         colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), GetColorItems());
         sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
+        sampleRatePickerControl.GetLabelTextFunction = item => item <= 0
+            ? TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto)
+            : item + " Hz";
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
 
@@ -120,6 +133,17 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+
+        calibrateMicDelayControl.CalibrationResultEventStream
+            .Subscribe(CalibrationResult =>
+            {
+                if (CalibrationResult != null)
+                {
+                    double medianValue = CalibrationResult.DelaysInMilliseconds[CalibrationResult.DelaysInMilliseconds.Count / 2];
+                    double roundedMedianValue = ((int)(medianValue / delayPickerControl.StepValue)) * delayPickerControl.StepValue;
+                    delayPickerControl.SelectItem(roundedMedianValue);
+                }
+            });
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool isEnabled)
@@ -142,24 +166,11 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
             return;
         }
 
-        amplificationPickerControl.Selection.Value = amplificationPickerControl.Items
-            .FirstOrDefault(it => it == micProfile.Amplification)
-            .OrIfNull(amplificationItems[0]);
-
-        noiseSuppressionPickerControl.Selection.Value = noiseSuppressionPickerControl.Items
-            .FirstOrDefault(it => it == micProfile.NoiseSuppression)
-            .OrIfNull(noiseSuppressionItems[0]);
-
-        delayPickerControl.Selection.Value = micProfile.DelayInMillis;
-
-        colorPickerControl.Selection.Value = colorPickerControl.Items
-            .FirstOrDefault(it => it.ColorEquals(micProfile.Color))
-            .OrIfNull(GetColorItems()[0]);
-
-        sampleRatePickerControl.Selection.Value = sampleRatePickerControl.Items
-            .FirstOrDefault(it => micProfile.SampleRate == it)
-            .OrIfNull(0);
-
+        amplificationPickerControl.TrySelectItem(micProfile.Amplification);
+        noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
+        delayPickerControl.SelectItem(micProfile.DelayInMillis);
+        colorPickerControl.TrySelectItem(micProfile.Color);
+        sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
         enabledToggle.value = micProfile.IsEnabled;
 
         if (micProfile.IsConnected)
@@ -202,6 +213,14 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.recordingOptionsScene_title);
+        enabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
+        colorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_color);
+        delayContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_delay);
+        amplificationContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_amplification);
+        noiseSuppressionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
+        sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
+        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
+        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate, "value", "?");
     }
 
     private List<MicProfile> CreateMicProfiles()

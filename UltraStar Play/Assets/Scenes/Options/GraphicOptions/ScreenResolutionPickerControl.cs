@@ -15,6 +15,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
     public ScreenResolutionPickerControl(ItemPicker itemPicker)
         : base(itemPicker, GetItems())
     {
+        GetLabelTextFunction = item => $"{item.Width} x {item.Height} ({item.RefreshRate} Hz)";
         if (Application.isEditor)
         {
             Selection.Value = Items[0];
@@ -38,11 +39,6 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
         {
             return GetResolutions();
         }
-    }
-
-    protected override string GetLabelText(ScreenResolution item)
-    {
-        return $"{item.Width} x {item.Height} ({item.RefreshRate} Hz)";
     }
 
     private static List<ScreenResolution> GetDummyResolutions()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -7,6 +8,20 @@ using UnityEngine.InputSystem;
 
 public class NumberPickerControl : ComputedItemPickerControl<double>
 {
+    private Func<double, string> getLabelTextFunction = item => item.ToString(CultureInfo.InvariantCulture);
+    public Func<double, string> GetLabelTextFunction
+    {
+        get
+        {
+            return getLabelTextFunction;
+        }
+        set
+        {
+            getLabelTextFunction = value;
+            UpdateLabelText(SelectedItem);
+        }
+    }
+
     public bool WrapAround => ItemPicker.wrapAround;
     public double MinValue => ItemPicker.minValue;
     public double MaxValue => ItemPicker.maxValue;
@@ -15,12 +30,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
     public NumberPickerControl(ItemPicker itemPicker, double initialValue=0)
         : base(itemPicker, initialValue)
     {
-        Selection.Subscribe(newValue => ItemPicker.ItemLabel.text = GetLabelText(newValue));
-    }
-
-    protected virtual string GetLabelText(double newValue)
-    {
-        return newValue.ToString(CultureInfo.InvariantCulture);
+        Selection.Subscribe(newValue => UpdateLabelText(newValue));
     }
 
     public override void SelectNextItem()
@@ -77,5 +87,15 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         {
             SelectItem(nextValue);
         }
+    }
+
+    public void UpdateLabelText()
+    {
+        UpdateLabelText(SelectedItem);
+    }
+
+    private void UpdateLabelText(double newValue)
+    {
+        ItemPicker.ItemLabel.text = GetLabelTextFunction(newValue);
     }
 }
