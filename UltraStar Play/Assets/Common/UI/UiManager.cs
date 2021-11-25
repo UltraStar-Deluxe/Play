@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEditor.Graphs;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -22,6 +21,9 @@ public class UiManager : MonoBehaviour, INeedInjection
     }
 
     private readonly List<RectTransform> debugPoints = new List<RectTransform>();
+
+    [InjectedInInspector]
+    public StyleSheet largeScreenStyleSheet;
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -63,6 +65,9 @@ public class UiManager : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private UIDocument uiDocument;
+
     private readonly List<Notification> notifications = new List<Notification>();
     private readonly List<Dialog> dialogs = new List<Dialog>();
 
@@ -77,6 +82,8 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     void Start()
     {
+        AddScreenSpecificStyleSheets();
+
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
 
@@ -84,6 +91,31 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             CreateShowFpsInstance();
         }
+    }
+
+    private void AddScreenSpecificStyleSheets()
+    {
+        if (Screen.dpi < 20 || Screen.dpi > 1000)
+        {
+            // Unlikely DPI value. Do nothing.
+        }
+
+        float physicalDiagonalScreenSizeInInches = GetPhysicalDiagonalScreenSizeInInches();
+        Debug.Log("PhysicalDiagonalScreenSizeInInches: " + physicalDiagonalScreenSizeInInches);
+        if (physicalDiagonalScreenSizeInInches > 10)
+        {
+            uiDocument.rootVisualElement.styleSheets.Add(largeScreenStyleSheet);
+        }
+    }
+
+    private float GetPhysicalDiagonalScreenSizeInInches()
+    {
+        // Get diagonal of rigth angle triangle via Pythagoras theorem
+        float widthInPixels = Screen.width * Screen.width;
+        float heightInPixels = Screen.height * Screen.height;
+        float diagonalInPixels = Mathf.Sqrt(widthInPixels + heightInPixels);
+        float diagonalInInches = diagonalInPixels / Screen.dpi;
+        return diagonalInInches;
     }
 
     void Update()
@@ -236,7 +268,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         string text,
         params string[] additionalTextClasses)
     {
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
         if (uiDocument == null)
         {
             return null;

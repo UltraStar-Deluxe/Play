@@ -1,5 +1,6 @@
 :root {
     --text-color: white;
+    --font-size-normal: 18px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
     --control-color: rgb(66, 163, 231);
@@ -11,7 +12,7 @@
     color: var(--text-color);
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-size: var(--font-size-normal);
 }
 
 .unity-base-text-field {
@@ -54,7 +55,7 @@
     margin: 0;
     padding: 0;
     border-width: 0;
-    font-size: 18px;
+    font-size: var(--font-size-normal);
 }
 
 .unity-base-popup-field__arrow {
@@ -89,7 +90,7 @@
 }
 
 .unity-base-dropdown__label {
-    font-size: 18px;
+    font-size: var(--font-size-normal);
 }
 
 .unity-button {
@@ -97,7 +98,7 @@
     color: rgb(255, 255, 255);
     width: 120px;
     height: 40px;
-    font-size: 18px;
+    font-size: var(--font-size-normal);
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
@@ -173,7 +174,7 @@ ScrollView #unity-content-container {
 }
 
 TextInput {
-    font-size: 18px;
+    font-size: var(--font-size-normal);
     padding: 2px;
     border-width: 2px;
 }
@@ -186,7 +187,7 @@ TextInput {
     -unity-text-align: middle-left;
     width: 300px;
     -unity-font-style: bold;
-    font-size: 18px;
+    font-size: var(--font-size-normal);
 }
 
 .titleImage {
@@ -200,7 +201,7 @@ TextInput {
 }
 
 .titleSubText {
-    font-size: 18px;
+    font-size: var(--font-size-normal);
     color: rgb(180, 229, 255);
 }
 
