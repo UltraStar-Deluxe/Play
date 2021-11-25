@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Configuration;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
@@ -23,12 +24,6 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     private Subject<CalibrationResult> calibrationResultEventStream = new Subject<CalibrationResult>();
     public IObservable<CalibrationResult> CalibrationResultEventStream => calibrationResultEventStream;
-
-    [Inject]
-    private UiManager uiManager;
-
-    [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
-    private Button button;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
@@ -64,7 +59,6 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        button.RegisterCallbackButtonTriggered(() => OnStartCalibration());
         micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
     }
 
@@ -91,7 +85,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnStartCalibration()
+    public void StartCalibration()
     {
         if (isCalibrationInProgress)
         {
@@ -107,12 +101,15 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     private void OnCalibrationTimedOut()
     {
         Debug.Log("Mic delay calibration - timeout");
-        uiManager.CreateNotification("Calibration timed out", Colors.red);
         audioSource.Stop();
         isCalibrationInProgress = false;
+        calibrationResultEventStream.OnNext(new CalibrationResult
+        {
+            IsSuccess = false
+        });
     }
 
-    private void OnEndCalibration()
+    public void OnEndCalibration()
     {
         Debug.Log($"Mic delay calibration - median delay of {delaysInMillis.Count} values: {delaysInMillis[delaysInMillis.Count/2]}");
         audioSource.Stop();
@@ -166,6 +163,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     public class CalibrationResult
     {
+        public bool IsSuccess { get; set; }
         public List<int> DelaysInMilliseconds { get; set; }
     }
 }

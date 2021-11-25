@@ -181,6 +181,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  notificationOverlayVisualTreeAsset: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
+    type: 3}
+  notificationVisualTreeAsset: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
+    type: 3}
   warningDialogPrefab: {fileID: 6090808193284951113, guid: 26a11ce5964394349a3e18d9ffccf003,
     type: 3}
   questionDialogPrefab: {fileID: 8068263864902124345, guid: 7a92a57c453d28bfb9c4dd88c18f3c29,

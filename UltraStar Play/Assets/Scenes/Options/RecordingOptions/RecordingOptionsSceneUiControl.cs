@@ -21,6 +21,9 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
     private RecordingOptionsMicVisualizer micVisualizer;
 
     [Inject]
+    private UiManager uiManager;
+
+    [Inject]
     private Settings settings;
 
     [Inject]
@@ -134,14 +137,21 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
 
+        calibrateDelayButton.RegisterCallbackButtonTriggered(() => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
             .Subscribe(CalibrationResult =>
             {
-                if (CalibrationResult != null)
+                if (CalibrationResult.IsSuccess)
                 {
                     double medianValue = CalibrationResult.DelaysInMilliseconds[CalibrationResult.DelaysInMilliseconds.Count / 2];
                     double roundedMedianValue = ((int)(medianValue / delayPickerControl.StepValue)) * delayPickerControl.StepValue;
                     delayPickerControl.SelectItem(roundedMedianValue);
+                }
+                else
+                {
+                    uiManager.CreateNotificationVisualElement(
+                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout),
+                        "error");
                 }
             });
     }

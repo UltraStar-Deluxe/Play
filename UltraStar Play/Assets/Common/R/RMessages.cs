@@ -83,6 +83,7 @@ public static partial class R
         public static readonly string options_connectedClientCount = "options_connectedClientCount";
         public static readonly string options_delay = "options_delay";
         public static readonly string options_delay_calibrate = "options_delay_calibrate";
+        public static readonly string options_delay_calibrate_timeout = "options_delay_calibrate_timeout";
         public static readonly string options_fullscreenMode = "options_fullscreenMode";
         public static readonly string options_httpServerNotSupported = "options_httpServerNotSupported";
         public static readonly string options_httpServerPortWithExampleUri = "options_httpServerPortWithExampleUri";
