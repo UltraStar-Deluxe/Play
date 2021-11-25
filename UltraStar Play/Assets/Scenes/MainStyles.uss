@@ -1,6 +1,7 @@
 :root {
     --text-color: white;
     --text-color-accent1: lightgrey;
+    --text-color-error: rgb(200, 48, 48);
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
@@ -369,4 +370,8 @@ ItemPicker.multiline Label {
 .optionsSceneTitleAndImageContainer {
     flex-direction: row;
     align-items: center;
+}
+
+#notificationLabel.error {
+    color: var(--text-color-error)
 }

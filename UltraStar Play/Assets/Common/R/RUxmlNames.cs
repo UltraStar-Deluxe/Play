@@ -89,6 +89,8 @@ public static partial class R
         public const string notConnectedLabel = "notConnectedLabel";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string noteLabel = "noteLabel";
+        public const string notificationLabel = "notificationLabel";
+        public const string notificationOverlay = "notificationOverlay";
         public const string outputTextField = "outputTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
