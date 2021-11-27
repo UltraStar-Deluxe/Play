@@ -24,4 +24,14 @@ public static class VisualElementExtensions
             }
         });
     }
+
+    public static void Show(this VisualElement visualElement)
+    {
+        visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+    }
+
+    public static void Hide(this VisualElement visualElement)
+    {
+        visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+    }
 }
