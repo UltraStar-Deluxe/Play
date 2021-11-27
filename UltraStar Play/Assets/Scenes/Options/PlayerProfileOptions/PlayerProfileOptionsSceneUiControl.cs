@@ -61,7 +61,7 @@ public class PlayerProfileOptionsSceneUiControl : MonoBehaviour, INeedInjection,
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.playerProfileOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title);
     }
 
     private void UpdatePlayerProfileList()

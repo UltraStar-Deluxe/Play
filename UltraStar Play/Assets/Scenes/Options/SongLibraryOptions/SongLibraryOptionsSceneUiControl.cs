@@ -64,9 +64,9 @@ public class SongLibraryOptionsSceneUiControl : MonoBehaviour, INeedInjection, I
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_openDownloadSceneButton);
+        downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_downloadSongs_button);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songLibraryOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_title);
     }
 
     private void UpdateSongFolderList()

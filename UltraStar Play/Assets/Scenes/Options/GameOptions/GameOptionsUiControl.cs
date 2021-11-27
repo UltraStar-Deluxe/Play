@@ -57,6 +57,6 @@ public class GameOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         ratePlayersContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_ratePlayers);
         combineDuetScoresContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_combineDuetScores);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.gameOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
     }
 }

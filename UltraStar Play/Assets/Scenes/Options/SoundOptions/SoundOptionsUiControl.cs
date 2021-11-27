@@ -85,6 +85,6 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
         volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.soundOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_sound_title);
     }
 }

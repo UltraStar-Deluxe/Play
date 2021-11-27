@@ -42,6 +42,6 @@ public class NetworkOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.networkOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_internet_title);
     }
 }

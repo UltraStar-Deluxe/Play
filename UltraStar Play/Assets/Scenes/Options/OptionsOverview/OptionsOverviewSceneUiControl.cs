@@ -107,15 +107,16 @@ public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITra
 
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
         backButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.back);
-        gameOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_game);
-        songsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_songs);
-        graphicsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_graphics);
-        recordingOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_recording);
-        profileOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_profiles);
-        designOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_design);
-        internetOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_internet);
-        appOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_apps);
-        developerOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_development);
+        gameOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_game_button);
+        songsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_button);
+        soundOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sound_button);
+        graphicsOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_graphics_button);
+        recordingOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_recording_button);
+        profileOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_button);
+        designOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_design_button);
+        internetOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_internet_button);
+        appOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_companionApp_button);
+        developerOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_development_button);
     }
 
     private void SetLanguage(SystemLanguage newValue)
