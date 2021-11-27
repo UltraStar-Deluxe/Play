@@ -12,7 +12,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="urlContainer" style="width: 100%; flex-direction: row; align-items: flex-start; margin-bottom: 20px;">
+            <ui:VisualElement name="urlContainer" style="width: 100%; flex-direction: row; align-items: flex-start; margin-bottom: 5px;">
                 <ui:Label text="Archive URL (tar file)" display-tooltip-when-elided="true" name="urlLabel" style="width: auto; margin-right: 20px;" />
                 <ui:VisualElement name="urlTextFieldContainer" style="flex-grow: 1;">
                     <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.tar" name="urlTextField" style="width: auto;" />
@@ -27,7 +27,7 @@
                     <ui:Button text="Cancel Download" display-tooltip-when-elided="true" name="cancelButton" style="width: 200px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" class="roundCorners outline" style="height: 50%; width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; background-color: rgba(0, 0, 0, 0.25);">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" class="roundCorners outline" style="height: 10%; width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; background-color: rgba(0, 0, 0, 0.25);">
                 <ui:TextField picking-mode="Ignore" value="_" text="_" name="outputTextField" multiline="true" readonly="true" class="noBackground smallFont" style="height: auto; flex-wrap: wrap;" />
             </ui:ScrollView>
             <ui:VisualElement name="backButtonContainer" style="width: 100%; justify-content: flex-end; align-items: flex-end;">

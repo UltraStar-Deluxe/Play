@@ -62,7 +62,7 @@ public class CompanionAppOptionsUiControl : MonoBehaviour, INeedInjection, ITran
             SceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionAppOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_companionApp_title);
     }
 
     private void UpdateConnectedClients()

@@ -84,6 +84,6 @@ public class DesignOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         pitchIndicatorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
         imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.designOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_design_title);
     }
 }

@@ -223,7 +223,7 @@ public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITr
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.recordingOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
         enabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
         colorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_color);
         delayContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_delay);

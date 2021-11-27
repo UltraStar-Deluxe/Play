@@ -64,7 +64,7 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
         fpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_targetFps);
         fullscreenContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.graphicOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_graphics_title);
     }
 
     private void ApplyGraphicSettingsAndExitScene()

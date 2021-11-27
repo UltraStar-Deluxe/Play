@@ -86,6 +86,6 @@ public class DevelopmentOptionsUiControl : MonoBehaviour, INeedInjection, ITrans
         pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.developmentOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_development_title);
     }
 }

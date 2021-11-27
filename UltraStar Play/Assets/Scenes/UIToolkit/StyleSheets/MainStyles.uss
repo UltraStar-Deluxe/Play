@@ -32,8 +32,6 @@
     background-color: var(--control-color);
     height: var(--control-height);
     -unity-text-align: middle-left;
-    padding-left: 5px;
-    padding-right: 5px;
 }
 
 .unity-base-popup-field:hover {
@@ -181,8 +179,12 @@
     border-radius: 5px;
 }
 
+.unity-base-dropdown ScrollView #unity-content-container {
+    padding-right: 0;
+    padding-bottom: 0;
+}
+
 ScrollView #unity-content-container {
-    /* Some distance to the scroll bars */
     padding-right: 10px;
     padding-bottom: 10px;
 }
@@ -396,5 +398,5 @@ ItemPicker.smallFont Label {
 }
 
 #notificationLabel.error {
-    color: var(--text-color-error)
+    color: var(--text-color-error);
 }
