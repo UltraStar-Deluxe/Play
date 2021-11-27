@@ -46,6 +46,18 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
         });
     }
 
+    private void Update()
+    {
+        // MouseUpEvent is not fired when performed outside of the VisualElement that listens for it.
+        // Thus, also check mouse button state here.
+        if (dragging
+            && Mouse.current != null
+            && !Mouse.current.leftButton.isPressed)
+        {
+            dragging = false;
+        }
+    }
+
     private void OnMouseDown(MouseDownEvent evt, ScrollView scrollView)
     {
         if (Touchscreen.current != null)
