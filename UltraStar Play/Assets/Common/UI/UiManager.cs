@@ -12,6 +12,12 @@ using UnityEngine.UIElements;
 
 public class UiManager : MonoBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        printScreenSize = true;
+    }
+
     public static UiManager Instance
     {
         get
@@ -19,6 +25,8 @@ public class UiManager : MonoBehaviour, INeedInjection
             return GameObjectUtils.FindComponentWithTag<UiManager>("UiManager");
         }
     }
+
+    private static bool printScreenSize = true;
 
     private readonly List<RectTransform> debugPoints = new List<RectTransform>();
 
@@ -82,6 +90,10 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     void Start()
     {
+        if (printScreenSize)
+        {
+            Debug.Log($"Screen size (inches): {GetPhysicalDiagonalScreenSizeInInches()}");
+        }
         AddScreenSpecificStyleSheets();
 
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
@@ -101,7 +113,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
 
         float physicalDiagonalScreenSizeInInches = GetPhysicalDiagonalScreenSizeInInches();
-        Debug.Log("PhysicalDiagonalScreenSizeInInches: " + physicalDiagonalScreenSizeInInches);
         if (physicalDiagonalScreenSizeInInches > 10)
         {
             uiDocument.rootVisualElement.styleSheets.Add(largeScreenStyleSheet);

@@ -52,7 +52,7 @@ public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITra
     private Button developerOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.languageChooser)]
-    private DropdownField languageChooser;
+    private ItemPicker languageChooser;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -91,11 +91,11 @@ public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITra
 
     private void InitLanguageChooser()
     {
-        languageChooser.choices = translationManager.GetTranslatedLanguages()
-            .Select(lang => lang.ToString())
-            .ToList();
-        languageChooser.SetValueWithoutNotify(settings.GameSettings.language.ToString());
-        languageChooser.RegisterValueChangedCallback(evt => SetLanguage(evt.newValue));
+        new LabeledItemPickerControl<SystemLanguage>(
+                languageChooser,
+                translationManager.GetTranslatedLanguages())
+            .Bind(() => translationManager.currentLanguage,
+                newValue => SetLanguage(newValue));
     }
 
     public void UpdateTranslation()
@@ -118,13 +118,10 @@ public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITra
         developerOptionsButton.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.optionsScene_button_development);
     }
 
-    private void SetLanguage(string newLanguageString)
+    private void SetLanguage(SystemLanguage newValue)
     {
-        if (Enum.TryParse(newLanguageString, true, out SystemLanguage newLanguageEnum))
-        {
-            settings.GameSettings.language = newLanguageEnum;
-            translationManager.currentLanguage = settings.GameSettings.language;
-            translationManager.ReloadTranslationsAndUpdateScene();
-        }
+        settings.GameSettings.language = newValue;
+        translationManager.currentLanguage = settings.GameSettings.language;
+        translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

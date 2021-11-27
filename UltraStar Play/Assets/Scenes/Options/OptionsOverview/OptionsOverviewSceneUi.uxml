@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" class="backgroundImage">
         <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
+            <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer" style="width: 50%;">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
@@ -11,10 +11,9 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="languageContainer" style="height: auto; width: 50%; flex-direction: row; align-items: center; justify-content: flex-end;">
-                    <ui:VisualElement name="languageImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/language_white_24dp.svg?fileID=7388822144124034973&amp;guid=1900ef20b8528d644b92809130c3c01a&amp;type=3#language_white_24dp&apos;); width: 20px; height: 20px; flex-direction: row; margin-right: 5px;" />
-                    <ui:Label text="Language" name="languageLabel" style="font-size: 18px; width: auto; flex-direction: row; flex-shrink: 1;" />
-                    <ui:DropdownField index="0" name="languageChooser" choices="English" style="width: auto; height: 100%; justify-content: flex-start; flex-shrink: 1; flex-grow: 1;" />
+                <ui:VisualElement name="languageContainer" style="flex-direction: row; align-items: center; justify-content: flex-end;">
+                    <ui:VisualElement name="languageImage" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/language_white_24dp.svg?fileID=7388822144124034973&amp;guid=1900ef20b8528d644b92809130c3c01a&amp;type=3#language_white_24dp&apos;); flex-direction: row; margin-right: 10px;" />
+                    <ItemPicker name="languageChooser" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement style="width: 100%; flex-grow: 1; justify-content: center;">

@@ -1,8 +1,16 @@
 :root {
     --text-color: white;
-    --font-size-normal: 18px;
+    --font-size: 18px;
+    --font-size-small: 14px;
+    --font-size-title: 24px;
+    --font-size-title-small: 20px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
+    --control-height: 40px;
+    --control-height-small: 30px;
+    --control-width: 120px;
+    --control-width-half: 60px;
+    --control-width-large: 150px;
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
@@ -12,17 +20,17 @@
     color: var(--text-color);
     margin: 0;
     padding: 0;
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
 }
 
 .unity-base-text-field {
-    height: 30px;
+    height: var(--control-height);
     -unity-text-align: middle-left;
 }
 
 .unity-base-popup-field {
     background-color: var(--control-color);
-    height: 30px;
+    height: var(--control-height);
     -unity-text-align: middle-left;
     padding-left: 5px;
     padding-right: 5px;
@@ -55,7 +63,7 @@
     margin: 0;
     padding: 0;
     border-width: 0;
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
 }
 
 .unity-base-popup-field__arrow {
@@ -90,15 +98,15 @@
 }
 
 .unity-base-dropdown__label {
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
 }
 
 .unity-button {
     background-color: var(--control-color);
     color: rgb(255, 255, 255);
-    width: 120px;
-    height: 40px;
-    font-size: var(--font-size-normal);
+    width: var(--control-width);
+    height: var(--control-height);
+    font-size: var(--font-size);
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
@@ -124,8 +132,8 @@
 }
 
 .unity-toggle {
-    width: 40px;
-    height: 40px;
+    width: var(--control-height);
+    height: var(--control-height);
 }
 
 .unity-toggle VisualElement {
@@ -158,9 +166,15 @@
     height: 100%;
 }
 
+.outline {
+    border-color: var(--text-color);
+    border-width: 1px;
+}
+
 .roundButton {
-    width: 120px;
-    border-radius: 60px;
+    width: var(--control-width-half);
+    height: var(--control-width-half);
+    border-radius: var(--control-width-half);
 }
 
 .roundCorners {
@@ -174,7 +188,7 @@ ScrollView #unity-content-container {
 }
 
 TextInput {
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
     padding: 2px;
     border-width: 2px;
 }
@@ -187,21 +201,21 @@ TextInput {
     -unity-text-align: middle-left;
     width: 300px;
     -unity-font-style: bold;
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
 }
 
 .titleImage {
     margin-right: 10px;
-    width: 32px;
-    height: 32px;
+    width: var(--font-size-title);
+    height: var(--font-size-title);
 }
 
 .titleText {
-    font-size: 24px;
+    font-size: var(--font-size-title);
 }
 
 .titleSubText {
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size);
     color: rgb(180, 229, 255);
 }
 
@@ -214,17 +228,17 @@ TextInput {
 }
 
 .dialogTitle {
-    font-size: 20px;
+    font-size: var(--font-size-title-small);
 }
 
 .dialogMessage {
-    font-size: 16px;
+    font-size: var(--font-size);
 }
 
 .dialogTitleImage {
     margin-right: 10px;
-    width: 32px;
-    height: 32px;
+    width: var(--font-size-title-small);
+    height: var(--font-size-title-small);
     background-color: rgba(0, 0, 0, 0);
 }
 
@@ -233,8 +247,8 @@ TextInput {
 }
 
 .mainSceneButton {
-    width: 130px;
-    height: 50px;
+    width: var(--control-width-large);
+    height: var(--control-height-large);
 }
 
 .dialogButton {
@@ -263,15 +277,15 @@ TextInput {
 
 .optionsOverviewButton {
     height: 100%;
-    width: 20%;
+    width: var(--control-width-large);
     justify-content: space-around;
     align-items: center;
 }
 
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
-    width: 20px;
-    height: 20px;
+    width: var(--font-size-title);
+    height: var(--font-size-title);
 }
 
 .noBackground TextInput {
@@ -280,19 +294,27 @@ TextInput {
     border-width: 0;
 }
 
+.iconImage {
+    width: var(--font-size-title);
+    height: var(--font-size-title);
+}
+
 .smallFont TextInput {
-    font-size: 14px;
+    font-size: var(--font-size-small);
 }
 
 ItemPicker {
     width: 300px;
-    height: 40px;
-    min-width: 30px;
+    height: var(--control-height);
+    min-width: var(--control-height-small);
 }
 
-ItemPicker.multiline Label {
+ItemPicker Label {
     white-space: normal;
-    font-size: 14px;
+}
+
+ItemPicker.smallFont Label {
+    font-size: var(--font-size-small);
 }
 
 .itemPickerButton {
@@ -300,8 +322,8 @@ ItemPicker.multiline Label {
     flex-shrink: 0;
     width: 60px;
     height: 100%;
-    min-width: 30px;
-    min-height: 30px;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
     max-width: 100%;
     max-height: 100%;
     margin: 0;
@@ -314,8 +336,8 @@ ItemPicker.multiline Label {
     flex-shrink: 1;
     width: 100%;
     height: 100%;
-    min-width: 30px;
-    min-height: 30px;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
     max-width: 100%;
     max-height: 100%;
     margin: 0;
@@ -356,7 +378,7 @@ ItemPicker.multiline Label {
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    height: 40px;
+    height: var(--control-height);
     margin-bottom: 10px;
 }
 
