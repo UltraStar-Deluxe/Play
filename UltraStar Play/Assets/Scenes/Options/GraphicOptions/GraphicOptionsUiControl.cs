@@ -38,14 +38,21 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
 
     private void Start()
     {
-        new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>());
+        if (PlatformUtils.IsStandalone)
+        {
+            new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>());
+            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>());
+        }
+        else
+        {
+            resolutionContainer.Hide();
+            fullscreenContainer.Hide();
+        }
 
         List<int> fpsOptions = new List<int> { 30, 60 };
         new LabeledItemPickerControl<int>(fpsContainer.Q<ItemPicker>(), fpsOptions)
             .Bind(() => settings.GraphicSettings.targetFps,
                 newValue => settings.GraphicSettings.targetFps = newValue);
-
-        new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>());
 
         backButton.RegisterCallbackButtonTriggered(() => ApplyGraphicSettingsAndExitScene());
         backButton.Focus();
@@ -75,6 +82,11 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
 
     private void ApplyGraphicSettings()
     {
+        if (!PlatformUtils.IsStandalone)
+        {
+            return;
+        }
+
         ScreenResolution res = SettingsManager.Instance.Settings.GraphicSettings.resolution;
         FullScreenMode fullScreenMode = SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode;
         Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
