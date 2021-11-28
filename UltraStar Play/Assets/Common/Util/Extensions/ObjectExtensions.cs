@@ -25,19 +25,4 @@ public static class ObjectExtensions
             return obj;
         }
     }
-
-    /// Returns true iff the value is equal to one of the specified values.
-    /// Thereby, comparison is done using object.Equals.
-    public static bool IsOneOf<T>(this T value, params T[] values)
-    {
-        foreach (T v in values)
-        {
-            if (object.Equals(value, v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

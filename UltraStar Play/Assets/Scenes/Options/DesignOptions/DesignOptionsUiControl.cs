@@ -48,10 +48,13 @@ public class DesignOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
     {
         new ThemeSliderControl(themeContainer.Q<ItemPicker>());
 
-        new LabeledItemPickerControl<ENoteDisplayMode>(noteDisplayModeContainer.Q<ItemPicker>(),
-                                                       EnumUtils.GetValuesAsList<ENoteDisplayMode>())
-            .Bind(() => settings.GraphicSettings.noteDisplayMode,
+        LabeledItemPickerControl<ENoteDisplayMode> noteDisplayModePickerControl = new LabeledItemPickerControl<ENoteDisplayMode>(noteDisplayModeContainer.Q<ItemPicker>(),
+            EnumUtils.GetValuesAsList<ENoteDisplayMode>());
+        noteDisplayModePickerControl.Bind(() => settings.GraphicSettings.noteDisplayMode,
                   newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+        noteDisplayModePickerControl.GetLabelTextFunction = noteDisplayMode => noteDisplayMode == ENoteDisplayMode.SentenceBySentence
+            ? TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_sentenceBySentence)
+            : TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_scrollingNoteStream);
 
         new BoolPickerControl(lyricsOnNotesContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.showLyricsOnNotes,

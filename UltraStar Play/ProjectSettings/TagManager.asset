@@ -27,6 +27,7 @@ TagManager:
   - InputManager
   - ServerSideConnectRequestManager
   - TranslationManager
+  - StyleSheetControl
   layers:
   - Default
   - TransparentFX

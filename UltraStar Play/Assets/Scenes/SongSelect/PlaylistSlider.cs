@@ -27,8 +27,7 @@ public class PlaylistSlider : TextItemSlider<UltraStarPlaylist>, INeedInjection
         playlists.AddRange(playlistManager.Playlists);
         Items = playlists;
         Selection.Value = playlists
-            .Where(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
-            .FirstOrDefault()
+            .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
             .OrIfNull(playlists[0]);
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
     }

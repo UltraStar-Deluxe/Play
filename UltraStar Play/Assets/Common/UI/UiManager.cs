@@ -12,12 +12,6 @@ using UnityEngine.UIElements;
 
 public class UiManager : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
-    {
-        printScreenSize = true;
-    }
-
     public static UiManager Instance
     {
         get
@@ -25,8 +19,6 @@ public class UiManager : MonoBehaviour, INeedInjection
             return GameObjectUtils.FindComponentWithTag<UiManager>("UiManager");
         }
     }
-
-    private static bool printScreenSize = true;
 
     private readonly List<RectTransform> debugPoints = new List<RectTransform>();
 
@@ -73,7 +65,7 @@ public class UiManager : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
-    [Inject]
+    [Inject(Optional = true)]
     private UIDocument uiDocument;
 
     private readonly List<Notification> notifications = new List<Notification>();
@@ -90,12 +82,6 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        if (printScreenSize)
-        {
-            Debug.Log($"Screen size (inches): {GetPhysicalDiagonalScreenSizeInInches()}");
-        }
-        AddScreenSpecificStyleSheets();
-
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
 
@@ -103,30 +89,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             CreateShowFpsInstance();
         }
-    }
-
-    private void AddScreenSpecificStyleSheets()
-    {
-        if (Screen.dpi < 20 || Screen.dpi > 1000)
-        {
-            // Unlikely DPI value. Do nothing.
-        }
-
-        float physicalDiagonalScreenSizeInInches = GetPhysicalDiagonalScreenSizeInInches();
-        if (physicalDiagonalScreenSizeInInches > 10)
-        {
-            uiDocument.rootVisualElement.styleSheets.Add(largeScreenStyleSheet);
-        }
-    }
-
-    private float GetPhysicalDiagonalScreenSizeInInches()
-    {
-        // Get diagonal of rigth angle triangle via Pythagoras theorem
-        float widthInPixels = Screen.width * Screen.width;
-        float heightInPixels = Screen.height * Screen.height;
-        float diagonalInPixels = Mathf.Sqrt(widthInPixels + heightInPixels);
-        float diagonalInInches = diagonalInPixels / Screen.dpi;
-        return diagonalInInches;
     }
 
     void Update()
