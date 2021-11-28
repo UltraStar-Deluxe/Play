@@ -99,7 +99,7 @@ public class PlayerProfileOptionsSceneUiControl : MonoBehaviour, INeedInjection,
 
         new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker))
             .Bind(() => playerProfile.Avatar,
-                newValue => playerProfile.Avatar = newValue);;
+                newValue => playerProfile.Avatar = newValue);
 
         new DifficultyPicker(result.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
             .Bind(() => playerProfile.Difficulty,

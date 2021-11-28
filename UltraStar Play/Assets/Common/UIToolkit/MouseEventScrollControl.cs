@@ -46,8 +46,8 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
             VisualElement contentViewport = scrollView.Q<VisualElement>("unity-content-viewport");
 
             contentViewport.RegisterCallback<MouseDownEvent>(evt => OnMouseDown(evt, scrollView), TrickleDown.TrickleDown);
-            contentViewport.RegisterCallback<MouseUpEvent>(evt => OnMouseUp(evt, scrollView), TrickleDown.TrickleDown);
             contentViewport.RegisterCallback<MouseMoveEvent>(evt => OnMouseMove(evt, scrollView), TrickleDown.TrickleDown);
+            contentViewport.RegisterCallback<MouseUpEvent>(evt => OnMouseUp(), TrickleDown.TrickleDown);
         });
     }
 
@@ -59,7 +59,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
             && Mouse.current != null
             && !Mouse.current.leftButton.isPressed)
         {
-            dragging = false;
+            OnMouseUp();
         }
     }
 
@@ -91,7 +91,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnMouseUp(MouseUpEvent evt, ScrollView scrollView)
+    private void OnMouseUp()
     {
         dragging = false;
     }
