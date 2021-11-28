@@ -615,14 +615,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioClips:
   - {fileID: 8300000, guid: 94615c7b4e27ac64a837274c0ac4bb25, type: 3}
-  - {fileID: 8300000, guid: e17bc4f3bdb7de44083df8996ec0982f, type: 3}
+  - {fileID: 8300000, guid: 9ff1328de34f2534eb4c4b29b5f6ab9b, type: 3}
+  - {fileID: 8300000, guid: bc1a4e978ef927f458a76eae8610967b, type: 3}
   - {fileID: 8300000, guid: b43d44962a3ab634b939641e5b6f7df3, type: 3}
-  - {fileID: 8300000, guid: dfd705ad70e36124d91679f58289c6af, type: 3}
   midiNoteNames:
   - A3
-  - C4
+  - C#4
+  - E4
   - A4
-  - A5
 --- !u!4 &1676211107
 Transform:
   m_ObjectHideFlags: 0
