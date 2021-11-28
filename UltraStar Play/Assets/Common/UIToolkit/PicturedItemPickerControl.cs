@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 abstract public class PicturedItemPickerControl<T> : ListedItemPickerControl<T>
 {
-    public PicturedItemPickerControl(ItemPicker itemPicker, List<T> items)
+    protected PicturedItemPickerControl(ItemPicker itemPicker, List<T> items)
         : base(itemPicker)
     {
         Selection.Subscribe(UpdateImageElement);

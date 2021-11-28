@@ -6,7 +6,8 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
 {
     private readonly string smallFontUssClass = "smallFont";
 
-    private Func<T, string> getLabelTextFunction = (T item) => item != null ? item.ToString() : "";
+    private Func<T, string> getLabelTextFunction = item => item != null ? item.ToString() : "";
+
     public Func<T, string> GetLabelTextFunction
     {
         get

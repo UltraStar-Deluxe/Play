@@ -34,8 +34,10 @@ public class PanelHelper
 
     public Vector2 PanelToScreen(Vector2 v)
     {
-        if(Time.frameCount != cacheFrame)
+        if (Time.frameCount != cacheFrame)
+        {
             UpdateCache();
+        }
         Vector2 result = (v - panelScreenMin) * scalingRatio;
         result.y = screenHeight - result.y;
         return result;

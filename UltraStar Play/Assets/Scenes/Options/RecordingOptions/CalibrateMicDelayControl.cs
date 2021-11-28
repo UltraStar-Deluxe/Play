@@ -22,7 +22,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     public MicProfile MicProfile { get; set; }
 
-    private Subject<CalibrationResult> calibrationResultEventStream = new Subject<CalibrationResult>();
+    private readonly Subject<CalibrationResult> calibrationResultEventStream = new Subject<CalibrationResult>();
     public IObservable<CalibrationResult> CalibrationResultEventStream => calibrationResultEventStream;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
