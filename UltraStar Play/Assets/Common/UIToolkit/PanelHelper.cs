@@ -62,8 +62,10 @@ public class PanelHelper
 
     public Vector2 GetScalingRatio()
     {
-        if(Time.frameCount != cacheFrame)
+        if (Time.frameCount != cacheFrame)
+        {
             UpdateCache();
+        }
         return scalingRatio;
     }
 
