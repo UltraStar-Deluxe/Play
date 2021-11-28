@@ -117,6 +117,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
         calibrationResultEventStream.OnNext(new CalibrationResult
         {
+            IsSuccess = true,
             DelaysInMilliseconds = new List<int>(delaysInMillis)
         });
     }
