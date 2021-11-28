@@ -22,7 +22,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
  */
 public class MouseEventScrollControl : MonoBehaviour, INeedInjection
 {
-    [Inject]
+    [Inject(Optional = true)]
     private UIDocument uiDocument;
 
     private bool dragging;
@@ -33,6 +33,11 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
 
     public void Start()
     {
+        if (uiDocument == null)
+        {
+            return;
+        }
+
         List<ScrollView> scrollViews = uiDocument.rootVisualElement.Query<ScrollView>()
             .ToList();
 

@@ -1,0 +1,5 @@
+:root {
+    --control-color: rgb(225, 48, 48);
+    --control-color-accent1: rgb(200, 64, 64);
+    --control-color-accent2: rgb(192, 32, 32);
+}
