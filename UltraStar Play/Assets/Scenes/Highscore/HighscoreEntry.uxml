@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="scoreRow" style="width: auto; height: 40px; flex-direction: row; align-items: center; margin-bottom: 20px;">
+        <ui:VisualElement name="icon" style="width: 30px; height: 30px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[sing]p.png?fileID=2800000&amp;guid=f8442e207ea2a3f4bbeb74789d94cfbf&amp;type=3#[sing]p&apos;); align-items: center; justify-content: center; margin-right: 20px;">
+            <ui:Label text="1" display-tooltip-when-elided="true" name="posLabel" class="titleText" style="width: 100%; height: 100%; -unity-text-align: middle-center; -unity-font-style: bold;" />
+        </ui:VisualElement>
+        <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" class="titleText" />
+        <ui:VisualElement name="rightSide" style="flex-direction: row; justify-content: flex-end; flex-grow: 1; height: 100%; align-items: center;">
+            <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" class="titleText" style="margin-right: 20px;" />
+            <ui:Label text="01.01.2020" display-tooltip-when-elided="true" name="dateLabel" class="titleText" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
