@@ -248,6 +248,10 @@ TextInput {
     background-color: rgba(0, 0, 0, 0);
 }
 
+.wideControl {
+    width: var(--control-width-large);
+}
+
 .mainSceneButton {
     width: var(--control-width-large);
     height: var(--control-height-large);
@@ -299,6 +303,11 @@ TextInput {
 .iconImage {
     width: var(--font-size-title);
     height: var(--font-size-title);
+}
+
+.iconImageTextSized {
+    width: var(--font-size);
+    height: var(--font-size);
 }
 
 .smallFont TextInput {

@@ -24,7 +24,7 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
     public Button nextDifficultyButton;
     
     [Inject]
-    private HighscoreSceneController highscoreSceneController;
+    private HighscoreSceneUiControl highscoreSceneUiControl;
     
     [Inject]
     private EventSystem eventSystem;
@@ -35,11 +35,11 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
         eventSystem.sendNavigationEvents = false;
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => highscoreSceneController.FinishScene());
+            .Subscribe(_ => highscoreSceneUiControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => highscoreSceneController.FinishScene());
+            .Subscribe(_ => highscoreSceneUiControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
-            .Subscribe(_ => highscoreSceneController.FinishScene());
+            .Subscribe(_ => highscoreSceneUiControl.FinishScene());
         
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Subscribe(context => OnNavigate(context));
@@ -53,11 +53,11 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
         Vector2 direction = context.ReadValue<Vector2>();
         if (direction.x > 0)
         {
-            highscoreSceneController.ShowNextDifficulty(1);
+            highscoreSceneUiControl.ShowNextDifficulty(1);
         }
         if (direction.x < 0)
         {
-            highscoreSceneController.ShowNextDifficulty(-1);
+            highscoreSceneUiControl.ShowNextDifficulty(-1);
         }
 
         if (direction.y != 0)
