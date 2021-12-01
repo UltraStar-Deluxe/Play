@@ -344,7 +344,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   versionPropertiesTextAsset: {fileID: 4900000, guid: 3ad2bf299d7def44da7e32ee50ae50f3,
     type: 3}
-  uiDoc: {fileID: 1203774101}
   quitGameDialogUxml: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
     type: 3}
 --- !u!4 &1194741003

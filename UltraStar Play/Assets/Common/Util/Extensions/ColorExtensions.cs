@@ -62,4 +62,12 @@ public static class ColorExtensions
     {
         return Color.HSVToRGB(color.r / 255f, color.g / 255f, color.b / 255f).WithAlpha(color.a / 255f);
     }
+
+    public static bool ColorEquals(this Color32 color, Color32 other)
+    {
+        return color.r == other.r
+            && color.g == other.g
+            && color.b == other.b
+            && color.a == other.a;
+    }
 }

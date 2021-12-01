@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -19,6 +21,15 @@ public class UiManager : MonoBehaviour, INeedInjection
     }
 
     private readonly List<RectTransform> debugPoints = new List<RectTransform>();
+
+    [InjectedInInspector]
+    public StyleSheet largeScreenStyleSheet;
+
+    [InjectedInInspector]
+    public VisualTreeAsset notificationOverlayVisualTreeAsset;
+
+    [InjectedInInspector]
+    public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
     public WarningDialog warningDialogPrefab;
@@ -53,6 +64,9 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private Injector injector;
+
+    [Inject(Optional = true)]
+    private UIDocument uiDocument;
 
     private readonly List<Notification> notifications = new List<Notification>();
     private readonly List<Dialog> dialogs = new List<Dialog>();
@@ -221,5 +235,66 @@ public class UiManager : MonoBehaviour, INeedInjection
         RectTransform debugPoint = GameObject.Instantiate(debugPositionIndicatorPrefab, parent);
         debugPoints.Add(debugPoint);
         return debugPoint;
+    }
+
+    public Label CreateNotificationVisualElement(
+        string text,
+        params string[] additionalTextClasses)
+    {
+        if (uiDocument == null)
+        {
+            return null;
+        }
+
+        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>(R.UxmlNames.notificationOverlay);
+        if (notificationOverlay == null)
+        {
+            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
+                .Children()
+                .First();
+            uiDocument.rootVisualElement.Add(notificationOverlay);
+        }
+
+        TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
+        VisualElement notification = templateContainer.Children().First();
+        Label notificationLabel = notification.Q<Label>(R.UxmlNames.notificationLabel);
+        notificationLabel.text = text;
+        if (additionalTextClasses != null)
+        {
+            additionalTextClasses.ForEach(className => notificationLabel.AddToClassList(className));
+        }
+        notificationOverlay.Add(notification);
+
+        // Fade out then remove
+        StartCoroutine(FadeOutVisualElement(notification, 2, 1));
+
+        return notificationLabel;
+    }
+
+    public static IEnumerator FadeOutVisualElement(
+        VisualElement visualElement,
+        float solidTimeInSeconds,
+        float fadeOutTimeInSeconds)
+    {
+        yield return new WaitForSeconds(solidTimeInSeconds);
+        float startOpacity = visualElement.resolvedStyle.opacity;
+        float startTime = Time.time;
+        while (visualElement.resolvedStyle.opacity > 0)
+        {
+            float newOpacity = Mathf.Lerp(startOpacity, 0, (Time.time - startTime) / fadeOutTimeInSeconds);
+            if (newOpacity < 0)
+            {
+                newOpacity = 0;
+            }
+
+            visualElement.style.opacity = newOpacity;
+            yield return null;
+        }
+
+        // Remove VisualElement
+        if (visualElement.parent != null)
+        {
+            visualElement.parent.Remove(visualElement);
+        }
     }
 }

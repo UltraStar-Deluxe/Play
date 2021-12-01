@@ -1,0 +1,402 @@
+:root {
+    --text-color: white;
+    --font-size: 18px;
+    --font-size-small: 14px;
+    --font-size-title: 24px;
+    --font-size-title-small: 20px;
+    --text-color-accent1: lightgrey;
+    --text-color-error: rgb(200, 48, 48);
+    --control-height: 40px;
+    --control-height-small: 30px;
+    --control-width: 120px;
+    --control-width-half: 60px;
+    --control-width-large: 150px;
+    --control-color: rgb(66, 163, 231);
+    --control-color-accent1: rgb(125, 198, 233);
+    --control-color-accent2: rgb(99, 154, 183);
+}
+
+.unity-label {
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    font-size: var(--font-size);
+}
+
+.unity-base-text-field {
+    height: var(--control-height);
+    -unity-text-align: middle-left;
+}
+
+.unity-base-popup-field {
+    background-color: var(--control-color);
+    height: var(--control-height);
+    -unity-text-align: middle-left;
+}
+
+.unity-base-popup-field:hover {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-base-popup-field:focus {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-base-popup-field .unity-base-popup-field__input {
+    background-color: rgb(66, 163, 231);
+    padding: 0 5px;
+    border-width: 0;
+}
+
+.unity-base-popup-field:hover .unity-base-popup-field__input {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-base-popup-field:focus .unity-base-popup-field__input {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-base-popup-field__text {
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    font-size: var(--font-size);
+}
+
+.unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: var(--text-color);
+    border-width: 0;
+}
+
+.unity-base-dropdown__container-outer {
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    margin-top: 2px;
+}
+
+.unity-base-dropdown__container-inner {
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.unity-base-dropdown__item {
+    background-color: var(--control-color);
+    padding: 0 5px;
+    margin: 0;
+    border-width: 0;
+    border-bottom-width: 2px;
+    border-color: var(--text-color);
+}
+
+.unity-base-dropdown__item:hover {
+    background-color: rgb(125, 198, 233);
+}
+
+.unity-base-dropdown__label {
+    font-size: var(--font-size);
+}
+
+.unity-button {
+    background-color: var(--control-color);
+    color: rgb(255, 255, 255);
+    width: var(--control-width);
+    height: var(--control-height);
+    font-size: var(--font-size);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.unity-button:hover {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-button:focus {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-button:active {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-toggle {
+    width: var(--control-height);
+    height: var(--control-height);
+}
+
+.unity-toggle VisualElement {
+    background-color: var(--control-color);
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+.unity-toggle:hover VisualElement {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-toggle:focus VisualElement {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-toggle:active VisualElement {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-toggle VisualElement {
+    border-radius: 5px;
+    border-width: 0;
+}
+
+.unity-toggle__checkmark {
+    -unity-background-image-tint-color: var(--text-color);
+    width: 100%;
+    height: 100%;
+}
+
+.outline {
+    border-color: var(--text-color);
+    border-width: 1px;
+}
+
+.roundButton {
+    width: var(--control-width-half);
+    height: var(--control-width-half);
+    border-radius: var(--control-width-half);
+}
+
+.roundCorners {
+    border-radius: 5px;
+}
+
+.unity-base-dropdown ScrollView #unity-content-container {
+    padding-right: 0;
+    padding-bottom: 0;
+}
+
+ScrollView #unity-content-container {
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+TextInput {
+    font-size: var(--font-size);
+    padding: 2px;
+    border-width: 2px;
+}
+
+.middleCenterText {
+    -unity-text-align: middle-center;
+}
+
+.controlLabel {
+    -unity-text-align: middle-left;
+    width: 300px;
+    -unity-font-style: bold;
+    font-size: var(--font-size);
+}
+
+.titleImage {
+    margin-right: 10px;
+    width: var(--font-size-title);
+    height: var(--font-size-title);
+}
+
+.titleText {
+    font-size: var(--font-size-title);
+}
+
+.titleSubText {
+    font-size: var(--font-size);
+    color: rgb(180, 229, 255);
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialogTitle {
+    font-size: var(--font-size-title-small);
+}
+
+.dialogMessage {
+    font-size: var(--font-size);
+}
+
+.dialogTitleImage {
+    margin-right: 10px;
+    width: var(--font-size-title-small);
+    height: var(--font-size-title-small);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#dummyButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.mainSceneButton {
+    width: var(--control-width-large);
+    height: var(--control-height-large);
+}
+
+.dialogButton {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.dialogTextButton {
+    height: auto;
+    width: auto;
+    color: rgb(6, 170, 233);
+}
+
+.dialogTextButton:hover {
+    color: rgb(0, 102, 156);
+}
+
+.optionsOverviewButtonRow {
+    width: 100%;
+    height: 25%;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.optionsOverviewButton {
+    height: 100%;
+    width: var(--control-width-large);
+    justify-content: space-around;
+    align-items: center;
+}
+
+.optionsOverviewButton VisualElement {
+    -unity-background-image-tint-color: var(--text-color);
+    width: var(--font-size-title);
+    height: var(--font-size-title);
+}
+
+.noBackground TextInput {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--text-color);
+    border-width: 0;
+}
+
+.iconImage {
+    width: var(--font-size-title);
+    height: var(--font-size-title);
+}
+
+.smallFont TextInput {
+    font-size: var(--font-size-small);
+}
+
+ItemPicker {
+    width: 300px;
+    height: var(--control-height);
+    min-width: var(--control-height-small);
+}
+
+ItemPicker Label {
+    white-space: normal;
+}
+
+ItemPicker.smallFont Label {
+    font-size: var(--font-size-small);
+}
+
+.itemPickerButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 60px;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.itemPickerItemLabel {
+    background-color: var(--control-color-accent2);
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.optionsLabelAndItemPicker {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.backgroundImage {
+    width: 100%;
+    height: 100%;
+    background-image: url('project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&guid=4fd0c0cd5661e0b45aee082182ae1a93&type=3#[bg-main]blue_plain');
+}
+
+.optionsSceneMainContainer {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.optionsSceneTopRow {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    height: var(--control-height);
+    margin-bottom: 10px;
+}
+
+.optionsSceneTitleContainer {
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-shrink: 1;
+}
+
+.optionsSceneTitleAndImageContainer {
+    flex-direction: row;
+    align-items: center;
+}
+
+#notificationLabel.error {
+    color: var(--text-color-error);
+}

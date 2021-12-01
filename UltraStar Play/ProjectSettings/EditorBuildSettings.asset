@@ -12,22 +12,22 @@ EditorBuildSettings:
     path: Assets/Scenes/Main/MainScene.unity
     guid: a5ef89c15e3547345b26b12e8c78ac9a
   - enabled: 1
-    path: Assets/Scenes/Options/OptionsScene.unity
+    path: Assets/Scenes/Options/OptionsOverview/OptionsOverviewScene.unity
     guid: 6c828cde566d47e4994dbf40c121d51d
   - enabled: 1
     path: Assets/Scenes/About/AboutScene.unity
     guid: 95c8c6f2708f1b247913f73397d51376
   - enabled: 1
-    path: Assets/Scenes/Options/GameOptions/OptionsGameScene.unity
+    path: Assets/Scenes/Options/GameOptions/GameOptionsScene.unity
     guid: 5d43988ef109d4246b6a972076c93a6d
   - enabled: 1
-    path: Assets/Scenes/Options/GraphicOptions/OptionsGraphicsScene.unity
+    path: Assets/Scenes/Options/GraphicOptions/GraphicsOptionsScene.unity
     guid: 8d4155580fdeff34a9db95f96b0f718f
   - enabled: 1
-    path: Assets/Scenes/Options/SoundOptions/OptionsSoundScene.unity
+    path: Assets/Scenes/Options/SoundOptions/SoundOptionsScene.unity
     guid: c593716c83a53884bbbd31e8afc223bd
   - enabled: 1
-    path: Assets/Scenes/Options/PlayerProfileSetup/PlayerProfileSetupScene.unity
+    path: Assets/Scenes/Options/PlayerProfileOptions/PlayerProfileOptionsScene.unity
     guid: f509dae09ad85ac4e9c41ff79fa95d6d
   - enabled: 1
     path: Assets/Scenes/Highscore/HighscoreScene.unity
@@ -51,14 +51,23 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
   - enabled: 1
-    path: Assets/Scenes/Options/ContentOptions/ContentDownloadScene.unity
+    path: Assets/Scenes/Options/ContentDownload/ContentDownloadScene.unity
     guid: 10cb82cf2be19ee46b443c17c2efc000
   - enabled: 1
-    path: Assets/Scenes/Options/ThemeOptions/ThemeOptionsScene.unity
+    path: Assets/Scenes/Options/DesignOptions/DesignOptionsScene.unity
     guid: 00e91542d7928d24b92cafbbda62b290
   - enabled: 1
     path: Assets/Scenes/Options/NetworkOptions/NetworkOptionsScene.unity
     guid: 2c3c687e37cd4174c99cb45b42bacc69
+  - enabled: 1
+    path: Assets/Scenes/Options/DevelopmentOptions/DevelopmentOptionsScene.unity
+    guid: 98c8b71f12960164881704e7a7c90561
+  - enabled: 1
+    path: Assets/Scenes/Options/CompanionAppOptions/CompanionAppOptionsScene.unity
+    guid: 761d9b3dcae421f4dbb93ef19dca5f09
+  - enabled: 1
+    path: Assets/Scenes/Options/SongLibraryOptions/SongLibraryOptionsScene.unity
+    guid: 429ddcd5c7d10f84d92048db969ff373
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}
