@@ -33,26 +33,26 @@ public static class ApplicationUtils
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension.IsOneOf(
-            "mp3",
-            "ogg",
-            "wav");
+        return fileExtension
+            is "mp3"
+            or "ogg"
+            or "wav";
     }
 
     public static bool IsSupportedVideoFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension.IsOneOf(
-            "avi",
-            "mp4",
-            "mpg",
-            "mpeg",
-            "vp8",
-            "m4v",
-            "mov",
-            "dv",
-            "afs",
-            "wmf");
+        return fileExtension
+            is "avi"
+            or "mp4"
+            or "mpg"
+            or "mpeg"
+            or "vp8"
+            or "m4v"
+            or "mov"
+            or "dv"
+            or "afs"
+            or "wmf";
     }
 
     private static string NormalizeFileExtension(string fileExtension)

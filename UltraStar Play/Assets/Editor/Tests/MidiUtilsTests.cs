@@ -66,7 +66,9 @@ public class MidiUtilsTests
         // Shortest signed distance via 11 -> -1
         Assert.AreEqual(-1, MidiUtils.GetRelativePitchDistanceSigned(0, 11));
         // Shortest signed distance from F to B -> 6 or -6
-        Assert.IsTrue(MidiUtils.GetRelativePitchDistanceSigned(77, 59).IsOneOf(-6, 6));
+        Assert.IsTrue(MidiUtils.GetRelativePitchDistanceSigned(77, 59)
+            is -6
+            or 6);
         // Shortest signed distance from A to D -> 5
         Assert.AreEqual(5, MidiUtils.GetRelativePitchDistanceSigned(45, 74));
         // Shortest signed distance from D to A -> -5

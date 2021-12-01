@@ -85,4 +85,24 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
             Selection.Value = Items[0];
         }
     }
+
+    public bool TrySelectItem(T item)
+    {
+        if (Items.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        int index = Items.IndexOf(item);
+        if (index >= 0)
+        {
+            Selection.Value = Items[index];
+            return true;
+        }
+        else
+        {
+            Selection.Value = Items[0];
+            return false;
+        }
+    }
 }

@@ -58,17 +58,18 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
             .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
                   newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);
 
-        new PercentNumberPickerControl(previewVolumeChooser)
-            .Bind(() => settings.AudioSettings.PreviewVolumePercent,
+        NumberPickerControl previewVolumePickerControl = new NumberPickerControl(previewVolumeChooser);
+        previewVolumePickerControl.GetLabelTextFunction = item => item + " %";
+        previewVolumePickerControl.Bind(() => settings.AudioSettings.PreviewVolumePercent,
                 newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
 
-        new PercentNumberPickerControl(volumeChooser)
-            .Bind(() => settings.AudioSettings.VolumePercent,
+        NumberPickerControl volumePickerControl = new NumberPickerControl(volumeChooser);
+        volumePickerControl.GetLabelTextFunction = item => item + " %";
+        volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
                 newValue => settings.AudioSettings.VolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-
-        backgroundMusicEnabledChooser.PreviousItemButton.Focus();
+        backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -76,7 +77,7 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backgroundMusicEnabledLabel == null)
+        if (!Application.isPlaying && backButton == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }
@@ -84,6 +85,6 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
         volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.soundOptionsScene_title);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_sound_title);
     }
 }
