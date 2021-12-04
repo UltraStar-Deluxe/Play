@@ -63,6 +63,7 @@ public static partial class R
         public const string fullscreenContainer = "fullscreenContainer";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
+        public const string hiddenContinueButton = "hiddenContinueButton";
         public const string highscoreEntry = "highscoreEntry";
         public const string HighscoreEntry = "HighscoreEntry";
         public const string httpServerPortLabel = "httpServerPortLabel";
@@ -89,6 +90,8 @@ public static partial class R
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextItemButton = "nextItemButton";
+        public const string nextItemIcon = "nextItemIcon";
+        public const string nextItemLabel = "nextItemLabel";
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";

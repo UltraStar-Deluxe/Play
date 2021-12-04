@@ -18,6 +18,9 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
 
+    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
+    private Button hiddenContinueButton;
+
     [Inject(UxmlName = R.UxmlNames.nextItemButton)]
     private Button nextItemButton;
 
@@ -51,6 +54,7 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
         highscoreEntries = uiDocument.rootVisualElement.Query<VisualElement>(R.UxmlNames.highscoreEntry)
             .ToList();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
+        hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         nextItemButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
         ShowHighscores(sceneData.SongMeta, sceneData.Difficulty);
     }

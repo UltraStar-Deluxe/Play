@@ -11,6 +11,7 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImage = "dialogTitleImage";
         public const string iconImage = "iconImage";
+        public const string iconImageTextSized = "iconImageTextSized";
         public const string itemPickerButton = "itemPickerButton";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string mainSceneButton = "mainSceneButton";
@@ -33,5 +34,6 @@ public static partial class R
         public const string titleImage = "titleImage";
         public const string titleSubText = "titleSubText";
         public const string titleText = "titleText";
+        public const string wideControl = "wideControl";
     }
 }
