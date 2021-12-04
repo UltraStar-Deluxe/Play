@@ -16,10 +16,10 @@ public class SingingResultsSceneContinueButton : MonoBehaviour, INeedInjection
     private Button uiButton;
 
     [Inject]
-    private SingingResultsSceneController singingResultsSceneController;
+    private SingingResultsSceneUiControl SingingResultsSceneUiControl;
 
     private void Start()
     {
-        uiButton.OnClickAsObservable().Subscribe(_ => singingResultsSceneController.FinishScene());
+        uiButton.OnClickAsObservable().Subscribe(_ => SingingResultsSceneUiControl.FinishScene());
     }
 }
