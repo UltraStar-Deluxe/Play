@@ -10,7 +10,7 @@ using UnityEngine.UI;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBinder
+public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public Text songLabel;
@@ -41,11 +41,11 @@ public class SingingResultsSceneController : MonoBehaviour, INeedInjection, IBin
 
     private SingingResultsSceneData sceneData;
 
-    public static SingingResultsSceneController Instance
+    public static SingingResultsSceneUiControl Instance
     {
         get
         {
-            return FindObjectOfType<SingingResultsSceneController>();
+            return FindObjectOfType<SingingResultsSceneUiControl>();
         }
     }
 

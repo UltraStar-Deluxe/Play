@@ -1,0 +1,51 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement style="width: 100%; height: 100%; flex-direction: row; align-items: flex-start; justify-content: space-between;">
+        <ui:VisualElement name="leftColumn" picking-mode="Ignore" style="width: 60%; height: 100%; flex-direction: column; align-items: center; flex-grow: 1; justify-content: space-between;">
+            <ui:VisualElement name="row" style="flex-direction: row; width: 80%; flex-grow: 0; justify-content: space-around; height: 25%;">
+                <ui:VisualElement name="playerImage" picking-mode="Ignore" style="width: 30%; height: auto; background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=21300000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit;" />
+                <ui:VisualElement name="VisualElement" style="width: 30%; height: auto;">
+                    <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; margin-right: 20px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-top: 0; margin-bottom: 0; flex-grow: 1; width: 100%; -unity-background-scale-mode: scale-to-fit; height: 100%;" />
+                    <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" style="-unity-text-align: upper-center;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="scores" style="width: 80%; height: 50%;">
+                <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" style="width: 100%;" />
+                <ui:VisualElement name="normalNoteScore" style="flex-direction: row; justify-content: space-between; padding-bottom: 5px; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    <ui:VisualElement name="icon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]bar_box_dark.png?fileID=2800000&amp;guid=3c60a383906a7be40b5f4fb58e2cfe59&amp;type=3#[score]bar_box_dark&apos;);" />
+                    <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 20px;">
+                        <ui:Label text="Notes" display-tooltip-when-elided="true" name="scoreName" />
+                        <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="goldenNoteScore" style="flex-direction: row; justify-content: space-between; padding-bottom: 5px; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    <ui:VisualElement name="icon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]bar_box_light.png?fileID=2800000&amp;guid=9b791fd7a45687e4691d4da40c122f8a&amp;type=3#[score]bar_box_light&apos;);" />
+                    <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 20px;">
+                        <ui:Label text="Golden Notes" display-tooltip-when-elided="true" name="scoreName" />
+                        <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="phraseBonusScore" style="flex-direction: row; justify-content: space-between; padding-bottom: 5px; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px;">
+                    <ui:VisualElement name="icon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]bar_box_lightest.png?fileID=2800000&amp;guid=219491d07d3deb247b6ca9d7d9394eb1&amp;type=3#[score]bar_box_lightest&apos;);" />
+                    <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 20px;">
+                        <ui:Label text="Phrase Bonus" display-tooltip-when-elided="true" name="scoreName" />
+                        <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="totalScore" style="flex-direction: row; justify-content: space-between; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px; width: 80%;">
+                <ui:VisualElement name="icon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[sing]p.png?fileID=2800000&amp;guid=f8442e207ea2a3f4bbeb74789d94cfbf&amp;type=3#[sing]p&apos;);" />
+                <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 20px;">
+                    <ui:Label text="Total" display-tooltip-when-elided="true" name="scoreName" />
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="rightColumn" style="height: 100%; flex-grow: 1; width: 20%;">
+            <ui:VisualElement name="scoreBar" style="height: 100%; flex-grow: 1;">
+                <ui:VisualElement name="emptyScoreBar" style="height: 96%; flex-grow: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]glass_box.png?fileID=21300000&amp;guid=ef4f1927ea9837c4794d0cc13280d088&amp;type=3#[score]glass_box&apos;); width: 100%;" />
+                <ui:VisualElement name="filledScoreBar" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]endcap.png?fileID=21300000&amp;guid=2cf4b5832641ba44eb2240332f340bdd&amp;type=3#[score]endcap&apos;); position: absolute; bottom: 0; -unity-background-scale-mode: stretch-to-fill; height: 5%; width: 100%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -16,10 +16,10 @@ public class ToggleStatisticsButton : MonoBehaviour, INeedInjection
     private Button button;
 
     [Inject]
-    private SingingResultsSceneController singingResultsSceneController;
+    private SingingResultsSceneUiControl SingingResultsSceneUiControl;
 
     void Start()
     {
-        button.OnClickAsObservable().Subscribe(_ => singingResultsSceneController.ToggleStatistics());
+        button.OnClickAsObservable().Subscribe(_ => SingingResultsSceneUiControl.ToggleStatistics());
     }
 }

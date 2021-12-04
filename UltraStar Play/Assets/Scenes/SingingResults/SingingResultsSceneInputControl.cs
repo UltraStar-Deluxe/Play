@@ -20,7 +20,7 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
     public Button toggleStatisticsButton;
     
     [Inject]
-    private SingingResultsSceneController singingResultsSceneController;
+    private SingingResultsSceneUiControl SingingResultsSceneUiControl;
     
     [Inject]
     private EventSystem eventSystem;
@@ -31,14 +31,14 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
         eventSystem.sendNavigationEvents = false;
         
         InputManager.GetInputAction(R.InputActions.usplay_toggleResultGraph).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneController.ToggleStatistics());
+            .Subscribe(_ => SingingResultsSceneUiControl.ToggleStatistics());
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneController.FinishScene());
+            .Subscribe(_ => SingingResultsSceneUiControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneController.FinishScene());
+            .Subscribe(_ => SingingResultsSceneUiControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneController.FinishScene());
+            .Subscribe(_ => SingingResultsSceneUiControl.FinishScene());
             
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Subscribe(_  => OnNavigate());
