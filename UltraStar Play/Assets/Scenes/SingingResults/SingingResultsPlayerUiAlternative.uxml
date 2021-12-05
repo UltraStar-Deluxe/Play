@@ -1,8 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement style="width: 100%; height: 100%; flex-direction: row; align-items: flex-start; justify-content: space-between;">
+        <ui:VisualElement name="column" style="height: 100%; flex-grow: 2; width: 10%; flex-shrink: 1; padding-left: 10px; padding-right: 20px;">
+            <ui:VisualElement name="scoreBar" style="height: 100%; flex-grow: 1;">
+                <ui:VisualElement name="emptyScoreBar" style="height: 96%; flex-grow: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]glass_box.png?fileID=21300000&amp;guid=ef4f1927ea9837c4794d0cc13280d088&amp;type=3#[score]glass_box&apos;); width: 100%;" />
+                <ui:VisualElement name="filledScoreBar" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]endcap.png?fileID=21300000&amp;guid=2cf4b5832641ba44eb2240332f340bdd&amp;type=3#[score]endcap&apos;); position: absolute; bottom: 0; -unity-background-scale-mode: stretch-to-fill; height: 5%; width: 100%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="column" picking-mode="Ignore" style="width: 60%; height: 100%; flex-direction: column; align-items: center; flex-grow: 1; justify-content: space-between;">
-            <ui:VisualElement name="row" style="flex-direction: row; width: 100%; flex-grow: 0; justify-content: space-around; height: 25%;">
+            <ui:VisualElement name="row" style="flex-direction: row-reverse; width: 100%; flex-grow: 0; justify-content: space-around; height: 25%;">
                 <ui:VisualElement name="playerImage" picking-mode="Ignore" style="width: 30%; height: auto; background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=21300000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit;" />
                 <ui:VisualElement name="VisualElement" style="width: 30%; height: auto;">
                     <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; margin-right: 20px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-top: 0; margin-bottom: 0; flex-grow: 1; width: 100%; -unity-background-scale-mode: scale-to-fit; height: 100%;" />
@@ -39,12 +45,6 @@
                     <ui:Label text="Total" display-tooltip-when-elided="true" name="scoreName" />
                     <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" />
                 </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="column" style="height: 100%; flex-grow: 2; width: 10%; flex-shrink: 1; padding-left: 20px; padding-right: 10px;">
-            <ui:VisualElement name="scoreBar" style="height: 100%; flex-grow: 1;">
-                <ui:VisualElement name="emptyScoreBar" style="height: 96%; flex-grow: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]glass_box.png?fileID=21300000&amp;guid=ef4f1927ea9837c4794d0cc13280d088&amp;type=3#[score]glass_box&apos;); width: 100%;" />
-                <ui:VisualElement name="filledScoreBar" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[score]endcap.png?fileID=21300000&amp;guid=2cf4b5832641ba44eb2240332f340bdd&amp;type=3#[score]endcap&apos;); position: absolute; bottom: 0; -unity-background-scale-mode: stretch-to-fill; height: 5%; width: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

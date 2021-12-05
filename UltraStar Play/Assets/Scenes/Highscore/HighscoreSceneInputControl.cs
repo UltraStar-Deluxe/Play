@@ -45,7 +45,7 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(context => OnNavigate(context));
         
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => OnSubmit());
+            .Subscribe(_ => highscoreSceneUiControl.FinishScene());
     }
 
     private void OnNavigate(InputAction.CallbackContext context)
@@ -70,19 +70,5 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
             }
             nextDifficultyButton.Select();
         }
-    }
-    
-    private void OnSubmit()
-    {
-        if (eventSystem.currentSelectedGameObject == null)
-        {
-            return;
-        }
-        Button selectedButton = eventSystem.currentSelectedGameObject.GetComponent<Button>();
-        if (selectedButton == null)
-        {
-            return;
-        }
-        selectedButton.OnSubmit(new BaseEventData(eventSystem));
     }
 }

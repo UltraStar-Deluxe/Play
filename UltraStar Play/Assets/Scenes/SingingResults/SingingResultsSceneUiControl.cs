@@ -3,35 +3,34 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBinder
+public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
 {
-    [InjectedInInspector]
-    public Text songLabel;
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
 
-    [InjectedInInspector]
-    public GameObject onePlayerLayout;
+    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
+    private Label songLabel;
 
-    [InjectedInInspector]
-    public GameObject twoPlayerLayout;
+    [Inject(UxmlName = R.UxmlNames.onePlayerLayout)]
+    public VisualElement onePlayerLayout;
 
-    [InjectedInInspector]
-    public GameObject threePlayerLayout;
+    [Inject(UxmlName = R.UxmlNames.twoPlayerLayout)]
+    public VisualElement twoPlayerLayout;
 
-    [InjectedInInspector]
-    public GameObject nPlayerLayout;
+    [Inject(UxmlName = R.UxmlNames.nPlayerLayout)]
+    public VisualElement nPlayerLayout;
 
-    [InjectedInInspector]
-    public RectTransform statisticsLegend;
-
-    [InjectedInInspector]
-    public SingingResultsPlayerUiController singingResultsPlayerUiControllerPrefab;
+    [Inject(UxmlName = R.UxmlNames.continueButton)]
+    public Button continueButton;
 
     [Inject]
     private Statistics statistics;
@@ -51,61 +50,57 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
 
     void Start()
     {
-        if (GetSelectedLayout() == nPlayerLayout)
-        {
-            PrepareNPlayerLayout();
-        }
+        continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
+        continueButton.Focus();
+
         ActivateLayout();
-        SetStatisticsVisible(false);
         FillLayout();
     }
 
     private void FillLayout()
     {
         SongMeta songMeta = sceneData.SongMeta;
-        string titleText = (String.IsNullOrEmpty(songMeta.Title)) ? "" : songMeta.Title;
-        string artistText = (String.IsNullOrEmpty(songMeta.Artist)) ? "" : " - " + songMeta.Artist;
+        string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
+        string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
         songLabel.text = titleText + artistText;
 
-        int i = 0;
-        SingingResultsPlayerUiController[] uiControllers = GetSelectedLayout().GetComponentsInChildren<SingingResultsPlayerUiController>();
-        foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
-        {
-            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
-            SongRating songRating = GetSongRating(playerScoreData.TotalScore);
-
-            Injector childInjector = UniInjectUtils.CreateInjector(injector);
-            childInjector.AddBindingForInstance(playerProfile);
-            childInjector.AddBindingForInstance(micProfile);
-            childInjector.AddBindingForInstance(playerScoreData);
-            childInjector.AddBindingForInstance(songRating);
-            childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
-
-            if (i < uiControllers.Length)
-            {
-                childInjector.InjectAllComponentsInChildren(uiControllers[i], true);
-            }
-            i++;
-        }
+        // int i = 0;
+        // foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
+        // {
+        //     sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+        //     PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
+        //     SongRating songRating = GetSongRating(playerScoreData.TotalScore);
+        //
+        //     Injector childInjector = UniInjectUtils.CreateInjector(injector);
+        //     childInjector.AddBindingForInstance(playerProfile);
+        //     childInjector.AddBindingForInstance(micProfile);
+        //     childInjector.AddBindingForInstance(playerScoreData);
+        //     childInjector.AddBindingForInstance(songRating);
+        //     childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
+        //
+        //     if (i < uiControllers.Length)
+        //     {
+        //         childInjector.InjectAllComponentsInChildren(uiControllers[i], true);
+        //     }
+        //     i++;
+        // }
     }
 
     private void ActivateLayout()
     {
-        List<GameObject> layouts = new List<GameObject>();
+        List<VisualElement> layouts = new List<VisualElement>();
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
-        layouts.Add(threePlayerLayout);
         layouts.Add(nPlayerLayout);
 
-        GameObject selectedLayout = GetSelectedLayout();
-        foreach (GameObject layout in layouts)
+        VisualElement selectedLayout = GetSelectedLayout();
+        foreach (VisualElement layout in layouts)
         {
-            layout.SetActive(layout == selectedLayout);
+            layout.SetVisible(layout == selectedLayout);
         }
     }
 
-    private GameObject GetSelectedLayout()
+    private VisualElement GetSelectedLayout()
     {
         int playerCount = sceneData.PlayerProfiles.Count;
         if (playerCount == 1)
@@ -116,23 +111,7 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
         {
             return twoPlayerLayout;
         }
-        if (playerCount == 3)
-        {
-            return threePlayerLayout;
-        }
         return nPlayerLayout;
-    }
-
-    private void PrepareNPlayerLayout()
-    {
-        nPlayerLayout.GetComponentsInChildren<SingingResultsPlayerUiController>().ForEach(it => it.gameObject.SetActive(false));
-        GameObjectUtils.DestroyAllDirectChildren(nPlayerLayout.transform);
-        for (int i = 0; i < sceneData.PlayerProfiles.Count; i++)
-        {
-            Instantiate(singingResultsPlayerUiControllerPrefab, nPlayerLayout.transform);
-        }
-
-        PlayerUiArea.SetupPlayerUiGrid(sceneData.PlayerProfiles.Count, nPlayerLayout.GetComponent<GridLayoutGroupCellSizer>());
     }
 
     public void FinishScene()
@@ -152,7 +131,6 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
             songSelectSceneData.SongMeta = sceneData.SongMeta;
             SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
-
     }
 
     public List<IBinding> GetBindings()
@@ -177,17 +155,9 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
         return SongRating.ToneDeaf;
     }
 
-    public void ToggleStatistics()
+    public void UpdateTranslation()
     {
-        SetStatisticsVisible(!statisticsLegend.gameObject.activeInHierarchy);
-    }
-
-    public void SetStatisticsVisible(bool newActiveState)
-    {
-        statisticsLegend.gameObject.SetActive(newActiveState);
-        foreach (SingingResultsStatisticsWindow statisticsWindow in GetSelectedLayout().GetComponentsInChildren<SingingResultsStatisticsWindow>(true))
-        {
-            statisticsWindow.gameObject.SetActive(newActiveState);
-        }
+        continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
     }
 }

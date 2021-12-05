@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingResultsPlayerUi" src="project://database/Assets/Scenes/SingingResults/SingingResultsPlayerUi.uxml?fileID=9197481963319205126&amp;guid=0f11bceaf8c280f499a9b5a0ee6b3b3e&amp;type=3#SingingResultsPlayerUi" />
+    <ui:Template name="SingingResultsPlayerUiAlternative" src="project://database/Assets/Scenes/SingingResults/SingingResultsPlayerUiAlternative.uxml?fileID=9197481963319205126&amp;guid=86eb4975b5d0ae4479b8fb524e2855e4&amp;type=3#SingingResultsPlayerUiAlternative" />
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
         <ui:Button display-tooltip-when-elided="true" name="hiddenContinueButton" style="position: absolute; width: 100%; height: 100%; background-color: rgba(66, 163, 231, 0);" />
@@ -15,9 +16,14 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="1PlayerLayout" picking-mode="Ignore" style="width: 80%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto;">
+            <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="width: 70%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; display: flex;">
                 <ui:Instance template="SingingResultsPlayerUi" name="SingingResultsPlayerUi" style="height: 100%; width: 100%;" />
             </ui:VisualElement>
+            <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; flex-direction: row; display: none;">
+                <ui:Instance template="SingingResultsPlayerUi" name="SingingResultsPlayerUi" style="height: 100%; width: 50%; flex-grow: 1;" />
+                <ui:Instance template="SingingResultsPlayerUiAlternative" name="SingingResultsPlayerUiAlternative" style="width: 50%; flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; flex-direction: row; display: none;" />
             <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row;">
                 <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
             </ui:VisualElement>
