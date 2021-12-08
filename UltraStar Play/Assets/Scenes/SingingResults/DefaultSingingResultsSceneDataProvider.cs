@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
 {
+    [Range(1, 16)]
+    public int playerCount = 1;
+
     public SceneData GetDefaultSceneData()
     {
         SingingResultsSceneData data = new SingingResultsSceneData();
@@ -36,8 +39,12 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
 
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
-        data.AddPlayerScores(playerProfile, playerScoreData);
         data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
+        data.AddPlayerScores(playerProfile, playerScoreData);
+        for (int i = 1; i < playerCount; i++)
+        {
+            data.AddPlayerScores(SettingsManager.Instance.Settings.PlayerProfiles[i], playerScoreData);
+        }
         return data;
     }
 

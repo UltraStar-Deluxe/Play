@@ -14,6 +14,9 @@ using IBinding = UniInject.IBinding;
 
 public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
 {
+    [InjectedInInspector]
+    public VisualTreeAsset nPlayerUi;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -32,13 +35,21 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     public Button continueButton;
 
+    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
+    public Button hiddenContinueButton;
+
     [Inject]
     private Statistics statistics;
+
+    [Inject]
+    private UIDocument uiDocument;
 
     [Inject]
     private Injector injector;
 
     private SingingResultsSceneData sceneData;
+
+    private List<SingingResultsPlayerUiControl> singingResultsPlayerUiControls = new List<SingingResultsPlayerUiControl>();
 
     public static SingingResultsSceneUiControl Instance
     {
@@ -50,8 +61,16 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
 
     void Start()
     {
+        hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.Focus();
+
+        // Click through to hiddenContinueButton
+        uiDocument.rootVisualElement.Query<VisualElement>()
+            .ToList()
+            .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
+                ? PickingMode.Position
+                : PickingMode.Ignore);
 
         ActivateLayout();
         FillLayout();
@@ -64,26 +83,86 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
         string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
         songLabel.text = titleText + artistText;
 
-        // int i = 0;
-        // foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
-        // {
-        //     sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-        //     PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
-        //     SongRating songRating = GetSongRating(playerScoreData.TotalScore);
-        //
-        //     Injector childInjector = UniInjectUtils.CreateInjector(injector);
-        //     childInjector.AddBindingForInstance(playerProfile);
-        //     childInjector.AddBindingForInstance(micProfile);
-        //     childInjector.AddBindingForInstance(playerScoreData);
-        //     childInjector.AddBindingForInstance(songRating);
-        //     childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
-        //
-        //     if (i < uiControllers.Length)
-        //     {
-        //         childInjector.InjectAllComponentsInChildren(uiControllers[i], true);
-        //     }
-        //     i++;
-        // }
+        VisualElement selectedLayout = GetSelectedLayout();
+        if (selectedLayout == nPlayerLayout)
+        {
+            PrepareNPlayerLayout();
+        }
+
+        List<VisualElement> playerUis = selectedLayout
+            .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUi)
+            .ToList();
+
+        singingResultsPlayerUiControls = new List<SingingResultsPlayerUiControl>();
+        int i = 0;
+        foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
+        {
+            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
+            SongRating songRating = GetSongRating(playerScoreData.TotalScore);
+
+            Injector childInjector = UniInjectUtils.CreateInjector(injector);
+            childInjector.AddBindingForInstance(childInjector);
+            childInjector.AddBindingForInstance(playerProfile);
+            childInjector.AddBindingForInstance(micProfile);
+            childInjector.AddBindingForInstance(playerScoreData);
+            childInjector.AddBindingForInstance(songRating);
+            childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
+
+            if (i < playerUis.Count)
+            {
+                VisualElement playerUi = playerUis[i];
+                SingingResultsPlayerUiControl singingResultsPlayerUiControl = new SingingResultsPlayerUiControl();
+                childInjector.RootVisualElement = playerUi;
+                childInjector.Inject(singingResultsPlayerUiControl);
+                singingResultsPlayerUiControls.Add(singingResultsPlayerUiControl);
+            }
+            i++;
+        }
+    }
+
+    private void PrepareNPlayerLayout()
+    {
+        int playerCount = sceneData.PlayerProfiles.Count;
+        // Add elements to "square similar" grid
+        int columns = (int)Math.Sqrt(sceneData.PlayerProfiles.Count);
+        int rows = (int)Math.Ceiling((float)playerCount / columns);
+        if (sceneData.PlayerProfiles.Count == 3)
+        {
+            columns = 3;
+            rows = 1;
+        }
+
+        int playerIndex = 0;
+        for (int column = 0; column < columns; column++)
+        {
+            VisualElement columnElement = new VisualElement();
+            columnElement.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
+            columnElement.style.height = new StyleLength(Length.Percent(100f));
+            columnElement.style.width = new StyleLength(Length.Percent(100f / columns));
+            nPlayerLayout.Add(columnElement);
+
+            for (int row = 0; row < rows; row++)
+            {
+                TemplateContainer templateContainer = nPlayerUi.CloneTree();
+                VisualElement playerUi = templateContainer.Children().FirstOrDefault();
+                playerUi.name = R.UxmlNames.singingResultsPlayerUi;
+                playerUi.style.marginBottom = new StyleLength(20);
+                playerUi.AddToClassList("singingResultUiSmall");
+                if (rows > 2)
+                {
+                    playerUi.AddToClassList("singingResultUiSmaller");
+                }
+                columnElement.Add(playerUi);
+
+                playerIndex++;
+                if (playerIndex >= sceneData.PlayerProfiles.Count)
+                {
+                    // Enough, i.e., one for every player.
+                    return;
+                }
+            }
+        }
     }
 
     private void ActivateLayout()
@@ -159,5 +238,6 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
+        singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
     }
 }

@@ -58,6 +58,13 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
         nextItemButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
         ShowHighscores(sceneData.SongMeta, sceneData.Difficulty);
 
+        // Click through to hiddenContinueButton
+        uiDocument.rootVisualElement.Query<VisualElement>()
+            .ToList()
+            .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
+                ? PickingMode.Position
+                : PickingMode.Ignore);
+
         continueButton.Focus();
     }
 
