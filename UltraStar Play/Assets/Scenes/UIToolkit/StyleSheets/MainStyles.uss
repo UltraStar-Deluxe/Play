@@ -2,6 +2,7 @@
     --text-color: white;
     --font-size: 18px;
     --font-size-small: 14px;
+    --font-size-smaller: 12px;
     --font-size-title: 24px;
     --font-size-title-small: 20px;
     --text-color-accent1: lightgrey;
@@ -329,6 +330,7 @@ ItemPicker {
 }
 
 ItemPicker Label {
+    -unity-background-scale-mode: scale-to-fit;
     white-space: normal;
 }
 
@@ -412,6 +414,52 @@ ItemPicker.smallFont Label {
 .optionsSceneTitleAndImageContainer {
     flex-direction: row;
     align-items: center;
+}
+
+.scoreRow {
+    padding: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--text-color);
+}
+
+
+#singingResultsScoresContainer  {
+    height: 50%;
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.singingResultUiSmall Label {
+    font-size: var(--font-size-small);
+}
+
+.singingResultUiSmall #ratingLabel {
+    display: none;
+}
+
+.singingResultUiSmall #scoreIcon {
+    display: none;
+}
+
+.singingResultUiSmall #ratingLabel {
+    display: none;
+}
+
+.singingResultUiSmaller Label {
+    font-size: var(--font-size-smaller);
+}
+
+.singingResultUiSmaller #ratingImage {
+    display: none;
+}
+
+.singingResultUiSmaller #playerImage {
+    display: none;
+}
+
+.singingResultUiSmaller #singingResultsScoresContainer  {
+    height: 91%;
 }
 
 #notificationLabel.error {

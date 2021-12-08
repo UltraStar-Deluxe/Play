@@ -23,9 +23,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     private readonly List<RectTransform> debugPoints = new List<RectTransform>();
 
     [InjectedInInspector]
-    public StyleSheet largeScreenStyleSheet;
-
-    [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
 
     [InjectedInInspector]

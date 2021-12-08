@@ -16,14 +16,18 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="width: 70%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; display: flex;">
-                <ui:Instance template="SingingResultsPlayerUi" name="SingingResultsPlayerUi" style="height: 100%; width: 100%;" />
+            <ui:VisualElement style="flex-grow: 1; justify-content: center; width: 100%;">
+                <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="width: 100%; margin-top: 20px; margin-bottom: 20px; height: 50%; display: flex; align-items: center; flex-grow: 1;">
+                    <ui:VisualElement style="width: 70%;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" style="height: 100%; width: 100%;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="width: 100%; margin-top: 20px; margin-bottom: 20px; height: 80%; flex-direction: row; display: none;">
+                    <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" style="height: 100%; width: 50%; flex-grow: 1;" />
+                    <ui:Instance template="SingingResultsPlayerUiAlternative" name="singingResultsPlayerUi" picking-mode="Ignore" style="width: 50%; flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; display: none; flex-direction: row;" />
             </ui:VisualElement>
-            <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; flex-direction: row; display: none;">
-                <ui:Instance template="SingingResultsPlayerUi" name="SingingResultsPlayerUi" style="height: 100%; width: 50%; flex-grow: 1;" />
-                <ui:Instance template="SingingResultsPlayerUiAlternative" name="SingingResultsPlayerUiAlternative" style="width: 50%; flex-grow: 1;" />
-            </ui:VisualElement>
-            <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; flex-direction: row; display: none;" />
             <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row;">
                 <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
             </ui:VisualElement>
