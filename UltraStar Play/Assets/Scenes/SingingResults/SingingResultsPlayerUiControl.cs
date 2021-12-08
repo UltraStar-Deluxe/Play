@@ -56,7 +56,7 @@ public class SingingResultsPlayerUiControl : INeedInjection, ITranslator, IInjec
     [Inject]
     private Injector injector;
 
-    private float animationTime = 1f;
+    private readonly float animationTimeInSeconds = 1f;
 
     public void OnInjectionFinished()
     {
@@ -72,7 +72,7 @@ public class SingingResultsPlayerUiControl : INeedInjection, ITranslator, IInjec
         {
             ratingImage.style.backgroundImage = new StyleBackground(holder.sprite);
             // Bouncy size animation
-            LeanTween.scale(singingResultsSceneUiControl.gameObject, Vector3.one, animationTime)
+            LeanTween.scale(singingResultsSceneUiControl.gameObject, Vector3.one, animationTimeInSeconds)
                 .setFrom(Vector3.one * 0.75f)
                 .setEaseSpring()
                 .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))));
@@ -80,19 +80,20 @@ public class SingingResultsPlayerUiControl : INeedInjection, ITranslator, IInjec
         ratingLabel.text = songRating.Text;
 
         // Score texts (animated)
-        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, animationTime)
+        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreLabelText(normalNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, animationTime)
+        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreLabelText(goldenNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, animationTime)
+        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreLabelText(phraseBonusScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.TotalScore, animationTime)
+        LeanTween.value(singingResultsSceneUiControl.gameObject, 0f, playerScoreData.TotalScore, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreLabelText(totalScoreContainer, interpolatedValue));
 
         // Score bar (animated)
+        float playerScorePercent = playerScoreData.TotalScore / PlayerScoreController.MaxScore;
         float minScoreBarHeightInPercent = 5f;
-        float maxScoreBarHeightInPercent = minScoreBarHeightInPercent + ((100f - minScoreBarHeightInPercent) * playerScoreData.TotalScore / PlayerScoreController.MaxScore);
-        LeanTween.value(singingResultsSceneUiControl.gameObject, minScoreBarHeightInPercent, maxScoreBarHeightInPercent, animationTime)
+        float maxScoreBarHeightInPercent = minScoreBarHeightInPercent + ((100f - minScoreBarHeightInPercent) * playerScorePercent);
+        LeanTween.value(singingResultsSceneUiControl.gameObject, minScoreBarHeightInPercent, maxScoreBarHeightInPercent, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => filledScoreBar.style.height = new StyleLength(new Length(interpolatedValue, LengthUnit.Percent)))
             .setEaseOutSine();
 
