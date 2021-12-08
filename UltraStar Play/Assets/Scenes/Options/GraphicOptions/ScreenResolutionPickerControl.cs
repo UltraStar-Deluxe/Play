@@ -23,10 +23,39 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
         else
         {
             ScreenResolution currentScreenResolution = ApplicationUtils.GetCurrentAppResolution();
-            Selection.Value = Items.FirstOrDefault(it => it.Equals(currentScreenResolution))
-                .OrIfNull(Items[0]);
+            if (!TrySelectItem(currentScreenResolution, false))
+            {
+                Selection.Value = GetBestMatchingScreenResolution(currentScreenResolution);
+            }
         }
         Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.resolution = newValue);
+    }
+
+    private ScreenResolution GetBestMatchingScreenResolution(ScreenResolution targetResolution)
+    {
+        float ResolutionDistance(ScreenResolution a, ScreenResolution b)
+        {
+            return Vector2.Distance(new Vector2(a.Width, a.Height), new Vector2(b.Width, b.Height));
+        }
+
+        float bestMatchDistance = float.MaxValue;
+        ScreenResolution bestMatch = new ScreenResolution(0, 0, 0);
+        Items.ForEach(screenResolution =>
+        {
+            if (bestMatch.Width == 0 || bestMatch.Height == 0 || bestMatch.RefreshRate == 0)
+            {
+                bestMatch = screenResolution;
+            }
+
+            float distance = ResolutionDistance(screenResolution, targetResolution);
+            if (distance < bestMatchDistance)
+            {
+                bestMatchDistance = distance;
+                bestMatch = screenResolution;
+            }
+        });
+
+        return bestMatch;
     }
 
     private static List<ScreenResolution> GetItems()
@@ -58,7 +87,9 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
 
     private static List<ScreenResolution> GetResolutions()
     {
-        List<ScreenResolution> result = Screen.resolutions.Select(it => new ScreenResolution(it)).ToList();
+        List<ScreenResolution> result = Screen.resolutions
+            .Select(it => new ScreenResolution(it))
+            .ToList();
         return result;
     }
 }
