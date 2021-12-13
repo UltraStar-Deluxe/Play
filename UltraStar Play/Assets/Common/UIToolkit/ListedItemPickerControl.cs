@@ -86,7 +86,7 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
         }
     }
 
-    public bool TrySelectItem(T item)
+    public bool TrySelectItem(T item, bool selectFirstItemAsFallback = true)
     {
         if (Items.IsNullOrEmpty())
         {
@@ -99,10 +99,11 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
             Selection.Value = Items[index];
             return true;
         }
-        else
+
+        if (selectFirstItemAsFallback)
         {
             Selection.Value = Items[0];
-            return false;
         }
+        return false;
     }
 }

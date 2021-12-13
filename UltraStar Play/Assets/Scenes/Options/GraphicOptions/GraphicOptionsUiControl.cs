@@ -89,6 +89,15 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
 
         ScreenResolution res = SettingsManager.Instance.Settings.GraphicSettings.resolution;
         FullScreenMode fullScreenMode = SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode;
-        Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
+        if (res.Width > 0
+            && res.Height > 0
+            && res.RefreshRate > 0)
+        {
+            Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
+        }
+        else
+        {
+            Debug.LogWarning($"Attempt to apply invalid screen resolution: {res}");
+        }
     }
 }

@@ -25,6 +25,18 @@ public static class VisualElementExtensions
         });
     }
 
+    public static void SetVisible(this VisualElement visualElement, bool isVisible)
+    {
+        if (isVisible)
+        {
+            visualElement.Show();
+        }
+        else
+        {
+            visualElement.Hide();
+        }
+    }
+
     public static void Show(this VisualElement visualElement)
     {
         visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);

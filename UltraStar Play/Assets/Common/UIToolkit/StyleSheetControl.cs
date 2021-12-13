@@ -44,6 +44,7 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
     {
         if (printScreenSize)
         {
+            printScreenSize = false;
             Debug.Log($"Screen size (inches): {GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
         }
         AddScreenSpecificStyleSheets();

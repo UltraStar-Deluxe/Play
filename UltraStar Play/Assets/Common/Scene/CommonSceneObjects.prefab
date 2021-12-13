@@ -181,8 +181,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  largeScreenStyleSheet: {fileID: 7433441132597879392, guid: 2e4c065aaef89214082b746b3a80b1bc,
-    type: 3}
+  avatarImages:
+  - {fileID: 2800000, guid: 2b09f4367842bc1418c7062bfe03f99a, type: 3}
   notificationOverlayVisualTreeAsset: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
     type: 3}
   notificationVisualTreeAsset: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
