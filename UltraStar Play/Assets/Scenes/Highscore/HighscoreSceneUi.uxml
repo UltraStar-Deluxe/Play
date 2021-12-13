@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="HighscoreEntry" src="project://database/Assets/Scenes/Highscore/HighscoreEntry.uxml?fileID=9197481963319205126&amp;guid=8f09aeb6748780846b99f097fc569ee0&amp;type=3#HighscoreEntry" />
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+        <ui:Button display-tooltip-when-elided="true" name="hiddenContinueButton" style="position: absolute; width: 100%; height: 100%; background-color: rgba(66, 163, 231, 0);" />
+        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 10px; padding-bottom: 10px; width: 100%;">
+            <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
+                <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
+                    <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;);" />
+                        <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
+                            <ui:Label text="Highscores" name="sceneTitle" class="titleText" />
+                            <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="centerContent" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px;">
+                <ui:Label text="Difficulty: Medium" display-tooltip-when-elided="true" name="difficultyLabel" picking-mode="Ignore" class="titleText" style="margin-bottom: 20px;" />
+                <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
+                <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
+                <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
+                <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
+                <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
+                <ui:Button name="nextItemButton" value="This is the about text on multiple lines." class="wideControl" style="flex-direction: row;">
+                    <ui:Label text="Next" display-tooltip-when-elided="true" name="nextItemLabel" style="flex-grow: 1;" />
+                    <ui:VisualElement name="nextItemIcon" class="iconImageTextSized" style="position: relative; right: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/navigate_next_white_24dp.svg?fileID=7388822144124034973&amp;guid=a18bfb4f3168ff741bd72aa12e1e7a4d&amp;type=3#navigate_next_white_24dp&apos;); flex-grow: 0;" />
+                </ui:Button>
+                <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

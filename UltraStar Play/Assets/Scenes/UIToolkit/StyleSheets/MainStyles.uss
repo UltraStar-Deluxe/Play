@@ -2,12 +2,14 @@
     --text-color: white;
     --font-size: 18px;
     --font-size-small: 14px;
+    --font-size-smaller: 12px;
     --font-size-title: 24px;
     --font-size-title-small: 20px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
     --control-height: 40px;
     --control-height-small: 30px;
+    --control-height-large: 92px;
     --control-width: 120px;
     --control-width-half: 60px;
     --control-width-large: 150px;
@@ -66,6 +68,7 @@
 
 .unity-base-popup-field__arrow {
     -unity-background-image-tint-color: var(--text-color);
+    -unity-background-scale-mode: scale-to-fit;
     border-width: 0;
 }
 
@@ -160,6 +163,7 @@
 
 .unity-toggle__checkmark {
     -unity-background-image-tint-color: var(--text-color);
+    -unity-background-scale-mode: scale-to-fit;
     width: 100%;
     height: 100%;
 }
@@ -207,9 +211,10 @@ TextInput {
 }
 
 .titleImage {
-    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-title);
     height: var(--font-size-title);
+    margin-right: 10px;
 }
 
 .titleText {
@@ -238,14 +243,19 @@ TextInput {
 }
 
 .dialogTitleImage {
-    margin-right: 10px;
+    -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-title-small);
     height: var(--font-size-title-small);
+    margin-right: 10px;
     background-color: rgba(0, 0, 0, 0);
 }
 
 #dummyButton {
     background-color: rgba(0, 0, 0, 0);
+}
+
+.wideControl {
+    width: var(--control-width-large);
 }
 
 .mainSceneButton {
@@ -278,7 +288,7 @@ TextInput {
 }
 
 .optionsOverviewButton {
-    height: 100%;
+    height: var(--control-height-large);
     width: var(--control-width-large);
     justify-content: space-around;
     align-items: center;
@@ -286,6 +296,7 @@ TextInput {
 
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
+    -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-title);
     height: var(--font-size-title);
 }
@@ -297,8 +308,15 @@ TextInput {
 }
 
 .iconImage {
+    -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-title);
     height: var(--font-size-title);
+}
+
+.iconImageTextSized {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size);
+    height: var(--font-size);
 }
 
 .smallFont TextInput {
@@ -312,6 +330,7 @@ ItemPicker {
 }
 
 ItemPicker Label {
+    -unity-background-scale-mode: scale-to-fit;
     white-space: normal;
 }
 
@@ -395,6 +414,52 @@ ItemPicker.smallFont Label {
 .optionsSceneTitleAndImageContainer {
     flex-direction: row;
     align-items: center;
+}
+
+.scoreRow {
+    padding: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--text-color);
+}
+
+
+#singingResultsScoresContainer  {
+    height: 50%;
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.singingResultUiSmall Label {
+    font-size: var(--font-size-small);
+}
+
+.singingResultUiSmall #ratingLabel {
+    display: none;
+}
+
+.singingResultUiSmall #scoreIcon {
+    display: none;
+}
+
+.singingResultUiSmall #ratingLabel {
+    display: none;
+}
+
+.singingResultUiSmaller Label {
+    font-size: var(--font-size-smaller);
+}
+
+.singingResultUiSmaller #ratingImage {
+    display: none;
+}
+
+.singingResultUiSmaller #playerImage {
+    display: none;
+}
+
+.singingResultUiSmaller #singingResultsScoresContainer  {
+    height: 91%;
 }
 
 #notificationLabel.error {
