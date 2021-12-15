@@ -21,7 +21,7 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
     private PlaylistManager playlistManager;
 
     [Inject]
-    private SongSelectSceneController songSelectSceneController;
+    private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
     private SongRouletteController songRouletteController;
@@ -32,7 +32,7 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
             () => SongMeta.Reload());
 
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => songSelectSceneController.StartSongEditorScene());
+            () => songSelectSceneUiControl.StartSongEditorScene());
 
         if (PlatformUtils.IsStandalone)
         {

@@ -24,7 +24,7 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
     private OrderSlider orderSlider;
 
     [Inject]
-    private SongSelectSceneController songSelectSceneController;
+    private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -55,8 +55,8 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
         {
             Debug.Log("Song Metas Outdated");
             isSongMetasOutdated = false;
-            songSelectSceneController.GetSongMetasFromManager();
-            songSelectSceneController.UpdateFilteredSongs();
+            songSelectSceneUiControl.GetSongMetasFromManager();
+            songSelectSceneUiControl.UpdateFilteredSongs();
             UpdateCharacters();
         }
     }
@@ -76,7 +76,7 @@ public class CharacterQuickJumpBar : MonoBehaviour, INeedInjection
         characterQuickJump.character = character.ToString();
         injector.Inject(characterQuickJump);
 
-        SongMeta match = songSelectSceneController.GetCharacterQuickJumpSongMeta(character);
+        SongMeta match = songSelectSceneUiControl.GetCharacterQuickJumpSongMeta(character);
         if (match == null)
         {
             characterQuickJump.Interactable = false;

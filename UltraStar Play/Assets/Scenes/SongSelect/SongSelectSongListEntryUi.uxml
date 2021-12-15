@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="songEntry" class="roundCorners smallerFont" style="height: 100%; width: 100%; align-items: center; background-color: rgb(6, 170, 233); max-height: 200px; max-width: 150px;">
+        <ui:VisualElement name="songImageOuter" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-and-crop; flex-grow: 1; width: 100%;">
+            <ui:VisualElement name="songImageInner" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="detailContainer" style="width: 100%; height: 30%; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; min-height: 50px;">
+            <ui:Label text="Song Artist" display-tooltip-when-elided="true" name="artistLabel" />
+            <ui:Label text="Song Title" display-tooltip-when-elided="true" name="nameLabel" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

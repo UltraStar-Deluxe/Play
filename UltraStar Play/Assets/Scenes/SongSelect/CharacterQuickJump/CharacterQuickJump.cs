@@ -13,7 +13,7 @@ using PrimeInputActions;
 public class CharacterQuickJump : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongSelectSceneController songSelectSceneController;
+    private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
     private SongRouletteController songRouletteController;
@@ -60,7 +60,7 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
     {
         if (!character.IsNullOrEmpty())
         {
-            SongMeta match = songSelectSceneController.GetCharacterQuickJumpSongMeta(character.ToLowerInvariant()[0]);
+            SongMeta match = songSelectSceneUiControl.GetCharacterQuickJumpSongMeta(character.ToLowerInvariant()[0]);
             if (match != null)
             {
                 songRouletteController.SelectSong(match);

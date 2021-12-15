@@ -183,6 +183,10 @@
     border-radius: 5px;
 }
 
+.transparentBackgroundColor {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .unity-base-dropdown ScrollView #unity-content-container {
     padding-right: 0;
     padding-bottom: 0;
@@ -338,6 +342,29 @@ ItemPicker.smallFont Label {
     font-size: var(--font-size-small);
 }
 
+.smallFont Label {
+    font-size: var(--font-size-small);
+}
+
+Label.smallFont {
+    font-size: var(--font-size-small);
+}
+
+.smallerFont Label {
+    font-size: var(--font-size-smaller);
+}
+
+Label.smallerFont {
+    font-size: var(--font-size-smaller);
+}
+
+.ellipsis {
+    text-overflow: ellipsis;
+    -unity-text-overflow-position: end;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .itemPickerButton {
     flex-grow: 0;
     flex-shrink: 0;
@@ -422,8 +449,7 @@ ItemPicker.smallFont Label {
     border-bottom-color: var(--text-color);
 }
 
-
-#singingResultsScoresContainer  {
+#singingResultsScoresContainer {
     height: 50%;
     width: 100%;
     flex-grow: 1;
@@ -458,10 +484,50 @@ ItemPicker.smallFont Label {
     display: none;
 }
 
-.singingResultUiSmaller #singingResultsScoresContainer  {
+.singingResultUiSmaller #singingResultsScoresContainer {
     height: 91%;
 }
 
 #notificationLabel.error {
     color: var(--text-color-error);
+}
+
+.characterQuickJumpCharacterButton {
+    font-size: var(--font-size-smaller);
+}
+
+.characterQuickJumpCharacter {
+    background-color: rgba(32, 32, 32, 0.5);
+    width: 20px;
+    height: 100%;
+    border-radius: 10px;
+    font-size: 10px;
+    -unity-text-align: middle-center;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+#playlistChooser.unity-base-popup-field {
+    background-color: rgba(0, 0, 0, 0);
+    height: var(--control-height);
+    -unity-text-align: middle-left;
+}
+
+#playlistChooser.unity-base-popup-field .unity-base-popup-field__input {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 0 5px;
+    border-width: 0;
+}
+
+#characterContainer .unity-scroll-view__content-and-vertical-scroll-container {
+    height: 100%;
+}
+
+#characterContainer .unity-scroll-view__content-container {
+    height: 100%;
+    padding: 0;
+}
+
+.smallControl {
+    max-height: var(--control-height-small);
 }
