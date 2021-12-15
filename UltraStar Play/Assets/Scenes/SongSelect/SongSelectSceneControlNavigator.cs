@@ -17,7 +17,7 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
     private EventSystem eventSystem;
     
     [Inject]
-    private SongSelectSceneController songSelectSceneController;
+    private SongSelectSceneUiControl songSelectSceneUiControl;
     
     [Inject]
     private SongSelectPlayerProfileListController playerProfileListController;
@@ -168,7 +168,7 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
         switch (SelectedSceneControl)
         {
             case SongSelectSceneControls.Song:
-                songSelectSceneController.CheckAudioAndStartSingScene();
+                songSelectSceneUiControl.CheckAudioAndStartSingScene();
                 break;
             case SongSelectSceneControls.Player:
                 if (playerProfileListController.FocusedPlayerProfileControl != null)
@@ -184,7 +184,7 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
                 orderSlider.SelectNextItem();
                 break;
             case SongSelectSceneControls.Search:
-                songSelectSceneController.UpdateFilteredSongs();
+                songSelectSceneUiControl.UpdateFilteredSongs();
                 break;
             case SongSelectSceneControls.CharacterQuickJump:
                 // Do nothing. The event is handled by the CharacterQuickJump itself.
@@ -207,12 +207,12 @@ public class SongSelectSceneControlNavigator : MonoBehaviour, INeedInjection
     
     private void DeselectSearchControl()
     {
-        songSelectSceneController.DisableSearch();
+        songSelectSceneUiControl.DisableSearch();
     }
     
     private void SelectSearchControl()
     {
-        songSelectSceneController.EnableSearch(SearchInputField.ESearchMode.ByTitleOrArtist);
+        songSelectSceneUiControl.EnableSearch(SearchInputField.ESearchMode.ByTitleOrArtist);
     }
 
     private void SelectOrderSliderControl()

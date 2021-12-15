@@ -25,7 +25,7 @@ public class FavoriteIndicator : MonoBehaviour, INeedInjection
     private SongRouletteController songRouletteController;
 
     [Inject]
-    private SongSelectSceneController songSelectSceneController;
+    private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -33,7 +33,7 @@ public class FavoriteIndicator : MonoBehaviour, INeedInjection
     void Start()
     {
         songRouletteController.Selection.Subscribe(newSelection => UpdateImage(newSelection.SongMeta));
-        image.OnPointerClickAsObservable().Subscribe(_ => songSelectSceneController.ToggleSelectedSongIsFavorite());
+        image.OnPointerClickAsObservable().Subscribe(_ => songSelectSceneUiControl.ToggleSelectedSongIsFavorite());
 
         playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
         {
