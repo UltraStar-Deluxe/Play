@@ -10,5 +10,6 @@
             <ui:VisualElement name="titleRow" style="flex-direction: row; justify-content: space-between; align-items: center;" />
         </ui:VisualElement>
         <ui:VisualElement name="favoriteIcon" style="position: absolute; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconFilled.png?fileID=2800000&amp;guid=3c8ebe4e2e712904f84bf08e36421283&amp;type=3#FavoriteIconFilled&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; right: 5px; top: 5px;" />
+        <ui:Button display-tooltip-when-elided="true" name="songButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
     </ui:VisualElement>
 </ui:UXML>

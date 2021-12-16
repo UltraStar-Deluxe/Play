@@ -204,9 +204,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     // In such a case, keyboard input could be intended to change the controls state, e.g., (de)select the checkbox.
     private bool IsNoControlOrSongButtonFocused()
     {
-        GameObject focusedControl = eventSystem.currentSelectedGameObject;
-        bool focusedControlIsSongButton = (focusedControl != null && focusedControl.GetComponent<SongRouletteItem>() != null);
-        return focusedControl == null || focusedControlIsSongButton;
+        // TODO: Migrate to UIToolkit
+        return true;
     }
 
     private bool IsFuzzySearchActive()

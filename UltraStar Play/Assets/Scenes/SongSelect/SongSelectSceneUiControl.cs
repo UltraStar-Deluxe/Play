@@ -11,11 +11,13 @@ using System.IO;
 using System;
 using TMPro;
 using ProTrans;
+using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder
+public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder, ITranslator
 {
     public static SongSelectSceneUiControl Instance
     {
@@ -54,7 +56,13 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     [InjectedInInspector]
     public SongPreviewController songPreviewController;
-    
+
+    [Inject]
+    private UIDocument uiDocument;
+
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
+
     public ArtistText artistText;
     public Text songTitleText;
 
@@ -92,7 +100,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     }
 
     void Start()
-    {   
+    {
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
@@ -575,5 +583,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             })
             .FirstOrDefault();
         return match;
+    }
+
+    public void UpdateTranslation()
+    {
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
     }
 }
