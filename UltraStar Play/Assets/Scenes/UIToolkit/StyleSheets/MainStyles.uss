@@ -187,6 +187,14 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
+.transparentBackgroundColor:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentBackgroundColor:focus {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .unity-base-dropdown ScrollView #unity-content-container {
     padding-right: 0;
     padding-bottom: 0;
