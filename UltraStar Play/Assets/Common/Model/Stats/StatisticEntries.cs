@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using ProTrans;
 using UnityEngine;
 
 // Handles storage and operation over the song statistic entries themselves
@@ -9,15 +10,6 @@ using UnityEngine;
 public class StatisticEntries
 {
     public SortedSet<SongStatistic> SongStatistics { get; private set; }
-
-    // Returns the top score entry or null if no scores are yet recorded
-    public SongStatistic TopScore
-    {
-        get
-        {
-            return SongStatistics.FirstOrDefault();
-        }
-    }
 
     public StatisticEntries()
     {
@@ -32,5 +24,16 @@ public class StatisticEntries
     public void RemoveRecord(SongStatistic record)
     {
         SongStatistics.Remove(record);
+    }
+
+    public List<SongStatistic> GetTopScores(int count)
+    {
+        if (SongStatistics.IsNullOrEmpty())
+        {
+            return new List<SongStatistic>();
+        }
+        return SongStatistics
+            .Take(count)
+            .ToList();
     }
 }

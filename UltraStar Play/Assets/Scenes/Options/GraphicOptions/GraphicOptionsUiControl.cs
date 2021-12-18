@@ -45,8 +45,8 @@ public class GraphicOptionsUiControl : MonoBehaviour, INeedInjection, ITranslato
         }
         else
         {
-            resolutionContainer.Hide();
-            fullscreenContainer.Hide();
+            resolutionContainer.HideByDisplay();
+            fullscreenContainer.HideByDisplay();
         }
 
         List<int> fpsOptions = new List<int> { 30, 60 };

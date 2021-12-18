@@ -25,25 +25,47 @@ public static class VisualElementExtensions
         });
     }
 
-    public static void SetVisible(this VisualElement visualElement, bool isVisible)
+    public static void SetVisibleByDisplay(this VisualElement visualElement, bool isVisible)
     {
         if (isVisible)
         {
-            visualElement.Show();
+            visualElement.ShowByDisplay();
         }
         else
         {
-            visualElement.Hide();
+            visualElement.HideByDisplay();
         }
     }
 
-    public static void Show(this VisualElement visualElement)
+    public static void ShowByDisplay(this VisualElement visualElement)
     {
         visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
     }
 
-    public static void Hide(this VisualElement visualElement)
+    public static void HideByDisplay(this VisualElement visualElement)
     {
         visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+    }
+
+    public static void SetVisibleByVisibility(this VisualElement visualElement, bool isVisible)
+    {
+        if (isVisible)
+        {
+            visualElement.ShowByVisibility();
+        }
+        else
+        {
+            visualElement.HideByVisibility();
+        }
+    }
+
+    public static void ShowByVisibility(this VisualElement visualElement)
+    {
+        visualElement.style.visibility = new StyleEnum<Visibility>(Visibility.Visible);
+    }
+
+    public static void HideByVisibility(this VisualElement visualElement)
+    {
+        visualElement.style.visibility = new StyleEnum<Visibility>(Visibility.Hidden);
     }
 }

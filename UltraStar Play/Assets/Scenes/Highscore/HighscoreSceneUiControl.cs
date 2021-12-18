@@ -100,12 +100,12 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
         {
             if (i < topSongStatistics.Count)
             {
-                highscoreEntries[i].Show();
+                highscoreEntries[i].ShowByDisplay();
                 FillHighscoreEntry(highscoreEntries[i], topSongStatistics[i], i);
             }
             else
             {
-                highscoreEntries[i].Hide();
+                highscoreEntries[i].HideByDisplay();
             }
         }
 

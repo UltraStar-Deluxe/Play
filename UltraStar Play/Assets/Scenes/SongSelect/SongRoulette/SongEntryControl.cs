@@ -5,18 +5,18 @@ using System.IO;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem
+public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener
 {
     // [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     // private SongRouletteItemContextMenuHandler songRouletteItemContextMenuHandler;
 
     [Inject]
-    private SongRouletteController songRouletteController;
+    private SongRouletteControl songRouletteControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -56,7 +56,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             // songRouletteItemContextMenuHandler.SongMeta = songMeta;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
-            favoriteIcon.SetVisible(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
+            UpdateFavoriteIcon();
             UpdateCover(songMeta);
         }
     }
@@ -84,13 +84,19 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public VisualElement VisualElement { get; private set; }
 
-    private Vector3 animStartPosition;
-    private Vector3 animStartSize;
+    private Vector2 animStartPosition;
+    private Vector2 animStartSize;
     
     public SongEntryControl(VisualElement visualElement, SongEntryPlaceholderControl targetPlaceholderControl)
     {
         this.VisualElement = visualElement;
         this.targetPlaceholderControl = targetPlaceholderControl;
+
+        // Initial size and position
+        SetSize(targetPlaceholderControl.GetSize());
+        SetPosition(targetPlaceholderControl.GetPosition());
+        animStartPosition = targetPlaceholderControl.GetPosition();
+        animStartSize = targetPlaceholderControl.GetSize();
 
         // Add itself as IDragListener to be notified when its RectTransform is dragged.
         // AddListener(this);
@@ -102,8 +108,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         // Destroy this item when it does not have a target.
         if (TargetPlaceholderControl == null)
         {
-            songRouletteController.RemoveSongRouletteItem(this);
-            if (songRouletteController.DragSongRouletteItem == this)
+            songRouletteControl.RemoveSongRouletteItem(this);
+            if (songRouletteControl.DragSongRouletteItem == this)
             {
                 OnEndDrag(null);
             }
@@ -111,8 +117,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             return;
         }
         
-        if (songRouletteController.IsDrag
-            || songRouletteController.IsFlickGesture)
+        if (songRouletteControl.IsDrag
+            || songRouletteControl.IsFlickGesture)
         {
             return;
         }
@@ -129,7 +135,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private void UpdateMoveToTargetPosition(Vector2 targetPosition, Vector2 targetSize)
     {
-        float animPercent = songRouletteController.AnimTimeInSeconds / songRouletteController.MaxAnimTimeInSeconds;
+        float animPercent = songRouletteControl.AnimTimeInSeconds / songRouletteControl.MaxAnimTimeInSeconds;
         Vector2 animatedPosition = Vector2.Lerp(animStartPosition, targetPosition, animPercent);
         SetPosition(animatedPosition);
         SetSize(Vector2.Lerp(animStartSize, targetSize, animPercent));
@@ -152,17 +158,17 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
-        songRouletteController.OnBeginDrag(this);
+        songRouletteControl.OnBeginDrag(this);
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
-        songRouletteController.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
+        songRouletteControl.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)
     {
-        songRouletteController.OnEndDrag(dragEvent != null ? dragEvent.ScreenCoordinateInPixels.DragDelta : Vector2.zero);
+        songRouletteControl.OnEndDrag(dragEvent != null ? dragEvent.ScreenCoordinateInPixels.DragDelta : Vector2.zero);
     }
 
     public void CancelDrag()
@@ -211,7 +217,18 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     public void StartAnimationToFullScale()
     {
         VisualElement.style.scale = new StyleScale(new Scale(Vector3.zero));
-        LeanTween.value(songRouletteController.gameObject, Vector3.zero, Vector3.one, 0.2f)
+        LeanTween.value(songRouletteControl.gameObject, Vector3.zero, Vector3.one, 0.2f)
             .setOnUpdate((Vector3 value) => VisualElement.style.scale = new StyleScale(new Scale(value)));
+    }
+
+    public void OnInjectionFinished()
+    {
+        playlistManager.PlaylistChangeEventStream
+            .Subscribe(evt => UpdateFavoriteIcon());
+    }
+
+    private void UpdateFavoriteIcon()
+    {
+        favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
     }
 }

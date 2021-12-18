@@ -16,7 +16,7 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
     private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
-    private SongRouletteController songRouletteController;
+    private SongRouletteControl songRouletteControl;
 
     [Inject]
     private EventSystem eventSystem;
@@ -63,7 +63,7 @@ public class CharacterQuickJump : MonoBehaviour, INeedInjection
             SongMeta match = songSelectSceneUiControl.GetCharacterQuickJumpSongMeta(character.ToLowerInvariant()[0]);
             if (match != null)
             {
-                songRouletteController.SelectSong(match);
+                songRouletteControl.SelectSong(match);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -78,5 +79,40 @@ public class SongEntryPlaceholderControl : ISlotListSlot
             float bCenterDistance = Mathf.Abs(centerPosition - b.GetPosition().x);
             return aCenterDistance.CompareTo(bCenterDistance);
         }
+    }
+
+    public int GetCenterDistanceIndex(List<SongEntryPlaceholderControl> allPlaceholderControls, SongEntryPlaceholderControl centerPlaceholderControl)
+    {
+        if (this == centerPlaceholderControl)
+        {
+            return 0;
+        }
+
+        // first item left of center => returns -1
+        // first item right of center => returns 1
+        // second item left of center => returns -2
+        // second item right of center => returns 2
+        // ...
+
+        // Count items between this and the center.
+        float currentX = GetPosition().x;
+        float centerX = centerPlaceholderControl.GetPosition().x;
+        if (currentX < centerX)
+        {
+            // Left of center
+            List<SongEntryPlaceholderControl> placeholdersInBetween = allPlaceholderControls
+                .Where(it => currentX < it.GetPosition().x && it.GetPosition().x < centerX)
+                .ToList();
+            return -(placeholdersInBetween.Count + 1);
+        }
+        else
+        {
+            // Right of center
+            List<SongEntryPlaceholderControl> placeholdersInBetween = allPlaceholderControls
+                .Where(it => centerX < it.GetPosition().x && it.GetPosition().x < currentX)
+                .ToList();
+            return placeholdersInBetween.Count + 1;
+        }
+        return 0;
     }
 }
