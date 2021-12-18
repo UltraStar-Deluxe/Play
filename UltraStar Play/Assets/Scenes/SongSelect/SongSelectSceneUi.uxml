@@ -40,6 +40,7 @@
                 <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButtom" class="transparentBackgroundColor characterQuickJumpCharacterButton outline" style="width: 25px; height: 40px; left: 30px; position: absolute; top: 3px;" />
                 <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButtom" class="transparentBackgroundColor characterQuickJumpCharacterButton outline" style="width: 25px; height: 40px; right: 30px; position: absolute; top: 6px;" />
                 <ui:VisualElement name="songEntryContainer" style="position: absolute; width: 100%; height: 100%;">
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 116px; height: 100%; position: absolute; left: -226px; max-height: 200px; top: 0;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 116px; height: 100%; position: absolute; left: -90px; max-height: 200px;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 113px; height: 100%; position: absolute; left: 64px; max-height: 200px;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 130px; height: 100%; position: absolute; left: 184px; max-height: 200px;" />
@@ -47,8 +48,10 @@
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 121px; height: 100%; position: absolute; left: 473px; max-height: 200px;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 118px; height: 100%; position: absolute; left: 606px; max-height: 200px;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 128px; height: 100%; position: absolute; left: 772px; max-height: 200px;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 128px; height: 100%; position: absolute; left: 908px; max-height: 200px; top: 0;" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Label text="No songs found" display-tooltip-when-elided="true" name="noSongsFoundLabel" class="titleText" style="position: absolute; width: 100%; -unity-text-align: middle-center; height: 100%; white-space: normal; display: none;" />
             <ui:VisualElement name="editSongListContainer" class="roundCorners" style="flex-direction: row; display: none; border-top-width: 1px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); padding-top: 5px; height: 120px;">
                 <ui:VisualElement name="editSongListControls" style="flex-direction: column; padding-left: 10px; padding-right: 10px; width: 30%;">
                     <ui:TextField picking-mode="Ignore" text="SongList Name" class="smallControl" style="width: 100%;" />
@@ -76,9 +79,9 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="songInfoContainer" class="roundCorners" style="flex-grow: 1; align-items: center; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); margin-left: 10px; margin-right: 10px; justify-content: space-between;">
                     <ui:VisualElement name="topRow" style="width: 100%; align-items: flex-end; flex-direction: row; justify-content: space-between;">
-                        <ui:Label text="2017" display-tooltip-when-elided="true" name="yearLabel" class="smallFont" />
-                        <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" />
-                        <ui:Label text="Rock" display-tooltip-when-elided="true" name="genreLabel" class="smallFont" />
+                        <ui:Label text="Rock" display-tooltip-when-elided="true" name="genreLabel" class="smallFont" style="-unity-text-align: upper-left; width: 30%;" />
+                        <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" style="-unity-text-align: upper-center; width: 30%;" />
+                        <ui:Label text="2017" display-tooltip-when-elided="true" name="yearLabel" class="smallFont" style="width: 30%; -unity-text-align: upper-right;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="bottomRow" style="width: 100%; flex-direction: row; justify-content: space-between;">
                         <ui:Label text="Cleared: 999" display-tooltip-when-elided="true" name="timesClearedLabel" class="smallFont" style="margin-top: 10px; display: flex;" />
@@ -86,7 +89,9 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="iconContainer" style="position: absolute; height: 100%; width: 30%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
                         <ui:VisualElement name="duetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 24px; height: 24px;" />
-                        <ui:VisualElement name="favoriteIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconEmpty.png?fileID=2800000&amp;guid=fc9005b45ccd7424fbb9fbe707e57f7b&amp;type=3#FavoriteIconEmpty&apos;); height: 40px; width: 40px;" />
+                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconEmpty.png?fileID=21300000&amp;guid=fc9005b45ccd7424fbb9fbe707e57f7b&amp;type=3#FavoriteIconEmpty&apos;); -unity-background-scale-mode: scale-to-fit;">
+                            <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                        </ui:VisualElement>
                         <ui:VisualElement name="videoIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/VideoIcon.png?fileID=2800000&amp;guid=7383f98aba0fc1f4c97010b513d5b884&amp;type=3#VideoIcon&apos;); width: 24px; height: 24px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
@@ -133,5 +138,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%;" />
     </ui:VisualElement>
 </ui:UXML>

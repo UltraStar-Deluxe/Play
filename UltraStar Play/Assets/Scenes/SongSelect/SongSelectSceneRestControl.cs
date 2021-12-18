@@ -15,12 +15,12 @@ using SimpleHttpServerForUnity;
 public class SongSelectSceneRestControl : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongRouletteController songRouletteController;
+    private SongRouletteControl songRouletteControl;
     
 	private void Start() {
         HttpServer.Instance.On(HttpMethod.Post, "api/rest/selectNextSong")
             .WithDescription("Select the next song")
             .UntilDestroy(gameObject)
-            .Do(_ => songRouletteController.SelectNextSong());
+            .Do(_ => songRouletteControl.SelectNextSong());
 	}
 }

@@ -24,7 +24,7 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
     private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
-    private SongRouletteController songRouletteController;
+    private SongRouletteControl songRouletteControl;
     
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
@@ -46,8 +46,8 @@ public class SongRouletteItemContextMenuHandler : AbstractContextMenuHandler, IN
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
-        if (songRouletteController.DragDistance.magnitude > DragDistanceThreshold
-            || songRouletteController.IsFlickGesture)
+        if (songRouletteControl.DragDistance.magnitude > DragDistanceThreshold
+            || songRouletteControl.IsFlickGesture)
         {
             // Do not open when drag-gesture is in progress.
             return;

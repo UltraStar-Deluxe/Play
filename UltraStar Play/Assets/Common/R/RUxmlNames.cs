@@ -82,6 +82,7 @@ public static partial class R
         public const string first = "first";
         public const string fpsContainer = "fpsContainer";
         public const string fullscreenContainer = "fullscreenContainer";
+        public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string genreLabel = "genreLabel";
         public const string goldenNoteScore = "goldenNoteScore";
@@ -132,6 +133,7 @@ public static partial class R
         public const string nextSongButtom = "nextSongButtom";
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
         public const string normalNoteScore = "normalNoteScore";
+        public const string noSongsFoundLabel = "noSongsFoundLabel";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
@@ -231,6 +233,8 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string titleRow = "titleRow";
         public const string toggle = "toggle";
+        public const string toggleFavoriteButton = "toggleFavoriteButton";
+        public const string toggleFavoriteIcon = "toggleFavoriteIcon";
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";

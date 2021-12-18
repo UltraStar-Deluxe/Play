@@ -18,11 +18,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
     
-    [Inject]
-    private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
+    // [Inject]
+    // private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
 
     [Inject]
-    private SongRouletteController songRouletteController;
+    private SongRouletteControl songRouletteControl;
     
     private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
@@ -86,7 +86,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            songSelectSceneControlNavigator.SubmitSelectedControl();
+            // songSelectSceneControlNavigator.SubmitSelectedControl();
         }
     }
 
@@ -94,11 +94,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         if (context.ReadValue<Vector2>().y < 0) 
         {
-            songRouletteController.SelectNextSong();
+            songRouletteControl.SelectNextSong();
         }
         if (context.ReadValue<Vector2>().y > 0)
         {
-            songRouletteController.SelectPreviousSong();
+            songRouletteControl.SelectPreviousSong();
         }
     }
 
@@ -106,21 +106,21 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {   
         if (context.ReadValue<Vector2>().x > 0) 
         {
-            songRouletteController.SelectNextSong();
+            songRouletteControl.SelectNextSong();
         }
         if (context.ReadValue<Vector2>().x < 0)
         {
-            songRouletteController.SelectPreviousSong();
+            songRouletteControl.SelectPreviousSong();
         }
 
-        if (context.ReadValue<Vector2>().y > 0)
-        {
-            songSelectSceneControlNavigator.SelectPreviousControl();
-        }
-        if (context.ReadValue<Vector2>().y < 0)
-        {
-            songSelectSceneControlNavigator.SelectNextControl();
-        }
+        // if (context.ReadValue<Vector2>().y > 0)
+        // {
+        //     songSelectSceneControlNavigator.SelectPreviousControl();
+        // }
+        // if (context.ReadValue<Vector2>().y < 0)
+        // {
+        //     songSelectSceneControlNavigator.SelectNextControl();
+        // }
     }
 
     private void OnBack()

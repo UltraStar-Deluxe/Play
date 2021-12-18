@@ -11,13 +11,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongRouletteController : MonoBehaviour, INeedInjection
+public class SongRouletteControl : MonoBehaviour, INeedInjection
 {
     private const float FlickGestureThresholdInPixels = 20f;
     private const float FlickAcceleration = 0.98f;
-    
-    [InjectedInInspector]
-    public RectTransform songRouletteItemContainer;
     
     public VisualTreeAsset songEntryUi;
     
@@ -29,16 +26,19 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
-    [Inject]
-    private SongPreviewController songPreviewController;
+    // [Inject]
+    // private SongPreviewControl songPreviewControl;
 
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private PlaylistManager playlistManager;
+
     [Inject(UxmlName = R.UxmlNames.songEntryContainer)]
     private VisualElement songEntryContainer;
 
-    private List<SongEntryPlaceholderControl> songEntryPlaceholderControls;
+    private List<SongEntryPlaceholderControl> songEntryPlaceholderControls = new List<SongEntryPlaceholderControl>();
 
     private List<SongEntryPlaceholderControl> activeEntryPlaceholders = new List<SongEntryPlaceholderControl>();
     private SongEntryPlaceholderControl centerItem;
@@ -94,6 +94,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             .Select(it => new SongEntryPlaceholderControl(it))
             .ToList();
 
+        // In the first frame, the placeholders do not have their position and size defined correctly.
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => DoInit()));
     }
 
@@ -114,11 +115,10 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
             ISlotListSlot nextSlot = FindNearestSlot(current.GetPosition().x, followingSlots);
             songEntryPlaceholderControls[i].SetNeighborSlots(previousSlot, nextSlot);
         }
+        centerItem = FindNearestSlot(400, songEntryPlaceholderControls);
+        activeEntryPlaceholders = new List<SongEntryPlaceholderControl>(songEntryPlaceholderControls);
 
         SlotListControl.SlotChangeEventStream.Subscribe(OnSongRouletteItemChangedSlot);
-
-        activeEntryPlaceholders = new List<SongEntryPlaceholderControl>(songEntryPlaceholderControls);
-        centerItem = FindNearestSlot(400, songEntryPlaceholderControls);
 
         if (!showRouletteItemPlaceholders)
         {
@@ -127,10 +127,6 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
                 item.VisualElement.style.visibility = new StyleEnum<Visibility>(Visibility.Hidden);
             }
         }
-
-        Selection
-            .Where(it => it.SongMeta != null)
-            .Subscribe(it => Debug.Log("Selected Song: " + it.SongMeta.Title));
     }
 
     private void OnSongRouletteItemChangedSlot(SlotChangeEvent slotChangeEvent)
@@ -177,7 +173,8 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         }
 
         if (!IsDrag
-            && !IsFlickGesture)
+            && !IsFlickGesture
+            && centerItem != null)
         {
             SpawnAndRemoveSongRouletteItems();
         }
@@ -203,12 +200,9 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         List<SongEntryControl> usedSongRouletteItems = new List<SongEntryControl>();
 
         // Spawn roulette items for songs to be displayed (i.e. selected song and its surrounding songs)
-        int activeCenterIndex = activeEntryPlaceholders.IndexOf(centerItem);
         foreach (SongEntryPlaceholderControl placeholderControl in activeEntryPlaceholders)
         {
-            int index = activeEntryPlaceholders.IndexOf(placeholderControl);
-            int activeCenterDistance = index - activeCenterIndex;
-            int songIndex = SelectedSongIndex + activeCenterDistance;
+            int songIndex = SelectedSongIndex + placeholderControl.GetCenterDistanceIndex(activeEntryPlaceholders, centerItem);
             SongMeta songMeta = GetSongAtIndex(songIndex);
 
             // Get or create SongEntryControl for the song at the index
@@ -243,12 +237,12 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
     private SongEntryControl CreateSongRouletteItem(SongMeta songMeta, SongEntryPlaceholderControl placeholderControl)
     {
-        SongEntryControl item = new SongEntryControl(songEntryUi.CloneTree().Children().FirstOrDefault(), placeholderControl);
+        SongEntryControl item = new SongEntryControl(
+            songEntryUi.CloneTree().Children().FirstOrDefault(),
+            placeholderControl);
         injector.WithRootVisualElement(item.VisualElement).Inject(item);
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
-        item.SetSize(placeholderControl.GetSize());
-        item.SetPosition(placeholderControl.GetPosition());
         // item.StartAnimationToFullScale();
 
         item.Button.RegisterCallbackButtonTriggered(() => OnSongButtonClicked(songMeta));
@@ -282,19 +276,6 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         activeEntryPlaceholders.Sort(SongEntryPlaceholderControl.comparerByCenterDistance);
     }
 
-    private void UpdateRouletteItemsActiveState()
-    {
-        // foreach (RouletteItemPlaceholder item in rouletteItemPlaceholders)
-        // {
-        //     item.gameObject.SetActive(false);
-        // }
-        //
-        // foreach (RouletteItemPlaceholder item in activeEntryPlaceholders)
-        // {
-        //     item.gameObject.SetActive(true);
-        // }
-    }
-
     public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
         int lastSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
@@ -314,7 +295,6 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
             Selection.Value = new SongSelection(songs[lastSelectedSongIndex], lastSelectedSongIndex, songs.Count);
             FindActiveRouletteItems();
-            UpdateRouletteItemsActiveState();
         }
         else
         {
@@ -363,6 +343,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
 
     private void ResetAnimationTimeTowardsTargetRouletteItem()
     {
+        songEntryControls.ForEach(it => it.StartAnimationTowardsTargetPlaceholder());
         // Animate towards target. Thereby, keep already finished part of previous animation.
         AnimTimeInSeconds = MaxAnimTimeInSeconds - AnimTimeInSeconds;
     }
@@ -466,7 +447,7 @@ public class SongRouletteController : MonoBehaviour, INeedInjection
         IsDrag = true;
         DragSongRouletteItem = songRouletteItem;
         songEntryControls.ForEach(it => it.StartAnimationTowardsTargetPlaceholder());
-        songPreviewController.StopSongPreview();
+        // songPreviewControl.StopSongPreview();
         
         // For velocity calculation
         dragStartPosition = songRouletteItem.GetPosition();
