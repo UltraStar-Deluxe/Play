@@ -5,12 +5,12 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UniRx;
-using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjection
+public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -23,27 +23,25 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     private static PlayerProfileToMicProfileMap lastPlayerProfileToMicProfileMap;
 
     [InjectedInInspector]
-    public SongSelectPlayerProfileListEntry listEntryPrefab;
-    
-    [InjectedInInspector]
-    public GameObject scrollViewContent;
+    public VisualTreeAsset playerEntryUi;
 
-    private readonly List<SongSelectPlayerProfileListEntry> listEntries = new List<SongSelectPlayerProfileListEntry>();
-    public List<SongSelectPlayerProfileListEntry> PlayerProfileControls => listEntries;
+    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
+    public VisualElement playerScrollView;
 
-    public SongSelectPlayerProfileListEntry FocusedPlayerProfileControl => PlayerProfileControls
-        .FirstOrDefault(it => eventSystem.currentSelectedGameObject == it.isSelectedToggle.gameObject);
+    private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new List<SongSelectPlayerEntryControl>();
+    public List<SongSelectPlayerEntryControl> PlayerEntryControlControl => playerEntryControls;
 
-    public int FocusedPlayerProfileControlIndex => PlayerProfileControls.IndexOf(FocusedPlayerProfileControl);
-    
-    [Inject]
-    private EventSystem eventSystem;
-    
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
     
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private SongRouletteControl songRouletteControl;
 
     void Start()
     {
@@ -81,11 +79,8 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
     private void UpdateListEntries()
     {
         // Remove old entries
-        foreach (Transform child in scrollViewContent.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        listEntries.Clear();
+        playerScrollView.Clear();
+        playerEntryControls.Clear();
 
         // Create new entries
         List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
@@ -98,13 +93,17 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
 
     private void CreateListEntry(PlayerProfile playerProfile)
     {
-        SongSelectPlayerProfileListEntry listEntry = Instantiate(listEntryPrefab, scrollViewContent.transform);
-        listEntry.Init(playerProfile);
+        VisualElement playerEntryVisualElement = playerEntryUi.CloneTree().Children().FirstOrDefault();
+        playerScrollView.Add(playerEntryVisualElement);
 
-        listEntry.SetSelected(playerProfile.IsSelected);
-        listEntry.isSelectedToggle.OnValueChangedAsObservable().Subscribe(newValue => OnSelectionStatusChanged(listEntry, newValue));
+        SongSelectPlayerEntryControl listEntryControl = new SongSelectPlayerEntryControl(playerEntryVisualElement);
+        injector.WithRootVisualElement(playerEntryVisualElement).Inject(listEntryControl);
+        listEntryControl.Init(playerProfile);
 
-        listEntries.Add(listEntry);
+        listEntryControl.EnabledToggle.RegisterValueChangedCallback(evt => OnSelectionStatusChanged(listEntryControl, evt.newValue));
+        listEntryControl.SetSelected(playerProfile.IsSelected);
+
+        playerEntryControls.Add(listEntryControl);
     }
 
     private void UseMicProfileWhereNeeded(MicProfile micProfile)
@@ -115,25 +114,25 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
             return;
         }
         
-        SongSelectPlayerProfileListEntry listEntryWithMatchingMicProfile = listEntries.FirstOrDefault(it => 
+        SongSelectPlayerEntryControl listEntryControlWithMatchingMicProfile = playerEntryControls.FirstOrDefault(it =>
                it.MicProfile != null
             && it.MicProfile.ConnectedClientId == micProfile.ConnectedClientId);
-        if (listEntryWithMatchingMicProfile != null)
+        if (listEntryControlWithMatchingMicProfile != null)
         {
             // Already in use. Cannot be assign to other players.
             return;
         }
         
-        SongSelectPlayerProfileListEntry listEntryWithMissingMicProfile = listEntries.FirstOrDefault(it => it.PlayerProfile.IsSelected && it.MicProfile == null);
-        if (listEntryWithMissingMicProfile != null)
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfile = playerEntryControls.FirstOrDefault(it => it.PlayerProfile.IsSelected && it.MicProfile == null);
+        if (listEntryControlWithMissingMicProfile != null)
         {
-            listEntryWithMissingMicProfile.MicProfile = micProfile;
+            listEntryControlWithMissingMicProfile.MicProfile = micProfile;
         }
     }
     
     private void RemoveMicProfileFromListEntries(MicProfile micProfile)
     {
-        foreach (SongSelectPlayerProfileListEntry listEntry in listEntries)
+        foreach (SongSelectPlayerEntryControl listEntry in playerEntryControls)
         {
             if (listEntry.MicProfile != null
                 && listEntry.MicProfile.ConnectedClientId == micProfile.ConnectedClientId)
@@ -143,26 +142,26 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
         }
     }
     
-    private void OnSelectionStatusChanged(SongSelectPlayerProfileListEntry listEntry, bool newValue)
+    private void OnSelectionStatusChanged(SongSelectPlayerEntryControl listEntryControl, bool newValue)
     {
-        listEntry.PlayerProfile.IsSelected = newValue;
+        listEntryControl.PlayerProfile.IsSelected = newValue;
         if (newValue == false)
         {
-            listEntry.MicProfile = null;
+            listEntryControl.MicProfile = null;
         }
         else
         {
             List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
             if (!unusedMicProfiles.IsNullOrEmpty())
             {
-                listEntry.MicProfile = unusedMicProfiles[0];
+                listEntryControl.MicProfile = unusedMicProfiles[0];
             }
         }
     }
 
     private List<MicProfile> FindUnusedMicProfiles()
     {
-        List<MicProfile> usedMicProfiles = listEntries.Where(it => it.MicProfile != null)
+        List<MicProfile> usedMicProfiles = playerEntryControls.Where(it => it.MicProfile != null)
             .Select(it => it.MicProfile)
             .ToList();
         List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles
@@ -176,31 +175,31 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
 
     public List<PlayerProfile> GetSelectedPlayerProfiles()
     {
-        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
-        List<PlayerProfile> result = listEntriesInScrollView.Where(it => it.IsSelected).Select(it => it.PlayerProfile).ToList();
+        List<PlayerProfile> result = playerEntryControls
+            .Where(it => it.IsSelected)
+            .Select(it => it.PlayerProfile)
+            .ToList();
         return result;
     }
 
     public PlayerProfileToMicProfileMap GetSelectedPlayerProfileToMicProfileMap()
     {
         PlayerProfileToMicProfileMap result = new PlayerProfileToMicProfileMap();
-        SongSelectPlayerProfileListEntry[] listEntries = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
-        foreach (SongSelectPlayerProfileListEntry entry in listEntries)
+        playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected && entry.MicProfile != null)
             {
                 result.Add(entry.PlayerProfile, entry.MicProfile);
             }
-        }
+        });
         return result;
     }
 
     public void ToggleSelectedPlayers()
     {
-        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
-        List<SongSelectPlayerProfileListEntry> deselectedEntries = new List<SongSelectPlayerProfileListEntry>();
+        List<SongSelectPlayerEntryControl> deselectedEntries = new List<SongSelectPlayerEntryControl>();
         // First deactivate the selected ones to make their mics available for others.
-        foreach (SongSelectPlayerProfileListEntry entry in listEntriesInScrollView)
+        playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected)
             {
@@ -210,10 +209,10 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
             {
                 deselectedEntries.Add(entry);
             }
-        }
+        });
         // Second activate the ones that were deselected.
         // Because others have been deselected, they will be assigned free mics if any.
-        foreach (SongSelectPlayerProfileListEntry entry in deselectedEntries)
+        foreach (SongSelectPlayerEntryControl entry in deselectedEntries)
         {
             entry.SetSelected(true);
         }
@@ -227,7 +226,6 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
         }
 
         // Restore the previously assigned microphones
-        SongSelectPlayerProfileListEntry[] listEntriesInScrollView = scrollViewContent.GetComponentsInChildren<SongSelectPlayerProfileListEntry>();
         foreach (KeyValuePair<PlayerProfile, MicProfile> playerProfileAndMicProfileEntry in lastPlayerProfileToMicProfileMap)
         {
             PlayerProfile playerProfile = playerProfileAndMicProfileEntry.Key;
@@ -240,20 +238,20 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
                 continue;
             }
 
-            foreach (SongSelectPlayerProfileListEntry listEntry in listEntriesInScrollView)
+            playerEntryControls.ForEach(entry =>
             {
-                if (listEntry.PlayerProfile == playerProfile)
+                if (entry.PlayerProfile == playerProfile)
                 {
                     // Select the mic for this player
-                    listEntry.MicProfile = lastUsedMicProfile;
+                    entry.MicProfile = lastUsedMicProfile;
                 }
-                else if (listEntry.IsSelected
-                         && listEntry.MicProfile == lastUsedMicProfile)
+                else if (entry.IsSelected
+                         && entry.MicProfile == lastUsedMicProfile)
                 {
                     // Deselect lastUsedMicProfile from other player.
-                    listEntry.MicProfile = null;
+                    entry.MicProfile = null;
                 }
-            }
+            });
         }
     }
 
@@ -263,43 +261,61 @@ public class SongSelectPlayerProfileListController : MonoBehaviour, INeedInjecti
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
     }
 
-    public bool TrySelectNextControl()
-    {
-        if ((eventSystem.currentSelectedGameObject == null
-            || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerProfileListEntry>() == null)
-            && PlayerProfileControls.Count > 0)
-        {
-            PlayerProfileControls.First().isSelectedToggle.Select();
-            return true;
-        }
-            
-        SongSelectPlayerProfileListEntry nextEntry = PlayerProfileControls.GetElementAfter(FocusedPlayerProfileControl, false);
-        if (nextEntry != null)
-        {
-            nextEntry.isSelectedToggle.Select();
-            return true;
-        }
+    // public bool TrySelectNextControl()
+    // {
+    //     if ((eventSystem.currentSelectedGameObject == null
+    //         || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerEntryControl>() == null)
+    //         && PlayerEntryControlControl.Count > 0)
+    //     {
+    //         PlayerEntryControlControl.First().isSelectedToggle.Select();
+    //         return true;
+    //     }
+    //
+    //     SongSelectPlayerEntryControl nextEntryControl = PlayerEntryControlControl.GetElementAfter(FocusedPlayerEntryControl, false);
+    //     if (nextEntryControl != null)
+    //     {
+    //         nextEntryControl.isSelectedToggle.Select();
+    //         return true;
+    //     }
+    //
+    //     return false;
+    // }
+    //
+    // public bool TrySelectPreviousControl()
+    // {
+    //     if ((eventSystem.currentSelectedGameObject == null
+    //         || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerEntryControl>() == null)
+    //         && PlayerEntryControlControl.Count > 0)
+    //     {
+    //         PlayerEntryControlControl.Last().isSelectedToggle.Select();
+    //         return true;
+    //     }
+    //
+    //     SongSelectPlayerEntryControl nextEntryControl = PlayerEntryControlControl.GetElementBefore(FocusedPlayerEntryControl, false);
+    //     if (nextEntryControl != null)
+    //     {
+    //         nextEntryControl.isSelectedToggle.Select();
+    //         return true;
+    //     }
+    //
+    //     return false;
+    // }
 
-        return false;
-    }
-    
-    public bool TrySelectPreviousControl()
+    public void HideVoiceSelection()
     {
-        if ((eventSystem.currentSelectedGameObject == null
-            || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerProfileListEntry>() == null)
-            && PlayerProfileControls.Count > 0)
+        playerEntryControls.ForEach(entry =>
         {
-            PlayerProfileControls.Last().isSelectedToggle.Select();
-            return true;
-        }
-        
-        SongSelectPlayerProfileListEntry nextEntry = PlayerProfileControls.GetElementBefore(FocusedPlayerProfileControl, false);
-        if (nextEntry != null)
+            entry.HideVoiceSelection();
+        });
+    }
+
+    public void ShowVoiceSelection(SongMeta selectedSong)
+    {
+        int voiceIndex = 0;
+        playerEntryControls.ForEach(entry =>
         {
-            nextEntry.isSelectedToggle.Select();
-            return true;
-        }
-        
-        return false;
+            entry.ShowVoiceSelection(selectedSong, voiceIndex);
+            voiceIndex = (voiceIndex + 1) % selectedSong.VoiceNames.Count;
+        });
     }
 }

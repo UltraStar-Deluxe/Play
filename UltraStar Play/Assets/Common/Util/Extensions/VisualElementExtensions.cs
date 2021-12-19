@@ -25,6 +25,11 @@ public static class VisualElementExtensions
         });
     }
 
+    public static bool IsVisibleByDisplay(this VisualElement visualElement)
+    {
+        return visualElement.style.display != DisplayStyle.None;
+    }
+
     public static void SetVisibleByDisplay(this VisualElement visualElement, bool isVisible)
     {
         if (isVisible)
@@ -45,6 +50,11 @@ public static class VisualElementExtensions
     public static void HideByDisplay(this VisualElement visualElement)
     {
         visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+    }
+
+    public static bool IsVisibleByVisibility(this VisualElement visualElement)
+    {
+        return visualElement.style.visibility != Visibility.Hidden;
     }
 
     public static void SetVisibleByVisibility(this VisualElement visualElement, bool isVisible)

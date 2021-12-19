@@ -183,4 +183,24 @@ public static class SongMetaUtils
 
         Application.OpenURL("file://" + songMeta.Directory);
     }
+
+    public static string GetLyrics(SongMeta songMeta, string voiceName)
+    {
+        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.Name == voiceName);
+        if (voice == null)
+        {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        voice.Sentences.ForEach(sentence =>
+        {
+            sentence.Notes.ForEach(note =>
+            {
+                sb.Append(note.Text);
+            });
+            sb.Append("\n");
+        });
+        return sb.ToString();
+    }
 }
