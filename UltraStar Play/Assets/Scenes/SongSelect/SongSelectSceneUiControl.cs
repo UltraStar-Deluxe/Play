@@ -56,6 +56,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
 
+    [InjectedInInspector]
+    public SongSelectPlayerListControl playerListControl;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -104,7 +107,20 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.fuzzySearchTextLabel)]
     private Label fuzzySearchTextLabel;
 
-    public SongSelectPlayerProfileListController playerProfileListController;
+    [Inject(UxmlName = R.UxmlNames.playerSelectOverlayContainer)]
+    private VisualElement playerSelectOverlayContainer;
+
+    [Inject(UxmlName = R.UxmlNames.closePlayerSelectOverlayButton)]
+    private Button closePlayerSelectOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.leftLyricsOverlay)]
+    private VisualElement leftLyricsOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.rightLyricsOverlay)]
+    private VisualElement rightLyricsOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.startButton)]
+    private Button startButton;
 
     private SearchInputField searchTextInputField;
 
@@ -177,10 +193,16 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
 
+        closePlayerSelectOverlayButton.RegisterCallbackButtonTriggered(() => HidePlayerSelectOverlay());
+
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
         InitSongRoulette();
+
+        HidePlayerSelectOverlay();
+
+        startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
     }
 
     private void UpdateFavoriteIcon()
@@ -355,7 +377,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         SingSceneData singSceneData = new SingSceneData();
         singSceneData.SelectedSongMeta = songMeta;
 
-        List<PlayerProfile> selectedPlayerProfiles = playerProfileListController.GetSelectedPlayerProfiles();
+        List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
             UiManager.Instance.CreateWarningDialog(
@@ -365,7 +387,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
-        PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerProfileListController.GetSelectedPlayerProfileToMicProfileMap();
+        PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
         singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
         return singSceneData;
     }
@@ -422,8 +444,17 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public void CheckAudioAndStartSingScene()
     {
-        if (SelectedSong != null)
+        if (playerSelectOverlayContainer.IsVisibleByDisplay())
         {
+            StartSingScene(SelectedSong);
+        }
+        else
+        {
+            if (SelectedSong == null)
+            {
+                return;
+            }
+
             // Check that the audio file exists
             string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
             if (!File.Exists(audioPath))
@@ -440,8 +471,38 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
                 return;
             }
 
-            StartSingScene(SelectedSong);
+            ShowPlayerSelectOverlay();
         }
+    }
+
+    private void ShowPlayerSelectOverlay()
+    {
+        playerSelectOverlayContainer.ShowByDisplay();
+
+        // Show lyrics for duet song
+        bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
+        leftLyricsOverlay.SetVisibleByDisplay(hasMultipleVoices);
+        rightLyricsOverlay.SetVisibleByDisplay(hasMultipleVoices);
+        if (hasMultipleVoices)
+        {
+            List<string> voiceNames = SelectedSong.VoiceNames.Values.ToList();
+            leftLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[0];
+            leftLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, SelectedSong.VoiceNames[Voice.firstVoiceName]);
+
+            rightLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[1];
+            rightLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, SelectedSong.VoiceNames[Voice.secondVoiceName]);
+
+            playerListControl.ShowVoiceSelection(SelectedSong);
+        }
+        else
+        {
+            playerListControl.HideVoiceSelection();
+        }
+    }
+
+    private void HidePlayerSelectOverlay()
+    {
+        playerSelectOverlayContainer.HideByDisplay();
     }
 
     public void StartSongEditorScene()
@@ -562,7 +623,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public void ToggleSelectedPlayers()
     {
-        playerProfileListController.ToggleSelectedPlayers();
+        playerListControl.ToggleSelectedPlayers();
     }
 
     public List<IBinding> GetBindings()
@@ -575,7 +636,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(orderSlider);
         bb.BindExistingInstance(characterQuickJumpBar);
-        bb.BindExistingInstance(playerProfileListController);
+        bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(songSelectSceneControlNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
