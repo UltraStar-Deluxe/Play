@@ -5,40 +5,50 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UniRx;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection
+public class SongSelectMicListControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
-    public SongSelectMicListEntry listEntryPrefab;
-    
+    public VisualTreeAsset listEntryUi;
+
     [InjectedInInspector]
-    public GameObject scrollViewContent;
-    
-    [InjectedInInspector]
-    public GameObject emptyListLabel;
+    public MicPitchTracker micPitchTrackerPrefab;
+
+    [Inject(UxmlName = R.UxmlNames.micScrollView)]
+    private VisualElement micScrollView;
+
+    [Inject(UxmlName = R.UxmlNames.noMicsFoundLabel)]
+    private VisualElement noMicsFoundLabel;
 
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private readonly List<SongSelectMicListEntry> listEntries = new List<SongSelectMicListEntry>();
+    private readonly List<SongSelectMicEntryControl> listEntryControls = new List<SongSelectMicEntryControl>();
 
-    void Start()
+    private void Start()
     {
+        micScrollView.Clear();
         UpdateListEntries();
-        
+
         // Remove/add MicProfile when Client (dis)connects.
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(HandleClientConnectedEvent)
             .AddTo(gameObject);
+    }
+
+    private void Update()
+    {
+        listEntryControls.ForEach(entry => entry.UpdateWaveForm());
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -50,46 +60,39 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
             micProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, connectionEvent.ConnectedClientHandler.ClientId);
             settings.MicProfiles.Add(micProfile);
         }
-        
-        SongSelectMicListEntry matchingListEntry = listEntries.FirstOrDefault(listEntry => 
+
+        SongSelectMicEntryControl matchingEntryControl = listEntryControls.FirstOrDefault(listEntry =>
                listEntry.MicProfile != null
             && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId
             && listEntry.MicProfile.IsEnabled);
-        if (connectionEvent.IsConnected && matchingListEntry == null && micProfile.IsEnabled)
+        if (connectionEvent.IsConnected && matchingEntryControl == null && micProfile.IsEnabled)
         {
             // Add to UI
             CreateListEntry(micProfile);
+            noMicsFoundLabel.HideByDisplay();
         }
-        else if (!connectionEvent.IsConnected && matchingListEntry != null)
+        else if (!connectionEvent.IsConnected && matchingEntryControl != null)
         {
             // Remove from UI
-            RemoveListEntry(matchingListEntry);
+            RemoveListEntry(matchingEntryControl);
         }
-    }
-
-    public void OnHotSwapFinished()
-    {
-        UpdateListEntries();
     }
 
     private void UpdateListEntries()
     {
         // Remove old entries
-        foreach (Transform child in scrollViewContent.transform)
-        {
-            Destroy(child.gameObject);
-        }
+        new List<SongSelectMicEntryControl>(listEntryControls).ForEach(entry => RemoveListEntry(entry));
 
         // Create new entries
         List<MicProfile> micProfiles = settings.MicProfiles;
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles.Where(it => it.IsEnabled && it.IsConnected).ToList();
         if (enabledAndConnectedMicProfiles.IsNullOrEmpty())
         {
-            emptyListLabel.SetActive(true);
+            noMicsFoundLabel.ShowByDisplay();
         }
         else
         {
-            emptyListLabel.SetActive(false);
+            noMicsFoundLabel.HideByDisplay();
             foreach (MicProfile micProfile in enabledAndConnectedMicProfiles)
             {
                 CreateListEntry(micProfile);
@@ -99,22 +102,27 @@ public class SongSelectMicListController : MonoBehaviour, IOnHotSwapFinishedList
 
     private void CreateListEntry(MicProfile micProfile)
     {
-        SongSelectMicListEntry listEntry = Instantiate(listEntryPrefab, scrollViewContent.transform);
-        injector.InjectAllComponentsInChildren(listEntry);
-        listEntry.MicProfile = micProfile;
+        VisualElement visualElement = listEntryUi.CloneTree().Children().FirstOrDefault();
+        micScrollView.Add(visualElement);
 
-        listEntries.Add(listEntry);
-        
-        emptyListLabel.SetActive(false);
+        MicPitchTracker micPitchTracker = Instantiate(micPitchTrackerPrefab, gameObject.transform);
+        injector.InjectAllComponentsInChildren(micPitchTracker);
+        micPitchTracker.MicProfile = micProfile;
+        micPitchTracker.MicSampleRecorder.StartRecording();
+
+        SongSelectMicEntryControl entryControl = new SongSelectMicEntryControl(gameObject, visualElement, micPitchTracker);
+        injector.WithRootVisualElement(visualElement).Inject(entryControl);
+        entryControl.MicProfile = micProfile;
+        listEntryControls.Add(entryControl);
     }
 
-    private void RemoveListEntry(SongSelectMicListEntry listEntry)
+    private void RemoveListEntry(SongSelectMicEntryControl entryControl)
     {
-        Destroy(listEntry.gameObject);
-        listEntries.Remove(listEntry);
-        if (listEntries.IsNullOrEmpty())
+        entryControl.Destroy();
+        listEntryControls.Remove(entryControl);
+        if (listEntryControls.IsNullOrEmpty())
         {
-            emptyListLabel.SetActive(true);
+            noMicsFoundLabel.ShowByDisplay();
         }
     }
 }
