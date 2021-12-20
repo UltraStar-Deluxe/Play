@@ -13,7 +13,6 @@ public static partial class R
         public const string appOptionsButton = "appOptionsButton";
         public const string artistLabel = "artistLabel";
         public const string audioWaveForm = "audioWaveForm";
-        public const string audioWwaveForm = "audioWwaveForm";
         public const string avatarPicker = "avatarPicker";
         public const string b = "b";
         public const string backButton = "backButton";
@@ -135,6 +134,7 @@ public static partial class R
         public const string nextItemLabel = "nextItemLabel";
         public const string nextSongButtom = "nextSongButtom";
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
+        public const string noMicsFoundLabel = "noMicsFoundLabel";
         public const string normalNoteScore = "normalNoteScore";
         public const string noSongsFoundLabel = "noSongsFoundLabel";
         public const string notConnectedContainer = "notConnectedContainer";

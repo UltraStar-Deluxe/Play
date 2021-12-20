@@ -78,4 +78,26 @@ public static class VisualElementExtensions
     {
         visualElement.style.visibility = new StyleEnum<Visibility>(Visibility.Hidden);
     }
+
+    /**
+     * Executes the given callback at most once when the event occurs.
+     */
+    public static void RegisterCallbackOneShot<TEventType>(
+        this VisualElement visualElement,
+        EventCallback<TEventType> callback,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
+        where TEventType : EventBase<TEventType>, new()
+    {
+        bool wasExecuted = false;
+        void RunCallbackIfNotDoneYet(TEventType evt)
+        {
+            if (!wasExecuted)
+            {
+                wasExecuted = true;
+                callback(evt);
+            }
+        }
+
+        visualElement.RegisterCallback<TEventType>(RunCallbackIfNotDoneYet, useTrickleDown);
+    }
 }

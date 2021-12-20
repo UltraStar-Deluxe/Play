@@ -8,24 +8,39 @@ using UnityEngine.UIElements;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicPitchTracker micPitchTracker;
+
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
-    public Label currentNoteLabel;
+    private Label currentNoteLabel;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
+    private VisualElement audioWaveForm;
+
     private AudioWaveFormVisualization audioWaveFormVisualization;
-
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    public MicPitchTracker micPitchTracker;
 
     private IDisposable pitchEventStreamDisposable;
 
-    void Update()
+    private void Start()
+    {
+        audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);
+        });
+    }
+
+    private void Update()
     {
         UpdateWaveForm();
     }
 
     private void UpdateWaveForm()
     {
+        if (audioWaveFormVisualization == null)
+        {
+            return;
+        }
+
         MicProfile micProfile = micPitchTracker.MicProfile;
         if (micProfile == null)
         {

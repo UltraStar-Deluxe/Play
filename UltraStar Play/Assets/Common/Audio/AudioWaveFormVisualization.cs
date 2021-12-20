@@ -1,38 +1,26 @@
 ﻿using System;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AudioWaveFormVisualization : MonoBehaviour, INeedInjection
+public class AudioWaveFormVisualization : INeedInjection
 {
     public Color waveformColor = Color.white;
 
-    [InjectedInInspector]
-    public DynamicTexture dynTexture;
+    private readonly DynamicTexture dynTexture;
 
-    [InjectedInInspector]
-    public string visualElementName;
-
-    public void Awake()
+    public AudioWaveFormVisualization(GameObject gameObject, VisualElement visualElement)
     {
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
-        VisualElement visualElement = uiDocument.rootVisualElement.Q<VisualElement>(visualElementName);
-        if (visualElement == null)
-        {
-            Debug.LogWarning($"No visualElement found with name {visualElementName}");
-            return;
-        }
-        
-        visualElement.RegisterCallback<GeometryChangedEvent>(_ =>
-        {
-            if (!dynTexture.IsInitialized)
-            {
-                dynTexture.Init(visualElement);
-            }
-        });
+        dynTexture = new DynamicTexture(gameObject, visualElement);
     }
-    
+
+    public void Destroy()
+    {
+        dynTexture.Destroy();
+    }
+
     public void DrawWaveFormMinAndMaxValues(AudioClip audioClip)
     {
         if (audioClip == null || audioClip.samples == 0)
@@ -78,7 +66,7 @@ public class AudioWaveFormVisualization : MonoBehaviour, INeedInjection
 
     public void DrawWaveFormMinAndMaxValues(float[] samples)
     {
-        if (samples == null || samples.Length == 0
+        if (samples.IsNullOrEmpty()
             || !dynTexture.IsInitialized)
         {
             return;
