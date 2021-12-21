@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UniRx;
@@ -10,7 +11,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectMicListControl : MonoBehaviour, INeedInjection
+public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset listEntryUi;
@@ -22,7 +23,7 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection
     private VisualElement micScrollView;
 
     [Inject(UxmlName = R.UxmlNames.noMicsFoundLabel)]
-    private VisualElement noMicsFoundLabel;
+    private Label noMicsFoundLabel;
 
     [Inject]
     private Injector injector;
@@ -34,6 +35,7 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     private readonly List<SongSelectMicEntryControl> listEntryControls = new List<SongSelectMicEntryControl>();
+    public IReadOnlyList<SongSelectMicEntryControl> MicEntryControls => listEntryControls;
 
     private void Start()
     {
@@ -124,5 +126,14 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection
         {
             noMicsFoundLabel.ShowByDisplay();
         }
+    }
+
+    public void UpdateTranslation()
+    {
+        if (!Application.isPlaying && noMicsFoundLabel == null)
+        {
+            SceneInjectionManager.Instance.DoInjection();
+        }
+        noMicsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noMicsFound);
     }
 }

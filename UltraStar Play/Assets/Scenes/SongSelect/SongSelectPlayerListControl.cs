@@ -29,7 +29,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     public VisualElement playerScrollView;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new List<SongSelectPlayerEntryControl>();
-    public List<SongSelectPlayerEntryControl> PlayerEntryControlControl => playerEntryControls;
+    public List<SongSelectPlayerEntryControl> PlayerEntryControlControls => playerEntryControls;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;

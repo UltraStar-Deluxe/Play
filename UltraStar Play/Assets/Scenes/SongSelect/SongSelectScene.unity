@@ -238,6 +238,7 @@ MonoBehaviour:
   songSelectSceneControlNavigator: {fileID: 2131434058}
   songPreviewControl: {fileID: 974432510}
   playerListControl: {fileID: 922159446}
+  micListControl: {fileID: 1127310616}
 --- !u!4 &620408750
 Transform:
   m_ObjectHideFlags: 0
