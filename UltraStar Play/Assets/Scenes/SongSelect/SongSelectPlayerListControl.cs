@@ -195,6 +195,22 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
+    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceNameMap()
+    {
+        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new Dictionary<PlayerProfile,string>();
+        playerEntryControls.ForEach(entry =>
+        {
+            if (entry.IsSelected)
+            {
+                string voiceName = entry.Voice != null
+                    ? entry.Voice.Name
+                    : Voice.soloVoiceName;
+                selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
+            }
+        });
+        return selectedPlayerProfileToVoiceNameMap;
+    }
+
     public void ToggleSelectedPlayers()
     {
         List<SongSelectPlayerEntryControl> deselectedEntries = new List<SongSelectPlayerEntryControl>();

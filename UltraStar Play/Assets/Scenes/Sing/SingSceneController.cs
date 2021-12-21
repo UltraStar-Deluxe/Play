@@ -396,15 +396,18 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
         List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Keys);
         int voiceNameCount = voiceNames.Count;
-        if (voiceNameCount > 1)
-        {
-            int voiceIndex = (SceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNameCount);
-            return voiceNames[voiceIndex];
-        }
-        else
+        if (voiceNameCount <= 1)
         {
             return Voice.soloVoiceName;
         }
+
+        if (sceneData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
+        {
+            return voiceName;
+        }
+
+        int voiceIndex = SceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
+        return voiceNames[voiceIndex];
     }
 
     public void TogglePlayPause()
