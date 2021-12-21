@@ -49,6 +49,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
+            .Where(_ => !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneUiControl.OnRandomSong());
         
         // Open the song editor
@@ -57,6 +58,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Toggle selected players
         InputManager.GetInputAction(R.InputActions.usplay_togglePlayers).PerformedAsObservable()
+            .Where(_ => songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedPlayers());
         
         // Open the sing scene
@@ -74,6 +76,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        {
+            return;
+        }
+
         if (songSelectSceneUiControl.IsSearchEnabled()
             && songSelectSceneUiControl.IsSearchTextInputHasFocus())
         {
@@ -92,6 +99,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        {
+            return;
+        }
+
         if (context.ReadValue<Vector2>().y < 0) 
         {
             songRouletteControl.SelectNextSong();
@@ -103,7 +115,12 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     }
 
     private void OnNavigate(InputAction.CallbackContext context)
-    {   
+    {
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        {
+            return;
+        }
+
         if (context.ReadValue<Vector2>().x > 0) 
         {
             songRouletteControl.SelectNextSong();
@@ -125,7 +142,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneUiControl.IsSearchEnabled())
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        {
+            songSelectSceneUiControl.HidePlayerSelectOverlay();
+        }
+        else if (songSelectSceneUiControl.IsSearchEnabled())
         {
             songSelectSceneUiControl.DisableSearch();
         }
