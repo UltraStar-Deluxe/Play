@@ -59,6 +59,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [InjectedInInspector]
     public SongSelectPlayerListControl playerListControl;
 
+    [InjectedInInspector]
+    public SongSelectMicListControl micListControl;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -446,6 +449,16 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         if (playerSelectOverlayContainer.IsVisibleByDisplay())
         {
+            StartSingScene(SelectedSong);
+        }
+        else if (SelectedSong.VoiceNames.Count <= 1
+                 && playerListControl.PlayerEntryControlControls.Count == 1
+                 && micListControl.MicEntryControls.Count == 1)
+        {
+            // There is one mic for only one player and only one voice to sing.
+            // Thus, there is no choice to make and the song can be started immediately.
+            playerListControl.PlayerEntryControlControls[0].MicProfile = micListControl.MicEntryControls[0].MicProfile;
+            playerListControl.PlayerEntryControlControls[0].SetSelected(true);
             StartSingScene(SelectedSong);
         }
         else

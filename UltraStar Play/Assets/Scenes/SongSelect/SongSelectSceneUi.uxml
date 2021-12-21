@@ -111,7 +111,7 @@
         <ui:VisualElement name="menuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: none;">
             <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" />
         </ui:VisualElement>
-        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: flex;">
+        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: flex; background-color: rgba(32, 32, 32, 0.5);">
             <ui:VisualElement name="playerSelectOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
                 <ui:VisualElement name="buttonRow" style="flex-direction: row;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />
@@ -125,7 +125,7 @@
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="micScrollView" style="width: 90%; flex-grow: 1;">
                     <ui:Instance template="SongSelectSceneMicEntryUi" name="micEntry" />
                 </ui:ScrollView>
-                <ui:Label text="No microphone found" display-tooltip-when-elided="true" name="noMicsFoundLabel" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; display: none; flex-wrap: wrap;" />
+                <ui:Label text="No microphone found" display-tooltip-when-elided="true" name="noMicsFoundLabel" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; display: none; white-space: normal;" />
             </ui:VisualElement>
             <ui:VisualElement name="controlLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgb(32, 32, 32); height: auto;">
                 <ui:Label text="Y: Toggle Players&#10;" display-tooltip-when-elided="true" name="buttonDescription" />
