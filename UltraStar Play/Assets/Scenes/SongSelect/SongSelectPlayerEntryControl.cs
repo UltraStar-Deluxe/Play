@@ -46,6 +46,10 @@ public class SongSelectPlayerEntryControl : INeedInjection
         }
     }
 
+    public Voice Voice => voiceChooserControl.ItemPicker.IsVisibleByDisplay()
+        ? voiceChooserControl.Selection.Value
+        : null;
+
     public bool IsSelected
     {
         get

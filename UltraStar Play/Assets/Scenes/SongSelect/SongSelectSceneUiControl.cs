@@ -387,8 +387,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
-        PlayerProfileToMicProfileMap playerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singSceneData.PlayerProfileToMicProfileMap = playerProfileToMicProfileMap;
+        singSceneData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
+        singSceneData.PlayerProfileToVoiceNameMap = playerListControl.GetSelectedPlayerProfileToVoiceNameMap();
         return singSceneData;
     }
 
