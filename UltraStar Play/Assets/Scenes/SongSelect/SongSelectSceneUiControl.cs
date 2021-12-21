@@ -65,6 +65,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private UiManager uiManager;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -149,6 +152,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     private PlaylistChooserControl playlistChooserControl;
 
+    public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
 
     private SongMeta SelectedSong
     {
@@ -383,9 +387,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateWarningDialog(
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title),
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+            uiManager.CreateNotificationVisualElement(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
         singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
@@ -511,9 +513,13 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         {
             playerListControl.HideVoiceSelection();
         }
+
+        // Focus start button, such that it can be triggered by keyboard
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+            playerSelectOverlayContainer.Q<Button>(R.UxmlNames.startButton).Focus()));
     }
 
-    private void HidePlayerSelectOverlay()
+    public void HidePlayerSelectOverlay()
     {
         playerSelectOverlayContainer.HideByDisplay();
     }
