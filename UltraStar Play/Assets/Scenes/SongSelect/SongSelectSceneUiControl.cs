@@ -100,7 +100,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     private VisualElement videoIndicator;
 
     [Inject(UxmlName = R.UxmlNames.duetIcon)]
-    private VisualElement duetIndicator;
+    private VisualElement duetIcon;
 
     [Inject(UxmlName = R.UxmlNames.toggleFavoriteIcon)]
     private VisualElement favoriteIcon;
@@ -282,7 +282,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         videoIndicator.SetVisibleByVisibility(hasVideo);
 
         bool isDuet = selectedSong.VoiceNames.Count > 1;
-        duetIndicator.SetVisibleByVisibility(isDuet);
+        duetIcon.SetVisibleByVisibility(isDuet);
 
         UpdateFavoriteIcon();
 
@@ -440,8 +440,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         yearLabel.text = "";
         timesClearedLabel.text = "";
         timesCanceledLabel.text = "";
-        videoIndicator.SetVisibleByDisplay(false);
-        duetIndicator.SetVisibleByDisplay(false);
+        videoIndicator.HideByVisibility();
+        duetIcon.HideByVisibility();
         UpdateFavoriteIcon();
     }
 
