@@ -23,6 +23,7 @@ public static partial class R
         public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
         public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
         public const string backImage = "backImage";
+        public const string backToMainMenuButton = "backToMainMenuButton";
         public const string bottomButtonRow = "bottomButtonRow";
         public const string bottomContent = "bottomContent";
         public const string bottomRow = "bottomRow";
@@ -34,7 +35,9 @@ public static partial class R
         public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
         public const string centerContent = "centerContent";
+        public const string characterButton = "characterButton";
         public const string characterContainer = "characterContainer";
+        public const string characterLabel = "characterLabel";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
@@ -98,6 +101,7 @@ public static partial class R
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
         public const string imageAsCursorContainer = "imageAsCursorContainer";
+        public const string innerMenuOverlay = "innerMenuOverlay";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string itemIndexLabel = "itemIndexLabel";
@@ -128,7 +132,7 @@ public static partial class R
         public const string nameTextField = "nameTextField";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
         public const string newVersionDialogRoot = "newVersionDialogRoot";
-        public const string nextCharacterButtom = "nextCharacterButtom";
+        public const string nextCharacterButton = "nextCharacterButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
@@ -164,7 +168,7 @@ public static partial class R
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";
         public const string previewVolumeLabel = "previewVolumeLabel";
-        public const string previousCharacterButtom = "previousCharacterButtom";
+        public const string previousCharacterButton = "previousCharacterButton";
         public const string previousItemButton = "previousItemButton";
         public const string previousSongButtom = "previousSongButtom";
         public const string profileList = "profileList";

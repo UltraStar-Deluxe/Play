@@ -181,8 +181,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158966a929f7d5c4d9079f5b306ff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarImages:
-  - {fileID: 2800000, guid: 2b09f4367842bc1418c7062bfe03f99a, type: 3}
   notificationOverlayVisualTreeAsset: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
     type: 3}
   notificationVisualTreeAsset: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
@@ -2299,7 +2297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fabe7a13319057e43beb904c265073b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  invertY: 1
+  invertY: 0
 --- !u!1 &7070348881094510554
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,7 +49,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public OrderSlider orderSlider;
 
     [InjectedInInspector]
-    public CharacterQuickJumpBar characterQuickJumpBar;
+    public CharacterQuickJumpListControl characterQuickJumpListControl;
     
     [InjectedInInspector]
     public SongSelectSceneControlNavigator songSelectSceneControlNavigator;
@@ -68,6 +68,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
@@ -131,6 +134,18 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
+
+    [Inject(UxmlName = R.UxmlNames.menuButton)]
+    private Button menuButton;
+
+    [Inject(UxmlName = R.UxmlNames.menuOverlay)]
+    private VisualElement menuOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.closeMenuOverlayButton)]
+    private Button closeMenuOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
+    private Button backToMainMenuButton;
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
@@ -214,6 +229,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         searchTextField.RegisterValueChangedCallback(evt => OnSearchTextChanged());
 
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+
+        menuButton.RegisterCallbackButtonTriggered(() => menuOverlay.ShowByDisplay());
+        closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => menuOverlay.HideByDisplay());
+        backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
     }
 
     private void UpdateFavoriteIcon()
@@ -640,7 +659,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(orderSlider);
-        bb.BindExistingInstance(characterQuickJumpBar);
+        bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(songSelectSceneControlNavigator);
         bb.BindExistingInstance(songPreviewControl);
@@ -728,27 +747,27 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         SongMeta match = GetFilteredSongMetas()
             .Where(songMeta =>
             {
-                string relevantString;
-                if (orderSlider.SelectedItem == ESongOrder.Title)
-                {
-                    relevantString = songMeta.Title;
-                }
-                else if (orderSlider.SelectedItem == ESongOrder.Genre)
-                {
-                    relevantString = songMeta.Genre;
-                }
-                else if (orderSlider.SelectedItem == ESongOrder.Language)
-                {
-                    relevantString = songMeta.Language;
-                }
-                else if (orderSlider.SelectedItem == ESongOrder.Folder)
-                {
-                    relevantString = songMeta.Directory + "/" + songMeta.Filename;
-                }
-                else
-                {
-                    relevantString = songMeta.Artist;
-                }
+                string relevantString = songMeta.Artist;
+                // if (orderSlider.SelectedItem == ESongOrder.Title)
+                // {
+                //     relevantString = songMeta.Title;
+                // }
+                // else if (orderSlider.SelectedItem == ESongOrder.Genre)
+                // {
+                //     relevantString = songMeta.Genre;
+                // }
+                // else if (orderSlider.SelectedItem == ESongOrder.Language)
+                // {
+                //     relevantString = songMeta.Language;
+                // }
+                // else if (orderSlider.SelectedItem == ESongOrder.Folder)
+                // {
+                //     relevantString = songMeta.Directory + "/" + songMeta.Filename;
+                // }
+                // else
+                // {
+                //     relevantString = songMeta.Artist;
+                // }
                 return !relevantString.IsNullOrEmpty()
                     && matchPredicate.Invoke(relevantString.ToLowerInvariant()[0]);
             })
