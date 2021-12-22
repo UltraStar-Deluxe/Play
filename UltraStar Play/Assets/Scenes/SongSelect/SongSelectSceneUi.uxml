@@ -28,7 +28,7 @@
                 <ui:Button text="R2 &gt;" display-tooltip-when-elided="true" name="nextCharacterButtom" class="transparentBackgroundColor characterQuickJumpCharacterButton" style="width: 25px; height: 100%;" />
             </ui:VisualElement>
             <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
-                <ui:TextField picking-mode="Ignore" text="Search title, artist, ..." name="searchTextField" style="align-items: center; height: 90%;" />
+                <ui:TextField picking-mode="Ignore" name="searchTextField" text="Search title, artist, ..." style="align-items: center; height: 90%; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="transparentBackgroundColor" style="width: 30px; height: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
                     <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/search_white_24dp.svg?fileID=7388822144124034973&amp;guid=5d5fa5a06c7029f47be8b6566e1806ad&amp;type=3#search_white_24dp&apos;); width: 100%; height: 100%;" />
                 </ui:Button>
@@ -111,7 +111,7 @@
         <ui:VisualElement name="menuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: none;">
             <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" />
         </ui:VisualElement>
-        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: flex; background-color: rgba(32, 32, 32, 0.5);">
+        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
             <ui:VisualElement name="playerSelectOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
                 <ui:VisualElement name="buttonRow" style="flex-direction: row;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />

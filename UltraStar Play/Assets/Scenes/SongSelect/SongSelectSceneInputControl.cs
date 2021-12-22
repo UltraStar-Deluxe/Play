@@ -31,10 +31,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     
     void Start()
     {
-        // Toggle Search
-        InputManager.GetInputAction(R.InputActions.usplay_toggleSearch).PerformedAsObservable()
-            .Subscribe(_ => ToggleSearch());
-        
         // Toggle song is favorite
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedSongIsFavorite());
@@ -81,11 +77,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (songSelectSceneUiControl.IsSearchEnabled()
-            && songSelectSceneUiControl.IsSearchTextInputHasFocus())
+        if (songSelectSceneUiControl.IsSearchTextFieldFocused())
         {
-            // Close search
-            songSelectSceneUiControl.DisableSearch();
+            // Remove focus
+            songSelectSceneUiControl.SubmitSearch();
         }
         else if (IsNoControlOrSongButtonFocused())
         {
@@ -146,9 +141,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneUiControl.HidePlayerSelectOverlay();
         }
-        else if (songSelectSceneUiControl.IsSearchEnabled())
+        else if (songSelectSceneUiControl.IsSearchTextFieldFocused())
         {
-            songSelectSceneUiControl.DisableSearch();
+            songSelectSceneUiControl.SubmitSearch();
         }
         else if (songSelectSceneUiControl.IsPlaylistActive())
         {
@@ -157,18 +152,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         else
         {
             SceneNavigator.Instance.LoadScene(EScene.MainScene);
-        }
-    }
-
-    private void ToggleSearch()
-    {
-        if (songSelectSceneUiControl.IsSearchEnabled())
-        {
-            songSelectSceneUiControl.DisableSearch();
-        }
-        else
-        {
-            songSelectSceneUiControl.EnableSearch(SearchInputField.ESearchMode.ByTitleOrArtist);
         }
     }
 
@@ -232,6 +215,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool IsFuzzySearchActive()
     {
         return !InputUtils.AnyKeyboardModifierPressed()
-               && !GameObjectUtils.InputFieldHasFocus(eventSystem);
+               && !songSelectSceneUiControl.IsSearchTextFieldFocused();
     }
 }

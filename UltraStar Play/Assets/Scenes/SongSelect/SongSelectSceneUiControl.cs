@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Threading;
 using System.IO;
 using System;
+using PrimeInputActions;
 using TMPro;
 using ProTrans;
 using UnityEngine.UIElements;
@@ -67,6 +68,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     [Inject]
     private UiManager uiManager;
+
+    [Inject(UxmlName = R.UxmlNames.searchTextField)]
+    private TextField searchTextField;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -128,11 +132,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
 
-    private SearchInputField searchTextInputField;
-
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
     private int lastSongMetasReloadFrame = -1;
+    private string lastRawSearchText;
     private SongMeta selectedSongBeforeSearch;
 
     [Inject]
@@ -173,8 +176,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
-        searchTextInputField = GameObjectUtils.FindObjectOfType<SearchInputField>(true);
-
         playlistChooserControl = new PlaylistChooserControl();
         injector.Inject(playlistChooserControl);
 
@@ -202,12 +203,15 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         closePlayerSelectOverlayButton.RegisterCallbackButtonTriggered(() => HidePlayerSelectOverlay());
 
+        fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
         InitSongRoulette();
 
         HidePlayerSelectOverlay();
+
+        searchTextField.RegisterValueChangedCallback(evt => OnSearchTextChanged());
 
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
     }
@@ -231,7 +235,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         // Check if new songs were loaded in background. Update scene if necessary.
         if (songMetas.Count != SongMetaManager.Instance.GetSongMetas().Count
-            && !IsSearchEnabled()
             && lastSongMetasReloadFrame + 10 < Time.frameCount)
         {
             GetSongMetasFromManager();
@@ -536,6 +539,13 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         SongMeta lastSelectedSong = SelectedSong;
         string rawSearchText = GetRawSearchText();
+        if (lastRawSearchText.IsNullOrEmpty()
+            && !rawSearchText.IsNullOrEmpty())
+        {
+            selectedSongBeforeSearch = SelectedSong;
+        }
+        lastRawSearchText = rawSearchText;
+
         if (TryExecuteSpecialSearchSyntax(rawSearchText))
         {
             // Special search syntax used. Do not perform normal filtering.
@@ -558,7 +568,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public List<SongMeta> GetFilteredSongMetas()
     {
-        string searchText = IsSearchEnabled() ? GetSearchText().TrimStart() : null;
+        string searchText = GetSearchText().TrimStart();
         UltraStarPlaylist playlist = playlistChooserControl.Selection.Value;
         List<SongMeta> filteredSongs = songMetas
             .Where(songMeta => searchText.IsNullOrEmpty()
@@ -600,27 +610,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         // return songMeta.Artist;
     }
 
-    public void EnableSearch(SearchInputField.ESearchMode searchMode)
-    {
-        selectedSongBeforeSearch = SelectedSong;
-
-        searchTextInputField.Show();
-        searchTextInputField.RequestFocus();
-        searchTextInputField.SearchMode = searchMode;
-        searchTextInputField.Text = "";
-    }
-
-    public void DisableSearch()
-    {
-        searchTextInputField.Text = "";
-        searchTextInputField.Hide();
-        // Remove the focus from the search input text field
-        EventSystem.current.SetSelectedGameObject(null);
-    }
-
     public string GetRawSearchText()
     {
-        return searchTextInputField.Text;
+        return searchTextField.value;
     }
 
     public string GetSearchText()
@@ -628,16 +620,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         return GetRawSearchText().TrimStart().ToLowerInvariant();
     }
 
-    public bool IsSearchEnabled()
+    public bool IsSearchTextFieldFocused()
     {
-        // return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
-        return false;
-    }
-
-    public bool IsSearchTextInputHasFocus()
-    {
-        // return eventSystem.currentSelectedGameObject == searchTextInputField.GetInputField().gameObject;
-        return false;
+        return searchTextField.focusController.focusedElement == searchTextField
+            || !searchTextField.value.IsNullOrEmpty();
     }
 
     public void ToggleSelectedPlayers()
@@ -783,5 +769,12 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         return songMeta != null
                && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title);
+    }
+
+    public void SubmitSearch()
+    {
+        selectedSongBeforeSearch = SelectedSong;
+        searchTextField.value = "";
+        searchTextField.Blur();
     }
 }
