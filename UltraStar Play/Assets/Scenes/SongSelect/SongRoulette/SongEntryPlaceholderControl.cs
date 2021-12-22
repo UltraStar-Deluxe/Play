@@ -75,8 +75,8 @@ public class SongEntryPlaceholderControl : ISlotListSlot
             }
 
             float centerPosition = 400;
-            float aCenterDistance = Mathf.Abs(centerPosition - a.GetPosition().x);
-            float bCenterDistance = Mathf.Abs(centerPosition - b.GetPosition().x);
+            float aCenterDistance = Mathf.Abs(centerPosition - a.VisualElement.worldBound.center.x);
+            float bCenterDistance = Mathf.Abs(centerPosition - b.VisualElement.worldBound.center.x);
             return aCenterDistance.CompareTo(bCenterDistance);
         }
     }

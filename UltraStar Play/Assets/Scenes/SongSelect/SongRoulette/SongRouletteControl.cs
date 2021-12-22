@@ -265,7 +265,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
         // Select the N placeholders that are closest to the center.
         activeEntryPlaceholders.Clear();
-        for (int i = 0; i <= songs.Count; i++)
+        for (int i = 0; i < songs.Count; i++)
         {
             List<SongEntryPlaceholderControl> availablePlaceholders = songEntryPlaceholderControls
                 .Where(it => !activeEntryPlaceholders.Contains(it))
@@ -294,13 +294,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             }
 
             Selection.Value = new SongSelection(songs[lastSelectedSongIndex], lastSelectedSongIndex, songs.Count);
-            FindActiveRouletteItems();
         }
         else
         {
             Selection.Value = new SongSelection(null, -1, 0);
             RemoveAllSongRouletteItems();
         }
+        FindActiveRouletteItems();
     }
 
     private int GetSongIndex(SongMeta songMeta)
@@ -501,10 +501,11 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         where T : SongEntryPlaceholderControl
     {
         float nearestDistance = float.MaxValue;
-        T nearest = default(T);
+        T nearest = null;
         foreach (T current in allEntries)
         {
-            float currentDistance = Mathf.Abs(current.VisualElement.contentRect.center.x - targetPositionX);
+            float currentX = current.VisualElement.worldBound.center.x;
+            float currentDistance = Mathf.Abs(currentX - targetPositionX);
             if (nearest == null
                 || currentDistance < nearestDistance)
             {
