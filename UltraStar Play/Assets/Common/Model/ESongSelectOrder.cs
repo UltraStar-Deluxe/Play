@@ -6,6 +6,6 @@
     Language,
     Folder,
     Year,
-    CountStarted,
+    CountCanceled,
     CountFinished
 }

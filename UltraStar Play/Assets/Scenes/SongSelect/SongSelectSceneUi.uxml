@@ -108,10 +108,24 @@
             <ui:Label text="Y: Song Details" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song Editor" display-tooltip-when-elided="true" name="buttonDescription" />
         </ui:VisualElement>
-        <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
+        <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: flex;">
             <ui:VisualElement name="innerMenuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" style="width: 100%;" />
-                <ui:Button text="Main Menu" display-tooltip-when-elided="true" name="backToMainMenuButton" style="width: 100%;" />
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
+                <ItemPicker noPreviousButton="true" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />
+                <ui:Button text="Main Menu" display-tooltip-when-elided="true" name="backToMainMenuButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
+                <ui:VisualElement name="legendContainer" style="flex-grow: 1; width: 100%;">
+                    <ui:VisualElement name="spacer" style="flex-grow: 1; width: 100%;" />
+                    <ui:VisualElement name="legendInnerContainer" class="roundCorners" style="width: 100%; border-top-color: rgb(192, 192, 192); border-top-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 0; border-left-color: rgb(192, 192, 192); border-right-color: rgb(192, 192, 192); border-bottom-color: rgb(192, 192, 192);">
+                        <ui:VisualElement name="duetLegend" style="width: 100%; flex-direction: row; align-items: center;">
+                            <ui:VisualElement name="duetLegendIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); margin-right: 5px;" />
+                            <ui:Label text="Duet" display-tooltip-when-elided="true" name="duetLegendLabel" class="smallFont" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="videoLegend" style="width: 100%; flex-direction: row; align-items: center;">
+                            <ui:VisualElement name="videoLegendIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/VideoIcon.png?fileID=2800000&amp;guid=7383f98aba0fc1f4c97010b513d5b884&amp;type=3#VideoIcon&apos;); margin-right: 5px;" />
+                            <ui:Label text="With video" display-tooltip-when-elided="true" name="videoLegendLabel" class="smallFont" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">

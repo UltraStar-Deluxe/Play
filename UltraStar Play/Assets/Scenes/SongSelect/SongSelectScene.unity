@@ -233,8 +233,7 @@ MonoBehaviour:
   songAudioPlayer: {fileID: 1830530624}
   songVideoPlayer: {fileID: 0}
   songRouletteControl: {fileID: 1966461583}
-  orderSlider: {fileID: 0}
-  characterQuickJumpListControl: {fileID: 0}
+  characterQuickJumpListControl: {fileID: 2122758100}
   songSelectSceneControlNavigator: {fileID: 2131434058}
   songPreviewControl: {fileID: 974432510}
   playerListControl: {fileID: 922159446}

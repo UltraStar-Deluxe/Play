@@ -20,9 +20,6 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
-    // [Inject]
-    // private OrderSlider orderSlider;
-
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
 
@@ -47,8 +44,6 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         characterContainer.Clear();
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => UpdateCharacters()));
 
-        // orderSlider.Selection.Subscribe(newSongOrder => UpdateCharacters());
-
         previousCharacterButton.RegisterCallbackButtonTriggered(() => characterContainer.horizontalScroller.ScrollPageUp());
         nextCharacterButton.RegisterCallbackButtonTriggered(() => characterContainer.horizontalScroller.ScrollPageDown());
 
@@ -62,13 +57,13 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         {
             Debug.Log("Song Metas outdated");
             isSongMetasOutdated = false;
-            songSelectSceneUiControl.GetSongMetasFromManager();
+            songSelectSceneUiControl.InitSongMetas();
             songSelectSceneUiControl.UpdateFilteredSongs();
             UpdateCharacters();
         }
     }
 
-    private void UpdateCharacters()
+    public void UpdateCharacters()
     {
         characterQuickJumpEntryControls.ForEach(it => it.VisualElement.RemoveFromHierarchy());
         foreach (char c in characters.ToLowerInvariant())

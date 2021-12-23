@@ -18,6 +18,7 @@ public static partial class R
         public const string itemPickerButton = "itemPickerButton";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string mainSceneButton = "mainSceneButton";
+        public const string marginBottomSmaller = "marginBottomSmaller";
         public const string middleCenterText = "middleCenterText";
         public const string multiline = "multiline";
         public const string noBackground = "noBackground";

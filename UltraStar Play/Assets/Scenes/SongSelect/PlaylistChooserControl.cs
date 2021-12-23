@@ -23,7 +23,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Settings settings;
 
-    List<UltraStarPlaylist> items = new List<UltraStarPlaylist>();
+    private List<UltraStarPlaylist> items = new List<UltraStarPlaylist>();
 
     public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new ReactiveProperty<UltraStarPlaylist>();
 

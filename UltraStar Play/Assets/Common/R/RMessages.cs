@@ -125,8 +125,8 @@ public static partial class R
         public static readonly string options_volume = "options_volume";
         public static readonly string order = "order";
         public static readonly string order_Artist = "order_Artist";
+        public static readonly string order_CountCanceled = "order_CountCanceled";
         public static readonly string order_CountFinished = "order_CountFinished";
-        public static readonly string order_CountStarted = "order_CountStarted";
         public static readonly string order_Folder = "order_Folder";
         public static readonly string order_Genre = "order_Genre";
         public static readonly string order_Language = "order_Language";

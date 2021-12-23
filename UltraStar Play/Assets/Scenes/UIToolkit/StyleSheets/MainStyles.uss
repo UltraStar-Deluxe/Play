@@ -539,3 +539,11 @@ Label.smallerFont {
 .smallControl {
     max-height: var(--control-height-small);
 }
+
+.marginBottomSmall {
+    margin-bottom: 10px;
+}
+
+.marginBottomSmaller {
+    margin-bottom: 5px;
+}
