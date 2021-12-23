@@ -106,10 +106,10 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="controlLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto;">
+        <ui:VisualElement name="controlLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex;">
             <ui:Label text="A: Select&#10;B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="Y: Song Details" display-tooltip-when-elided="true" name="buttonDescription" />
-            <ui:Label text="X: Song Editor" display-tooltip-when-elided="true" name="buttonDescription" />
+            <ui:Label text="X: Something" display-tooltip-when-elided="true" name="buttonDescription" />
         </ui:VisualElement>
         <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
             <ui:VisualElement name="innerMenuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">

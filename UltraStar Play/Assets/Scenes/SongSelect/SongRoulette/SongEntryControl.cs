@@ -39,6 +39,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songButton)]
     private Button songButton;
 
+    [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
+    public VisualElement SongPreviewVideoImage { get; private set; }
+
+    [Inject(UxmlName = R.UxmlNames.songPreviewBackgroundImage)]
+    public VisualElement SongPreviewBackgroundImage { get; private set; }
+
     public Button Button => songButton;
 
     public string Name { get; set; }
@@ -223,6 +229,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void OnInjectionFinished()
     {
+        SongPreviewVideoImage.HideByDisplay();
+        SongPreviewBackgroundImage.HideByDisplay();
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateFavoriteIcon());
     }

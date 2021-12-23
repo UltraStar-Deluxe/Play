@@ -68,6 +68,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     }
     
     private readonly List<SongEntryControl> songEntryControls = new List<SongEntryControl>();
+    public IReadOnlyList<SongEntryControl> SongEntryControls => songEntryControls;
 
     private bool isInitialized;
 
