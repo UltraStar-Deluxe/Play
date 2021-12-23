@@ -200,6 +200,7 @@ public static partial class R
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
         public const string searchTextField = "searchTextField";
+        public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
