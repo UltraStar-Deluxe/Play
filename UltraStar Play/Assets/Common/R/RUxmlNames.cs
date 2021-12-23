@@ -218,6 +218,7 @@ public static partial class R
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songImageInner = "songImageInner";
         public const string songImageOuter = "songImageOuter";
+        public const string songIndexButton = "songIndexButton";
         public const string songIndexContainer = "songIndexContainer";
         public const string songIndexIcon = "songIndexIcon";
         public const string songIndexLabel = "songIndexLabel";

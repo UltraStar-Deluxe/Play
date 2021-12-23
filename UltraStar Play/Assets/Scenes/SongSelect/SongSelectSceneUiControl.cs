@@ -81,6 +81,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
 
+    [Inject(UxmlName = R.UxmlNames.songIndexButton)]
+    private Button songIndexButton;
+
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
 
@@ -191,6 +194,14 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
     }
 
+    private int SelectedSongIndex
+    {
+        get
+        {
+            return songRouletteControl.Songs.IndexOf(SelectedSong);
+        }
+    }
+
     private void Start()
     {
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
@@ -234,6 +245,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
+
+        songIndexButton.RegisterCallbackButtonTriggered(() => searchTextField.value = $"#{SelectedSongIndex + 1}");
 
         playlistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 

@@ -44,6 +44,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private SongEntryPlaceholderControl centerItem;
 
     private List<SongMeta> songs = new List<SongMeta>();
+    public IReadOnlyList<SongMeta> Songs => songs;
 
     public IReactiveProperty<SongSelection> Selection { get; private set; } = new ReactiveProperty<SongSelection>();
 

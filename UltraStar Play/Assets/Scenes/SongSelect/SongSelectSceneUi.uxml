@@ -102,6 +102,7 @@
                 <ui:VisualElement name="songIndexContainer" class="smallFont roundCorners" style="width: 25%; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); justify-content: flex-end; flex-direction: row; align-items: flex-end;">
                     <ui:VisualElement name="songIndexIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]cd.png?fileID=2800000&amp;guid=b31378768ea13604c86e1c1de8c3b8f4&amp;type=3#[icon]cd&apos;); height: 100%; width: 32px; -unity-background-scale-mode: scale-to-fit; margin-right: 5px;" />
                     <ui:Label text="10000&#10;of 99999" display-tooltip-when-elided="true" name="songIndexLabel" style="-unity-text-align: upper-right; font-size: 18px;" />
+                    <ui:Button display-tooltip-when-elided="true" name="songIndexButton" class="transparentBackgroundColor" style="position: absolute; width: 80%; height: 90%; right: 0;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
