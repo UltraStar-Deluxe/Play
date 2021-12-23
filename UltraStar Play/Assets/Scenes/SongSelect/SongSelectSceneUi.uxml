@@ -37,11 +37,11 @@
                 <ui:DropdownField index="0" choices="Playlist-A,Playlist-B" name="playlistChooser" style="height: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="centerContent" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px;">
-            <ui:VisualElement name="songRouletteContainer" style="flex-grow: 3; flex-direction: row; flex-shrink: 0; align-items: center; justify-content: center; padding-bottom: 10px;">
-                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButtom" class="transparentBackgroundColor characterQuickJumpCharacterButton outline" style="width: 25px; height: 40px; left: 30px; position: absolute; top: 3px;" />
-                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButtom" class="transparentBackgroundColor characterQuickJumpCharacterButton outline" style="width: 25px; height: 40px; right: 30px; position: absolute; top: 6px;" />
-                <ui:VisualElement name="songEntryContainer" style="position: absolute; width: 100%; height: 100%;">
+        <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px;">
+            <ui:VisualElement name="songRouletteContainer" style="flex-grow: 3; flex-direction: row; flex-shrink: 0; align-items: center; justify-content: center; padding-bottom: 10px; display: flex;">
+                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButton" class="outline smallerFont transparentBackgroundColor" style="width: 25px; height: 40px; left: 30px; position: absolute; top: 3px;" />
+                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButton" class="transparentBackgroundColor outline smallerFont" style="width: 25px; height: 40px; right: 30px; position: absolute; top: 6px;" />
+                <ui:VisualElement name="songEntryContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: flex;">
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 116px; height: 100%; position: absolute; left: -226px; max-height: 200px; top: 0;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 116px; height: 100%; position: absolute; left: -90px; max-height: 200px;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 113px; height: 100%; position: absolute; left: 64px; max-height: 200px;" />
@@ -108,7 +108,7 @@
             <ui:Label text="Y: Song Details" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song Editor" display-tooltip-when-elided="true" name="buttonDescription" />
         </ui:VisualElement>
-        <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: flex;">
+        <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
             <ui:VisualElement name="innerMenuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                 <ItemPicker noPreviousButton="true" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />

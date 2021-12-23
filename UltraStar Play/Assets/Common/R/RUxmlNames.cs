@@ -141,7 +141,7 @@ public static partial class R
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
-        public const string nextSongButtom = "nextSongButtom";
+        public const string nextSongButton = "nextSongButton";
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
         public const string noMicsFoundLabel = "noMicsFoundLabel";
         public const string normalNoteScore = "normalNoteScore";
@@ -175,7 +175,7 @@ public static partial class R
         public const string previewVolumeLabel = "previewVolumeLabel";
         public const string previousCharacterButton = "previousCharacterButton";
         public const string previousItemButton = "previousItemButton";
-        public const string previousSongButtom = "previousSongButtom";
+        public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
         public const string quitButton = "quitButton";

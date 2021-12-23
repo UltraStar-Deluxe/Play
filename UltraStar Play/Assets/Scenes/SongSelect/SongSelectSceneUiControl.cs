@@ -144,6 +144,12 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
     private Button backToMainMenuButton;
 
+    [Inject(UxmlName = R.UxmlNames.nextSongButton)]
+    private Button nextSongButton;
+
+    [Inject(UxmlName = R.UxmlNames.previousSongButton)]
+    private Button previousSongButton;
+
     private SongOrderPickerControl songOrderPickerControl;
 
     private SongSelectSceneData sceneData;
@@ -222,6 +228,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         menuButton.RegisterCallbackButtonTriggered(() => menuOverlay.ShowByDisplay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => menuOverlay.HideByDisplay());
         backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+
+        nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
+        previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
 
         playlistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
