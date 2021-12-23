@@ -72,6 +72,9 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string duetIcon = "duetIcon";
+        public const string duetLegend = "duetLegend";
+        public const string duetLegendIcon = "duetLegendIcon";
+        public const string duetLegendLabel = "duetLegendLabel";
         public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
         public const string editSongListContainer = "editSongListContainer";
@@ -115,6 +118,8 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
         public const string leftLyricsOverlay = "leftLyricsOverlay";
+        public const string legendContainer = "legendContainer";
+        public const string legendInnerContainer = "legendInnerContainer";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsContainer = "lyricsContainer";
@@ -220,6 +225,7 @@ public static partial class R
         public const string songList = "songList";
         public const string songListContainer = "songListContainer";
         public const string songListEntryContainer = "songListEntryContainer";
+        public const string songOrderPicker = "songOrderPicker";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
@@ -229,6 +235,7 @@ public static partial class R
         public const string songsOptionsButton = "songsOptionsButton";
         public const string songTitle = "songTitle";
         public const string soundOptionsButton = "soundOptionsButton";
+        public const string spacer = "spacer";
         public const string startButton = "startButton";
         public const string statusLabel = "statusLabel";
         public const string textFieldContainer = "textFieldContainer";
@@ -256,6 +263,9 @@ public static partial class R
         public const string urlTextFieldContainer = "urlTextFieldContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string videoIcon = "videoIcon";
+        public const string videoLegend = "videoLegend";
+        public const string videoLegendIcon = "videoLegendIcon";
+        public const string videoLegendLabel = "videoLegendLabel";
         public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";
