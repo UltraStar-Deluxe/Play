@@ -335,6 +335,14 @@ TextInput {
     font-size: var(--font-size-small);
 }
 
+Button.smallFont {
+    font-size: var(--font-size-small);
+}
+
+Button.smallerFont {
+    font-size: var(--font-size-smaller);
+}
+
 ItemPicker {
     width: 300px;
     height: var(--control-height);
