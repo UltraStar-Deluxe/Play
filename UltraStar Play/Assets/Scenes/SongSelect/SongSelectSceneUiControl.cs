@@ -72,6 +72,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
+    [Inject(UxmlName = R.UxmlNames.searchTextFieldHint)]
+    private Label searchTextFieldHint;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -579,6 +582,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         SongMeta lastSelectedSong = SelectedSong;
         string rawSearchText = GetRawSearchText();
+
+        searchTextFieldHint.SetVisibleByDisplay(rawSearchText.IsNullOrEmpty());
+
         if (lastRawSearchText.IsNullOrEmpty()
             && !rawSearchText.IsNullOrEmpty())
         {
@@ -608,7 +614,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public List<SongMeta> GetFilteredSongMetas()
     {
-        string searchText = GetSearchText().TrimStart();
+        // Ignore prefix for special search syntax
+        string searchText = GetRawSearchText() != "#"
+            ? GetSearchText()
+            : "";
         UltraStarPlaylist playlist = playlistChooserControl.Selection.Value;
         List<SongMeta> filteredSongs = songMetas
             .Where(songMeta => searchText.IsNullOrEmpty()
@@ -737,8 +746,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             if (int.TryParse(numberString, out int number))
             {
                 songRouletteControl.SelectSongByIndex(number - 1, false);
+                return true;
             }
-            return true;
         }
         return false;
     }
