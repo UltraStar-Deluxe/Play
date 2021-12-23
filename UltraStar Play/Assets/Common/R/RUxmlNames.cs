@@ -228,6 +228,8 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songListEntryContainer = "songListEntryContainer";
         public const string songOrderPicker = "songOrderPicker";
+        public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
+        public const string songPreviewVideoImage = "songPreviewVideoImage";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";

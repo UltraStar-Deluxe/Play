@@ -100,4 +100,21 @@ public static class VisualElementExtensions
 
         visualElement.RegisterCallback<TEventType>(RunCallbackIfNotDoneYet, useTrickleDown);
     }
+
+    public static void SetBackgroundImageAlpha(this VisualElement visualElement, float newAlpha)
+    {
+        Color lastColor = visualElement.resolvedStyle.unityBackgroundImageTintColor;
+        visualElement.style.unityBackgroundImageTintColor = new Color(lastColor.r, lastColor.g, lastColor.b, newAlpha);
+    }
+
+    // Make the color of an image darker with a factor < 1, or brighter with a factor > 1.
+    public static void MultiplyBackgroundImageColor(this VisualElement visualElement, float factor, bool includeAlpha = false)
+    {
+        Color lastColor = visualElement.resolvedStyle.unityBackgroundImageTintColor;
+        float newR = NumberUtils.Limit(lastColor.r * factor, 0, 1);
+        float newG = NumberUtils.Limit(lastColor.g * factor, 0, 1);
+        float newB = NumberUtils.Limit(lastColor.b * factor, 0, 1);
+        float newAlpha = includeAlpha ? NumberUtils.Limit(lastColor.a * factor, 0, 1) : lastColor.a;
+        visualElement.style.unityBackgroundImageTintColor = new Color(newR, newG, newB, newAlpha);
+    }
 }

@@ -3,8 +3,9 @@ using UnityEngine;
 using UniInject;
 using UnityEngine.Video;
 using System.IO;
-using UnityEngine.UI;
 using UniRx;
+using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
 
 public class SongVideoPlayer : MonoBehaviour
 {
@@ -16,6 +17,43 @@ public class SongVideoPlayer : MonoBehaviour
 
     [InjectedInInspector]
     public Image videoImage;
+
+    private VisualElement videoImageVisualElement;
+    public VisualElement VideoImageVisualElement
+    {
+        get
+        {
+            return videoImageVisualElement;
+        }
+        set
+        {
+            videoImageVisualElement = value;
+            if (HasLoadedVideo
+                && videoImageVisualElement != null)
+            {
+                videoImageVisualElement.ShowByDisplay();
+            }
+        }
+    }
+
+    private VisualElement backgroundImageVisualElement;
+    public VisualElement BackgroundImageVisualElement
+    {
+        get
+        {
+            return backgroundImageVisualElement;
+        }
+        set
+        {
+            backgroundImageVisualElement = value;
+            if (HasLoadedBackgroundImage
+                && backgroundImageVisualElement != null)
+            {
+                backgroundImageVisualElement.ShowByDisplay();
+                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
+            }
+        }
+    }
 
     public bool forceSyncOnForwardJumpInTheSong;
 
@@ -33,6 +71,8 @@ public class SongVideoPlayer : MonoBehaviour
 
     private IDisposable jumpBackInSongEventStreamDisposable;
     private IDisposable jumpForwardInSongEventStreamDisposable;
+
+    private Sprite coverImageSprite;
 
     public string videoPlayerErrorMessage;
 
@@ -119,7 +159,14 @@ public class SongVideoPlayer : MonoBehaviour
         // For now, only load the video. Starting it is done from the outside.
         if (HasLoadedVideo)
         {
-            videoImage.gameObject.SetActive(true);
+            if (videoImage != null)
+            {
+                videoImage.gameObject.SetActive(true);
+            }
+            if (videoImageVisualElement != null)
+            {
+                videoImageVisualElement.ShowByDisplay();
+            }
             videoPlayer.Pause();
         }
     }
@@ -222,7 +269,14 @@ public class SongVideoPlayer : MonoBehaviour
 
     public void ShowBackgroundImage()
     {
-        videoImage.gameObject.SetActive(false);
+        if (videoImage != null)
+        {
+            videoImage.gameObject.SetActive(false);
+        }
+        if (videoImageVisualElement != null)
+        {
+            videoImageVisualElement.HideByDisplay();
+        }
         if (string.IsNullOrEmpty(SongMeta.Background))
         {
             ShowCoverImageAsBackground();
@@ -261,8 +315,16 @@ public class SongVideoPlayer : MonoBehaviour
 
     private void LoadBackgroundImage(string imagePath)
     {
-        Sprite coverImageSprite = ImageManager.LoadSprite(imagePath);
-        backgroundImage.sprite = coverImageSprite;
+        coverImageSprite = ImageManager.LoadSprite(imagePath);
+        if (backgroundImage != null)
+        {
+            backgroundImage.sprite = coverImageSprite;
+        }
+        if (backgroundImageVisualElement != null)
+        {
+            backgroundImageVisualElement.ShowByDisplay();
+            backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
+        }
         HasLoadedBackgroundImage = true;
     }
 
