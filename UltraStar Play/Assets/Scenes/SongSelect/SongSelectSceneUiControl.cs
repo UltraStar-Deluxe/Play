@@ -314,11 +314,13 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             songRouletteControl.SelectSong(sceneData.SongMeta);
         }
 
-        songRouletteControl.Selection.Subscribe(newValue => OnNewSongSelection(newValue));
+        songRouletteControl.Selection.Subscribe(newValue => OnSongSelectionChanged(newValue));
     }
 
-    private void OnNewSongSelection(SongSelection selection)
+    private void OnSongSelectionChanged(SongSelection selection)
     {
+        songRouletteControl.HideSongMenuOverlay();
+
         SongMeta selectedSong = selection.SongMeta;
         if (selectedSong == null)
         {

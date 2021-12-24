@@ -3,18 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
-using UnityEngine.EventSystems;
 using UniRx;
 using UnityEngine.InputSystem;
 using PrimeInputActions;
+using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
 public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 {
-    [Inject]
-    private EventSystem eventSystem;
-
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
     
@@ -71,11 +68,16 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(OnNavigate);
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
+
+        // Toggle song menu overlay
+        InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
+            .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
-        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible
+            || songRouletteControl.IsSongMenuOverlayVisible)
         {
             return;
         }
@@ -114,7 +116,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnNavigate(InputAction.CallbackContext context)
     {
-        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible
+            || songSelectSceneUiControl.IsSearchTextFieldFocused())
         {
             return;
         }
@@ -143,6 +146,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
         {
             songSelectSceneUiControl.HidePlayerSelectOverlay();
+        }
+        else if (songRouletteControl.IsSongMenuOverlayVisible)
+        {
+            songRouletteControl.HideSongMenuOverlay();
         }
         else if (songSelectSceneUiControl.IsSearchTextFieldFocused())
         {
@@ -178,6 +185,12 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnKeyboardTextInput(char newChar)
     {
+        if (newChar == 27)
+        {
+            // Ignore ESCAPE key
+            return;
+        }
+
         if (IsFuzzySearchActive())
         {
             // When there was no keyboard input for a while, then reset the search term.

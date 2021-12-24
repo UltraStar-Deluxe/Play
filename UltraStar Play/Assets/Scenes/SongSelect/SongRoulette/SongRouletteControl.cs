@@ -69,6 +69,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private readonly List<SongEntryControl> songEntryControls = new List<SongEntryControl>();
     public IReadOnlyList<SongEntryControl> SongEntryControls => songEntryControls;
+    public SongEntryControl SelectedSongEntryControl => songEntryControls
+        .FirstOrDefault(it => it.SongMeta == Selection.Value.SongMeta);
 
     private bool isInitialized;
 
@@ -79,6 +81,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     public float MaxAnimTimeInSeconds { get; private set; } = 0.2f;
     public float AnimTimeInSeconds { get; set; }
+    public bool IsSongMenuOverlayVisible => SongEntryControls
+        .AnyMatch(it => it.IsSongMenuOverlayVisible);
 
     private bool flickGestureWasNoTouchscreenPressed;
     private Vector2 dragVelocity;
@@ -516,5 +520,27 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             }
         }
         return nearest;
+    }
+
+    public void ShowSongMenuOverlay()
+    {
+        SelectedSongEntryControl.ShowSongMenuOverlay();
+    }
+
+    public void HideSongMenuOverlay()
+    {
+        SongEntryControls.ForEach(it => it.HideSongMenuOverlay());
+    }
+
+    public void ToggleSongMenuOverlay()
+    {
+        if (IsSongMenuOverlayVisible)
+        {
+            HideSongMenuOverlay();
+        }
+        else
+        {
+            ShowSongMenuOverlay();
+        }
     }
 }

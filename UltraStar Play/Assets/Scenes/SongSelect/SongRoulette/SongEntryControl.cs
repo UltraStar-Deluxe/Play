@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using PrimeInputActions;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,6 +18,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject]
     private SongRouletteControl songRouletteControl;
+
+    [Inject]
+    private SongSelectSceneUiControl songSelectSceneUiControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -39,6 +43,21 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songButton)]
     private Button songButton;
 
+    [Inject(UxmlName = R.UxmlNames.songMenuOverlay)]
+    private VisualElement songOverlayMenu;
+
+    [Inject(UxmlName = R.UxmlNames.singThisSongButton)]
+    private Button singThisSongButton;
+
+    [Inject(UxmlName = R.UxmlNames.showSongDetailsButton)]
+    private Button showSongDetailsButton;
+
+    [Inject(UxmlName = R.UxmlNames.openSongEditorButton)]
+    private Button openSongEditorButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeSongOverlayButton)]
+    private Button closeSongOverlayButton;
+
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     public VisualElement SongPreviewVideoImage { get; private set; }
 
@@ -48,6 +67,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     public Button Button => songButton;
 
     public string Name { get; set; }
+
+    public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
 
     private SongMeta songMeta;
     public SongMeta SongMeta
@@ -231,8 +252,33 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         SongPreviewVideoImage.HideByDisplay();
         SongPreviewBackgroundImage.HideByDisplay();
+
+        HideSongMenuOverlay();
+        singThisSongButton.RegisterCallbackButtonTriggered(() =>
+        {
+            HideSongMenuOverlay();
+            songSelectSceneUiControl.CheckAudioAndStartSingScene();
+        });
+        closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
+        {
+            HideSongMenuOverlay();
+            InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
+        });
+        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneUiControl.StartSongEditorScene());
+
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateFavoriteIcon());
+    }
+
+    public void ShowSongMenuOverlay()
+    {
+        songOverlayMenu.ShowByDisplay();
+        singThisSongButton.Focus();
+    }
+
+    public void HideSongMenuOverlay()
+    {
+        songOverlayMenu.HideByDisplay();
     }
 
     private void UpdateFavoriteIcon()

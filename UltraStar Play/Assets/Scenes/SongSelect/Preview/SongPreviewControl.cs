@@ -182,7 +182,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     private void StartVideoPreview(SongMeta songMeta)
     {
-        if (songMeta.Video.IsNullOrEmpty())
+        if (songMeta.Video.IsNullOrEmpty()
+            || currentSongEntryControl == null)
         {
             return;
         }
