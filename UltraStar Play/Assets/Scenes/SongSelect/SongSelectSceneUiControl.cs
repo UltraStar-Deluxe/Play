@@ -69,12 +69,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject(UxmlName = R.UxmlNames.searchTextField)]
-    private TextField searchTextField;
-
-    [Inject(UxmlName = R.UxmlNames.searchTextFieldHint)]
-    private Label searchTextFieldHint;
-
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -189,6 +183,20 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
 
+    private SongSearchControl songSearchControl;
+    public SongSearchControl SongSearchControl
+    {
+        get
+        {
+            if (songSearchControl == null)
+            {
+                songSearchControl = new SongSearchControl();
+                injector.Inject(songSearchControl);
+            }
+            return songSearchControl;
+        }
+    }
+
     private SongMeta SelectedSong
     {
         get
@@ -238,8 +246,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        searchTextField.RegisterValueChangedCallback(evt => OnSearchTextChanged());
-
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
 
         menuButton.RegisterCallbackButtonTriggered(() => menuOverlay.ShowByDisplay());
@@ -249,7 +255,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
 
-        songIndexButton.RegisterCallbackButtonTriggered(() => searchTextField.value = $"#{SelectedSongIndex + 1}");
+        songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
+
+        SongSearchControl.SearchChangedEventStream.Subscribe(_ => OnSearchTextChanged());
 
         playlistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
@@ -609,9 +617,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public void OnSearchTextChanged()
     {
         SongMeta lastSelectedSong = SelectedSong;
-        string rawSearchText = GetRawSearchText();
-
-        searchTextFieldHint.SetVisibleByDisplay(rawSearchText.IsNullOrEmpty());
+        string rawSearchText = songSearchControl.GetRawSearchText();
 
         if (lastRawSearchText.IsNullOrEmpty()
             && !rawSearchText.IsNullOrEmpty())
@@ -627,7 +633,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
 
         UpdateFilteredSongs();
-        if (string.IsNullOrEmpty(GetSearchText()))
+        if (string.IsNullOrEmpty(songSearchControl.GetSearchText()))
         {
             if (lastSelectedSong != null)
             {
@@ -643,14 +649,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
-        string searchText = GetRawSearchText() != "#"
-            ? GetSearchText()
-            : "";
         UltraStarPlaylist playlist = playlistChooserControl.Selection.Value;
-        List<SongMeta> filteredSongs = songMetas
-            .Where(songMeta => searchText.IsNullOrEmpty()
-                               || songMeta.Title.ToLowerInvariant().Contains(searchText)
-                               || songMeta.Artist.ToLowerInvariant().Contains(searchText))
+        List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
@@ -682,22 +682,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
                 Debug.LogWarning("Unknown order for songs: " + songOrderPickerControl.SelectedItem);
                 return songMeta.Artist;
         }
-    }
-
-    public string GetRawSearchText()
-    {
-        return searchTextField.value;
-    }
-
-    public string GetSearchText()
-    {
-        return GetRawSearchText().TrimStart().ToLowerInvariant();
-    }
-
-    public bool IsSearchTextFieldFocused()
-    {
-        return searchTextField.focusController.focusedElement == searchTextField
-            || !searchTextField.value.IsNullOrEmpty();
     }
 
     public void ToggleSelectedPlayers()
@@ -848,7 +832,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public void SubmitSearch()
     {
         selectedSongBeforeSearch = SelectedSong;
-        searchTextField.value = "";
-        searchTextField.Blur();
+        songSearchControl.ResetSearchText();
     }
 }

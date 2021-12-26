@@ -29,10 +29,10 @@
             </ui:VisualElement>
             <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
                 <ui:TextField picking-mode="Ignore" name="searchTextField" style="align-items: center; height: 90%; flex-grow: 1;">
-                    <ui:Label text="Search title, artist, ..." display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="smallerFont" style="-unity-font-style: italic; width: 100%; position: absolute; left: 10px; color: rgb(0, 0, 0);" />
+                    <ui:Label text="Search title, artist, language" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="smallerFont ellipsis" style="-unity-font-style: italic; width: 85%; position: absolute; left: 10px; color: rgb(0, 0, 0);" />
                 </ui:TextField>
                 <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="transparentBackgroundColor" style="width: 30px; height: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-                    <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/search_white_24dp.svg?fileID=7388822144124034973&amp;guid=5d5fa5a06c7029f47be8b6566e1806ad&amp;type=3#search_white_24dp&apos;); width: 100%; height: 100%;" />
+                    <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%;">
@@ -163,6 +163,42 @@
                         <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; -unity-text-align: upper-right;" />
                     </ui:ScrollView>
                 </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="searchPropertyDropdownOverlay" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: none;">
+            <ui:Button display-tooltip-when-elided="true" name="closeSearchPropertyDropdownButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
+            <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 87px; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex;">
+                <ui:Label text="Search in:" display-tooltip-when-elided="true" name="searchByPropertyLabel" class="smallFont" />
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="searchPropertyScrollView" style="flex-grow: 1;">
+                    <ui:VisualElement name="artistPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Artist" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="titlePropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Title" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="genrePropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Genre" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="yearPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Year" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="languagePropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Language" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="editionPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Edition" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="lyricsPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+                        <ui:Toggle />
+                        <ui:Label text="Lyrics" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+                    </ui:VisualElement>
+                </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none;" />
