@@ -87,6 +87,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
 
+    [Inject(UxmlName = R.UxmlNames.durationLabel)]
+    private Label durationLabel;
+
     [Inject(UxmlName = R.UxmlNames.songTitle)]
     private Label songTitle;
 
@@ -336,6 +339,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             : "";
         songIndexLabel.text = (selection.SongIndex + 1) + "\nof " + selection.SongsCount;
 
+        UpdateSongDurationLabel(selectedSong);
+
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetVisibleByVisibility(hasVideo);
 
@@ -345,6 +350,14 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         UpdateFavoriteIcon();
 
         UpdateSongStatistics(selectedSong);
+    }
+
+    private void UpdateSongDurationLabel(SongMeta songMeta)
+    {
+        songAudioPlayer.Init(songMeta);
+        int min = (int)Math.Floor(songAudioPlayer.DurationOfSongInMillis / 1000 / 60);
+        int seconds = (int)Math.Floor((songAudioPlayer.DurationOfSongInMillis / 1000) % 60);
+        durationLabel.text = $"{min}:{seconds.ToString().PadLeft(2, '0')}";
     }
 
     private void UpdateSongStatistics(SongMeta songMeta)
