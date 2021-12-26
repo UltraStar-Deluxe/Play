@@ -13,6 +13,7 @@ public static partial class R
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
         public const string artistLabel = "artistLabel";
+        public const string artistPropertyContainer = "artistPropertyContainer";
         public const string audioWaveForm = "audioWaveForm";
         public const string avatarPicker = "avatarPicker";
         public const string b = "b";
@@ -42,6 +43,7 @@ public static partial class R
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
+        public const string closeSearchPropertyDropdownButton = "closeSearchPropertyDropdownButton";
         public const string closeSongOverlayButton = "closeSongOverlayButton";
         public const string colorContainer = "colorContainer";
         public const string column = "column";
@@ -79,6 +81,7 @@ public static partial class R
         public const string duetLegendLabel = "duetLegendLabel";
         public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
+        public const string editionPropertyContainer = "editionPropertyContainer";
         public const string editSongListContainer = "editSongListContainer";
         public const string editSongListControls = "editSongListControls";
         public const string emptyScoreBar = "emptyScoreBar";
@@ -93,6 +96,7 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string genreLabel = "genreLabel";
+        public const string genrePropertyContainer = "genrePropertyContainer";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string hiddenContinueButton = "hiddenContinueButton";
@@ -119,6 +123,7 @@ public static partial class R
         public const string languageChooser = "languageChooser";
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
+        public const string languagePropertyContainer = "languagePropertyContainer";
         public const string leftLyricsOverlay = "leftLyricsOverlay";
         public const string legendContainer = "legendContainer";
         public const string legendInnerContainer = "legendInnerContainer";
@@ -127,6 +132,7 @@ public static partial class R
         public const string lyricsContainer = "lyricsContainer";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
+        public const string lyricsPropertyContainer = "lyricsPropertyContainer";
         public const string lyricsScrollView = "lyricsScrollView";
         public const string menuButton = "menuButton";
         public const string menuOverlay = "menuOverlay";
@@ -200,8 +206,12 @@ public static partial class R
         public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
         public const string searchBarContainer = "searchBarContainer";
+        public const string searchByPropertyLabel = "searchByPropertyLabel";
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
+        public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
+        public const string searchPropertyDropdownOverlay = "searchPropertyDropdownOverlay";
+        public const string searchPropertyScrollView = "searchPropertyScrollView";
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
@@ -259,6 +269,7 @@ public static partial class R
         public const string titleContainer = "titleContainer";
         public const string titleImage = "titleImage";
         public const string titleImageAndText = "titleImageAndText";
+        public const string titlePropertyContainer = "titlePropertyContainer";
         public const string titleRow = "titleRow";
         public const string toggle = "toggle";
         public const string toggleFavoriteButton = "toggleFavoriteButton";
@@ -284,5 +295,6 @@ public static partial class R
         public const string volumeLabel = "volumeLabel";
         public const string warningIcon = "warningIcon";
         public const string yearLabel = "yearLabel";
+        public const string yearPropertyContainer = "yearPropertyContainer";
     }
 }

@@ -548,6 +548,10 @@ Label.smallerFont {
     max-height: var(--control-height-small);
 }
 
+.smallControl.unity-toggle {
+    max-width: var(--control-height-small);
+}
+
 .marginBottomSmall {
     margin-bottom: 10px;
 }
