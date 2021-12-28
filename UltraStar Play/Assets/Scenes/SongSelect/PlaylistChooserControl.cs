@@ -29,18 +29,8 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        items = new List<UltraStarPlaylist>();
-        items.Add(new UltraStarAllSongsPlaylist());
-        items.AddRange(playlistManager.Playlists);
+        InitDropdownChoices();
 
-        dropdownField.choices = items
-            .Select(it => GetDisplayString(it))
-            .ToList();
-
-        // Initial selection
-        Selection.Value = items
-            .FirstOrDefault(playlist => GetDisplayString(playlist) == settings.SongSelectSettings.playlistName)
-            .OrIfNull(items[0]);
         // Update settings
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
 
@@ -58,6 +48,26 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
             UltraStarPlaylist playlist = items.FirstOrDefault(it => GetDisplayString(it) == evt.newValue);
             Selection.Value = playlist;
         });
+
+        playlistManager.PlaylistChangeEventStream
+            .Subscribe(_ => InitDropdownChoices());
+    }
+
+    private void InitDropdownChoices()
+    {
+        items = new List<UltraStarPlaylist>();
+        items.Add(new UltraStarAllSongsPlaylist());
+        items.AddRange(playlistManager.Playlists);
+
+        dropdownField.choices = items
+            .Select(it => GetDisplayString(it))
+            .ToList();
+
+        // Initial selection
+        UltraStarPlaylist newSelection = items
+            .FirstOrDefault(playlist => GetDisplayString(playlist) == settings.SongSelectSettings.playlistName)
+            .OrIfNull(items[0]);
+        Selection.SetValueAndForceNotify(newSelection);
     }
 
     private string GetDisplayString(UltraStarPlaylist playlist)

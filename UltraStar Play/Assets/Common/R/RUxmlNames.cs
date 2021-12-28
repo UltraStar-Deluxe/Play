@@ -36,6 +36,7 @@ public static partial class R
         public const string c = "c";
         public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
+        public const string cancelDeletePlaylistButton = "cancelDeletePlaylistButton";
         public const string centerContent = "centerContent";
         public const string characterButton = "characterButton";
         public const string characterContainer = "characterContainer";
@@ -49,14 +50,17 @@ public static partial class R
         public const string column = "column";
         public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
+        public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
         public const string controlLegend = "controlLegend";
+        public const string createPlaylistButton = "createPlaylistButton";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
+        public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string detailContainer = "detailContainer";
         public const string developerOptionsButton = "developerOptionsButton";
@@ -72,7 +76,6 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
-        public const string doneButton = "doneButton";
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string duetIcon = "duetIcon";
@@ -82,8 +85,10 @@ public static partial class R
         public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
         public const string editionPropertyContainer = "editionPropertyContainer";
-        public const string editSongListContainer = "editSongListContainer";
-        public const string editSongListControls = "editSongListControls";
+        public const string editPlaylistButton = "editPlaylistButton";
+        public const string editPlaylistDialog = "editPlaylistDialog";
+        public const string editPlaylistDialogTitle = "editPlaylistDialogTitle";
+        public const string editPlaylistOverlay = "editPlaylistOverlay";
         public const string emptyScoreBar = "emptyScoreBar";
         public const string enabledContainer = "enabledContainer";
         public const string enabledLabel = "enabledLabel";
@@ -136,6 +141,7 @@ public static partial class R
         public const string lyricsScrollView = "lyricsScrollView";
         public const string menuButton = "menuButton";
         public const string menuOverlay = "menuOverlay";
+        public const string menuScrollView = "menuScrollView";
         public const string micEntry = "micEntry";
         public const string micIcon = "micIcon";
         public const string micListOverlay = "micListOverlay";
@@ -178,6 +184,7 @@ public static partial class R
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
         public const string playlistChooser = "playlistChooser";
         public const string playlistChooserContainer = "playlistChooserContainer";
+        public const string playlistNameTextField = "playlistNameTextField";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";
@@ -241,7 +248,6 @@ public static partial class R
         public const string songInfoContainer = "songInfoContainer";
         public const string songList = "songList";
         public const string songListContainer = "songListContainer";
-        public const string songListEntryContainer = "songListEntryContainer";
         public const string songMenuOverlay = "songMenuOverlay";
         public const string songMenuOverlayScrollView = "songMenuOverlayScrollView";
         public const string songOrderPicker = "songOrderPicker";
@@ -252,13 +258,12 @@ public static partial class R
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
-        public const string SongSelectSongListEntryUi = "SongSelectSongListEntryUi";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string songTitle = "songTitle";
         public const string soundOptionsButton = "soundOptionsButton";
-        public const string spacer = "spacer";
         public const string startButton = "startButton";
         public const string statusLabel = "statusLabel";
+        public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string textFieldContainer = "textFieldContainer";
         public const string themeContainer = "themeContainer";
         public const string third = "third";
