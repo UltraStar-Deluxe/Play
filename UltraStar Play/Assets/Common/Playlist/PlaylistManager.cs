@@ -5,6 +5,9 @@ using System.Linq;
 using UnityEngine;
 using UniRx;
 using System.IO;
+using System.Text.RegularExpressions;
+using UnityEngine.WSA;
+using Application = UnityEngine.Application;
 
 public class PlaylistManager : MonoBehaviour
 {
@@ -23,6 +26,8 @@ public class PlaylistManager : MonoBehaviour
             return GameObjectUtils.FindComponentWithTag<PlaylistManager>("PlaylistManager");
         }
     }
+
+    public static readonly string favoritesPlaylistName = "Favorites";
 
     // static references to be persisted across scenes
     private static Dictionary<UltraStarPlaylist, string> playlistToFilePathMap = new Dictionary<UltraStarPlaylist, string>();
@@ -60,7 +65,7 @@ public class PlaylistManager : MonoBehaviour
     void Awake()
     {
         playlistFolder = Application.persistentDataPath + "/Playlists";
-        favoritesPlaylistFile = playlistFolder + "/Favorites" + playlistFileExtension;
+        favoritesPlaylistFile = $"{playlistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
 
         CreateFavoritePlaylistIfNotExist();
     }
@@ -103,14 +108,27 @@ public class PlaylistManager : MonoBehaviour
         foreach (string filePath in playlistFilePaths)
         {
             UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
-            playlists.Add(playlist);
-            playlistToFilePathMap.Add(playlist, filePath);
+            AddPlaylist(playlist, filePath);
+        }
+    }
 
-            // This is the special playlist for the favorite songs.
-            if (Path.GetFullPath(favoritesPlaylistFile) == Path.GetFullPath(filePath))
+    private void AddPlaylist(UltraStarPlaylist playlist, string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            using (FileStream fileStream = File.Create(filePath))
             {
-                favoritesPlaylist = playlist;
+                // Automatically closed by using-statement.
             }
+        }
+
+        playlists.Add(playlist);
+        playlistToFilePathMap.Add(playlist, filePath);
+
+        if (Path.GetFullPath(favoritesPlaylistFile) == Path.GetFullPath(filePath))
+        {
+            // This is the special playlist for the favorite songs.
+            favoritesPlaylist = playlist;
         }
     }
 
@@ -151,5 +169,159 @@ public class PlaylistManager : MonoBehaviour
             Playlist = playlist;
             SongMeta = songMeta;
         }
+    }
+
+    public EPlaylistNameIssue GetPlaylistNameIssue(UltraStarPlaylist playlist, string newName)
+    {
+        if (newName.IsNullOrEmpty())
+        {
+            return EPlaylistNameIssue.Invalid;
+        }
+
+        List<char> invalidCharacters = Path.GetInvalidPathChars()
+            .Concat(new List<char> { '\\', '/' })
+            .ToList();
+        foreach (char invalidChar in invalidCharacters)
+        {
+            if (newName.Contains(invalidChar))
+            {
+                return EPlaylistNameIssue.Invalid;
+            }
+        }
+
+        if (playlists
+            .Where(it => it != playlist)
+            .Select(it => GetPlaylistName(it))
+            .AnyMatch(playlistName => playlistName == newName))
+        {
+            return EPlaylistNameIssue.Duplicate;
+        }
+
+        return EPlaylistNameIssue.None;
+    }
+
+    public string TrySetPlaylistName(UltraStarPlaylist playlist, string newName)
+    {
+        if (GetPlaylistName(playlist) == newName)
+        {
+            return "";
+        }
+
+        if (playlist == null
+            || playlist is UltraStarAllSongsPlaylist
+            || GetPlaylistName(playlist) == favoritesPlaylistName)
+        {
+            return "Cannot rename this playlist";
+        }
+
+        if (GetPlaylistNameIssue(playlist, newName) != EPlaylistNameIssue.None)
+        {
+            return "Invalid or duplicate playlist name";
+        }
+
+        // Rename file
+        if (!playlistToFilePathMap.TryGetValue(playlist, out string oldPath))
+        {
+            return "Playlist not found in file system";
+        }
+
+        string oldName = GetPlaylistName(playlist);
+        string oldFolder = Path.GetDirectoryName(oldPath);
+        string newPath = $"{oldFolder}/{newName}{playlistFileExtension}";
+        try
+        {
+            Debug.Log($"Moving playlist from '{oldPath}' to '{newPath}'");
+            File.Move(oldPath, newPath);
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Error(e, $"Failed to rename playlist to {newName}");
+            return "Failed to rename playlist: " + e.Message;
+        }
+
+        // Update path in map such that modifications of playlist will be saved to correct location.
+        playlistToFilePathMap[playlist] = newPath;
+
+        // Update settings
+        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        {
+            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = newName;
+        }
+
+        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
+
+        return "";
+    }
+
+    public string TryRemovePlaylist(UltraStarPlaylist playlist)
+    {
+        if (playlist == null
+            || playlist is UltraStarAllSongsPlaylist
+            || GetPlaylistName(playlist) == favoritesPlaylistName)
+        {
+            return "Cannot remove this playlist";
+        }
+
+        if (!playlistToFilePathMap.TryGetValue(playlist, out string oldPath))
+        {
+            return "Playlist not found in file system";
+        }
+
+        string oldName = GetPlaylistName(playlist);
+        try
+        {
+            Debug.Log($"Deleting playlist '{oldPath}'");
+            File.Delete(oldPath);
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Error(e, $"Failed to delete playlist '{oldPath}'");
+            return "Failed to delete playlist: " + e.Message;
+        }
+
+        // Update settings
+        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        {
+            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = "";
+        }
+
+        playlists.Remove(playlist);
+        playlistToFilePathMap.Remove(playlist);
+
+
+        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
+
+        return "";
+    }
+
+    public UltraStarPlaylist CreateNewPlaylist(string initialName)
+    {
+        string newPlaylistName = GetNewUniquePlaylistName(initialName);
+        string newPlaylistPath = $"{playlistFolder}/{newPlaylistName}{playlistFileExtension}";
+        UltraStarPlaylist newPlaylist = new UltraStarPlaylist();
+        AddPlaylist(newPlaylist, newPlaylistPath);
+
+        playlistChangeEventStream.OnNext(new PlaylistChangeEvent(newPlaylist, null));
+
+        return newPlaylist;
+    }
+
+    private string GetNewUniquePlaylistName(string initialName)
+    {
+        bool IsPlaylistNameUnique(string playlistName)
+        {
+            return Playlists
+                .AllMatch(playlist => GetPlaylistName(playlist) != playlistName);
+        }
+
+        int index = 1;
+        string newPlaylistName = initialName;
+        while (!IsPlaylistNameUnique(newPlaylistName))
+        {
+            index++;
+            newPlaylistName = $"{initialName} {index}";
+        }
+
+        return newPlaylistName;
     }
 }

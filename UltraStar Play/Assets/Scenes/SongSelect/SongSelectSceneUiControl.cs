@@ -17,7 +17,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder, ITranslator
+public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
 {
     public static SongSelectSceneUiControl Instance
     {
@@ -78,14 +78,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.songIndexButton)]
     private Button songIndexButton;
 
-    [Inject(UxmlName = R.UxmlNames.artistLabel)]
-    private Label artistLabel;
-
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
-
-    [Inject(UxmlName = R.UxmlNames.songTitle)]
-    private Label songTitle;
 
     [Inject(UxmlName = R.UxmlNames.yearLabel)]
     private Label yearLabel;
@@ -179,7 +173,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
     private VisualElement noSongsFoundLabel;
 
-    private PlaylistChooserControl playlistChooserControl;
+    public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
 
@@ -227,10 +221,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         InitSongMetas();
 
         HidePlayerSelectOverlay();
-        menuOverlay.HideByDisplay();
-
-        playlistChooserControl = new PlaylistChooserControl();
-        injector.Inject(playlistChooserControl);
+        HideMenuOverlay();
 
         ItemPicker songOrderItemPicker = uiDocument.rootVisualElement.Q<ItemPicker>(R.UxmlNames.songOrderPicker);
         songOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
@@ -248,8 +239,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
 
-        menuButton.RegisterCallbackButtonTriggered(() => menuOverlay.ShowByDisplay());
-        closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => menuOverlay.HideByDisplay());
+        menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
+        closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
         backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
 
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
@@ -259,7 +250,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         SongSearchControl.SearchChangedEventStream.Subscribe(_ => OnSearchTextChanged());
 
-        playlistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
+        PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
         songOrderPickerControl.Selection.Subscribe(newValue =>
         {
@@ -270,7 +261,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
         {
-            if (playlistChangeEvent.Playlist == playlistChooserControl.Selection.Value)
+            if (playlistChangeEvent.Playlist == PlaylistChooserControl.Selection.Value)
             {
                 UpdateFilteredSongs();
             }
@@ -281,6 +272,16 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         InitSongRouletteSongMetas();
         songRouletteControl.SelectionClickedEventStream
             .Subscribe(_ => CheckAudioAndStartSingScene());
+    }
+
+    public void ShowMenuOverlay()
+    {
+        menuOverlay.ShowByDisplay();
+    }
+
+    public void HideMenuOverlay()
+    {
+        menuOverlay.HideByDisplay();
     }
 
     private void UpdateFavoriteIcon()
@@ -339,8 +340,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             return;
         }
 
-        artistLabel.text = selectedSong.Artist;
-        songTitle.text = selectedSong.Title;
         genreLabel.text = selectedSong.Genre;
         yearLabel.text = selectedSong.Year > 0
             ? selectedSong.Year.ToString()
@@ -513,8 +512,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     private void SetEmptySongDetails()
     {
-        artistLabel.text = "";
-        songTitle.text = "";
         genreLabel.text = "";
         yearLabel.text = "";
         timesClearedLabel.text = "";
@@ -649,7 +646,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
-        UltraStarPlaylist playlist = playlistChooserControl.Selection.Value;
+        UltraStarPlaylist playlist = PlaylistChooserControl.Selection.Value;
         List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
@@ -707,7 +704,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public void ToggleFavoritePlaylist()
     {
-        playlistChooserControl.ToggleFavoritePlaylist();
+        PlaylistChooserControl.ToggleFavoritePlaylist();
     }
 
     public void ToggleSelectedSongIsFavorite()
@@ -739,13 +736,13 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public bool IsPlaylistActive()
     {
-        return playlistChooserControl.Selection.Value != null
-               && !(playlistChooserControl.Selection.Value is UltraStarAllSongsPlaylist);
+        return PlaylistChooserControl.Selection.Value != null
+               && !(PlaylistChooserControl.Selection.Value is UltraStarAllSongsPlaylist);
     }
 
     public void ResetPlaylistSelection()
     {
-        playlistChooserControl.Reset();
+        PlaylistChooserControl.Reset();
     }
 
     private bool TryExecuteSpecialSearchSyntax(string searchText)
@@ -833,5 +830,11 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         selectedSongBeforeSearch = SelectedSong;
         songSearchControl.ResetSearchText();
+    }
+
+    public void OnInjectionFinished()
+    {
+        PlaylistChooserControl = new PlaylistChooserControl();
+        injector.Inject(PlaylistChooserControl);
     }
 }
