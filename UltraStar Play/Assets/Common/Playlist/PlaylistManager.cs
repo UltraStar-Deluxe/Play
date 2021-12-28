@@ -324,4 +324,9 @@ public class PlaylistManager : MonoBehaviour
 
         return newPlaylistName;
     }
+
+    public bool HasSongEntry(UltraStarPlaylist playlist, SongMeta songMeta)
+    {
+        return playlist.HasSongEntry(songMeta.Artist, songMeta.Title);
+    }
 }
