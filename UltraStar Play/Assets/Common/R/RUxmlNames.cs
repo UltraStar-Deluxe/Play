@@ -147,6 +147,7 @@ public static partial class R
         public const string micListOverlay = "micListOverlay";
         public const string micScrollView = "micScrollView";
         public const string micVisualizationContainer = "micVisualizationContainer";
+        public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
         public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";

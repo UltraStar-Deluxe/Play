@@ -15,11 +15,12 @@
         <ui:Button display-tooltip-when-elided="true" name="songButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
         <ui:VisualElement name="songMenuOverlay" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songMenuOverlayScrollView" style="width: 100%; height: 100%; align-items: center;">
-                <ui:Button text="Sing" display-tooltip-when-elided="true" name="singThisSongButton" class="smallControl" style="width: 100%;" />
-                <ui:Button text="Add to Medley" display-tooltip-when-elided="true" name="addToMedleyButton" class="smallControl" style="width: 100%;" />
-                <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" class="smallControl" style="width: 100%;" />
-                <ui:Button text="Details" display-tooltip-when-elided="true" name="showSongDetailsButton" class="smallControl" style="width: 100%;" />
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" class="smallControl" style="width: 100%;" />
+                <ui:Button text="Sing" display-tooltip-when-elided="true" name="singThisSongButton" style="width: 100%;" />
+                <ui:Button text="Add to Medley" display-tooltip-when-elided="true" name="addToMedleyButton" style="width: 100%;" />
+                <ui:VisualElement name="modifyPlaylistButtonContainer" style="width: 100%;" />
+                <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" style="width: 100%;" />
+                <ui:Button text="Details" display-tooltip-when-elided="true" name="showSongDetailsButton" style="width: 100%;" />
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" style="width: 100%;" />
             </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>

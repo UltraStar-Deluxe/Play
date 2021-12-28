@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml;
 using PrimeInputActions;
 using UniInject;
 using UnityEngine;
@@ -45,6 +47,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject(UxmlName = R.UxmlNames.songMenuOverlay)]
     private VisualElement songOverlayMenu;
+
+    [Inject(UxmlName = R.UxmlNames.modifyPlaylistButtonContainer)]
+    private VisualElement modifyPlaylistButtonContainer;
 
     [Inject(UxmlName = R.UxmlNames.singThisSongButton)]
     private Button singThisSongButton;
@@ -272,8 +277,34 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void ShowSongMenuOverlay()
     {
+        InitModifyPlaylistButtons();
         songOverlayMenu.ShowByDisplay();
         singThisSongButton.Focus();
+    }
+
+    private void InitModifyPlaylistButtons()
+    {
+        modifyPlaylistButtonContainer.Clear();
+        playlistManager.Playlists
+            .Where(playlist => !(playlist is UltraStarAllSongsPlaylist))
+            .ForEach(playlist =>
+        {
+            string playlistName = playlistManager.GetPlaylistName(playlist);
+            Button button = new Button();
+            button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            button.AddToClassList("smallFont");
+            modifyPlaylistButtonContainer.Add(button);
+            if (playlistManager.HasSongEntry(playlist, songMeta))
+            {
+                button.text = $"Remove from\n'{playlistName}'";
+                button.RegisterCallbackButtonTriggered(() => playlistManager.RemoveSongFromPlaylist(playlist, songMeta));
+            }
+            else
+            {
+                button.text = $"Add to\n'{playlistName}'";
+                button.RegisterCallbackButtonTriggered(() => playlistManager.AddSongToPlaylist(playlist, songMeta));
+            }
+        });
     }
 
     public void HideSongMenuOverlay()
