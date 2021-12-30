@@ -559,3 +559,7 @@ Label.smallerFont {
 .marginBottomSmaller {
     margin-bottom: 5px;
 }
+
+.inputLegendLabel {
+    width: 20%;
+}

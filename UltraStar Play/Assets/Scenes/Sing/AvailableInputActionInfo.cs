@@ -52,8 +52,8 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
             List<string> availableInputActionInfosRichText = GetAvailableInputActionInfos()
                 .Select(it =>
                 {
-                    string actionNameDisplayString = CamelCaseToDisplayName(it.ActionName.Replace(" ", ""));
-                    return $"<color=\"orange\">{actionNameDisplayString}:</color> {it.InfoText}";
+                    string actionNameDisplayString = CamelCaseToDisplayName(it.ActionText.Replace(" ", ""));
+                    return $"<color=\"orange\">{actionNameDisplayString}:</color> {it.InputText}";
                 }).ToList();
             inputActionInfo = string.Join("\n\n", availableInputActionInfosRichText);
             if (uiText != null)
@@ -89,8 +89,8 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
         {
             InputActionInfo existingInfo = infos.FirstOrDefault(it =>
             {
-                string actionNameToLowerNoSpace = it.ActionName.ToLowerInvariant().Replace(" ", "");
-                string additionalInputActionNameToLowerNoSpace = additionalInputActionInfo.ActionName.ToLowerInvariant().Replace(" ", "");
+                string actionNameToLowerNoSpace = it.ActionText.ToLowerInvariant().Replace(" ", "");
+                string additionalInputActionNameToLowerNoSpace = additionalInputActionInfo.ActionText.ToLowerInvariant().Replace(" ", "");
                 return actionNameToLowerNoSpace == additionalInputActionNameToLowerNoSpace;
             });
             if (existingInfo == null)
@@ -99,7 +99,7 @@ public class AvailableInputActionInfo : MonoBehaviour, INeedInjection
             }
             else
             {
-                existingInfo.AddInfoText(additionalInputActionInfo.InfoText);
+                existingInfo.AddInfoText(additionalInputActionInfo.InputText);
             }
         }
         

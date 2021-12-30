@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
@@ -24,6 +25,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject]
+    private UiManager uiManager;
+
     private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
@@ -31,6 +35,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     
     void Start()
     {
+        InitInputLegend();
+
         // Toggle song is favorite
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedSongIsFavorite());
@@ -73,6 +79,15 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
             .Where(_ => !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
+    }
+
+    private void InitInputLegend()
+    {
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_back, "Back");
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.ui_submit, "Select song");
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_space, "Song options");
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_randomSong, "Random song");
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_openSongEditor, "Song editor");
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
