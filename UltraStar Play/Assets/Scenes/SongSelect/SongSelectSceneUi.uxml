@@ -40,15 +40,15 @@
         </ui:VisualElement>
         <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px;">
             <ui:VisualElement name="songRouletteContainer" style="flex-grow: 3; flex-direction: row; flex-shrink: 0; align-items: center; justify-content: center; padding-bottom: 10px; display: flex;">
-                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButton" class="outline smallerFont transparentBackgroundColor" style="width: 25px; height: 40px; left: 128px; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
-                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButton" class="transparentBackgroundColor outline smallerFont" style="width: 25px; height: 40px; right: 113px; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButton" class="outline smallerFont transparentBackgroundColor" style="width: 25px; height: 40px; left: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButton" class="transparentBackgroundColor outline smallerFont" style="width: 25px; height: 40px; right: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
                 <ui:VisualElement name="songEntryContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: flex; top: 0;">
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: -226px; max-height: 200px; top: 0; align-items: center;" />
-                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: -38px; max-height: 200px; top: -1px; align-items: center;" />
-                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 162px; max-height: 200px; top: 0; align-items: center;" />
-                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 325px; max-height: 200px; top: 0; align-items: center;" />
-                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 488px; max-height: 200px; top: 0; align-items: center;" />
-                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 698px; max-height: 200px; align-items: center; top: 0;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: -5%; max-height: 200px; align-items: center;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 20%; max-height: 200px; align-items: center;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 40%; max-height: 200px; align-items: center;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 60%; max-height: 200px; align-items: center;" />
+                    <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 85%; max-height: 200px; align-items: center;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 908px; max-height: 200px; top: 0; align-items: center;" />
                 </ui:VisualElement>
             </ui:VisualElement>
