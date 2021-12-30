@@ -116,6 +116,7 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string innerMenuOverlay = "innerMenuOverlay";
+        public const string inputLegend = "inputLegend";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string itemIndexLabel = "itemIndexLabel";

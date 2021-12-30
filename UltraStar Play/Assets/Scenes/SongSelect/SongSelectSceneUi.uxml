@@ -93,7 +93,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="controlLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex;">
+        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; flex-wrap: wrap;">
             <ui:Label text="A: Select&#10;B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="Y: Song Details" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Something" display-tooltip-when-elided="true" name="buttonDescription" />
