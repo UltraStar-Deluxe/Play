@@ -985,6 +985,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!328 &1982453478 stripped
+VideoPlayer:
+  m_CorrespondingSourceObject: {fileID: 8294266774787169066, guid: a3fcba59c524442498a77d92542d3e03,
+    type: 3}
+  m_PrefabInstance: {fileID: 8294266774937821312}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2122758098
 GameObject:
   m_ObjectHideFlags: 0
@@ -1087,6 +1093,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SongSelectPreviewVideoPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 8294266774522871405, guid: a3fcba59c524442498a77d92542d3e03,
+        type: 3}
+      propertyPath: videoPlayer
+      value: 
+      objectReference: {fileID: 1982453478}
     - target: {fileID: 8294266774522871406, guid: a3fcba59c524442498a77d92542d3e03,
         type: 3}
       propertyPath: m_RootOrder
