@@ -20,11 +20,14 @@ public class UltraStarPlayInputManager : InputManager
     
     private void Start()
     {
-        if (Touchscreen.current != null
-            && !EnhancedTouchSupport.enabled)
+        try
         {
             // Enable EnhancedTouchSupport to make use of EnhancedTouch.Touch struct etc.
             EnhancedTouchSupport.Enable();
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Error(e, "Could not enable enhanced touch support");
         }
         ContextMenu.OpenContextMenus.Clear();
     }
