@@ -14,6 +14,14 @@ using UnityEngine.InputSystem;
 
 public class InputLegendControl : INeedInjection, IInjectionFinishedListener
 {
+    private static HashSet<string> inputActionWithDisplayStringError = new HashSet<string>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        inputActionWithDisplayStringError = new HashSet<string>();
+    }
+
     public EInputSource CurrentInputSource { get; private set; }
 
     private Dictionary<EInputSource, List<InputActionInfo>> inputLegend = new Dictionary<EInputSource, List<InputActionInfo>>();
@@ -34,23 +42,110 @@ public class InputLegendControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void AddInputActionInfo(string inputActionPath, string actionText, EInputSource inputSource)
+    public void RemoveInputActionInfosForAllDevices(string inputActionPath)
     {
-        InputAction inputAction = InputManager.GetInputAction(inputActionPath).InputAction;
-        // TODO: How to handle composites?
-        InputBinding inputBinding = inputAction.bindings
-            .FirstOrDefault(binding =>
-            {
-                InputControl inputControl = InputSystem.FindControl(binding.path);
-                return inputControl?.device == GetInputDevice(inputSource);
-            });
+        foreach (EInputSource inputSource in EnumUtils.GetValuesAsList<EInputSource>())
+        {
+            RemoveInputActionInfo(inputActionPath, inputSource);
+        }
+    }
 
-        if (inputBinding.path.IsNullOrEmpty())
+    private void RemoveInputActionInfo(string inputActionPath, EInputSource inputSource)
+    {
+        InputDevice inputDevice = GetInputDevice(inputSource);
+        if (inputDevice == null)
         {
             return;
         }
 
-        AddInputActionInfo(inputSource, new InputActionInfo(actionText, inputBinding.ToDisplayString()));
+        InputAction inputAction = InputManager.GetInputAction(inputActionPath).InputAction;
+        string bindingDisplayString = GetBindingDisplayString(inputAction, inputDevice);
+        if (bindingDisplayString.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        if (!inputLegend.TryGetValue(inputSource, out List<InputActionInfo> inputActionInfos))
+        {
+            return;
+        }
+        List<InputActionInfo> matchingInputActionInfos = inputActionInfos
+            .Where(inputActionInfo => inputActionInfo.InputText == bindingDisplayString)
+            .ToList();
+        matchingInputActionInfos.ForEach(it => RemoveInputActionInfo(inputSource, it));
+    }
+
+    private void AddInputActionInfo(string inputActionPath, string actionText, EInputSource inputSource)
+    {
+        InputDevice inputDevice = GetInputDevice(inputSource);
+        if (inputDevice == null)
+        {
+            return;
+        }
+
+        InputAction inputAction = InputManager.GetInputAction(inputActionPath).InputAction;
+        string bindingDisplayString = GetBindingDisplayString(inputAction, inputDevice);
+        if (bindingDisplayString.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        AddInputActionInfo(inputSource, new InputActionInfo(actionText, bindingDisplayString));
+    }
+
+    private string GetBindingDisplayString(InputAction inputAction, InputDevice inputDevice)
+    {
+        // if (inputAction.name == "submit")
+        // {
+        //     if (inputDevice == Keyboard.current)
+        //     {
+        //         return "Enter";
+        //     }
+        //     else if (inputDevice == Gamepad.current)
+        //     {
+        //         return "A";
+        //     }
+        // }
+
+        if (inputActionWithDisplayStringError.Contains(inputAction.name))
+        {
+            // Do not try already failed InputActions again.
+            return "";
+        }
+
+        try
+        {
+            string combinedBindingDisplayStrings = inputAction.GetBindingDisplayString(InputBinding.DisplayStringOptions.DontOmitDevice);
+            if (combinedBindingDisplayStrings.IsNullOrEmpty())
+            {
+                return "";
+            }
+
+            string[] bindingDisplayStrings = combinedBindingDisplayStrings.Split(InputActionInfo.InfoSeparator);
+            string displayStringDeviceText = GetDisplayStringDeviceText(inputDevice);
+            if (displayStringDeviceText.IsNullOrEmpty())
+            {
+                return "";
+            }
+            string matchingBindingDisplayString = bindingDisplayStrings
+                .FirstOrDefault(it => it.Contains(displayStringDeviceText));
+            if (matchingBindingDisplayString.IsNullOrEmpty())
+            {
+                return "";
+            }
+
+            return matchingBindingDisplayString
+                .Replace(displayStringDeviceText, "")
+                .Replace(" +", "+")
+                .Replace("+ ", "+")
+                .Trim();
+        }
+        catch (NotImplementedException e)
+        {
+            Log.Logger.Error(e, $"Could not determine BindingDisplayString for InputAction '{inputAction.name}'");
+            inputActionWithDisplayStringError.Add(inputAction.name);
+            return "";
+        }
     }
 
     public void AddInputActionInfo(EInputSource inputSource, InputActionInfo inputActionInfo)
@@ -138,5 +233,31 @@ public class InputLegendControl : INeedInjection, IInjectionFinishedListener
     {
         CurrentInputSource = GetInputSource();
         UpdateInputLegendUi();
+    }
+
+    private string GetDisplayStringDeviceText(InputDevice inputDevice)
+    {
+        if (Gamepad.current != null
+            && inputDevice == Gamepad.current)
+        {
+            return $"[{Gamepad.current.displayName}]";
+        }
+        else if (Keyboard.current != null
+                 && inputDevice == Keyboard.current)
+        {
+            return $"[{Keyboard.current.displayName}]";
+        }
+        else if (Mouse.current != null
+                 && inputDevice == Keyboard.current)
+        {
+            return $"[{Mouse.current.displayName}]";
+        }
+        else if (Touchscreen.current != null
+                 && inputDevice == Touchscreen.current)
+        {
+            return $"[{Touchscreen.current.displayName}]";
+        }
+
+        return "";
     }
 }

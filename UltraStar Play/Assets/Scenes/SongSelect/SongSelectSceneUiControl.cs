@@ -147,7 +147,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.previousSongButton)]
     private Button previousSongButton;
 
-    private SongOrderPickerControl songOrderPickerControl;
+    public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     private SongSelectSceneData sceneData;
     private List<SongMeta> songMetas;
@@ -176,6 +176,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
+    public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -191,7 +192,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
     }
 
-    private SongMeta SelectedSong
+    public SongMeta SelectedSong
     {
         get
         {
@@ -199,7 +200,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         }
     }
 
-    private int SelectedSongIndex
+    public int SelectedSongIndex
     {
         get
         {
@@ -224,9 +225,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         HideMenuOverlay();
 
         ItemPicker songOrderItemPicker = uiDocument.rootVisualElement.Q<ItemPicker>(R.UxmlNames.songOrderPicker);
-        songOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
+        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
         injector.WithRootVisualElement(songOrderItemPicker)
-            .Inject(songOrderPickerControl);
+            .Inject(SongOrderPickerControl);
 
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
@@ -252,7 +253,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
-        songOrderPickerControl.Selection.Subscribe(newValue =>
+        SongOrderPickerControl.Selection.Subscribe(newValue =>
         {
             settings.SongSelectSettings.songOrder = newValue;
             characterQuickJumpListControl.UpdateCharacters();
@@ -337,6 +338,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         if (selectedSong == null)
         {
             SetEmptySongDetails();
+            songIndexLabel.text = "-";
             return;
         }
 
@@ -573,6 +575,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         playerSelectOverlayContainer.ShowByDisplay();
 
+        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_togglePlayers, "Toggle players");
+
         // Show lyrics for duet song
         bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
         leftLyricsOverlay.SetVisibleByDisplay(hasMultipleVoices);
@@ -600,6 +604,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public void HidePlayerSelectOverlay()
     {
+        uiManager.InputLegendControl.RemoveInputActionInfosForAllDevices(R.InputActions.usplay_togglePlayers);
         playerSelectOverlayContainer.HideByDisplay();
     }
 
@@ -657,7 +662,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     private object GetSongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (songOrderPickerControl.SelectedItem)
+        switch (SongOrderPickerControl.SelectedItem)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
@@ -676,7 +681,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             case ESongOrder.CountFinished:
                 return statistics.GetLocalStats(songMeta)?.TimesFinished;
             default:
-                Debug.LogWarning("Unknown order for songs: " + songOrderPickerControl.SelectedItem);
+                Debug.LogWarning("Unknown order for songs: " + SongOrderPickerControl.SelectedItem);
                 return songMeta.Artist;
         }
     }
@@ -694,7 +699,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
-        bb.BindExistingInstance(songOrderPickerControl);
+        bb.BindExistingInstance(SongOrderPickerControl);
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(songSelectSceneControlNavigator);
@@ -759,56 +764,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             }
         }
         return false;
-    }
-
-    public SongMeta GetCharacterQuickJumpSongMeta(char character)
-    {
-        Predicate<char> matchPredicate;
-        if (char.IsLetterOrDigit(character))
-        {
-            // Jump to song starts with character
-            matchPredicate = (songCharacter) => songCharacter == character;
-        }
-        else if (character == '#')
-        {
-            // Jump to song starts with number
-            matchPredicate = (songCharacter) => char.IsDigit(songCharacter);
-        }
-        else
-        {
-            // Jump to song starts with non-alphanumeric character
-            matchPredicate = (songCharacter) => !char.IsLetterOrDigit(songCharacter);
-        }
-
-        SongMeta match = GetFilteredSongMetas()
-            .Where(songMeta =>
-            {
-                string relevantString = songMeta.Artist;
-                if (songOrderPickerControl.SelectedItem == ESongOrder.Title)
-                {
-                    relevantString = songMeta.Title;
-                }
-                else if (songOrderPickerControl.SelectedItem == ESongOrder.Genre)
-                {
-                    relevantString = songMeta.Genre;
-                }
-                else if (songOrderPickerControl.SelectedItem == ESongOrder.Language)
-                {
-                    relevantString = songMeta.Language;
-                }
-                else if (songOrderPickerControl.SelectedItem == ESongOrder.Folder)
-                {
-                    relevantString = songMeta.Directory + "/" + songMeta.Filename;
-                }
-                else
-                {
-                    relevantString = songMeta.Artist;
-                }
-                return !relevantString.IsNullOrEmpty()
-                    && matchPredicate.Invoke(relevantString.ToLowerInvariant()[0]);
-            })
-            .FirstOrDefault();
-        return match;
     }
 
     public void UpdateTranslation()

@@ -11,19 +11,16 @@ using UnityEngine.UIElements;
 
 public class CharacterQuickJumpCharacterControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
-
-    [Inject]
-    private SongRouletteControl songRouletteControl;
-
     [Inject(UxmlName = R.UxmlNames.characterLabel)]
     private Label label;
 
     [Inject(UxmlName = R.UxmlNames.characterButton)]
     private Button characterButton;
 
-    private readonly string character;
+    [Inject]
+    private CharacterQuickJumpListControl characterQuickJumpListControl;
+
+    public char Character { get; private set; }
 
     public VisualElement VisualElement { get; private set; }
 
@@ -40,33 +37,19 @@ public class CharacterQuickJumpCharacterControl : INeedInjection, IInjectionFini
         }
     }
 
-    public CharacterQuickJumpCharacterControl(VisualElement visualElement, string character)
+    public CharacterQuickJumpCharacterControl(VisualElement visualElement, char character)
     {
         this.VisualElement = visualElement;
-        this.character = character;
+        this.Character = character;
     }
 
     public void OnInjectionFinished()
     {
-        label.text = character.ToUpperInvariant();
+        label.text = Character.ToString().ToUpperInvariant();
 
-        characterButton.RegisterCallbackButtonTriggered(() => DoCharacterQuickJump());
-        this.ObserveEveryValueChanged(me => me.character)
+        characterButton.RegisterCallbackButtonTriggered(() => characterQuickJumpListControl.DoCharacterQuickJump(Character));
+        this.ObserveEveryValueChanged(me => me.Character)
             .WhereNotNull()
-            .Subscribe(newCharacter => label.text = newCharacter.ToUpperInvariant());
-    }
-
-    private void DoCharacterQuickJump()
-    {
-        if (character.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        SongMeta match = songSelectSceneUiControl.GetCharacterQuickJumpSongMeta(character.ToLowerInvariant()[0]);
-        if (match != null)
-        {
-            songRouletteControl.SelectSong(match);
-        }
+            .Subscribe(newCharacter => label.text = newCharacter.ToString().ToUpperInvariant());
     }
 }

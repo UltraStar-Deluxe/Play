@@ -28,6 +28,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    public CharacterQuickJumpListControl characterQuickJumpListControl;
+
     private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
@@ -56,6 +59,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Open the song editor
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
+            .Where(_ => !songSelectSceneUiControl.IsMenuOverlayVisible
+                        && !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneUiControl.StartSongEditorScene());
         
         // Toggle selected players
@@ -74,9 +79,19 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(OnNavigate);
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
+        InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
+            .Subscribe(_ => songRouletteControl.SelectNextSong());
+        InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
+            .Subscribe(_ => songRouletteControl.SelectPreviousSong());
+
+        // Select next / previous character-quick-jump character
+        InputManager.GetInputAction(R.InputActions.usplay_nextCharacterQuickJumpCharacter).PerformedAsObservable()
+            .Subscribe(_ => characterQuickJumpListControl.SelectNextCharacter());
+        InputManager.GetInputAction(R.InputActions.usplay_previousCharacterQuickJumpCharacter).PerformedAsObservable()
+            .Subscribe(_ => characterQuickJumpListControl.SelectPreviousCharacter());
 
         // Toggle song menu overlay
-        InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
             .Where(_ => !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }
@@ -86,8 +101,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_back, "Back");
         uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.ui_submit, "Select song");
         uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_space, "Song options");
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_randomSong, "Random song");
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_openSongEditor, "Song editor");
+        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_randomSong, "Random song");
+        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_openSongEditor, "Song editor");
+        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_toggleFavorite, "Toggle favorite");
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
@@ -174,6 +190,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         else if (songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneUiControl.SubmitSearch();
+        }
+        else if (songSelectSceneUiControl.IsMenuOverlayVisible)
+        {
+            songSelectSceneUiControl.HideMenuOverlay();
         }
         else if (songSelectSceneUiControl.IsPlaylistActive())
         {
