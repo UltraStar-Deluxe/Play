@@ -93,10 +93,41 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
+            <ui:VisualElement name="playerSelectOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
+                <ui:VisualElement name="buttonRow" style="flex-direction: row;">
+                    <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />
+                    <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" style="margin-bottom: 20px;" />
+                </ui:VisualElement>
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 90%; flex-grow: 1;">
+                    <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement name="micListOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; bottom: 0; flex-grow: 1; margin-top: 5px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="micScrollView" style="width: 90%; flex-grow: 1;">
+                    <ui:Instance template="SongSelectSceneMicEntryUi" name="micEntry" />
+                </ui:ScrollView>
+                <ui:Label text="No microphone found" display-tooltip-when-elided="true" name="noMicsFoundLabel" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; display: none; white-space: normal;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="lyricsContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; flex-direction: row;">
+                <ui:VisualElement name="leftLyricsOverlay" class="roundCorners" style="position: absolute; left: 0; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+                    <ui:Label text="Voice 1" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView">
+                        <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; flex-grow: 1;" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                <ui:VisualElement name="rightLyricsOverlay" class="roundCorners" style="position: absolute; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; right: 0; display: flex;">
+                    <ui:Label text="Voice 2" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold; -unity-text-align: upper-right;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView" style="flex-grow: 1;">
+                        <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; -unity-text-align: upper-right;" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; flex-wrap: wrap;">
-            <ui:Label text="A: Select&#10;B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
-            <ui:Label text="Y: Song Details" display-tooltip-when-elided="true" name="buttonDescription" />
-            <ui:Label text="X: Something" display-tooltip-when-elided="true" name="buttonDescription" />
+            <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
+            <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
+            <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />
         </ui:VisualElement>
         <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
             <ui:VisualElement name="innerMenuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
@@ -118,40 +149,6 @@
                             <ui:Label text="With video" display-tooltip-when-elided="true" name="videoLegendLabel" class="smallFont" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
-            <ui:VisualElement name="playerSelectOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
-                <ui:VisualElement name="buttonRow" style="flex-direction: row;">
-                    <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />
-                    <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" style="margin-bottom: 20px;" />
-                </ui:VisualElement>
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 90%; flex-grow: 1;">
-                    <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
-                </ui:ScrollView>
-            </ui:VisualElement>
-            <ui:VisualElement name="micListOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; bottom: 0; flex-grow: 1; margin-top: 5px;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="micScrollView" style="width: 90%; flex-grow: 1;">
-                    <ui:Instance template="SongSelectSceneMicEntryUi" name="micEntry" />
-                </ui:ScrollView>
-                <ui:Label text="No microphone found" display-tooltip-when-elided="true" name="noMicsFoundLabel" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; display: none; white-space: normal;" />
-            </ui:VisualElement>
-            <ui:VisualElement name="controlLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgb(32, 32, 32); height: auto;">
-                <ui:Label text="Y: Toggle Players&#10;" display-tooltip-when-elided="true" name="buttonDescription" />
-            </ui:VisualElement>
-            <ui:VisualElement name="lyricsContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; flex-direction: row;">
-                <ui:VisualElement name="leftLyricsOverlay" class="roundCorners" style="position: absolute; left: 0; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
-                    <ui:Label text="Voice 1" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold;" />
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView">
-                        <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; flex-grow: 1;" />
-                    </ui:ScrollView>
-                </ui:VisualElement>
-                <ui:VisualElement name="rightLyricsOverlay" class="roundCorners" style="position: absolute; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; right: 0; display: flex;">
-                    <ui:Label text="Voice 2" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold; -unity-text-align: upper-right;" />
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView" style="flex-grow: 1;">
-                        <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; -unity-text-align: upper-right;" />
-                    </ui:ScrollView>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

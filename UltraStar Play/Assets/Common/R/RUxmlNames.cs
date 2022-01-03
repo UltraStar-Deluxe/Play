@@ -55,7 +55,6 @@ public static partial class R
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
-        public const string controlLegend = "controlLegend";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
