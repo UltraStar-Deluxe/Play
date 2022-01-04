@@ -11,6 +11,7 @@ using System;
 using PrimeInputActions;
 using TMPro;
 using ProTrans;
+using UnityEditor.Graphs;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -147,6 +148,15 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     [Inject(UxmlName = R.UxmlNames.closeMenuOverlayButton)]
     private Button closeMenuOverlayButton;
 
+    [Inject(UxmlName = R.UxmlNames.songDetailOverlay)]
+    private VisualElement songDetailOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.toggleSongDetailOverlayButton)]
+    private Button toggleSongDetailOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.songDetailOverlayScrollView)]
+    private VisualElement songDetailOverlayScrollView;
+
     [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
     private Button backToMainMenuButton;
 
@@ -186,6 +196,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
+    public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -232,6 +243,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         HidePlayerSelectOverlay();
         HideMenuOverlay();
+        HideSongDetailOverlay();
 
         ItemPicker songOrderItemPicker = uiDocument.rootVisualElement.Q<ItemPicker>(R.UxmlNames.songOrderPicker);
         SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
@@ -252,6 +264,18 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
         backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+
+        toggleSongDetailOverlayButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (IsSongDetailOverlayVisible)
+            {
+                HideSongDetailOverlay();
+            }
+            else
+            {
+                ShowSongDetailOverlay();
+            }
+        });
 
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
@@ -295,6 +319,17 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public void HideMenuOverlay()
     {
         menuOverlay.HideByDisplay();
+    }
+
+    public void ShowSongDetailOverlay()
+    {
+        songDetailOverlay.ShowByDisplay();
+        UpdateSongDetailsInOverlay();
+    }
+
+    public void HideSongDetailOverlay()
+    {
+        songDetailOverlay.HideByDisplay();
     }
 
     private void UpdateFavoriteIcon()
@@ -371,6 +406,11 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         UpdateFavoriteIcon();
 
         UpdateSongStatistics(selectedSong);
+
+        if (IsSongDetailOverlayVisible)
+        {
+            UpdateSongDetailsInOverlay();
+        }
     }
 
     private void UpdateSongDurationLabel(SongMeta songMeta)
@@ -824,5 +864,71 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor, "Song editor", menuOverlayInputLegend);
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite, "Toggle favorite", menuOverlayInputLegend);
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavoritePlaylistActive, "Toggle favorite playlist", menuOverlayInputLegend);
+    }
+
+    private void UpdateSongDetailsInOverlay()
+    {
+        songDetailOverlayScrollView.Clear();
+        SongMeta songMeta = SelectedSong;
+        if (songMeta == null)
+        {
+            return;
+        }
+
+        Label CreateSongDetailLabel(string fieldName, object fieldValue)
+        {
+            Label label = new Label();
+            label.enableRichText = true;
+            label.AddToClassList("songDetailOverlayLabel");
+            string fieldValueDisplayString = fieldValue?.ToString();
+            fieldValueDisplayString = fieldValueDisplayString.IsNullOrEmpty()
+                ? "-"
+                : fieldValueDisplayString;
+            label.text = $"<b>{fieldName}</b>: {fieldValueDisplayString}";
+            return label;
+        }
+
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Artist", songMeta.Artist));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Title", songMeta.Title));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Genre", songMeta.Genre));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Year", songMeta.Year > 0 ? songMeta.Year : null));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Audio", songMeta.Mp3));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Gap", songMeta.Gap));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Bpm", songMeta.Bpm));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Video", songMeta.Video));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Video Gap", songMeta.VideoGap));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Cover", songMeta.Cover));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Language", songMeta.Language));
+        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Edition", songMeta.Edition));
+        songDetailOverlayScrollView.Add(new Label("\n"));
+
+        songMeta.VoiceNames.Keys.ForEach(voiceNameKey =>
+        {
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, voiceNameKey);
+            if (lyrics.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            if (voiceNameKey != Voice.soloVoiceName)
+            {
+                Label voiceNameLabel = new Label();
+                voiceNameLabel.enableRichText = true;
+                voiceNameLabel.AddToClassList("songDetailOverlayLabel");
+                string voiceName = songMeta.VoiceNames[voiceNameKey];
+                string voiceNameText = voiceName != voiceNameKey
+                    ? $" ({voiceName})"
+                    : "";
+                voiceNameLabel.text = $"<b>{voiceNameKey}{voiceNameText}</b>";
+                songDetailOverlayScrollView.Add(voiceNameLabel);
+            }
+
+            Label lyricsLabel = new Label();
+            lyricsLabel.AddToClassList("songDetailOverlayLabel");
+            lyricsLabel.text = lyrics;
+
+            songDetailOverlayScrollView.Add(lyricsLabel);
+            songDetailOverlayScrollView.Add(new Label("\n"));
+        });
     }
 }

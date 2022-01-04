@@ -115,6 +115,7 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string innerMenuOverlay = "innerMenuOverlay";
+        public const string innerSongDetailOverlay = "innerSongDetailOverlay";
         public const string inputLegend = "inputLegend";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ipAddressLabel = "ipAddressLabel";
@@ -172,6 +173,7 @@ public static partial class R
         public const string onePlayerLayout = "onePlayerLayout";
         public const string onlineHighScoreContainer = "onlineHighScoreContainer";
         public const string openSongEditorButton = "openSongEditorButton";
+        public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
@@ -227,7 +229,6 @@ public static partial class R
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
-        public const string showSongDetailsButton = "showSongDetailsButton";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
         public const string SingingResultsPlayerUi = "SingingResultsPlayerUi";
         public const string SingingResultsPlayerUiAlternative = "SingingResultsPlayerUiAlternative";
@@ -237,6 +238,8 @@ public static partial class R
         public const string songArtist = "songArtist";
         public const string songButton = "songButton";
         public const string songContainer = "songContainer";
+        public const string songDetailOverlay = "songDetailOverlay";
+        public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
         public const string songEntry = "songEntry";
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
@@ -281,6 +284,7 @@ public static partial class R
         public const string toggle = "toggle";
         public const string toggleFavoriteButton = "toggleFavoriteButton";
         public const string toggleFavoriteIcon = "toggleFavoriteIcon";
+        public const string toggleSongDetailOverlayButton = "toggleSongDetailOverlayButton";
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";

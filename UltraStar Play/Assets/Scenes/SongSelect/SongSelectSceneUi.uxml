@@ -136,6 +136,7 @@
                     <ItemPicker noPreviousButton="true" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />
                     <ui:Button text="Create Playlist" display-tooltip-when-elided="true" name="createPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Edit Playlist" display-tooltip-when-elided="true" name="editPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
+                    <ui:Button text="Song Details" display-tooltip-when-elided="true" name="toggleSongDetailOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Main Menu" display-tooltip-when-elided="true" name="backToMainMenuButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                 </ui:ScrollView>
                 <ui:VisualElement name="legendContainer" class="roundCorners" style="width: 100%; max-height: 33%;">
@@ -153,6 +154,11 @@
                         </ui:VisualElement>
                     </ui:ScrollView>
                 </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="songDetailOverlay" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0); display: none;">
+            <ui:VisualElement name="innerSongDetailOverlay" style="position: absolute; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; left: 0;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songDetailOverlayScrollView" style="width: 100%; height: auto; flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="editPlaylistOverlay" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">

@@ -54,11 +54,11 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.singThisSongButton)]
     private Button singThisSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.showSongDetailsButton)]
-    private Button showSongDetailsButton;
-
     [Inject(UxmlName = R.UxmlNames.openSongEditorButton)]
     private Button openSongEditorButton;
+
+    [Inject(UxmlName = R.UxmlNames.openSongFolderButton)]
+    private Button openSongFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.closeSongOverlayButton)]
     private Button closeSongOverlayButton;
@@ -274,6 +274,14 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
         });
         openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneUiControl.StartSongEditorScene());
+        if (PlatformUtils.IsStandalone)
+        {
+            openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
+        }
+        else
+        {
+            openSongFolderButton.HideByDisplay();
+        }
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateFavoriteIcon());

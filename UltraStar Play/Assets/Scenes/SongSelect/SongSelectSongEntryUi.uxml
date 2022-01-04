@@ -19,7 +19,7 @@
                 <ui:Button text="Add to Medley" display-tooltip-when-elided="true" name="addToMedleyButton" style="width: 100%;" />
                 <ui:VisualElement name="modifyPlaylistButtonContainer" style="width: 100%;" />
                 <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" style="width: 100%;" />
-                <ui:Button text="Details" display-tooltip-when-elided="true" name="showSongDetailsButton" style="width: 100%;" />
+                <ui:Button text="Open Folder" display-tooltip-when-elided="true" name="openSongFolderButton" style="width: 100%;" />
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" style="width: 100%;" />
             </ui:ScrollView>
         </ui:VisualElement>

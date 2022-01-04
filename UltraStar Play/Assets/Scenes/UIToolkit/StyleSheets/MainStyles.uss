@@ -563,3 +563,9 @@ Label.smallerFont {
 .inputLegendLabel {
     width: 20%;
 }
+
+.songDetailOverlayLabel {
+    width: 100%;
+    font-size: var(--font-size-small);
+    white-space: normal;
+}

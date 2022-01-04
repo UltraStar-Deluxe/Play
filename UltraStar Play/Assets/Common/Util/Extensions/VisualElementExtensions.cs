@@ -42,6 +42,11 @@ public static class VisualElementExtensions
         }
     }
 
+    public static void ToggleVisibleByDisplay(this VisualElement visualElement)
+    {
+        visualElement.SetVisibleByDisplay(!visualElement.IsVisibleByDisplay());
+    }
+
     public static void ShowByDisplay(this VisualElement visualElement)
     {
         visualElement.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
@@ -67,6 +72,11 @@ public static class VisualElementExtensions
         {
             visualElement.HideByVisibility();
         }
+    }
+
+    public static void ToggleVisibleByVisibility(this VisualElement visualElement)
+    {
+        visualElement.SetVisibleByVisibility(!visualElement.IsVisibleByVisibility());
     }
 
     public static void ShowByVisibility(this VisualElement visualElement)
