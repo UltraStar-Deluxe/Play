@@ -41,7 +41,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
 
     private bool needsRefresh;
 
-    private List<CharacterQuickJumpCharacterControl> characterQuickJumpEntryControls = new List<CharacterQuickJumpCharacterControl>();
+    private readonly List<CharacterQuickJumpCharacterControl> characterQuickJumpEntryControls = new List<CharacterQuickJumpCharacterControl>();
     private List<CharacterQuickJumpCharacterControl> EnabledCharacterQuickJumpEntryControls => characterQuickJumpEntryControls
         .Where(it => it.Enabled)
         .ToList();
@@ -94,7 +94,8 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
             .FirstOrDefault();
         CharacterQuickJumpCharacterControl currentCharacterQuickJumpCharacterControl = EnabledCharacterQuickJumpEntryControls
             .FirstOrDefault(it => it.Character == currentCharacter
-                                  || (char.IsDigit(currentCharacter) && it.Character == '#'));
+                                  || (char.IsDigit(currentCharacter) && it.Character == '#')
+                                  || (!char.IsLetterOrDigit(currentCharacter) && it.Character == '&'));
         if (currentCharacterQuickJumpCharacterControl == null)
         {
             return;
@@ -109,6 +110,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
     public void UpdateCharacters()
     {
         characterQuickJumpEntryControls.ForEach(it => it.VisualElement.RemoveFromHierarchy());
+        characterQuickJumpEntryControls.Clear();
         foreach (char c in characters.ToLowerInvariant())
         {
             CreateCharacter(c);
