@@ -66,8 +66,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     [Inject(Optional = true)]
     private UIDocument uiDocument;
 
-    public InputLegendControl InputLegendControl { get; private set; } = new InputLegendControl();
-
     private readonly List<Notification> notifications = new List<Notification>();
     private readonly List<Dialog> dialogs = new List<Dialog>();
 
@@ -80,20 +78,8 @@ public class UiManager : MonoBehaviour, INeedInjection
         LeanTween.init(800);
     }
 
-    private void OnEnable()
-    {
-        InputSystem.onDeviceChange += OnDeviceChange;
-    }
-
-    private void OnDisable()
-    {
-        InputSystem.onDeviceChange -= OnDeviceChange;
-    }
-
     private void Start()
     {
-        injector.Inject(InputLegendControl);
-
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
 
@@ -308,10 +294,5 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             visualElement.parent.Remove(visualElement);
         }
-    }
-
-    private void OnDeviceChange(InputDevice arg1, InputDeviceChange arg2)
-    {
-        InputLegendControl.UpdateCurrentInputSource();
     }
 }

@@ -67,10 +67,19 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     private UiManager uiManager;
 
     [Inject]
+    private UltraStarPlayInputManager inputManager;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
+
+    [Inject(UxmlName = R.UxmlNames.inputLegend)]
+    private VisualElement inputLegend;
+
+    [Inject(UxmlName = R.UxmlNames.menuOverlayInputLegend)]
+    private VisualElement menuOverlayInputLegend;
 
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
@@ -273,6 +282,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         InitSongRouletteSongMetas();
         songRouletteControl.SelectionClickedEventStream
             .Subscribe(_ => CheckAudioAndStartSingScene());
+
+        UpdateInputLegend();
+        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
     }
 
     public void ShowMenuOverlay()
@@ -563,7 +575,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             songAudioPlayer.Init(SelectedSong);
             if (!songAudioPlayer.HasAudioClip)
             {
-                UiManager.Instance.CreateWarningDialog("Audio Error", "Audio file could not be loaded.\nPlease use a supported format.");
+                uiManager.CreateWarningDialog("Audio Error", "Audio file could not be loaded.\nPlease use a supported format.");
                 return;
             }
 
@@ -574,8 +586,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     private void ShowPlayerSelectOverlay()
     {
         playerSelectOverlayContainer.ShowByDisplay();
-
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_togglePlayers, "Toggle players");
+        UpdateInputLegend();
 
         // Show lyrics for duet song
         bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
@@ -604,8 +615,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
     public void HidePlayerSelectOverlay()
     {
-        uiManager.InputLegendControl.RemoveInputActionInfosForAllDevices(R.InputActions.usplay_togglePlayers);
         playerSelectOverlayContainer.HideByDisplay();
+        UpdateInputLegend();
     }
 
     public void StartSongEditorScene()
@@ -791,5 +802,27 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     {
         PlaylistChooserControl = new PlaylistChooserControl();
         injector.Inject(PlaylistChooserControl);
+    }
+
+    private void UpdateInputLegend()
+    {
+        inputLegend.Clear();
+        if (IsPlayerSelectOverlayVisible)
+        {
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers, "Toggle players", inputLegend);
+        }
+        else
+        {
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit, "Select song", inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu, "Song menu", inputLegend);
+        }
+
+        menuOverlayInputLegend.Clear();
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_randomSong, "Random song", menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor, "Song editor", menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite, "Toggle favorite", menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavoritePlaylistActive, "Toggle favorite playlist", menuOverlayInputLegend);
     }
 }

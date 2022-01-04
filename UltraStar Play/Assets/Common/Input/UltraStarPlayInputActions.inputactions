@@ -507,18 +507,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "toggleFavorite",
-                    "type": "Button",
-                    "id": "6227994f-ca76-4f05-917e-85d369edb5e7",
+                    "name": "toggleFavoritePlaylistActive",
+                    "type": "PassThrough",
+                    "id": "78ffc4f4-f4d2-468d-9e42-608b3b757ccf",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "toggleFavoritePlaylistActive",
-                    "type": "Button",
-                    "id": "78ffc4f4-f4d2-468d-9e42-608b3b757ccf",
+                    "name": "toggleFavorite",
+                    "type": "PassThrough",
+                    "id": "6227994f-ca76-4f05-917e-85d369edb5e7",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -936,50 +936,6 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Ctrl+Shift+D",
-                    "id": "25fdc418-5480-4b4d-93d9-e87f180b743e",
-                    "path": "ButtonWithTwoModifiers",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier1",
-                    "id": "f81b60fa-95ba-4835-9162-a0c606bbe759",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "modifier2",
-                    "id": "df835fe2-c3ab-4ef3-9472-28e958b4bc56",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "button",
-                    "id": "e2c18228-aa4a-43b9-90f0-873b07924af9",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "toggleFavoritePlaylistActive",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
                     "name": "",
                     "id": "479cc28f-605c-4269-b28b-007ff626e181",
                     "path": "<Mouse>/rightButton",
@@ -1330,6 +1286,50 @@
                     "action": "previousSong",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Ctrl+Shift+D",
+                    "id": "25fdc418-5480-4b4d-93d9-e87f180b743e",
+                    "path": "ButtonWithTwoModifiers",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier1",
+                    "id": "f81b60fa-95ba-4835-9162-a0c606bbe759",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "modifier2",
+                    "id": "df835fe2-c3ab-4ef3-9472-28e958b4bc56",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "e2c18228-aa4a-43b9-90f0-873b07924af9",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "toggleFavoritePlaylistActive",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },
