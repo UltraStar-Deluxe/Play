@@ -185,6 +185,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneUiControl.HideMenuOverlay();
         }
+        else if (songSelectSceneUiControl.IsSongDetailOverlayVisible)
+        {
+            songSelectSceneUiControl.HideSongDetailOverlay();
+        }
         else if (songSelectSceneUiControl.IsPlaylistActive())
         {
             songSelectSceneUiControl.ResetPlaylistSelection();
