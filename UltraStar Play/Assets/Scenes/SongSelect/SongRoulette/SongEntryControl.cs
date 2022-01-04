@@ -119,16 +119,20 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     private Vector2 animStartPosition;
     private Vector2 animStartSize;
     
-    public SongEntryControl(VisualElement visualElement, SongEntryPlaceholderControl targetPlaceholderControl)
+    public SongEntryControl(
+        VisualElement visualElement,
+        SongEntryPlaceholderControl targetPlaceholderControl,
+        Vector2 initialPosition,
+        Vector2 initialSize)
     {
         this.VisualElement = visualElement;
         this.targetPlaceholderControl = targetPlaceholderControl;
 
         // Initial size and position
-        SetSize(targetPlaceholderControl.GetSize());
-        SetPosition(targetPlaceholderControl.GetPosition());
-        animStartPosition = targetPlaceholderControl.GetPosition();
-        animStartSize = targetPlaceholderControl.GetSize();
+        SetPosition(initialPosition);
+        SetSize(initialSize);
+        animStartPosition = initialPosition;
+        animStartSize = initialSize;
 
         // Add itself as IDragListener to be notified when its RectTransform is dragged.
         // AddListener(this);
@@ -249,7 +253,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     public void StartAnimationToFullScale()
     {
         VisualElement.style.scale = new StyleScale(new Scale(Vector3.zero));
-        LeanTween.value(songRouletteControl.gameObject, Vector3.zero, Vector3.one, 0.2f)
+        LeanTween.value(songRouletteControl.gameObject, Vector3.zero, Vector3.one, songRouletteControl.MaxAnimTimeInSeconds)
             .setOnUpdate((Vector3 value) => VisualElement.style.scale = new StyleScale(new Scale(value)));
     }
 
