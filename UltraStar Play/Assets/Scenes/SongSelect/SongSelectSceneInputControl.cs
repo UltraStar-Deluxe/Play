@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UniInject;
@@ -16,9 +17,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
     
-    // [Inject]
-    // private SongSelectSceneControlNavigator songSelectSceneControlNavigator;
-
     [Inject]
     private SongRouletteControl songRouletteControl;
 
@@ -26,10 +24,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private UiManager uiManager;
-
-    [Inject]
     public CharacterQuickJumpListControl characterQuickJumpListControl;
+
+    [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
+    private VisualElement inputLegendContainer;
 
     private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
@@ -38,14 +36,15 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     
     void Start()
     {
-        InitInputLegend();
-
         // Toggle song is favorite
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() == 0)
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).InputAction.ReadValue<float>() >= 1)
             .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedSongIsFavorite());
         
         // Toggle favorite playlist is active
-        InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).StartedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).PerformedAsObservable()
+            .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() >= 1)
             .Subscribe(_ => songSelectSceneUiControl.ToggleFavoritePlaylist());
         
         // Close search or leave scene with Back
@@ -92,18 +91,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         // Toggle song menu overlay
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
+            .Where(_ => !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
             .Where(_ => !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
-    }
-
-    private void InitInputLegend()
-    {
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_back, "Back");
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.ui_submit, "Select song");
-        uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_space, "Song options");
-        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_randomSong, "Random song");
-        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_openSongEditor, "Song editor");
-        // uiManager.InputLegendControl.AddInputActionInfosForAllDevices(R.InputActions.usplay_toggleFavorite, "Toggle favorite");
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)

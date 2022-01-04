@@ -1,4 +1,4 @@
-public enum EInputSource
+public enum EInputDevice
 {
     Gamepad,
     KeyboardAndMouse,

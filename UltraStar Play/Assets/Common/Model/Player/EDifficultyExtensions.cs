@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ProTrans;
 
-public static class DifficultyExtensions
+public static class EDifficultyExtensions
 {
     public static string GetTranslatedName(this EDifficulty difficulty)
     {

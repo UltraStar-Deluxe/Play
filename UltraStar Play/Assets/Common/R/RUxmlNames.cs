@@ -141,6 +141,7 @@ public static partial class R
         public const string lyricsScrollView = "lyricsScrollView";
         public const string menuButton = "menuButton";
         public const string menuOverlay = "menuOverlay";
+        public const string menuOverlayInputLegend = "menuOverlayInputLegend";
         public const string menuScrollView = "menuScrollView";
         public const string micEntry = "micEntry";
         public const string micIcon = "micIcon";

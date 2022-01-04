@@ -133,6 +133,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
                 item.VisualElement.style.visibility = new StyleEnum<Visibility>(Visibility.Hidden);
             }
         }
+
+        FindActiveRouletteItems();
     }
 
     private void OnSongRouletteItemChangedSlot(SlotChangeEvent slotChangeEvent)
@@ -401,6 +403,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }
         int wrappedIndex = (nextIndex < 0) ? nextIndex + songs.Count : nextIndex;
         int wrappedIndexModulo = wrappedIndex % songs.Count;
+        if (wrappedIndexModulo < 0)
+        {
+            wrappedIndexModulo = 0;
+        }
         SongMeta song = songs[wrappedIndexModulo];
         return song;
     }
