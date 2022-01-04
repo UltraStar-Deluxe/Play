@@ -245,9 +245,26 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private SongEntryControl CreateSongRouletteItem(SongMeta songMeta, SongEntryPlaceholderControl placeholderControl)
     {
+        // Find initial position outside of screen
+        SongEntryPlaceholderControl initialPositionPlaceholderControl = placeholderControl;
+        List<SongEntryPlaceholderControl> placeholderControlsSortedByPosition = new List<SongEntryPlaceholderControl>(songEntryPlaceholderControls);
+        placeholderControlsSortedByPosition.Sort((a, b) => a.GetPosition().x.CompareTo(b.GetPosition().x));
+        if (placeholderControl.GetPosition().x > centerItem.GetPosition().x)
+        {
+            initialPositionPlaceholderControl = placeholderControlsSortedByPosition.Last();
+        }
+        else if (placeholderControl.GetPosition().x < centerItem.GetPosition().x)
+        {
+            initialPositionPlaceholderControl = placeholderControlsSortedByPosition.First();
+        }
+        Vector2 initialPosition = initialPositionPlaceholderControl.GetPosition();
+        Vector2 initialSize = initialPositionPlaceholderControl.GetSize();
+
         SongEntryControl item = new SongEntryControl(
             songEntryUi.CloneTree().Children().FirstOrDefault(),
-            placeholderControl);
+            placeholderControl,
+            initialPosition,
+            initialSize);
         injector.WithRootVisualElement(item.VisualElement).Inject(item);
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
@@ -352,7 +369,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private void ResetAnimationTimeTowardsTargetRouletteItem()
     {
         songEntryControls.ForEach(it => it.StartAnimationTowardsTargetPlaceholder());
-        // Animate towards target. Thereby, keep already finished part of previous animation.
         AnimTimeInSeconds = MaxAnimTimeInSeconds - AnimTimeInSeconds;
     }
 
