@@ -2,76 +2,100 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection, IBeginDragHandler, IEndDragHandler, IDragHandler
+public abstract class AbstractDragControl<EVENT>
 {
     private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
 
-    [Inject]
-    public GraphicRaycaster graphicRaycaster;
-
-    public bool IsDragging { get; private set; }
+    public bool IsDragging => dragState == DragState.Dragging;
     public Vector2 DragDistance { get; private set; }
-    private bool ignoreDrag;
 
     private EVENT dragStartEvent;
     private int pointerId;
 
-    private Vector2 dragStartPosition;
-    
-    public RectTransform targetRectTransform;
+    private Vector3 dragStartPosition;
 
-    protected virtual void Start()
+    private IPointerEvent pointerDownEvent;
+    private DragState dragState = DragState.ReadyForDrag;
+
+    private readonly VisualElement target;
+
+	public AbstractDragControl(VisualElement target, GameObject gameObject)
     {
+        this.target = target;
+        target.RegisterCallback<PointerDownEvent>(OnPointerDown);
+        target.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        target.RegisterCallback<PointerUpEvent>(OnPointerUp);
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
             .Subscribe(_ =>
             {
                 CancelDrag();
-                // Cancel other callbacks. To do so, this subscription has a higher priority. 
+                // Cancel other callbacks. To do so, this subscription has a higher priority.
                 InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
             })
             .AddTo(gameObject);
     }
 
-    public void AddListener(IDragListener<EVENT> listener)
+    protected abstract EVENT CreateDragEventStart(IPointerEvent eventData);
+    protected abstract EVENT CreateDragEvent(IPointerEvent eventData, EVENT dragStartEvent);
+
+    private void OnPointerDown(PointerDownEvent evt)
     {
-        dragListeners.Add(listener);
+        pointerDownEvent = evt;
+        dragState = DragState.ReadyForDrag;
     }
 
-    public void RemoveListener(IDragListener<EVENT> listener)
+    private void OnPointerMove(PointerMoveEvent evt)
     {
-        dragListeners.Remove(listener);
+        if (dragState == DragState.ReadyForDrag)
+        {
+            Vector2 pointerMoveDistance =  evt.position - pointerDownEvent.position;
+            if (pointerMoveDistance.magnitude > 5f)
+            {
+                OnBeginDrag(pointerDownEvent);
+            }
+        }
+        else if (dragState == DragState.Dragging)
+        {
+            OnDrag(evt);
+        }
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        if (dragState == DragState.Dragging)
+        {
+            OnEndDrag(evt);
+        }
+    }
+
+    public void OnBeginDrag(IPointerEvent eventData)
     {
         if (IsDragging)
         {
             return;
         }
 
-        ignoreDrag = false;
-        IsDragging = true;
+        dragState = DragState.Dragging;
         dragStartPosition = eventData.position;
         pointerId = eventData.pointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(IPointerEvent eventData)
     {
-        if (ignoreDrag
+        if (dragState == DragState.IgnoreDrag
             || !IsDragging
             || eventData.pointerId != pointerId)
         {
@@ -83,10 +107,9 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(IPointerEvent eventData)
     {
-        if (ignoreDrag
-            || !IsDragging
+        if (dragState != DragState.Dragging
             || eventData.pointerId != pointerId)
         {
             return;
@@ -94,19 +117,18 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
 
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
-        IsDragging = false;
+        dragState = DragState.ReadyForDrag;
         DragDistance = Vector2.zero;
     }
 
     private void CancelDrag()
     {
-        if (ignoreDrag)
+        if (dragState == DragState.IgnoreDrag)
         {
             return;
         }
 
-        IsDragging = false;
-        ignoreDrag = true;
+        dragState = DragState.IgnoreDrag;
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
 
@@ -121,31 +143,20 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         }
     }
 
-    protected abstract EVENT CreateDragEventStart(PointerEventData eventData);
-    protected abstract EVENT CreateDragEvent(PointerEventData eventData, EVENT dragStartEvent);
-
-    protected GeneralDragEvent CreateGeneralDragEvent(PointerEventData eventData, GeneralDragEvent dragStartEvent)
+    protected GeneralDragEvent CreateGeneralDragEvent(IPointerEvent eventData, GeneralDragEvent dragStartEvent)
     {
         // Screen coordinates in pixels
         Vector2 screenPosInPixels = eventData.position;
         Vector2 screenDistanceInPixels = screenPosInPixels - dragStartEvent.ScreenCoordinateInPixels.StartPosition;
-        Vector2 deltaInPixels = eventData.delta;
+        Vector2 deltaInPixels = eventData.deltaPosition;
 
-        // Target RectTransform coordinates in pixels
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            targetRectTransform,
-            eventData.position,
-            eventData.pressEventCamera,
-            out Vector2 localPoint);
+        // Target coordinates in pixels
+        float targetWidthInPixels = target.contentRect.width;
+        float targetHeightInPixels = target.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(target.resolvedStyle.left, target.resolvedStyle.top);
 
-        float rectTransformWidthInPixels = targetRectTransform.rect.width;
-        float rectTransformHeightInPixels = targetRectTransform.rect.height;
-        Vector2 rectTransformPosInPixels = new Vector2(
-            localPoint.x + (rectTransformWidthInPixels / 2),
-            localPoint.y + (rectTransformHeightInPixels / 2));
-
-        float rectTransformXDistanceInPixels = rectTransformPosInPixels.x - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
-        float rectTransformYDistanceInPixels = rectTransformPosInPixels.y - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
+        float rectTransformXDistanceInPixels = targetPosInPixels.x - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
+        float rectTransformYDistanceInPixels = targetPosInPixels.y - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
         Vector2 rectTransformDistanceInPixels = new Vector2(rectTransformXDistanceInPixels, rectTransformYDistanceInPixels);
 
         GeneralDragEvent result = new GeneralDragEvent(
@@ -166,36 +177,21 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
                 dragStartEvent.RectTransformCoordinateInPixels.StartPosition,
                 rectTransformDistanceInPixels,
                 deltaInPixels,
-                new Vector2(targetRectTransform.rect.width,
-                    targetRectTransform.rect.height)),
+                new Vector2(targetWidthInPixels, targetHeightInPixels)),
             dragStartEvent.RaycastResultsDragStart,
             dragStartEvent.InputButton);
         return result;
     }
 
-    protected GeneralDragEvent CreateGeneralDragEventStart(PointerEventData eventData)
+    protected GeneralDragEvent CreateGeneralDragEventStart(IPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenPosInPixels = eventData.pressPosition;
+        Vector2 screenPosInPixels = eventData.position;
 
-        // Target RectTransform coordinate in pixels
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            targetRectTransform,
-            screenPosInPixels,
-            eventData.pressEventCamera,
-            out Vector2 localPoint);
-
-        float rectTransformWidthInPixels = targetRectTransform.rect.width;
-        float rectTransformHeightInPixels = targetRectTransform.rect.height;
-        Vector2 rectTransformPosInPixels = new Vector2(
-            localPoint.x + (rectTransformWidthInPixels / 2),
-            localPoint.y + (rectTransformHeightInPixels / 2));
-
-        // Raycast
-        List<RaycastResult> raycastResults = new List<RaycastResult>();
-        PointerEventData eventDataForRaycast = new PointerEventData(EventSystem.current);
-        eventDataForRaycast.position = screenPosInPixels;
-        graphicRaycaster.Raycast(eventDataForRaycast, raycastResults);
+        // Target coordinate in pixels
+        float targetWidthInPixels = target.contentRect.width;
+        float targetHeightInPixels = target.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(target.resolvedStyle.left, target.resolvedStyle.top);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
@@ -208,16 +204,16 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
                 Vector2.zero,
                 new Vector2(Screen.width, Screen.height)),
             new DragCoordinate(
-                rectTransformPosInPixels,
+                targetPosInPixels,
                 Vector2.zero,
                 Vector2.zero),
             CreateDragCoordinateInPercent(
-                rectTransformPosInPixels,
+                targetPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
-                new Vector2(rectTransformWidthInPixels, rectTransformHeightInPixels)),
-            raycastResults,
-            (int)eventData.button);
+                new Vector2(targetWidthInPixels, targetHeightInPixels)),
+            null,
+            eventData.button);
         return result;
     }
 
@@ -227,5 +223,12 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
         Vector2 distanceInPercent = distanceInPixels / fullSize;
         Vector2 deltaInPercent = deltaInPixels / fullSize;
         return new DragCoordinate(startPosInPercent, distanceInPercent, deltaInPercent);
+    }
+
+    private enum DragState
+    {
+        ReadyForDrag,
+        Dragging,
+        IgnoreDrag
     }
 }

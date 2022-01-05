@@ -38,7 +38,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
         isCanceled = false;
-        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Middle
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Middle
             && Touch.activeTouches.Count == 0)
         {
             CancelDrag();
@@ -52,7 +52,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
     {
-        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Middle
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Middle
             && Touch.activeTouches.Count < 2)
         {
             return;

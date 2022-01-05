@@ -48,7 +48,7 @@ public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDra
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
         isCanceled = false;
-        if (dragEvent.InputButton != PointerEventData.InputButton.Left)
+        if (dragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;

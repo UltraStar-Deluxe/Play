@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class GeneralDragEvent
 {
-    public PointerEventData.InputButton InputButton { get; private set; }
+    public int InputButton { get; private set; }
 
     public List<RaycastResult> RaycastResultsDragStart { get; private set; }
 
@@ -19,7 +19,7 @@ public class GeneralDragEvent
         DragCoordinate rectTransformCoordinateInPixels,
         DragCoordinate rectTransformCoordinateInPercent,
         List<RaycastResult> raycastResultsDragStart,
-        PointerEventData.InputButton inputButton)
+        int inputButton)
     {
         ScreenCoordinateInPixels = screenCoordinateInPixels;
         ScreenCoordinateInPercent = screenCoordinateInPercent;
