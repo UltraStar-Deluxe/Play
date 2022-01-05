@@ -61,7 +61,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         isCanceled = false;
         lastDragEvent = dragEvent;
         startDragEvent = dragEvent;
-        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;
