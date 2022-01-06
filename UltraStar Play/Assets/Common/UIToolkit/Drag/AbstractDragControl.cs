@@ -15,8 +15,7 @@ public abstract class AbstractDragControl<EVENT>
 {
     private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
 
-    public bool IsDragging => dragState == DragState.Dragging;
-    public Vector2 DragDistance { get; private set; }
+    public bool IsDragging => DragState.Value == EDragState.Dragging;
 
     private EVENT dragStartEvent;
     private int pointerId;
@@ -24,16 +23,16 @@ public abstract class AbstractDragControl<EVENT>
     private Vector3 dragStartPosition;
 
     private IPointerEvent pointerDownEvent;
-    private DragState dragState = DragState.ReadyForDrag;
+    public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
 
     private readonly VisualElement target;
 
 	public AbstractDragControl(VisualElement target, GameObject gameObject)
     {
         this.target = target;
-        target.RegisterCallback<PointerDownEvent>(OnPointerDown);
-        target.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-        target.RegisterCallback<PointerUpEvent>(OnPointerUp);
+        target.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        target.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+        target.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
@@ -49,15 +48,25 @@ public abstract class AbstractDragControl<EVENT>
     protected abstract EVENT CreateDragEventStart(IPointerEvent eventData);
     protected abstract EVENT CreateDragEvent(IPointerEvent eventData, EVENT dragStartEvent);
 
+    public void AddListener(IDragListener<EVENT> listener)
+    {
+        dragListeners.Add(listener);
+    }
+
+    public void RemoveListener(IDragListener<EVENT> listener)
+    {
+        dragListeners.Remove(listener);
+    }
+
     private void OnPointerDown(PointerDownEvent evt)
     {
         pointerDownEvent = evt;
-        dragState = DragState.ReadyForDrag;
+        DragState.Value = EDragState.ReadyForDrag;
     }
 
     private void OnPointerMove(PointerMoveEvent evt)
     {
-        if (dragState == DragState.ReadyForDrag)
+        if (DragState.Value == EDragState.ReadyForDrag)
         {
             Vector2 pointerMoveDistance =  evt.position - pointerDownEvent.position;
             if (pointerMoveDistance.magnitude > 5f)
@@ -65,7 +74,7 @@ public abstract class AbstractDragControl<EVENT>
                 OnBeginDrag(pointerDownEvent);
             }
         }
-        else if (dragState == DragState.Dragging)
+        else if (DragState.Value == EDragState.Dragging)
         {
             OnDrag(evt);
         }
@@ -73,43 +82,44 @@ public abstract class AbstractDragControl<EVENT>
 
     private void OnPointerUp(PointerUpEvent evt)
     {
-        if (dragState == DragState.Dragging)
+        if (DragState.Value == EDragState.Dragging)
         {
             OnEndDrag(evt);
         }
+
+        DragState.Value = EDragState.WaitingForPointerDown;
     }
 
-    public void OnBeginDrag(IPointerEvent eventData)
+    private void OnBeginDrag(IPointerEvent eventData)
     {
         if (IsDragging)
         {
             return;
         }
 
-        dragState = DragState.Dragging;
+        DragState.Value = EDragState.Dragging;
         dragStartPosition = eventData.position;
         pointerId = eventData.pointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
-    public void OnDrag(IPointerEvent eventData)
+    private void OnDrag(IPointerEvent eventData)
     {
-        if (dragState == DragState.IgnoreDrag
+        if (DragState.Value == EDragState.IgnoreDrag
             || !IsDragging
             || eventData.pointerId != pointerId)
         {
             return;
         }
 
-        DragDistance = eventData.position - dragStartPosition;
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
-    public void OnEndDrag(IPointerEvent eventData)
+    private void OnEndDrag(IPointerEvent eventData)
     {
-        if (dragState != DragState.Dragging
+        if (DragState.Value != EDragState.Dragging
             || eventData.pointerId != pointerId)
         {
             return;
@@ -117,18 +127,17 @@ public abstract class AbstractDragControl<EVENT>
 
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
-        dragState = DragState.ReadyForDrag;
-        DragDistance = Vector2.zero;
+        DragState.Value = EDragState.ReadyForDrag;
     }
 
     private void CancelDrag()
     {
-        if (dragState == DragState.IgnoreDrag)
+        if (DragState.Value == EDragState.IgnoreDrag)
         {
             return;
         }
 
-        dragState = DragState.IgnoreDrag;
+        DragState.Value = EDragState.IgnoreDrag;
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
 
@@ -223,12 +232,5 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 distanceInPercent = distanceInPixels / fullSize;
         Vector2 deltaInPercent = deltaInPixels / fullSize;
         return new DragCoordinate(startPosInPercent, distanceInPercent, deltaInPercent);
-    }
-
-    private enum DragState
-    {
-        ReadyForDrag,
-        Dragging,
-        IgnoreDrag
     }
 }

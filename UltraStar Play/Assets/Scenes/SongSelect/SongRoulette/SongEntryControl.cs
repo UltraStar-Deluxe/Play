@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using PrimeInputActions;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -69,11 +70,14 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songPreviewBackgroundImage)]
     public VisualElement SongPreviewBackgroundImage { get; private set; }
 
-    public Button Button => songButton;
-
     public string Name { get; set; }
 
     public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
+
+    public Subject<bool> clickEventStream = new Subject<bool>();
+    public IObservable<bool> ClickEventStream => clickEventStream;
+
+    private bool ignoreNextClickEvent;
 
     private SongMeta songMeta;
     public SongMeta SongMeta
@@ -118,7 +122,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private Vector2 animStartPosition;
     private Vector2 animStartSize;
-    
+
+    private GeneralDragControl dragControl;
+
     public SongEntryControl(
         VisualElement visualElement,
         SongEntryPlaceholderControl targetPlaceholderControl,
@@ -133,10 +139,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         SetSize(initialSize);
         animStartPosition = initialPosition;
         animStartSize = initialSize;
-
-        // Add itself as IDragListener to be notified when its RectTransform is dragged.
-        // AddListener(this);
-        // targetRectTransform = RectTransform;
     }
 
     public void Update()
@@ -285,6 +287,28 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateFavoriteIcon());
+
+        // Add itself as IDragListener to be notified when its RectTransform is dragged.
+        dragControl = new GeneralDragControl(songButton, songRouletteControl.gameObject);
+        dragControl.AddListener(this);
+
+        // Ignore button click after dragging
+        dragControl.DragState.Subscribe(dragState =>
+        {
+            if (dragState == EDragState.Dragging)
+            {
+                ignoreNextClickEvent = true;
+            }
+        });
+        
+        songButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (!ignoreNextClickEvent)
+            {
+                clickEventStream.OnNext(true);
+            }
+            ignoreNextClickEvent = false;
+        });
     }
 
     public void ShowSongMenuOverlay()
