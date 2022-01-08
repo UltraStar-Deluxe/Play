@@ -111,6 +111,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public void ShowSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
+        artistPropertyContainer.Q<Toggle>().Focus();
     }
 
     public void HideSearchPropertyDropdownOverlay()
@@ -192,6 +193,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public string GetSearchText()
     {
         return GetRawSearchText().TrimStart().ToLowerInvariant();
+    }
+
+    public void FocusSearchTextField()
+    {
+        searchTextField.Focus();
     }
 
     public bool IsSearchTextFieldFocused()

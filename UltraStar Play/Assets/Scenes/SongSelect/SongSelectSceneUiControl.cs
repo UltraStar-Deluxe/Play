@@ -50,7 +50,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public CharacterQuickJumpListControl characterQuickJumpListControl;
     
     [InjectedInInspector]
-    public SongSelectSceneControlNavigator songSelectSceneControlNavigator;
+    public FocusableNavigatorControl focusableNavigatorControl;
 
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
@@ -314,6 +314,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public void ShowMenuOverlay()
     {
         menuOverlay.ShowByDisplay();
+        closeMenuOverlayButton.Focus();
     }
 
     public void HideMenuOverlay()
@@ -753,7 +754,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         bb.BindExistingInstance(SongOrderPickerControl);
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
-        bb.BindExistingInstance(songSelectSceneControlNavigator);
+        bb.BindExistingInstance(focusableNavigatorControl);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
     }

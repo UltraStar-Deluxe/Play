@@ -89,7 +89,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private Vector2 dragVelocity;
     private float dragDuration;
     private Vector2 dragStartPosition;
-    
+
     private void Start()
     {
         // UIToolkit
@@ -534,20 +534,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private T FindNearestSlot<T>(float targetPositionX, List<T> allEntries)
         where T : SongEntryPlaceholderControl
     {
-        float nearestDistance = float.MaxValue;
-        T nearest = null;
-        foreach (T current in allEntries)
+        return allEntries.FindMinElement(entry =>
         {
-            float currentX = current.VisualElement.worldBound.center.x;
-            float currentDistance = Mathf.Abs(currentX - targetPositionX);
-            if (nearest == null
-                || currentDistance < nearestDistance)
-            {
-                nearest = current;
-                nearestDistance = currentDistance;
-            }
-        }
-        return nearest;
+            float x = entry.VisualElement.worldBound.center.x;
+            float distance = Mathf.Abs(x - targetPositionX);
+            return distance;
+        });
     }
 
     public void ShowSongMenuOverlay()

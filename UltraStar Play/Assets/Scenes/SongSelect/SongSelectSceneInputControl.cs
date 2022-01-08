@@ -8,6 +8,7 @@ using UniInject;
 using UniRx;
 using UnityEngine.InputSystem;
 using PrimeInputActions;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -22,6 +23,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private FocusableNavigatorControl navigatorControl;
 
     [Inject]
     public CharacterQuickJumpListControl characterQuickJumpListControl;
@@ -50,6 +54,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         // Close search or leave scene with Back
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
+        InputManager.GetInputAction(R.InputActions.usplay_search).PerformedAsObservable()
+            .Subscribe(_ => songSelectSceneUiControl.SongSearchControl.FocusSearchTextField());
         
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
@@ -73,9 +79,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneUiControl.CheckAudioAndStartSingScene());
         
-        // Select next / previous song with (hold) arrow keys or mouse wheel
+        // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Subscribe(OnNavigate);
+            .Subscribe(context => navigatorControl.OnNavigate(context.ReadValue<Vector2>()));
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
         InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
@@ -109,13 +115,13 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             // Remove focus
             songSelectSceneUiControl.SubmitSearch();
         }
-        else if (IsNoControlOrSongButtonFocused())
+        else if (IsSongButtonFocused())
         {
             songSelectSceneUiControl.CheckAudioAndStartSingScene();
         }
         else
         {
-            // songSelectSceneControlNavigator.SubmitSelectedControl();
+            navigatorControl.OnSubmit();
         }
     }
 
@@ -134,33 +140,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songRouletteControl.SelectPreviousSong();
         }
-    }
-
-    private void OnNavigate(InputAction.CallbackContext context)
-    {
-        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible
-            || songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
-        {
-            return;
-        }
-
-        if (context.ReadValue<Vector2>().x > 0) 
-        {
-            songRouletteControl.SelectNextSong();
-        }
-        if (context.ReadValue<Vector2>().x < 0)
-        {
-            songRouletteControl.SelectPreviousSong();
-        }
-
-        // if (context.ReadValue<Vector2>().y > 0)
-        // {
-        //     songSelectSceneControlNavigator.SelectPreviousControl();
-        // }
-        // if (context.ReadValue<Vector2>().y < 0)
-        // {
-        //     songSelectSceneControlNavigator.SelectNextControl();
-        // }
     }
 
     private void OnBack()
@@ -254,12 +233,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
     }
 
-    // Check that no other control has the focus, such as a checkbox of a player profile.
-    // In such a case, keyboard input could be intended to change the controls state, e.g., (de)select the checkbox.
-    private bool IsNoControlOrSongButtonFocused()
+    private bool IsSongButtonFocused()
     {
-        // TODO: Migrate to UIToolkit
-        return true;
+        VisualElement focusedVisualElement = navigatorControl.FocusedVisualElement;
+        return focusedVisualElement != null
+               && focusedVisualElement.name == R.UxmlNames.songButton;
     }
 
     private bool IsFuzzySearchActive()

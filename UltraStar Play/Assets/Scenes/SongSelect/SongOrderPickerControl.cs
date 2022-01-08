@@ -20,7 +20,7 @@ public class SongOrderPickerControl : LabeledItemPickerControl<ESongOrder>, INee
         {
             string prefixTranslation = TranslationManager.GetTranslation(R.Messages.order);
             string valueTranslation = songOrder.GetTranslatedName();
-            return $"{prefixTranslation}: {valueTranslation}";
+            return $"{prefixTranslation}:\n{valueTranslation}";
         };
     }
 }

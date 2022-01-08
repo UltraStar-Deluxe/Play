@@ -13,6 +13,7 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImage = "dialogTitleImage";
         public const string ellipsis = "ellipsis";
+        public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
         public const string itemPickerButton = "itemPickerButton";

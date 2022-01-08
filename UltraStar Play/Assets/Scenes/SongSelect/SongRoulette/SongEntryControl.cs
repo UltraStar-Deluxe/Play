@@ -74,7 +74,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
 
-    public Subject<bool> clickEventStream = new Subject<bool>();
+    public readonly Subject<bool> clickEventStream = new Subject<bool>();
     public IObservable<bool> ClickEventStream => clickEventStream;
 
     private bool ignoreNextClickEvent;

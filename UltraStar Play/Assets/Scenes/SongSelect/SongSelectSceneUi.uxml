@@ -3,7 +3,7 @@
     <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
     <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
-    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+    <ui:VisualElement name="background" class="focusableNavigatorRoot" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
         <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
             <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
                 <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
@@ -94,7 +94,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
-            <ui:VisualElement name="playerSelectOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
+            <ui:VisualElement name="playerSelectOverlay" class="roundCorners focusableNavigatorRoot" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
                 <ui:VisualElement name="buttonRow" style="flex-direction: row;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />
                     <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" style="margin-bottom: 20px;" />
@@ -130,10 +130,10 @@
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />
         </ui:VisualElement>
         <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
-            <ui:VisualElement name="innerMenuOverlay" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+            <ui:VisualElement name="innerMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="menuScrollView" style="width: 100%; height: auto; flex-grow: 1;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
-                    <ItemPicker noPreviousButton="true" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />
+                    <ItemPicker noPreviousButton="false" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />
                     <ui:Button text="Create Playlist" display-tooltip-when-elided="true" name="createPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Edit Playlist" display-tooltip-when-elided="true" name="editPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Song Details" display-tooltip-when-elided="true" name="toggleSongDetailOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
@@ -162,7 +162,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="editPlaylistOverlay" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
-            <ui:VisualElement name="editPlaylistDialog" class="roundCorners" style="background-color: rgba(32, 32, 32, 0.88); width: 400px; height: auto; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
+            <ui:VisualElement name="editPlaylistDialog" class="roundCorners focusableNavigatorRoot" style="background-color: rgba(32, 32, 32, 0.88); width: 400px; height: auto; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
                 <ui:Label text="Create Playlist" display-tooltip-when-elided="true" name="editPlaylistDialogTitle" style="padding-left: 5px;" />
                 <ui:TextField picking-mode="Ignore" text="Playlist Name" name="playlistNameTextField" style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0;" />
                 <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-around; margin-top: 10px;">
@@ -173,7 +173,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="searchPropertyDropdownOverlay" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: none;">
+        <ui:VisualElement name="searchPropertyDropdownOverlay" picking-mode="Ignore" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
             <ui:Button display-tooltip-when-elided="true" name="closeSearchPropertyDropdownButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
             <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 87px; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex;">
                 <ui:Label text="Search in:" display-tooltip-when-elided="true" name="searchByPropertyLabel" class="smallFont" />
