@@ -101,8 +101,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             .Select(it => new SongEntryPlaceholderControl(it))
             .ToList();
 
-        // In the first frame, the placeholders do not have their position and size defined correctly.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => DoInit()));
+        // On start of first frame, the placeholders do not yet have their position and size defined correctly.
+        songEntryPlaceholderControls[0].VisualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt => DoInit());
     }
 
     private void DoInit()
