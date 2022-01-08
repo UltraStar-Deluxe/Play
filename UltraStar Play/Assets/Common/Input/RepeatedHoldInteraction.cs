@@ -43,6 +43,8 @@ public class RepeatedHoldInteraction : IInputInteraction
     private float RepeatedPauseOrDefault => repeatedPause > 0.0 ? repeatedPause : InputSystem.settings.defaultHoldTime;
     private float PressPointOrDefault => pressPoint > 0.0 ? pressPoint : defaultButtonPressPoint;
 
+    private float ignoreInputUntilTime;
+
     /// <inheritdoc />
     public void Process(ref InputInteractionContext context)
     {
@@ -50,13 +52,17 @@ public class RepeatedHoldInteraction : IInputInteraction
         {
             case InputActionPhase.Waiting:
             case InputActionPhase.Canceled:
-                if (context.ControlIsActuated(PressPointOrDefault))
+                if (context.ControlIsActuated(PressPointOrDefault)
+                    && Time.time >= ignoreInputUntilTime - 0.1f)
                 {
                     context.Started();
                     if (fireImmediately)
                     {
                         context.PerformedAndStayStarted();
                     }
+                    ignoreInputUntilTime = Time.time + InitialPauseOrDefault;
+
+                    // Check input again when the time elapsed or input changed.
                     context.SetTimeout(InitialPauseOrDefault);
                 }
                 break;
@@ -64,13 +70,15 @@ public class RepeatedHoldInteraction : IInputInteraction
             case InputActionPhase.Started:
                 if (!context.ControlIsActuated())
                 {
-                    context.Canceled();
+                    Cancel(ref context);
                 }
-                else
+                else if (Time.time >= ignoreInputUntilTime - 0.1f)
                 {
                     // Perform action but stay in the started phase, because we want to fire again after durationOrDefault 
                     context.PerformedAndStayStarted();
-                    // Fire again after durationOrDefault
+                    ignoreInputUntilTime = Time.time + RepeatedPauseOrDefault;
+
+                    // Check input again when the time elapsed or input changed.
                     context.SetTimeout(RepeatedPauseOrDefault);
                 }
                 break;
@@ -78,16 +86,22 @@ public class RepeatedHoldInteraction : IInputInteraction
             case InputActionPhase.Performed:
                 if (!context.ControlIsActuated(PressPointOrDefault))
                 {
-                    context.Canceled();
+                    Cancel(ref context);
                 }
                 break;
             default:
                 if (!context.ControlIsActuated(PressPointOrDefault))
                 {
-                    context.Canceled();
+                    Cancel(ref context);
                 }
                 break;
         }
+    }
+
+    private void Cancel(ref InputInteractionContext context)
+    {
+        ignoreInputUntilTime = 0;
+        context.Canceled();
     }
     
     /// <inheritdoc />
