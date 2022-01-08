@@ -105,6 +105,13 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
             ? EnabledCharacterQuickJumpEntryControls.GetElementAfter(currentCharacterQuickJumpCharacterControl, true)
             : EnabledCharacterQuickJumpEntryControls.GetElementBefore(currentCharacterQuickJumpCharacterControl, true);
         DoCharacterQuickJump(characterQuickJumpCharacterControl.Character);
+
+        // Scroll the CharacterQuickJumpButton into view and animate it to make clear what happened
+        VisualElement target = characterQuickJumpCharacterControl.VisualElement;
+        characterContainer.ScrollTo(target);
+        LeanTween.value(gameObject, Vector3.one * 0.5f, Vector3.one, 0.5f)
+            .setEaseSpring()
+            .setOnUpdate(s => target.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))));
     }
 
     public void UpdateCharacters()
