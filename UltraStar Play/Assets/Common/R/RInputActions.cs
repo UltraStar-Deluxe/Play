@@ -50,6 +50,7 @@ public static partial class R
         public static readonly string usplay_previousSong = "usplay/previousSong";
         public static readonly string usplay_randomSong = "usplay/randomSong";
         public static readonly string usplay_restartSong = "usplay/restartSong";
+        public static readonly string usplay_search = "usplay/search";
         public static readonly string usplay_skipToNextLyrics = "usplay/skipToNextLyrics";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_start = "usplay/start";
@@ -61,7 +62,6 @@ public static partial class R
         public static readonly string usplay_togglePause = "usplay/togglePause";
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";
         public static readonly string usplay_toggleResultGraph = "usplay/toggleResultGraph";
-        public static readonly string usplay_toggleSearch = "usplay/toggleSearch";
         public static readonly string usplay_toggleSongMenu = "usplay/toggleSongMenu";
     }
 }

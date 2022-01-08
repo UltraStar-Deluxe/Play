@@ -13,7 +13,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="favoriteIcon" style="position: absolute; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconFilled.png?fileID=2800000&amp;guid=3c8ebe4e2e712904f84bf08e36421283&amp;type=3#FavoriteIconFilled&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; right: 5px; top: 5px;" />
         <ui:Button display-tooltip-when-elided="true" name="songButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
-        <ui:VisualElement name="songMenuOverlay" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
+        <ui:VisualElement name="songMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songMenuOverlayScrollView" style="width: 100%; height: 100%; align-items: center;">
                 <ui:Button text="Sing" display-tooltip-when-elided="true" name="singThisSongButton" style="width: 100%;" />
                 <ui:Button text="Add to Medley" display-tooltip-when-elided="true" name="addToMedleyButton" style="width: 100%;" />

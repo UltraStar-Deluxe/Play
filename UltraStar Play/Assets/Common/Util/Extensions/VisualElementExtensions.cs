@@ -127,4 +127,31 @@ public static class VisualElementExtensions
         float newAlpha = includeAlpha ? NumberUtils.Limit(lastColor.a * factor, 0, 1) : lastColor.a;
         visualElement.style.unityBackgroundImageTintColor = new Color(newR, newG, newB, newAlpha);
     }
+
+    public static void ScrollToSelf(this VisualElement visualElement)
+    {
+        List<VisualElement> visualElementAndAncestors = new List<VisualElement>();
+        visualElementAndAncestors.Add(visualElement);
+        visualElementAndAncestors.AddRange(visualElement.GetAncestors());
+        visualElementAndAncestors.ForEach(ancestor =>
+        {
+            VisualElement parent = ancestor.parent;
+            if (parent is ScrollView scrollView)
+            {
+                scrollView.ScrollTo(ancestor);
+            }
+        });
+    }
+
+    public static List<VisualElement> GetAncestors(this VisualElement visualElement)
+    {
+        List<VisualElement> ancestors = new List<VisualElement>();
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            ancestors.Add(parent);
+            parent = parent.parent;
+        }
+        return ancestors;
+    }
 }

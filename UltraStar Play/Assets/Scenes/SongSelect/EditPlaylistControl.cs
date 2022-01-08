@@ -141,6 +141,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         submitEditPlaylistButton.ShowByDisplay();
         confirmDeletePlaylistButton.HideByDisplay();
         cancelDeletePlaylistButton.HideByDisplay();
+        submitEditPlaylistButton.Focus();
     }
 
     private void ShowConfirmAndCancelDeleteButtons()
@@ -149,6 +150,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         submitEditPlaylistButton.HideByDisplay();
         confirmDeletePlaylistButton.ShowByDisplay();
         cancelDeletePlaylistButton.ShowByDisplay();
+        cancelDeletePlaylistButton.Focus();
     }
 
     private void SubmitEditPlaylistDialog()

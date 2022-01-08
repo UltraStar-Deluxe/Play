@@ -498,7 +498,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "toggleSearch",
+                    "name": "search",
                     "type": "Button",
                     "id": "41e6fe7e-d361-40fe-897f-152f177a881f",
                     "expectedControlType": "Button",
@@ -755,7 +755,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleSearch",
+                    "action": "search",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -766,7 +766,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleSearch",
+                    "action": "search",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -777,7 +777,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "toggleSearch",
+                    "action": "search",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
