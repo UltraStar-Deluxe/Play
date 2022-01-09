@@ -58,26 +58,23 @@ public class PlaylistManager : MonoBehaviour
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
     private readonly string playlistFileExtension = ".playlist";
-    private string favoritesPlaylistFile;
-    private string playlistFolder;
+    private string FavoritesPlaylistFile => $"{PlaylistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
+    private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
 
     void Awake()
     {
-        playlistFolder = Application.persistentDataPath + "/Playlists";
-        favoritesPlaylistFile = $"{playlistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
-
         CreateFavoritePlaylistIfNotExist();
     }
 
     private void CreateFavoritePlaylistIfNotExist()
     {
-        if (!Directory.Exists(playlistFolder))
+        if (!Directory.Exists(PlaylistFolder))
         {
-            Directory.CreateDirectory(playlistFolder);
+            Directory.CreateDirectory(PlaylistFolder);
         }
-        if (!File.Exists(favoritesPlaylistFile))
+        if (!File.Exists(FavoritesPlaylistFile))
         {
-            File.WriteAllText(favoritesPlaylistFile, "# UltraStar playlist");
+            File.WriteAllText(FavoritesPlaylistFile, "# UltraStar playlist");
         }
     }
 
@@ -92,7 +89,7 @@ public class PlaylistManager : MonoBehaviour
     {
         if (playlist == FavoritesPlaylist)
         {
-            return favoritesPlaylistFile;
+            return FavoritesPlaylistFile;
         }
         return playlistToFilePathMap[playlist];
     }
@@ -103,7 +100,7 @@ public class PlaylistManager : MonoBehaviour
         playlistToFilePathMap = new Dictionary<UltraStarPlaylist, string>();
 
         FolderScanner scanner = new FolderScanner("*" + playlistFileExtension);
-        List<string> playlistFilePaths = scanner.GetFiles(playlistFolder);
+        List<string> playlistFilePaths = scanner.GetFiles(PlaylistFolder);
         foreach (string filePath in playlistFilePaths)
         {
             UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
@@ -124,7 +121,7 @@ public class PlaylistManager : MonoBehaviour
         playlists.Add(playlist);
         playlistToFilePathMap.Add(playlist, filePath);
 
-        if (Path.GetFullPath(favoritesPlaylistFile) == Path.GetFullPath(filePath))
+        if (Path.GetFullPath(FavoritesPlaylistFile) == Path.GetFullPath(filePath))
         {
             // This is the special playlist for the favorite songs.
             favoritesPlaylist = playlist;
@@ -296,7 +293,7 @@ public class PlaylistManager : MonoBehaviour
     public UltraStarPlaylist CreateNewPlaylist(string initialName)
     {
         string newPlaylistName = GetNewUniquePlaylistName(initialName);
-        string newPlaylistPath = $"{playlistFolder}/{newPlaylistName}{playlistFileExtension}";
+        string newPlaylistPath = $"{PlaylistFolder}/{newPlaylistName}{playlistFileExtension}";
         UltraStarPlaylist newPlaylist = new UltraStarPlaylist();
         AddPlaylist(newPlaylist, newPlaylistPath);
 
