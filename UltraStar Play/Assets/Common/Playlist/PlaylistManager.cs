@@ -6,7 +6,6 @@ using UnityEngine;
 using UniRx;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEngine.WSA;
 using Application = UnityEngine.Application;
 
 public class PlaylistManager : MonoBehaviour
