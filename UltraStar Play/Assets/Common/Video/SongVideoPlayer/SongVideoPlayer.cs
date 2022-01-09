@@ -111,6 +111,7 @@ public class SongVideoPlayer : MonoBehaviour
     {
         if (!videoPlayerErrorMessage.IsNullOrEmpty())
         {
+            Debug.LogError(videoPlayerErrorMessage);
             UiManager.Instance.CreateNotificationVisualElement(videoPlayerErrorMessage, "error");
             videoPlayerErrorMessage = "";
             UnloadVideo();
