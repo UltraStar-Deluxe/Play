@@ -209,7 +209,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            uiManager.CreateNotification("Audio could not be loaded.", Colors.red);
+            uiManager.CreateNotificationVisualElement("Audio could not be loaded.", "error");
         }
     }
 
