@@ -28,7 +28,7 @@ public static class InputLegendControl
             return null;
         }
 
-        InputDevice inputDevice = UltraStarPlayInputManager.GetCurrentInputDeviceEnum().GetInputDevice();;
+        InputDevice inputDevice = (InputManager.Instance as UltraStarPlayInputManager)?.InputDeviceEnum.GetInputDevice();
         InputAction inputAction = InputManager.GetInputAction(inputActionPath).InputAction;
         string bindingDisplayString = GetBindingDisplayString(inputAction, inputDevice);
         if (bindingDisplayString.IsNullOrEmpty())

@@ -63,13 +63,13 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         songSelectSceneUiControl.PlaylistChooserControl.Selection
             .Subscribe(_ => needsRefresh = true);
 
-        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateButtonLabels());
         UpdateButtonLabels();
+        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateButtonLabels());
     }
 
     private void UpdateButtonLabels()
     {
-        if (UltraStarPlayInputManager.GetCurrentInputDeviceEnum() == EInputDevice.Gamepad)
+        if (inputManager.InputDeviceEnum == EInputDevice.Gamepad)
         {
             previousCharacterButton.text = "< L2";
             nextCharacterButton.text = "R2 >";

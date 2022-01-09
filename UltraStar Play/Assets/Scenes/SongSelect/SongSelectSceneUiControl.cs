@@ -853,7 +853,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         inputLegend.Query<Label>()
             .ForEach(label => label.RemoveFromHierarchy());
 
-        if (UltraStarPlayInputManager.GetCurrentInputDeviceEnum() == EInputDevice.Touch)
+        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
             inputDeviceIcon.HideByDisplay();
         }
