@@ -22,7 +22,7 @@ public abstract class AbstractDragControl<EVENT>
 
     private Vector3 dragStartPosition;
 
-    private IPointerEvent pointerDownEvent;
+    private DragControlPointerEvent dragControlPointerDownEvent;
     public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
 
     private readonly VisualElement target;
@@ -45,8 +45,8 @@ public abstract class AbstractDragControl<EVENT>
             .AddTo(gameObject);
     }
 
-    protected abstract EVENT CreateDragEventStart(IPointerEvent eventData);
-    protected abstract EVENT CreateDragEvent(IPointerEvent eventData, EVENT dragStartEvent);
+    protected abstract EVENT CreateDragEventStart(DragControlPointerEvent eventData);
+    protected abstract EVENT CreateDragEvent(DragControlPointerEvent eventData, EVENT dragStartEvent);
 
     public void AddListener(IDragListener<EVENT> listener)
     {
@@ -60,7 +60,7 @@ public abstract class AbstractDragControl<EVENT>
 
     private void OnPointerDown(PointerDownEvent evt)
     {
-        pointerDownEvent = evt;
+        dragControlPointerDownEvent = new DragControlPointerEvent(evt);
         DragState.Value = EDragState.ReadyForDrag;
     }
 
@@ -68,15 +68,15 @@ public abstract class AbstractDragControl<EVENT>
     {
         if (DragState.Value == EDragState.ReadyForDrag)
         {
-            Vector2 pointerMoveDistance =  evt.position - pointerDownEvent.position;
+            Vector2 pointerMoveDistance =  evt.position - dragControlPointerDownEvent.Position;
             if (pointerMoveDistance.magnitude > 5f)
             {
-                OnBeginDrag(pointerDownEvent);
+                OnBeginDrag(dragControlPointerDownEvent);
             }
         }
         else if (DragState.Value == EDragState.Dragging)
         {
-            OnDrag(evt);
+            OnDrag(new DragControlPointerEvent(evt));
         }
     }
 
@@ -84,13 +84,13 @@ public abstract class AbstractDragControl<EVENT>
     {
         if (DragState.Value == EDragState.Dragging)
         {
-            OnEndDrag(evt);
+            OnEndDrag(new DragControlPointerEvent(evt));
         }
 
         DragState.Value = EDragState.WaitingForPointerDown;
     }
 
-    private void OnBeginDrag(IPointerEvent eventData)
+    private void OnBeginDrag(DragControlPointerEvent eventData)
     {
         if (IsDragging)
         {
@@ -98,17 +98,17 @@ public abstract class AbstractDragControl<EVENT>
         }
 
         DragState.Value = EDragState.Dragging;
-        dragStartPosition = eventData.position;
-        pointerId = eventData.pointerId;
+        dragStartPosition = eventData.Position;
+        pointerId = eventData.PointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
-    private void OnDrag(IPointerEvent eventData)
+    private void OnDrag(DragControlPointerEvent eventData)
     {
         if (DragState.Value == EDragState.IgnoreDrag
             || !IsDragging
-            || eventData.pointerId != pointerId)
+            || eventData.PointerId != pointerId)
         {
             return;
         }
@@ -117,10 +117,10 @@ public abstract class AbstractDragControl<EVENT>
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
-    private void OnEndDrag(IPointerEvent eventData)
+    private void OnEndDrag(DragControlPointerEvent eventData)
     {
         if (DragState.Value != EDragState.Dragging
-            || eventData.pointerId != pointerId)
+            || eventData.PointerId != pointerId)
         {
             return;
         }
@@ -152,50 +152,50 @@ public abstract class AbstractDragControl<EVENT>
         }
     }
 
-    protected GeneralDragEvent CreateGeneralDragEvent(IPointerEvent eventData, GeneralDragEvent dragStartEvent)
+    protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenPosInPixels = eventData.position;
-        Vector2 screenDistanceInPixels = screenPosInPixels - dragStartEvent.ScreenCoordinateInPixels.StartPosition;
-        Vector2 deltaInPixels = eventData.deltaPosition;
+        Vector2 screenPosInPixels = eventData.Position;
+        Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
+        Vector2 deltaInPixels = eventData.DeltaPosition;
 
         // Target coordinates in pixels
         float targetWidthInPixels = target.contentRect.width;
         float targetHeightInPixels = target.contentRect.height;
         Vector2 targetPosInPixels = new Vector2(target.resolvedStyle.left, target.resolvedStyle.top);
 
-        float rectTransformXDistanceInPixels = targetPosInPixels.x - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
-        float rectTransformYDistanceInPixels = targetPosInPixels.y - dragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
+        float rectTransformXDistanceInPixels = targetPosInPixels.x - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
+        float rectTransformYDistanceInPixels = targetPosInPixels.y - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
         Vector2 rectTransformDistanceInPixels = new Vector2(rectTransformXDistanceInPixels, rectTransformYDistanceInPixels);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
-                dragStartEvent.ScreenCoordinateInPixels.StartPosition,
+                localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
                 deltaInPixels),
             CreateDragCoordinateInPercent(
-                dragStartEvent.ScreenCoordinateInPixels.StartPosition,
+                localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
                 deltaInPixels,
                 new Vector2(Screen.width, Screen.height)),
             new DragCoordinate(
-                dragStartEvent.RectTransformCoordinateInPixels.StartPosition,
+                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
                 rectTransformDistanceInPixels,
                 deltaInPixels),
             CreateDragCoordinateInPercent(
-                dragStartEvent.RectTransformCoordinateInPixels.StartPosition,
+                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
                 rectTransformDistanceInPixels,
                 deltaInPixels,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
-            dragStartEvent.RaycastResultsDragStart,
-            dragStartEvent.InputButton);
+            localDragStartEvent.RaycastResultsDragStart,
+            localDragStartEvent.InputButton);
         return result;
     }
 
-    protected GeneralDragEvent CreateGeneralDragEventStart(IPointerEvent eventData)
+    protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenPosInPixels = eventData.position;
+        Vector2 screenPosInPixels = eventData.Position;
 
         // Target coordinate in pixels
         float targetWidthInPixels = target.contentRect.width;
@@ -222,7 +222,7 @@ public abstract class AbstractDragControl<EVENT>
                 Vector2.zero,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
             null,
-            eventData.button);
+            eventData.Button);
         return result;
     }
 

@@ -16,9 +16,6 @@ using UniRx;
 
 public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener
 {
-    // [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    // private SongRouletteItemContextMenuHandler songRouletteItemContextMenuHandler;
-
     [Inject]
 
     private SongRouletteControl songRouletteControl;
@@ -89,7 +86,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         set
         {
             songMeta = value;
-            // songRouletteItemContextMenuHandler.SongMeta = songMeta;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
             UpdateFavoriteIcon();
@@ -266,8 +262,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
         HideSongMenuOverlay();
 
-        RegisterLongPressToOpenSongMenu();
-
         singThisSongButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
@@ -292,16 +286,17 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             .Subscribe(evt => UpdateFavoriteIcon());
 
         // // Add itself as IDragListener to be notified when its RectTransform is dragged.
-        // dragControl = new GeneralDragControl(songButton, songRouletteControl.gameObject);
-        // dragControl.AddListener(this);
-        // // Ignore button click after dragging
-        // dragControl.DragState.Subscribe(dragState =>
-        // {
-        //     if (dragState == EDragState.Dragging)
-        //     {
-        //         ignoreNextClickEvent = true;
-        //     }
-        // });
+        dragControl = new GeneralDragControl(songButton, songRouletteControl.gameObject);
+        dragControl.AddListener(this);
+
+        // Ignore button click after dragging
+        dragControl.DragState.Subscribe(dragState =>
+        {
+            if (dragState == EDragState.Dragging)
+            {
+                ignoreNextClickEvent = true;
+            }
+        });
         
         songButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -311,6 +306,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
             ignoreNextClickEvent = false;
         });
+
+        RegisterLongPressToOpenSongMenu();
     }
 
     private void RegisterLongPressToOpenSongMenu()
@@ -352,21 +349,15 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         {
             StopCoroutine();
         }, TrickleDown.TrickleDown);
-        songButton.RegisterCallback<PointerMoveEvent>(evt =>
+
+        // Stop coroutine when dragging
+        dragControl.DragState.Subscribe(dragState =>
         {
-            if (showSongMenuOverlayCoroutine == null)
+            if (dragState == EDragState.Dragging)
             {
-                return;
+                StopCoroutine();
             }
-
-            Vector3 difference = evt.position - pointerDownEventPosition;
-            if (difference.magnitude > 20f
-                && showSongMenuOverlayCoroutine != null)
-            {
-                // Drag motion
-
-            }
-        }, TrickleDown.TrickleDown);
+        });
     }
 
     public void ShowSongMenuOverlay()
