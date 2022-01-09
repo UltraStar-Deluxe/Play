@@ -38,9 +38,9 @@ public static partial class R
         public const string cancelButton = "cancelButton";
         public const string cancelDeletePlaylistButton = "cancelDeletePlaylistButton";
         public const string centerContent = "centerContent";
-        public const string characterButton = "characterButton";
         public const string characterContainer = "characterContainer";
-        public const string characterLabel = "characterLabel";
+        public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
+        public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
@@ -285,10 +285,11 @@ public static partial class R
         public const string toggleFavoriteButton = "toggleFavoriteButton";
         public const string toggleFavoriteIcon = "toggleFavoriteIcon";
         public const string toggleSongDetailOverlayButton = "toggleSongDetailOverlayButton";
+        public const string topContent = "topContent";
+        public const string topControlBar = "topControlBar";
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";
-        public const string upperBar = "upperBar";
         public const string urlChooser = "urlChooser";
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";

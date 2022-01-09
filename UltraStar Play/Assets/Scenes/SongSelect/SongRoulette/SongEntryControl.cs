@@ -352,4 +352,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
     }
+
+    public void FocusSongButton()
+    {
+        songButton.Focus();
+    }
 }

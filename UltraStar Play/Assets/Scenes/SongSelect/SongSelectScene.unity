@@ -234,7 +234,7 @@ MonoBehaviour:
   songVideoPlayer: {fileID: 1740431085}
   songRouletteControl: {fileID: 1966461583}
   characterQuickJumpListControl: {fileID: 2122758100}
-  focusableNavigatorControl: {fileID: 1565359474}
+  focusableNavigator: {fileID: 1565359474}
   songPreviewControl: {fileID: 974432510}
   playerListControl: {fileID: 922159446}
   micListControl: {fileID: 1127310616}
@@ -643,7 +643,7 @@ GameObject:
   - component: {fileID: 1565359473}
   - component: {fileID: 1565359474}
   m_Layer: 0
-  m_Name: FocusableNavigatorControl
+  m_Name: SongSelectFocusableNavigator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -673,9 +673,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1565359472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f880e0660a67ec47aff907058c2093f, type: 3}
+  m_Script: {fileID: 11500000, guid: f4879dc1082740b2912d1e28d035def2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  focusLastElementIfNothingFocused: 0
 --- !u!114 &1740431085 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8294266774522871405, guid: a3fcba59c524442498a77d92542d3e03,
@@ -1151,6 +1152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f880e0660a67ec47aff907058c2093f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  focusLastElementIfNothingFocused: 1
 --- !u!4 &2131434059
 Transform:
   m_ObjectHideFlags: 0

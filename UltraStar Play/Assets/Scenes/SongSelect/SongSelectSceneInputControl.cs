@@ -25,7 +25,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private FocusableNavigatorControl navigatorControl;
+    private FocusableNavigator navigator;
 
     [Inject]
     public CharacterQuickJumpListControl characterQuickJumpListControl;
@@ -81,7 +81,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Subscribe(context => navigatorControl.OnNavigate(context.ReadValue<Vector2>()));
+            .Subscribe(context => navigator.OnNavigate(context.ReadValue<Vector2>()));
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
         InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
@@ -104,24 +104,14 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
-        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible
-            || songRouletteControl.IsSongMenuOverlayVisible)
-        {
-            return;
-        }
-
         if (songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
         {
             // Remove focus
             songSelectSceneUiControl.SubmitSearch();
         }
-        else if (IsSongButtonFocused())
-        {
-            songSelectSceneUiControl.CheckAudioAndStartSingScene();
-        }
         else
         {
-            navigatorControl.OnSubmit();
+            navigator.OnSubmit();
         }
     }
 
@@ -231,13 +221,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             fuzzySearchText.Value = "";
         }
-    }
-
-    private bool IsSongButtonFocused()
-    {
-        VisualElement focusedVisualElement = navigatorControl.FocusedVisualElement;
-        return focusedVisualElement != null
-               && focusedVisualElement.name == R.UxmlNames.songButton;
     }
 
     private bool IsFuzzySearchActive()
