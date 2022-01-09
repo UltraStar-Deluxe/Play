@@ -92,7 +92,6 @@ public class SongEntryPlaceholderControl : ISlotListSlot
                 .ToList();
             return placeholdersInBetween.Count + 1;
         }
-        return 0;
     }
 
 
