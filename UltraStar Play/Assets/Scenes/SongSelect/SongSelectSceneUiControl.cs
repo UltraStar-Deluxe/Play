@@ -446,8 +446,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
 
             List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(3);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
-            UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
 
+            UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
             UpdateTopScoreLabels(new List<int>(), onlineHighScoreContainer);
         }
         else
@@ -455,9 +455,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
             timesClearedLabel.text = "";
             timesCanceledLabel.text = "";
 
-            localHighScoreContainer.Q<Label>(R.UxmlNames.first).text = "";
-            localHighScoreContainer.Q<Label>(R.UxmlNames.second).text = "";
-            localHighScoreContainer.Q<Label>(R.UxmlNames.third).text = "";
+            UpdateTopScoreLabels(new List<int>(), localHighScoreContainer);
+            UpdateTopScoreLabels(new List<int>(), onlineHighScoreContainer);
         }
     }
 
