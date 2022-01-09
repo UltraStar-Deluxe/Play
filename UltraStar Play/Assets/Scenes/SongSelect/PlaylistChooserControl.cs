@@ -95,6 +95,11 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
+    public void FocusDropdownField()
+    {
+        dropdownField.Focus();
+    }
+
     public void Reset()
     {
         Selection.Value = items[0];

@@ -3,45 +3,47 @@
     <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
     <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
-    <ui:VisualElement name="background" class="focusableNavigatorRoot" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
-        <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
-            <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
-                <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;); display: flex;" />
-                    <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
-                        <ui:Label text="Song Select" name="sceneTitle" class="titleText" />
-                        <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto; display: none;" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
+        <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
+            <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
+                <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
+                    <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;); display: flex;" />
+                        <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
+                            <ui:Label text="Song Select" name="sceneTitle" class="titleText" />
+                            <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto; display: none;" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" />
             </ui:VisualElement>
-            <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" />
-        </ui:VisualElement>
-        <ui:VisualElement name="upperBar" style="flex-direction: row; justify-content: space-between; margin-left: 5px; margin-right: 5px; margin-top: 5px; height: 30px;">
-            <ui:VisualElement name="characterQuickJumpContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
-                <ui:Button text="&lt; L2" display-tooltip-when-elided="true" name="previousCharacterButton" class="transparentBackgroundColor characterQuickJumpCharacterButton" style="width: 25px; height: 100%;" />
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="characterContainer" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" mode="Horizontal" style="flex-direction: row; justify-content: center; flex-grow: 1; align-items: center; overflow: visible;">
-                    <ui:Label text="A" display-tooltip-when-elided="true" name="a" class="characterQuickJumpCharacter" />
-                    <ui:Label text="B" display-tooltip-when-elided="true" name="b" class="characterQuickJumpCharacter" />
-                    <ui:Label text="C" display-tooltip-when-elided="true" name="c" class="characterQuickJumpCharacter" />
-                </ui:ScrollView>
-                <ui:Button text="R2 &gt;" display-tooltip-when-elided="true" name="nextCharacterButton" class="transparentBackgroundColor characterQuickJumpCharacterButton" style="width: 25px; height: 100%;" />
-            </ui:VisualElement>
-            <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
-                <ui:TextField picking-mode="Ignore" name="searchTextField" style="align-items: center; height: 90%; flex-grow: 1;">
-                    <ui:Label text="Search artist, title, language" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="smallerFont ellipsis" style="-unity-font-style: italic; width: 85%; position: absolute; left: 10px; color: rgb(0, 0, 0);" />
-                </ui:TextField>
-                <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="transparentBackgroundColor" style="width: 30px; height: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-                    <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
-                </ui:Button>
-            </ui:VisualElement>
-            <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%;">
-                <ui:DropdownField index="0" choices="Playlist-A,Playlist-B" name="playlistChooser" style="height: 100%;" />
+            <ui:VisualElement name="topControlBar" style="flex-direction: row; justify-content: space-between; margin-left: 5px; margin-right: 5px; margin-top: 5px; height: 30px;">
+                <ui:VisualElement name="characterQuickJumpContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
+                    <ui:Button text="&lt; L2" display-tooltip-when-elided="true" name="previousCharacterButton" class="transparentBackgroundColor characterQuickJumpCharacterButton focusableNavigatorIgnore" style="width: 25px; height: 100%;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="characterContainer" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" mode="Horizontal" style="flex-direction: row; justify-content: center; flex-grow: 1; align-items: center; overflow: visible;">
+                        <ui:Label text="A" display-tooltip-when-elided="true" name="a" class="characterQuickJumpCharacter" />
+                        <ui:Label text="B" display-tooltip-when-elided="true" name="b" class="characterQuickJumpCharacter" />
+                        <ui:Label text="C" display-tooltip-when-elided="true" name="c" class="characterQuickJumpCharacter" />
+                    </ui:ScrollView>
+                    <ui:Button text="R2 &gt;" display-tooltip-when-elided="true" name="nextCharacterButton" class="transparentBackgroundColor characterQuickJumpCharacterButton focusableNavigatorIgnore" style="width: 25px; height: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row;">
+                    <ui:TextField picking-mode="Ignore" name="searchTextField" style="align-items: center; height: 90%; flex-grow: 1;">
+                        <ui:Label text="Search artist, title, language" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="smallerFont ellipsis" style="-unity-font-style: italic; width: 85%; position: absolute; left: 10px; color: rgb(0, 0, 0);" />
+                    </ui:TextField>
+                    <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="transparentBackgroundColor outlineOnFocus roundCorners" style="width: 30px; height: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
+                        <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%;">
+                    <ui:DropdownField index="0" choices="Playlist-A,Playlist-B" name="playlistChooser" class="outlineOnFocus roundCorners" style="height: 100%;" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px;">
             <ui:VisualElement name="songRouletteContainer" style="flex-grow: 3; flex-direction: row; flex-shrink: 0; align-items: center; justify-content: center; padding-bottom: 10px; display: flex;">
-                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButton" class="outline smallerFont transparentBackgroundColor" style="width: 25px; height: 40px; left: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
-                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButton" class="transparentBackgroundColor outline smallerFont" style="width: 25px; height: 40px; right: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                <ui:Button text="&lt; L1" display-tooltip-when-elided="true" name="previousSongButton" class="outline smallerFont transparentBackgroundColor focusableNavigatorIgnore" style="width: 25px; height: 40px; left: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                <ui:Button text="R1 &gt;" display-tooltip-when-elided="true" name="nextSongButton" class="transparentBackgroundColor outline smallerFont focusableNavigatorIgnore" style="width: 25px; height: 40px; right: 16%; position: absolute; top: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
                 <ui:VisualElement name="songEntryContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: flex; top: 0;">
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: -226px; max-height: 200px; top: 0; align-items: center;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: -5%; max-height: 200px; align-items: center;" />
@@ -174,7 +176,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="searchPropertyDropdownOverlay" picking-mode="Ignore" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
-            <ui:Button display-tooltip-when-elided="true" name="closeSearchPropertyDropdownButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
+            <ui:Button display-tooltip-when-elided="true" name="closeSearchPropertyDropdownButton" class="transparentBackgroundColor focusableNavigatorIgnore" style="position: absolute; width: 100%; height: 100%;" />
             <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 87px; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex;">
                 <ui:Label text="Search in:" display-tooltip-when-elided="true" name="searchByPropertyLabel" class="smallFont" />
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="searchPropertyScrollView" style="flex-grow: 1;">

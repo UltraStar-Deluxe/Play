@@ -130,6 +130,11 @@ public static class VisualElementExtensions
 
     public static void ScrollToSelf(this VisualElement visualElement)
     {
+        if (visualElement == null)
+        {
+            return;
+        }
+
         List<VisualElement> visualElementAndAncestors = new List<VisualElement>();
         visualElementAndAncestors.Add(visualElement);
         visualElementAndAncestors.AddRange(visualElement.GetAncestors());
@@ -145,6 +150,11 @@ public static class VisualElementExtensions
 
     public static List<VisualElement> GetAncestors(this VisualElement visualElement)
     {
+        if (visualElement == null)
+        {
+            return new List<VisualElement>();
+        }
+
         List<VisualElement> ancestors = new List<VisualElement>();
         VisualElement parent = visualElement.parent;
         while (parent != null)

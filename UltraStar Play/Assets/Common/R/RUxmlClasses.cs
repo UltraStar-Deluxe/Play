@@ -13,6 +13,7 @@ public static partial class R
         public const string dialogTitle = "dialogTitle";
         public const string dialogTitleImage = "dialogTitleImage";
         public const string ellipsis = "ellipsis";
+        public const string focusableNavigatorIgnore = "focusableNavigatorIgnore";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
@@ -31,6 +32,7 @@ public static partial class R
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string outline = "outline";
+        public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";

@@ -11,10 +11,10 @@ using UnityEngine.UIElements;
 
 public class CharacterQuickJumpCharacterControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = R.UxmlNames.characterLabel)]
+    [Inject(UxmlName = R.UxmlNames.characterQuickJumpCharacter)]
     private Label label;
 
-    [Inject(UxmlName = R.UxmlNames.characterButton)]
+    [Inject(UxmlName = R.UxmlNames.characterQuickJumpCharacterButton)]
     private Button characterButton;
 
     [Inject]

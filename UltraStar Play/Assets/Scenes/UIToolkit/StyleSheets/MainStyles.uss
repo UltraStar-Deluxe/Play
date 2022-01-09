@@ -30,6 +30,11 @@
     -unity-text-align: middle-left;
 }
 
+.unity-base-text-field__input:focus {
+    border-color: black;
+    border-width: 2px;
+}
+
 .unity-base-popup-field {
     background-color: var(--control-color);
     height: var(--control-height);
@@ -568,4 +573,9 @@ Label.smallerFont {
     width: 100%;
     font-size: var(--font-size-small);
     white-space: normal;
+}
+
+.outlineOnFocus:focus {
+    border-color: var(--text-color);
+    border-width: 1;
 }

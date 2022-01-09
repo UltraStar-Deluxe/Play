@@ -12,13 +12,14 @@ using PrimeInputActions;
 using TMPro;
 using ProTrans;
 using UnityEditor.Graphs;
+using UnityEditor.StyleSheets;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListener, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
+public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
 {
     public static SongSelectSceneUiControl Instance
     {
@@ -50,7 +51,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public CharacterQuickJumpListControl characterQuickJumpListControl;
     
     [InjectedInInspector]
-    public FocusableNavigatorControl focusableNavigatorControl;
+    public SongSelectFocusableNavigator focusableNavigator;
 
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
@@ -309,6 +310,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
 
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+
+        focusableNavigator.FocusedVisualElement?.Blur();
     }
 
     public void ShowMenuOverlay()
@@ -320,6 +323,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
     public void HideMenuOverlay()
     {
         menuOverlay.HideByDisplay();
+        menuButton.Focus();
     }
 
     public void ShowSongDetailOverlay()
@@ -359,11 +363,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
             InitSongRouletteSongMetas();
             songRouletteControl.SelectSong(selectedSong);
         }
-    }
-
-    public void OnHotSwapFinished()
-    {
-        InitSongRouletteSongMetas();
     }
 
     private void InitSongRouletteSongMetas()
@@ -754,7 +753,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         bb.BindExistingInstance(SongOrderPickerControl);
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
-        bb.BindExistingInstance(focusableNavigatorControl);
+        bb.BindExistingInstance(focusableNavigator);
+        bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
     }
@@ -864,7 +864,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, IOnHotSwapFinishedListene
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_randomSong, "Random song", menuOverlayInputLegend);
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor, "Song editor", menuOverlayInputLegend);
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite, "Toggle favorite", menuOverlayInputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavoritePlaylistActive, "Toggle favorite playlist", menuOverlayInputLegend);
     }
 
     private void UpdateSongDetailsInOverlay()
