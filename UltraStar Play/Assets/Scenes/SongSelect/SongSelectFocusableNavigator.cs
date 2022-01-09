@@ -55,6 +55,11 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
                 songSelectSceneUiControl.PlaylistChooserControl.FocusDropdownField();
                 return;
             }
+            if (evt.NavigationDirection.y < 0)
+            {
+                songSelectSceneUiControl.ToggleSelectedSongIsFavorite();
+                return;
+            }
 
             if (evt.NavigationDirection.x > 0)
             {

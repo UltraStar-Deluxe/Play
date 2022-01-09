@@ -78,7 +78,7 @@ public static class InputLegendControl
         }
     }
 
-    private static VisualElement CreateInputActionInfoUi(InputActionInfo entry)
+    public static VisualElement CreateInputActionInfoUi(InputActionInfo entry)
     {
         Label label = new Label();
         label.AddToClassList("inputLegendLabel");
