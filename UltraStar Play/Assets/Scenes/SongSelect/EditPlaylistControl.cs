@@ -79,6 +79,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             string errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
             if (!errorMessage.IsNullOrEmpty())
             {
+                Debug.LogError(errorMessage);
                 uiManager.CreateNotificationVisualElement(errorMessage, "error");
             }
             HideEditPlaylistDialog();
@@ -168,6 +169,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
         if (!errorMessage.IsNullOrEmpty())
         {
             // Show error in popup
+            Debug.LogError(errorMessage);
             uiManager.CreateNotificationVisualElement(errorMessage, "error");
         }
         editPlaylistOverlay.HideByDisplay();
