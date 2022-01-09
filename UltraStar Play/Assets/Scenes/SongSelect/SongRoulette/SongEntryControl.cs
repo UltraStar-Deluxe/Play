@@ -20,8 +20,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     // private SongRouletteItemContextMenuHandler songRouletteItemContextMenuHandler;
 
     [Inject]
-    private SongRouletteControl songRouletteControl;
 
+    private SongRouletteControl songRouletteControl;
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
 
@@ -124,6 +124,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     private Vector2 animStartSize;
 
     private GeneralDragControl dragControl;
+
+    private PointerDownEvent pointerDownEvent;
+    private IEnumerator showSongMenuOverlayCoroutine;
 
     public SongEntryControl(
         VisualElement visualElement,
@@ -265,6 +268,49 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         SongPreviewBackgroundImage.HideByDisplay();
 
         HideSongMenuOverlay();
+
+        // Long press to open song menu
+        songButton.RegisterCallback<PointerDownEvent>(evt =>
+        {
+            pointerDownEvent = evt;
+            if (showSongMenuOverlayCoroutine != null)
+            {
+                songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
+            }
+            showSongMenuOverlayCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
+            {
+                if (songRouletteControl.SelectedSongEntryControl != this)
+                {
+                    songRouletteControl.SelectSong(songMeta);
+                }
+                ignoreNextClickEvent = true;
+                ShowSongMenuOverlay();
+            });
+            songRouletteControl.StartCoroutine(showSongMenuOverlayCoroutine);
+        }, TrickleDown.TrickleDown);
+        songButton.RegisterCallback<PointerUpEvent>(_ =>
+        {
+            if (showSongMenuOverlayCoroutine != null)
+            {
+                songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
+            }
+        }, TrickleDown.TrickleDown);
+        songButton.RegisterCallback<PointerMoveEvent>(evt =>
+        {
+            if (pointerDownEvent == null)
+            {
+                return;
+            }
+            
+            Vector3 difference = evt.position - pointerDownEvent.position;
+            if (difference.magnitude > 5f
+                && showSongMenuOverlayCoroutine != null)
+            {
+                // Drag motion
+                songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
+            }
+        }, TrickleDown.TrickleDown);
+
         singThisSongButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
