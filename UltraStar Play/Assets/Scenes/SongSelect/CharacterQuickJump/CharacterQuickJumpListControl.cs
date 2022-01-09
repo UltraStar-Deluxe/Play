@@ -30,6 +30,9 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
+    [Inject]
+    private UltraStarPlayInputManager inputManager;
+
     [Inject(UxmlName = R.UxmlNames.characterContainer)]
     private ScrollView characterContainer;
 
@@ -59,6 +62,23 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => needsRefresh = true);
         songSelectSceneUiControl.PlaylistChooserControl.Selection
             .Subscribe(_ => needsRefresh = true);
+
+        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateButtonLabels());
+        UpdateButtonLabels();
+    }
+
+    private void UpdateButtonLabels()
+    {
+        if (UltraStarPlayInputManager.GetCurrentInputDeviceEnum() == EInputDevice.Gamepad)
+        {
+            previousCharacterButton.text = "< L2";
+            nextCharacterButton.text = "R2 >";
+        }
+        else
+        {
+            previousCharacterButton.text = "<";
+            nextCharacterButton.text = ">";
+        }
     }
 
     private void Update()

@@ -7,9 +7,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using PrimeInputActions;
+using UniInject;
 using UniRx;
+using UnityEngine.UIElements;
 
-public class UltraStarPlayInputManager : InputManager
+public class UltraStarPlayInputManager : InputManager, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -19,8 +21,20 @@ public class UltraStarPlayInputManager : InputManager
 
     public static List<InputActionInfo> AdditionalInputActionInfos { get; private set; }= new List<InputActionInfo>();
 
+    [InjectedInInspector]
+    public VectorImage gamepadIcon;
+
+    [InjectedInInspector]
+    public VectorImage keyboardAndMouseIcon;
+
+    [InjectedInInspector]
+    public VectorImage touchIcon;
+
     private Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new Subject<InputDeviceChangeEvent>();
     public IObservable<InputDeviceChangeEvent> InputDeviceChangeEventStream => inputDeviceChangeEventStream;
+
+    [Inject(UxmlName = R.UxmlNames.inputDeviceIcon, Optional = true)]
+    private VisualElement inputDeviceIcon;
 
     private void OnEnable()
     {
@@ -44,8 +58,13 @@ public class UltraStarPlayInputManager : InputManager
             Log.Logger.Error(e, "Could not enable enhanced touch support");
         }
         ContextMenu.OpenContextMenus.Clear();
+
+        if (inputDeviceIcon != null)
+        {
+            InputDeviceChangeEventStream.Subscribe(_ => UpdateInputDeviceIcon());
+        }
     }
-    
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
@@ -57,21 +76,40 @@ public class UltraStarPlayInputManager : InputManager
 
     private void OnDeviceChange(InputDevice inputDevice, InputDeviceChange inputDeviceChange)
     {
+        Debug.Log($"inputDeviceChange: {inputDeviceChange}");
         inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent(inputDevice, inputDeviceChange));
     }
 
     public static EInputDevice GetCurrentInputDeviceEnum()
     {
-        if (Gamepad.current != null)
+        if (Gamepad.current != null
+            && Gamepad.current.enabled)
         {
             return EInputDevice.Gamepad;
         }
 
-        if (Keyboard.current != null)
+        if (Keyboard.current != null
+            && Keyboard.current.enabled)
         {
             return EInputDevice.KeyboardAndMouse;
         }
 
         return EInputDevice.Touch;
+    }
+
+    private void UpdateInputDeviceIcon()
+    {
+        switch (GetCurrentInputDeviceEnum())
+        {
+            case EInputDevice.Gamepad:
+                inputDeviceIcon.style.backgroundImage = new StyleBackground(gamepadIcon);
+                break;
+            case EInputDevice.KeyboardAndMouse:
+                inputDeviceIcon.style.backgroundImage = new StyleBackground(keyboardAndMouseIcon);
+                break;
+            case EInputDevice.Touch:
+                inputDeviceIcon.style.backgroundImage = new StyleBackground(touchIcon);
+                break;
+        }
     }
 }

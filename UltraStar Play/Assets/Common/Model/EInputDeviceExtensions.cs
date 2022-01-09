@@ -14,7 +14,26 @@ public static class EInputDeviceExtensions
             case EInputDevice.Touch:
                 return Touchscreen.current;
             default:
-                throw new ArgumentException($"No device defined for inputSource {inputDevice}");
+                throw new ArgumentException($"No enum value defined for InputDevice {inputDevice}");
         }
+    }
+
+    public static EInputDevice GetInputDeviceEnum(this InputDevice inputDevice)
+    {
+        if (inputDevice == Keyboard.current)
+        {
+            return EInputDevice.KeyboardAndMouse;
+        }
+
+        if (inputDevice == Gamepad.current)
+        {
+            return EInputDevice.Gamepad;
+        }
+
+        if (inputDevice == Touchscreen.current)
+        {
+            return EInputDevice.Touch;
+        }
+        throw new ArgumentException($"No enum value defined for InputDevice {inputDevice}");
     }
 }

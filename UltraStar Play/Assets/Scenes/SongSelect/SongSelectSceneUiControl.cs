@@ -80,6 +80,9 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject(UxmlName = R.UxmlNames.inputDeviceIcon)]
+    private VisualElement inputDeviceIcon;
+
     [Inject(UxmlName = R.UxmlNames.menuOverlayInputLegend)]
     private VisualElement menuOverlayInputLegend;
 
@@ -847,7 +850,14 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
 
     private void UpdateInputLegend()
     {
-        inputLegend.Clear();
+        inputLegend.Query<Label>()
+            .ForEach(label => label.RemoveFromHierarchy());
+
+        if (UltraStarPlayInputManager.GetCurrentInputDeviceEnum() == EInputDevice.Touch)
+        {
+            inputDeviceIcon.HideByDisplay();
+        }
+
         if (IsPlayerSelectOverlayVisible)
         {
             InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);

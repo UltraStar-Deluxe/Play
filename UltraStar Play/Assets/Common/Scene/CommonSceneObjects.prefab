@@ -386,6 +386,12 @@ MonoBehaviour:
   useDontDestroyOnLoad: 0
   logInfoInEditMode: 0
   logInfoInPlayMode: 1
+  gamepadIcon: {fileID: 7388822144124034973, guid: 4d46d47bdcb4baa4b819010bbc44f270,
+    type: 3}
+  keyboardAndMouseIcon: {fileID: 7388822144124034973, guid: 3595fdd3d728cc2418a169be1d969e46,
+    type: 3}
+  touchIcon: {fileID: 7388822144124034973, guid: bfd9917501282de4aa4f198862a7ad72,
+    type: 3}
 --- !u!1 &568775263153110267
 GameObject:
   m_ObjectHideFlags: 0
@@ -2297,7 +2303,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fabe7a13319057e43beb904c265073b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  invertY: 0
 --- !u!1 &7070348881094510554
 GameObject:
   m_ObjectHideFlags: 0
