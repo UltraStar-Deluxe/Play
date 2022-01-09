@@ -864,11 +864,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         inputLegend.Query<Label>()
             .ForEach(label => label.RemoveFromHierarchy());
 
-        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
-        {
-            inputDeviceIcon.HideByDisplay();
-        }
-
         if (IsPlayerSelectOverlayVisible)
         {
             InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
@@ -879,6 +874,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
             InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
             InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit, "Select song", inputLegend);
             InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu, "Song menu", inputLegend);
+        }
+        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
+        {
+            inputLegend.Add(new Label("Press and hold a song to open its menu"));
         }
 
         menuOverlayInputLegend.Clear();
