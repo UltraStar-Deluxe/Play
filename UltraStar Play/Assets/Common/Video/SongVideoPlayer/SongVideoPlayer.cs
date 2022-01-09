@@ -111,7 +111,7 @@ public class SongVideoPlayer : MonoBehaviour
     {
         if (!videoPlayerErrorMessage.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateNotification(videoPlayerErrorMessage, Colors.red);
+            UiManager.Instance.CreateNotificationVisualElement(videoPlayerErrorMessage, "error");
             videoPlayerErrorMessage = "";
             UnloadVideo();
             // Do not attempt to load the video again
