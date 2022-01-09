@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Scripting;
 
 #if UNITY_EDITOR
-    using UnityEngine.InputSystem.Editor;
     using UnityEditor;
 #endif
 
@@ -20,7 +19,7 @@ using UnityEngine.Scripting;
 [DisplayName("Repeated Hold")]
 public class RepeatedHoldInteraction : IInputInteraction
 {
-    [RuntimeInitializeOnLoadMethod]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     static void Init()
     {
         // Trigger static constructor
