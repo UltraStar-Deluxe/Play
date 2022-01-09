@@ -41,7 +41,8 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     {
         if (evt.FocusedVisualElement == null
             && IsFocusableNow(lastFocusedVisualElement)
-            && GetFocusableNavigatorRootVisualElement(lastFocusedVisualElement) != null)
+            && GetFocusableNavigatorRootVisualElement(lastFocusedVisualElement) != null
+            && !lastFocusedVisualElement.GetAncestors().Contains(topContent))
         {
             FocusLastFocusedVisualElement();
             return;
@@ -72,7 +73,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             if (evt.NavigationDirection.y < 0)
             {
-                songRouletteControl.FocusSelectedSongButton();
+                FocusedVisualElement.Blur();
             }
             return;
         }

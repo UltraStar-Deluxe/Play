@@ -283,6 +283,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
 
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
+        UpdateNextAndPreviousSongButtonLabels();
+        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateNextAndPreviousSongButtonLabels());
 
         songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 
@@ -315,6 +317,20 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         focusableNavigator.FocusedVisualElement?.Blur();
+    }
+
+    private void UpdateNextAndPreviousSongButtonLabels()
+    {
+        if (inputManager.InputDeviceEnum == EInputDevice.Gamepad)
+        {
+            nextSongButton.text = "R1 >";
+            previousSongButton.text = "< L1";
+        }
+        else
+        {
+            nextSongButton.text = ">";
+            previousSongButton.text = "<";
+        }
     }
 
     public void ShowMenuOverlay()

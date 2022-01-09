@@ -63,21 +63,21 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         songSelectSceneUiControl.PlaylistChooserControl.Selection
             .Subscribe(_ => needsRefresh = true);
 
-        UpdateButtonLabels();
-        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateButtonLabels());
+        UpdateNextAndPreviousCharacterButtonLabels();
+        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateNextAndPreviousCharacterButtonLabels());
     }
 
-    private void UpdateButtonLabels()
+    private void UpdateNextAndPreviousCharacterButtonLabels()
     {
         if (inputManager.InputDeviceEnum == EInputDevice.Gamepad)
         {
-            previousCharacterButton.text = "< L2";
             nextCharacterButton.text = "R2 >";
+            previousCharacterButton.text = "< L2";
         }
         else
         {
-            previousCharacterButton.text = "<";
             nextCharacterButton.text = ">";
+            previousCharacterButton.text = "<";
         }
     }
 

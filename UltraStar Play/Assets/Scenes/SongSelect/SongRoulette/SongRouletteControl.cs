@@ -563,12 +563,4 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             ShowSongMenuOverlay();
         }
     }
-
-    public void FocusSelectedSongButton()
-    {
-        if (SelectedSongEntryControl != null)
-        {
-            SelectedSongEntryControl.FocusSongButton();
-        }
-    }
 }
