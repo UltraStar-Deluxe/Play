@@ -4,7 +4,7 @@
         <ui:VisualElement name="row" style="width: 100%; height: 40px; flex-direction: row; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="micIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicIconFilled.png?fileID=2800000&amp;guid=c461ec905d3b8b643b4297ef57ee683d&amp;type=3#MicIconFilled&apos;); width: 32px; height: 32px; margin-right: 10px;" />
             <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1;" />
-            <ui:Toggle name="enabledToggle" class="smallControl" />
+            <ui:Toggle name="enabledToggle" />
         </ui:VisualElement>
         <ItemPicker name="voiceChooser" noPreviousButton="true" wrapAround="true" class="smallControl smallFont" style="width: 90%;" />
     </ui:VisualElement>

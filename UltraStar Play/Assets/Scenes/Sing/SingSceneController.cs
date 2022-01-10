@@ -389,11 +389,6 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
 
     private string GetVoiceName(PlayerProfile playerProfile)
     {
-        if (SceneData.SelectedPlayerProfiles.Count == 1)
-        {
-            return Voice.soloVoiceName;
-        }
-
         List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Keys);
         int voiceNameCount = voiceNames.Count;
         if (voiceNameCount <= 1)
@@ -404,6 +399,11 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         if (sceneData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
         {
             return voiceName;
+        }
+
+        if (SceneData.SelectedPlayerProfiles.Count == 1)
+        {
+            return Voice.soloVoiceName;
         }
 
         int voiceIndex = SceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
