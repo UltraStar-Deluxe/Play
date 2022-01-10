@@ -650,10 +650,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         {
             List<string> voiceNames = SelectedSong.VoiceNames.Values.ToList();
             leftLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[0];
-            leftLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, SelectedSong.VoiceNames[Voice.firstVoiceName]);
+            leftLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
 
             rightLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[1];
-            rightLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, SelectedSong.VoiceNames[Voice.secondVoiceName]);
+            rightLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, Voice.secondVoiceName);
 
             playerListControl.ShowVoiceSelection(SelectedSong);
         }
@@ -834,7 +834,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
             SceneInjectionManager.Instance.DoInjection();
         }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
-        
+
         PlaylistChooserControl.UpdateTranslation();
     }
 
