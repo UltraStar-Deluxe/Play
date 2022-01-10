@@ -36,7 +36,8 @@
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%;">
-                    <ui:DropdownField index="0" choices="Playlist-A,Playlist-B" name="playlistChooser" class="outlineOnFocus roundCorners" style="height: 100%;" />
+                    <ui:VisualElement picking-mode="Ignore" name="dropdownIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/DropdownArrowWhite.png?fileID=2800000&amp;guid=c6a47f1258c592348b2eba94580ff0b8&amp;type=3#DropdownArrowWhite&apos;); width: 12px; height: 100%; position: absolute; right: 10px; -unity-background-scale-mode: scale-to-fit;" />
+                    <ui:Button text="Playlist A" display-tooltip-when-elided="true" name="playlistChooserButton" class="transparentBackgroundColor outlineOnFocus roundCorners" style="width: 100%; height: 100%; -unity-text-align: middle-left; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 10px; padding-right: 10px; padding-top: 0; padding-bottom: 0;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
@@ -178,8 +179,8 @@
         </ui:VisualElement>
         <ui:VisualElement name="searchPropertyDropdownOverlay" picking-mode="Ignore" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
             <ui:Button display-tooltip-when-elided="true" name="closeSearchPropertyDropdownButton" class="transparentBackgroundColor focusableNavigatorIgnore" style="position: absolute; width: 100%; height: 100%;" />
-            <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 87px; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex;">
-                <ui:Label text="Search in:" display-tooltip-when-elided="true" name="searchByPropertyLabel" class="smallFont" />
+            <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 85px; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex;">
+                <ui:Label text="Search in:" display-tooltip-when-elided="true" name="searchByPropertyLabel" class="smallFont" style="margin-bottom: 5px;" />
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="searchPropertyScrollView" style="flex-grow: 1;">
                     <ui:VisualElement name="artistPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
                         <ui:Toggle />
@@ -209,6 +210,16 @@
                         <ui:Toggle />
                         <ui:Label text="Lyrics" display-tooltip-when-elided="true" style="margin-right: 5px;" />
                     </ui:VisualElement>
+                </ui:ScrollView>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="playlistChooserDropdownOverlay" picking-mode="Ignore" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
+            <ui:Button display-tooltip-when-elided="true" name="closePlaylistChooserDropdownButton" class="transparentBackgroundColor focusableNavigatorIgnore" style="position: absolute; width: 100%; height: 100%;" />
+            <ui:VisualElement name="playlistChooserDropdownContainer" class="roundCorners" style="position: absolute; height: 60%; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 85px; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; display: flex; right: 5px;">
+                <ui:Label text="Select playlist:" display-tooltip-when-elided="true" name="playlistChooserDropdownTitle" class="smallFont" style="margin-bottom: 5px;" />
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playlistChooserDropdownScrollView" text="Select song list:" style="flex-grow: 1;">
+                    <ui:Button text="Playlist-A" display-tooltip-when-elided="true" style="width: 100%;" />
+                    <ui:Button text="Playlist-B" display-tooltip-when-elided="true" style="width: 100%;" />
                 </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>

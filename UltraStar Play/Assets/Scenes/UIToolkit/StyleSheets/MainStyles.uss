@@ -113,14 +113,9 @@
     width: var(--control-width);
     height: var(--control-height);
     font-size: var(--font-size);
-    border-left-width: 0;
-    border-right-width: 0;
-    border-top-width: 0;
-    border-bottom-width: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-width: 0;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 0;
     align-items: center;
     justify-content: center;
 }
