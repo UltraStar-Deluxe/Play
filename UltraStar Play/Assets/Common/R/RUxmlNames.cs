@@ -44,6 +44,7 @@ public static partial class R
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
+        public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
         public const string closeSearchPropertyDropdownButton = "closeSearchPropertyDropdownButton";
         public const string closeSongOverlayButton = "closeSongOverlayButton";
         public const string colorContainer = "colorContainer";
@@ -187,8 +188,12 @@ public static partial class R
         public const string playerScrollView = "playerScrollView";
         public const string playerSelectOverlay = "playerSelectOverlay";
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
-        public const string playlistChooser = "playlistChooser";
+        public const string playlistChooserButton = "playlistChooserButton";
         public const string playlistChooserContainer = "playlistChooserContainer";
+        public const string playlistChooserDropdownContainer = "playlistChooserDropdownContainer";
+        public const string playlistChooserDropdownOverlay = "playlistChooserDropdownOverlay";
+        public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
+        public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";

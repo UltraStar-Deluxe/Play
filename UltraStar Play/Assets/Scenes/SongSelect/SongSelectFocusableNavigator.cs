@@ -22,6 +22,9 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     [Inject(UxmlName = R.UxmlNames.topContent)]
     private VisualElement topContent;
 
+    [Inject(UxmlName = R.UxmlNames.menuButton)]
+    private VisualElement menuButton;
+
     public override void Start()
     {
         base.Start();
@@ -35,6 +38,19 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             songSelectSceneUiControl.CheckAudioAndStartSingScene();
         }
+    }
+
+    public override void OnNavigate(Vector2 navigationDirection)
+    {
+        if (navigationDirection.y < 0
+            && FocusedVisualElement != menuButton
+            && GetFocusableNavigatorRootVisualElement() == topContent)
+        {
+            FocusSongRoulette();
+            return;
+        }
+
+        base.OnNavigate(navigationDirection);
     }
 
     private void OnNoNavigationTargetFound(NoNavigationTargetFoundEvent evt)
@@ -52,7 +68,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             if (evt.NavigationDirection.y > 0)
             {
-                songSelectSceneUiControl.PlaylistChooserControl.FocusDropdownField();
+                songSelectSceneUiControl.PlaylistChooserControl.FocusPlaylistChooser();
                 return;
             }
             if (evt.NavigationDirection.y < 0)
@@ -78,9 +94,15 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             if (evt.NavigationDirection.y < 0)
             {
-                FocusedVisualElement.Blur();
+                FocusSongRoulette();
             }
             return;
         }
+    }
+
+    public void FocusSongRoulette()
+    {
+        // SongRoulette has focus when nothing else has focus.
+        FocusedVisualElement?.Blur();
     }
 }

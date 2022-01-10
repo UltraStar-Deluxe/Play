@@ -50,6 +50,11 @@ public class PlaylistManager : MonoBehaviour
     {
         get
         {
+            if (playlists.IsNullOrEmpty())
+            {
+                CreateFavoritePlaylistIfNotExist();
+                ScanPlaylistFolder();
+            }
             return favoritesPlaylist;
         }
     }

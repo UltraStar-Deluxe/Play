@@ -312,7 +312,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
-        focusableNavigator.FocusedVisualElement?.Blur();
+        focusableNavigator.FocusSongRoulette();
     }
 
     private void UpdateNextAndPreviousSongButtonLabels()
@@ -798,11 +798,6 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
     public void UpdateFilteredSongs()
     {
         songRouletteControl.SetSongs(GetFilteredSongMetas());
-
-        // Indicate filtered playlist via font style of song count
-        songIndexLabel.style.unityFontStyleAndWeight = IsPlaylistActive()
-            ? new StyleEnum<FontStyle>(FontStyle.BoldAndItalic)
-            : new StyleEnum<FontStyle>(FontStyle.Normal);
     }
 
     public bool IsPlaylistActive()
@@ -839,6 +834,8 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
             SceneInjectionManager.Instance.DoInjection();
         }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
+        
+        PlaylistChooserControl.UpdateTranslation();
     }
 
     private bool IsFavorite(SongMeta songMeta)
