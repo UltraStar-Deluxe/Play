@@ -28,8 +28,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private Injector injector;
 
-    // [Inject]
-    // private SongPreviewControl songPreviewControl;
+    [Inject]
+    private SongPreviewControl songPreviewControl;
 
     [Inject]
     private UIDocument uiDocument;
@@ -50,7 +50,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     public IReactiveProperty<SongSelection> Selection { get; private set; } = new ReactiveProperty<SongSelection>();
 
-    private Subject<SongSelection> selectionClickedEventStream = new Subject<SongSelection>();
+    private readonly Subject<SongSelection> selectionClickedEventStream = new Subject<SongSelection>();
     public IObservable<SongSelection> SelectionClickedEventStream => selectionClickedEventStream;
 
     private int SelectedSongIndex
@@ -275,7 +275,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         injector.WithRootVisualElement(item.VisualElement).Inject(item);
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
-        // item.StartAnimationToFullScale();
 
         item.ClickEventStream.Subscribe(_ => OnSongButtonClicked(songMeta));
 
@@ -469,21 +468,23 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     public void OnEndDrag(Vector2 dragDeltaInPixels)
     {
         CheckStartFlickGesture(dragDeltaInPixels);
-        
+
         IsDrag = false;
         DragSongRouletteItem = null;
         DragDistance = Vector2.zero;
         songEntryControls.ForEach(it => it.StartAnimationTowardsTargetPlaceholder());
         ResetAnimationTimeTowardsTargetRouletteItem();
+
+        songPreviewControl.StartSongPreview(Selection.Value);
     }
-    
+
     public void OnBeginDrag(SongEntryControl songRouletteItem)
     {
         IsDrag = true;
         DragSongRouletteItem = songRouletteItem;
         songEntryControls.ForEach(it => it.StartAnimationTowardsTargetPlaceholder());
-        // songPreviewControl.StopSongPreview();
-        
+        songPreviewControl.StopSongPreview();
+
         // For velocity calculation
         dragStartPosition = songRouletteItem.GetPosition();
         dragDuration = 0;
