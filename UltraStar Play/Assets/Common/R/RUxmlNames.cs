@@ -7,12 +7,10 @@ public static partial class R
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
         public const string addButton = "addButton";
-        public const string addToMedleyButton = "addToMedleyButton";
         public const string adminRightsContainer = "adminRightsContainer";
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
         public const string appOptionsButton = "appOptionsButton";
-        public const string artistLabel = "artistLabel";
         public const string artistPropertyContainer = "artistPropertyContainer";
         public const string audioWaveForm = "audioWaveForm";
         public const string avatarPicker = "avatarPicker";
@@ -62,7 +60,6 @@ public static partial class R
         public const string deleteButton = "deleteButton";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
-        public const string detailContainer = "detailContainer";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
@@ -78,6 +75,7 @@ public static partial class R
         public const string difficultyPicker = "difficultyPicker";
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
+        public const string dropdownIcon = "dropdownIcon";
         public const string duetIcon = "duetIcon";
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
@@ -223,11 +221,11 @@ public static partial class R
         public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
         public const string searchBarContainer = "searchBarContainer";
-        public const string searchByPropertyLabel = "searchByPropertyLabel";
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
         public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
         public const string searchPropertyDropdownOverlay = "searchPropertyDropdownOverlay";
+        public const string searchPropertyDropdownTitle = "searchPropertyDropdownTitle";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
@@ -246,7 +244,6 @@ public static partial class R
         public const string songContainer = "songContainer";
         public const string songDetailOverlay = "songDetailOverlay";
         public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
-        public const string songEntry = "songEntry";
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songImageInner = "songImageInner";

@@ -14,11 +14,11 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener
+public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener, ITranslator
 {
     [Inject]
-
     private SongRouletteControl songRouletteControl;
+
     [Inject]
     private SongSelectSceneUiControl songSelectSceneUiControl;
 
@@ -308,6 +308,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         });
 
         RegisterLongPressToOpenSongMenu();
+        UpdateTranslation();
     }
 
     private void RegisterLongPressToOpenSongMenu()
@@ -405,5 +406,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     public void FocusSongButton()
     {
         songButton.Focus();
+    }
+
+    public void UpdateTranslation()
+    {
+        singThisSongButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_startButton);
+        openSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongFolder);
+        openSongEditorButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongEditor);
+        closeSongOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
     }
 }

@@ -12,7 +12,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditPlaylistControl : MonoBehaviour, INeedInjection
+public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.editPlaylistButton)]
     private Button editPlaylistButton;
@@ -22,6 +22,9 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.editPlaylistOverlay)]
     private VisualElement editPlaylistOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownTitle)]
+    private Label playlistChooserDropdownTitle;
 
     [Inject(UxmlName = R.UxmlNames.submitEditPlaylistButton)]
     private Button submitEditPlaylistButton;
@@ -173,5 +176,16 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection
             uiManager.CreateNotificationVisualElement(errorMessage, "error");
         }
         editPlaylistOverlay.HideByDisplay();
+    }
+
+    public void UpdateTranslation()
+    {
+        if (!Application.isPlaying && createPlaylistButton == null)
+        {
+            SceneInjectionManager.Instance.DoInjection();
+        }
+        playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
+        editPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_editPlaylistButton);
+        createPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_createPlaylistButton);
     }
 }
