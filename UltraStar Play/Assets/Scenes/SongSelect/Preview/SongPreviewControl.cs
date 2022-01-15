@@ -54,7 +54,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        songRouletteControl.Selection.Subscribe(OnSelectedSongChanged);
+        songRouletteControl.Selection.Subscribe(StartSongPreview);
     }
 
     private void Update()
@@ -94,7 +94,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnSelectedSongChanged(SongSelection songSelection)
+    public void StartSongPreview(SongSelection songSelection)
     {
         if (songRouletteControl.IsDrag
             || songRouletteControl.IsFlickGesture)
@@ -125,8 +125,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             .FirstOrDefault(it => it.SongMeta == songMeta);
         if (songMeta != null)
         {
-            int previewStartInMillis = GetPreviewStartInMillis(songMeta);
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => StartSongPreview(songMeta, previewStartInMillis)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
         }
     }
 
@@ -165,9 +164,10 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         songRouletteControl.SongEntryControls.ForEach(it => it.SongPreviewBackgroundImage.HideByDisplay());
     }
 
-    private void StartSongPreview(SongMeta songMeta, int previewStartInMillis)
+    private void DoStartSongPreview(SongMeta songMeta)
     {
-        if (currentPreviewSongMeta != songMeta)
+        if (songMeta == null
+            || currentPreviewSongMeta != songMeta)
         {
             // A different song was selected in the meantime.
             return;
@@ -176,6 +176,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         fadeInStartInSeconds = Time.time;
         videoFadeInStartInSeconds = Time.time;
         isFadeInStarted = true;
+        int previewStartInMillis = GetPreviewStartInMillis(songMeta);
         StartAudioPreview(songMeta, previewStartInMillis);
         StartVideoPreview(songMeta);
     }
