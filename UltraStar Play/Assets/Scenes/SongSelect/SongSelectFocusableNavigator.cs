@@ -29,10 +29,10 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     {
         base.Start();
         NoNavigationTargetFoundEventStream.Subscribe(evt => OnNoNavigationTargetFound(evt));
-        NoSubmitTargetFoundEventStream.Subscribe(evt => OnNoSubmitTargetFound(evt));
+        NoSubmitTargetFoundEventStream.Subscribe(_ => OnNoSubmitTargetFound());
     }
 
-    private void OnNoSubmitTargetFound(NoSubmitTargetFoundEvent evt)
+    private void OnNoSubmitTargetFound()
     {
         if (GetFocusableNavigatorRootVisualElement() == null)
         {
@@ -96,7 +96,6 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
             {
                 FocusSongRoulette();
             }
-            return;
         }
     }
 

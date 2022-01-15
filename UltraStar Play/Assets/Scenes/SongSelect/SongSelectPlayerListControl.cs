@@ -277,46 +277,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
     }
 
-    // public bool TrySelectNextControl()
-    // {
-    //     if ((eventSystem.currentSelectedGameObject == null
-    //         || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerEntryControl>() == null)
-    //         && PlayerEntryControlControl.Count > 0)
-    //     {
-    //         PlayerEntryControlControl.First().isSelectedToggle.Select();
-    //         return true;
-    //     }
-    //
-    //     SongSelectPlayerEntryControl nextEntryControl = PlayerEntryControlControl.GetElementAfter(FocusedPlayerEntryControl, false);
-    //     if (nextEntryControl != null)
-    //     {
-    //         nextEntryControl.isSelectedToggle.Select();
-    //         return true;
-    //     }
-    //
-    //     return false;
-    // }
-    //
-    // public bool TrySelectPreviousControl()
-    // {
-    //     if ((eventSystem.currentSelectedGameObject == null
-    //         || eventSystem.currentSelectedGameObject.GetComponentInParent<SongSelectPlayerEntryControl>() == null)
-    //         && PlayerEntryControlControl.Count > 0)
-    //     {
-    //         PlayerEntryControlControl.Last().isSelectedToggle.Select();
-    //         return true;
-    //     }
-    //
-    //     SongSelectPlayerEntryControl nextEntryControl = PlayerEntryControlControl.GetElementBefore(FocusedPlayerEntryControl, false);
-    //     if (nextEntryControl != null)
-    //     {
-    //         nextEntryControl.isSelectedToggle.Select();
-    //         return true;
-    //     }
-    //
-    //     return false;
-    // }
-
     public void HideVoiceSelection()
     {
         playerEntryControls.ForEach(entry =>

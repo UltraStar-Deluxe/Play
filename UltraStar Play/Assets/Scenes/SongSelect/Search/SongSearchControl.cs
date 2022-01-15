@@ -59,7 +59,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private HashSet<ESearchProperty> searchProperties = new HashSet<ESearchProperty>();
 
-    private Subject<SearchChangedEvent> searchChangedEventStream = new Subject<SearchChangedEvent>();
+    private readonly Subject<SearchChangedEvent> searchChangedEventStream = new Subject<SearchChangedEvent>();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
     public void OnInjectionFinished()

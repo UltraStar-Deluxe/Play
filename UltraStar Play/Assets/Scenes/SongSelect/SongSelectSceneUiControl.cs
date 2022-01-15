@@ -582,8 +582,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
 
     private SongSelectSceneData CreateDefaultSceneData()
     {
-        SongSelectSceneData sceneData = new SongSelectSceneData();
-        return sceneData;
+        return new SongSelectSceneData();
     }
 
     private void SetEmptySongDetails()

@@ -31,11 +31,11 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
-    private AudioWaveFormVisualization audioWaveFormVisualizer;
-    private MicPitchTracker micPitchTracker;
-
     private readonly GameObject gameObject;
     private readonly VisualElement visualElement;
+    private readonly MicPitchTracker micPitchTracker;
+
+    private AudioWaveFormVisualization audioWaveFormVisualizer;
 
     public SongSelectMicEntryControl(GameObject gameObject, VisualElement visualElement, MicPitchTracker micPitchTracker)
     {
