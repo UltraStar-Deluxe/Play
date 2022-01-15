@@ -207,6 +207,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void CancelDrag()
     {
+        // Nothing to do. This method is part of IDragListener.
     }
 
     public bool IsCanceled()
