@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ProTrans;
 using UnityEngine;
 using UniRx;
 using UniInject;
@@ -11,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongRouletteControl : MonoBehaviour, INeedInjection
+public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 {
     private const float FlickGestureStartThresholdInPixels = 20f;
     private const float FlickGestureStopThresholdInPixels = 100f;
@@ -562,5 +563,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             ShowSongMenuOverlay();
         }
+    }
+
+    public void UpdateTranslation()
+    {
+        songEntryControls.ForEach(songEntryControl => songEntryControl.UpdateTranslation());
     }
 }

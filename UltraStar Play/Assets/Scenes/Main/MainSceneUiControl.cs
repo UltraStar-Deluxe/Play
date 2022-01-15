@@ -23,6 +23,12 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private UIDocument uiDoc;
 
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
+    private Label sceneTitle;
+
+    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
+    private Label sceneSubtitle;
+
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
 
@@ -41,9 +47,6 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.jukeboxButton)]
     private Button jukeboxButton;
 
-    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
-    private Label sceneSubtitle;
-    
     [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
     
@@ -105,6 +108,7 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
         jukeboxButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);

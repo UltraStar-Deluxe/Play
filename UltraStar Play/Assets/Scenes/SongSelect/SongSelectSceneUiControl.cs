@@ -166,6 +166,12 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
     [Inject(UxmlName = R.UxmlNames.previousSongButton)]
     private Button previousSongButton;
 
+    [Inject(UxmlName = R.UxmlNames.duetLegendLabel)]
+    private Label duetLegendLabel;
+
+    [Inject(UxmlName = R.UxmlNames.videoLegendLabel)]
+    private Label videoLegendLabel;
+
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     private SongSelectSceneData sceneData;
@@ -441,8 +447,10 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
         if (localStatistic != null)
         {
-            timesClearedLabel.text = $"Cleared: {localStatistic.TimesFinished.ToString()}";
-            timesCanceledLabel.text = $"Canceled: {localStatistic.TimesCanceled.ToString()}";
+            timesClearedLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_timesClearedInfo,
+                "value", localStatistic.TimesFinished);
+            timesCanceledLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_timesCanceledInfo,
+                "value", localStatistic.TimesCanceled);
 
             List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(3);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
@@ -835,7 +843,22 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
         }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
 
+        menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
+        closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        backToMainMenuButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
+        toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
+        duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
+        videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
+        closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
+        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+
+        localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
+        onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
+
         PlaylistChooserControl.UpdateTranslation();
+        SongSearchControl.UpdateTranslation();
+        songRouletteControl.UpdateTranslation();
+        UpdateInputLegend();
     }
 
     private bool IsFavorite(SongMeta songMeta)
@@ -863,24 +886,40 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
 
         if (IsPlayerSelectOverlayVisible)
         {
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers, "Toggle players", inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+                TranslationManager.GetTranslation(R.Messages.back),
+                inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers,
+                TranslationManager.GetTranslation(R.Messages.action_togglePlayers),
+                inputLegend);
         }
         else
         {
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back, "Back", inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit, "Select song", inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu, "Song menu", inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+                TranslationManager.GetTranslation(R.Messages.back),
+                inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit,
+                TranslationManager.GetTranslation(R.Messages.submit),
+                inputLegend);
+            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu,
+                TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
+                inputLegend);
         }
         if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
-            inputLegend.Add(new Label("Press and hold a song to open its menu"));
+            inputLegend.Add(new Label(TranslationManager.GetTranslation(R.Messages.action_pressAndHoldToOpenSongMenu)));
         }
 
         menuOverlayInputLegend.Clear();
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_randomSong, "Random song", menuOverlayInputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor, "Song editor", menuOverlayInputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite, "Toggle favorite", menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_randomSong,
+            TranslationManager.GetTranslation(R.Messages.action_randomSong),
+            menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
+            TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            menuOverlayInputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite,
+            TranslationManager.GetTranslation(R.Messages.action_toggleFavorites),
+            menuOverlayInputLegend);
     }
 
     private void UpdateSongDetailsInOverlay()
@@ -901,7 +940,7 @@ public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, 
             fieldValueDisplayString = fieldValueDisplayString.IsNullOrEmpty()
                 ? "-"
                 : fieldValueDisplayString;
-            label.text = $"<b>{fieldName}</b>: {fieldValueDisplayString}";
+            label.text = $"<b><u>{fieldName}</u></b>: {fieldValueDisplayString}";
             return label;
         }
 

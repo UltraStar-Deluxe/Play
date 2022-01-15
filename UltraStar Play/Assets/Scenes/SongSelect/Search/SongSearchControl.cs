@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSearchControl : INeedInjection, IInjectionFinishedListener
+public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITranslator
 {
     [Inject]
     private Settings settings;
@@ -27,6 +27,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.closeSearchPropertyDropdownButton)]
     private Button closeSearchPropertyDropdownButton;
+
+    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownTitle)]
+    private Label searchPropertyDropdownTitle;
 
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
@@ -100,12 +103,35 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     private void UpdateTextFieldHint()
     {
         List<string> searchPropertyStrings = searchProperties
-            .Select(it => it.ToString().ToLowerInvariant())
+            .Select(it => GetTranslation(it))
             .ToList();
         searchPropertyStrings.Sort();
-        string hint = $"Search {string.Join(", ", searchPropertyStrings)}";
-
+        string hint = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint,
+            "properties", string.Join(", ", searchPropertyStrings));
         searchTextFieldHint.text = hint;
+    }
+
+    private string GetTranslation(ESearchProperty searchProperty)
+    {
+        switch (searchProperty)
+        {
+            case ESearchProperty.Artist:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_artist);
+            case ESearchProperty.Title:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_title);
+            case ESearchProperty.Year:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_year);
+            case ESearchProperty.Genre:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_genre);
+            case ESearchProperty.Language:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_language);
+            case ESearchProperty.Edition:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_edition);
+            case ESearchProperty.Lyrics:
+                return TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
+            default:
+                return searchProperty.ToString();
+        }
     }
 
     public void ShowSearchPropertyDropdownOverlay()
@@ -261,5 +287,18 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener
     public class SearchTextChangedEvent : SearchChangedEvent
     {
 
+    }
+
+    public void UpdateTranslation()
+    {
+        searchPropertyDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchPropertyDropdownTitle);
+        artistPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
+        titlePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_title);
+        editionPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
+        genrePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
+        languagePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_language);
+        lyricsPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
+        yearPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_year);
+        UpdateTextFieldHint();
     }
 }

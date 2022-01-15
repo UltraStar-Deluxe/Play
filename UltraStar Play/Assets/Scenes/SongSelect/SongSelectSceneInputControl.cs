@@ -98,6 +98,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         // Toggle song menu overlay
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
             .Where(_ => !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+            .Where(_ => !songSelectSceneUiControl.IsMenuOverlayVisible)
             .Where(_ => !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }

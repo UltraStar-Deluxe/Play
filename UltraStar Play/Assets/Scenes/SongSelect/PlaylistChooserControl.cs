@@ -91,7 +91,11 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist)
         {
-            return TranslationManager.GetTranslation(R.Messages.filter_allSongs);
+            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
+        }
+        else if (playlist == playlistManager.FavoritesPlaylist)
+        {
+            return TranslationManager.GetTranslation(R.Messages.playlistName_favorites);
         }
         else
         {
