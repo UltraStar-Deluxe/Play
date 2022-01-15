@@ -18,7 +18,7 @@ public class SongSelectPlayerEntryControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     public Toggle EnabledToggle { get; private set; }
 
-    private LabeledItemPickerControl<Voice> voiceChooserControl;
+    private readonly LabeledItemPickerControl<Voice> voiceChooserControl;
 
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }

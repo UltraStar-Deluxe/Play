@@ -34,7 +34,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
     [InjectedInInspector]
     public VectorImage touchIcon;
 
-    private Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new Subject<InputDeviceChangeEvent>();
+    private readonly Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new Subject<InputDeviceChangeEvent>();
     public IObservable<InputDeviceChangeEvent> InputDeviceChangeEventStream => inputDeviceChangeEventStream;
 
     private EInputDevice inputDeviceEnum = GetDefaultInputDeviceEnum();
@@ -163,6 +163,9 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
                 break;
             case EInputDevice.Touch:
                 inputDeviceIcon.style.backgroundImage = new StyleBackground(touchIcon);
+                break;
+            default:
+                Debug.Log("Unhandled EInputDevice: " + inputDeviceEnum);
                 break;
         }
     }

@@ -46,13 +46,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
 
         // Show playlist name in button
-        Selection.Subscribe(playlist =>
-        {
-            if (GetDisplayString(playlist) != playlistChooserButton.text)
-            {
-                playlistChooserButton.text = GetDisplayString(playlist);
-            }
-        });
+        Selection.Subscribe(playlist => playlistChooserButton.text = GetDisplayString(playlist));
 
         HidePlaylistChooserDropdownOverlay();
         playlistChooserButton.RegisterCallbackButtonTriggered(() =>

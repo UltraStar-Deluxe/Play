@@ -27,7 +27,7 @@ public abstract class AbstractDragControl<EVENT>
 
     private readonly VisualElement target;
 
-	public AbstractDragControl(VisualElement target, GameObject gameObject)
+	protected AbstractDragControl(VisualElement target, GameObject gameObject)
     {
         this.target = target;
         target.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);

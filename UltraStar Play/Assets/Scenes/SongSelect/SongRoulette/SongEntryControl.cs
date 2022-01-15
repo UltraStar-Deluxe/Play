@@ -207,7 +207,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void CancelDrag()
     {
-        // RectTransform.MoveAnchorsToCorners();
     }
 
     public bool IsCanceled()
