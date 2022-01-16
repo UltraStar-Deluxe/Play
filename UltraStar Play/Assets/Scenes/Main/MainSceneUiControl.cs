@@ -60,9 +60,6 @@ public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        // Make all Buttons focusable
-        uiDoc.rootVisualElement.Query<Button>().ForEach(button => button.focusable = true);
-
         startButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));

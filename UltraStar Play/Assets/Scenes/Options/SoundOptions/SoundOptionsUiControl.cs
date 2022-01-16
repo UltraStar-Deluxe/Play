@@ -52,8 +52,6 @@ public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        uiDoc.rootVisualElement.Query<Button>().ForEach(button => button.focusable = true);
-
         new BoolPickerControl(backgroundMusicEnabledChooser)
             .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
                   newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);

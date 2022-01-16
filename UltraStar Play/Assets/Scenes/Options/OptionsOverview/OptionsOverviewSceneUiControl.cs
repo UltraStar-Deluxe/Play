@@ -68,7 +68,6 @@ public class OptionsOverviewSceneUiControl : MonoBehaviour, INeedInjection, ITra
 
 	private void Start()
     {
-        uiDoc.rootVisualElement.Query<Button>().ForEach(button => button.focusable = true);
         gameOptionsButton.Focus();
 
         gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
