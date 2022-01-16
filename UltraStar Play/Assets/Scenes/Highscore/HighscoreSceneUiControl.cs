@@ -33,7 +33,7 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
     [Inject(UxmlName = R.UxmlNames.difficultyLabel)]
     private Label difficultyText;
 
-    // TODO: Make injectable by UniInject
+    [Inject(UxmlName = R.UxmlNames.highscoreEntry)]
     private List<VisualElement> highscoreEntries;
 
     [Inject]
@@ -51,8 +51,6 @@ public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, I
     void Start()
     {
         sceneData = sceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>();
-        highscoreEntries = uiDocument.rootVisualElement.Query<VisualElement>(R.UxmlNames.highscoreEntry)
-            .ToList();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         nextItemButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));

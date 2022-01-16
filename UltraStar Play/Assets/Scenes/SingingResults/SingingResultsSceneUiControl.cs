@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniInject.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -113,7 +114,7 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
             {
                 VisualElement playerUi = playerUis[i];
                 SingingResultsPlayerUiControl singingResultsPlayerUiControl = new SingingResultsPlayerUiControl();
-                childInjector.RootVisualElement = playerUi;
+                childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUi, RebindingBehavior.Ignore);
                 childInjector.Inject(singingResultsPlayerUiControl);
                 singingResultsPlayerUiControls.Add(singingResultsPlayerUiControl);
             }
