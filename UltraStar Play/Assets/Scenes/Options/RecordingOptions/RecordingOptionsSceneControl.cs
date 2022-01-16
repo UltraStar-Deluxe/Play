@@ -95,6 +95,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
 
+    private bool ignoreSampleRateChange;
+
     private void Start()
     {
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
@@ -119,7 +121,20 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noiseSuppressionPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.NoiseSuppression = newValue);
         delayPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.DelayInMillis = (int)newValue);
         colorPickerControl.Selection.Subscribe(newValue => SelectedMicProfile.Color = newValue);
-        sampleRatePickerControl.Selection.Subscribe(newValue => SelectedMicProfile.SampleRate = newValue);
+        sampleRatePickerControl.Selection.Subscribe(newValue =>
+        {
+            SelectedMicProfile.SampleRate = newValue;
+            // Reconnect with companion app
+            if (ignoreSampleRateChange)
+            {
+                ignoreSampleRateChange = false;
+            }
+            else if (!SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
+                     && ServerSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out ConnectedClientHandler connectedClientHandler))
+            {
+                serverSideConnectRequestManager.RemoveConnectedClientHandler(connectedClientHandler);
+            }
+        });
 
         // Reselect recording device of connected client, when the client has now connected
         serverSideConnectRequestManager.ClientConnectedEventStream
@@ -180,7 +195,11 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
         delayPickerControl.SelectItem(micProfile.DelayInMillis);
         colorPickerControl.TrySelectItem(micProfile.Color);
+
+        ignoreSampleRateChange = true;
         sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
+        ignoreSampleRateChange = false;
+
         enabledToggle.value = micProfile.IsEnabled;
 
         if (micProfile.IsConnected)
