@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
     private static readonly List<int> amplificationItems = new List<int> { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new List<int> { 0, 5, 10, 15, 20, 25, 30 };

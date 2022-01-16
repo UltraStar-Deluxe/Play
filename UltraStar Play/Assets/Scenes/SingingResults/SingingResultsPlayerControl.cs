@@ -9,7 +9,7 @@ using UnityEngine;
 using UniRx;
 using UnityEngine.UIElements;
 
-public class SingingResultsPlayerUiControl : INeedInjection, ITranslator, IInjectionFinishedListener
+public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjectionFinishedListener
 {
     [Inject]
     private SingingResultsSceneUiControl singingResultsSceneUiControl;

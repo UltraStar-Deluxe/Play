@@ -45,7 +45,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     private Label editPlaylistDialogTitle;
 
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -59,7 +59,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        songSelectSceneUiControl.PlaylistChooserControl.Selection
+        songSelectSceneControl.PlaylistChooserControl.Selection
             .Subscribe(newValue => currentPlaylist = newValue);
 
         editPlaylistButton.RegisterCallbackButtonTriggered(() => ShowEditCurrentPlaylistDialog());
@@ -92,7 +92,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     private void CreateThenEditNewPlaylist()
     {
         UltraStarPlaylist newPlaylist = playlistManager.CreateNewPlaylist("New Playlist");
-        songSelectSceneUiControl.PlaylistChooserControl.Selection.Value = newPlaylist;
+        songSelectSceneControl.PlaylistChooserControl.Selection.Value = newPlaylist;
         ShowEditCurrentPlaylistDialog();
     }
 
@@ -133,7 +133,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         titleText = "Edit Playlist";
         editPlaylistDialogTitle.text = titleText;
         playlistNameTextField.value = playlistManager.GetPlaylistName(currentPlaylist);
-        songSelectSceneUiControl.HideMenuOverlay();
+        songSelectSceneControl.HideMenuOverlay();
         editPlaylistOverlay.ShowByDisplay();
 
         ShowDeleteAndSubmitButtons();

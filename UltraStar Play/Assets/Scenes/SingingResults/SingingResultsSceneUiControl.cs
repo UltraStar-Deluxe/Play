@@ -50,7 +50,7 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
 
     private SingingResultsSceneData sceneData;
 
-    private List<SingingResultsPlayerUiControl> singingResultsPlayerUiControls = new List<SingingResultsPlayerUiControl>();
+    private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
 
     public static SingingResultsSceneUiControl Instance
     {
@@ -94,7 +94,7 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
             .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUi)
             .ToList();
 
-        singingResultsPlayerUiControls = new List<SingingResultsPlayerUiControl>();
+        singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
         int i = 0;
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
@@ -113,10 +113,10 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
             if (i < playerUis.Count)
             {
                 VisualElement playerUi = playerUis[i];
-                SingingResultsPlayerUiControl singingResultsPlayerUiControl = new SingingResultsPlayerUiControl();
+                SingingResultsPlayerControl singingResultsPlayerControl = new SingingResultsPlayerControl();
                 childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUi, RebindingBehavior.Ignore);
-                childInjector.Inject(singingResultsPlayerUiControl);
-                singingResultsPlayerUiControls.Add(singingResultsPlayerUiControl);
+                childInjector.Inject(singingResultsPlayerControl);
+                singingResultsPlayerUiControls.Add(singingResultsPlayerControl);
             }
             i++;
         }

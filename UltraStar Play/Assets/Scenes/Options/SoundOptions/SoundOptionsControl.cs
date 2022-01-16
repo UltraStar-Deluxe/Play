@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SoundOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [Inject]
     private SceneNavigator sceneNavigator;

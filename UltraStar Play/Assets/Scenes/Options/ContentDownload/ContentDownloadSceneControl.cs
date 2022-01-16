@@ -17,7 +17,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ContentDownloadSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
     private static readonly List<string> defaultArchiveUrls = new List<string>
     {

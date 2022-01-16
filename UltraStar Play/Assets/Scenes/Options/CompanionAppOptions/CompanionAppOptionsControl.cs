@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CompanionAppOptionsUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset connectedClientListEntryAsset;
