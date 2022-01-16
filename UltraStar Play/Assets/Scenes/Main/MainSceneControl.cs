@@ -12,7 +12,7 @@ using ProTrans;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;

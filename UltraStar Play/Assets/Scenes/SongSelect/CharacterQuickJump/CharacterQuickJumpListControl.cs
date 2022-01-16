@@ -22,7 +22,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
     private Injector injector;
 
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -60,7 +60,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         // Update outdated song metas on main thread
         songMetaManager.SongScanFinishedEventStream
             .Subscribe(_ => needsRefresh = true);
-        songSelectSceneUiControl.PlaylistChooserControl.Selection
+        songSelectSceneControl.PlaylistChooserControl.Selection
             .Subscribe(_ => needsRefresh = true);
 
         UpdateNextAndPreviousCharacterButtonLabels();
@@ -86,8 +86,8 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         if (needsRefresh)
         {
             needsRefresh = false;
-            songSelectSceneUiControl.InitSongMetas();
-            songSelectSceneUiControl.UpdateFilteredSongs();
+            songSelectSceneControl.InitSongMetas();
+            songSelectSceneControl.UpdateFilteredSongs();
             UpdateCharacters();
         }
     }
@@ -104,12 +104,12 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
 
     private void SelectAdjacentCharacter(bool selectNext)
     {
-        if (songSelectSceneUiControl.SelectedSong == null)
+        if (songSelectSceneControl.SelectedSong == null)
         {
             return;
         }
 
-        char currentCharacter = GetCharacterQuickJumpRelevantString(songSelectSceneUiControl.SelectedSong)
+        char currentCharacter = GetCharacterQuickJumpRelevantString(songSelectSceneControl.SelectedSong)
             .ToLowerInvariant()
             .FirstOrDefault();
         CharacterQuickJumpCharacterControl currentCharacterQuickJumpCharacterControl = EnabledCharacterQuickJumpEntryControls
@@ -180,7 +180,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
             matchPredicate = (songCharacter) => !char.IsLetterOrDigit(songCharacter);
         }
 
-        SongMeta match = songSelectSceneUiControl.GetFilteredSongMetas()
+        SongMeta match = songSelectSceneControl.GetFilteredSongMetas()
             .Where(songMeta =>
             {
                 string relevantString = GetCharacterQuickJumpRelevantString(songMeta);
@@ -194,7 +194,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
 
     private string GetCharacterQuickJumpRelevantString(SongMeta songMeta)
     {
-        ESongOrder songOrder = songSelectSceneUiControl.SongOrderPickerControl.SelectedItem;
+        ESongOrder songOrder = songSelectSceneControl.SongOrderPickerControl.SelectedItem;
         switch (songOrder)
         {
             case ESongOrder.Artist:

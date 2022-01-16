@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerProfileOptionsSceneUiControl : MonoBehaviour, INeedInjection, ITranslator
+public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;

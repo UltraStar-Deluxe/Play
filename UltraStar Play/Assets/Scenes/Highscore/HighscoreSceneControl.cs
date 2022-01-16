@@ -13,7 +13,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class HighscoreSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
+public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;

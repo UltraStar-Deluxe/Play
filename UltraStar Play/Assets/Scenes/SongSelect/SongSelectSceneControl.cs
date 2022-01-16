@@ -15,13 +15,13 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
+public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
 {
-    public static SongSelectSceneUiControl Instance
+    public static SongSelectSceneControl Instance
     {
         get
         {
-            return FindObjectOfType<SongSelectSceneUiControl>();
+            return FindObjectOfType<SongSelectSceneControl>();
         }
     }
 

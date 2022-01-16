@@ -20,7 +20,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     private SongRouletteControl songRouletteControl;
 
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -265,14 +265,14 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         singThisSongButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
-            songSelectSceneUiControl.CheckAudioAndStartSingScene();
+            songSelectSceneControl.CheckAudioAndStartSingScene();
         });
         closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
             InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
         });
-        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneUiControl.StartSongEditorScene());
+        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
