@@ -21,7 +21,6 @@ public class SceneNavigator : MonoBehaviour
     }
 
     /// Static map to store and load SceneData instances across scenes.
-    /// This static map will be reset after a Hotswap (like all static fields).
     private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new Dictionary<System.Type, SceneData>();
 
     public void LoadScene(SceneEnumHolder holder)

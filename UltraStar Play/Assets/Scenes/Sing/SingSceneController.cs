@@ -11,7 +11,7 @@ using ProTrans;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHotSwapFinishedListener
+public class SingSceneController : MonoBehaviour, INeedInjection, IBinder
 {
     private static SingSceneController instance;
     public static SingSceneController Instance
@@ -249,11 +249,6 @@ public class SingSceneController : MonoBehaviour, INeedInjection, IBinder, IOnHo
         {
             songVideoPlayer.StartVideoOrShowBackgroundImage();
         }
-    }
-
-    public void OnHotSwapFinished()
-    {
-        StartMusicAndVideo();
     }
 
     void OnDisable()
