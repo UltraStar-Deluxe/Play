@@ -2,6 +2,7 @@
     --font-size: 14px;
     --font-size-small: 12px;
     --font-size-smaller: 10px;
+    --font-size-tiny: 8px;
     --font-size-title: 20px;
     --font-size-title-small: 18px;
     --control-height: 30px;
