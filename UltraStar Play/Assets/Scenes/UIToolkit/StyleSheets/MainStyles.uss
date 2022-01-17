@@ -3,6 +3,7 @@
     --font-size: 18px;
     --font-size-small: 14px;
     --font-size-smaller: 12px;
+    --font-size-tiny: 10px;
     --font-size-title: 24px;
     --font-size-title-small: 20px;
     --text-color-accent1: lightgrey;
@@ -374,6 +375,14 @@ Label.smallerFont {
     font-size: var(--font-size-smaller);
 }
 
+.tinyFont Label {
+    font-size: var(--font-size-tiny);
+}
+
+Label.tinyFont {
+    font-size: var(--font-size-tiny);
+}
+
 .ellipsis {
     text-overflow: ellipsis;
     -unity-text-overflow-position: end;
@@ -573,4 +582,41 @@ Label.smallerFont {
 .outlineOnFocus:focus {
     border-color: var(--text-color);
     border-width: 1;
+}
+
+.singingLyrics {
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.75);
+}
+
+.singingLyrics.currentLyrics {
+    font-size: var(--font-size-title);
+    margin-bottom: 5px;
+}
+
+.singingLyrics.nextLyrics {
+    font-size: var(--font-size);
+}
+
+.lyricsContainer {
+    align-items: center;
+    background-color: rgba(64, 64, 64, 0.75);
+    padding: 5px;
+}
+
+#timeBar {
+    background-color: rgba(41, 58, 58, 0.8);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#timeBarCenter {
+    background-color: rgba(61, 91, 91, 1);
+    margin-top: 3px;
+    margin-bottom: 2px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
