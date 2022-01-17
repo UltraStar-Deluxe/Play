@@ -1,10 +1,11 @@
 :root {
     --font-size: 14px;
-    --font-size-small: 12px;
-    --font-size-smaller: 10px;
     --font-size-tiny: 8px;
-    --font-size-title: 20px;
+    --font-size-smaller: 10px;
+    --font-size-small: 12px;
+    --font-size-large: 18px;
     --font-size-title-small: 18px;
+    --font-size-title: 20px;
     --control-height: 30px;
     --control-width: 100px;
     --control-width-half: 50px;

@@ -1,11 +1,12 @@
 :root {
     --text-color: white;
     --font-size: 18px;
-    --font-size-small: 14px;
-    --font-size-smaller: 12px;
     --font-size-tiny: 10px;
-    --font-size-title: 24px;
+    --font-size-smaller: 12px;
+    --font-size-small: 14px;
+    --font-size-large: 20px;
     --font-size-title-small: 20px;
+    --font-size-title: 24px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
     --control-height: 40px;
@@ -359,6 +360,14 @@ ItemPicker.smallFont Label {
     font-size: var(--font-size-small);
 }
 
+.largeFont Label {
+    font-size: var(--font-size-large);
+}
+
+Label.largeFont {
+    font-size: var(--font-size-large);
+}
+
 .smallFont Label {
     font-size: var(--font-size-small);
 }
@@ -614,7 +623,7 @@ Label.tinyFont {
 }
 
 #timeBarCenter {
-    background-color: rgba(61, 91, 91, 1);
+    background-color: rgb(61, 91, 91);
     margin-top: 3px;
     margin-bottom: 2px;
     margin-left: 15px;
