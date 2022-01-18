@@ -9,10 +9,10 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
 {
     public int playerIndexToSimulate;
 
-    protected PlayerController playerController;
+    protected PlayerControl playerControl;
 
     [Inject]
-    protected SingSceneController singSceneController;
+    protected SingSceneControl singSceneControl;
 
     [Inject]
     protected SongMeta songMeta;
@@ -29,39 +29,39 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     void Update()
     {
-        int currentBeat = (int)singSceneController.CurrentBeat;
-        int beatToAnalyze = playerController.PlayerPitchTracker.BeatToAnalyze;
+        int currentBeat = (int)singSceneControl.CurrentBeat;
+        int beatToAnalyze = playerControl.PlayerPitchTracker.BeatToAnalyze;
 
         if (currentBeat > 0
             && beatToAnalyze <= currentBeat
-            && playerController.PlayerPitchTracker.RecordingSentence != null)
+            && playerControl.PlayerPitchTracker.RecordingSentence != null)
         {
             Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
             PitchEvent pitchEvent = GetDummyPichtEvent(beatToAnalyze, noteAtBeat);
-            playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
-            playerController.PlayerPitchTracker.GoToNextBeat();
+            playerControl.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
+            playerControl.PlayerPitchTracker.GoToNextBeat();
         }
     }
 
-    public void SetPlayerController(PlayerController playerController)
+    public void SetPlayerController(PlayerControl playerControl)
     {
-        this.playerController = playerController;
+        this.playerControl = playerControl;
         // Disable real microphone input for this player
-        playerController.MicSampleRecorder.enabled = false;
+        playerControl.MicSampleRecorder.enabled = false;
     }
 
     protected double GetBeatDelayedByMicDelay(int beat)
     {
-        double micDelayInBeats = (playerController.MicProfile == null)
+        double micDelayInBeats = (playerControl.MicProfile == null)
             ? 0
-            : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerController.MicProfile.DelayInMillis);
+            : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerControl.MicProfile.DelayInMillis);
         double delayedBeat = beat - micDelayInBeats;
         return delayedBeat;
     }
 
     protected Note GetNoteAtBeat(int beat)
     {
-        Sentence recordingSentence = playerController?.PlayerPitchTracker?.RecordingSentence;
+        Sentence recordingSentence = playerControl?.PlayerPitchTracker?.RecordingSentence;
         if (recordingSentence == null)
         {
             return null;

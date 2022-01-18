@@ -8,35 +8,30 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8375225363643972244}
+  - component: {fileID: 4113302136809297594}
   - component: {fileID: 3677057615630954125}
   m_Layer: 5
-  m_Name: PlayerScoreController
+  m_Name: PlayerScoreControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &8375225363643972244
-RectTransform:
+--- !u!4 &4113302136809297594
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2821432290210372071}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 413.96063}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8027944080584314603}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -332.30502, y: -279.35526}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3677057615630954125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,7 +224,7 @@ GameObject:
   - component: {fileID: 8027944080584314603}
   - component: {fileID: 2965445179344377450}
   m_Layer: 0
-  m_Name: PlayerControllerPrefab
+  m_Name: PlayerControlPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -243,11 +238,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4968118855066421690}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 332.30502, y: 279.35526, z: -413.96063}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8375225363643972244}
+  - {fileID: 4113302136809297594}
   - {fileID: 7882357268378806898}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -264,5 +259,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9f4992be2165ce4dbe3c61528ee71e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUiControllerPrefab: {fileID: 2671619950860038949, guid: e2db2cdfcd84c1d4fbe3e38bae31b2ba,
-    type: 3}

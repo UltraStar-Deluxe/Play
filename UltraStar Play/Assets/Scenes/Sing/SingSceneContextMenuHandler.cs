@@ -14,19 +14,19 @@ using ProTrans;
 public class SingSceneContextMenuHandler : AbstractContextMenuHandler, INeedInjection
 {
     [Inject]
-    private SingSceneController singSceneController;
+    private SingSceneControl singSceneControl;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
-            () => singSceneController.TogglePlayPause());
+            () => singSceneControl.TogglePlayPause());
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
-            () => singSceneController.Restart());
+            () => singSceneControl.Restart());
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-            () => singSceneController.SkipToNextSingableNote());
+            () => singSceneControl.SkipToNextSingableNote());
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => singSceneController.FinishScene(false));
+            () => singSceneControl.FinishScene(false));
         contextMenu.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => singSceneController.OpenSongInEditor());
+            () => singSceneControl.OpenSongInEditor());
     }
 }

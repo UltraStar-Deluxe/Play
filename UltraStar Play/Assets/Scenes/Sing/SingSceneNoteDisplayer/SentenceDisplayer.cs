@@ -12,7 +12,7 @@ using System;
 public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 {
     [Inject]
-    private PlayerController playerController;
+    private PlayerControl playerControl;
 
     private Sentence currentSentence;
 
@@ -33,7 +33,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     {
         base.Init(lineCount);
 
-        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);
         });

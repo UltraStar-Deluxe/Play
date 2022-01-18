@@ -13,7 +13,7 @@ public class BeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectionFinish
     public DynamicallyCreatedImage verticalGridImage;
 
     [Inject]
-    private PlayerController playerController;
+    private PlayerControl playerControl;
 
     public Color lineColor;
 
@@ -31,7 +31,7 @@ public class BeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectionFinish
 
     public void OnInjectionFinished()
     {
-        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);
         });

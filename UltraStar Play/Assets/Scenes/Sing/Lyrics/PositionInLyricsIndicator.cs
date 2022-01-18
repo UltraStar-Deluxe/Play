@@ -12,10 +12,10 @@ using UnityEngine.UI;
 public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
-    public LyricsDisplayer lyricsDisplayer;
+    public SingingLyricsControl singingLyricsControl;
 
     [Inject]
-    private SingSceneController singSceneController;
+    private SingSceneControl singSceneControl;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
@@ -28,7 +28,7 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
     {
         get
         {
-            return lyricsDisplayer.CurrentSentence;
+            return singingLyricsControl.CurrentSentence;
         }
     }
 
@@ -36,15 +36,15 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
     {
         get
         {
-            return lyricsDisplayer.SortedNotes;
+            return singingLyricsControl.SortedNotes;
         }
     }
 
-    private Text CurrentSentenceText
+    private Text CurrentSentenceLabel
     {
         get
         {
-            return lyricsDisplayer.currentSentenceText;
+            return null;
         }
     }
 
@@ -52,7 +52,7 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
     {
         get
         {
-            return singSceneController.SongMeta;
+            return singSceneControl.SongMeta;
         }
     }
 
@@ -90,14 +90,15 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
     private void CalculateVelocity()
     {
         if (CurrentSentence == null
-            || CurrentSentenceText.text.Length == 0
-            || CurrentSentenceText.cachedTextGenerator.vertexCount == 0)
+            || CurrentSentenceLabel == null
+            || CurrentSentenceLabel.text.Length == 0
+            || CurrentSentenceLabel.cachedTextGenerator.vertexCount == 0)
         {
             return;
         }
-        double positionInSongInMillis = singSceneController.PositionInSongInMillis;
+        double positionInSongInMillis = singSceneControl.PositionInSongInMillis;
 
-        double currentBeat = singSceneController.CurrentBeat;
+        double currentBeat = singSceneControl.CurrentBeat;
         double sentenceMinBeat = CurrentSentence.MinBeat;
         double sentenceMaxBeat = CurrentSentence.MaxBeat;
 
@@ -115,7 +116,7 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
             if (positionInSentenceInMillis <= sentenceStartInMillis)
             {
                 // Range before first note of sentence.
-                double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceText, CurrentSentence, SortedNotes[0]);
+                double sentenceFirstCharacterPosition = GetStartPositionOfNote(CurrentSentenceLabel, CurrentSentence, SortedNotes[0]);
                 endPos = sentenceFirstCharacterPosition;
                 endTimeInMillis = sentenceStartInMillis;
             }
@@ -126,7 +127,7 @@ public class PositionInLyricsIndicator : MonoBehaviour, INeedInjection
                 if (currentNote != null)
                 {
                     double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(SongMeta, currentNote.EndBeat);
-                    endPos = GetEndPositionOfNote(CurrentSentenceText, CurrentSentence, currentNote);
+                    endPos = GetEndPositionOfNote(CurrentSentenceLabel, CurrentSentence, currentNote);
                     endTimeInMillis = noteEndInMillis;
                 }
             }

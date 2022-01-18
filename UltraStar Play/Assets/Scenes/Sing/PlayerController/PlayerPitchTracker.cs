@@ -19,7 +19,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
-    private PlayerController playerController;
+    private PlayerControl playerControl;
 
     [Inject]
     private PlayerProfile playerProfile;
@@ -214,7 +214,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     private void GoToNextRecordingSentence()
     {
         // Fire event about finished sentence
-        Sentence nextRecordingSentence = playerController.GetSentence(recordingSentenceIndex + 1);
+        Sentence nextRecordingSentence = playerControl.GetSentence(recordingSentenceIndex + 1);
         sentenceAnalyzedEventStream.OnNext(new SentenceAnalyzedEvent(RecordingSentence, nextRecordingSentence == null));
         // Select next sentence
         recordingSentenceIndex++;
@@ -234,7 +234,7 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
 
     private void SetRecordingSentence(int sentenceIndex)
     {
-        RecordingSentence = playerController.GetSentence(sentenceIndex);
+        RecordingSentence = playerControl.GetSentence(sentenceIndex);
         if (RecordingSentence == null)
         {
             currentAndUpcomingNotesInRecordingSentence = new List<Note>();
@@ -295,12 +295,12 @@ public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
     public void SkipToBeat(double currentBeat)
     {
         // Find sentence to analyze next.
-        RecordingSentence = playerController.SortedSentences
+        RecordingSentence = playerControl.SortedSentences
             .Where(sentence => currentBeat <= sentence.MaxBeat)
             .FirstOrDefault();
         if (RecordingSentence != null)
         {
-            recordingSentenceIndex = playerController.SortedSentences.IndexOf(RecordingSentence);
+            recordingSentenceIndex = playerControl.SortedSentences.IndexOf(RecordingSentence);
             // Find note to analyze next
             currentAndUpcomingNotesInRecordingSentence = RecordingSentence.Notes
                 .Where(note => currentBeat <= note.EndBeat)

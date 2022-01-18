@@ -14,7 +14,7 @@ using UnityEngine.EventSystems;
 public class SingScenePointerClickHandler : MonoBehaviour, INeedInjection, IPointerClickHandler
 {
     [Inject]
-    private SingSceneController singSceneController;
+    private SingSceneControl singSceneControl;
     
     private float lastClickTime;
     
@@ -24,7 +24,7 @@ public class SingScenePointerClickHandler : MonoBehaviour, INeedInjection, IPoin
         lastClickTime = Time.time;
         if (isDoubleClick)
         {
-            singSceneController.TogglePlayPause();
+            singSceneControl.TogglePlayPause();
         }
     }
 }
