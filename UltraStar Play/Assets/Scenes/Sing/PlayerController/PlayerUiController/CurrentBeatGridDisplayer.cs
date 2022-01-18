@@ -12,10 +12,10 @@ using UniRx;
 public class CurrentBeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IExcludeFromSceneInjection
 {
     [Inject]
-    private PlayerController playerController;
+    private PlayerControl playerControl;
 
     [Inject]
-    private SingSceneController singSceneController;
+    private SingSceneControl singSceneControl;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     private RectTransform rectTransform;
@@ -36,13 +36,13 @@ public class CurrentBeatGridDisplayer : MonoBehaviour, INeedInjection, IInjectio
             return;
         }
 
-        double currentBeat = singSceneController.CurrentBeat;
+        double currentBeat = singSceneControl.CurrentBeat;
         CreateLine(currentBeat, currentSentence.MinBeat, currentSentence.MaxBeat);
     }
 
     public void OnInjectionFinished()
     {
-        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);
         });

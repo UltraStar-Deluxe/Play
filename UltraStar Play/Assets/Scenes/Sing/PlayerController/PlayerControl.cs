@@ -10,14 +10,8 @@ using UnityEngine.UI;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerController : MonoBehaviour, INeedInjection
+public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    [InjectedInInspector]
-    public PlayerUiController playerUiControllerPrefab;
-
-    public PlayerProfile PlayerProfile { get; private set; }
-    public MicProfile MicProfile { get; private set; }
-
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerNoteRecorder PlayerNoteRecorder { get; private set; }
 
@@ -30,6 +24,13 @@ public class PlayerController : MonoBehaviour, INeedInjection
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerScoreController PlayerScoreController { get; private set; }
 
+    [Inject]
+    public PlayerProfile PlayerProfile { get; private set; }
+
+    [Inject(Optional = true)]
+    public MicProfile MicProfile { get; private set; }
+
+    [Inject]
     private Voice voice;
     public Voice Voice
     {
@@ -57,49 +58,38 @@ public class PlayerController : MonoBehaviour, INeedInjection
     // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
     private Injector childrenInjector;
 
-    [Inject]
-    private PlayerUiArea playerUiArea;
-
-    public PlayerUiController PlayerUiController { get { return playerUiController; } }
-
-    // The PlayerUiController is instantiated by the PlayerController as a child of the PlayerUiArea.
-    private PlayerUiController playerUiController;
+    private PlayerUiControl playerUiControl;
 
     [Inject]
     private SongMeta songMeta;
 
     private int displaySentenceIndex;
 
-    public void Init(PlayerProfile playerProfile, string voiceName, MicProfile micProfile)
+    public void OnInjectionFinished()
     {
-        this.PlayerProfile = playerProfile;
-        this.MicProfile = micProfile;
-        this.Voice = GetVoice(songMeta, voiceName);
-        this.playerUiController = Instantiate(playerUiControllerPrefab, playerUiArea.transform);
-
-        // Recalculate layout
-        LayoutRebuilder.ForceRebuildLayoutImmediate(playerUiArea.GetComponent<RectTransform>());
-
+        this.playerUiControl = new PlayerUiControl();
         this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
         // Inject all
-        childrenInjector.InjectAllComponentsInChildren(this);
-        childrenInjector.InjectAllComponentsInChildren(playerUiController);
-
+        // childrenInjector.Inject(playerUiControl);
+        foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
+        {
+            if (childThatNeedsInjection is not PlayerControl)
+            {
+                childrenInjector.Inject(childThatNeedsInjection);
+            }
+        }
         SetDisplaySentenceIndex(0);
     }
 
     private Injector CreateChildrenInjectorWithAdditionalBindings()
     {
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
-        newInjector.AddBindingForInstance(PlayerProfile);
-        newInjector.AddBindingForInstance(MicProfile);
-        newInjector.AddBindingForInstance(Voice);
         newInjector.AddBindingForInstance(MicSampleRecorder);
         newInjector.AddBindingForInstance(PlayerPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
         newInjector.AddBindingForInstance(PlayerScoreController);
-        newInjector.AddBindingForInstance(playerUiController);
+        newInjector.AddBindingForInstance(playerUiControl);
         newInjector.AddBindingForInstance(newInjector);
         newInjector.AddBindingForInstance(this);
         return newInjector;
@@ -117,77 +107,6 @@ public class PlayerController : MonoBehaviour, INeedInjection
                 SetDisplaySentenceIndex(nextDisplaySentenceIndex);
             }
         }
-    }
-
-    private Voice GetVoice(SongMeta songMeta, string voiceName)
-    {
-        IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
-        if (string.IsNullOrEmpty(voiceName) || voiceName == Voice.soloVoiceName)
-        {
-            Voice mergedVoice = CreateMergedVoice(voices);
-            return mergedVoice;
-        }
-        else
-        {
-            Voice matchingVoice = voices.Where(it => it.Name == voiceName).FirstOrDefault();
-            if (matchingVoice != null)
-            {
-                return matchingVoice;
-            }
-            else
-            {
-                string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
-                throw new UnityException($"The song data does not contain a voice with name {voiceName}."
-                    + $" Available voices: {voiceNameCsv}");
-            }
-        }
-    }
-
-    private Voice CreateMergedVoice(IReadOnlyCollection<Voice> voices)
-    {
-        if (voices.Count == 1)
-        {
-            return voices.First();
-        }
-
-        Voice mergedVoice = new Voice("");
-        List<Sentence> allSentences = voices.SelectMany(voice => voice.Sentences).ToList();
-        List<Note> allNotes = allSentences.SelectMany(sentence => sentence.Notes).ToList();
-        // Sort notes by start beat
-        allNotes.Sort((note1, note2) => note1.StartBeat.CompareTo(note2.StartBeat));
-        // Find sentence borders
-        List<int> lineBreaks = allSentences.Select(sentence => sentence.LinebreakBeat).Where(lineBreak => lineBreak > 0).ToList();
-        lineBreaks.Sort();
-        int lineBreakIndex = 0;
-        int nextLineBreakBeat = lineBreaks[lineBreakIndex];
-        // Create sentences
-        Sentence mutableSentence = new Sentence();
-        foreach (Note note in allNotes)
-        {
-            if (!mutableSentence.Notes.IsNullOrEmpty()
-                && (nextLineBreakBeat >= 0 && note.StartBeat > nextLineBreakBeat))
-            {
-                // Finish the last sentence
-                mutableSentence.SetLinebreakBeat(nextLineBreakBeat);
-                mergedVoice.AddSentence(mutableSentence);
-                mutableSentence = new Sentence();
-
-                lineBreakIndex++;
-                if (lineBreakIndex < lineBreaks.Count)
-                {
-                    nextLineBreakBeat = lineBreaks[lineBreakIndex];
-                }
-                else
-                {
-                    lineBreakIndex = -1;
-                }
-            }
-            mutableSentence.AddNote(note.Clone());
-        }
-
-        // Finish the last sentence
-        mergedVoice.AddSentence(mutableSentence);
-        return mergedVoice;
     }
 
     private void SetDisplaySentenceIndex(int newValue)

@@ -127,8 +127,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; flex-wrap: wrap;">
-            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 5px;" />
+        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; flex-wrap: wrap;">
+            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />

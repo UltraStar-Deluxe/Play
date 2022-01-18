@@ -9,7 +9,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSceneInjection, IInjectionFinishedListener
+public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 {
     public int lineCount = 10;
 
@@ -22,23 +22,17 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private TotalScoreDisplayer totalScoreDisplayer;
     
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerMessageDisplayer playerMessageDisplayer;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private SentenceRatingDisplayer sentenceRatingDisplayer;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private PlayerNameText playerNameText;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AvatarImage avatarImage;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public PlayerCrownDisplayer PlayerCrownDisplayer { get; private set; }
+    private PlayerCrownDisplayer playerCrownDisplayer;
 
     [Inject]
     private Settings settings;
@@ -48,6 +42,9 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    [Inject]
+    private SingSceneControl singSceneControl;
 
     private ISingSceneNoteDisplayer noteDisplayer;
 
@@ -75,7 +72,7 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         {
             serverSideConnectRequestManager.ClientConnectedEventStream
                 .Subscribe(HandleClientConnectedEvent)
-                .AddTo(gameObject);
+                .AddTo(singSceneControl);
         }
 
         // Create effect when there are at least two perfect sentences in a row.
@@ -130,16 +127,16 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         noteDisplayer.CreatePerfectNoteEffect(perfectNote);
     }
 
-    private void InitNoteDisplayer(int lineCount)
+    private void InitNoteDisplayer(int localLineCount)
     {
         // Find a suited note displayer
         if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence)
         {
-            noteDisplayer = GetComponentInChildren<SentenceDisplayer>(true);
+            noteDisplayer = new SentenceDisplayer();
         }
         else if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
         {
-            noteDisplayer = GetComponentInChildren<ScrollingNoteStreamDisplayer>(true);
+            noteDisplayer = new ScrollingNoteStreamDisplayer();
         }
         if (noteDisplayer == null)
         {
@@ -149,15 +146,15 @@ public class PlayerUiController : MonoBehaviour, INeedInjection, IExcludeFromSce
         // Enable and initialize the selected note displayer
         noteDisplayer.GetGameObject().SetActive(true);
         injector.InjectAllComponentsInChildren(noteDisplayer.GetGameObject());
-        noteDisplayer.Init(lineCount);
+        noteDisplayer.Init(localLineCount);
 
         // Disable other note displayers
-        foreach (ISingSceneNoteDisplayer singSceneNoteDisplayer in GetComponentsInChildren<ISingSceneNoteDisplayer>())
-        {
-            if (singSceneNoteDisplayer != noteDisplayer)
-            {
-                singSceneNoteDisplayer.GetGameObject().SetActive(false);
-            }
-        }
+        // foreach (ISingSceneNoteDisplayer singSceneNoteDisplayer in GetComponentsInChildren<ISingSceneNoteDisplayer>())
+        // {
+        //     if (singSceneNoteDisplayer != noteDisplayer)
+        //     {
+        //         singSceneNoteDisplayer.GetGameObject().SetActive(false);
+        //     }
+        // }
     }
 }

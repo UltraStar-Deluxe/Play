@@ -3,42 +3,39 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class LyricsDisplayer : MonoBehaviour, INeedInjection
+public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 {
-    public Text currentSentenceText;
-    public Text nextSentenceText;
-
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new List<Note>();
+
+    [Inject(UxmlName = R.UxmlNames.currentSentenceLabel)]
+    private Label currentSentenceLabel;
+
+    [Inject(UxmlName = R.UxmlNames.nextSentenceLabel)]
+    private Label nextSentenceLabel;
 
     [Inject]
     private Settings settings;
 
-    void Start()
-    {
-        // The ScrollingNoteStreamDisplayer shows the lyrics below the notes. Thus, there is no need for this LyricsDisplayer.
-        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
-        {
-            gameObject.SetActive(false);
-        }
-    }
+    [Inject]
+    private PlayerControl playerControl;
 
-    public void Init(PlayerController playerController)
+    public void OnInjectionFinished()
     {
-        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
-            Sentence nextSentence = playerController.GetSentence(enterSentenceEvent.SentenceIndex + 1);
+            Sentence nextSentence = playerControl.GetSentence(enterSentenceEvent.SentenceIndex + 1);
             SetCurrentSentence(enterSentenceEvent.Sentence);
             SetNextSentence(nextSentence);
         });
 
-        SetCurrentSentence(playerController.GetSentence(0));
-        SetNextSentence(playerController.GetSentence(1));
+        SetCurrentSentence(playerControl.GetSentence(0));
+        SetNextSentence(playerControl.GetSentence(1));
     }
 
     public void SetCurrentSentence(Sentence sentence)
@@ -48,18 +45,18 @@ public class LyricsDisplayer : MonoBehaviour, INeedInjection
         {
             SortedNotes = new List<Note>(sentence.Notes);
             SortedNotes.Sort(Note.comparerByStartBeat);
-            currentSentenceText.text = CreateStringFromSentence(sentence);
+            currentSentenceLabel.text = CreateStringFromSentence(sentence);
         }
         else
         {
             SortedNotes = new List<Note>();
-            currentSentenceText.text = "";
+            currentSentenceLabel.text = "";
         }
     }
 
     public void SetNextSentence(Sentence sentence)
     {
-        nextSentenceText.text = CreateStringFromSentence(sentence);
+        nextSentenceLabel.text = CreateStringFromSentence(sentence);
     }
 
     private string CreateStringFromSentence(Sentence sentence)

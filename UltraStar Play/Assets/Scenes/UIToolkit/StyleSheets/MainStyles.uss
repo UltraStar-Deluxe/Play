@@ -580,6 +580,14 @@ Label.tinyFont {
 
 .inputLegendLabel {
     width: 20%;
+    -unity-text-align: middle-center;
+}
+
+.inputLegendBar {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 50px;
+    background-color: rgba(32, 32, 32, 0.88);
 }
 
 .songDetailOverlayLabel {
@@ -614,7 +622,7 @@ Label.tinyFont {
     padding: 5px;
 }
 
-#timeBar {
+.timeBar {
     background-color: rgba(41, 58, 58, 0.8);
     padding-top: 0;
     padding-bottom: 0;
@@ -622,10 +630,11 @@ Label.tinyFont {
     padding-right: 15px;
 }
 
-#timeBarCenter {
+.innerTimeBarSentenceEntryContainer {
     background-color: rgb(61, 91, 91);
-    margin-top: 3px;
-    margin-bottom: 2px;
-    margin-left: 15px;
-    margin-right: 15px;
+}
+
+.textOutline {
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.75);
 }
