@@ -5,10 +5,11 @@
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
         <ui:VisualElement name="topLyricsContainer" class="lyricsContainer" style="border-bottom-left-radius: 5px; border-bottom-right-radius: 5px;">
-            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row;">
+            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
+                <ui:VisualElement name="positionBeforeLyricsIndicator" style="width: 20px; height: 100%; position: absolute; left: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/PitchIndicatorArrow.png?fileID=2800000&amp;guid=c03df72ce2e2b2e488425c460854bca5&amp;type=3#PitchIndicatorArrow&apos;); -unity-background-image-tint-color: rgb(66, 163, 231); -unity-background-scale-mode: stretch-to-fill; margin-left: -25px; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="currentSentenceLabel" class="currentLyrics singingLyrics" />
             </ui:VisualElement>
-            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row;">
+            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="nextSentenceLabel" class="nextLyrics singingLyrics" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -17,14 +18,15 @@
             <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="bottomLyricsContainer" class="lyricsContainer" style="border-top-right-radius: 5px; border-top-left-radius: 5px;">
-            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row;">
+            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
+                <ui:VisualElement name="positionBeforeLyricsIndicator" style="width: 20px; height: 100%; position: absolute; left: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/PitchIndicatorArrow.png?fileID=2800000&amp;guid=c03df72ce2e2b2e488425c460854bca5&amp;type=3#PitchIndicatorArrow&apos;); -unity-background-image-tint-color: rgb(66, 163, 231); -unity-background-scale-mode: stretch-to-fill; margin-left: -25px; margin-right: -25px; margin-top: -25px; margin-bottom: -25px;" />
                 <ui:Label text="Lo" display-tooltip-when-elided="true" name="lo" class="currentLyrics singingLyrics previousNoteLyrics" />
                 <ui:Label text="rem" display-tooltip-when-elided="true" name="rem" class="currentLyrics singingLyrics previousNoteLyrics" />
                 <ui:Label text="_" display-tooltip-when-elided="true" name="space" class="currentLyrics singingLyrics previousNoteLyrics" />
                 <ui:Label text="ip" display-tooltip-when-elided="true" name="ip" class="currentLyrics singingLyrics currentNoteLyrics" />
                 <ui:Label text="sum" display-tooltip-when-elided="true" name="sum" class="currentLyrics singingLyrics" />
             </ui:VisualElement>
-            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row;">
+            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="nextSentenceLabel" class="nextLyrics singingLyrics" />
             </ui:VisualElement>
         </ui:VisualElement>
