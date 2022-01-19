@@ -25,6 +25,11 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerControl playerControl;
 
+    [Inject]
+    private SongMeta songMeta;
+
+    private Dictionary<Note, Label> currentSentenceNoteToLabelMap = new Dictionary<Note, Label>();
+
     public void OnInjectionFinished()
     {
         playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
@@ -36,6 +41,53 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
+    }
+
+    public void UpdateNoteHighlighting(double positionInSongInMillis)
+    {
+        Note currentNote = SortedNotes
+            .FirstOrDefault(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis
+                                    && positionInSongInMillis <= BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat));
+        HighlightNoteLyrics(currentNote);
+    }
+
+    private void HighlightNoteLyrics(Note currentNote)
+    {
+        if (CurrentSentence == null)
+        {
+            return;
+        }
+
+        int currentNoteIndex = CurrentSentence.Notes.IndexOf(currentNote);
+        if (currentNoteIndex < 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < CurrentSentence.Notes.Count && i <= currentNoteIndex; i++)
+        {
+            Note note = SortedNotes[i];
+            if (!currentSentenceNoteToLabelMap.TryGetValue(note, out Label label))
+            {
+                continue;
+            }
+
+            if (i < currentNoteIndex)
+            {
+                label.AddToClassList(R.UxmlClasses.previousNoteLyrics);
+                label.RemoveFromClassList(R.UxmlClasses.currentNoteLyrics);
+            }
+            else if (i == currentNoteIndex)
+            {
+                label.RemoveFromClassList(R.UxmlClasses.previousNoteLyrics);
+                label.AddToClassList(R.UxmlClasses.currentNoteLyrics);
+            }
+            else
+            {
+                label.RemoveFromClassList(R.UxmlClasses.previousNoteLyrics);
+                label.RemoveFromClassList(R.UxmlClasses.currentNoteLyrics);
+            }
+        }
     }
 
     private void SetCurrentSentence(Sentence sentence)
@@ -56,6 +108,11 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
     {
         visualElement.Clear();
+        if (visualElement == currentSentenceContainer)
+        {
+            currentSentenceNoteToLabelMap.Clear();
+        }
+
         if (sentence == null
             || sentence.Notes.IsNullOrEmpty())
         {
@@ -74,12 +131,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             if (visualElement == currentSentenceContainer)
             {
                 label.AddToClassList(R.UxmlClasses.currentLyrics);
-            } else if (visualElement == nextSentenceContainer)
+                currentSentenceNoteToLabelMap.Add(note, label);
+            }
+            else if (visualElement == nextSentenceContainer)
             {
                 label.AddToClassList(R.UxmlClasses.nextLyrics);
             }
 
             visualElement.Add(label);
+
         });
     }
 

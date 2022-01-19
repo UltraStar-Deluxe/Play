@@ -1,12 +1,12 @@
 :root {
     --text-color: white;
     --font-size: 18px;
-    --font-size-tiny: 10px;
-    --font-size-smaller: 12px;
-    --font-size-small: 14px;
-    --font-size-large: 20px;
-    --font-size-title-small: 20px;
-    --font-size-title: 24px;
+    --font-size-xxs: 10px;
+    --font-size-xs: 12px;
+    --font-size-s: 14px;
+    --font-size-l: 20px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 26px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
     --control-height: 40px;
@@ -226,13 +226,13 @@ TextInput {
 
 .titleImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
     margin-right: 10px;
 }
 
 .titleText {
-    font-size: var(--font-size-title);
+    font-size: var(--font-size-xl);
 }
 
 .titleSubText {
@@ -249,7 +249,7 @@ TextInput {
 }
 
 .dialogTitle {
-    font-size: var(--font-size-title-small);
+    font-size: var(--font-size-l);
 }
 
 .dialogMessage {
@@ -258,8 +258,8 @@ TextInput {
 
 .dialogTitleImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title-small);
-    height: var(--font-size-title-small);
+    width: var(--font-size-l);
+    height: var(--font-size-l);
     margin-right: 10px;
     background-color: rgba(0, 0, 0, 0);
 }
@@ -311,8 +311,8 @@ TextInput {
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
 }
 
 .noBackground TextInput {
@@ -323,8 +323,8 @@ TextInput {
 
 .iconImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
 }
 
 .iconImageTextSized {
@@ -334,15 +334,15 @@ TextInput {
 }
 
 .smallFont TextInput {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Button.smallFont {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Button.smallerFont {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 ItemPicker {
@@ -357,39 +357,39 @@ ItemPicker Label {
 }
 
 ItemPicker.smallFont Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 .largeFont Label {
-    font-size: var(--font-size-large);
+    font-size: var(--font-size-l);
 }
 
 Label.largeFont {
-    font-size: var(--font-size-large);
+    font-size: var(--font-size-l);
 }
 
 .smallFont Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Label.smallFont {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 .smallerFont Label {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 Label.smallerFont {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 .tinyFont Label {
-    font-size: var(--font-size-tiny);
+    font-size: var(--font-size-xxs);
 }
 
 Label.tinyFont {
-    font-size: var(--font-size-tiny);
+    font-size: var(--font-size-xxs);
 }
 
 .ellipsis {
@@ -491,7 +491,7 @@ Label.tinyFont {
 }
 
 .singingResultUiSmall Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 .singingResultUiSmall #ratingLabel {
@@ -507,7 +507,7 @@ Label.tinyFont {
 }
 
 .singingResultUiSmaller Label {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 .singingResultUiSmaller #ratingImage {
@@ -527,7 +527,7 @@ Label.tinyFont {
 }
 
 .characterQuickJumpCharacterButton {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 .characterQuickJumpCharacter {
@@ -592,7 +592,7 @@ Label.tinyFont {
 
 .songDetailOverlayLabel {
     width: 100%;
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
     white-space: normal;
 }
 
@@ -607,13 +607,22 @@ Label.tinyFont {
     -unity-text-outline-color: rgba(64, 64, 64, 0.75);
 }
 
-.singingLyrics.currentLyrics {
-    font-size: var(--font-size-title);
+.currentLyrics {
+    font-size: var(--font-size-xl);
     margin-bottom: 5px;
 }
 
-.singingLyrics.nextLyrics {
+.nextLyrics {
     font-size: var(--font-size);
+}
+
+.currentNoteLyrics {
+    color: var(--control-color);
+    /*color: rgba(225, 64, 64, 1);*/
+}
+
+.previousNoteLyrics {
+    color: var(--control-color);
 }
 
 .lyricsContainer {

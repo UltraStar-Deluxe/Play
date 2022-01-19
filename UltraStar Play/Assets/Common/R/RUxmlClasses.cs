@@ -8,6 +8,7 @@ public static partial class R
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string controlLabel = "controlLabel";
         public const string currentLyrics = "currentLyrics";
+        public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";
         public const string dialogTextButton = "dialogTextButton";
@@ -40,6 +41,7 @@ public static partial class R
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
+        public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
         public const string scoreRow = "scoreRow";
