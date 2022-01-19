@@ -31,20 +31,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public MicProfile MicProfile { get; private set; }
 
     [Inject]
-    private Voice voice;
-    public Voice Voice
-    {
-        get
-        {
-            return voice;
-        }
-        private set
-        {
-            voice = value;
-            SortedSentences = voice.Sentences.ToList();
-            SortedSentences.Sort(Sentence.comparerByStartBeat);
-        }
-    }
+    public Voice Voice { get; private set; }
 
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
@@ -70,7 +57,10 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         this.playerUiControl = new PlayerUiControl();
         this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
-        // Inject all
+        SortedSentences = Voice.Sentences.ToList();
+        SortedSentences.Sort(Sentence.comparerByStartBeat);
+
+        // Inject all children
         // childrenInjector.Inject(playerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
@@ -138,11 +128,10 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         return nextSingableNote;
     }
 
-    public Sentence GetUpcomingSentenceForBeat(double currentBeat)
+    private Sentence GetUpcomingSentenceForBeat(double currentBeat)
     {
         Sentence result = Voice.Sentences
-            .Where(sentence => currentBeat < sentence.LinebreakBeat)
-            .FirstOrDefault();
+            .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);
         return result;
     }
 

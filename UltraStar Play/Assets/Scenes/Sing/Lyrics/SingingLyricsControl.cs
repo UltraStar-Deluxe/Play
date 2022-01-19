@@ -13,11 +13,11 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new List<Note>();
 
-    [Inject(UxmlName = R.UxmlNames.currentSentenceLabel)]
-    private Label currentSentenceLabel;
+    [Inject(UxmlName = R.UxmlNames.currentSentenceContainer)]
+    private VisualElement currentSentenceContainer;
 
-    [Inject(UxmlName = R.UxmlNames.nextSentenceLabel)]
-    private Label nextSentenceLabel;
+    [Inject(UxmlName = R.UxmlNames.nextSentenceContainer)]
+    private VisualElement nextSentenceContainer;
 
     [Inject]
     private Settings settings;
@@ -38,50 +38,57 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetNextSentence(playerControl.GetSentence(1));
     }
 
-    public void SetCurrentSentence(Sentence sentence)
+    private void SetCurrentSentence(Sentence sentence)
     {
         CurrentSentence = sentence;
         if (CurrentSentence != null)
         {
             SortedNotes = new List<Note>(sentence.Notes);
             SortedNotes.Sort(Note.comparerByStartBeat);
-            currentSentenceLabel.text = CreateStringFromSentence(sentence);
         }
         else
         {
             SortedNotes = new List<Note>();
-            currentSentenceLabel.text = "";
         }
+        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence);
     }
 
-    public void SetNextSentence(Sentence sentence)
+    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
     {
-        nextSentenceLabel.text = CreateStringFromSentence(sentence);
+        visualElement.Clear();
+        if (sentence == null
+            || sentence.Notes.IsNullOrEmpty())
+        {
+            visualElement.Add(new Label(" "));
+            return;
+        }
+
+        sentence.Notes.ForEach(note =>
+        {
+            string richText = IsItalicDisplayText(note.Type)
+                ? $"<i>{note.Text}</i>"
+                : note.Text;
+            Label label = new Label(richText);
+            label.enableRichText = true;
+            label.AddToClassList(R.UxmlClasses.singingLyrics);
+            if (visualElement == currentSentenceContainer)
+            {
+                label.AddToClassList(R.UxmlClasses.currentLyrics);
+            } else if (visualElement == nextSentenceContainer)
+            {
+                label.AddToClassList(R.UxmlClasses.nextLyrics);
+            }
+
+            visualElement.Add(label);
+        });
     }
 
-    private string CreateStringFromSentence(Sentence sentence)
+    private void SetNextSentence(Sentence sentence)
     {
-        if (sentence == null)
-        {
-            return "";
-        }
-
-        string result = "";
-        foreach (Note note in sentence.Notes)
-        {
-            if (IsItalicDisplayText(note.Type))
-            {
-                result += $"<i>{note.Text}</i>";
-            }
-            else
-            {
-                result += note.Text;
-            }
-        }
-        return result;
+        FillContainerWithSentenceText(nextSentenceContainer, sentence);
     }
 
-    private bool IsItalicDisplayText(ENoteType type)
+    private static bool IsItalicDisplayText(ENoteType type)
     {
         switch (type)
         {
