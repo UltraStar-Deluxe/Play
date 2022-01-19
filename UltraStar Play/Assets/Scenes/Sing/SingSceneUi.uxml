@@ -5,10 +5,10 @@
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
         <ui:VisualElement name="topLyricsContainer" class="lyricsContainer roundCorners">
-            <ui:VisualElement name="currentSentenceContainer">
+            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="currentSentenceLabel" class="currentLyrics singingLyrics" />
             </ui:VisualElement>
-            <ui:VisualElement name="nextSentenceContainer">
+            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="nextSentenceLabel" class="nextLyrics singingLyrics" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -17,10 +17,10 @@
             <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="bottomLyricsContainer" class="lyricsContainer roundCorners">
-            <ui:VisualElement name="currentSentenceContainer">
+            <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="currentSentenceLabel" class="currentLyrics singingLyrics" />
             </ui:VisualElement>
-            <ui:VisualElement name="nextSentenceContainer">
+            <ui:VisualElement name="nextSentenceContainer" style="flex-direction: row;">
                 <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="nextSentenceLabel" class="nextLyrics singingLyrics" />
             </ui:VisualElement>
         </ui:VisualElement>

@@ -212,6 +212,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
         else
         {
+            topLyricsContainer.HideByDisplay();
             bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControllers[0]);
         }
     }
@@ -490,12 +491,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             return matchingVoice;
         }
-        else
-        {
-            string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
-            Debug.LogError($"The song data does not contain a voice with name {voiceName}."
-                           + $" Available voice names: {voiceNameCsv}");
-            return voices.FirstOrDefault();
-        }
+
+        string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
+        Debug.LogError($"The song data does not contain a voice with name {voiceName}."
+                       + $" Available voice names: {voiceNameCsv}");
+        return voices.FirstOrDefault();
     }
 }
