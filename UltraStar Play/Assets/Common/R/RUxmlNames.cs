@@ -218,6 +218,7 @@ public static partial class R
         public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
         public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
+        public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";

@@ -285,8 +285,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         PlayerControllers.ForEach(it => it.SetCurrentBeat(CurrentBeat));
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
-        topSingingLyricsControl?.UpdateNoteHighlighting(songAudioPlayer.PositionInSongInMillis);
-        bottomSingingLyricsControl?.UpdateNoteHighlighting(songAudioPlayer.PositionInSongInMillis);
+        topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
+        bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
     }
 
     public void SkipToNextSingableNote()

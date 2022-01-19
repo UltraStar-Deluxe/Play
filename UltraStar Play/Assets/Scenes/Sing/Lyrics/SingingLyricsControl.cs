@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -19,6 +20,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.nextSentenceContainer)]
     private VisualElement nextSentenceContainer;
 
+    [Inject(UxmlName = R.UxmlNames.positionBeforeLyricsIndicator)]
+    private VisualElement positionBeforeLyricsIndicator;
+
     [Inject]
     private Settings settings;
 
@@ -28,6 +32,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SongMeta songMeta;
 
+    private Sentence previousSentence;
     private Dictionary<Note, Label> currentSentenceNoteToLabelMap = new Dictionary<Note, Label>();
 
     public void OnInjectionFinished()
@@ -43,7 +48,54 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetNextSentence(playerControl.GetSentence(1));
     }
 
-    public void UpdateNoteHighlighting(double positionInSongInMillis)
+    public void Update(double positionInSongInMillis)
+    {
+        UpdateNoteHighlighting(positionInSongInMillis);
+        UpdatePositionBeforeLyricsIndicator(positionInSongInMillis);
+    }
+
+    private void UpdatePositionBeforeLyricsIndicator(double positionInSongInMillis)
+    {
+        if (CurrentSentence == null
+            || CurrentSentence.Notes.IsNullOrEmpty()
+            || SortedNotes.IsNullOrEmpty())
+        {
+            positionBeforeLyricsIndicator.HideByDisplay();
+            return;
+        }
+
+        double previousSentenceEndInMillis = previousSentence != null
+            ? BpmUtils.BeatToMillisecondsInSong(songMeta, previousSentence.ExtendedMaxBeat)
+            : 0;
+        double firstNoteStartBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, CurrentSentence.MinBeat);
+
+        if (Math.Abs(firstNoteStartBeatInMillis - previousSentenceEndInMillis) < 500)
+        {
+            positionBeforeLyricsIndicator.HideByDisplay();
+            return;
+        }
+
+        double positionBeforeLyricsPercent = (positionInSongInMillis - previousSentenceEndInMillis)
+                                             / (firstNoteStartBeatInMillis - previousSentenceEndInMillis);
+
+        // Find start position of label
+        Note firstNote = SortedNotes[0];
+        if (positionBeforeLyricsPercent is < 0 or > 1
+            || !currentSentenceNoteToLabelMap.TryGetValue(firstNote, out Label firstLabel))
+        {
+            positionBeforeLyricsIndicator.HideByDisplay();
+            return;
+        }
+
+        float labelMinX = firstLabel.worldBound.xMin;
+        float containerMinX = currentSentenceContainer.worldBound.xMin;
+        float labelMinXRelativeToContainer = labelMinX - containerMinX;
+        float positionBeforeLyricsPx = (float)(labelMinXRelativeToContainer * positionBeforeLyricsPercent);
+        positionBeforeLyricsIndicator.ShowByDisplay();
+        positionBeforeLyricsIndicator.style.left = positionBeforeLyricsPx;
+    }
+
+    private void UpdateNoteHighlighting(double positionInSongInMillis)
     {
         Note currentNote = SortedNotes
             .FirstOrDefault(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis
@@ -92,6 +144,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void SetCurrentSentence(Sentence sentence)
     {
+        previousSentence = CurrentSentence;
         CurrentSentence = sentence;
         if (CurrentSentence != null)
         {
@@ -107,7 +160,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
     {
-        visualElement.Clear();
+        visualElement.Query<Label>().ToList().ForEach(label => label.RemoveFromHierarchy());
         if (visualElement == currentSentenceContainer)
         {
             currentSentenceNoteToLabelMap.Clear();
