@@ -124,6 +124,7 @@ public static partial class R
         public const string inputLegend = "inputLegend";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string internetOptionsButton = "internetOptionsButton";
+        public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
@@ -140,6 +141,7 @@ public static partial class R
         public const string leftLyricsOverlay = "leftLyricsOverlay";
         public const string legendContainer = "legendContainer";
         public const string legendInnerContainer = "legendInnerContainer";
+        public const string lo = "lo";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsContainer = "lyricsContainer";
@@ -230,6 +232,7 @@ public static partial class R
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
         public const string recordingOptionsButton = "recordingOptionsButton";
+        public const string rem = "rem";
         public const string resolutionContainer = "resolutionContainer";
         public const string rightLyricsOverlay = "rightLyricsOverlay";
         public const string rightSide = "rightSide";
@@ -296,10 +299,12 @@ public static partial class R
         public const string songTitle = "songTitle";
         public const string songVideoImage = "songVideoImage";
         public const string soundOptionsButton = "soundOptionsButton";
+        public const string space = "space";
         public const string spacer = "spacer";
         public const string startButton = "startButton";
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
+        public const string sum = "sum";
         public const string textFieldContainer = "textFieldContainer";
         public const string themeContainer = "themeContainer";
         public const string third = "third";
