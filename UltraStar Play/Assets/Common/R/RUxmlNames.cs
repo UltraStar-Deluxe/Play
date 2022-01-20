@@ -57,7 +57,6 @@ public static partial class R
         public const string continueButton = "continueButton";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string currentSentenceContainer = "currentSentenceContainer";
-        public const string currentSentenceLabel = "currentSentenceLabel";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
@@ -211,6 +210,7 @@ public static partial class R
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
         public const string playerUi = "playerUi";
         public const string PlayerUi = "PlayerUi";
+        public const string playerUiContainer = "playerUiContainer";
         public const string playlistChooserButton = "playlistChooserButton";
         public const string playlistChooserContainer = "playlistChooserContainer";
         public const string playlistChooserDropdownContainer = "playlistChooserDropdownContainer";
@@ -262,6 +262,7 @@ public static partial class R
         public const string semanticVersionText = "semanticVersionText";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string SingingLyricsUi = "SingingLyricsUi";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
         public const string SingingResultsPlayerUi = "SingingResultsPlayerUi";
         public const string SingingResultsPlayerUiAlternative = "SingingResultsPlayerUiAlternative";

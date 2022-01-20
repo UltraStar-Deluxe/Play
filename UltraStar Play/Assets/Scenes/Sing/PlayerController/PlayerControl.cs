@@ -45,7 +45,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
     private Injector childrenInjector;
 
-    private PlayerUiControl playerUiControl;
+    public PlayerUiControl PlayerUiControl { get; private set; }
 
     [Inject]
     private SongMeta songMeta;
@@ -54,14 +54,14 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     public void OnInjectionFinished()
     {
-        this.playerUiControl = new PlayerUiControl();
+        this.PlayerUiControl = new PlayerUiControl();
         this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
 
         SortedSentences = Voice.Sentences.ToList();
         SortedSentences.Sort(Sentence.comparerByStartBeat);
 
         // Inject all children
-        // childrenInjector.Inject(playerUiControl);
+        childrenInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)
@@ -79,7 +79,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         newInjector.AddBindingForInstance(PlayerPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
         newInjector.AddBindingForInstance(PlayerScoreController);
-        newInjector.AddBindingForInstance(playerUiControl);
+        newInjector.AddBindingForInstance(PlayerUiControl);
         newInjector.AddBindingForInstance(newInjector);
         newInjector.AddBindingForInstance(this);
         return newInjector;

@@ -62,8 +62,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     {
         // Player name and image
         playerNameLabel.text = playerProfile.Name;
-        AvatarImageControl avatarImageControl = new AvatarImageControl(playerImage);
-        injector.Inject(avatarImageControl);
+        AvatarImageControl avatarImageControl = new AvatarImageControl();
+        injector.WithRootVisualElement(playerImage)
+            .Inject(avatarImageControl);
 
         // Song rating
         SongRatingImageHolder[] holders = GameObject.FindObjectsOfType<SongRatingImageHolder>();

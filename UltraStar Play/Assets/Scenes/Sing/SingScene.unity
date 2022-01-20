@@ -857,6 +857,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControlPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
+  playerUi: {fileID: 9197481963319205126, guid: 9b1872cb139c5e34f94035c97230fb5b,
+    type: 3}
   songAudioPlayer: {fileID: 1098468898}
   songVideoPlayer: {fileID: 227833046}
 --- !u!4 &1427931089
