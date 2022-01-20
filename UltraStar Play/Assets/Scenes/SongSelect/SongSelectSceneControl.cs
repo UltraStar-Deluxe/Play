@@ -628,7 +628,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
             if (!File.Exists(audioPath))
             {
-                UiManager.Instance.CreateWarningDialog("Audio Error", "Audio file does not exist: " + audioPath);
+                uiManager.CreateNotificationVisualElement("Audio file does not exist: " + audioPath);
                 return;
             }
 
@@ -636,7 +636,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             songAudioPlayer.Init(SelectedSong);
             if (!songAudioPlayer.HasAudioClip)
             {
-                uiManager.CreateWarningDialog("Audio Error", "Audio file could not be loaded.\nPlease use a supported format.");
+                uiManager.CreateNotificationVisualElement("Audio file could not be loaded.\nPlease use a supported format.");
                 return;
             }
 

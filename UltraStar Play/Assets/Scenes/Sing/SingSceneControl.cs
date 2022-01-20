@@ -131,6 +131,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private TimeBarControl timeBarControl;
 
+    private SimpleDialogControl dialogControl;
+    public bool IsDialogOpen => dialogControl != null;
+
     void Start()
     {
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
@@ -198,10 +201,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
             string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
                 "playerNameCsv", playerNameCsv);
-            SimpleDialogControl dialogControlControl = new SimpleDialogControl(dialogUi, background, title, message);
-            dialogControlControl.DialogTitleImage.ShowByDisplay();
-            dialogControlControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
-            Button okButton = dialogControlControl.AddButton("OK", dialogControlControl.CloseDialog);
+            dialogControl = new SimpleDialogControl(dialogUi, background, title, message);
+            dialogControl.DialogTitleImage.ShowByDisplay();
+            dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
+            Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
         }
 
@@ -571,5 +574,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
                 TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
         }
+    }
+
+    public void CloseDialog()
+    {
+        if (dialogControl == null)
+        {
+            return;
+        }
+
+        dialogControl.CloseDialog();
+        dialogControl = null;
     }
 }
