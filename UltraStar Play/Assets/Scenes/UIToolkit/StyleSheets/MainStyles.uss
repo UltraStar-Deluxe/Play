@@ -526,6 +526,11 @@ Label.tinyFont {
     color: var(--text-color-error);
 }
 
+.error {
+    color: var(--text-color-error);
+    -unity-background-image-tint-color: var(--text-color-error);
+}
+
 .characterQuickJumpCharacterButton {
     font-size: var(--font-size-xs);
 }

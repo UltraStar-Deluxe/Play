@@ -34,6 +34,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public PlayerControl playerControlPrefab;
 
     [InjectedInInspector]
+    public VisualTreeAsset playerUi;
+
+    [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
 
     [InjectedInInspector]
@@ -124,7 +127,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
-            PlayerControl playerControl = CreatePlayerController(playerProfile, micProfile);
+            PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile);
 
             if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
             {
@@ -220,29 +223,29 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void RecomputeCrowns()
     {
         // Find best player with score > 0
-        PlayerControl bestScoreControl = null;
+        PlayerControl bestScorePlayerControl = null;
         foreach (PlayerControl playerController in PlayerControllers)
         {
-            if ((bestScoreControl == null && playerController.PlayerScoreController.TotalScore > 0)
-               || (bestScoreControl != null && playerController.PlayerScoreController.TotalScore > bestScoreControl.PlayerScoreController.TotalScore))
+            if ((bestScorePlayerControl == null && playerController.PlayerScoreController.TotalScore > 0)
+               || (bestScorePlayerControl != null && playerController.PlayerScoreController.TotalScore > bestScorePlayerControl.PlayerScoreController.TotalScore))
             {
-                bestScoreControl = playerController;
+                bestScorePlayerControl = playerController;
             }
         }
 
         // // Show crown on best player
-        // if (bestScoreControl != null)
-        // {
-        //     bestScoreControl.PlayerUiControl.PlayerCrownDisplayer.ShowCrown(true);
-        // }
-        // // Hide crown on other players
-        // foreach (PlayerControl playerController in PlayerControllers)
-        // {
-        //     if (playerController != bestScoreControl)
-        //     {
-        //         playerController.PlayerUiControl.PlayerCrownDisplayer.ShowCrown(false);
-        //     }
-        // }
+        if (bestScorePlayerControl != null)
+        {
+            bestScorePlayerControl.PlayerUiControl.ShowLeadingPlayerIcon();
+        }
+        // Hide crown on other players
+        foreach (PlayerControl playerController in PlayerControllers)
+        {
+            if (playerController != bestScorePlayerControl)
+            {
+                playerController.PlayerUiControl.HideLeadingPlayerIcon();
+            }
+        }
     }
 
     private void InitTimeBar()
@@ -391,7 +394,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         statistics.RecordSongFinished(SongMeta, songStatistics);
     }
 
-    private PlayerControl CreatePlayerController(PlayerProfile playerProfile, MicProfile micProfile)
+    private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile)
     {
         Voice voice = GetVoice(playerProfile);
 
@@ -481,6 +484,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.Bind("playerUi").ToExistingInstance(playerUi);
         return bb.GetBindings();
     }
 

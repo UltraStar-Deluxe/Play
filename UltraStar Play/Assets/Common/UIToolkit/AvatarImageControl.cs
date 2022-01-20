@@ -21,12 +21,8 @@ public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private UiManager uiManager;
 
-    private readonly VisualElement image;
-
-    public AvatarImageControl(VisualElement image)
-    {
-        this.image = image;
-    }
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement image;
 
     public void OnInjectionFinished()
     {
