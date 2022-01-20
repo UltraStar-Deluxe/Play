@@ -56,7 +56,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    private SimpleUxmlDialog closeGameDialog;
+    private SimpleDialogControl closeGameDialogControl;
 
     private void Start()
     {
@@ -83,7 +83,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void ToggleCloseGameDialog()
     {
-        if (closeGameDialog != null)
+        if (closeGameDialogControl != null)
         {
             CloseQuitGameDialog();
         }
@@ -142,31 +142,31 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void CloseQuitGameDialog()
     {
-        if (closeGameDialog == null)
+        if (closeGameDialogControl == null)
         {
             return;
         }
 
-        closeGameDialog.CloseDialog();
-        closeGameDialog = null;
+        closeGameDialogControl.CloseDialog();
+        closeGameDialogControl = null;
         // Must not immediately focus next button or it will trigger as well
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
     }
 
     private void OpenQuitGameDialog()
     {
-        if (closeGameDialog != null)
+        if (closeGameDialogControl != null)
         {
             return;
         }
 
-        closeGameDialog = new SimpleUxmlDialog(
+        closeGameDialogControl = new SimpleDialogControl(
             quitGameDialogUxml,
             uiDoc.rootVisualElement,
             TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title),
             TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message));
-        Button yesButton = closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
+        Button yesButton = closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
-        closeGameDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
+        closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
     }
 }

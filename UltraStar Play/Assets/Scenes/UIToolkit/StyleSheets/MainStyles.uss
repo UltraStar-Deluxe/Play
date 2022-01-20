@@ -9,6 +9,7 @@
     --font-size-xxl: 26px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
+    --text-color-warning: rgb(200, 200, 48);
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
@@ -529,6 +530,11 @@ Label.tinyFont {
 .error {
     color: var(--text-color-error);
     -unity-background-image-tint-color: var(--text-color-error);
+}
+
+.warning {
+    color: var(--text-color-warning);
+    -unity-background-image-tint-color: var(--text-color-warning);
 }
 
 .characterQuickJumpCharacterButton {
