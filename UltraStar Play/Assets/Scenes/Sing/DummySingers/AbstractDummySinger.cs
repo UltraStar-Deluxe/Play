@@ -43,7 +43,7 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
     }
 
-    public void SetPlayerController(PlayerControl playerControl)
+    public void SetPlayerControl(PlayerControl playerControl)
     {
         this.playerControl = playerControl;
         // Disable real microphone input for this player
