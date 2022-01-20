@@ -20,11 +20,12 @@
             <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" />
         </ui:VisualElement>
         <ui:VisualElement name="pauseOverlay" style="position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: flex-start; background-color: rgba(0, 0, 0, 0.5);">
-            <ui:Label text="Pause" display-tooltip-when-elided="true" name="pauseOverlayTitle" class="textOutline" style="-unity-font-style: bold-and-italic; font-size: 48px; width: 100%; height: 100%; position: absolute; -unity-text-align: middle-center;" />
-            <ui:VisualElement name="inputLegend" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; position: absolute; flex-wrap: wrap;">
+            <ui:Label text="Pause" display-tooltip-when-elided="true" name="pauseOverlayTitle" picking-mode="Ignore" class="textOutline" style="-unity-font-style: bold-and-italic; font-size: 48px; width: 100%; height: 100%; position: absolute; -unity-text-align: middle-center;" />
+            <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; position: absolute; flex-wrap: wrap;">
                 <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px; top: 4px;" />
                 <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="doubleClickToTogglePauseElement" style="position: absolute; width: 100%; height: 100%;" />
     </ui:VisualElement>
 </ui:UXML>

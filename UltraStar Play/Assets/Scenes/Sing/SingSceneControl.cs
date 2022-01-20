@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
@@ -55,6 +56,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private Statistics statistics;
 
+    [Inject]
+    private UltraStarPlayInputManager inputManager;
+
     [Inject(UxmlName = R.UxmlNames.topLyricsContainer)]
     private VisualElement topLyricsContainer;
 
@@ -66,6 +70,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     [Inject(UxmlName = R.UxmlNames.pauseOverlay)]
     private VisualElement pauseOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.doubleClickToTogglePauseElement)]
+    private VisualElement doubleClickToTogglePauseElement;
+
+    [Inject(UxmlName = R.UxmlNames.inputLegend)]
+    private VisualElement inputLegend;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
@@ -127,6 +137,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
         pauseOverlay.HideByDisplay();
+        new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
+            .Subscribe(_ => TogglePlayPause());
 
         // Prepare Player UI
         playerUiContainer.Clear();
@@ -212,6 +224,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         // Rebuild whole UI
         LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+
+        // Input legend (in pause overlay)
+        UpdateInputLegend();
+        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
     }
 
     private void InitSingingLyricsControls()
@@ -529,5 +545,31 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         Debug.LogError($"The song data does not contain a voice with name {voiceName}."
                        + $" Available voice names: {voiceNameCsv}");
         return voices.FirstOrDefault();
+    }
+
+    private void UpdateInputLegend()
+    {
+        inputLegend.Query<Label>()
+            .ForEach(label => label.RemoveFromHierarchy());
+
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+            TranslationManager.GetTranslation(R.Messages.back),
+            inputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
+            TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            inputLegend);
+
+        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
+        {
+            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+                TranslationManager.GetTranslation(R.Messages.back),
+                TranslationManager.GetTranslation(R.Messages.action_doubleTap))));
+        }
+        else
+        {
+            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+                TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+                TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
+        }
     }
 }
