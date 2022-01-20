@@ -32,19 +32,25 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => singSceneControl.TogglePlayPause());
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ =>
-            {
-                if (!songAudioPlayer.IsPlaying)
-                {
-                    singSceneControl.TogglePlayPause();   
-                }
-                else
-                {
-                    singSceneControl.FinishScene(false);
-                }
-            });
+            .Subscribe(_ => OnBack());
         
         UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
         UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
+    }
+
+    private void OnBack()
+    {
+        if (singSceneControl.IsDialogOpen)
+        {
+            singSceneControl.CloseDialog();
+        }
+        else if (!songAudioPlayer.IsPlaying)
+        {
+            singSceneControl.TogglePlayPause();
+        }
+        else
+        {
+            singSceneControl.FinishScene(false);
+        }
     }
 }

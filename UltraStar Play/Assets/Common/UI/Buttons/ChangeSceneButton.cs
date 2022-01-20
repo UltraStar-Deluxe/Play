@@ -28,9 +28,6 @@ public class ChangeSceneButton : MonoBehaviour, INeedInjection
 
     private void OnBack(InputAction.CallbackContext context)
     {
-        if (!UiManager.Instance.DialogOpen)
-        {
-            SceneNavigator.Instance.LoadScene(targetScene);
-        }
+        SceneNavigator.Instance.LoadScene(targetScene);
     }
 }

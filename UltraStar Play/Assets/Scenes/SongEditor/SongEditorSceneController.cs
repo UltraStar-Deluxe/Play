@@ -267,8 +267,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateWarningDialog("File operation failed",
-                "Saving the file failed: " + e.Message);
+            UiManager.Instance.CreateNotification("Saving the file failed:\n" + e.Message);
             return;
         }
 
@@ -289,8 +288,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateWarningDialog("File operation failed",
-                "Creating a copy of the original file failed: " + e.Message);
+            UiManager.Instance.CreateNotification("Creating a copy of the original file failed:\n" + e.Message);
             return;
         }
 
