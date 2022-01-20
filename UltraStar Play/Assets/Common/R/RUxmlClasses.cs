@@ -58,6 +58,7 @@ public static partial class R
         public const string titleSubText = "titleSubText";
         public const string titleText = "titleText";
         public const string transparentBackgroundColor = "transparentBackgroundColor";
+        public const string warning = "warning";
         public const string wideControl = "wideControl";
     }
 }

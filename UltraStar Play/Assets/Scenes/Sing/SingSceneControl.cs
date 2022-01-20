@@ -9,6 +9,7 @@ using UniRx;
 using ProTrans;
 using UniInject.Extensions;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
 using Image = UnityEngine.UI.Image;
 
@@ -35,6 +36,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public VisualTreeAsset playerUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset dialogUi;
+
+    [Inject(UxmlName = R.UxmlNames.background)]
+    public VisualElement background;
 
     [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
@@ -164,9 +171,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         string playerNameCsv = string.Join(",", playerProfilesWithoutMic.Select(it => it.Name).ToList());
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateWarningDialog(
-                TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title),
-                TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message, "playerNameCsv", playerNameCsv));
+            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
+            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+                "playerNameCsv", playerNameCsv);
+            SimpleDialogControl dialogControlControl = new SimpleDialogControl(dialogUi, background, title, message);
+            dialogControlControl.DialogTitleImage.ShowByDisplay();
+            dialogControlControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
+            Button okButton = dialogControlControl.AddButton("OK", dialogControlControl.CloseDialog);
+            okButton.Focus();
         }
 
         // Associate LyricsDisplayer with one of the (duett) players

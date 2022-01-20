@@ -1,23 +1,25 @@
 ﻿using System;
 using UnityEngine.UIElements;
 
-public class SimpleUxmlDialog
+public class SimpleDialogControl
 {
     private readonly VisualElement dialogRootVisualElement;
     private readonly VisualElement parentVisualElement;
 
     private readonly VisualElement buttonContainer;
+    public VisualElement DialogTitleImage { get; private set; }
 
-    public SimpleUxmlDialog(
-        VisualTreeAsset dialogUxml,
+    public SimpleDialogControl(
+        VisualTreeAsset dialogUi,
         VisualElement parentVisualElement,
         string title,
         string message)
     {
-        dialogRootVisualElement = dialogUxml.CloneTree();
-        buttonContainer = dialogRootVisualElement.Q<VisualElement>("dialogButtonContainer");
-        Label dialogTitle = dialogRootVisualElement.Q<Label>("dialogTitle");
-        Label dialogMessage = dialogRootVisualElement.Q<Label>("dialogMessage");
+        dialogRootVisualElement = dialogUi.CloneTree();
+        buttonContainer = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogButtonContainer);
+        DialogTitleImage = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogTitleImage);
+        Label dialogTitle = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogTitle);
+        Label dialogMessage = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogMessage);
 
         dialogRootVisualElement.AddToClassList("overlay");
         dialogTitle.text = title;
