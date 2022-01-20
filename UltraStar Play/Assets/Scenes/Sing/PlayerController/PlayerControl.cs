@@ -6,6 +6,7 @@ using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -32,6 +33,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject]
     public Voice Voice { get; private set; }
+
+    [Inject(Key = "playerUi")]
+    private VisualTreeAsset playerUi;
 
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
@@ -61,7 +65,8 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         SortedSentences.Sort(Sentence.comparerByStartBeat);
 
         // Inject all children
-        childrenInjector.Inject(PlayerUiControl);
+        VisualElement playerUiInstance = playerUi.CloneTree().Children().First();
+        childrenInjector.WithRootVisualElement(playerUiInstance).Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)

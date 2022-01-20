@@ -14,8 +14,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 {
     private const int LineCount = 10;
 
-    [Inject(Key = "playerUi")]
-    private VisualTreeAsset playerUi;
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    public VisualElement RootVisualElement { get; private set; }
 
     [Inject]
     private PlayerScoreController playerScoreController;
