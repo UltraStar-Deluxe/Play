@@ -29,8 +29,6 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
     private Vector2 dragStartScrollOffset;
     private Vector2 dragStartPosition;
 
-    public bool invertY = true;
-
     public void Start()
     {
         if (uiDocument == null)
@@ -80,11 +78,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
     {
         if (dragging)
         {
-            Vector2 dragDelta = evt.localMousePosition - dragStartPosition;
-            if (invertY)
-            {
-                dragDelta = new Vector2(dragDelta.x, -dragDelta.y);
-            }
+            Vector2 dragDelta = dragStartPosition - evt.localMousePosition;
             scrollView.scrollOffset = new Vector2(
                 dragStartScrollOffset.x + dragDelta.x,
                 dragStartScrollOffset.y + dragDelta.y);

@@ -1,16 +1,33 @@
 ﻿using System;
+using UnityEngine;
 
 public class InputActionInfo
 {
     public const string InfoSeparator = " | ";
-    
-    public string ActionName { get; private set; }
-    public string InfoText { get; private set; }
 
-    public InputActionInfo(string actionName, string infoText)
+    /**
+     * Button, gesture, shortcut or description of input to be performed.
+     * For example "Ctrl+C".
+     */
+    public string InputText { get; private set; }
+
+    /**
+     * Description of action that will be performed when the input is received.
+     * For example "Copy selection".
+     */
+    public string ActionText { get; private set; }
+
+    /**
+     * Sprite that illustrates the input.
+     * For example an image of an Escape button, controller button, or touch gesture.
+     */
+    public Sprite InputSprite { get; private set; }
+    
+    public InputActionInfo(string actionText, string inputText, Sprite inputSprite = null)
     {
-        ActionName = actionName;
-        InfoText = infoText;
+        ActionText = actionText;
+        InputText = inputText;
+        InputSprite = inputSprite;
     }
 
     public void AddInfoText(string infoText)
@@ -20,13 +37,13 @@ public class InputActionInfo
             return;
         }
         
-        InfoText = InfoText.Length == 0
+        InputText = InputText.Length == 0
             ? infoText
-            : InfoText + InfoSeparator + infoText;
+            : InputText + InfoSeparator + infoText;
     }
 
     public static int CompareByActionName(InputActionInfo a, InputActionInfo b)
     {
-        return string.Compare(a.ActionName, b.ActionName, StringComparison.InvariantCulture);
+        return string.Compare(a.ActionText, b.ActionText, StringComparison.InvariantCulture);
     }
 }

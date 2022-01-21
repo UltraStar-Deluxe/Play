@@ -72,8 +72,7 @@ public class SingingResultsPlayerUiControl : INeedInjection, ITranslator, IInjec
         {
             ratingImage.style.backgroundImage = new StyleBackground(holder.sprite);
             // Bouncy size animation
-            LeanTween.scale(singingResultsSceneUiControl.gameObject, Vector3.one, animationTimeInSeconds)
-                .setFrom(Vector3.one * 0.75f)
+            LeanTween.value(singingResultsSceneUiControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
                 .setEaseSpring()
                 .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))));
         }

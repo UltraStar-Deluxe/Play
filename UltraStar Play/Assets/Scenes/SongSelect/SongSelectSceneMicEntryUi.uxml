@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="micEntry" class="outline roundCorners" style="width: 100%; height: 40px; flex-direction: row; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:VisualElement name="micIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicIconFilled.png?fileID=2800000&amp;guid=c461ec905d3b8b643b4297ef57ee683d&amp;type=3#MicIconFilled&apos;); width: 32px; height: 32px; margin-right: 10px;" />
+        <ui:Label text="-----" display-tooltip-when-elided="true" name="audioWaveForm" style="flex-grow: 1; height: auto; width: auto;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -103,7 +103,10 @@ public class AudioWaveFormVisualizer : MonoBehaviour
         for (int i = 0; i < dynImage.TextureWidth; i++)
         {
             int offset = i * windowSize;
-            audioClip.GetData(windowSamples, offset);
+            if (!audioClip.GetData(windowSamples, offset))
+            {
+                return minMaxValues;
+            }
             Vector2 minMax = FindMinAndMaxValues(windowSamples, 0, windowSize);
             minMaxValues[i] = minMax;
         }

@@ -69,6 +69,8 @@ public class ItemPicker : VisualElement
         private readonly UxmlDoubleAttributeDescription minValue = new UxmlDoubleAttributeDescription { name = "minValue", defaultValue = double.MinValue};
         private readonly UxmlDoubleAttributeDescription maxValue = new UxmlDoubleAttributeDescription { name = "maxValue", defaultValue = double.MaxValue};
         private readonly UxmlDoubleAttributeDescription stepValue = new UxmlDoubleAttributeDescription { name = "stepValue", defaultValue = 1};
+        private readonly UxmlBoolAttributeDescription noPreviousButton = new UxmlBoolAttributeDescription { name = "noPreviousButton", defaultValue = false};
+        private readonly UxmlBoolAttributeDescription noNextButton = new UxmlBoolAttributeDescription { name = "noNextButton", defaultValue = false};
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
@@ -91,6 +93,17 @@ public class ItemPicker : VisualElement
             }
             TemplateContainer itemPickerTemplateContainer = visualTreeAsset.CloneTree();
             target.Add(itemPickerTemplateContainer.Children().First());
+
+            if (noPreviousButton.GetValueFromBag(bag, cc))
+            {
+                target.Q<VisualElement>(R.UxmlNames.previousItemButton).HideByDisplay();
+            }
+
+            if (noNextButton.GetValueFromBag(bag, cc))
+            {
+                target.Q<VisualElement>(R.UxmlNames.nextItemButton).HideByDisplay();
+            }
+
         }
     }
 }

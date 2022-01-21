@@ -175,7 +175,7 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
         VisualElement selectedLayout = GetSelectedLayout();
         foreach (VisualElement layout in layouts)
         {
-            layout.SetVisible(layout == selectedLayout);
+            layout.SetVisibleByDisplay(layout == selectedLayout);
         }
     }
 

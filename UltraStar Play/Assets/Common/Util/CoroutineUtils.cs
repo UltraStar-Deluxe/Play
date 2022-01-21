@@ -29,4 +29,13 @@ public class CoroutineUtils
         // Code to execute after the delay
         action();
     }
+
+    public static IEnumerator ExecuteRepeatedlyInSeconds(float delayInSeconds, Action action)
+    {
+        while (true)
+        {
+            action();
+            yield return new WaitForSeconds(delayInSeconds);
+        }
+    }
 }

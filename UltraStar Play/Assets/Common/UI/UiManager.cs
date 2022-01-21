@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -72,12 +73,12 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private ShowFps showFpsInstance;
 
-    void Awake()
+    private void Awake()
     {
         LeanTween.init(800);
     }
 
-    void Start()
+    private void Start()
     {
         notificationHeightInPixels = notificationPrefab.GetComponent<RectTransform>().rect.height;
         notificationWidthInPixels = notificationPrefab.GetComponent<RectTransform>().rect.width;
@@ -88,7 +89,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    void Update()
+    private void Update()
     {
         if (lastMousePosition != Input.mousePosition)
         {
