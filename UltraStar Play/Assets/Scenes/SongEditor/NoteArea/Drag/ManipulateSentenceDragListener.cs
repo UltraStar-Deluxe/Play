@@ -60,7 +60,7 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
-        if (dragEvent.GeneralDragEvent.InputButton != PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;

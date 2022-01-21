@@ -176,4 +176,38 @@ public static class CollectionExtensions
         }
         return -1;
     }
+
+    public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
+        where T : class
+    {
+        T minElement = null;
+        float minDistance = 0;
+        foreach (T element in enumerable)
+        {
+            float currentValue = valueFunction(element);
+            if (minElement == null || currentValue < minDistance)
+            {
+                minDistance = currentValue;
+                minElement = element;
+            }
+        }
+        return minElement;
+    }
+
+    public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
+        where T : class
+    {
+        T maxElement = null;
+        float maxDistance = 0;
+        foreach (T element in enumerable)
+        {
+            float currentValue = valueFunction(element);
+            if (maxElement == null || currentValue > maxDistance)
+            {
+                maxDistance = currentValue;
+                maxElement = element;
+            }
+        }
+        return maxElement;
+    }
 }

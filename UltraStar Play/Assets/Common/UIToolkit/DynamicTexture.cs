@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UniRx.Triggers;
 
 /**
  * Holds a texture to draw pixels on a VisualElement (for UI Toolkit)
@@ -23,7 +24,7 @@ using UniRx;
  *      });
  * </pre>
  */
-public class DynamicTexture : MonoBehaviour
+public class DynamicTexture
 {
     public Color backgroundColor = new Color(0, 0, 0, 0);
 
@@ -36,12 +37,13 @@ public class DynamicTexture : MonoBehaviour
 
     public bool IsInitialized => texture != null;
 
-    public void Init(VisualElement visualElement, PanelSettings panelSettings = null)
+    public bool initializeTextureDelayed;
+
+    private readonly GameObject gameObject;
+
+    public DynamicTexture(GameObject gameObject, VisualElement visualElement)
     {
-        if (texture != null)
-        {
-            throw new UnityException("Texture already exists.");
-        }
+        this.gameObject = gameObject;
 
         if (visualElement.resolvedStyle.width <= 0
             || visualElement.resolvedStyle.height <= 0)
@@ -49,36 +51,26 @@ public class DynamicTexture : MonoBehaviour
             throw new UnityException("VisualElement has no size. Consider calling Init from GeometryChangedEvent.");
         }
 
-        float scaleX = panelSettings != null
-            ? (float)ApplicationUtils.GetCurrentAppResolution().Width / panelSettings.referenceResolution.x
-            : 1;
-        float scaleY = panelSettings != null
-            ? (float)ApplicationUtils.GetCurrentAppResolution().Height / panelSettings.referenceResolution.y
-            : 1;
-
-        Vector2 visualElementSize = new PanelHelper(FindObjectOfType<UIDocument>()).PanelToScreen(visualElement.worldBound).size;
+        UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
+        Vector2 visualElementSize = new PanelHelper(uiDocument).PanelToScreen(visualElement.worldBound).size;
         Init((int)visualElementSize.x, (int)visualElementSize.y);
         visualElement.style.backgroundImage = new StyleBackground(texture);
     }
 
     public void Init(int textureWidth, int textureHeight)
     {
-        if (texture != null)
-        {
-            Destroy(texture);
-            texture = null;
-        }
+        Destroy();
 
         TextureWidth = textureWidth;
         TextureHeight = textureHeight;
         CreateTexture();
     }
 
-    private void OnDestroy()
+    public void Destroy()
     {
         if (texture != null)
         {
-            Destroy(texture);
+            GameObject.Destroy(texture);
             texture = null;
         }
     }
@@ -97,6 +89,10 @@ public class DynamicTexture : MonoBehaviour
 
         // create the texture and assign to the rawImage
         texture = new Texture2D(TextureWidth, TextureHeight);
+
+        // release texture when GameObject is destroyed
+        gameObject.OnDestroyAsObservable()
+            .Subscribe(_ => Destroy());
 
         // create a 'blank screen' image 
         blank = new Color[TextureWidth * TextureHeight];

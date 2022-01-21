@@ -217,7 +217,7 @@ abstract public class AbstractDragHandler<EVENT> : MonoBehaviour, INeedInjection
                 Vector2.zero,
                 new Vector2(rectTransformWidthInPixels, rectTransformHeightInPixels)),
             raycastResults,
-            eventData.button);
+            (int)eventData.button);
         return result;
     }
 
