@@ -261,6 +261,7 @@ public static partial class R
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
         public const string semanticVersionText = "semanticVersionText";
+        public const string sentenceRatingContainer = "sentenceRatingContainer";
         public const string settingsButton = "settingsButton";
         public const string showFpsContainer = "showFpsContainer";
         public const string SingingLyricsUi = "SingingLyricsUi";

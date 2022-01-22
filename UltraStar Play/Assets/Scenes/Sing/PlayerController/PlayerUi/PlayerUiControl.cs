@@ -23,6 +23,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
+    [Inject(Key = nameof(sentenceRatingUi))]
+    private VisualTreeAsset sentenceRatingUi;
+
+    [Inject(UxmlName = R.UxmlNames.sentenceRatingContainer)]
+    private VisualElement sentenceRatingContainer;
+
     [Inject]
     private PlayerProfile playerProfile;
 
@@ -40,8 +46,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
-
-    // private SentenceRatingDisplayer sentenceRatingDisplayer;
 
     private PlayerNameText playerNameText;
 
@@ -156,12 +160,23 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .id;
     }
 
-    public void ShowSentenceRating(SentenceRating sentenceRating)
+    private void ShowSentenceRating(SentenceRating sentenceRating)
     {
-        // sentenceRatingDisplayer.ShowSentenceRating(sentenceRating);
+        VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
+        visualElement.Q<Label>().text = sentenceRating.Text;
+        visualElement.style.unityBackgroundImageTintColor = sentenceRating.BackgroundColor;
+        visualElement.style.right = 0;
+        sentenceRatingContainer.Add(visualElement);
+
+        // Animate moving upwards, then destroy
+        float visualElementHeight = 30;
+        visualElement.style.top = visualElementHeight;
+        LeanTween.value(singSceneControl.gameObject, visualElementHeight, 0, 1f)
+            .setOnUpdate(interpolatedTop => visualElement.style.top = interpolatedTop)
+            .setOnComplete(visualElement.RemoveFromHierarchy);
     }
 
-    public void ShowTotalScore(int score)
+    private void ShowTotalScore(int score)
     {
         if (totalScoreAnimationId > 0)
         {
@@ -182,12 +197,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .id;
     }
 
-    public void CreatePerfectSentenceEffect()
+    private void CreatePerfectSentenceEffect()
     {
         // noteDisplayer.CreatePerfectSentenceEffect();
     }
 
-    public void CreatePerfectNoteEffect(Note perfectNote)
+    private void CreatePerfectNoteEffect(Note perfectNote)
     {
         // noteDisplayer.CreatePerfectNoteEffect(perfectNote);
     }

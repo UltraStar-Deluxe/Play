@@ -39,6 +39,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset playerUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset sentenceRatingUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
     [Inject(UxmlName = R.UxmlNames.background)]
@@ -530,7 +533,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
-        bb.Bind("playerUi").ToExistingInstance(playerUi);
+        bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
+        bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         return bb.GetBindings();
     }
 

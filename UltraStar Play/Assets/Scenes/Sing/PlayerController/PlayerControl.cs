@@ -34,7 +34,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     public Voice Voice { get; private set; }
 
-    [Inject(Key = "playerUi")]
+    [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
 
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
