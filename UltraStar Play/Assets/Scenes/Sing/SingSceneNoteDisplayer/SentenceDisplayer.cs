@@ -15,23 +15,15 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private PlayerControl playerControl;
 
+    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
+    private VisualElement lyricsContainer;
+
     private Sentence currentSentence;
-
-    protected override void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
-    {
-        // Draw the RecordedNote smoothly from their StartBeat to TargetEndBeat
-        if (recordedNoteControl.EndBeat < recordedNoteControl.TargetEndBeat)
-        {
-            UpdateRecordedNoteControlEndBeat(recordedNoteControl);
-            UpdateNotePosition(recordedNoteControl.VisualElement, recordedNoteControl.MidiNote, recordedNoteControl.StartBeat, recordedNoteControl.EndBeat);
-        }
-
-        base.UpdateRecordedNoteControl(recordedNoteControl);
-    }
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
+        lyricsContainer.HideByDisplay();
         playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);

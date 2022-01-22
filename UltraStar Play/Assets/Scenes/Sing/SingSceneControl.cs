@@ -12,7 +12,6 @@ using UniInject.Extensions;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
-using Image = UnityEngine.UI.Image;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -58,6 +57,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     [Inject]
     private Injector sceneInjector;
+
+    [Inject]
+    private Settings settings;
 
     [Inject]
     private Statistics statistics;
@@ -142,7 +144,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private SimpleDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
 
-    void Start()
+    private void Start()
     {
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
@@ -179,8 +181,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             // Handle crown display
             if (SceneData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreController.NoteScoreEventStream.Subscribe(noteScoreEvent => { RecomputeCrowns(); });
-                playerControl.PlayerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent => { RecomputeCrowns(); });
+                playerControl.PlayerScoreController.NoteScoreEventStream.Subscribe(noteScoreEvent => { UpdateLeadingPlayerIcon(); });
+                playerControl.PlayerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent => { UpdateLeadingPlayerIcon(); });
             }
         }
 
@@ -244,6 +246,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void InitSingingLyricsControls()
     {
+        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
+        {
+            // Lyrics are shown in each PlayerUi
+            topLyricsContainer.HideByDisplay();
+            bottomLyricsContainer.HideByDisplay();
+            return;
+        }
+
         if (PlayerControls.IsNullOrEmpty())
         {
             return;
@@ -272,7 +282,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
-    private void RecomputeCrowns()
+    private void UpdateLeadingPlayerIcon()
     {
         // Find best player with score > 0
         PlayerControl leadingPlayerControl = null;

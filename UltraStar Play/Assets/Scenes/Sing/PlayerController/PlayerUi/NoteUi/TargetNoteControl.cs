@@ -20,7 +20,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     public Label Label { get; private set; }
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    private VisualElement visualElement;
+    public VisualElement VisualElement { get; private set; }
 
     [Inject(UxmlName = R.UxmlNames.recordedNote)]
     private VisualElement recordedNote;
@@ -168,7 +168,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void Dispose()
     {
-        visualElement.RemoveFromHierarchy();
+        VisualElement.RemoveFromHierarchy();
         // DestroyStars();
         // DestroyLyrics();
     }
