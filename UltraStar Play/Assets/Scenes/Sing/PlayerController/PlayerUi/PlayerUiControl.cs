@@ -205,12 +205,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void CreatePerfectSentenceEffect()
     {
-        // noteDisplayer.CreatePerfectSentenceEffect();
+        noteDisplayer.CreatePerfectSentenceEffect();
     }
 
     private void CreatePerfectNoteEffect(Note perfectNote)
     {
-        // noteDisplayer.CreatePerfectNoteEffect(perfectNote);
+        noteDisplayer.CreatePerfectNoteEffect(perfectNote);
     }
 
     private void InitNoteDisplayer(int localLineCount)

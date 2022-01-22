@@ -7,9 +7,11 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.Xml;
+using TMPro;
 using UniInject.Extensions;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using Random = System.Random;
 using Range = UnityEngine.SocialPlatforms.Range;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -17,7 +19,8 @@ using Range = UnityEngine.SocialPlatforms.Range;
 
 public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectionFinishedListener
 {
-    // public StarParticle perfectSentenceStarPrefab;
+    [Inject(Key = nameof(perfectEffectStarUi))]
+    protected VisualTreeAsset perfectEffectStarUi;
 
     [Inject(Key = nameof(noteUi))]
     protected VisualTreeAsset noteUi;
@@ -41,6 +44,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected PlayerNoteRecorder playerNoteRecorder;
 
     [Inject]
+    protected SingSceneControl singSceneControl;
+
+    [Inject]
     protected Injector injector;
 
     [Inject(Optional = true)]
@@ -52,6 +58,8 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new Dictionary<Note, TargetNoteControl>();
     protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new Dictionary<RecordedNote, List<RecordedNoteControl>>();
+
+    protected readonly List<StarParticleControl> starControls = new List<StarParticleControl>();
 
     protected int avgMidiNote;
 
@@ -94,6 +102,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteToRecordedNoteControlsMap.Values
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => UpdateRecordedNoteControl(recordedNoteControl)));
+
+        // Update stars
+        starControls.ForEach(starControl => starControl.Update());
     }
 
     protected virtual void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
@@ -174,14 +185,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         }
     }
 
-    // public void CreatePerfectNoteEffect(Note perfectNote)
-    // {
-    //     if (noteToTargetNoteControl.TryGetValue(perfectNote, out TargetNoteControl uiNote))
-    //     {
-    //         uiNote.CreatePerfectNoteEffect();
-    //     }
-    // }
-
     protected virtual TargetNoteControl CreateTargetNoteControl(Note note)
     {
         if (note.StartBeat == note.EndBeat)
@@ -196,7 +199,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         childInjector.AddBindingForInstance(note);
         childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
 
-        TargetNoteControl targetNoteControl = new TargetNoteControl();
+        TargetNoteControl targetNoteControl = new TargetNoteControl(effectsContainer);
         childInjector.Inject(targetNoteControl);
 
         Label label = targetNoteControl.Label;
@@ -298,29 +301,52 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, noteControl);
     }
 
-    // public void CreatePerfectSentenceEffect()
-    // {
-    //     for (int i = 0; i < 50; i++)
-    //     {
-    //         CreatePerfectSentenceStar();
-    //     }
-    // }
+    public void CreatePerfectSentenceEffect()
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            CreatePerfectSentenceStar();
+        }
+    }
 
-    // protected void CreatePerfectSentenceStar()
-    // {
-    //     StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
-    //     RectTransform starRectTransform = star.GetComponent<RectTransform>();
-    //     float anchorX = UnityEngine.Random.Range(0f, 1f);
-    //     float anchorY = UnityEngine.Random.Range(0f, 1f);
-    //     starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchoredPosition = Vector2.zero;
-    //
-    //     star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.8f);
-    //     LeanTween.move(star.RectTransform, GetRandomVector2(-100, 100), 1f);
-    //     LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
-    //         .setOnComplete(() => Destroy(star.gameObject));
-    // }
+    protected void CreatePerfectSentenceStar()
+    {
+        VisualElement star = perfectEffectStarUi.CloneTree().Children().First();
+        star.style.position = new StyleEnum<Position>(Position.Absolute);
+        effectsContainer.Add(star);
+
+        StarParticleControl starControl = new StarParticleControl();
+        injector.WithRootVisualElement(star).Inject(starControl);
+
+        float xPercent = UnityEngine.Random.Range(0f, 100f);
+        float yPercent = UnityEngine.Random.Range(0f, 100f);
+        Vector2 startPos = new Vector2(xPercent, yPercent);
+        starControl.SetPosition(startPos);
+        LeanTween.value(singSceneControl.gameObject, startPos, startPos + GetRandomVector2(-50, 50), 1f)
+            .setOnUpdate((Vector2 p) => starControl.SetPosition(p));
+
+        Vector2 startScale = Vector2.one * UnityEngine.Random.Range(0.2f, 0.5f);
+        starControl.SetScale(Vector2.zero);
+        LeanTween.value(singSceneControl.gameObject, startScale, startScale * UnityEngine.Random.Range(1f, 2f), 1f)
+            .setOnUpdate((Vector2 s) => starControl.SetScale(s))
+            .setOnComplete(() => RemoveStarControl(starControl));
+
+        starControls.Add(starControl);
+    }
+
+    private void RemoveStarControl(StarParticleControl starControl)
+    {
+        starControl.VisualElement.RemoveFromHierarchy();
+        starControls.Remove(starControl);
+    }
+
+    public void CreatePerfectNoteEffect(Note perfectNote)
+    {
+        if (noteToTargetNoteControl.TryGetValue(perfectNote, out TargetNoteControl targetNoteControl))
+        {
+            targetNoteControl.CreatePerfectNoteEffect();
+        }
+    }
 
     private Vector2 GetRandomVector2(float min, float max)
     {

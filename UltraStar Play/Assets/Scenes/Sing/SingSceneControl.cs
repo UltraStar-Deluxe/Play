@@ -46,6 +46,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset perfectEffectStarUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset goldenNoteStarUi;
+
     [Inject(UxmlName = R.UxmlNames.background)]
     public VisualElement background;
 
@@ -559,6 +565,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
+        bb.Bind(nameof(perfectEffectStarUi)).ToExistingInstance(perfectEffectStarUi);
+        bb.Bind(nameof(goldenNoteStarUi)).ToExistingInstance(goldenNoteStarUi);
         return bb.GetBindings();
     }
 

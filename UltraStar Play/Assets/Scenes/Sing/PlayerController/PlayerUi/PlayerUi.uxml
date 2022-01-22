@@ -26,7 +26,7 @@
                 <ui:Instance template="NoteUi" name="noteEntry" style="position: absolute; top: 60px; width: 400px; height: 40px;" />
             </ui:VisualElement>
             <ui:VisualElement name="recordedNoteEntryContainer" style="width: 100%; position: absolute; height: 100%;" />
-            <ui:VisualElement name="effectsContainer" style="width: 100%; position: absolute; height: 100%;" />
+            <ui:VisualElement name="effectsContainer" style="width: 100%; position: absolute; height: 100%; overflow: visible;" />
             <ui:VisualElement name="sentenceRatingContainer" style="position: absolute; width: 100%; height: 100%;" />
         </ui:VisualElement>
         <ui:VisualElement name="lyricsContainer" class="lyricsContainer" style="justify-content: center; width: 100%; height: 20px;" />
