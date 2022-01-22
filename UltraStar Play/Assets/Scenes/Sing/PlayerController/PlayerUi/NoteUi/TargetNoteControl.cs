@@ -1,17 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using PrimeInputActions;
+using System.Linq;
 using UnityEngine;
 using UniInject;
 using UnityEngine.UIElements;
 
 public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 {
-    // [InjectedInInspector]
-    // public StarParticle goldenStarPrefab;
-    //
-    // [InjectedInInspector]
-    // public StarParticle perfectStarPrefab;
+    [Inject(Key = nameof(goldenNoteStarUi))]
+    protected VisualTreeAsset goldenNoteStarUi;
+
+    [Inject(Key = nameof(perfectEffectStarUi))]
+    protected VisualTreeAsset perfectEffectStarUi;
 
     [Inject]
     public Note Note { get; private set; }
@@ -31,7 +31,20 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
-    // private readonly List<StarParticle> stars = new List<StarParticle>();
+    [Inject]
+    private SingSceneControl singSceneControl;
+
+    [Inject]
+    private Injector injector;
+
+    protected VisualElement effectsContainer;
+
+    private readonly List<StarParticleControl> starControls = new List<StarParticleControl>();
+
+    public TargetNoteControl(VisualElement effectsContainer)
+    {
+        this.effectsContainer = effectsContainer;
+    }
 
     public void OnInjectionFinished()
     {
@@ -42,15 +55,12 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void Update()
     {
-        // if (Note.IsGolden)
-        // {
-        //     RemoveDestroyedStarsFromList();
-        //     CreateGoldenNoteEffect();
-        // }
-        // else
-        // {
-        //     DestroyStars();
-        // }
+        if (Note.IsGolden)
+        {
+            CreateGoldenNoteEffect();
+        }
+
+        starControls.ForEach(starControl => starControl.Update());
     }
 
     private void SetStyleByMicProfile()
@@ -70,106 +80,84 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         image.style.unityBackgroundImageTintColor = new StyleColor(finalColor);
     }
 
-    // private void RemoveDestroyedStarsFromList()
-    // {
-    //     foreach (StarParticle star in new List<StarParticle>(stars))
-    //     {
-    //         if (!star)
-    //         {
-    //             stars.Remove(star);
-    //         }
-    //     }
-    // }
-    //
-    // private void DestroyStars()
-    // {
-    //     foreach (StarParticle star in stars)
-    //     {
-    //         if (star)
-    //         {
-    //             Destroy(star.gameObject);
-    //         }
-    //     }
-    //     stars.Clear();
-    // }
-    //
-    // private void DestroyLyrics()
-    // {
-    //     if (label != null
-    //         && label.gameObject != null)
-    //     {
-    //         Destroy(label.gameObject);
-    //     }
-    //     if (lyricsUiTextRectTransform != null
-    //         && lyricsUiTextRectTransform.gameObject != null)
-    //     {
-    //         Destroy(lyricsUiTextRectTransform.gameObject);
-    //     }
-    // }
-    //
-    // private void CreateGoldenNoteEffect()
-    // {
-    //     // Create several particles. Longer notes require more particles because they have more space to fill.
-    //     int starCount = stars.Count;
-    //     int targetStarCount = Mathf.Max(6, (int)RectTransform.rect.width / 10);
-    //     if (starCount < targetStarCount)
-    //     {
-    //         CreateGoldenStar();
-    //     }
-    // }
-    //
-    // private void CreateGoldenStar()
-    // {
-    //     StarParticle star = Instantiate(goldenStarPrefab);
-    //     star.transform.SetParent(RectTransform);
-    //     star.RectTransformToFollow = RectTransform;
-    //     RectTransform starRectTransform = star.GetComponent<RectTransform>();
-    //     float anchorX = Random.Range(0f, 1f);
-    //     float anchorY = Random.Range(0f, 1f);
-    //     starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchoredPosition = Vector2.zero;
-    //
-    //     star.RectTransform.localScale = Vector3.one * Random.Range(0, 0.5f);
-    //     LeanTween.scale(star.RectTransform, Vector3.one * Random.Range(0.5f, 1f), Random.Range(1f, 2f))
-    //         .setOnComplete(() => Destroy(star.gameObject));
-    //
-    //     // Move to another parent to ensure that it is drawn in front of the notes.
-    //     star.transform.SetParent(uiEffectsContainer);
-    //
-    //     stars.Add(star);
-    // }
-    //
-    // public void CreatePerfectNoteEffect()
-    // {
-    //     CreatePerfectStar();
-    // }
-    //
-    // private void CreatePerfectStar()
-    // {
-    //     StarParticle star = Instantiate(perfectStarPrefab);
-    //     star.transform.SetParent(transform);
-    //     star.RectTransformToFollow = RectTransform;
-    //     RectTransform starRectTransform = star.GetComponent<RectTransform>();
-    //     float anchorX = 1;
-    //     float anchorY = 0.9f;
-    //     starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
-    //     starRectTransform.anchoredPosition = Vector2.zero;
-    //     starRectTransform.localEulerAngles = new Vector3(0, 0, Random.Range(0, 180));
-    //
-    //     star.RectTransform.localScale = Vector3.one * 1f;
-    //     LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
-    //         .setOnComplete(() => Destroy(star.gameObject));
-    //
-    //     // Move to another parent to ensure that it is drawn in front of the notes.
-    //     star.transform.SetParent(uiEffectsContainer);
-    // }
+    private void CreateGoldenNoteEffect()
+    {
+        // Create several particles. Longer notes require more particles because they have more space to fill.
+        int targetStarCount = Mathf.Max(6, (int)VisualElement.contentRect.width / 10);
+        if (starControls.Count < targetStarCount)
+        {
+            CreateGoldenStar();
+        }
+    }
+
+    private void CreateGoldenStar()
+    {
+        VisualElement star = goldenNoteStarUi.CloneTree().Children().First();
+        star.style.position = new StyleEnum<Position>(Position.Absolute);
+        effectsContainer.Add(star);
+
+        StarParticleControl starControl = new StarParticleControl();
+        starControl.VisualElementToFollow = VisualElement;
+        injector.WithRootVisualElement(star).Inject(starControl);
+
+        float noteWidth = VisualElement.style.width.value.value;
+        float noteHeight = VisualElement.style.height.value.value;
+        float xPercent = VisualElement.style.left.value.value + Random.Range(0, noteWidth);
+        float yPercent = VisualElement.style.bottom.value.value + Random.Range(-noteHeight / 2, noteHeight / 2);
+        Vector2 pos = new Vector2(xPercent, yPercent);
+        starControl.SetPosition(pos);
+        starControl.Rotation = Random.Range(0, 360);
+
+        Vector2 startScale = Vector2.zero;
+        starControl.SetScale(startScale);
+
+        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one * Random.Range(0.5f, 1f), Random.Range(1f, 2f))
+            .setOnUpdate((Vector2 s) => starControl.SetScale(s))
+            .setOnComplete(() => RemoveStarControl(starControl));
+
+        starControls.Add(starControl);
+    }
+
+    public void CreatePerfectNoteEffect()
+    {
+        CreatePerfectStar();
+    }
+
+    private void CreatePerfectStar()
+    {
+        VisualElement star = perfectEffectStarUi.CloneTree().Children().First();
+        star.style.position = new StyleEnum<Position>(Position.Absolute);
+        effectsContainer.Add(star);
+
+        StarParticleControl starControl = new StarParticleControl();
+        starControl.VisualElementToFollow = VisualElement;
+        injector.WithRootVisualElement(star).Inject(starControl);
+
+        star.style.marginLeft = -25;
+        float xPercent = VisualElement.style.left.value.value + VisualElement.style.width.value.value;
+        float yPercent = VisualElement.style.bottom.value.value;
+        Vector2 pos = new Vector2(xPercent, yPercent);
+        starControl.SetPosition(pos);
+        starControl.Rotation = Random.Range(0, 360);
+
+        Vector2 startScale = Vector2.one * 0.5f;
+        starControl.SetScale(startScale);
+        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one, 0.6f)
+            .setOnUpdate((Vector2 s) => starControl.SetScale(s))
+            .setOnComplete(() => RemoveStarControl(starControl));
+
+        starControls.Add(starControl);
+    }
+
+    private void RemoveStarControl(StarParticleControl starControl)
+    {
+        starControl.VisualElement.RemoveFromHierarchy();
+        starControls.Remove(starControl);
+    }
 
     public void Dispose()
     {
         VisualElement.RemoveFromHierarchy();
-        // DestroyStars();
-        // DestroyLyrics();
+        starControls.ToList().ForEach(starControl => RemoveStarControl(starControl));
     }
 }
