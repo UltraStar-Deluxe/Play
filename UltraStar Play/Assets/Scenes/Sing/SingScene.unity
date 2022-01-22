@@ -861,6 +861,7 @@ MonoBehaviour:
     type: 3}
   sentenceRatingUi: {fileID: 9197481963319205126, guid: fc5ccc90fb3478b49bea1f39b1e6bcce,
     type: 3}
+  noteUi: {fileID: 9197481963319205126, guid: 726e4c425e366bc4781f431b540ceb7f, type: 3}
   dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
     type: 3}
   songAudioPlayer: {fileID: 1098468898}

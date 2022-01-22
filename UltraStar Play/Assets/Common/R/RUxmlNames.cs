@@ -90,6 +90,7 @@ public static partial class R
         public const string editPlaylistDialog = "editPlaylistDialog";
         public const string editPlaylistDialogTitle = "editPlaylistDialogTitle";
         public const string editPlaylistOverlay = "editPlaylistOverlay";
+        public const string effectsContainer = "effectsContainer";
         public const string emptyScoreBar = "emptyScoreBar";
         public const string enabledContainer = "enabledContainer";
         public const string enabledLabel = "enabledLabel";
@@ -182,11 +183,10 @@ public static partial class R
         public const string noteContainer = "noteContainer";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string noteEntry = "noteEntry";
-        public const string noteEntryContainer = "noteEntryContainer";
-        public const string noteImage = "noteImage";
         public const string noteLabel = "noteLabel";
         public const string noteLines = "noteLines";
         public const string NoteUi = "NoteUi";
+        public const string noteUiRoot = "noteUiRoot";
         public const string notificationLabel = "notificationLabel";
         public const string notificationOverlay = "notificationOverlay";
         public const string nPlayerLayout = "nPlayerLayout";
@@ -233,6 +233,10 @@ public static partial class R
         public const string ratePlayersContainer = "ratePlayersContainer";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
+        public const string recordedNote = "recordedNote";
+        public const string recordedNoteEntryContainer = "recordedNoteEntryContainer";
+        public const string recordedNoteImage = "recordedNoteImage";
+        public const string recordedNoteLabel = "recordedNoteLabel";
         public const string recordingOptionsButton = "recordingOptionsButton";
         public const string rem = "rem";
         public const string resolutionContainer = "resolutionContainer";
@@ -309,6 +313,11 @@ public static partial class R
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";
+        public const string targetNote = "targetNote";
+        public const string targetNoteEntryContainer = "targetNoteEntryContainer";
+        public const string targetNoteImage = "targetNoteImage";
+        public const string targetNoteLabel = "targetNoteLabel";
+        public const string text = "text";
         public const string textFieldContainer = "textFieldContainer";
         public const string themeContainer = "themeContainer";
         public const string third = "third";

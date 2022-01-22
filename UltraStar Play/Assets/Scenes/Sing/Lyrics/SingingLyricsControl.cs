@@ -11,6 +11,8 @@ using UnityEngine.UIElements;
 
 public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 {
+    private const float SpaceWidthInPx = 8;
+
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new List<Note>();
 
@@ -176,10 +178,21 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         sentence.Notes.ForEach(note =>
         {
             string richText = IsItalicDisplayText(note.Type)
-                ? $"<i>{note.Text}</i>"
-                : note.Text;
+                ? $"<i>{note.Text.Trim()}</i>"
+                : note.Text.Trim();
+
             Label label = new Label(richText);
             label.enableRichText = true;
+
+            if (note.Text.StartsWith(" "))
+            {
+                label.style.marginLeft = SpaceWidthInPx;
+            }
+            if (note.Text.EndsWith(" "))
+            {
+                label.style.marginRight = SpaceWidthInPx;
+            }
+
             label.AddToClassList(R.UxmlClasses.singingLyrics);
             if (visualElement == currentSentenceContainer)
             {

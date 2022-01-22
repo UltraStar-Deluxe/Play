@@ -5,11 +5,11 @@ using System.Linq;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
+public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 {
     public int playerIndexToSimulate;
 
-    protected PlayerControl playerControl;
+    private PlayerControl playerControl;
 
     [Inject]
     protected SingSceneControl singSceneControl;
@@ -25,22 +25,48 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
     }
 
-    protected abstract PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat);
+    protected abstract PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat);
 
-    void Update()
+    private void Update()
     {
+        if (playerControl == null)
+        {
+            if (!TryFindPlayerControl())
+            {
+                return;
+            }
+        }
+
         int currentBeat = (int)singSceneControl.CurrentBeat;
         int beatToAnalyze = playerControl.PlayerPitchTracker.BeatToAnalyze;
-
-        if (currentBeat > 0
-            && beatToAnalyze <= currentBeat
-            && playerControl.PlayerPitchTracker.RecordingSentence != null)
+        if (currentBeat <= 0
+            || beatToAnalyze > currentBeat
+            || playerControl.PlayerPitchTracker.RecordingSentence == null)
         {
-            Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
-            PitchEvent pitchEvent = GetDummyPichtEvent(beatToAnalyze, noteAtBeat);
-            playerControl.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
-            playerControl.PlayerPitchTracker.GoToNextBeat();
+            return;
         }
+
+        Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
+        if (noteAtBeat == null)
+        {
+            return;
+        }
+
+        PitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze, noteAtBeat);
+        playerControl.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
+        playerControl.PlayerPitchTracker.GoToNextBeat();
+    }
+
+    private bool TryFindPlayerControl()
+    {
+        if (singSceneControl.PlayerControls.IsNullOrEmpty()
+            || playerIndexToSimulate >= singSceneControl.PlayerControls.Count)
+        {
+            return false;
+        }
+
+        playerControl = singSceneControl.PlayerControls[playerIndexToSimulate];
+        return true;
     }
 
     public void SetPlayerControl(PlayerControl playerControl)

@@ -92,9 +92,9 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
 
     private void UpdatePosition(int midiNote)
     {
-        Vector2 anchorY = scrollingNoteStreamDisplayer.GetAnchorYForMidiNote(midiNote);
-        arrowImageRectTransform.anchorMin = new Vector2(arrowImageRectTransform.anchorMin.x, anchorY.x);
-        arrowImageRectTransform.anchorMax = new Vector2(arrowImageRectTransform.anchorMax.x, anchorY.y);
+        Vector2 yPercent = scrollingNoteStreamDisplayer.GetYStartAndEndInPercentForMidiNote(midiNote);
+        arrowImageRectTransform.anchorMin = new Vector2(arrowImageRectTransform.anchorMin.x, yPercent.x);
+        arrowImageRectTransform.anchorMax = new Vector2(arrowImageRectTransform.anchorMax.x, yPercent.y);
         arrowImageRectTransform.MoveCornersToAnchors();
     }
 }
