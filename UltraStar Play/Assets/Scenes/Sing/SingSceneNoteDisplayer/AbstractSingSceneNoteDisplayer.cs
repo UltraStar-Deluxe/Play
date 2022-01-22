@@ -104,6 +104,13 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected virtual void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
     {
         recordedNoteControl.Update();
+
+        // Draw the RecordedNote smoothly from their StartBeat to TargetEndBeat
+        if (recordedNoteControl.EndBeat < recordedNoteControl.TargetEndBeat)
+        {
+            UpdateRecordedNoteControlEndBeat(recordedNoteControl);
+            UpdateNotePosition(recordedNoteControl.VisualElement, recordedNoteControl.MidiNote, recordedNoteControl.StartBeat, recordedNoteControl.EndBeat);
+        }
     }
 
     public void SetLineCount(int lineCount)
@@ -360,13 +367,13 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         }
     }
 
-    protected void RemoveTargetNote(TargetNoteControl targetNoteControl)
+    protected virtual void RemoveTargetNote(TargetNoteControl targetNoteControl)
     {
         noteToTargetNoteControl.Remove(targetNoteControl.Note);
         targetNoteControl.Dispose();
     }
 
-    protected void RemoveRecordedNote(RecordedNoteControl recordedNoteControl)
+    protected virtual void RemoveRecordedNote(RecordedNoteControl recordedNoteControl)
     {
         recordedNoteToRecordedNoteControlsMap.Remove(recordedNoteControl.RecordedNote);
         recordedNoteControl.Dispose();
@@ -374,15 +381,16 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected void RemoveTargetNotes()
     {
-        noteToTargetNoteControl.Values.ForEach(targetNoteControl => targetNoteControl.Dispose());
-        noteToTargetNoteControl.Clear();
+        noteToTargetNoteControl.Values
+            .ToList()
+            .ForEach(targetNoteControl => RemoveTargetNote(targetNoteControl));
     }
 
-    protected virtual void RemoveRecordedNotes()
+    protected void RemoveRecordedNotes()
     {
         recordedNoteToRecordedNoteControlsMap.Values
+            .ToList()
             .ForEach(recordedNoteControls => recordedNoteControls
-                .ForEach(recordedNoteControl => recordedNoteControl.Dispose()));
-        recordedNoteToRecordedNoteControlsMap.Clear();
+                .ForEach(recordedNoteControl => RemoveRecordedNote(recordedNoteControl)));
     }
 }
