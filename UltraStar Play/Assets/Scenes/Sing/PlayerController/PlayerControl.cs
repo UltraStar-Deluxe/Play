@@ -65,8 +65,11 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         SortedSentences.Sort(Sentence.comparerByStartBeat);
 
         // Inject all children
-        VisualElement playerUiInstance = playerUi.CloneTree().Children().First();
-        childrenInjector.WithRootVisualElement(playerUiInstance).Inject(PlayerUiControl);
+        VisualElement playerUiVisualElement = playerUi.CloneTree().Children().First();
+        Injector playerUiControlInjector = UniInjectUtils.CreateInjector(childrenInjector);
+        playerUiControlInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUiVisualElement);
+        playerUiControlInjector.AddBindingForInstance(playerUiControlInjector);
+        playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)
@@ -75,6 +78,11 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             }
         }
         SetDisplaySentenceIndex(0);
+    }
+
+    public void Update()
+    {
+        PlayerUiControl.Update();
     }
 
     private Injector CreateChildrenInjectorWithAdditionalBindings()

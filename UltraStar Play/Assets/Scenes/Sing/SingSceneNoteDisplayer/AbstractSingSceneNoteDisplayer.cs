@@ -7,23 +7,29 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using System.Xml;
+using UniInject.Extensions;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using Range = UnityEngine.SocialPlatforms.Range;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingSceneNoteDisplayer, INeedInjection, IExcludeFromSceneInjection
+public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectionFinishedListener
 {
-    public UiNote uiNotePrefab;
-    public UiRecordedNote uiRecordedNotePrefab;
+    // public StarParticle perfectSentenceStarPrefab;
 
-    public StarParticle perfectSentenceStarPrefab;
+    [Inject(Key = nameof(noteUi))]
+    protected VisualTreeAsset noteUi;
 
-    public RectTransform uiNotesContainer;
-    public RectTransform uiRecordedNotesContainer;
-    public RectTransform uiEffectsContainer;
+    [Inject(UxmlName = R.UxmlNames.targetNoteEntryContainer)]
+    protected VisualElement targetNoteEntryContainer;
 
-    public bool displayRoundedAndActualRecordedNotes;
-    public bool showPitchOfNotes;
+    [Inject(UxmlName = R.UxmlNames.recordedNoteEntryContainer)]
+    protected VisualElement recordedNoteEntryContainer;
+
+    [Inject(UxmlName = R.UxmlNames.effectsContainer)]
+    protected VisualElement effectsContainer;
 
     [Inject]
     protected Settings settings;
@@ -34,34 +40,41 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
     [Inject]
     protected PlayerNoteRecorder playerNoteRecorder;
 
+    [Inject]
+    protected Injector injector;
+
     [Inject(Optional = true)]
     protected MicProfile micProfile;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    protected LineDisplayer lineDisplayer;
+    // protected LineDisplayer lineDisplayer;
 
     protected double beatsPerSecond;
 
-    protected readonly List<UiRecordedNote> uiRecordedNotes = new List<UiRecordedNote>();
-    protected readonly Dictionary<RecordedNote, List<UiRecordedNote>> recordedNoteToUiRecordedNotesMap = new Dictionary<RecordedNote, List<UiRecordedNote>>();
-    protected readonly Dictionary<Note, UiNote> noteToUiNoteMap = new Dictionary<Note, UiNote>();
+    protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new Dictionary<Note, TargetNoteControl>();
+    protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new Dictionary<RecordedNote, List<RecordedNoteControl>>();
 
     protected int avgMidiNote;
 
     // The number of rows on which notes can be placed.
     protected int noteRowCount;
-    protected float[] noteRowToAnchorY;
+    protected float[] noteRowToYPercent;
 
     protected int maxNoteRowMidiNote;
     protected int minNoteRowMidiNote;
     protected float noteHeightPercent;
 
-    abstract protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat);
+    // Only for debugging
+    private bool displayRoundedAndActualRecordedNotes;
+    private bool showPitchOfNotes;
 
-    public virtual void Init(int lineCount)
+    protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+
+    public virtual void OnInjectionFinished()
     {
-        SetLineCount(lineCount);
-        lineDisplayer.SetTargetLineCount(lineCount);
+        targetNoteEntryContainer.Clear();
+        recordedNoteEntryContainer.Clear();
+        effectsContainer.Clear();
+
         beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
@@ -73,9 +86,24 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         });
     }
 
-    public GameObject GetGameObject()
+    public virtual void Update()
     {
-        return gameObject;
+        // Update notes
+        noteToTargetNoteControl.Values
+            .ForEach(targetNoteControl => UpdateTargetNoteControl(targetNoteControl));
+        recordedNoteToRecordedNoteControlsMap.Values
+            .ForEach(recordedNoteControls => recordedNoteControls
+                .ForEach(recordedNoteControl => UpdateRecordedNoteControl(recordedNoteControl)));
+    }
+
+    protected virtual void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
+    {
+        targetNoteControl.Update();
+    }
+
+    protected virtual void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
+    {
+        recordedNoteControl.Update();
     }
 
     public void SetLineCount(int lineCount)
@@ -88,7 +116,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         {
             throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
-        noteRowToAnchorY = new float[noteRowCount];
+        noteRowToYPercent = new float[noteRowCount];
 
         float lineHeightPercent = 1.0f / lineCount;
         noteHeightPercent = lineHeightPercent / 2.0f;
@@ -98,17 +126,19 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
             int lineIndex = (int)Math.Floor(i / 2f);
             // The even noteRows are drawn between the lines. Thus they have an offset of half the line height.
             float lineOffset = ((i % 2) == 0) ? 0 : (lineHeightPercent / 2);
-            noteRowToAnchorY[i] = ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
+            noteRowToYPercent[i] = ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
         }
+
+        // lineDisplayer.SetTargetLineCount(lineCount);
     }
 
     public void RemoveAllDisplayedNotes()
     {
-        RemoveUiNotes();
-        RemoveUiRecordedNotes();
+        RemoveTargetNotes();
+        RemoveRecordedNotes();
     }
 
-    public virtual void DisplayRecordedNote(RecordedNote recordedNote)
+    protected virtual void DisplayRecordedNote(RecordedNote recordedNote)
     {
         // Freestyle notes are not drawn
         if (recordedNote.TargetNote != null
@@ -118,9 +148,9 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         }
 
         // Try to update existing recorded notes.
-        if (recordedNoteToUiRecordedNotesMap.TryGetValue(recordedNote, out List<UiRecordedNote> uiRecordedNotes))
+        if (recordedNoteToRecordedNoteControlsMap.TryGetValue(recordedNote, out List<RecordedNoteControl> uiRecordedNotes))
         {
-            foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
+            foreach (RecordedNoteControl uiRecordedNote in uiRecordedNotes)
             {
                 uiRecordedNote.TargetEndBeat = recordedNote.EndBeat;
             }
@@ -129,69 +159,64 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
 
         // Draw the bar for the rounded note
         // and draw the bar for the actually recorded pitch if needed.
-        CreateUiRecordedNote(recordedNote, true);
-        if (displayRoundedAndActualRecordedNotes && (recordedNote.RecordedMidiNote != recordedNote.RoundedMidiNote))
+        CreateRecordedNoteControl(recordedNote, true);
+        if (displayRoundedAndActualRecordedNotes
+            && (recordedNote.RecordedMidiNote != recordedNote.RoundedMidiNote))
         {
-            CreateUiRecordedNote(recordedNote, false);
+            CreateRecordedNoteControl(recordedNote, false);
         }
     }
 
-    public void CreatePerfectNoteEffect(Note perfectNote)
-    {
-        if (noteToUiNoteMap.TryGetValue(perfectNote, out UiNote uiNote))
-        {
-            uiNote.CreatePerfectNoteEffect();
-        }
-    }
+    // public void CreatePerfectNoteEffect(Note perfectNote)
+    // {
+    //     if (noteToTargetNoteControl.TryGetValue(perfectNote, out TargetNoteControl uiNote))
+    //     {
+    //         uiNote.CreatePerfectNoteEffect();
+    //     }
+    // }
 
-    protected void RemoveUiNotes()
-    {
-        foreach (Transform child in uiNotesContainer.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        noteToUiNoteMap.Clear();
-    }
-
-    protected virtual UiNote CreateUiNote(Note note)
+    protected virtual TargetNoteControl CreateTargetNoteControl(Note note)
     {
         if (note.StartBeat == note.EndBeat)
         {
             return null;
         }
 
-        UiNote uiNote = Instantiate(uiNotePrefab, uiNotesContainer);
-        uiNote.Init(note, uiEffectsContainer);
-        if (micProfile != null)
-        {
-            uiNote.SetColorOfMicProfile(micProfile);
-        }
+        VisualElement visualElement = noteUi.CloneTree().Children().First();
 
-        Text uiNoteText = uiNote.lyricsUiText;
+        Injector childInjector = UniInjectUtils.CreateInjector(injector);
+        childInjector.AddBindingForInstance(childInjector);
+        childInjector.AddBindingForInstance(note);
+        childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
+
+        TargetNoteControl targetNoteControl = new TargetNoteControl();
+        childInjector.Inject(targetNoteControl);
+
+        Label label = targetNoteControl.Label;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
         if (settings.GraphicSettings.showLyricsOnNotes && showPitchOfNotes)
         {
-            uiNoteText.text = GetDisplayText(note) + " (" + pitchName + ")";
+            label.text = GetDisplayText(note) + " (" + pitchName + ")";
         }
         else if (settings.GraphicSettings.showLyricsOnNotes)
         {
-            uiNoteText.text = GetDisplayText(note);
+            label.text = GetDisplayText(note);
         }
         else if (showPitchOfNotes)
         {
-            uiNoteText.text = pitchName;
+            label.text = pitchName;
         }
         else
         {
-            uiNoteText.text = "";
+            label.text = "";
         }
 
-        RectTransform uiNoteRectTransform = uiNote.RectTransform;
-        PositionUiNote(uiNoteRectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
+        targetNoteEntryContainer.Add(visualElement);
+        UpdateNotePosition(visualElement, note.MidiNote, note.StartBeat, note.EndBeat);
 
-        noteToUiNoteMap[note] = uiNote;
+        noteToTargetNoteControl[note] = targetNoteControl;
 
-        return uiNote;
+        return targetNoteControl;
     }
 
     public string GetDisplayText(Note note)
@@ -210,17 +235,7 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         }
     }
 
-    protected virtual void RemoveUiRecordedNotes()
-    {
-        foreach (Transform child in uiRecordedNotesContainer.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        uiRecordedNotes.Clear();
-        recordedNoteToUiRecordedNotesMap.Clear();
-    }
-
-    protected void CreateUiRecordedNote(RecordedNote recordedNote, bool useRoundedMidiNote)
+    protected void CreateRecordedNoteControl(RecordedNote recordedNote, bool useRoundedMidiNote)
     {
         if (recordedNote.StartBeat == recordedNote.EndBeat)
         {
@@ -241,61 +256,64 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
             midiNote = recordedNote.RecordedMidiNote;
         }
 
-        UiRecordedNote uiNote = Instantiate(uiRecordedNotePrefab, uiRecordedNotesContainer);
-        uiNote.RecordedNote = recordedNote;
-        uiNote.StartBeat = recordedNote.StartBeat;
-        uiNote.TargetEndBeat = recordedNote.EndBeat;
+        VisualElement visualElement = noteUi.CloneTree().Children().First();
+
+        Injector childInjector = UniInjectUtils.CreateInjector(injector);
+        childInjector.AddBindingForInstance(childInjector);
+        childInjector.AddBindingForInstance(recordedNote);
+        childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
+
+        RecordedNoteControl noteControl = new RecordedNoteControl();
+        childInjector.Inject(noteControl);
+
+        noteControl.StartBeat = recordedNote.StartBeat;
+        noteControl.TargetEndBeat = recordedNote.EndBeat;
         // Draw already a portion of the note
-        uiNote.LifeTimeInSeconds = Time.deltaTime;
-        uiNote.EndBeat = recordedNote.StartBeat + (uiNote.LifeTimeInSeconds * beatsPerSecond);
+        noteControl.LifeTimeInSeconds = Time.deltaTime;
+        noteControl.EndBeat = recordedNote.StartBeat + (noteControl.LifeTimeInSeconds * beatsPerSecond);
 
-        uiNote.MidiNote = midiNote;
-        if (micProfile != null)
-        {
-            uiNote.SetColorOfMicProfile(micProfile);
-        }
+        noteControl.MidiNote = midiNote;
 
-        Text uiNoteText = uiNote.lyricsUiText;
+        Label label = noteControl.Label;
         if (showPitchOfNotes)
         {
             string pitchName = MidiUtils.GetAbsoluteName(midiNote);
-            uiNoteText.text = " (" + pitchName + ")";
+            label.text = " (" + pitchName + ")";
         }
         else
         {
-            uiNoteText.text = "";
+            label.text = "";
         }
 
-        RectTransform uiNoteRectTransform = uiNote.RectTransform;
-        PositionUiNote(uiNoteRectTransform, midiNote, uiNote.StartBeat, uiNote.EndBeat);
+        recordedNoteEntryContainer.Add(visualElement);
+        UpdateNotePosition(visualElement, midiNote, noteControl.StartBeat, noteControl.EndBeat);
 
-        uiRecordedNotes.Add(uiNote);
-        recordedNoteToUiRecordedNotesMap.AddInsideList(recordedNote, uiNote);
+        recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, noteControl);
     }
 
-    public void CreatePerfectSentenceEffect()
-    {
-        for (int i = 0; i < 50; i++)
-        {
-            CreatePerfectSentenceStar();
-        }
-    }
+    // public void CreatePerfectSentenceEffect()
+    // {
+    //     for (int i = 0; i < 50; i++)
+    //     {
+    //         CreatePerfectSentenceStar();
+    //     }
+    // }
 
-    protected void CreatePerfectSentenceStar()
-    {
-        StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
-        RectTransform starRectTransform = star.GetComponent<RectTransform>();
-        float anchorX = UnityEngine.Random.Range(0f, 1f);
-        float anchorY = UnityEngine.Random.Range(0f, 1f);
-        starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
-        starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
-        starRectTransform.anchoredPosition = Vector2.zero;
-
-        star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.8f);
-        LeanTween.move(star.RectTransform, GetRandomVector2(-100, 100), 1f);
-        LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
-            .setOnComplete(() => Destroy(star.gameObject));
-    }
+    // protected void CreatePerfectSentenceStar()
+    // {
+    //     StarParticle star = Instantiate(perfectSentenceStarPrefab, uiEffectsContainer);
+    //     RectTransform starRectTransform = star.GetComponent<RectTransform>();
+    //     float anchorX = UnityEngine.Random.Range(0f, 1f);
+    //     float anchorY = UnityEngine.Random.Range(0f, 1f);
+    //     starRectTransform.anchorMin = new Vector2(anchorX, anchorY);
+    //     starRectTransform.anchorMax = new Vector2(anchorX, anchorY);
+    //     starRectTransform.anchoredPosition = Vector2.zero;
+    //
+    //     star.RectTransform.localScale = Vector3.one * UnityEngine.Random.Range(0.2f, 0.8f);
+    //     LeanTween.move(star.RectTransform, GetRandomVector2(-100, 100), 1f);
+    //     LeanTween.scale(star.RectTransform, Vector3.zero, 1f)
+    //         .setOnComplete(() => Destroy(star.gameObject));
+    // }
 
     private Vector2 GetRandomVector2(float min, float max)
     {
@@ -324,34 +342,47 @@ abstract public class AbstractSingSceneNoteDisplayer : MonoBehaviour, ISingScene
         return noteRow;
     }
 
-    public Vector2 GetAnchorYForMidiNote(int midiNote)
+    public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote)
     {
         int noteRow = CalculateNoteRow(midiNote);
-        float anchorY = noteRowToAnchorY[noteRow];
-        float anchorYStart = anchorY - noteHeightPercent;
-        float anchorYEnd = anchorY + noteHeightPercent;
-        return new Vector2(anchorYStart, anchorYEnd);
+        float y = noteRowToYPercent[noteRow];
+        float yStart = y - noteHeightPercent;
+        float yEnd = y + noteHeightPercent;
+        return new Vector2(yStart, yEnd);
     }
 
-    protected void UpdateUiRecordedNoteEndBeat(UiRecordedNote uiRecordedNote)
+    protected void UpdateRecordedNoteControlEndBeat(RecordedNoteControl recordedNoteControl)
     {
-        uiRecordedNote.EndBeat = uiRecordedNote.StartBeat + (uiRecordedNote.LifeTimeInSeconds * beatsPerSecond);
-        if (uiRecordedNote.EndBeat > uiRecordedNote.TargetEndBeat)
+        recordedNoteControl.EndBeat = recordedNoteControl.StartBeat + (recordedNoteControl.LifeTimeInSeconds * beatsPerSecond);
+        if (recordedNoteControl.EndBeat > recordedNoteControl.TargetEndBeat)
         {
-            uiRecordedNote.EndBeat = uiRecordedNote.TargetEndBeat;
+            recordedNoteControl.EndBeat = recordedNoteControl.TargetEndBeat;
         }
     }
 
-    protected void RemoveUiNote(UiNote uiNote)
+    protected void RemoveTargetNote(TargetNoteControl targetNoteControl)
     {
-        noteToUiNoteMap.Remove(uiNote.Note);
-        Destroy(uiNote.gameObject);
+        noteToTargetNoteControl.Remove(targetNoteControl.Note);
+        targetNoteControl.Dispose();
     }
 
-    protected void RemoveUiRecordedNote(UiRecordedNote uiRecordedNote)
+    protected void RemoveRecordedNote(RecordedNoteControl recordedNoteControl)
     {
-        uiRecordedNotes.Remove(uiRecordedNote);
-        recordedNoteToUiRecordedNotesMap.Remove(uiRecordedNote.RecordedNote);
-        Destroy(uiRecordedNote.gameObject);
+        recordedNoteToRecordedNoteControlsMap.Remove(recordedNoteControl.RecordedNote);
+        recordedNoteControl.Dispose();
+    }
+
+    protected void RemoveTargetNotes()
+    {
+        noteToTargetNoteControl.Values.ForEach(targetNoteControl => targetNoteControl.Dispose());
+        noteToTargetNoteControl.Clear();
+    }
+
+    protected virtual void RemoveRecordedNotes()
+    {
+        recordedNoteToRecordedNoteControlsMap.Values
+            .ForEach(recordedNoteControls => recordedNoteControls
+                .ForEach(recordedNoteControl => recordedNoteControl.Dispose()));
+        recordedNoteToRecordedNoteControlsMap.Clear();
     }
 }

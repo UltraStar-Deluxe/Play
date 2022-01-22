@@ -101,6 +101,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 732d97cddf664894185e48ebccc0e6e1, type: 3}
   - {fileID: 21300000, guid: de73480ebcaba3549a0dfa0563904dc3, type: 3}
   - {fileID: 21300000, guid: 3c70652efc55e1a49b2912855077cb5d, type: 3}
+  - {fileID: 21300000, guid: 8b9ad24e30cec6144812334156db6180, type: 3}
   - {fileID: 21300000, guid: b4f7154e043553848afeaee4ec3a03a7, type: 3}
   - {fileID: 21300000, guid: 3c8ebe4e2e712904f84bf08e36421283, type: 3}
   - {fileID: 21300000, guid: 974845eee15033141b479dd5c0a40a5f, type: 3}
@@ -168,6 +169,7 @@ SpriteAtlas:
   - '[icon]score'
   - '[button]c'
   - '[button]esc'
+  - '[sing]lineBonusPopUp'
   - '[button]ins'
   - FavoriteIconFilled
   - CrossHatching

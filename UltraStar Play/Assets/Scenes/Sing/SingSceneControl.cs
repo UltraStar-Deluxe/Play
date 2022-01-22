@@ -42,6 +42,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset sentenceRatingUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset noteUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
     [Inject(UxmlName = R.UxmlNames.background)]
@@ -83,6 +86,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
     public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
+
+    private PlayerControl lastLeadingPlayerControl;
 
     private SingSceneData sceneData;
     public SingSceneData SceneData
@@ -188,6 +193,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
                 {
                     dummySinger.SetPlayerControl(PlayerControls[dummySinger.playerIndexToSimulate]);
+                    sceneInjector.Inject(dummySinger);
                 }
                 else
                 {
@@ -269,29 +275,32 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void RecomputeCrowns()
     {
         // Find best player with score > 0
-        PlayerControl bestScorePlayerControl = null;
+        PlayerControl leadingPlayerControl = null;
         foreach (PlayerControl playerController in PlayerControls)
         {
-            if ((bestScorePlayerControl == null && playerController.PlayerScoreController.TotalScore > 0)
-               || (bestScorePlayerControl != null && playerController.PlayerScoreController.TotalScore > bestScorePlayerControl.PlayerScoreController.TotalScore))
+            if ((leadingPlayerControl == null && playerController.PlayerScoreController.TotalScore > 0)
+               || (leadingPlayerControl != null && playerController.PlayerScoreController.TotalScore > leadingPlayerControl.PlayerScoreController.TotalScore))
             {
-                bestScorePlayerControl = playerController;
+                leadingPlayerControl = playerController;
             }
         }
 
         // // Show crown on best player
-        if (bestScorePlayerControl != null)
+        if (leadingPlayerControl != null
+            && lastLeadingPlayerControl != leadingPlayerControl)
         {
-            bestScorePlayerControl.PlayerUiControl.ShowLeadingPlayerIcon();
+            leadingPlayerControl.PlayerUiControl.ShowLeadingPlayerIcon();
         }
         // Hide crown on other players
         foreach (PlayerControl playerController in PlayerControls)
         {
-            if (playerController != bestScorePlayerControl)
+            if (playerController != leadingPlayerControl)
             {
                 playerController.PlayerUiControl.HideLeadingPlayerIcon();
             }
         }
+
+        lastLeadingPlayerControl = leadingPlayerControl;
     }
 
     private void InitTimeBar()
@@ -332,7 +341,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     void Update()
     {
-        PlayerControls.ForEach(it => it.SetCurrentBeat(CurrentBeat));
+        PlayerControls.ForEach(playerControl =>
+        {
+            playerControl.SetCurrentBeat(CurrentBeat);
+            playerControl.Update();
+        });
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
@@ -535,6 +548,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(songVideoPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
+        bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
         return bb.GetBindings();
     }
 

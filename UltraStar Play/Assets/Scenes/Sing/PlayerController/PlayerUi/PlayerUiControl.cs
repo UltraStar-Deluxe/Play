@@ -63,7 +63,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
-    // private ISingSceneNoteDisplayer noteDisplayer;
+    private AbstractSingSceneNoteDisplayer noteDisplayer;
 
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
@@ -71,7 +71,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        // InitNoteDisplayer(LineCount);
+        InitNoteDisplayer(LineCount);
 
         // Player name and image
         playerNameLabel.text = playerProfile.Name;
@@ -116,6 +116,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.Perfect))
             // Create an effect for these.
             .Subscribe(xs => CreatePerfectSentenceEffect());
+    }
+
+    public void Update()
+    {
+        noteDisplayer.Update();
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -172,6 +177,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         float visualElementHeight = 30;
         visualElement.style.top = visualElementHeight;
         LeanTween.value(singSceneControl.gameObject, visualElementHeight, 0, 1f)
+            .setEaseInSine()
             .setOnUpdate(interpolatedTop => visualElement.style.top = interpolatedTop)
             .setOnComplete(visualElement.RemoveFromHierarchy);
     }
@@ -209,24 +215,22 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void InitNoteDisplayer(int localLineCount)
     {
-        // // Find a suited note displayer
-        // if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence)
-        // {
-        //     noteDisplayer = new SentenceDisplayer();
-        // }
-        // else if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
-        // {
-        //     noteDisplayer = new ScrollingNoteStreamDisplayer();
-        // }
-        // if (noteDisplayer == null)
-        // {
-        //     throw new UnityException("Did not find a suited ISingSceneNoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);
-        // }
-        //
-        // // Enable and initialize the selected note displayer
-        // noteDisplayer.GetGameObject().SetActive(true);
-        // injector.InjectAllComponentsInChildren(noteDisplayer.GetGameObject());
-        // noteDisplayer.Init(localLineCount);
+        // Find a suited note displayer
+        switch (settings.GraphicSettings.noteDisplayMode)
+        {
+            case ENoteDisplayMode.SentenceBySentence:
+                noteDisplayer = new SentenceDisplayer();
+                break;
+            case ENoteDisplayMode.ScrollingNoteStream:
+                noteDisplayer = new ScrollingNoteStreamDisplayer();
+                break;
+            default:
+                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);
+        }
+
+        // Enable and initialize the selected note displayer
+        injector.Inject(noteDisplayer);
+        noteDisplayer.SetLineCount(localLineCount);
     }
 
     public void ShowLeadingPlayerIcon()
