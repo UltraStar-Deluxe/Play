@@ -130,7 +130,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
 
         songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.Init(SongMeta, songAudioPlayer);
+        songVideoPlayer.SongMeta = SongMeta;
 
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
     }

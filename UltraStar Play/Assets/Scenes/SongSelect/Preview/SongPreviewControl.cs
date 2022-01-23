@@ -194,9 +194,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         currentSongEntryControl.SongPreviewBackgroundImage.ShowByDisplay();
         currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(0);
 
-        songVideoPlayer.Init(songMeta, songAudioPlayer);
+        songVideoPlayer.SongMeta = songMeta;
         songVideoPlayer.StartVideoOrShowBackgroundImage();
-
     }
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
