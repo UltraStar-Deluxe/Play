@@ -11,7 +11,11 @@ public class ChangingOffsetSinger : AbstractDummySinger
         // Change noteOffset when note changes.
         if (lastNote != null && noteAtBeat != lastNote)
         {
-            noteOffset = (noteOffset + 1) % maxOffset;
+            noteOffset = noteOffset + 1;
+            if (noteOffset > maxOffset)
+            {
+                noteOffset = 0;
+            }
         }
 
         PitchEvent pitchEvent = null;

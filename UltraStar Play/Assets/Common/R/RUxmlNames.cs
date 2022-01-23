@@ -54,6 +54,11 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
+        public const string contextMenu = "contextMenu";
+        public const string contextMenuButton = "contextMenuButton";
+        public const string contextMenuItem = "contextMenuItem";
+        public const string contextMenuLabel = "contextMenuLabel";
+        public const string contextMenuSeparator = "contextMenuSeparator";
         public const string continueButton = "continueButton";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string currentSentenceContainer = "currentSentenceContainer";

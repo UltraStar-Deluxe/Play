@@ -906,7 +906,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
-            inputLegend.Add(new Label(TranslationManager.GetTranslation(R.Messages.action_pressAndHoldToOpenSongMenu)));
+            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+                TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
+                TranslationManager.GetTranslation(R.Messages.action_longPress))));
         }
 
         menuOverlayInputLegend.Clear();

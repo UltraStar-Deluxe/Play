@@ -247,6 +247,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+
+        // Register ContextMenu
+        SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(doubleClickToTogglePauseElement, gameObject);
+        sceneInjector.Inject(singSceneContextMenuControl);
     }
 
     private void PreparePlayerUiLayout()
@@ -647,8 +651,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
             inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-                TranslationManager.GetTranslation(R.Messages.back),
+                TranslationManager.GetTranslation(R.Messages.continue_),
                 TranslationManager.GetTranslation(R.Messages.action_doubleTap))));
+            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+                TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
+                TranslationManager.GetTranslation(R.Messages.action_longPress))));
         }
         else
         {

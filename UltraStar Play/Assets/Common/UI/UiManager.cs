@@ -39,6 +39,15 @@ public class UiManager : MonoBehaviour, INeedInjection
     public ContextMenu contextMenuPrefab;
 
     [InjectedInInspector]
+    public VisualTreeAsset contextMenuUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset contextMenuItemUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset contextMenuSeparatorUi;
+
+    [InjectedInInspector]
     public Tooltip tooltipPrefab;
 
     [InjectedInInspector]
@@ -87,6 +96,9 @@ public class UiManager : MonoBehaviour, INeedInjection
             mousePositionChangeEventStream.OnNext(Input.mousePosition);
         }
         lastMousePosition = Input.mousePosition;
+
+        ContextMenuPopupControl.OpenContextMenuPopups
+            .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
     public void CreateShowFpsInstance()

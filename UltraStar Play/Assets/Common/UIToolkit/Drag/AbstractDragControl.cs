@@ -25,14 +25,17 @@ public abstract class AbstractDragControl<EVENT>
     private DragControlPointerEvent dragControlPointerDownEvent;
     public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
 
-    private readonly VisualElement target;
+    public VisualElement TargetVisualElement { get; private set; }
 
-	protected AbstractDragControl(VisualElement target, GameObject gameObject)
+    protected readonly GameObject gameObject;
+
+	protected AbstractDragControl(VisualElement targetVisualElement, GameObject gameObject)
     {
-        this.target = target;
-        target.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
-        target.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
-        target.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        this.TargetVisualElement = targetVisualElement;
+        this.gameObject = gameObject;
+        targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
@@ -160,9 +163,9 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
         // Target coordinates in pixels
-        float targetWidthInPixels = target.contentRect.width;
-        float targetHeightInPixels = target.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(target.resolvedStyle.left, target.resolvedStyle.top);
+        float targetWidthInPixels = TargetVisualElement.contentRect.width;
+        float targetHeightInPixels = TargetVisualElement.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
 
         float rectTransformXDistanceInPixels = targetPosInPixels.x - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
         float rectTransformYDistanceInPixels = targetPosInPixels.y - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
@@ -198,9 +201,9 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 screenPosInPixels = eventData.Position;
 
         // Target coordinate in pixels
-        float targetWidthInPixels = target.contentRect.width;
-        float targetHeightInPixels = target.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(target.resolvedStyle.left, target.resolvedStyle.top);
+        float targetWidthInPixels = TargetVisualElement.contentRect.width;
+        float targetHeightInPixels = TargetVisualElement.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
