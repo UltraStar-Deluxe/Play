@@ -234,8 +234,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         Statistics stats = StatsManager.Instance.Statistics;
         stats.RecordSongStarted(SongMeta);
 
-        songVideoPlayer.Init(SongMeta, songAudioPlayer);
-
         StartCoroutine(StartMusicAndVideo());
 
         // Update TimeBar every second
@@ -371,7 +369,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         yield return StartAudioPlayback();
 
         // Start any associated video
-        if (string.IsNullOrEmpty(SongMeta.Video))
+        songVideoPlayer.SongMeta = SongMeta;
+        if (SongMeta.Video.IsNullOrEmpty())
         {
             songVideoPlayer.ShowBackgroundImage();
         }
