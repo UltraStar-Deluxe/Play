@@ -52,7 +52,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     [Inject(Optional = true)]
     protected MicProfile micProfile;
 
-    // protected LineDisplayer lineDisplayer;
+    protected LineDisplayer lineDisplayer;
 
     protected double beatsPerSecond;
 
@@ -92,6 +92,10 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         {
             DisplayRecordedNote(recordedNoteContinuedEvent.RecordedNote);
         });
+
+        lineDisplayer = new LineDisplayer();
+        lineDisplayer.LineColor = Color.grey;
+        injector.Inject(lineDisplayer);
     }
 
     public virtual void Update()
@@ -147,7 +151,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             noteRowToYPercent[i] = ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
         }
 
-        // lineDisplayer.SetTargetLineCount(lineCount);
+        lineDisplayer.LineCount = lineCount;
     }
 
     public void RemoveAllDisplayedNotes()
