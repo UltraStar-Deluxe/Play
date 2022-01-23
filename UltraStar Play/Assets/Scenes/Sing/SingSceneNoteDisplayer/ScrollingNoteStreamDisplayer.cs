@@ -26,6 +26,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     private VisualElement lyricsContainer;
 
     private List<Note> upcomingNotes = new List<Note>();
+    private List<Sentence> upcomingSentences = new List<Sentence>();
 
     private int micDelayInMillis;
     private int displayedBeats;
@@ -33,6 +34,8 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     private int frameCount;
 
     private readonly Dictionary<Note, Label> noteToLyricsContainerLabel = new Dictionary<Note, Label>();
+
+    private readonly Dictionary<Sentence, VisualElement> sentenceToSeparator = new Dictionary<Sentence, VisualElement>();
 
     public override void OnInjectionFinished()
     {
@@ -48,6 +51,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             .SelectMany(sentence => sentence.Notes)
             .ToList();
         upcomingNotes.Sort(Note.comparerByStartBeat);
+        upcomingSentences = voice.Sentences.ToList();
 
         avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
@@ -61,6 +65,13 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         base.Update();
         RemoveNotesOutsideOfDisplayArea();
         CreateNotesInDisplayArea();
+
+        sentenceToSeparator.ForEach(entry =>
+        {
+            Sentence sentence = entry.Key;
+            VisualElement separator = entry.Value;
+            UpdateSeparatorPosition(separator, sentence);
+        });
     }
 
     protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
@@ -196,6 +207,47 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             upcomingNotes.Remove(note);
             CreateTargetNoteControl(note);
         }
+
+        // Create sentence separators
+        List<Sentence> newSentences = new List<Sentence>();
+        foreach (Sentence sentence in upcomingSentences)
+        {
+            if (sentenceToSeparator.ContainsKey(sentence))
+            {
+                continue;
+            }
+
+            if (displayAreaMinBeat <= sentence.MinBeat && sentence.ExtendedMaxBeat <= displayAreaMaxBeat)
+            {
+                VisualElement separator = CreateSentenceSeparator(sentence);
+                UpdateSeparatorPosition(separator, sentence);
+                targetNoteEntryContainer.Add(separator);
+                newSentences.Add(sentence);
+            }
+            else if (sentence.ExtendedMaxBeat > displayAreaMaxBeat)
+            {
+                // The upcoming sentence are sorted. Thus, all following sentence will not be inside the drawingArea as well.
+                break;
+            }
+        }
+        newSentences.ForEach(sentence => upcomingSentences.Remove(sentence));
+    }
+
+    private void UpdateSeparatorPosition(VisualElement separator, Sentence sentence)
+    {
+        UpdateNotePosition(separator, 0, sentence.LinebreakBeat, sentence.LinebreakBeat);
+        float marginTopBottomInPercent = 5;
+        separator.style.top = new StyleLength(new Length(marginTopBottomInPercent, LengthUnit.Percent));
+        separator.style.width = 1;
+        separator.style.height = new StyleLength(new Length(90 - marginTopBottomInPercent * 2, LengthUnit.Percent));
+    }
+
+    private VisualElement CreateSentenceSeparator(Sentence sentence)
+    {
+        VisualElement separator = new VisualElement();
+        separator.AddToClassList("scrollingNoteStreamSentenceSeparator");
+        sentenceToSeparator[sentence] = separator;
+        return separator;
     }
 
     private void RemoveNotesOutsideOfDisplayArea()
@@ -220,6 +272,26 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 RemoveRecordedNote(recordedNoteControl);
             }
         }
+
+        List<Sentence> sentencesToBeRemoved = new List<Sentence>();
+        sentenceToSeparator.Keys.ForEach(sentence =>
+        {
+            if (sentence.ExtendedMaxBeat < displayAreaMinBeat)
+            {
+                sentencesToBeRemoved.Add(sentence);
+            }
+        });
+        sentencesToBeRemoved.ForEach(sentence => RemoveSentenceSeparator(sentence));
+    }
+
+    private void RemoveSentenceSeparator(Sentence sentence)
+    {
+        if (!sentenceToSeparator.TryGetValue(sentence, out VisualElement separator))
+        {
+            return;
+        }
+        sentenceToSeparator.Remove(sentence);
+        separator.RemoveFromHierarchy();
     }
 
     private static int CalculateAvgMidiNote(IReadOnlyCollection<Note> notes)

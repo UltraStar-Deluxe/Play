@@ -718,3 +718,9 @@ Label.tinyFont {
 .contextMenu Button:focus {
     background-color: rgba(92, 92, 92, 1);
 }
+
+.scrollingNoteStreamSentenceSeparator {
+    height: 100%;
+    width: 1px;
+    background-color: rgba(92, 92, 92, 0.5);
+}
