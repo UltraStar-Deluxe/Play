@@ -32,6 +32,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerProfile playerProfile;
 
+    [Inject(UxmlName = R.UxmlNames.scoreContainer)]
+    private VisualElement scoreContainer;
+
     [Inject(UxmlName = R.UxmlNames.scoreLabel)]
     private Label scoreLabel;
 
@@ -79,6 +82,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         injector.WithRootVisualElement(playerImage)
             .Inject(avatarImageControl);
 
+        if (micProfile != null)
+        {
+            scoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        }
+
         HideLeadingPlayerIcon();
 
         // Show rating and score after each sentence
@@ -116,6 +124,16 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.Perfect))
             // Create an effect for these.
             .Subscribe(xs => CreatePerfectSentenceEffect());
+
+        ChangeLayoutByPlayerCount();
+    }
+
+    private void ChangeLayoutByPlayerCount()
+    {
+        if (singSceneControl.SceneData.SelectedPlayerProfiles.Count >= 5)
+        {
+            RootVisualElement.AddToClassList("singScenePlayerUiSmall");
+        }
     }
 
     public void Update()
@@ -247,11 +265,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             LeanTween.cancel(singSceneControl.gameObject, leadingPlayerIconAnimationId);
         }
 
-        Vector3 from = Vector3.one * 0.5f;
+        Vector2 from = Vector2.one * 0.5f;
+        Vector2 to = Vector2.one;
         leadingPlayerIcon.style.scale = new StyleScale(new Scale(from));
-        leadingPlayerIconAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector3.one, 0.5f)
+        leadingPlayerIconAnimationId = LeanTween.value(singSceneControl.gameObject, from, to, 0.5f)
             .setEaseSpring()
-            .setOnUpdate(s => leadingPlayerIcon.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
+            .setOnUpdate((Vector2 s) => leadingPlayerIcon.style.scale = new StyleScale(new Scale(s)))
             .id;
     }
 

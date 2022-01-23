@@ -46,9 +46,14 @@ public class LineDisplayer : INeedInjection, IInjectionFinishedListener
         else
         {
             // Wait until geometry has been calculated
-            visualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+            visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
             {
-                CreateDynamicTexture();
+                if (dynamicTexture == null
+                    && visualElement.resolvedStyle.width > 0
+                    && visualElement.resolvedStyle.height > 0)
+                {
+                    CreateDynamicTexture();
+                }
             });
         }
     }

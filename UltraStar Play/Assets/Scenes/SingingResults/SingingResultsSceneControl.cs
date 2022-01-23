@@ -13,7 +13,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
+public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset nPlayerUi;
@@ -52,11 +52,11 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
 
-    public static SingingResultsSceneUiControl Instance
+    public static SingingResultsSceneControl Instance
     {
         get
         {
-            return FindObjectOfType<SingingResultsSceneUiControl>();
+            return FindObjectOfType<SingingResultsSceneControl>();
         }
     }
 
@@ -153,6 +153,10 @@ public class SingingResultsSceneUiControl : MonoBehaviour, INeedInjection, IBind
                 if (rows > 2)
                 {
                     playerUi.AddToClassList("singingResultUiSmaller");
+                }
+                if (rows > 3)
+                {
+                    playerUi.AddToClassList("singingResultUiSmallest");
                 }
                 columnElement.Add(playerUi);
 

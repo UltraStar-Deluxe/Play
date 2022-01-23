@@ -1,13 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="NoteUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteUi.uxml?fileID=9197481963319205126&amp;guid=726e4c425e366bc4781f431b540ceb7f&amp;type=3#NoteUi" />
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
-    <ui:VisualElement name="root" style="padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; flex-grow: 1;">
+    <ui:VisualElement name="root" class="singScenePlayerUi" style="flex-grow: 1;">
         <ui:VisualElement name="column">
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
                 <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: flex-end;">
-                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); width: 48px; height: 48px;" />
+                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;);" />
                     <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" style="margin-left: 10px; margin-right: 10px; -unity-text-align: middle-left; text-shadow: 0 0 2px rgba(64, 64, 64, 0.5); -unity-font-style: bold;" />
-                    <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]leader_crown.png?fileID=2800000&amp;guid=3a770ae44a43b6e4c8f744668b0fb921&amp;type=3#[icon]leader_crown&apos;); width: 32px; height: 32px; margin-left: 10px; margin-right: 10px;" />
+                    <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]leader_crown.png?fileID=2800000&amp;guid=3a770ae44a43b6e4c8f744668b0fb921&amp;type=3#[icon]leader_crown&apos;); margin-left: 10px; margin-right: 10px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                 <ui:VisualElement name="micDisconnectedContainer" style="flex-direction: row; align-items: flex-end; width: auto; height: 100%;">
