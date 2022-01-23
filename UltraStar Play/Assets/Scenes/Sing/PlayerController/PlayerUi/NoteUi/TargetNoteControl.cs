@@ -83,7 +83,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     private void CreateGoldenNoteEffect()
     {
         // Create several particles. Longer notes require more particles because they have more space to fill.
-        int targetStarCount = Mathf.Max(6, (int)VisualElement.contentRect.width / 10);
+        int targetStarCount = Mathf.Max(6, (int)VisualElement.contentRect.width / 5);
         if (starControls.Count < targetStarCount)
         {
             CreateGoldenStar();
@@ -103,7 +103,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         float noteWidth = VisualElement.style.width.value.value;
         float noteHeight = VisualElement.style.height.value.value;
         float xPercent = VisualElement.style.left.value.value + Random.Range(0, noteWidth);
-        float yPercent = VisualElement.style.bottom.value.value + Random.Range(-noteHeight / 2, noteHeight / 2);
+        float yPercent = VisualElement.style.bottom.value.value + Random.Range(-noteHeight * 0.9f, 0);
         Vector2 pos = new Vector2(xPercent, yPercent);
         starControl.SetPosition(pos);
         starControl.Rotation = Random.Range(0, 360);
@@ -111,9 +111,14 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         Vector2 startScale = Vector2.zero;
         starControl.SetScale(startScale);
 
-        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one * Random.Range(0.5f, 1f), Random.Range(1f, 2f))
+        // Animate to full size, stay there a while, then remove.
+        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one * Random.Range(0.25f, 0.5f), Random.Range(0.5f, 1f))
             .setOnUpdate((Vector2 s) => starControl.SetScale(s))
-            .setOnComplete(() => RemoveStarControl(starControl));
+            .setOnComplete(() =>
+            {
+                LeanTween.value(singSceneControl.gameObject, 0, 0, Random.Range(1f, 4f))
+                    .setOnComplete(() => RemoveStarControl(starControl));
+            });
 
         starControls.Add(starControl);
     }
@@ -135,16 +140,26 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
         star.style.marginLeft = -25;
         float xPercent = VisualElement.style.left.value.value + VisualElement.style.width.value.value;
-        float yPercent = VisualElement.style.bottom.value.value;
+        float yPercent = VisualElement.style.bottom.value.value - VisualElement.style.height.value.value / 4f;
         Vector2 pos = new Vector2(xPercent, yPercent);
         starControl.SetPosition(pos);
         starControl.Rotation = Random.Range(0, 360);
 
-        Vector2 startScale = Vector2.one * 0.5f;
+        Vector2 startScale = Vector2.zero;
+        Vector2 endScale = Vector2.one * 0.8f;
         starControl.SetScale(startScale);
-        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one, 0.6f)
+        float animationTime = 1.5f;
+        // Animate to full size, then animate to zero size, then remove.
+        LeanTween.value(singSceneControl.gameObject, startScale, endScale, animationTime / 2f)
+            .setEaseOutSine()
             .setOnUpdate((Vector2 s) => starControl.SetScale(s))
-            .setOnComplete(() => RemoveStarControl(starControl));
+            .setOnComplete(() =>
+            {
+                LeanTween.value(singSceneControl.gameObject, endScale, startScale, animationTime / 2f)
+                    .setEaseOutSine()
+                    .setOnUpdate((Vector2 s) => starControl.SetScale(s))
+                    .setOnComplete(() => RemoveStarControl(starControl));
+            });
 
         starControls.Add(starControl);
     }
