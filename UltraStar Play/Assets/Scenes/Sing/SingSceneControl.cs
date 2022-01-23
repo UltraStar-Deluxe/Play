@@ -68,6 +68,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Settings settings;
 
     [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject]
     private Statistics statistics;
 
     [Inject]
@@ -467,6 +470,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void FinishScene(bool isAfterEndOfSong)
     {
+        if (settings.GameSettings.RatePlayers)
+        {
+            FinishSceneToSingingResults(isAfterEndOfSong);
+        }
+        else
+        {
+            FinishSceneToSongSelect();
+        }
+    }
+
+    private void FinishSceneToSongSelect()
+    {
+        // Open song select without recording scores
+        SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+        songSelectSceneData.SongMeta = SongMeta;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+    }
+
+    public void FinishSceneToSingingResults(bool isAfterEndOfSong)
+    {
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
         singingResultsSceneData.SongMeta = SongMeta;
@@ -492,7 +515,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             UpdateSongFinishedStats();
         }
 
-        SceneNavigator.Instance.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
+        sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
     private void UpdateSongFinishedStats()
