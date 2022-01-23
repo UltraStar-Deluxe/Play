@@ -97,6 +97,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private PlayerControl lastLeadingPlayerControl;
 
+    private VisualElement[] playerUiColumns;
+
     private SingSceneData sceneData;
     public SingSceneData SceneData
     {
@@ -159,36 +161,33 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
             .Subscribe(_ => TogglePlayPause());
 
-        // Prepare Player UI
-        playerUiContainer.Clear();
-        if (SceneData.SelectedPlayerProfiles.Count <= 1)
-        {
-            VisualElement spacer = new VisualElement();
-            spacer.style.flexGrow = 1;
-            playerUiContainer.Add(spacer);
-        }
+        // Prepare player UI layout (depends on player count)
+        PreparePlayerUiLayout();
 
         // Create PlayerControl (and PlayerUi) for each player
         List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
-        foreach (PlayerProfile playerProfile in SceneData.SelectedPlayerProfiles)
+        for (int i = 0; i < SceneData.SelectedPlayerProfiles.Count; i++)
         {
+            PlayerProfile playerProfile = SceneData.SelectedPlayerProfiles[i];
             SceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             if (micProfile == null)
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
-            PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile);
+            PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
 
             if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
             {
                 playerControl.PlayerScoreController.ScoreData = scoreData;
             }
 
-            // Handle crown display
+            // Update leading player icon
             if (SceneData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreController.NoteScoreEventStream.Subscribe(noteScoreEvent => { UpdateLeadingPlayerIcon(); });
-                playerControl.PlayerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent => { UpdateLeadingPlayerIcon(); });
+                playerControl.PlayerScoreController.NoteScoreEventStream
+                    .Subscribe(_ => UpdateLeadingPlayerIcon());
+                playerControl.PlayerScoreController.SentenceScoreEventStream
+                    .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
 
@@ -212,7 +211,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
 
         // Create warning about missing microphones
-        string playerNameCsv = string.Join(",", playerProfilesWithoutMic.Select(it => it.Name).ToList());
+        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
             string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
@@ -248,6 +247,40 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+    }
+
+    private void PreparePlayerUiLayout()
+    {
+        int playerCount = SceneData.SelectedPlayerProfiles.Count;
+        playerUiContainer.Clear();
+        if (playerCount <= 1)
+        {
+            // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
+            VisualElement spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            playerUiContainer.Add(spacer);
+            return;
+        }
+
+        if (playerCount > 3)
+        {
+            // Create row
+            playerUiContainer.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+
+            // Create columns
+            int columnCount = (int)Math.Sqrt(playerCount);
+            playerUiColumns = new VisualElement[columnCount];
+            for (int i = 0; i < columnCount; i++)
+            {
+                VisualElement column = new VisualElement();
+                column.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
+                column.style.flexGrow = 1;
+                column.style.height = new StyleLength(new Length(100, LengthUnit.Percent));
+
+                playerUiContainer.Add(column);
+                playerUiColumns[i] = column;
+            }
+        }
     }
 
     private void InitSingingLyricsControls()
@@ -301,13 +334,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             }
         }
 
-        // // Show crown on best player
+        // // Show icon for best player only
         if (leadingPlayerControl != null
             && lastLeadingPlayerControl != leadingPlayerControl)
         {
             leadingPlayerControl.PlayerUiControl.ShowLeadingPlayerIcon();
         }
-        // Hide crown on other players
         foreach (PlayerControl playerController in PlayerControls)
         {
             if (playerController != leadingPlayerControl)
@@ -469,7 +501,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         statistics.RecordSongFinished(SongMeta, songStatistics);
     }
 
-    private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile)
+    private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile, int playerIndex)
     {
         Voice voice = GetVoice(playerProfile);
 
@@ -484,9 +516,23 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         PlayerControls.Add(playerControl);
 
-        playerUiContainer.Add(playerControl.PlayerUiControl.RootVisualElement);
+        AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 
         return playerControl;
+    }
+
+    private void AddPlayerUi(VisualElement visualElement, int playerIndex)
+    {
+        int playerCount = SceneData.SelectedPlayerProfiles.Count;
+        if (playerCount <= 3)
+        {
+            playerUiContainer.Add(visualElement);
+            return;
+        }
+
+        int columnIndex = (int)((float)playerUiColumns.Length * (float)playerIndex / (float)playerCount);
+        VisualElement column = playerUiColumns[columnIndex];
+        column.Add(visualElement);
     }
 
     private string GetVoiceName(PlayerProfile playerProfile)

@@ -1,9 +1,9 @@
 :root {
     --text-color: white;
-    --font-size: 18px;
     --font-size-xxs: 10px;
     --font-size-xs: 12px;
     --font-size-s: 14px;
+    --font-size: 18px;
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
@@ -523,6 +523,10 @@ Label.tinyFont {
     height: 91%;
 }
 
+.singingResultUiSmallest .scoreRow {
+    border-bottom-width: 0;
+}
+
 #notificationLabel.error {
     color: var(--text-color-error);
 }
@@ -629,7 +633,6 @@ Label.tinyFont {
 
 .currentNoteLyrics {
     color: var(--control-color);
-    /*color: rgba(225, 64, 64, 1);*/
 }
 
 .previousNoteLyrics {
@@ -657,4 +660,38 @@ Label.tinyFont {
 .textOutline {
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(64, 64, 64, 0.75);
+}
+
+#root.singScenePlayerUi {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#root.singScenePlayerUiSmall {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.singScenePlayerUi #playerImage {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #playerImage {
+    display: none;
+}
+
+.singScenePlayerUi #leadingPlayerIcon {
+    flex-shrink: 0;
+    width: var(--font-size-xxl);
+    height: var(--font-size-xxl);
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #leadingPlayerIcon {
+    flex-shrink: 0;
+    width: var(--font-size);
+    height: var(--font-size);
 }
