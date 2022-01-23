@@ -695,3 +695,26 @@ Label.tinyFont {
     width: var(--font-size);
     height: var(--font-size);
 }
+
+.contextMenuSeparator {
+    width: 95%;
+    height: 1px;
+    background-color: rgba(92, 92, 92, 1);
+}
+
+.contextMenu {
+    background-color: rgba(64, 64, 64, 1);
+    padding: 5px;
+}
+
+.contextMenu Button {
+    background-color: rgba(64, 64, 64, 1);
+}
+
+.contextMenu Button:hover {
+    background-color: rgba(92, 92, 92, 1);
+}
+
+.contextMenu Button:focus {
+    background-color: rgba(92, 92, 92, 1);
+}

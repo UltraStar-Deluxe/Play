@@ -6,6 +6,8 @@ public static partial class R
         public const string backgroundImage = "backgroundImage";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
+        public const string contextMenu = "contextMenu";
+        public const string contextMenuSeparator = "contextMenuSeparator";
         public const string controlLabel = "controlLabel";
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
@@ -47,6 +49,7 @@ public static partial class R
         public const string roundCorners = "roundCorners";
         public const string scoreRow = "scoreRow";
         public const string singingLyrics = "singingLyrics";
+        public const string singScenePlayerUi = "singScenePlayerUi";
         public const string smallControl = "smallControl";
         public const string smallerFont = "smallerFont";
         public const string smallFont = "smallFont";

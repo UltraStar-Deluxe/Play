@@ -19,7 +19,7 @@ public class DoubleClickControl
 
     public DoubleClickControl(VisualElement visualElement)
     {
-        visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
+        visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(), TrickleDown.TrickleDown);
     }
 
     private void OnPointerDown()

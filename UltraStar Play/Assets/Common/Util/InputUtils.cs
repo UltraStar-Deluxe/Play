@@ -111,4 +111,17 @@ public static class InputUtils
     {
         return Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
     }
+
+    public static Vector2 GetPointerPositionInPanelCoordinates(PanelHelper panelHelper, bool invertY = false)
+    {
+        Vector2 pointerScreenCoordinates = new Vector2(Pointer.current.position.x.ReadValue(), Pointer.current.position.y.ReadValue());
+        Vector2 pointerPanelCoordinates = panelHelper.ScreenToPanel(pointerScreenCoordinates);
+        if (invertY)
+        {
+            Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+            return new Vector2(pointerPanelCoordinates.x, screenSizePanelCoordinates.y - pointerPanelCoordinates.y);
+        }
+
+        return pointerPanelCoordinates;
+    }
 }

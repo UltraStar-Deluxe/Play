@@ -33,9 +33,6 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
-        
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Skip To Next Lyrics", "Navigate Right"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Pause", "Double Click"));
     }
 
     private void OnBack()
