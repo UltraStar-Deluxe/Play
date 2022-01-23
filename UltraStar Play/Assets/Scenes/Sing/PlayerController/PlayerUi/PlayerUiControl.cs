@@ -90,13 +90,20 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         HideLeadingPlayerIcon();
 
         // Show rating and score after each sentence
-        scoreLabel.text = "";
-        ShowTotalScore(playerScoreController.TotalScore);
-        playerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
+        if (settings.GameSettings.RatePlayers)
         {
+            scoreLabel.text = "";
             ShowTotalScore(playerScoreController.TotalScore);
-            ShowSentenceRating(sentenceScoreEvent.SentenceRating);
-        });
+            playerScoreController.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
+            {
+                ShowTotalScore(playerScoreController.TotalScore);
+                ShowSentenceRating(sentenceScoreEvent.SentenceRating);
+            });
+        }
+        else
+        {
+            scoreContainer.HideByDisplay();
+        }
 
         // Show an effect for perfectly sung notes
         playerScoreController.NoteScoreEventStream.Subscribe(noteScoreEvent =>
@@ -185,6 +192,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ShowSentenceRating(SentenceRating sentenceRating)
     {
+        if (!settings.GameSettings.RatePlayers)
+        {
+            return;
+        }
+
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
         visualElement.Q<Label>().text = sentenceRating.Text;
         visualElement.style.unityBackgroundImageTintColor = sentenceRating.BackgroundColor;
@@ -202,6 +214,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ShowTotalScore(int score)
     {
+        if (!settings.GameSettings.RatePlayers)
+        {
+            return;
+        }
+
         if (totalScoreAnimationId > 0)
         {
             LeanTween.cancel(singSceneControl.gameObject, totalScoreAnimationId);
