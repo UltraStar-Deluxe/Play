@@ -96,7 +96,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
-    public List<AbstractDummySinger> DummySingers { get; private set; } = new List<AbstractDummySinger>();
+    [Inject(SearchMethod = SearchMethods.FindObjectsOfType)]
+    private AbstractDummySinger[] dummySingers;
 
     private PlayerControl lastLeadingPlayerControl;
 
@@ -197,8 +198,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Handle dummy singers
         if (Application.isEditor)
         {
-            DummySingers = FindObjectsOfType<AbstractDummySinger>().ToList();
-            foreach (AbstractDummySinger dummySinger in DummySingers)
+            foreach (AbstractDummySinger dummySinger in dummySingers)
             {
                 if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
                 {
@@ -305,10 +305,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         SingingLyricsControl CreateSingingLyricsControl(VisualElement visualElement, PlayerControl playerController)
         {
-            SingingLyricsControl singingLyricsControl = new SingingLyricsControl();
             Injector lyricsControlInjector = UniInjectUtils.CreateInjector(sceneInjector);
             lyricsControlInjector.AddBindingForInstance(playerController);
-            lyricsControlInjector.WithRootVisualElement(visualElement).Inject(singingLyricsControl);
+            SingingLyricsControl singingLyricsControl = lyricsControlInjector
+                .WithRootVisualElement(visualElement)
+                .CreateAndInject<SingingLyricsControl>();
             return singingLyricsControl;
         }
 

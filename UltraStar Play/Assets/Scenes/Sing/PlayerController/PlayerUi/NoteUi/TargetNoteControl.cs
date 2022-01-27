@@ -96,9 +96,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         star.style.position = new StyleEnum<Position>(Position.Absolute);
         effectsContainer.Add(star);
 
-        StarParticleControl starControl = new StarParticleControl();
+        StarParticleControl starControl = injector
+            .WithRootVisualElement(star)
+            .CreateAndInject<StarParticleControl>();
         starControl.VisualElementToFollow = VisualElement;
-        injector.WithRootVisualElement(star).Inject(starControl);
 
         float noteWidth = VisualElement.style.width.value.value;
         float noteHeight = VisualElement.style.height.value.value;
@@ -134,9 +135,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         star.style.position = new StyleEnum<Position>(Position.Absolute);
         effectsContainer.Add(star);
 
-        StarParticleControl starControl = new StarParticleControl();
+        StarParticleControl starControl = injector
+            .WithRootVisualElement(star)
+            .CreateAndInject<StarParticleControl>();
         starControl.VisualElementToFollow = VisualElement;
-        injector.WithRootVisualElement(star).Inject(starControl);
 
         star.style.marginLeft = -25;
         float xPercent = VisualElement.style.left.value.value + VisualElement.style.width.value.value;

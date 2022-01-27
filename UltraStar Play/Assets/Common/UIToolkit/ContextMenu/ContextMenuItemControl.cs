@@ -13,9 +13,6 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.contextMenuButton)]
     private Button button;
 
-    [Inject]
-    private UIDocument uiDocument;
-
     private readonly string text;
 
     private readonly Action action;

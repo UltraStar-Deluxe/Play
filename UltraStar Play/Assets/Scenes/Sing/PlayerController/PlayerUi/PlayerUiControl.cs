@@ -78,9 +78,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         // Player name and image
         playerNameLabel.text = playerProfile.Name;
-        AvatarImageControl avatarImageControl = new AvatarImageControl();
         injector.WithRootVisualElement(playerImage)
-            .Inject(avatarImageControl);
+            .CreateAndInject<AvatarImageControl>();
 
         if (micProfile != null)
         {
