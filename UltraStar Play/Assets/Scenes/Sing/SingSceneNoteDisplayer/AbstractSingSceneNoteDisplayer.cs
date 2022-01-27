@@ -319,8 +319,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         star.style.position = new StyleEnum<Position>(Position.Absolute);
         effectsContainer.Add(star);
 
-        StarParticleControl starControl = new StarParticleControl();
-        injector.WithRootVisualElement(star).Inject(starControl);
+        StarParticleControl starControl = injector
+            .WithRootVisualElement(star)
+            .CreateAndInject<StarParticleControl>();
 
         float xPercent = UnityEngine.Random.Range(0f, 100f);
         float yPercent = UnityEngine.Random.Range(0f, 100f);

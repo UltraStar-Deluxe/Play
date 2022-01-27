@@ -59,9 +59,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectMicListControl micListControl;
 
     [Inject]
-    private UIDocument uiDocument;
-
-    [Inject]
     private UiManager uiManager;
 
     [Inject]
@@ -172,6 +169,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.videoLegendLabel)]
     private Label videoLegendLabel;
 
+    [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
+    private ItemPicker songOrderItemPicker;
+
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     private SongSelectSceneData sceneData;
@@ -251,10 +251,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         HideMenuOverlay();
         HideSongDetailOverlay();
 
-        ItemPicker songOrderItemPicker = uiDocument.rootVisualElement.Q<ItemPicker>(R.UxmlNames.songOrderPicker);
         SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
-        injector.WithRootVisualElement(songOrderItemPicker)
-            .Inject(SongOrderPickerControl);
 
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());

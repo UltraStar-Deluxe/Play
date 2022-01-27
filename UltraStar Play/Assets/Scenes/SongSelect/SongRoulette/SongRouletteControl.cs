@@ -32,9 +32,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     private SongPreviewControl songPreviewControl;
 
     [Inject]
-    private UIDocument uiDocument;
-
-    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.songEntryContainer)]
