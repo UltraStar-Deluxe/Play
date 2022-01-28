@@ -674,6 +674,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
             TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             inputLegend);
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_restartSong,
+            TranslationManager.GetTranslation(R.Messages.action_restart),
+            inputLegend);
 
         if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {

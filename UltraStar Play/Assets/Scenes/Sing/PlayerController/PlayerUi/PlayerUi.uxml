@@ -6,7 +6,7 @@
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
                 <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: flex-end;">
                     <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;);" />
-                    <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" style="margin-left: 10px; margin-right: 10px; -unity-text-align: middle-left; text-shadow: 0 0 2px rgba(64, 64, 64, 0.5); -unity-font-style: bold;" />
+                    <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" class="textOutline" style="margin-left: 10px; margin-right: 10px; -unity-text-align: middle-left;" />
                     <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]leader_crown.png?fileID=2800000&amp;guid=3a770ae44a43b6e4c8f744668b0fb921&amp;type=3#[icon]leader_crown&apos;); margin-left: 10px; margin-right: 10px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />

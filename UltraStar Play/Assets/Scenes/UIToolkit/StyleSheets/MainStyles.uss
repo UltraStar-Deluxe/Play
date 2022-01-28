@@ -699,28 +699,34 @@ Label.tinyFont {
 .contextMenuSeparator {
     width: 95%;
     height: 1px;
-    background-color: rgba(92, 92, 92, 1);
+    background-color: rgb(92, 92, 92);
 }
 
 .contextMenu {
-    background-color: rgba(64, 64, 64, 1);
+    background-color: rgb(64, 64, 64);
     padding: 5px;
 }
 
 .contextMenu Button {
-    background-color: rgba(64, 64, 64, 1);
+    background-color: rgb(64, 64, 64);
 }
 
 .contextMenu Button:hover {
-    background-color: rgba(92, 92, 92, 1);
+    background-color: rgb(92, 92, 92);
 }
 
 .contextMenu Button:focus {
-    background-color: rgba(92, 92, 92, 1);
+    background-color: rgb(92, 92, 92);
 }
 
 .scrollingNoteStreamSentenceSeparator {
     height: 100%;
     width: 1px;
     background-color: rgba(92, 92, 92, 0.5);
+}
+
+.textOutline {
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }
