@@ -37,10 +37,10 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songTitle)]
     private Label songTitle;
 
-    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    [Inject(UxmlName = R.UxmlNames.songEntryFavoriteIcon)]
     private VisualElement favoriteIcon;
 
-    [Inject(UxmlName = R.UxmlNames.duetIcon)]
+    [Inject(UxmlName = R.UxmlNames.songEntryDuetIcon)]
     private VisualElement duetIcon;
 
     [Inject(UxmlName = R.UxmlNames.songButton)]

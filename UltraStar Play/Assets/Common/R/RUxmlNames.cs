@@ -102,7 +102,6 @@ public static partial class R
         public const string enabledContainer = "enabledContainer";
         public const string enabledLabel = "enabledLabel";
         public const string enabledToggle = "enabledToggle";
-        public const string favoriteIcon = "favoriteIcon";
         public const string filledScoreBar = "filledScoreBar";
         public const string first = "first";
         public const string fpsContainer = "fpsContainer";
@@ -290,6 +289,8 @@ public static partial class R
         public const string songDetailOverlay = "songDetailOverlay";
         public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
         public const string songEntryContainer = "songEntryContainer";
+        public const string songEntryDuetIcon = "songEntryDuetIcon";
+        public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songImage = "songImage";
         public const string songImageInner = "songImageInner";
