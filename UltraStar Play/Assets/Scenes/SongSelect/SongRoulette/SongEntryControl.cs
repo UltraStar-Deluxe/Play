@@ -58,6 +58,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.openSongEditorButton)]
     private Button openSongEditorButton;
 
+    [Inject(UxmlName = R.UxmlNames.reloadSongButton)]
+    private Button reloadSongButton;
+
     [Inject(UxmlName = R.UxmlNames.openSongFolderButton)]
     private Button openSongFolderButton;
 
@@ -279,10 +282,16 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
+            reloadSongButton.RegisterCallbackButtonTriggered(() =>
+            {
+                SongMeta.Reload();
+                HideSongMenuOverlay();
+            });
         }
         else
         {
             openSongFolderButton.HideByDisplay();
+            reloadSongButton.HideByDisplay();
         }
 
         playlistManager.PlaylistChangeEventStream
