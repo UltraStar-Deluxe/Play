@@ -96,9 +96,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
-    [Inject(SearchMethod = SearchMethods.FindObjectsOfType)]
-    private AbstractDummySinger[] dummySingers;
-
     private PlayerControl lastLeadingPlayerControl;
 
     private VisualElement[] playerUiColumns;
@@ -198,19 +195,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Handle dummy singers
         if (Application.isEditor)
         {
-            foreach (AbstractDummySinger dummySinger in dummySingers)
-            {
-                if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
-                {
-                    dummySinger.SetPlayerControl(PlayerControls[dummySinger.playerIndexToSimulate]);
-                    sceneInjector.Inject(dummySinger);
-                }
-                else
-                {
-                    Debug.LogWarning("DummySinger cannot simulate player with index " + dummySinger.playerIndexToSimulate);
-                    dummySinger.gameObject.SetActive(false);
-                }
-            }
+            InitDummySingers();
         }
 
         // Create warning about missing microphones
@@ -252,6 +237,25 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Register ContextMenu
         SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(doubleClickToTogglePauseElement, gameObject);
         sceneInjector.Inject(singSceneContextMenuControl);
+    }
+
+    private void InitDummySingers()
+    {
+        bool includeInactive = false;
+        AbstractDummySinger[] findObjectsOfType = FindObjectsOfType<AbstractDummySinger>(includeInactive);
+        foreach (AbstractDummySinger dummySinger in findObjectsOfType)
+        {
+            if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
+            {
+                dummySinger.SetPlayerControl(PlayerControls[dummySinger.playerIndexToSimulate]);
+                sceneInjector.Inject(dummySinger);
+            }
+            else
+            {
+                Debug.LogWarning("DummySinger cannot simulate player with index " + dummySinger.playerIndexToSimulate);
+                dummySinger.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void PreparePlayerUiLayout()

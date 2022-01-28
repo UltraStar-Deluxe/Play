@@ -22,6 +22,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
 
+    [Inject(UxmlName = R.UxmlNames.targetNote)]
+    private VisualElement targetNote;
+
     [Inject(UxmlName = R.UxmlNames.recordedNote)]
     private VisualElement recordedNote;
 
@@ -48,6 +51,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
+        targetNote.ShowByDisplay();
         recordedNote.HideByDisplay();
 
         SetStyleByMicProfile();
@@ -77,7 +81,12 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
             ? color.WithAlpha(0.3f)
             : color;
 
-        image.style.unityBackgroundImageTintColor = new StyleColor(finalColor);
+
+        image.style.unityBackgroundImageTintColor = finalColor;
+        image.style.backgroundColor = new Color(130f / 255f, 168 / 255f, 179 / 255f).RgbToHsv()
+            // Red is hue
+            .WithRed(finalColor.RgbToHsv().r)
+            .HsvToRgb();
     }
 
     private void CreateGoldenNoteEffect()
