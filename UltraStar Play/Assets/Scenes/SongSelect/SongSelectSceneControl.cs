@@ -26,10 +26,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     }
 
     [InjectedInInspector]
-    public Sprite favoriteSprite;
+    public VectorImage favoriteImageAsset;
 
     [InjectedInInspector]
-    public Sprite noFavoriteSprite;
+    public VectorImage noFavoriteImageAsset;
 
     [InjectedInInspector]
     public SongSelectSceneInputControl songSelectSceneInputControl;
@@ -357,10 +357,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateFavoriteIcon()
     {
-        Sprite sprite = IsFavorite(SelectedSong)
-            ? favoriteSprite
-            : noFavoriteSprite;
-        favoriteIcon.style.backgroundImage = new StyleBackground(sprite);
+        VectorImage vectorImage = IsFavorite(SelectedSong)
+            ? favoriteImageAsset
+            : noFavoriteImageAsset;
+        favoriteIcon.style.backgroundImage = new StyleBackground(vectorImage);
     }
 
     public void InitSongMetas()
