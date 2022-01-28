@@ -402,8 +402,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         PlayerControls.ForEach(playerControl =>
         {
-            playerControl.SetCurrentBeat(CurrentBeat);
-            playerControl.Update();
+            if (songAudioPlayer.IsPlaying)
+            {
+                playerControl.SetCurrentBeat(CurrentBeat);
+                playerControl.UpdateUi();
+            }
         });
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);

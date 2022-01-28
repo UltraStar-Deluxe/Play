@@ -80,7 +80,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         SetDisplaySentenceIndex(0);
     }
 
-    public void Update()
+    public void UpdateUi()
     {
         PlayerUiControl.Update();
     }
