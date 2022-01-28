@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
 
 // Handles loading and caching of images.
 public static class ImageManager
@@ -129,6 +130,23 @@ public static class ImageManager
             }
         }
 
+        // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
+        UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
+        if (uiDocument != null)
+        {
+            uiDocument.rootVisualElement
+                .Query<VisualElement>()
+                .ForEach(visualElement =>
+                {
+                    if (visualElement.style.backgroundImage != null
+                        && visualElement.style.backgroundImage.value != null
+                        && visualElement.style.backgroundImage.value.sprite != null)
+                    {
+                        usedSprites.Add(visualElement.style.backgroundImage.value.sprite);
+                    }
+                });
+        }
+
         // Remove sprites from the cache that have not been marked as still in use.
         foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
         {
@@ -142,7 +160,7 @@ public static class ImageManager
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
     {
         spriteCache.Remove(cachedSprite.Source);
-        // Destoying the texture is important to free the memory.
+        // Destroying the texture is important to free the memory.
         if (cachedSprite.Sprite != null)
         {
             if (cachedSprite.Sprite.texture != null)
