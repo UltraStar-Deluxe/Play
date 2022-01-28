@@ -57,8 +57,10 @@ public static partial class R
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
         public const string contextMenuItem = "contextMenuItem";
+        public const string ContextMenuItemUi = "ContextMenuItemUi";
         public const string contextMenuLabel = "contextMenuLabel";
         public const string contextMenuSeparator = "contextMenuSeparator";
+        public const string ContextMenuSeparatorUi = "ContextMenuSeparatorUi";
         public const string continueButton = "continueButton";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string currentSentenceContainer = "currentSentenceContainer";
@@ -117,6 +119,7 @@ public static partial class R
         public const string HighscoreEntry = "HighscoreEntry";
         public const string httpServerPortLabel = "httpServerPortLabel";
         public const string icon = "icon";
+        public const string iconBar = "iconBar";
         public const string iconContainer = "iconContainer";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
@@ -243,6 +246,7 @@ public static partial class R
         public const string recordedNoteImage = "recordedNoteImage";
         public const string recordedNoteLabel = "recordedNoteLabel";
         public const string recordingOptionsButton = "recordingOptionsButton";
+        public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
         public const string resolutionContainer = "resolutionContainer";
         public const string rightLyricsOverlay = "rightLyricsOverlay";
