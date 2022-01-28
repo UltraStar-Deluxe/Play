@@ -10,10 +10,13 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     public VisualElement VisualElement { get; private set; }
 
     [Inject(UxmlName = R.UxmlNames.targetNote)]
-    private VisualElement targetNote;
+    private VisualElement targetNoteVisualElement;
+
+    [Inject(UxmlName = R.UxmlNames.recordedNote)]
+    private VisualElement recordedNoteVisualElement;
 
     [Inject(UxmlName = R.UxmlNames.recordedNoteImage)]
-    private VisualElement backgroundImage;
+    private VisualElement image;
 
     [Inject(UxmlName = R.UxmlNames.recordedNoteLabel)]
     public Label Label { get; private set; }
@@ -36,7 +39,8 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        targetNote.HideByDisplay();
+        targetNoteVisualElement.HideByDisplay();
+        recordedNoteVisualElement.ShowByDisplay();
 
         if (micProfile != null)
         {
@@ -56,7 +60,7 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
         Color finalColor = (RecordedNote != null && RecordedNote.TargetNote == null)
             ? color.RgbToHsv().WithGreen(0).HsvToRgb().WithAlpha(0.25f)
             : color;
-        backgroundImage.style.unityBackgroundImageTintColor = finalColor;
+        image.style.unityBackgroundImageTintColor = finalColor;
     }
 
     public void Dispose()
