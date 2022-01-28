@@ -12,8 +12,8 @@
             <ui:VisualElement name="titleRow" style="flex-direction: row; justify-content: space-between; align-items: center;" />
         </ui:VisualElement>
         <ui:VisualElement name="iconBar" style="position: absolute; flex-shrink: 0; display: flex; right: 5px; top: 5px; align-items: center;">
-            <ui:VisualElement name="favoriteIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
-            <ui:VisualElement name="duetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=21300000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="songEntryFavoriteIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="songEntryDuetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=21300000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
         </ui:VisualElement>
         <ui:Button display-tooltip-when-elided="true" name="songButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
         <ui:VisualElement name="songMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
