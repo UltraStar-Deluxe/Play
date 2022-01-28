@@ -40,6 +40,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
     private VisualElement favoriteIcon;
 
+    [Inject(UxmlName = R.UxmlNames.duetIcon)]
+    private VisualElement duetIcon;
+
     [Inject(UxmlName = R.UxmlNames.songButton)]
     private Button songButton;
 
@@ -88,7 +91,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songMeta = value;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
-            UpdateFavoriteIcon();
+            UpdateIcons();
             UpdateCover(songMeta);
         }
     }
@@ -283,7 +286,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         }
 
         playlistManager.PlaylistChangeEventStream
-            .Subscribe(evt => UpdateFavoriteIcon());
+            .Subscribe(evt => UpdateIcons());
 
         // // Add itself as IDragListener to be notified when its RectTransform is dragged.
         dragControl = new GeneralDragControl(songButton, songRouletteControl.gameObject);
@@ -398,9 +401,10 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         songOverlayMenu.HideByDisplay();
     }
 
-    private void UpdateFavoriteIcon()
+    private void UpdateIcons()
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
+        duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
     }
 
     public void FocusSongButton()
