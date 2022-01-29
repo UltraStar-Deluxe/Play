@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UniInject;
 using UniRx;
@@ -150,7 +149,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         label.style.bottom = new StyleLength(StyleKeyword.Auto);
     }
 
-    private double GetNoteStartBeatOfFollowingNote(Note note)
+    private static double GetNoteStartBeatOfFollowingNote(Note note)
     {
         Sentence sentence = note.Sentence;
         if (sentence == null)

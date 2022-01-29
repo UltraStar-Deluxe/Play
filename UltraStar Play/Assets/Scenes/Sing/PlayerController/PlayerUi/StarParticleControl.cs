@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class StarParticleControl : INeedInjection, IInjectionFinishedListener
+public class StarParticleControl : INeedInjection
 {
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -35,11 +35,6 @@ public class StarParticleControl : INeedInjection, IInjectionFinishedListener
             rotation = value;
             VisualElement.style.rotate = new StyleRotate(new Rotate(rotation));
         }
-    }
-
-    public void OnInjectionFinished()
-    {
-
     }
 
     public void Update()
