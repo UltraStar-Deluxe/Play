@@ -369,7 +369,9 @@ public static partial class R
         public const string volumeChooser = "volumeChooser";
         public const string volumeContainer = "volumeContainer";
         public const string volumeLabel = "volumeLabel";
+        public const string warningContainer = "warningContainer";
         public const string warningIcon = "warningIcon";
+        public const string warningLabel = "warningLabel";
         public const string yearLabel = "yearLabel";
         public const string yearPropertyContainer = "yearPropertyContainer";
     }
