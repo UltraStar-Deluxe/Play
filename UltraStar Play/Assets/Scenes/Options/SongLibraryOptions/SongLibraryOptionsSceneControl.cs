@@ -7,7 +7,6 @@ using UniRx;
 #if UNITY_ANDROID
     using UnityEngine.Android;
 #endif
-using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 using Application = UnityEngine.Application;
 
@@ -52,6 +51,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         {
             settings.GameSettings.songDirs.Add("./Songs");
             UpdateSongFolderList();
+
+            RequestExternalStoragePermissionIfNeeded();
         });
 
         downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
@@ -61,6 +62,18 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+    }
+
+    private static void RequestExternalStoragePermissionIfNeeded()
+    {
+#if UNITY_ANDROID || UNITY_IOS
+        if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead))
+        {
+            Permission.RequestUserPermission(Permission.ExternalStorageRead);
+        }
+#else
+        // Nothing to do
+#endif
     }
 
     public void UpdateTranslation()
