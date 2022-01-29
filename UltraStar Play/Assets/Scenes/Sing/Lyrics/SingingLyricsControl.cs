@@ -35,7 +35,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private SongMeta songMeta;
 
     private Sentence previousSentence;
-    private Dictionary<Note, Label> currentSentenceNoteToLabelMap = new Dictionary<Note, Label>();
+    private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new Dictionary<Note, Label>();
 
     public void OnInjectionFinished()
     {
@@ -222,7 +222,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             case ENoteType.Rap:
             case ENoteType.RapGolden:
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 }
