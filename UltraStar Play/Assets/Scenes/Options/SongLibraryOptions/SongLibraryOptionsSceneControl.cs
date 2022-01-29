@@ -4,9 +4,11 @@ using ProTrans;
 using UnityEngine;
 using UniInject;
 using UniRx;
+#if UNITY_ANDROID
+    using UnityEngine.Android;
+#endif
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
-using UnityEngine.WSA;
 using Application = UnityEngine.Application;
 
 // Disable warning about fields that are never assigned, their values are injected.
