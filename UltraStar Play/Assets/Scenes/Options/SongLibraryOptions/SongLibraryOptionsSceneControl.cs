@@ -1,3 +1,4 @@
+using System.IO;
 using PrimeInputActions;
 using ProTrans;
 using UnityEngine;
@@ -5,6 +6,8 @@ using UniInject;
 using UniRx;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
+using UnityEngine.WSA;
+using Application = UnityEngine.Application;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -84,6 +87,27 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     {
         VisualElement result = songFolderListEntryAsset.CloneTree();
         TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
+        VisualElement warningContainer = result.Q<VisualElement>(R.UxmlNames.warningContainer);
+        Label warningLabel = warningContainer.Q<Label>(R.UxmlNames.warningLabel);
+
+        void CheckFolderExists(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                warningContainer.HideByDisplay();
+            }
+            else if (File.Exists(path))
+            {
+                warningContainer.ShowByDisplay();
+                warningLabel.text = "Not a folder.";
+            }
+            else
+            {
+                warningContainer.ShowByDisplay();
+                warningLabel.text = "File does not exist.";
+            }
+        }
+        CheckFolderExists(songDir);
 
         // Workaround for escaped characters
         // (https://forum.unity.com/threads/preventing-escaped-characters-in-textfield.1071425/)
@@ -93,7 +117,10 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             string newValueEscaped = evt.newValue
                 .Replace("\\", backslashReplacement);
             string newValueUnescaped = newValueEscaped.Replace(backslashReplacement, "\\");
+
             settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
+            CheckFolderExists(newValueUnescaped);
+
             textField.SetValueWithoutNotify(newValueEscaped);
         });
 
