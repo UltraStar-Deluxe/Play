@@ -3,11 +3,12 @@ using UnityEngine;
 using UniInject;
 using UnityEngine.Video;
 using System.IO;
+using ProTrans;
 using UniRx;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 
-public class SongVideoPlayer : MonoBehaviour
+public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
@@ -18,6 +19,7 @@ public class SongVideoPlayer : MonoBehaviour
     [InjectedInInspector]
     public Image videoImage;
 
+    [Inject(UxmlName = R.UxmlNames.songVideoImage, Optional = true)]
     private VisualElement videoImageVisualElement;
     public VisualElement VideoImageVisualElement
     {
@@ -36,6 +38,7 @@ public class SongVideoPlayer : MonoBehaviour
         }
     }
 
+    [Inject(UxmlName = R.UxmlNames.songImage, Optional = true)]
     private VisualElement backgroundImageVisualElement;
     public VisualElement BackgroundImageVisualElement
     {
@@ -59,9 +62,23 @@ public class SongVideoPlayer : MonoBehaviour
 
     // Optional SongAudioPlayer.
     // If set, then the video playback is synchronized with the position in the SongAudioPlayer.
-    public SongAudioPlayer SongAudioPlayer { get; set; }
+    [Inject]
+    public SongAudioPlayer SongAudioPlayer { get; private set; }
 
-    private SongMeta SongMeta { get; set; }
+    private SongMeta songMeta;
+    public SongMeta SongMeta
+    {
+        get
+        {
+            return songMeta;
+        }
+
+        set
+        {
+            songMeta = value;
+            InitVideo(songMeta);
+        }
+    }
 
     public bool HasLoadedVideo { get; private set; }
     public bool HasLoadedBackgroundImage { get; private set; }
@@ -76,13 +93,11 @@ public class SongVideoPlayer : MonoBehaviour
 
     public string videoPlayerErrorMessage;
 
-    public void Init(SongMeta songMeta, SongAudioPlayer songAudioPlayer)
+    public void OnInjectionFinished()
     {
-        this.SongMeta = songMeta;
-        this.SongAudioPlayer = songAudioPlayer;
         HasLoadedBackgroundImage = false;
         InitEventSubscriber();
-        InitVideo(songMeta);
+        InitVideo(SongMeta);
     }
 
     private void InitEventSubscriber()
@@ -332,6 +347,11 @@ public class SongVideoPlayer : MonoBehaviour
     private void InitVideo(SongMeta songMeta)
     {
         UnloadVideo();
+
+        if (songMeta == null)
+        {
+            return;
+        }
 
         videoPath = "";
         if (!string.IsNullOrEmpty(songMeta.Video))

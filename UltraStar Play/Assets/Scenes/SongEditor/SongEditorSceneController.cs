@@ -130,7 +130,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
 
         songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.Init(SongMeta, songAudioPlayer);
+        songVideoPlayer.SongMeta = SongMeta;
 
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
     }
@@ -267,8 +267,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateWarningDialog("File operation failed",
-                "Saving the file failed: " + e.Message);
+            UiManager.Instance.CreateNotification("Saving the file failed:\n" + e.Message);
             return;
         }
 
@@ -289,8 +288,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateWarningDialog("File operation failed",
-                "Creating a copy of the original file failed: " + e.Message);
+            UiManager.Instance.CreateNotification("Creating a copy of the original file failed:\n" + e.Message);
             return;
         }
 

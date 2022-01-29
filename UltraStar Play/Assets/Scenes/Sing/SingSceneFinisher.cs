@@ -13,18 +13,18 @@ public class SingSceneFinisher : MonoBehaviour
     private bool isSongFinished;
     private float durationAfterSongFinishedInSeconds;
 
-    private SingSceneController singSceneController;
+    private SingSceneControl singSceneControl;
 
     private double positionInSongInMillisOld;
 
     void Awake()
     {
-        singSceneController = FindObjectOfType<SingSceneController>();
+        singSceneControl = FindObjectOfType<SingSceneControl>();
     }
 
     void Update()
     {
-        double durationOfSongInMillis = singSceneController.DurationOfSongInMillis;
+        double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
         if (durationOfSongInMillis <= 0)
         {
             return;
@@ -35,12 +35,12 @@ public class SingSceneFinisher : MonoBehaviour
             durationAfterSongFinishedInSeconds += Time.deltaTime;
             if (durationAfterSongFinishedInSeconds >= 1)
             {
-                singSceneController.FinishScene(true);
+                singSceneControl.FinishScene(true);
             }
         }
         else
         {
-            double positionInSongInMillis = singSceneController.PositionInSongInMillis;
+            double positionInSongInMillis = singSceneControl.PositionInSongInMillis;
 
             // Normal detection of song finished.
             // This only works when the position is not reset to zero when the AudioClip finishes.

@@ -4,14 +4,18 @@ public class ChangingOffsetSinger : AbstractDummySinger
 {
     public int maxOffset = 5;
     private int noteOffset;
-    Note lastNote;
+    private Note lastNote;
 
-    protected override PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat)
+    protected override PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat)
     {
         // Change noteOffset when note changes.
         if (lastNote != null && noteAtBeat != lastNote)
         {
-            noteOffset = (noteOffset + 1) % maxOffset;
+            noteOffset = noteOffset + 1;
+            if (noteOffset > maxOffset)
+            {
+                noteOffset = 0;
+            }
         }
 
         PitchEvent pitchEvent = null;

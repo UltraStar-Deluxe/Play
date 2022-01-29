@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="noteUiRoot" style="width: 100%; height: 100%;">
+        <ui:VisualElement name="targetNote" style="position: absolute; width: 100%; height: 100%; overflow: hidden; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
+            <ui:VisualElement name="targetNoteImage" style="background-image: none; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: rgb(126, 167, 179);">
+                <ui:Label text="A#3" display-tooltip-when-elided="true" name="targetNoteLabel" class="smallFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="recordedNote" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: flex; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; overflow: hidden;">
+            <ui:VisualElement name="recordedNoteImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/Notes/NoteFancy.png?fileID=21300000&amp;guid=fedd6afaca480cd4d8bce5bb1650b7c0&amp;type=3#NoteFancy&apos;); align-items: center; justify-content: center; width: 100%; height: 100%;">
+                <ui:Label text="A#3" display-tooltip-when-elided="true" name="recordedNoteLabel" class="smallFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

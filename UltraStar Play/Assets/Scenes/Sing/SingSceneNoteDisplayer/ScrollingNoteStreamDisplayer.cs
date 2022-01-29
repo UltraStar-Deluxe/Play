@@ -3,20 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 {
-    [InjectedInInspector]
-    public RectTransform lyricsBar;
-
-    public float pitchIndicatorAnchorX = 0.15f;
-    public float displayedNoteDurationInSeconds = 5;
+    private const float PitchIndicatorXPercent = 0.15f;
+    private const float DisplayedNoteDurationInSeconds = 5;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -24,101 +21,135 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private Voice voice;
 
+    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
+    private VisualElement lyricsContainer;
+
     private List<Note> upcomingNotes = new List<Note>();
+    private List<Sentence> upcomingSentences = new List<Sentence>();
 
     private int micDelayInMillis;
     private int displayedBeats;
 
     private int frameCount;
 
-    private void Update()
-    {
-        // For some reason, Unity seems to need some frames to finish the calculation of the lyricsBar position.
-        // In the first frame, the lyrics positions are wrong. Thus, as a workaround, delay the Update code by one frame.
-        if (frameCount > 2)
-        {
-            RemoveNotesOutsideOfDisplayArea();
-            CreateNotesInDisplayArea();
+    private readonly Dictionary<Note, Label> noteToLyricsContainerLabel = new Dictionary<Note, Label>();
 
-            UpdateUiNotePositions();
-        }
-        else
-        {
-            frameCount++;
-        }
-    }
+    private readonly Dictionary<Sentence, VisualElement> sentenceToSeparator = new Dictionary<Sentence, VisualElement>();
 
-    override public void Init(int lineCount)
+    public override void OnInjectionFinished()
     {
+        base.OnInjectionFinished();
+
         if (micProfile != null)
         {
             micDelayInMillis = micProfile.DelayInMillis;
+            effectsContainer.Add(CreateRecordingPositionIndicator());
         }
-        base.Init(lineCount);
 
         upcomingNotes = voice.Sentences
             .SelectMany(sentence => sentence.Notes)
             .ToList();
         upcomingNotes.Sort(Note.comparerByStartBeat);
+        upcomingSentences = voice.Sentences.ToList();
 
         avgMidiNote = CalculateAvgMidiNote(voice.Sentences.SelectMany(sentence => sentence.Notes).ToList());
         maxNoteRowMidiNote = avgMidiNote + (noteRowCount / 2);
         minNoteRowMidiNote = avgMidiNote - (noteRowCount / 2);
 
-        displayedBeats = (int)Math.Ceiling(BpmUtils.GetBeatsPerSecond(songMeta) * displayedNoteDurationInSeconds);
+        displayedBeats = (int)Math.Ceiling(BpmUtils.GetBeatsPerSecond(songMeta) * DisplayedNoteDurationInSeconds);
     }
 
-    override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
+    public override void Update()
+    {
+        base.Update();
+        RemoveNotesOutsideOfDisplayArea();
+        CreateNotesInDisplayArea();
+
+        sentenceToSeparator.ForEach(entry =>
+        {
+            Sentence sentence = entry.Key;
+            VisualElement separator = entry.Value;
+            UpdateSeparatorPosition(separator, sentence);
+        });
+    }
+
+    protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
+    {
+        base.UpdateTargetNoteControl(targetNoteControl);
+        UpdateNotePosition(targetNoteControl.VisualElement, targetNoteControl.Note.MidiNote, targetNoteControl.Note.StartBeat, targetNoteControl.Note.EndBeat);
+
+        UpdateNoteLyricsPosition(targetNoteControl);
+    }
+
+    protected override void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
+    {
+        base.UpdateRecordedNoteControl(recordedNoteControl);
+
+        if (recordedNoteControl.EndBeat >= recordedNoteControl.TargetEndBeat)
+        {
+            // The other case (EndBeat < TargetEndBeat) is handled in the base method.
+            UpdateNotePosition(recordedNoteControl.VisualElement, recordedNoteControl.MidiNote, recordedNoteControl.StartBeat, recordedNoteControl.EndBeat);
+        }
+    }
+
+    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         // The VerticalPitchIndicator's position is the position where recording happens.
         // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
         double millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
         double currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
 
-        Vector2 anchorY = GetAnchorYForMidiNote(midiNote);
-        float anchorXStart = (float)((noteStartBeat - currentBeatConsideringMicDelay) / displayedBeats) + pitchIndicatorAnchorX;
-        float anchorXEnd = (float)((noteEndBeat - currentBeatConsideringMicDelay) / displayedBeats) + pitchIndicatorAnchorX;
+        Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);
+        float yStartPercent = yStartEndPercent.x;
+        float yEndPercent = yStartEndPercent.y;
+        float xStartPercent = (float)((noteStartBeat - currentBeatConsideringMicDelay) / displayedBeats) + PitchIndicatorXPercent;
+        float xEndPercent = (float)((noteEndBeat - currentBeatConsideringMicDelay) / displayedBeats) + PitchIndicatorXPercent;
 
-        uiNote.anchorMin = new Vector2(anchorXStart, anchorY.x);
-        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY.y);
-        uiNote.MoveCornersToAnchors();
+        yStartPercent *= 100;
+        yEndPercent *= 100;
+        xStartPercent *= 100;
+        xEndPercent *= 100;
+
+        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
+        visualElement.style.left = new StyleLength(new Length(xStartPercent, LengthUnit.Percent));
+        visualElement.style.width = new StyleLength(new Length(xEndPercent - xStartPercent, LengthUnit.Percent));
+        visualElement.style.bottom = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(yEndPercent - yStartPercent, LengthUnit.Percent));
     }
 
-    override protected UiNote CreateUiNote(Note note)
+    protected override TargetNoteControl CreateTargetNoteControl(Note note)
     {
-        UiNote uiNote = base.CreateUiNote(note);
-        if (uiNote != null)
+        TargetNoteControl targetNoteControl = base.CreateTargetNoteControl(note);
+        if (targetNoteControl == null)
         {
-            // Freestyle notes are not drawn
-            if (uiNote.Note.IsFreestyle)
-            {
-                uiNote.image.enabled = false;
-            }
-
-            PositionUiNoteLyrics(uiNote);
+            return null;
         }
-        return uiNote;
+
+        // Create label for dedicated lyrics bar
+        Label label = new Label(targetNoteControl.Note.Text.Trim());
+        targetNoteControl.Label.GetClasses().ForEach(className => label.AddToClassList(className));
+        lyricsContainer.Add(label);
+        noteToLyricsContainerLabel[targetNoteControl.Note] = label;
+
+        UpdateNoteLyricsPosition(targetNoteControl);
+        return targetNoteControl;
     }
 
-    private void PositionUiNoteLyrics(UiNote uiNote)
+    private void UpdateNoteLyricsPosition(TargetNoteControl targetNoteControl)
     {
         // Position lyrics. Width until next note, vertically centered on lyricsBar.
-        uiNote.lyricsUiText.enabled = true;
-        uiNote.lyricsUiText.color = Color.white;
-        uiNote.lyricsUiText.alignment = TextAnchor.MiddleLeft;
+        if (!noteToLyricsContainerLabel.TryGetValue(targetNoteControl.Note, out Label label))
+        {
+            return;
+        }
 
-        RectTransform lyricsRectTransform = uiNote.lyricsUiTextRectTransform;
-        lyricsRectTransform.SetParent(uiNote.transform.parent, true);
-        PositionUiNote(lyricsRectTransform, 60, uiNote.Note.StartBeat, GetNoteStartBeatOfFollowingNote(uiNote.Note));
-        lyricsRectTransform.SetParent(lyricsBar, true);
-        lyricsRectTransform.anchorMin = new Vector2(lyricsRectTransform.anchorMin.x, 0);
-        lyricsRectTransform.anchorMax = new Vector2(lyricsRectTransform.anchorMax.x, 1);
-        lyricsRectTransform.sizeDelta = new Vector2(lyricsRectTransform.sizeDelta.x, 0);
-        lyricsRectTransform.localPosition = new Vector2(lyricsRectTransform.localPosition.x, 0);
-        uiNote.lyricsUiText.transform.SetParent(lyricsBar, true);
+        UpdateNotePosition(label, 60, targetNoteControl.Note.StartBeat, GetNoteStartBeatOfFollowingNote(targetNoteControl.Note));
+        label.style.position = new StyleEnum<Position>(Position.Absolute);
+        label.style.top = 5;
+        label.style.bottom = new StyleLength(StyleKeyword.Auto);
     }
 
-    private double GetNoteStartBeatOfFollowingNote(Note note)
+    private static double GetNoteStartBeatOfFollowingNote(Note note)
     {
         Sentence sentence = note.Sentence;
         if (sentence == null)
@@ -148,28 +179,6 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    private void UpdateUiNotePositions()
-    {
-        foreach (UiNote uiNote in noteToUiNoteMap.Values)
-        {
-            Vector3 lastPosition = uiNote.RectTransform.position;
-            PositionUiNote(uiNote.RectTransform, uiNote.Note.MidiNote, uiNote.Note.StartBeat, uiNote.Note.EndBeat);
-            Vector3 positionDelta = uiNote.RectTransform.position - lastPosition;
-            uiNote.lyricsUiTextRectTransform.Translate(positionDelta);
-        }
-
-        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
-        {
-            // Draw the UiRecordedNotes smoothly from their StartBeat to TargetEndBeat
-            if (uiRecordedNote.EndBeat < uiRecordedNote.TargetEndBeat)
-            {
-                UpdateUiRecordedNoteEndBeat(uiRecordedNote);
-            }
-
-            PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, uiRecordedNote.StartBeat, uiRecordedNote.EndBeat);
-        }
-    }
-
     private void CreateNotesInDisplayArea()
     {
         // Create UiNotes to fill the display area
@@ -195,30 +204,96 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         {
             // The note is not upcoming anymore
             upcomingNotes.Remove(note);
-            CreateUiNote(note);
+            CreateTargetNoteControl(note);
         }
+
+        // Create sentence separators
+        List<Sentence> newSentences = new List<Sentence>();
+        foreach (Sentence sentence in upcomingSentences)
+        {
+            if (sentenceToSeparator.ContainsKey(sentence))
+            {
+                continue;
+            }
+
+            if (displayAreaMinBeat <= sentence.MinBeat && sentence.ExtendedMaxBeat <= displayAreaMaxBeat)
+            {
+                VisualElement separator = CreateSentenceSeparator(sentence);
+                UpdateSeparatorPosition(separator, sentence);
+                targetNoteEntryContainer.Add(separator);
+                newSentences.Add(sentence);
+            }
+            else if (sentence.ExtendedMaxBeat > displayAreaMaxBeat)
+            {
+                // The upcoming sentence are sorted. Thus, all following sentence will not be inside the drawingArea as well.
+                break;
+            }
+        }
+        newSentences.ForEach(sentence => upcomingSentences.Remove(sentence));
+    }
+
+    private void UpdateSeparatorPosition(VisualElement separator, Sentence sentence)
+    {
+        UpdateNotePosition(separator, 0, sentence.LinebreakBeat, sentence.LinebreakBeat);
+        float marginTopBottomInPercent = 5;
+        separator.style.top = new StyleLength(new Length(marginTopBottomInPercent, LengthUnit.Percent));
+        separator.style.width = 1;
+        separator.style.height = new StyleLength(new Length(90 - marginTopBottomInPercent * 2, LengthUnit.Percent));
+    }
+
+    private VisualElement CreateSentenceSeparator(Sentence sentence)
+    {
+        VisualElement separator = new VisualElement();
+        separator.AddToClassList("scrollingNoteStreamSentenceSeparator");
+        sentenceToSeparator[sentence] = separator;
+        return separator;
     }
 
     private void RemoveNotesOutsideOfDisplayArea()
     {
         int displayAreaMinBeat = CalculateDisplayAreaMinBeat();
-        foreach (UiNote uiNote in noteToUiNoteMap.Values.ToList())
+        foreach (TargetNoteControl targetNoteControl in noteToTargetNoteControl.Values.ToList())
         {
-            if (uiNote.Note.EndBeat < displayAreaMinBeat)
+            if (targetNoteControl.Note.EndBeat < displayAreaMinBeat)
             {
-                RemoveUiNote(uiNote);
+                RemoveTargetNote(targetNoteControl);
             }
         }
-        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes.ToList())
+
+        List<RecordedNoteControl> recordedNoteControls =
+            recordedNoteToRecordedNoteControlsMap
+                .SelectMany(entry => entry.Value)
+                .ToList();
+        foreach (RecordedNoteControl recordedNoteControl in recordedNoteControls)
         {
-            if (uiRecordedNote.EndBeat < displayAreaMinBeat)
+            if (recordedNoteControl.EndBeat < displayAreaMinBeat)
             {
-                RemoveUiRecordedNote(uiRecordedNote);
+                RemoveRecordedNote(recordedNoteControl);
             }
         }
+
+        List<Sentence> sentencesToBeRemoved = new List<Sentence>();
+        sentenceToSeparator.Keys.ForEach(sentence =>
+        {
+            if (sentence.ExtendedMaxBeat < displayAreaMinBeat)
+            {
+                sentencesToBeRemoved.Add(sentence);
+            }
+        });
+        sentencesToBeRemoved.ForEach(sentence => RemoveSentenceSeparator(sentence));
     }
 
-    private int CalculateAvgMidiNote(IReadOnlyCollection<Note> notes)
+    private void RemoveSentenceSeparator(Sentence sentence)
+    {
+        if (!sentenceToSeparator.TryGetValue(sentence, out VisualElement separator))
+        {
+            return;
+        }
+        sentenceToSeparator.Remove(sentence);
+        separator.RemoveFromHierarchy();
+    }
+
+    private static int CalculateAvgMidiNote(IReadOnlyCollection<Note> notes)
     {
         return notes.Count > 0
             ? (int)notes.Select(it => it.MidiNote).Average()
@@ -235,5 +310,26 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     {
         // This is an over-approximation of the visible displayArea
         return (int)songAudioPlayer.CurrentBeat + displayedBeats;
+    }
+
+    private VisualElement CreateRecordingPositionIndicator()
+    {
+        VisualElement recordingPositionIndicator = new VisualElement();
+        recordingPositionIndicator.style.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        recordingPositionIndicator.style.position = new StyleEnum<Position>(Position.Absolute);
+        recordingPositionIndicator.style.width = new StyleLength(new Length(1, LengthUnit.Pixel));
+        recordingPositionIndicator.style.height = new StyleLength(new Length(100, LengthUnit.Percent));
+        recordingPositionIndicator.style.left = new StyleLength(new Length(PitchIndicatorXPercent * 100, LengthUnit.Percent));;
+        return recordingPositionIndicator;
+    }
+
+    protected override void RemoveTargetNote(TargetNoteControl targetNoteControl)
+    {
+        base.RemoveTargetNote(targetNoteControl);
+        if (noteToLyricsContainerLabel.TryGetValue(targetNoteControl.Note, out Label label))
+        {
+            label.RemoveFromHierarchy();
+            noteToLyricsContainerLabel.Remove(targetNoteControl.Note);
+        }
     }
 }

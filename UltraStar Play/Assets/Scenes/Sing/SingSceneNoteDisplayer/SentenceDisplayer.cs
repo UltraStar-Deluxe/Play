@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -12,28 +13,18 @@ using System;
 public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 {
     [Inject]
-    private PlayerController playerController;
+    private PlayerControl playerControl;
+
+    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
+    private VisualElement lyricsContainer;
 
     private Sentence currentSentence;
 
-    void Update()
+    public override void OnInjectionFinished()
     {
-        // Draw the UiRecordedNotes smoothly from their StartBeat to TargetEndBeat
-        foreach (UiRecordedNote uiRecordedNote in uiRecordedNotes)
-        {
-            if (uiRecordedNote.EndBeat < uiRecordedNote.TargetEndBeat)
-            {
-                UpdateUiRecordedNoteEndBeat(uiRecordedNote);
-                PositionUiNote(uiRecordedNote.RectTransform, uiRecordedNote.MidiNote, uiRecordedNote.StartBeat, uiRecordedNote.EndBeat);
-            }
-        }
-    }
-
-    public override void Init(int lineCount)
-    {
-        base.Init(lineCount);
-
-        playerController.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        base.OnInjectionFinished();
+        lyricsContainer.HideByDisplay();
+        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);
         });
@@ -58,11 +49,11 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         IEnumerable<Note> nonFreestyleNotes = sentence.Notes.Where(note => !note.IsFreestyle);
         foreach (Note note in nonFreestyleNotes)
         {
-            CreateUiNote(note);
+            CreateTargetNoteControl(note);
         }
     }
 
-    public override void DisplayRecordedNote(RecordedNote recordedNote)
+    protected override void DisplayRecordedNote(RecordedNote recordedNote)
     {
         if (currentSentence == null
             || recordedNote.TargetSentence != currentSentence
@@ -76,18 +67,27 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         base.DisplayRecordedNote(recordedNote);
     }
 
-    override protected void PositionUiNote(RectTransform uiNote, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
-        Vector2 anchorY = GetAnchorYForMidiNote(midiNote);
-        float anchorXStart = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
-        float anchorXEnd = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
+        Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);
+        float yStartPercent = yStartEndPercent.x;
+        float yEndPercent = yStartEndPercent.y;
+        float xStartPercent = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
+        float xEndPercent = (float)(noteEndBeat - sentenceStartBeat) / beatsInSentence;
 
-        uiNote.anchorMin = new Vector2(anchorXStart, anchorY.x);
-        uiNote.anchorMax = new Vector2(anchorXEnd, anchorY.y);
-        uiNote.MoveCornersToAnchors();
+        yStartPercent *= 100;
+        yEndPercent *= 100;
+        xStartPercent *= 100;
+        xEndPercent *= 100;
+
+        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
+        visualElement.style.left = new StyleLength(new Length(xStartPercent, LengthUnit.Percent));
+        visualElement.style.width = new StyleLength(new Length(xEndPercent - xStartPercent, LengthUnit.Percent));
+        visualElement.style.bottom = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(yEndPercent - yStartPercent, LengthUnit.Percent));
     }
 }

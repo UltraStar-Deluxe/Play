@@ -75,7 +75,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject]
     private Voice voice;
 
-    private Subject<SentenceScoreEvent> sentenceScoreEventStream = new Subject<SentenceScoreEvent>();
+    private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new Subject<SentenceScoreEvent>();
     public IObservable<SentenceScoreEvent> SentenceScoreEventStream
     {
         get
@@ -84,7 +84,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private Subject<NoteScoreEvent> noteScoreEventStream = new Subject<NoteScoreEvent>();
+    private readonly Subject<NoteScoreEvent> noteScoreEventStream = new Subject<NoteScoreEvent>();
     public IObservable<NoteScoreEvent> NoteScoreEventStream
     {
         get

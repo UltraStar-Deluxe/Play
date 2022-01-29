@@ -12,6 +12,12 @@ public static class VisualElementExtensions
         button.RegisterCallback<NavigationSubmitEvent>(_ => callback());
     }
 
+    public static void UnregisterCallbackButtonTriggered(this Button button, Action callback)
+    {
+        button.UnregisterCallback<ClickEvent>(_ => callback());
+        button.UnregisterCallback<NavigationSubmitEvent>(_ => callback());
+    }
+
     public static void AddToClassListIfNew(this VisualElement visualElement, params string[] newClasses)
     {
         HashSet<string> currentClasses = new HashSet<string>();
