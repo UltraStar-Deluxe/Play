@@ -20,7 +20,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     private SongRouletteControl songRouletteControl;
 
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -37,8 +37,11 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songTitle)]
     private Label songTitle;
 
-    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    [Inject(UxmlName = R.UxmlNames.songEntryFavoriteIcon)]
     private VisualElement favoriteIcon;
+
+    [Inject(UxmlName = R.UxmlNames.songEntryDuetIcon)]
+    private VisualElement duetIcon;
 
     [Inject(UxmlName = R.UxmlNames.songButton)]
     private Button songButton;
@@ -54,6 +57,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject(UxmlName = R.UxmlNames.openSongEditorButton)]
     private Button openSongEditorButton;
+
+    [Inject(UxmlName = R.UxmlNames.reloadSongButton)]
+    private Button reloadSongButton;
 
     [Inject(UxmlName = R.UxmlNames.openSongFolderButton)]
     private Button openSongFolderButton;
@@ -88,7 +94,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songMeta = value;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
-            UpdateFavoriteIcon();
+            UpdateIcons();
             UpdateCover(songMeta);
         }
     }
@@ -265,25 +271,31 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         singThisSongButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
-            songSelectSceneUiControl.CheckAudioAndStartSingScene();
+            songSelectSceneControl.CheckAudioAndStartSingScene();
         });
         closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
             InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
         });
-        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneUiControl.StartSongEditorScene());
+        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
+            reloadSongButton.RegisterCallbackButtonTriggered(() =>
+            {
+                SongMeta.Reload();
+                HideSongMenuOverlay();
+            });
         }
         else
         {
             openSongFolderButton.HideByDisplay();
+            reloadSongButton.HideByDisplay();
         }
 
         playlistManager.PlaylistChangeEventStream
-            .Subscribe(evt => UpdateFavoriteIcon());
+            .Subscribe(evt => UpdateIcons());
 
         // // Add itself as IDragListener to be notified when its RectTransform is dragged.
         dragControl = new GeneralDragControl(songButton, songRouletteControl.gameObject);
@@ -398,9 +410,10 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         songOverlayMenu.HideByDisplay();
     }
 
-    private void UpdateFavoriteIcon()
+    private void UpdateIcons()
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
+        duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
     }
 
     public void FocusSongButton()

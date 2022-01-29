@@ -5,11 +5,14 @@ public static partial class R
     {
         public static readonly string aboutScene_title = "aboutScene_title";
         public static readonly string action_addToPlaylist = "action_addToPlaylist";
+        public static readonly string action_doubleTap = "action_doubleTap";
         public static readonly string action_exitSong = "action_exitSong";
+        public static readonly string action_longPress = "action_longPress";
+        public static readonly string action_navigateRight = "action_navigateRight";
+        public static readonly string action_openContextMenu = "action_openContextMenu";
         public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_openSongMenu = "action_openSongMenu";
-        public static readonly string action_pressAndHoldToOpenSongMenu = "action_pressAndHoldToOpenSongMenu";
         public static readonly string action_randomSong = "action_randomSong";
         public static readonly string action_reloadSong = "action_reloadSong";
         public static readonly string action_removeFromPlaylist = "action_removeFromPlaylist";

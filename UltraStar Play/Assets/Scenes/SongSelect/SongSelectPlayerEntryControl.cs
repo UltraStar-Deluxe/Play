@@ -5,9 +5,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Toggle = UnityEngine.UIElements.Toggle;
 
-public class SongSelectPlayerEntryControl : INeedInjection
+public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
 {
-    private readonly VisualElement visualElement;
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
 
     [Inject(UxmlName = R.UxmlNames.micIcon)]
     private VisualElement micIcon;
@@ -18,7 +19,7 @@ public class SongSelectPlayerEntryControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     public Toggle EnabledToggle { get; private set; }
 
-    private readonly LabeledItemPickerControl<Voice> voiceChooserControl;
+    private LabeledItemPickerControl<Voice> voiceChooserControl;
 
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
@@ -58,9 +59,8 @@ public class SongSelectPlayerEntryControl : INeedInjection
         }
     }
 
-    public SongSelectPlayerEntryControl(VisualElement visualElement)
+    public void OnInjectionFinished()
     {
-        this.visualElement = visualElement;
         voiceChooserControl = new LabeledItemPickerControl<Voice>(visualElement.Q<ItemPicker>(R.UxmlNames.voiceChooser), new List<Voice>());
         voiceChooserControl.GetLabelTextFunction = voice => voice != null
             ? voice.Name

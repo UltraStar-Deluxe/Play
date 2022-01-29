@@ -2,7 +2,7 @@
 
 public class StutterSinger : AbstractDummySinger
 {
-    protected override PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat)
+    protected override PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat)
     {
         PitchEvent pitchEvent = null;
         if (noteAtBeat != null && Random.Range(0, 5) != 0)

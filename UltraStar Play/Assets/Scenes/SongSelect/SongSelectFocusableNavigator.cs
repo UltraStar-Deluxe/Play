@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
 {
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -36,7 +36,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     {
         if (GetFocusableNavigatorRootVisualElement() == null)
         {
-            songSelectSceneUiControl.CheckAudioAndStartSingScene();
+            songSelectSceneControl.CheckAudioAndStartSingScene();
         }
     }
 
@@ -68,12 +68,12 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             if (evt.NavigationDirection.y > 0)
             {
-                songSelectSceneUiControl.PlaylistChooserControl.FocusPlaylistChooser();
+                songSelectSceneControl.PlaylistChooserControl.FocusPlaylistChooser();
                 return;
             }
             if (evt.NavigationDirection.y < 0)
             {
-                songSelectSceneUiControl.ToggleSelectedSongIsFavorite();
+                songSelectSceneControl.ToggleSelectedSongIsFavorite();
                 return;
             }
 

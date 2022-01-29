@@ -83,7 +83,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="iconContainer" style="position: absolute; height: 100%; width: 30%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
                         <ui:VisualElement name="duetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 24px; height: 24px; display: flex;" />
-                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconEmpty.png?fileID=21300000&amp;guid=fc9005b45ccd7424fbb9fbe707e57f7b&amp;type=3#FavoriteIconEmpty&apos;); -unity-background-scale-mode: scale-to-fit;">
+                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit;">
                             <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="videoIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/VideoIcon.png?fileID=2800000&amp;guid=7383f98aba0fc1f4c97010b513d5b884&amp;type=3#VideoIcon&apos;); width: 24px; height: 24px;" />
@@ -97,7 +97,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5);">
-            <ui:VisualElement name="playerSelectOverlay" class="roundCorners focusableNavigatorRoot" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; flex-grow: 3;">
+            <ui:VisualElement name="playerSelectOverlay" class="roundCorners focusableNavigatorRoot" style="height: 66%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
                 <ui:VisualElement name="buttonRow" style="flex-direction: row;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="margin-bottom: 20px;" />
                     <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" style="margin-bottom: 20px;" />
@@ -106,20 +106,20 @@
                     <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                 </ui:ScrollView>
             </ui:VisualElement>
-            <ui:VisualElement name="micListOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex; bottom: 0; flex-grow: 1; margin-top: 5px;">
+            <ui:VisualElement name="micListOverlay" class="roundCorners" style="height: 33%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 30px; display: flex; bottom: 0; margin-top: 5px;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="micScrollView" style="width: 90%; flex-grow: 1;">
                     <ui:Instance template="SongSelectSceneMicEntryUi" name="micEntry" />
                 </ui:ScrollView>
                 <ui:Label text="No microphone found" display-tooltip-when-elided="true" name="noMicsFoundLabel" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center; display: none; white-space: normal;" />
             </ui:VisualElement>
             <ui:VisualElement name="lyricsContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; flex-direction: row;">
-                <ui:VisualElement name="leftLyricsOverlay" class="roundCorners" style="position: absolute; left: 0; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+                <ui:VisualElement name="leftLyricsOverlay" class="roundCorners" style="position: absolute; left: 0; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 30px; display: flex;">
                     <ui:Label text="Voice 1" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold;" />
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView">
                         <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; flex-grow: 1;" />
                     </ui:ScrollView>
                 </ui:VisualElement>
-                <ui:VisualElement name="rightLyricsOverlay" class="roundCorners" style="position: absolute; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; right: 0; display: flex;">
+                <ui:VisualElement name="rightLyricsOverlay" class="roundCorners" style="position: absolute; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 30px; right: 0; display: flex;">
                     <ui:Label text="Voice 2" display-tooltip-when-elided="true" name="voiceNameLabel" style="margin-bottom: 10px; -unity-font-style: bold; -unity-text-align: upper-right;" />
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="lyricsScrollView" style="flex-grow: 1;">
                         <ui:Label text="These are the awesome&#10;lyrics of the song" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; -unity-text-align: upper-right;" />
@@ -127,8 +127,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; flex-wrap: wrap;">
-            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 5px;" />
+        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; flex-wrap: wrap;">
+            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />

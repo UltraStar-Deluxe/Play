@@ -96,8 +96,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         VisualElement playerEntryVisualElement = playerEntryUi.CloneTree().Children().FirstOrDefault();
         playerScrollView.Add(playerEntryVisualElement);
 
-        SongSelectPlayerEntryControl listEntryControl = new SongSelectPlayerEntryControl(playerEntryVisualElement);
-        injector.WithRootVisualElement(playerEntryVisualElement).Inject(listEntryControl);
+        SongSelectPlayerEntryControl listEntryControl = injector
+            .WithRootVisualElement(playerEntryVisualElement)
+            .CreateAndInject<SongSelectPlayerEntryControl>();
         listEntryControl.Init(playerProfile);
 
         listEntryControl.EnabledToggle.RegisterValueChangedCallback(evt => OnSelectionStatusChanged(listEntryControl, evt.newValue));

@@ -16,7 +16,7 @@ using UnityEngine.UIElements;
 public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongSelectSceneUiControl songSelectSceneUiControl;
+    private SongSelectSceneControl songSelectSceneControl;
     
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -44,40 +44,40 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() == 0)
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).InputAction.ReadValue<float>() >= 1)
-            .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedSongIsFavorite());
+            .Subscribe(_ => songSelectSceneControl.ToggleSelectedSongIsFavorite());
         
         // Toggle favorite playlist is active
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).PerformedAsObservable()
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() >= 1)
-            .Subscribe(_ => songSelectSceneUiControl.ToggleFavoritePlaylist());
+            .Subscribe(_ => songSelectSceneControl.ToggleFavoritePlaylist());
         
         // Close search or leave scene with Back
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_search).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneUiControl.SongSearchControl.FocusSearchTextField());
+            .Subscribe(_ => songSelectSceneControl.SongSearchControl.FocusSearchTextField());
         
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
-            .Where(_ => !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
-            .Subscribe(_ => songSelectSceneUiControl.OnRandomSong());
+            .Where(_ => !songSelectSceneControl.IsPlayerSelectOverlayVisible)
+            .Subscribe(_ => songSelectSceneControl.OnRandomSong());
         
         // Open the song editor
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
-            .Where(_ => !songSelectSceneUiControl.IsMenuOverlayVisible
-                        && !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
-            .Subscribe(_ => songSelectSceneUiControl.StartSongEditorScene());
+            .Where(_ => !songSelectSceneControl.IsMenuOverlayVisible
+                        && !songSelectSceneControl.IsPlayerSelectOverlayVisible)
+            .Subscribe(_ => songSelectSceneControl.StartSongEditorScene());
         
         // Toggle selected players
         InputManager.GetInputAction(R.InputActions.usplay_togglePlayers).PerformedAsObservable()
-            .Where(_ => songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
-            .Subscribe(_ => songSelectSceneUiControl.ToggleSelectedPlayers());
+            .Where(_ => songSelectSceneControl.IsPlayerSelectOverlayVisible)
+            .Subscribe(_ => songSelectSceneControl.ToggleSelectedPlayers());
         
         // Open the sing scene
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(OnSubmit);
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneUiControl.CheckAudioAndStartSingScene());
+            .Subscribe(_ => songSelectSceneControl.CheckAudioAndStartSingScene());
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -97,18 +97,18 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         // Toggle song menu overlay
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
-            .Where(_ => !songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
-            .Where(_ => !songSelectSceneUiControl.IsMenuOverlayVisible)
-            .Where(_ => !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
+            .Where(_ => !songSelectSceneControl.IsPlayerSelectOverlayVisible)
+            .Where(_ => !songSelectSceneControl.IsMenuOverlayVisible)
+            .Where(_ => !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
-        if (songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
+        if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
         {
             // Remove focus
-            songSelectSceneUiControl.SubmitSearch();
+            songSelectSceneControl.SubmitSearch();
         }
         else
         {
@@ -118,7 +118,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        if (songSelectSceneControl.IsPlayerSelectOverlayVisible)
         {
             return;
         }
@@ -135,37 +135,37 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneUiControl.PlaylistChooserControl.IsPlaylistChooserDropdownOverlayVisible)
+        if (songSelectSceneControl.PlaylistChooserControl.IsPlaylistChooserDropdownOverlayVisible)
         {
-            songSelectSceneUiControl.PlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
+            songSelectSceneControl.PlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
         }
-        else if (songSelectSceneUiControl.SongSearchControl.IsSearchPropertyDropdownVisible)
+        else if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
         {
-            songSelectSceneUiControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
+            songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
         }
-        else if (songSelectSceneUiControl.IsPlayerSelectOverlayVisible)
+        else if (songSelectSceneControl.IsPlayerSelectOverlayVisible)
         {
-            songSelectSceneUiControl.HidePlayerSelectOverlay();
+            songSelectSceneControl.HidePlayerSelectOverlay();
         }
         else if (songRouletteControl.IsSongMenuOverlayVisible)
         {
             songRouletteControl.HideSongMenuOverlay();
         }
-        else if (songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused())
+        else if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
         {
-            songSelectSceneUiControl.SubmitSearch();
+            songSelectSceneControl.SubmitSearch();
         }
-        else if (songSelectSceneUiControl.IsMenuOverlayVisible)
+        else if (songSelectSceneControl.IsMenuOverlayVisible)
         {
-            songSelectSceneUiControl.HideMenuOverlay();
+            songSelectSceneControl.HideMenuOverlay();
         }
-        else if (songSelectSceneUiControl.IsSongDetailOverlayVisible)
+        else if (songSelectSceneControl.IsSongDetailOverlayVisible)
         {
-            songSelectSceneUiControl.HideSongDetailOverlay();
+            songSelectSceneControl.HideSongDetailOverlay();
         }
-        else if (songSelectSceneUiControl.IsPlaylistActive())
+        else if (songSelectSceneControl.IsPlaylistActive())
         {
-            songSelectSceneUiControl.ResetPlaylistSelection();
+            songSelectSceneControl.ResetPlaylistSelection();
         }
         else
         {
@@ -214,7 +214,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             {
                 fuzzySearchText.Value += newChar;
             }
-            songSelectSceneUiControl.DoFuzzySearch(fuzzySearchText.Value);
+            songSelectSceneControl.DoFuzzySearch(fuzzySearchText.Value);
 
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(fuzzySearchResetTimeInSeconds, () => CheckResetFuzzySearchText()));
         }
@@ -231,6 +231,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool IsFuzzySearchActive()
     {
         return !InputUtils.AnyKeyboardModifierPressed()
-               && !songSelectSceneUiControl.SongSearchControl.IsSearchTextFieldFocused();
+               && !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused();
     }
 }

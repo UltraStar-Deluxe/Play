@@ -32,13 +32,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     private SongPreviewControl songPreviewControl;
 
     [Inject]
-    private UIDocument uiDocument;
-
-    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.songEntryContainer)]
     private VisualElement songEntryContainer;
+
+    [Inject(UxmlName = R.UxmlNames.songEntryPlaceholder)]
+    private List<VisualElement> songEntryPlaceholders;
 
     private List<SongEntryPlaceholderControl> songEntryPlaceholderControls = new List<SongEntryPlaceholderControl>();
 
@@ -93,11 +93,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        // UIToolkit
-        List<VisualElement> songEntryPlaceholders = uiDocument.rootVisualElement
-            .Query<VisualElement>(R.UxmlNames.songEntryPlaceholder)
-            .ToList();
-
         songEntryPlaceholderControls = songEntryPlaceholders
             .Select(it => new SongEntryPlaceholderControl(it))
             .ToList();

@@ -15,7 +15,7 @@ using ProTrans;
 public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SingingResultsSceneUiControl singingResultsSceneUiControl;
+    private SingingResultsSceneControl singingResultsSceneControl;
     
     [Inject]
     private EventSystem eventSystem;
@@ -26,14 +26,14 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
         eventSystem.sendNavigationEvents = false;
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneUiControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneUiControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneUiControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.FinishScene());
             
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneUiControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.FinishScene());
 
     }
 }

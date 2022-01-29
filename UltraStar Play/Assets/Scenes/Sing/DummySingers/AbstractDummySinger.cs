@@ -5,14 +5,14 @@ using System.Linq;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
+public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 {
     public int playerIndexToSimulate;
 
-    protected PlayerController playerController;
+    private PlayerControl playerControl;
 
     [Inject]
-    protected SingSceneController singSceneController;
+    protected SingSceneControl singSceneControl;
 
     [Inject]
     protected SongMeta songMeta;
@@ -25,43 +25,69 @@ abstract public class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
     }
 
-    protected abstract PitchEvent GetDummyPichtEvent(int beat, Note noteAtBeat);
+    protected abstract PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat);
 
-    void Update()
+    private void Update()
     {
-        int currentBeat = (int)singSceneController.CurrentBeat;
-        int beatToAnalyze = playerController.PlayerPitchTracker.BeatToAnalyze;
-
-        if (currentBeat > 0
-            && beatToAnalyze <= currentBeat
-            && playerController.PlayerPitchTracker.RecordingSentence != null)
+        if (playerControl == null)
         {
-            Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
-            PitchEvent pitchEvent = GetDummyPichtEvent(beatToAnalyze, noteAtBeat);
-            playerController.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
-            playerController.PlayerPitchTracker.GoToNextBeat();
+            if (!TryFindPlayerControl())
+            {
+                return;
+            }
         }
+
+        int currentBeat = (int)singSceneControl.CurrentBeat;
+        int beatToAnalyze = playerControl.PlayerPitchTracker.BeatToAnalyze;
+        if (currentBeat <= 0
+            || beatToAnalyze > currentBeat
+            || playerControl.PlayerPitchTracker.RecordingSentence == null)
+        {
+            return;
+        }
+
+        Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
+        if (noteAtBeat == null)
+        {
+            return;
+        }
+
+        PitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze, noteAtBeat);
+        playerControl.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
+        playerControl.PlayerPitchTracker.GoToNextBeat();
     }
 
-    public void SetPlayerController(PlayerController playerController)
+    private bool TryFindPlayerControl()
     {
-        this.playerController = playerController;
+        if (singSceneControl.PlayerControls.IsNullOrEmpty()
+            || playerIndexToSimulate >= singSceneControl.PlayerControls.Count)
+        {
+            return false;
+        }
+
+        playerControl = singSceneControl.PlayerControls[playerIndexToSimulate];
+        return true;
+    }
+
+    public void SetPlayerControl(PlayerControl playerControl)
+    {
+        this.playerControl = playerControl;
         // Disable real microphone input for this player
-        playerController.MicSampleRecorder.enabled = false;
+        playerControl.MicSampleRecorder.enabled = false;
     }
 
     protected double GetBeatDelayedByMicDelay(int beat)
     {
-        double micDelayInBeats = (playerController.MicProfile == null)
+        double micDelayInBeats = (playerControl.MicProfile == null)
             ? 0
-            : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerController.MicProfile.DelayInMillis);
+            : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerControl.MicProfile.DelayInMillis);
         double delayedBeat = beat - micDelayInBeats;
         return delayedBeat;
     }
 
     protected Note GetNoteAtBeat(int beat)
     {
-        Sentence recordingSentence = playerController?.PlayerPitchTracker?.RecordingSentence;
+        Sentence recordingSentence = playerControl?.PlayerPitchTracker?.RecordingSentence;
         if (recordingSentence == null)
         {
             return null;

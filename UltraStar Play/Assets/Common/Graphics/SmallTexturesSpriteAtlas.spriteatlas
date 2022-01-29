@@ -59,7 +59,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 2cf4b5832641ba44eb2240332f340bdd, type: 3}
   - {fileID: 21300000, guid: 5deb6694a398abc4ab780d5d83778900, type: 3}
   - {fileID: 21300000, guid: 6a28ad9413215d8498ae7d7d1ca187cb, type: 3}
-  - {fileID: 21300000, guid: fc9005b45ccd7424fbb9fbe707e57f7b, type: 3}
   - {fileID: 21300000, guid: 3320a9c41743da34690ecfd21f6181c3, type: 3}
   - {fileID: 21300000, guid: caa92ed4b08666749a91f4258c0e22ec, type: 3}
   - {fileID: 21300000, guid: 3a770ae44a43b6e4c8f744668b0fb921, type: 3}
@@ -101,8 +100,8 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 732d97cddf664894185e48ebccc0e6e1, type: 3}
   - {fileID: 21300000, guid: de73480ebcaba3549a0dfa0563904dc3, type: 3}
   - {fileID: 21300000, guid: 3c70652efc55e1a49b2912855077cb5d, type: 3}
+  - {fileID: 21300000, guid: 8b9ad24e30cec6144812334156db6180, type: 3}
   - {fileID: 21300000, guid: b4f7154e043553848afeaee4ec3a03a7, type: 3}
-  - {fileID: 21300000, guid: 3c8ebe4e2e712904f84bf08e36421283, type: 3}
   - {fileID: 21300000, guid: 974845eee15033141b479dd5c0a40a5f, type: 3}
   - {fileID: 21300000, guid: f58c178fd3c06a743b8244d9281a79ab, type: 3}
   - {fileID: 21300000, guid: a32b6caf47aad0d449ac5bea72c91e05, type: 3}
@@ -126,7 +125,6 @@ SpriteAtlas:
   - '[score]endcap'
   - '[score]rating_0'
   - SolidLeftTransparentRight
-  - FavoriteIconEmpty
   - GradientTopWhiteBottomTransparent
   - NotePlain
   - '[icon]leader_crown'
@@ -168,8 +166,8 @@ SpriteAtlas:
   - '[icon]score'
   - '[button]c'
   - '[button]esc'
+  - '[sing]lineBonusPopUp'
   - '[button]ins'
-  - FavoriteIconFilled
   - CrossHatching
   - '[score]rating_4'
   - EditorNotePlain

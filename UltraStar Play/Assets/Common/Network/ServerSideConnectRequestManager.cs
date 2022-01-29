@@ -56,7 +56,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     /**
      * This version number must to be increased when introducing breaking changes.
      */
-    public const int ProtocolVersion = 2;
+    public const int ProtocolVersion = 3;
     
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
@@ -66,6 +66,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private HttpServer httpServer;
+
+    [Inject]
+    private Settings settings;
     
     private void Start()
     {
@@ -196,13 +199,20 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     {
         ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId, connectRequestDto.MicrophoneSampleRate);
         clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
-        
+
+        MicProfile micProfileOfClient = settings.MicProfiles
+            .FirstOrDefault(micProfile => micProfile.ConnectedClientId == newConnectedClientHandler.ClientId);
+        int micProfileSampleRate = micProfileOfClient != null
+            ? micProfileOfClient.SampleRate
+            : -1;
+
         ConnectResponseDto connectResponseDto = new ConnectResponseDto
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
             MicrophonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
+            MicrophoneSampleRate = micProfileSampleRate,
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);

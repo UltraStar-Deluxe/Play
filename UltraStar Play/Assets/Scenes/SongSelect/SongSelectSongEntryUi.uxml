@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="songContainer" class="roundCorners" style="width: 100%; height: 100%; position: absolute; background-color: rgb(6, 170, 233); max-height: 200px; max-width: 150px;">
         <ui:VisualElement name="songImageOuter" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-and-crop; flex-grow: 10;">
-            <ui:VisualElement name="songImageInner" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
+            <ui:VisualElement name="songImageInner" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1; display: none;" />
             <ui:VisualElement name="songPreviewVideoImage" style="position: absolute; width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/SongSelect/Preview/SongSelectVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=363c6948b86eebc4daacef28984654ff&amp;type=2#SongSelectVideoRenderTexture&apos;);" />
             <ui:VisualElement name="songPreviewBackgroundImage" style="position: absolute; width: 100%; height: 100%;" />
         </ui:VisualElement>
@@ -11,13 +11,17 @@
             <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" class="ellipsis" style="width: 90%; flex-grow: 1; white-space: normal; max-height: 66%;" />
             <ui:VisualElement name="titleRow" style="flex-direction: row; justify-content: space-between; align-items: center;" />
         </ui:VisualElement>
-        <ui:VisualElement name="favoriteIcon" style="position: absolute; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/FavoriteIconFilled.png?fileID=2800000&amp;guid=3c8ebe4e2e712904f84bf08e36421283&amp;type=3#FavoriteIconFilled&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; right: 5px; top: 5px;" />
+        <ui:VisualElement name="iconBar" style="position: absolute; flex-shrink: 0; display: flex; right: 5px; top: 5px; align-items: center;">
+            <ui:VisualElement name="songEntryFavoriteIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="songEntryDuetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=21300000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
+        </ui:VisualElement>
         <ui:Button display-tooltip-when-elided="true" name="songButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
         <ui:VisualElement name="songMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songMenuOverlayScrollView" style="width: 100%; height: 100%; align-items: center;">
                 <ui:Button text="Sing" display-tooltip-when-elided="true" name="singThisSongButton" style="width: 100%;" />
                 <ui:VisualElement name="modifyPlaylistButtonContainer" style="width: 100%;" />
                 <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" style="width: 100%;" />
+                <ui:Button text="Reload" display-tooltip-when-elided="true" name="reloadSongButton" style="width: 100%;" />
                 <ui:Button text="Open Folder" display-tooltip-when-elided="true" name="openSongFolderButton" style="width: 100%;" />
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" style="width: 100%;" />
             </ui:ScrollView>

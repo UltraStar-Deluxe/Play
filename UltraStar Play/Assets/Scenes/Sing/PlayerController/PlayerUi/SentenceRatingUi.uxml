@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="background" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[sing]lineBonusPopUp.png?fileID=21300000&amp;guid=8b9ad24e30cec6144812334156db6180&amp;type=3#[sing]lineBonusPopUp&apos;); align-items: center; width: 120px; height: 30px; justify-content: center; right: 0; position: absolute;">
+        <ui:Label text="Perfect!" display-tooltip-when-elided="true" name="text" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold;" />
+    </ui:VisualElement>
+</ui:UXML>

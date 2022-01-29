@@ -1,12 +1,15 @@
 :root {
     --text-color: white;
+    --font-size-xxs: 10px;
+    --font-size-xs: 12px;
+    --font-size-s: 14px;
     --font-size: 18px;
-    --font-size-small: 14px;
-    --font-size-smaller: 12px;
-    --font-size-title: 24px;
-    --font-size-title-small: 20px;
+    --font-size-l: 20px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 26px;
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
+    --text-color-warning: rgb(200, 200, 48);
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
@@ -224,13 +227,13 @@ TextInput {
 
 .titleImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
     margin-right: 10px;
 }
 
 .titleText {
-    font-size: var(--font-size-title);
+    font-size: var(--font-size-xl);
 }
 
 .titleSubText {
@@ -247,7 +250,7 @@ TextInput {
 }
 
 .dialogTitle {
-    font-size: var(--font-size-title-small);
+    font-size: var(--font-size-l);
 }
 
 .dialogMessage {
@@ -256,8 +259,8 @@ TextInput {
 
 .dialogTitleImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title-small);
-    height: var(--font-size-title-small);
+    width: var(--font-size-l);
+    height: var(--font-size-l);
     margin-right: 10px;
     background-color: rgba(0, 0, 0, 0);
 }
@@ -309,8 +312,8 @@ TextInput {
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
 }
 
 .noBackground TextInput {
@@ -321,8 +324,8 @@ TextInput {
 
 .iconImage {
     -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-title);
-    height: var(--font-size-title);
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
 }
 
 .iconImageTextSized {
@@ -332,15 +335,15 @@ TextInput {
 }
 
 .smallFont TextInput {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Button.smallFont {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Button.smallerFont {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 ItemPicker {
@@ -355,23 +358,39 @@ ItemPicker Label {
 }
 
 ItemPicker.smallFont Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
+}
+
+.largeFont Label {
+    font-size: var(--font-size-l);
+}
+
+Label.largeFont {
+    font-size: var(--font-size-l);
 }
 
 .smallFont Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 Label.smallFont {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 .smallerFont Label {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 Label.smallerFont {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
+}
+
+.tinyFont Label {
+    font-size: var(--font-size-xxs);
+}
+
+Label.tinyFont {
+    font-size: var(--font-size-xxs);
 }
 
 .ellipsis {
@@ -473,7 +492,7 @@ Label.smallerFont {
 }
 
 .singingResultUiSmall Label {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
 }
 
 .singingResultUiSmall #ratingLabel {
@@ -489,7 +508,7 @@ Label.smallerFont {
 }
 
 .singingResultUiSmaller Label {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 .singingResultUiSmaller #ratingImage {
@@ -504,12 +523,26 @@ Label.smallerFont {
     height: 91%;
 }
 
+.singingResultUiSmallest .scoreRow {
+    border-bottom-width: 0;
+}
+
 #notificationLabel.error {
     color: var(--text-color-error);
 }
 
+.error {
+    color: var(--text-color-error);
+    -unity-background-image-tint-color: var(--text-color-error);
+}
+
+.warning {
+    color: var(--text-color-warning);
+    -unity-background-image-tint-color: var(--text-color-warning);
+}
+
 .characterQuickJumpCharacterButton {
-    font-size: var(--font-size-smaller);
+    font-size: var(--font-size-xs);
 }
 
 .characterQuickJumpCharacter {
@@ -562,15 +595,138 @@ Label.smallerFont {
 
 .inputLegendLabel {
     width: 20%;
+    -unity-text-align: middle-center;
+}
+
+.inputLegendBar {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 50px;
+    background-color: rgba(32, 32, 32, 0.88);
 }
 
 .songDetailOverlayLabel {
     width: 100%;
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-s);
     white-space: normal;
 }
 
 .outlineOnFocus:focus {
     border-color: var(--text-color);
     border-width: 1;
+}
+
+.singingLyrics {
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.75);
+}
+
+.currentLyrics {
+    font-size: var(--font-size-xl);
+    margin-bottom: 5px;
+}
+
+.nextLyrics {
+    font-size: var(--font-size);
+}
+
+.currentNoteLyrics {
+    color: var(--control-color);
+}
+
+.previousNoteLyrics {
+    color: var(--control-color);
+}
+
+.lyricsContainer {
+    align-items: center;
+    background-color: rgba(64, 64, 64, 0.75);
+    padding: 5px;
+}
+
+.timeBar {
+    background-color: rgba(41, 58, 58, 0.8);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.innerTimeBarSentenceEntryContainer {
+    background-color: rgb(61, 91, 91);
+}
+
+.textOutline {
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.75);
+}
+
+#root.singScenePlayerUi {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#root.singScenePlayerUiSmall {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.singScenePlayerUi #playerImage {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #playerImage {
+    display: none;
+}
+
+.singScenePlayerUi #leadingPlayerIcon {
+    flex-shrink: 0;
+    width: var(--font-size-xxl);
+    height: var(--font-size-xxl);
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #leadingPlayerIcon {
+    flex-shrink: 0;
+    width: var(--font-size);
+    height: var(--font-size);
+}
+
+.contextMenuSeparator {
+    width: 95%;
+    height: 1px;
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu {
+    background-color: rgb(64, 64, 64);
+    padding: 5px;
+}
+
+.contextMenu Button {
+    background-color: rgb(64, 64, 64);
+}
+
+.contextMenu Button:hover {
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu Button:focus {
+    background-color: rgb(92, 92, 92);
+}
+
+.scrollingNoteStreamSentenceSeparator {
+    height: 100%;
+    width: 1px;
+    background-color: rgba(92, 92, 92, 0.5);
+}
+
+.textOutline {
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }

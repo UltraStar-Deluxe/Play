@@ -30,12 +30,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
-    public WarningDialog warningDialogPrefab;
-
-    [InjectedInInspector]
-    public QuestionDialog questionDialogPrefab;
-
-    [InjectedInInspector]
     public Notification notificationPrefab;
 
     [InjectedInInspector]
@@ -45,6 +39,15 @@ public class UiManager : MonoBehaviour, INeedInjection
     public ContextMenu contextMenuPrefab;
 
     [InjectedInInspector]
+    public VisualTreeAsset contextMenuUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset contextMenuItemUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset contextMenuSeparatorUi;
+
+    [InjectedInInspector]
     public Tooltip tooltipPrefab;
 
     [InjectedInInspector]
@@ -52,8 +55,6 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
     public IObservable<Vector3> MousePositionChangeEventStream => mousePositionChangeEventStream;
-
-    public bool DialogOpen => dialogs.Count > 0;
 
     private Canvas canvas;
     private RectTransform canvasRectTransform;
@@ -67,7 +68,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     private UIDocument uiDocument;
 
     private readonly List<Notification> notifications = new List<Notification>();
-    private readonly List<Dialog> dialogs = new List<Dialog>();
 
     private Vector3 lastMousePosition;
 
@@ -96,6 +96,9 @@ public class UiManager : MonoBehaviour, INeedInjection
             mousePositionChangeEventStream.OnNext(Input.mousePosition);
         }
         lastMousePosition = Input.mousePosition;
+
+        ContextMenuPopupControl.OpenContextMenuPopups
+            .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
     public void CreateShowFpsInstance()
@@ -119,46 +122,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public WarningDialog CreateWarningDialog(string title, string message)
-    {
-        FindCanvas();
-
-        WarningDialog warningDialog = Instantiate(warningDialogPrefab, canvas.transform);
-        injector.Inject(warningDialog);
-        warningDialog.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        if (title != null)
-        {
-            warningDialog.Title = title;
-        }
-        if (message != null)
-        {
-            warningDialog.Message = message;
-        }
-
-        dialogs.Add(warningDialog);
-        return warningDialog;
-    }
-
-    public QuestionDialog CreateQuestionDialog(string title, string message)
-    {
-        FindCanvas();
-
-        QuestionDialog questionDialog = Instantiate(questionDialogPrefab, canvas.transform);
-        injector.Inject(questionDialog);
-        questionDialog.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        if (title != null)
-        {
-            questionDialog.Title = title;
-        }
-        if (message != null)
-        {
-            questionDialog.Message = message;
-        }
-
-        dialogs.Add(questionDialog);
-        return questionDialog;
-    }
-
     public Notification CreateNotification(string message)
     {
         FindCanvas();
@@ -170,11 +133,6 @@ public class UiManager : MonoBehaviour, INeedInjection
 
         notifications.Add(notification);
         return notification;
-    }
-
-    public void OnDialogClosed(Dialog dialog)
-    {
-        dialogs.Remove(dialog);
     }
 
     public Notification CreateNotification(string message, Color color)
