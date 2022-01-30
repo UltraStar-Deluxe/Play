@@ -1,8 +1,20 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Label = UnityEngine.UIElements.Label;
+using UniRx;
 
 public class ShowFps : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        lastFpsLabelPositionInPx = Vector2.zero;
+    }
+
+    private static Vector2 lastFpsLabelPositionInPx;
+
     public Text fpsText;
 
     [ReadOnly]
@@ -11,7 +23,35 @@ public class ShowFps : MonoBehaviour
     private float deltaTime;
     private int frameCount;
 
-    void Update()
+    private Label fpsLabel;
+
+    private void Start()
+    {
+        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
+        if (uiDocument != null)
+        {
+            CreateLabel(uiDocument.rootVisualElement);
+
+            DragToMoveControl dragToMoveControl = new DragToMoveControl(uiDocument, fpsLabel, gameObject);
+            dragToMoveControl.MovedEventStream
+                .Subscribe(newPositionInPx => lastFpsLabelPositionInPx = newPositionInPx);
+        }
+    }
+
+    private void CreateLabel(VisualElement parent)
+    {
+        fpsLabel = new Label("FPS: ?");
+        fpsLabel.AddToClassList("fpsLabel");
+        parent.Add(fpsLabel);
+
+        if (lastFpsLabelPositionInPx != Vector2.zero)
+        {
+            fpsLabel.style.left = lastFpsLabelPositionInPx.x;
+            fpsLabel.style.top = lastFpsLabelPositionInPx.y;
+        }
+    }
+
+    private void Update()
     {
         frameCount++;
         deltaTime += Time.deltaTime;
@@ -24,8 +64,20 @@ public class ShowFps : MonoBehaviour
 
             if (fpsText != null)
             {
-                fpsText.text = "FPS: " + fps.ToString();
+                fpsText.text = "FPS: " + fps;
             }
+            if (fpsLabel != null)
+            {
+                fpsLabel.text = "FPS: " + fps;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (fpsLabel != null)
+        {
+            fpsLabel.RemoveFromHierarchy();
         }
     }
 }

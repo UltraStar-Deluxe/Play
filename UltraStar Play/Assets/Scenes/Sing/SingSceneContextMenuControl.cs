@@ -17,8 +17,8 @@ public class SingSceneContextMenuControl : AbstractContextMenuControl, INeedInje
     [Inject]
     private SingSceneControl singSceneControl;
 
-    public SingSceneContextMenuControl(VisualElement targetVisualElement, GameObject gameObject)
-        : base(targetVisualElement, gameObject)
+    public SingSceneContextMenuControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
+        : base(uiDocument, targetVisualElement, gameObject)
     {
     }
 
