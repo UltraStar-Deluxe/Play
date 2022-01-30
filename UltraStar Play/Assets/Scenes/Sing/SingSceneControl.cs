@@ -94,6 +94,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject]
+    private UIDocument uiDocument;
+
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -235,7 +238,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Register ContextMenu
-        SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(doubleClickToTogglePauseElement, gameObject);
+        SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(uiDocument, doubleClickToTogglePauseElement, gameObject);
         sceneInjector.Inject(singSceneContextMenuControl);
     }
 

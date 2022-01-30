@@ -26,8 +26,8 @@ public abstract class AbstractContextMenuControl : GeneralDragControl, INeedInje
 
     protected abstract void FillContextMenu(ContextMenuPopupControl contextMenuPopup);
 
-    protected AbstractContextMenuControl(VisualElement targetVisualElement, GameObject gameObject)
-        : base(targetVisualElement, gameObject)
+    protected AbstractContextMenuControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
+        : base(uiDocument, targetVisualElement, gameObject)
     {
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)

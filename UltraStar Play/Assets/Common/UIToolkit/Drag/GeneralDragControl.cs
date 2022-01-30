@@ -13,8 +13,8 @@ using UniRx;
 
 public class GeneralDragControl : AbstractDragControl<GeneralDragEvent>
 {
-    public GeneralDragControl(VisualElement targetVisualElement, GameObject gameObject)
-        : base(targetVisualElement, gameObject)
+    public GeneralDragControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
+        : base(uiDocument, targetVisualElement, gameObject)
     {
     }
 

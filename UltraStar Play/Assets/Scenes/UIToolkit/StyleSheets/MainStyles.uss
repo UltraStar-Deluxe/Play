@@ -730,3 +730,12 @@ Label.tinyFont {
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }
+
+.fpsLabel {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: var(--font-size-xs);
+    -unity-text-align: middle-center;
+    padding: 10px;
+}

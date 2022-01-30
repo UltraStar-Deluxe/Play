@@ -29,10 +29,13 @@ public abstract class AbstractDragControl<EVENT>
 
     protected readonly GameObject gameObject;
 
-	protected AbstractDragControl(VisualElement targetVisualElement, GameObject gameObject)
+    private PanelHelper panelHelper;
+
+	protected AbstractDragControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
     {
         this.TargetVisualElement = targetVisualElement;
         this.gameObject = gameObject;
+        this.panelHelper = new PanelHelper(uiDocument);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         targetVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
         targetVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
@@ -180,7 +183,7 @@ public abstract class AbstractDragControl<EVENT>
                 localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
                 deltaInPixels,
-                new Vector2(Screen.width, Screen.height)),
+                GetReferenceResolution()),
             new DragCoordinate(
                 localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
                 rectTransformDistanceInPixels,
@@ -214,7 +217,7 @@ public abstract class AbstractDragControl<EVENT>
                 screenPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
-                new Vector2(Screen.width, Screen.height)),
+                GetReferenceResolution()),
             new DragCoordinate(
                 targetPosInPixels,
                 Vector2.zero,
@@ -227,6 +230,12 @@ public abstract class AbstractDragControl<EVENT>
             null,
             eventData.Button);
         return result;
+    }
+
+    private Vector2 GetReferenceResolution()
+    {
+        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        return screenSizePanelCoordinates;
     }
 
     private DragCoordinate CreateDragCoordinateInPercent(Vector2 startPosInPixels, Vector2 distanceInPixels, Vector2 deltaInPixels, Vector2 fullSize)
