@@ -66,7 +66,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
     private static void RequestExternalStoragePermissionIfNeeded()
     {
-#if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead))
         {
             Permission.RequestUserPermission(Permission.ExternalStorageRead);
