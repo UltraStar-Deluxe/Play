@@ -112,7 +112,7 @@
 
 .unity-button {
     background-color: var(--control-color);
-    color: rgb(255, 255, 255);
+    color: var(--text-color);
     width: var(--control-width);
     height: var(--control-height);
     font-size: var(--font-size);

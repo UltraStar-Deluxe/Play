@@ -1,3 +1,30 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
+    <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
+        <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
+            <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
+                <ui:VisualElement name="leftSideBarMainColumn" class="panel" style="height: 100%; border-left-width: 0; border-top-width: 0; border-bottom-width: 0;">
+                    <ui:Button text="Button" display-tooltip-when-elided="true" />
+                </ui:VisualElement>
+                <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="height: 100%; border-top-width: 0; border-bottom-width: 0; display: none;">
+                    <ui:Label text="Lorem ipsum dolor&#10;met" display-tooltip-when-elided="true" name="Label" class="smallerFont" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="keyboard" style="height: 100%; width: 48px;" />
+            <ui:VisualElement name="noteArea" style="flex-grow: 1;" />
+            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%;">
+                <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; flex-grow: 1;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="min-width: 100px; flex-grow: 2;">
+                        <ui:Label text="Lorem ipsum dolor sit amet, adhuc erroribus scripserit te sed, eum molestie ullamcorper ad, ad sit minim ignota constituam. Vivendo consulatu ex nec. Has te nihil postea. Nam oporteat similique comprehensam et, utinam postea adipiscing no mea." display-tooltip-when-elided="true" name="lyricsAreaLabel" class="smallFont" style="white-space: normal;" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 100%; height: 128px; align-items: center; justify-content: center;">
+                    <ui:VisualElement name="noVideoImage" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
+                    <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-bottom-width: 0; border-right-width: 0; border-left-width: 0;" />
+    </ui:VisualElement>
 </ui:UXML>

@@ -5841,7 +5841,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 697563421}
   m_Direction: 0
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -23555,7 +23555,7 @@ PrefabInstance:
     - target: {fileID: 397122787577337535, guid: b31ac69ac93d08447a31065f63944232,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.000061035156
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 397122788071855718, guid: b31ac69ac93d08447a31065f63944232,
         type: 3}
