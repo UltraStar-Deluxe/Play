@@ -1,0 +1,31 @@
+#songEditorRoot {
+    /* Overwrite variables for song editor */
+    --text-color: rgb(208, 208, 208);
+    --control-color: rgb(88, 88, 88);
+    --control-color-accent1: rgb(103, 103, 103);
+    --control-color-accent2: rgb(70, 96, 124);
+
+    background-color: rgb(50, 50, 50);
+}
+
+#leftSideBar {
+    --control-width: 80px;
+}
+
+.panel {
+    background-color: rgb(60, 63, 65);
+    border-width: 1px;
+    border-color: rgb(50, 50, 50);
+}
+
+.icon {
+    -unity-background-image-tint-color: rgb(196, 196, 196);
+}
+
+#keyboard {
+    background-color: rgb(49, 51, 53);
+}
+
+#noteArea {
+    background-color: rgb(43, 43, 43);
+}
