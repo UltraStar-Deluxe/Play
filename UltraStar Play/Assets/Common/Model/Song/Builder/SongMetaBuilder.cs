@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-static class SongMetaBuilder
+public static class SongMetaBuilder
 {
     public static SongMeta ParseFile(string path, Encoding enc = null)
     {

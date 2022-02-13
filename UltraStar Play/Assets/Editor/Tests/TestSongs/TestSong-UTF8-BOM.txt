@@ -1,0 +1,11 @@
+﻿#TITLE:TestTitle___ä___ß___'___Ж
+#ARTIST:TestArtist
+#MP3:TestSong.ogg
+#BPM:200
+#GAP:0
+#LANGUAGE:English
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo 
+: 12 3 9  world!
+E
