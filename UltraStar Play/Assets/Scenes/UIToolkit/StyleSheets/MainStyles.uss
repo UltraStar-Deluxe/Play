@@ -198,6 +198,10 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
+.transparentBackgroundColor #unity-text-input {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .unity-base-dropdown ScrollView #unity-content-container {
     padding-right: 0;
     padding-bottom: 0;
@@ -742,4 +746,33 @@ Label.tinyFont {
     font-size: var(--font-size-xs);
     -unity-text-align: middle-center;
     padding: 10px;
+}
+
+.unity-scroller--vertical {
+    width: 12px;
+}
+
+.unity-scroller__low-button {
+    width: 100%;
+    display: none;
+}
+
+.unity-scroller__high-button {
+    width: 100%;
+    display: none;
+}
+
+.unity-base-slider {
+    width: 100%;
+    min-width: auto;
+}
+
+.unity-base-slider--vertical {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.unity-base-slider__dragger {
+    width: 10px;
+    left: 1px;
 }
