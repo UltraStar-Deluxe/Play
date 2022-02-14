@@ -8,15 +8,13 @@ using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
 using System.Globalization;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDragEvent>, IPointerEnterHandler, IPointerExitHandler
+public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDragListener<GeneralDragEvent>
 {
-    [InjectedInInspector]
-    public GeneralDragHandler videoAreaDragHandler;
-
     [Inject]
     private CursorManager cursorManager;
 
@@ -26,13 +24,39 @@ public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDra
     [Inject]
     private SetVideoGapAction setVideoGapAction;
 
-    private bool isCanceled;
+    [Inject]
+    private UIDocument uiDocument;
 
+    [Inject]
+    private SongEditorSceneControl songEditorSceneControl;
+
+    [Inject]
+    private UiManager uiManager;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject(UxmlName = R.UxmlNames.videoArea)]
+    private VisualElement videoArea;
+
+    private bool isCanceled;
     private float videoGapAtDragStart;
 
-    public void Start()
+    private GeneralDragControl dragControl;
+
+    public void OnInjectionFinished()
     {
-        videoAreaDragHandler.AddListener(this);
+        dragControl = new GeneralDragControl(uiDocument, videoArea, songEditorSceneControl.gameObject);
+        dragControl.AddListener(this);
+
+        videoArea.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
+        videoArea.RegisterCallback<PointerLeaveEvent>(evt =>
+        {
+            cursorManager.SetDefaultCursor();
+            cursorManager.SetCursorTextVisible(false);
+        });
+
+        new ContextMenuControl(uiDocument, videoArea, songEditorSceneControl.gameObject, injector, FillContextMenu);
     }
 
     public void CancelDrag()
@@ -69,17 +93,6 @@ public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDra
         cursorManager.SetCursorTextVisible(false);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        cursorManager.SetCursorHorizontal();
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        cursorManager.SetDefaultCursor();
-        cursorManager.SetCursorTextVisible(false);
-    }
-
     private float GetNewVideoGap(GeneralDragEvent dragEvent)
     {
         float videoGapDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2f;
@@ -87,5 +100,16 @@ public class VideoArea : MonoBehaviour, INeedInjection, IDragListener<GeneralDra
         // Round to 2 decimal places
         float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);
         return newVideoGap;
+    }
+
+    private void RemoveVideoGap()
+    {
+        setVideoGapAction.ExecuteAndNotify(0);
+        uiManager.CreateNotification("VideoGap reset to 0");
+    }
+
+    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        contextMenuPopup.AddItem("Remove VideoGap", () => RemoveVideoGap());
     }
 }

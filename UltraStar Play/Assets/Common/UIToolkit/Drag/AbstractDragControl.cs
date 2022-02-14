@@ -27,12 +27,13 @@ public abstract class AbstractDragControl<EVENT>
 
     public VisualElement TargetVisualElement { get; private set; }
 
+    protected readonly UIDocument uiDocument;
+    protected readonly PanelHelper panelHelper;
     protected readonly GameObject gameObject;
-
-    private PanelHelper panelHelper;
 
 	protected AbstractDragControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
     {
+        this.uiDocument = uiDocument;
         this.TargetVisualElement = targetVisualElement;
         this.gameObject = gameObject;
         this.panelHelper = new PanelHelper(uiDocument);

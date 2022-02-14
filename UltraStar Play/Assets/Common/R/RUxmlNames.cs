@@ -7,7 +7,6 @@ public static partial class R
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
         public const string addButton = "addButton";
-        public const string addToolButton = "addToolButton";
         public const string adminRightsContainer = "adminRightsContainer";
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
@@ -98,7 +97,6 @@ public static partial class R
         public const string editPlaylistDialog = "editPlaylistDialog";
         public const string editPlaylistDialogTitle = "editPlaylistDialogTitle";
         public const string editPlaylistOverlay = "editPlaylistOverlay";
-        public const string editToolButton = "editToolButton";
         public const string effectsContainer = "effectsContainer";
         public const string emptyScoreBar = "emptyScoreBar";
         public const string enabledContainer = "enabledContainer";

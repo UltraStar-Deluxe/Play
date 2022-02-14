@@ -7,10 +7,8 @@
                 <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont" style="height: 100%; border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView">
                         <ui:Button text="Play/Pause" display-tooltip-when-elided="true" name="togglePlaybackButton" />
-                        <ui:Button text="Edit Tool" display-tooltip-when-elided="true" name="editToolButton" />
-                        <ui:Button text="Add Tool" display-tooltip-when-elided="true" name="addToolButton" />
-                        <ui:Button text="Issues" display-tooltip-when-elided="true" name="toggleIssuesButton" />
                         <ui:Button text="Record" display-tooltip-when-elided="true" name="toggleRecordingButton" />
+                        <ui:Button text="Issues" display-tooltip-when-elided="true" name="toggleIssuesButton" />
                         <ui:Button text="Song&#10;Properties" display-tooltip-when-elided="true" name="toggleSongPropertiesButton" />
                         <ui:Button text="Layers" display-tooltip-when-elided="true" name="toggleLayers" />
                         <ui:Button text="Settings" display-tooltip-when-elided="true" name="toggleSettingsButton" />
