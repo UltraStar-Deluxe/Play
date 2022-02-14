@@ -161,7 +161,7 @@ public static partial class R
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";
-        public const string lyricsAreaLabel = "lyricsAreaLabel";
+        public const string lyricsAreaTextField = "lyricsAreaTextField";
         public const string lyricsContainer = "lyricsContainer";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
@@ -346,6 +346,7 @@ public static partial class R
         public const string startButton = "startButton";
         public const string statusBar = "statusBar";
         public const string statusBarControlHintLabel = "statusBarControlHintLabel";
+        public const string statusBarSongInfoLabel = "statusBarSongInfoLabel";
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";

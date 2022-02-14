@@ -14,11 +14,11 @@ using System.Text;
 public class LyricsAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjection
 {
     [Inject]
-    private LyricsArea lyricsArea;
+    private LyricsAreaControl lyricsAreaControl;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        contextMenu.AddItem("Refresh", () => lyricsArea.UpdateLyrics());
+        contextMenu.AddItem("Refresh", () => lyricsAreaControl.UpdateLyrics());
     }
 
 

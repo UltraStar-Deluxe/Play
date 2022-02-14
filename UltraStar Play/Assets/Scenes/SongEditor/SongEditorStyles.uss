@@ -58,3 +58,8 @@ Button.recording
 .virtualPianoKey.blackKey:focus {
     background-color: var(--control-color-accent2);
 }
+
+#unity-text-input {
+    color: var(--text-color);
+    border-width: 0;
+}
