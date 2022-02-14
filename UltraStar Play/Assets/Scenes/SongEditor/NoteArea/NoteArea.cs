@@ -81,6 +81,9 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject(UxmlName = R.UxmlNames.noteArea)]
     private VisualElement noteAreaVisualElement;
 
+    [Inject(UxmlName = R.UxmlNames.noteAreaPositionInSongIndicator)]
+    private VisualElement noteAreaPositionInSongIndicator;
+
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
@@ -174,6 +177,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
             double newViewportX = positionInSongInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
             SetViewportX((int)newViewportX);
         }
+
+        UpdatePositionInSongIndicator(positionInSongInMillis);
     }
 
     public bool IsNoteVisible(Note note)
@@ -547,5 +552,11 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     {
         Rect rect = RectTransformUtils.GetScreenCoordinates(rectTransform);
         return (int)(MinMidiNoteInViewport + ViewportHeight * ((y - rect.y) / rect.height));
+    }
+
+    private void UpdatePositionInSongIndicator(double positionInSongInMillis)
+    {
+        float xPercent = (float)GetHorizontalPositionForMillis(positionInSongInMillis);
+        noteAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
     }
 }

@@ -199,6 +199,8 @@ public static partial class R
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";
         public const string noteArea = "noteArea";
+        public const string noteAreaPositionInSongIndicator = "noteAreaPositionInSongIndicator";
+        public const string noteAreaSelectionFrame = "noteAreaSelectionFrame";
         public const string noteContainer = "noteContainer";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string noteEntry = "noteEntry";

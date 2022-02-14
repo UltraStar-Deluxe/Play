@@ -28,13 +28,15 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="keyboard" style="height: 100%; width: 48px;" />
-            <ui:VisualElement name="noteArea" style="flex-grow: 1;">
+            <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">
                 <ui:VisualElement name="horizontalGrid" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0);">
                     <ui:VisualElement name="horizontalGridLabelContainer" style="position: absolute; width: 100%; height: 100%;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="verticalGrid" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);">
                     <ui:VisualElement name="verticalGridLabelContainer" style="position: absolute; width: 100%; height: 100%;" />
                 </ui:VisualElement>
+                <ui:VisualElement name="noteAreaPositionInSongIndicator" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute;" />
+                <ui:VisualElement name="noteAreaSelectionFrame" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
             </ui:VisualElement>
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%;">
                 <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; flex-grow: 1;">
