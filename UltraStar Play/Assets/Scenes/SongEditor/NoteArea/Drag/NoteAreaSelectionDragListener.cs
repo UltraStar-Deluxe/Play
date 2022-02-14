@@ -8,6 +8,7 @@ using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -35,6 +36,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
+    private VisualElement noteAreaSelectionFrame;
 
     private readonly float scrollBorderPercent = 0.05f;
 
@@ -75,6 +79,10 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         selectionFrame.gameObject.SetActive(true);
+
+        noteAreaSelectionFrame.ShowByDisplay();
+        noteAreaSelectionFrame.style.width = 0;
+        noteAreaSelectionFrame.style.height = 0;
     }
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
@@ -96,12 +104,14 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         lastDragEvent = dragEvent;
         scrollAmount = Vector2.zero;
         selectionFrame.gameObject.SetActive(false);
+        noteAreaSelectionFrame.HideByDisplay();
     }
 
     public void CancelDrag()
     {
         scrollAmount = Vector2.zero;
         selectionFrame.gameObject.SetActive(false);
+        noteAreaSelectionFrame.HideByDisplay();
         isCanceled = true;
     }
 
@@ -232,6 +242,20 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
         selectionFrame.position = new Vector2(fromX, fromY);
         selectionFrame.sizeDelta = new Vector2(width, height);
+
+        int fromBeat = Mathf.Min(startBeat, endBeat);
+        int toBeat = Mathf.Max(startBeat, endBeat);
+        int fromMidiNote = Mathf.Min(startMidiNote, endMidiNote);
+        int toMidiNote = Mathf.Max(startMidiNote, endMidiNote);
+
+        float xPercent = (float)noteArea.GetHorizontalPositionForBeat(fromBeat);
+        float yPercent = (float)noteArea.GetVerticalPositionForMidiNote(fromMidiNote);
+        float widthPercent = (float)(toBeat - fromBeat) / noteArea.ViewportWidthInBeats;
+        float heightPercent = (float)(toMidiNote - fromMidiNote) / noteArea.ViewportHeight;
+        noteAreaSelectionFrame.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }
 
     private void UpdateScrollAmount(NoteAreaDragEvent dragEvent)
