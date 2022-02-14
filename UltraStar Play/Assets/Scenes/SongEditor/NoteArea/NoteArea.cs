@@ -5,9 +5,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UniInject;
 using UniRx;
-using UnityEngine.UI;
 using System.Linq;
-using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
@@ -76,6 +75,12 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
+    [Inject]
+    private Injector injector;
+
+    [Inject(UxmlName = R.UxmlNames.noteArea)]
+    private VisualElement noteAreaVisualElement;
+
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
     public ISubject<ViewportEvent> ViewportEventStream
     {
@@ -100,6 +105,14 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
 
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+
+        injector
+            .WithRootVisualElement(noteAreaVisualElement)
+            .CreateAndInject<NoteAreaHorizontalRulerControl>();
+
+        injector
+            .WithRootVisualElement(noteAreaVisualElement)
+            .CreateAndInject<NoteAreaVerticalRulerControl>();
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
