@@ -117,6 +117,8 @@ public static partial class R
         public const string highScoreContainer = "highScoreContainer";
         public const string highscoreEntry = "highscoreEntry";
         public const string HighscoreEntry = "HighscoreEntry";
+        public const string horizontalGrid = "horizontalGrid";
+        public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
         public const string httpServerPortLabel = "httpServerPortLabel";
         public const string icon = "icon";
         public const string iconBar = "iconBar";
@@ -392,6 +394,8 @@ public static partial class R
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldContainer = "urlTextFieldContainer";
         public const string versionInfoContainer = "versionInfoContainer";
+        public const string verticalGrid = "verticalGrid";
+        public const string verticalGridLabelContainer = "verticalGridLabelContainer";
         public const string videoArea = "videoArea";
         public const string videoIcon = "videoIcon";
         public const string videoImage = "videoImage";

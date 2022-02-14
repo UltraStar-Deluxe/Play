@@ -2,46 +2,56 @@
 using System.Globalization;
 using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
 using UniRx;
+using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinishedListener
 {
-    [InjectedInInspector]
-    public Text beatLabelPrefab;
-    [InjectedInInspector]
-    public Text secondLabelPrefab;
-
-    [InjectedInInspector]
-    public RectTransform beatLabelContainer;
-    [InjectedInInspector]
-    public RectTransform secondLabelContainer;
-
-    [InjectedInInspector]
-    public DynamicallyCreatedImage verticalGridImage;
-
-    public Color lineNormalColor = Color.gray;
-    public Color lineHighlightColor = Color.white;
-
-    [Inject(SearchMethod = SearchMethods.GetComponentInParent)]
-    private NoteArea noteArea;
+    public static readonly Color normalLineColor = Color.gray;
+    public static readonly Color highlightLineColor = Color.white;
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject]
+    private NoteArea noteArea;
+
+    [Inject]
+    private SongEditorSceneControl songEditorSceneControl;
+
+    [Inject(UxmlName = R.UxmlNames.verticalGridLabelContainer)]
+    private VisualElement verticalGridLabelContainer;
+
+    [Inject(UxmlName = R.UxmlNames.verticalGrid)]
+    private VisualElement verticalGrid;
+
+    private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
 
     private float lastSongMetaBpm;
 
-    public void OnSceneInjectionFinished()
+    public void OnInjectionFinished()
     {
+        verticalGrid.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, verticalGrid);
+            dynamicTexture.backgroundColor = new Color(0, 0, 0, 0);
+            OnViewportChanged(lastViewportEvent);
+        });
+
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
     {
+        if (viewportEvent == null)
+        {
+            return;
+        }
+
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
@@ -56,7 +66,11 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
 
     private void UpdateLines()
     {
-        verticalGridImage.ClearTexture();
+        if (dynamicTexture == null)
+        {
+            return;
+        }
+        dynamicTexture.ClearTexture();
 
         int viewportStartBeat = noteArea.MinBeatInViewport;
         int viewportEndBeat = noteArea.MaxBeatInViewport;
@@ -90,23 +104,22 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
             {
-                DrawVerticalGridLine(beatPosInMillis, lineHighlightColor);
+                DrawVerticalGridLine(beatPosInMillis, highlightLineColor);
             }
 
             bool hasFineLine = drawStepFine > 0 && (beat % drawStepFine == 0);
             if (hasFineLine && !hasRoughLine)
             {
-                DrawVerticalGridLine(beatPosInMillis, lineNormalColor);
+                DrawVerticalGridLine(beatPosInMillis, normalLineColor);
             }
         }
 
-        verticalGridImage.ApplyTexture();
+        dynamicTexture.ApplyTexture();
     }
 
     private void UpdateLabels()
     {
-        beatLabelContainer.DestroyAllDirectChildren();
-        secondLabelContainer.DestroyAllDirectChildren();
+        verticalGridLabelContainer.Clear();
 
         int viewportStartBeat = noteArea.MinBeatInViewport;
         int viewportEndBeat = noteArea.MaxBeatInViewport;
@@ -136,42 +149,44 @@ public class NoteAreaRulerHorizontal : MonoBehaviour, INeedInjection, ISceneInje
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
             {
-                Text uiText = CreateLabel(beatPosInMillis, labelWidthInMillis, beatLabelPrefab, beatLabelContainer);
-                uiText.text = beat.ToString();
+                Label label = CreateLabel(beatPosInMillis, labelWidthInMillis, verticalGridLabelContainer);
+                label.text = beat.ToString();
+                label.style.top = 12;
             }
 
             bool hasSecondLabel = drawStepVeryRough > 0 && (beat % drawStepVeryRough == 0);
             if (hasSecondLabel)
             {
                 double beatPosInSeconds = beatPosInMillis / 1000;
-                Text uiText = CreateLabel(beatPosInMillis, labelWidthInMillis, secondLabelPrefab, secondLabelContainer);
-                uiText.text = beatPosInSeconds.ToString("F3", CultureInfo.InvariantCulture) + " s";
+                Label label = CreateLabel(beatPosInMillis, labelWidthInMillis, verticalGridLabelContainer);
+                label.text = beatPosInSeconds.ToString("F3", CultureInfo.InvariantCulture) + " s";
             }
         }
     }
 
-    private Text CreateLabel(double beatPosInMillis, double labelWidthInMillis, Text uiTextPrefab, RectTransform container)
+    private Label CreateLabel(double beatPosInMillis, double labelWidthInMillis, VisualElement container)
     {
-        Text uiText = Instantiate(uiTextPrefab, container);
-        RectTransform label = uiText.GetComponent<RectTransform>();
+        Label label = new Label();
+        label.AddToClassList("tinyFont");
+        label.style.position = new StyleEnum<Position>(Position.Absolute);
+        label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        float x = (float)((beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth);
-        float anchorWidth = (float)(labelWidthInMillis / noteArea.ViewportWidth);
-        label.anchorMin = new Vector2(x - (anchorWidth / 2f), 0);
-        label.anchorMax = new Vector2(x + (anchorWidth / 2f), 1);
-        label.anchoredPosition = Vector2.zero;
-        label.sizeDelta = new Vector2(0, 0);
-
-        return uiText;
+        float xPercent = (float)((beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth);
+        float widthPercent = (float)(labelWidthInMillis / noteArea.ViewportWidth);
+        label.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        label.style.top = 0;
+        label.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
+        container.Add(label);
+        return label;
     }
 
     private void DrawVerticalGridLine(double beatPosInMillis, Color color)
     {
         double xPercent = (beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth;
-        int x = (int)(xPercent * verticalGridImage.TextureWidth);
-        for (int y = 0; y < verticalGridImage.TextureHeight; y++)
+        int x = (int)(xPercent * dynamicTexture.TextureWidth);
+        for (int y = 0; y < dynamicTexture.TextureHeight; y++)
         {
-            verticalGridImage.SetPixel(x, y, color);
+            dynamicTexture.SetPixel(x, y, color);
         }
     }
 }
