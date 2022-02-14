@@ -95,6 +95,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
 
     private OverviewAreaControl overviewAreaControl;
     private VideoAreaControl videoAreaControl;
+    private SongEditorVirtualPianoControl songEditorVirtualPianoControl;
 
     public SongMeta SongMeta
     {
@@ -158,6 +159,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     {
         overviewAreaControl = injector.CreateAndInject<OverviewAreaControl>();
         videoAreaControl = injector.CreateAndInject<VideoAreaControl>();
+        songEditorVirtualPianoControl = injector.CreateAndInject<SongEditorVirtualPianoControl>();
 
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);

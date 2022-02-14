@@ -34,3 +34,27 @@ Button.recording
 {
     background-color: rgb(200, 32, 32);
 }
+
+.virtualPianoKey.whiteKey {
+    background-color: white;
+}
+
+.virtualPianoKey.blackKey {
+    background-color: black;
+}
+
+.virtualPianoKey.whiteKey:hover {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.blackKey:hover {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.whiteKey:focus {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.blackKey:focus {
+    background-color: var(--control-color-accent2);
+}

@@ -116,6 +116,8 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         injector
             .WithRootVisualElement(noteAreaVisualElement)
             .CreateAndInject<NoteAreaVerticalRulerControl>();
+
+        UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis);
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
