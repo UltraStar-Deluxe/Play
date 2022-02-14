@@ -19,7 +19,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     public RectTransform selectionFrame;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private NoteArea noteArea;
@@ -31,7 +31,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     private Canvas canvas;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private SongMeta songMeta;
@@ -117,7 +117,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         int startMidiNote = GetDragStartMidiNote();
         int endMidiNote = GetDragEndMidiNote(currentDragEvent);
 
-        List<Note> visibleNotes = songEditorSceneController.GetAllVisibleNotes();
+        List<Note> visibleNotes = songEditorSceneControl.GetAllVisibleNotes();
         List<Note> selectedNotes = visibleNotes
             .Where(note => IsInSelectionFrame(note, startMidiNote, endMidiNote, startBeat, endBeat))
             .ToList();
@@ -127,16 +127,16 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         {
             if (InputUtils.IsKeyboardControlPressed())
             {
-                selectionController.RemoveFromSelection(selectedNotes);
+                selectionControl.RemoveFromSelection(selectedNotes);
             }
             else
             {
-                selectionController.AddToSelection(selectedNotes);
+                selectionControl.AddToSelection(selectedNotes);
             }
         }
         else
         {
-            selectionController.SetSelection(selectedNotes);
+            selectionControl.SetSelection(selectedNotes);
         }
     }
 

@@ -62,7 +62,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
     private SongMeta songMeta;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -470,7 +470,7 @@ public class NoteArea : MonoBehaviour, INeedInjection, IPointerEnterHandler, IPo
         lastClickTime = Time.time;
         if (isDoubleClick)
         {
-            songEditorSceneController.ToggleAudioPlayPause();
+            songEditorSceneControl.ToggleAudioPlayPause();
             return;
         }
         

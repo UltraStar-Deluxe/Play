@@ -16,7 +16,7 @@ using Debug = UnityEngine.Debug;
 public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;

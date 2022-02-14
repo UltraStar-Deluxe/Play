@@ -4,10 +4,11 @@ using UniInject;
 using UnityEngine;
 using UniRx;
 using System;
+using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class OverviewBarViewportIndicator : MonoBehaviour, INeedInjection
+public class OverviewAreaViewportIndicatorControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -15,10 +16,10 @@ public class OverviewBarViewportIndicator : MonoBehaviour, INeedInjection
     [Inject]
     private NoteArea noteArea;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private RectTransform rectTransform;
+    [Inject(UxmlName = R.UxmlNames.overviewAreaViewportIndicator)]
+    private VisualElement overviewAreaViewportIndicator;
 
-    void Start()
+    public void OnInjectionFinished()
     {
         noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
     }
@@ -35,11 +36,10 @@ public class OverviewBarViewportIndicator : MonoBehaviour, INeedInjection
 
     private void UpdatePositionAndWidth(double startPercent, double endPercent)
     {
-        float xMin = (float)startPercent;
-        float xMax = (float)endPercent;
+        float xMinPercent = (float)startPercent;
+        float widthPercent = (float)(endPercent - startPercent);
 
-        rectTransform.anchorMin = new Vector2(xMin, rectTransform.anchorMin.y);
-        rectTransform.anchorMax = new Vector2(xMax, rectTransform.anchorMax.y);
-        rectTransform.anchoredPosition = Vector2.zero;
+        overviewAreaViewportIndicator.style.left = new StyleLength(new Length(xMinPercent, LengthUnit.Percent));
+        overviewAreaViewportIndicator.style.width = new StyleLength(new Length(widthPercent, LengthUnit.Percent));
     }
 }

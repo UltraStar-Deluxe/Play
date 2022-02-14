@@ -14,11 +14,11 @@ using UniRx;
 public class SongEditorSaveButton : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     void Start()
     {
         GetComponent<Button>().OnClickAsObservable()
-            .Subscribe(_ => songEditorSceneController.SaveSong());
+            .Subscribe(_ => songEditorSceneControl.SaveSong());
     }
 }

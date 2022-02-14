@@ -11,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
+public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
 {
     [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
@@ -23,13 +23,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     public SongEditorNoteRecorder songEditorNoteRecorder;
 
     [InjectedInInspector]
-    public SongEditorSelectionController selectionController;
-
-    [InjectedInInspector]
-    public RectTransform uiNoteContainer;
-
-    [InjectedInInspector]
-    public AudioWaveFormVisualizer audioWaveFormVisualizer;
+    public SongEditorSelectionControl selectionControl;
 
     [InjectedInInspector]
     public NoteArea noteArea;
@@ -67,6 +61,9 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public LyricsArea lyricsArea;
 
+    [Inject]
+    public Injector injector;
+
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
     private double positionInSongInMillisWhenPlaybackStarted;
@@ -76,6 +73,8 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     private bool audioWaveFormInitialized;
 
     public double StopPlaybackAfterPositionInSongInMillis { get; set; }
+
+    private OverviewAreaControl overviewAreaControl;
 
     public SongMeta SongMeta
     {
@@ -112,7 +111,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
-        bb.BindExistingInstance(selectionController);
+        bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(canvas);
         bb.BindExistingInstance(graphicRaycaster);
@@ -137,6 +136,8 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
 
     void Start()
     {
+        overviewAreaControl = injector.CreateAndInject<OverviewAreaControl>();
+
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
     }
@@ -161,18 +162,6 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
         {
             songAudioPlayer.PauseAudio();
             StopPlaybackAfterPositionInSongInMillis = 0;
-        }
-
-        // Create the audio waveform image if not done yet.
-        if (!audioWaveFormInitialized && songAudioPlayer.HasAudioClip && songAudioPlayer.AudioClip.samples > 0)
-        {
-            using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
-            {
-                // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-                AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(SongMeta), false);
-                audioWaveFormInitialized = true;
-                audioWaveFormVisualizer.DrawWaveFormMinAndMaxValues(audioClip);
-            }
         }
     }
 
@@ -352,7 +341,7 @@ public class SongEditorSceneController : MonoBehaviour, IBinder, INeedInjection
     
     public void StartEditingNoteText()
     {
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.Count == 1)
         {
             Note selectedNote = selectedNotes.FirstOrDefault();

@@ -65,10 +65,10 @@ public class EditorUiNote : MonoBehaviour,
     private Injector injector;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private CursorManager cursorManager;
@@ -103,14 +103,14 @@ public class EditorUiNote : MonoBehaviour,
 
     public void SyncWithNote()
     {
-        bool isSelected = selectionController.IsSelected(Note);
+        bool isSelected = selectionControl.IsSelected(Note);
         goldenNoteImageOverlay.gameObject.SetActive(Note.IsGolden);
         SetLyrics(Note.Text);
         SetSelected(isSelected);
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorSceneController.GetColorForVoice(Note.Sentence.Voice);
+            Color color = songEditorSceneControl.GetColorForVoice(Note.Sentence.Voice);
             SetColor(color);
         }
         UpdateFontSize();
@@ -209,7 +209,7 @@ public class EditorUiNote : MonoBehaviour,
 
     private void UpdateHandles()
     {
-        bool isSelected = (selectionController != null) && selectionController.IsSelected(Note);
+        bool isSelected = (selectionControl != null) && selectionControl.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
             || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));
         if (leftHandle.gameObject.activeSelf != isLeftHandleVisible)
@@ -270,13 +270,13 @@ public class EditorUiNote : MonoBehaviour,
         // Select / deselect notes via Shift.
         if (InputUtils.IsKeyboardShiftPressed())
         {
-            if (selectionController.IsSelected(Note))
+            if (selectionControl.IsSelected(Note))
             {
-                selectionController.RemoveFromSelection(this);
+                selectionControl.RemoveFromSelection(this);
             }
             else
             {
-                selectionController.AddToSelection(this);
+                selectionControl.AddToSelection(this);
             }
         }
         else if (!InputUtils.IsKeyboardControlPressed())

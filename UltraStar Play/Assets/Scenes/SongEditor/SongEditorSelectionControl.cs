@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorSelectionController : MonoBehaviour, INeedInjection
+public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public RectTransform uiNoteContainer;
@@ -20,7 +20,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
     private EventSystem eventSystem;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -64,7 +64,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
     public void SelectAll()
     {
-        List<Note> allNotes = songEditorSceneController.GetAllVisibleNotes();
+        List<Note> allNotes = songEditorSceneControl.GetAllVisibleNotes();
         SetSelection(allNotes);
     }
 
@@ -175,7 +175,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneController.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
         int maxEndBeat = selectedNotes.Select(it => it.EndBeat).Max();
 
         // Find the next note, i.e., the note right of maxEndBeat with the smallest distance to it.
@@ -206,11 +206,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
             if (wasEditingLyrics)
             {
-                songEditorSceneController.StartEditingNoteText();
+                songEditorSceneControl.StartEditingNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
                 StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                    () => songEditorSceneController.StartEditingNoteText()));
+                    () => songEditorSceneControl.StartEditingNoteText()));
             }
         }
     }
@@ -236,7 +236,7 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneController.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
         int minStartBeat = selectedNotes.Select(it => it.StartBeat).Min();
 
         // Find the previous note, i.e., the note left of minStartBeat with the smallest distance to it.
@@ -267,11 +267,11 @@ public class SongEditorSelectionController : MonoBehaviour, INeedInjection
 
             if (wasEditingLyrics)
             {
-                songEditorSceneController.StartEditingNoteText();
+                songEditorSceneControl.StartEditingNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
                 StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                    () => songEditorSceneController.StartEditingNoteText()));
+                    () => songEditorSceneControl.StartEditingNoteText()));
             }
         }
     }
