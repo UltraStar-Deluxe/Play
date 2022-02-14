@@ -38,24 +38,25 @@
                 <ui:VisualElement name="noteAreaPositionInSongIndicator" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute;" />
                 <ui:VisualElement name="noteAreaSelectionFrame" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
             </ui:VisualElement>
-            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%;">
-                <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; flex-grow: 1;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="min-width: 100px; flex-grow: 2;">
-                        <ui:Label text="Lorem ipsum dolor sit amet, adhuc erroribus scripserit te sed, eum molestie ullamcorper ad, ad sit minim ignota constituam. Vivendo consulatu ex nec. Has te nihil postea. Nam oporteat similique comprehensam et, utinam postea adipiscing no mea." display-tooltip-when-elided="true" name="lyricsAreaLabel" class="smallFont" style="white-space: normal;" />
+            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: 180px;">
+                <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="flex-grow: 2; width: 100%; height: 100%;">
+                        <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="transparentBackgroundColor smallFont" style="height: 100%; white-space: normal;" />
                     </ui:ScrollView>
                 </ui:VisualElement>
-                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 100%; height: 128px; align-items: center; justify-content: center;">
+                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 100%; height: 80px; align-items: center; justify-content: center; flex-shrink: 0;">
                     <ui:VisualElement name="noVideoImage" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
                     <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0;">
+        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
             <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
             <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
         </ui:VisualElement>
-        <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px;">
-            <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" style="padding-bottom: 1px; padding-top: 1px;" />
+        <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">
+            <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />
+            <ui:Label text="The Artist - The Title" display-tooltip-when-elided="true" name="statusBarSongInfoLabel" class="tinyFont" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

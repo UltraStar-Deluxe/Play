@@ -7,7 +7,9 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -59,9 +61,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     [InjectedInInspector]
     public SongEditorCopyPasteManager songEditorCopyPasteManager;
     
-    [InjectedInInspector]
-    public LyricsArea lyricsArea;
-
     [Inject]
     private Injector injector;
 
@@ -83,6 +82,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     [Inject(UxmlName = R.UxmlNames.saveButton)]
     private Button saveButton;
 
+    [Inject(UxmlName = R.UxmlNames.statusBarSongInfoLabel)]
+    private Label statusBarSongInfoLabel;
+
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
     private double positionInSongInMillisWhenPlaybackStarted;
@@ -96,6 +98,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     private OverviewAreaControl overviewAreaControl;
     private VideoAreaControl videoAreaControl;
     private SongEditorVirtualPianoControl songEditorVirtualPianoControl;
+    private LyricsAreaControl lyricsAreaControl;
 
     public SongMeta SongMeta
     {
@@ -138,7 +141,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
-        bb.BindExistingInstance(lyricsArea);
         bb.BindExistingInstance(midiFileImporter);
         bb.BindExistingInstance(songEditorCopyPasteManager);
         bb.BindExistingInstance(this);
@@ -160,6 +162,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         overviewAreaControl = injector.CreateAndInject<OverviewAreaControl>();
         videoAreaControl = injector.CreateAndInject<VideoAreaControl>();
         songEditorVirtualPianoControl = injector.CreateAndInject<SongEditorVirtualPianoControl>();
+        lyricsAreaControl = injector.CreateAndInject<LyricsAreaControl>();
 
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
@@ -181,6 +184,21 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         undoButton.RegisterCallbackButtonTriggered(() => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
         saveButton.RegisterCallbackButtonTriggered(() => SaveSong());
+        statusBarSongInfoLabel.text = $"{SongMeta.Artist} - {SongMeta.Title}";
+    }
+
+    private void Update()
+    {
+        // Automatically stop playback after a given threshold (e.g. only play the selected notes)
+        if (songAudioPlayer.IsPlaying
+            && StopPlaybackAfterPositionInSongInMillis > 0
+            && songAudioPlayer.PositionInSongInMillis > StopPlaybackAfterPositionInSongInMillis)
+        {
+            songAudioPlayer.PauseAudio();
+            StopPlaybackAfterPositionInSongInMillis = 0;
+        }
+
+        lyricsAreaControl.Update();
     }
 
     private void OnAudioPlaybackStopped(double positionInSongInMillis)
@@ -192,18 +210,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     private void OnAudioPlaybackStarted(double positionInSongInMillis)
     {
         positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
-    }
-
-    void Update()
-    {
-        // Automatically stop playback after a given threshold (e.g. only play the selected notes)
-        if (songAudioPlayer.IsPlaying
-            && StopPlaybackAfterPositionInSongInMillis > 0
-            && songAudioPlayer.PositionInSongInMillis > StopPlaybackAfterPositionInSongInMillis)
-        {
-            songAudioPlayer.PauseAudio();
-            StopPlaybackAfterPositionInSongInMillis = 0;
-        }
     }
 
     public Color GetColorForVoice(Voice voice)
