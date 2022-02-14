@@ -10,36 +10,31 @@ using PrimeInputActions;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
-public abstract class AbstractContextMenuControl : GeneralDragControl, INeedInjection, IInjectionFinishedListener
+public class ContextMenuControl : GeneralDragControl
 {
     public const float DragDistanceThreshold = 10f;
 
     private readonly Vector2 popupOffset = new Vector2(2, 2);
 
-    [Inject]
-    protected Injector injector;
+    private readonly Action<ContextMenuPopupControl> fillContextMenuAction;
 
-    [Inject]
-    protected UIDocument uiDocument;
+    private readonly Injector injector;
 
-    private PanelHelper panelHelper;
-
-    protected abstract void FillContextMenu(ContextMenuPopupControl contextMenuPopup);
-
-    protected AbstractContextMenuControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
+    public ContextMenuControl(UIDocument uiDocument,
+        VisualElement targetVisualElement,
+        GameObject gameObject,
+        Injector injector,
+        Action<ContextMenuPopupControl> fillContextMenuAction)
         : base(uiDocument, targetVisualElement, gameObject)
     {
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
             .AddTo(gameObject);
+        this.fillContextMenuAction = fillContextMenuAction;
+        this.injector = injector;
     }
 
-    public void OnInjectionFinished()
-    {
-        panelHelper = new PanelHelper(uiDocument);
-    }
-
-    protected virtual void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
+    protected void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         if (Pointer.current == null
             || !context.ReadValueAsButton()
@@ -64,6 +59,11 @@ public abstract class AbstractContextMenuControl : GeneralDragControl, INeedInje
     {
         ContextMenuPopupControl contextMenuPopup = new ContextMenuPopupControl(gameObject, position);
         injector.Inject(contextMenuPopup);
-        FillContextMenu(contextMenuPopup);
+        fillContextMenuAction(contextMenuPopup);
+    }
+
+    private static void DefaultFillContextMenuAction(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        // Do nothing.
     }
 }

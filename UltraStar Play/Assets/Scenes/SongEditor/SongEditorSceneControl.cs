@@ -7,6 +7,7 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using Button = UnityEngine.UIElements.Button;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -62,7 +63,25 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     public LyricsArea lyricsArea;
 
     [Inject]
-    public Injector injector;
+    private Injector injector;
+
+    [Inject(UxmlName = R.UxmlNames.togglePlaybackButton)]
+    private Button togglePlaybackButton;
+
+    [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
+    private Button toggleRecordingButton;
+
+    [Inject(UxmlName = R.UxmlNames.undoButton)]
+    private Button undoButton;
+
+    [Inject(UxmlName = R.UxmlNames.redoButton)]
+    private Button redoButton;
+
+    [Inject(UxmlName = R.UxmlNames.exitSceneButton)]
+    private Button exitSceneButton;
+
+    [Inject(UxmlName = R.UxmlNames.saveButton)]
+    private Button saveButton;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
@@ -75,6 +94,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     public double StopPlaybackAfterPositionInSongInMillis { get; set; }
 
     private OverviewAreaControl overviewAreaControl;
+    private VideoAreaControl videoAreaControl;
 
     public SongMeta SongMeta
     {
@@ -137,9 +157,28 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     void Start()
     {
         overviewAreaControl = injector.CreateAndInject<OverviewAreaControl>();
+        videoAreaControl = injector.CreateAndInject<VideoAreaControl>();
 
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
+
+        togglePlaybackButton.RegisterCallbackButtonTriggered(() => ToggleAudioPlayPause());
+        toggleRecordingButton.RegisterCallbackButtonTriggered(() =>
+        {
+            songEditorNoteRecorder.IsRecordingEnabled = !songEditorNoteRecorder.IsRecordingEnabled;
+            if (songEditorNoteRecorder.IsRecordingEnabled)
+            {
+                toggleRecordingButton.AddToClassList("recording");
+            }
+            else
+            {
+                toggleRecordingButton.RemoveFromClassList("recording");
+            }
+        });
+        exitSceneButton.RegisterCallbackButtonTriggered(() => ReturnToLastScene());
+        undoButton.RegisterCallbackButtonTriggered(() => historyManager.Undo());
+        redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
+        saveButton.RegisterCallbackButtonTriggered(() => SaveSong());
     }
 
     private void OnAudioPlaybackStopped(double positionInSongInMillis)

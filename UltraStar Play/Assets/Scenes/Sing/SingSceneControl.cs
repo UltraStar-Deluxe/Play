@@ -62,7 +62,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public SongVideoPlayer songVideoPlayer;
 
     [Inject]
-    private Injector sceneInjector;
+    private Injector injector;
 
     [Inject]
     private Settings settings;
@@ -238,8 +238,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Register ContextMenu
-        SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(uiDocument, doubleClickToTogglePauseElement, gameObject);
-        sceneInjector.Inject(singSceneContextMenuControl);
+        ContextMenuControl contextMenuControl = new ContextMenuControl(uiDocument, doubleClickToTogglePauseElement, gameObject, injector, FillContextMenu);
     }
 
     private void InitDummySingers()
@@ -251,7 +250,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
             {
                 dummySinger.SetPlayerControl(PlayerControls[dummySinger.playerIndexToSimulate]);
-                sceneInjector.Inject(dummySinger);
+                injector.Inject(dummySinger);
             }
             else
             {
@@ -312,7 +311,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         SingingLyricsControl CreateSingingLyricsControl(VisualElement visualElement, PlayerControl playerController)
         {
-            Injector lyricsControlInjector = UniInjectUtils.CreateInjector(sceneInjector);
+            Injector lyricsControlInjector = UniInjectUtils.CreateInjector(injector);
             lyricsControlInjector.AddBindingForInstance(playerController);
             SingingLyricsControl singingLyricsControl = lyricsControlInjector
                 .WithRootVisualElement(visualElement)
@@ -367,7 +366,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void InitTimeBar()
     {
         timeBarControl = new TimeBarControl();
-        sceneInjector.Inject(timeBarControl);
+        injector.Inject(timeBarControl);
         timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
     }
 
@@ -544,7 +543,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         PlayerControl playerControl = GameObject.Instantiate<PlayerControl>(playerControlPrefab);
 
-        Injector playerControlInjector = UniInjectUtils.CreateInjector(sceneInjector);
+        Injector playerControlInjector = UniInjectUtils.CreateInjector(injector);
         playerControlInjector.AddBindingForInstance(playerProfile);
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
@@ -710,5 +709,19 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         dialogControl.CloseDialog();
         dialogControl = null;
+    }
+
+    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
+            () => TogglePlayPause());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
+            () => Restart());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+            () => SkipToNextSingableNote());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
+            () => FinishScene(false));
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            () => OpenSongInEditor());
     }
 }

@@ -52,9 +52,11 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private bool isRecording;
 
+    public bool IsRecordingEnabled { get; set; }
+
     void Start()
     {
-        micPitchTracker.MicProfile = settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
+        micPitchTracker.MicProfile = settings.MicProfiles.FirstOrDefault(it => it.IsEnabled && it.IsConnected);
 
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource).Subscribe(OnNoteRecordingSourceChanged);
         songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying).Subscribe(OnSongIsPlayingChanged);
@@ -101,6 +103,11 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void UpdateRecordingViaButtonClick()
     {
+        if (!IsRecordingEnabled)
+        {
+            return;
+        }
+
         // Record notes via button click.
         bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
         if (keyboardButtonRecordingEnabled)
@@ -121,6 +128,11 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
+        if (!IsRecordingEnabled)
+        {
+            return;
+        }
+
         if (!isRecording
             || lastPitchDetectedFrame == Time.frameCount)
         {
