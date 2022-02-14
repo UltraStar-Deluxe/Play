@@ -172,8 +172,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        float xPercent = (float)((beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth);
         float widthPercent = (float)(labelWidthInMillis / noteArea.ViewportWidth);
+        float xPercent = (float)((beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth) - widthPercent / 2;
         label.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
         label.style.top = 0;
         label.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));

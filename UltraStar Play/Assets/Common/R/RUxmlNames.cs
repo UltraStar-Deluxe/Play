@@ -142,7 +142,6 @@ public static partial class R
         public const string itemLabel = "itemLabel";
         public const string ItemPicker = "ItemPicker";
         public const string jukeboxButton = "jukeboxButton";
-        public const string keyboard = "keyboard";
         public const string label = "label";
         public const string Label = "Label";
         public const string labels = "labels";
@@ -404,6 +403,7 @@ public static partial class R
         public const string videoLegend = "videoLegend";
         public const string videoLegendIcon = "videoLegendIcon";
         public const string videoLegendLabel = "videoLegendLabel";
+        public const string virtualPiano = "virtualPiano";
         public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";
