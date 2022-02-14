@@ -17,7 +17,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     private SongMeta songMeta;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -26,7 +26,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     private NoteArea noteArea;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private AddNoteAction addNoteAction;
@@ -66,7 +66,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
             contextMenu.AddItem("Fit horizontal to sentence ", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
         }
 
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.Count > 0)
         {
             int minBeat = selectedNotes.Select(it => it.StartBeat).Min() - 1;

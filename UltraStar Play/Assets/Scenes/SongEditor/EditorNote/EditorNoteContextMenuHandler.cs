@@ -18,7 +18,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     private SongMeta songMeta;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private DeleteNotesAction deleteNotesAction;
@@ -54,7 +54,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     private NoteAreaDragHandler noteAreaDragHandler;
     
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
     
     private EditorUiNote uiNote;
 
@@ -76,14 +76,14 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         {
             uiNote = GetComponent<EditorUiNote>();
         }
-        if (!selectionController.IsSelected(uiNote.Note))
+        if (!selectionControl.IsSelected(uiNote.Note))
         {
-            selectionController.SetSelection(new List<EditorUiNote> { uiNote });
+            selectionControl.SetSelection(new List<EditorUiNote> { uiNote });
         }
 
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
-        contextMenu.AddItem("Edit lyrics", () => songEditorSceneController.StartEditingNoteText());
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);

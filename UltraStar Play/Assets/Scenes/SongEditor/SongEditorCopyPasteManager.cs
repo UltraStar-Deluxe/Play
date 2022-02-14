@@ -24,7 +24,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -151,7 +151,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
         ClearCopiedNotes();
 
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         foreach (Note note in selectedNotes)
         {
             copiedVoice = note.Sentence?.Voice;
@@ -161,7 +161,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             layerManager.AddNoteToLayer(ESongEditorLayer.CopyPaste, noteCopy);
         }
 
-        selectionController.ClearSelection();
+        selectionControl.ClearSelection();
 
         editorNoteDisplayer.UpdateNotes();
     }

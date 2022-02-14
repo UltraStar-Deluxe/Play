@@ -338,6 +338,10 @@ TextInput {
     font-size: var(--font-size-s);
 }
 
+.smallFont .unity-text-element {
+    font-size: var(--font-size-s);
+}
+
 Button.smallFont {
     font-size: var(--font-size-s);
 }

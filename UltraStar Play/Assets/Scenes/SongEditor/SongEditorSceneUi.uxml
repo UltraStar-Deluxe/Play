@@ -4,11 +4,29 @@
     <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
         <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
             <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
-                <ui:VisualElement name="leftSideBarMainColumn" class="panel" style="height: 100%; border-left-width: 0; border-top-width: 0; border-bottom-width: 0;">
-                    <ui:Button text="Button" display-tooltip-when-elided="true" />
+                <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont" style="height: 100%; border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView">
+                        <ui:Button text="Play/Pause" display-tooltip-when-elided="true" name="togglePlaybackButton" />
+                        <ui:Button text="Edit Tool" display-tooltip-when-elided="true" name="editToolButton" />
+                        <ui:Button text="Add Tool" display-tooltip-when-elided="true" name="addToolButton" />
+                        <ui:Button text="Issues" display-tooltip-when-elided="true" name="toggleIssuesButton" />
+                        <ui:Button text="Record" display-tooltip-when-elided="true" name="toggleRecordingButton" />
+                        <ui:Button text="Song&#10;Properties" display-tooltip-when-elided="true" name="toggleSongPropertiesButton" />
+                        <ui:Button text="Layers" display-tooltip-when-elided="true" name="toggleLayers" />
+                        <ui:Button text="Settings" display-tooltip-when-elided="true" name="toggleSettingsButton" />
+                        <ui:Button text="Help" display-tooltip-when-elided="true" name="toggleHelpButton" />
+                        <ui:Button text="Undo" display-tooltip-when-elided="true" name="undoButton" />
+                        <ui:Button text="Redo" display-tooltip-when-elided="true" name="redoButton" />
+                        <ui:Button text="Save" display-tooltip-when-elided="true" name="saveButton" />
+                        <ui:Button text="Back" display-tooltip-when-elided="true" name="exitSceneButton" />
+                        <ui:Button text="&lt;" display-tooltip-when-elided="true" name="toggleSideBarSizeButton" />
+                    </ui:ScrollView>
                 </ui:VisualElement>
-                <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="height: 100%; border-top-width: 0; border-bottom-width: 0; display: none;">
-                    <ui:Label text="Lorem ipsum dolor&#10;met" display-tooltip-when-elided="true" name="Label" class="smallerFont" />
+                <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="border-top-width: 0; border-bottom-width: 0; display: none; height: 100%; min-width: 100px;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="issuesSideBarContainer" style="width: 100%; height: 100%; position: absolute;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="layersSideBarContainer" style="width: 100%; height: 100%; position: absolute;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" style="width: 100%; height: 100%; position: absolute;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="settingsSideBarContainer" style="width: 100%; height: 100%; position: absolute;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="keyboard" style="height: 100%; width: 48px;" />
@@ -25,6 +43,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-bottom-width: 0; border-right-width: 0; border-left-width: 0;" />
+        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0;">
+            <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
+            <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px;">
+            <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" style="padding-bottom: 1px; padding-top: 1px;" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

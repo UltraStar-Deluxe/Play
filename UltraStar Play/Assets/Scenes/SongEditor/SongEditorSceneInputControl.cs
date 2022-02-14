@@ -26,13 +26,13 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     public GameObject inputActionInfoOverlay;
     
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private NoteArea noteArea;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -103,12 +103,12 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_togglePlayPause).PerformedAsObservable()
             .Where(_ => !InputUtils.IsKeyboardControlPressed())
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => songEditorSceneController.ToggleAudioPlayPause());
+            .Subscribe(_ => songEditorSceneControl.ToggleAudioPlayPause());
 
         // Play only the selected notes
         InputManager.GetInputAction(R.InputActions.songEditor_playSelectedNotes).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => PlayAudioInRangeOfNotes(selectionController.GetSelectedNotes()));
+            .Subscribe(_ => PlayAudioInRangeOfNotes(selectionControl.GetSelectedNotes()));
         
         // Stop playback or return to last scene
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
@@ -117,29 +117,29 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Select all notes
         InputManager.GetInputAction(R.InputActions.songEditor_selectAll).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => selectionController.SelectAll());
+            .Subscribe(_ => selectionControl.SelectAll());
         
         // Select next / previous note
         InputManager.GetInputAction(R.InputActions.songEditor_selectNextNote).PerformedAsObservable()
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => selectionController.SelectNextNote());
+            .Subscribe(_ => selectionControl.SelectNextNote());
         InputManager.GetInputAction(R.InputActions.songEditor_selectPreviousNote).PerformedAsObservable()
-            .Subscribe(_ => selectionController.SelectPreviousNote());
+            .Subscribe(_ => selectionControl.SelectPreviousNote());
         
         // Deselect notes
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(cancelNoteSelectionPriority)
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed() && !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Where(_ => selectionController.HasSelectedNotes())
+            .Where(_ => selectionControl.HasSelectedNotes())
             .Subscribe(_ =>
             {
-                selectionController.ClearSelection();
+                selectionControl.ClearSelection();
                 InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
             });
         
         // Delete notes
         InputManager.GetInputAction(R.InputActions.songEditor_delete).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => deleteNotesAction.ExecuteAndNotify(selectionController.GetSelectedNotes()));
+            .Subscribe(_ => deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes()));
         
         // Undo
         InputManager.GetInputAction(R.InputActions.songEditor_undo).PerformedAsObservable()
@@ -154,12 +154,12 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Save
         InputManager.GetInputAction(R.InputActions.songEditor_save).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => songEditorSceneController.SaveSong());
+            .Subscribe(_ => songEditorSceneControl.SaveSong());
         
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(_ => songEditorSceneController.StartEditingNoteText());
+            .Subscribe(_ => songEditorSceneControl.StartEditingNoteText());
         
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -170,27 +170,27 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeGolden).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Golden));
+            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Golden));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeFreestyle).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Freestyle));
+            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Freestyle));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeNormal).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Normal));
+            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Normal));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeRap).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.Rap));
+            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Rap));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeRapGolden).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
-            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionController.GetSelectedNotes(), ENoteType.RapGolden));
+            .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.RapGolden));
         
         // Zoom and scroll with mouse wheel
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
@@ -241,7 +241,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             // Special case: the back-Action in an InputField removes its focus.
             // Thus also check that in the previous frame no InputField was focused.
-            songEditorSceneController.ReturnToLastScene();
+            songEditorSceneControl.ReturnToLastScene();
         }
     }
 
@@ -303,7 +303,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                 }
             }
             
-            List<Note> selectedNotes = selectionController.GetSelectedNotes();
+            List<Note> selectedNotes = selectionControl.GetSelectedNotes();
             if (selectedNotes.IsNullOrEmpty())
             {
                 return;
@@ -358,7 +358,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (Keyboard.current != null
             && InputUtils.IsKeyboardControlPressed()
             && (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
-            && selectionController.GetSelectedNotes().IsNullOrEmpty())
+            && selectionControl.GetSelectedNotes().IsNullOrEmpty())
         {
             int stepInMillis = InputUtils.IsKeyboardShiftPressed()
                 ? 1
@@ -458,15 +458,15 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
         
         // 4 and 6 on keypad to move to the previous/next note
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         List<Note> followingNotes = GetFollowingNotesOrEmptyListIfDeactivated(selectedNotes);
         if (Keyboard.current.numpad4Key.wasReleasedThisFrame)
         {
-            selectionController.SelectPreviousNote();
+            selectionControl.SelectPreviousNote();
         }
         if (Keyboard.current.numpad6Key.wasReleasedThisFrame)
         {
-            selectionController.SelectNextNote();
+            selectionControl.SelectNextNote();
         }
 
         // 1 and 3 moves the note left and right (by one beat, length unchanged)
@@ -516,7 +516,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             if (selectedNotes.IsNullOrEmpty())
             {
-                songEditorSceneController.ToggleAudioPlayPause();
+                songEditorSceneControl.ToggleAudioPlayPause();
             }
             else
             {
@@ -546,7 +546,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         int maxBeat = notes.Select(it => it.EndBeat).Max();
         double maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
         double minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
-        songEditorSceneController.StopPlaybackAfterPositionInSongInMillis = maxMillis;
+        songEditorSceneControl.StopPlaybackAfterPositionInSongInMillis = maxMillis;
         songAudioPlayer.PositionInSongInMillis = minMillis;
         songAudioPlayer.PlayAudio();
     }

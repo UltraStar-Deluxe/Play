@@ -30,7 +30,7 @@ public class EditorUiSentence : MonoBehaviour, INeedInjection, IPointerEnterHand
     public Text uiText;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private UiManager uiManager;
@@ -55,7 +55,7 @@ public class EditorUiSentence : MonoBehaviour, INeedInjection, IPointerEnterHand
 
         if (sentence.Voice != null)
         {
-            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
+            Color color = songEditorSceneControl.GetColorForVoice(sentence.Voice);
             SetColor(color);
         }
     }

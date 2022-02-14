@@ -15,7 +15,7 @@ using UnityEngine.InputSystem;
 public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private NoteAreaDragHandler noteAreaDragHandler;
@@ -74,14 +74,14 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
             return;
         }
 
-        if (!selectionController.IsSelected(dragStartUiNote.Note))
+        if (!selectionControl.IsSelected(dragStartUiNote.Note))
         {
-            selectionController.SetSelection(new List<EditorUiNote> { dragStartUiNote });
+            selectionControl.SetSelection(new List<EditorUiNote> { dragStartUiNote });
         }
 
         dragAction = GetDragAction(dragStartUiNote, dragEvent);
 
-        selectedNotes = selectionController.GetSelectedNotes();
+        selectedNotes = selectionControl.GetSelectedNotes();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);

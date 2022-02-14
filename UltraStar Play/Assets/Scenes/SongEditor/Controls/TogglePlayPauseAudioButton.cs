@@ -9,13 +9,13 @@ using UniRx;
 public class TogglePlayPauseAudioButton : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private Button button;
 
     void Start()
     {
-        button.OnClickAsObservable().Subscribe(_ => songEditorSceneController.ToggleAudioPlayPause());
+        button.OnClickAsObservable().Subscribe(_ => songEditorSceneControl.ToggleAudioPlayPause());
     }
 }

@@ -45,7 +45,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     private Settings settings;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
@@ -355,7 +355,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         // Update color
         if (sentence.Voice != null)
         {
-            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
+            Color color = songEditorSceneControl.GetColorForVoice(sentence.Voice);
             uiSentence.SetColor(color);
 
             // Make sentence rectangles alternating light/dark

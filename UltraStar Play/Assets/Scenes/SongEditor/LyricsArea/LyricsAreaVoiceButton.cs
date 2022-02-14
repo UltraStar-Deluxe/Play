@@ -27,7 +27,7 @@ public class LyricsAreaVoiceButton : MonoBehaviour, INeedInjection
     private LyricsArea lyricsArea;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
     private SongMeta songMeta;
@@ -42,7 +42,7 @@ public class LyricsAreaVoiceButton : MonoBehaviour, INeedInjection
             return;
         }
 
-        image.color = songEditorSceneController.GetColorForVoice(GetVoice());
+        image.color = songEditorSceneControl.GetColorForVoice(GetVoice());
         uiText.text = "P" + (voiceIndex + 1);
 
         button.OnClickAsObservable().Subscribe(_ => lyricsArea.Voice = GetVoice());

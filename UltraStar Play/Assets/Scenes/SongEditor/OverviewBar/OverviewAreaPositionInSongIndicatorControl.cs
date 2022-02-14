@@ -4,19 +4,19 @@ using UniInject;
 using UnityEngine;
 using UniRx;
 using System;
+using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class OverviewBarPositionInSongIndicator : MonoBehaviour, INeedInjection
+public class OverviewAreaPositionInSongIndicatorControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private RectTransform rectTransform;
+    [Inject(UxmlName = R.UxmlNames.overviewAreaPositionInSongIndicator)]
+    private VisualElement overviewAreaPositionInSongIndicator;
 
-    void Start()
+    public void OnInjectionFinished()
     {
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
     }
@@ -29,10 +29,7 @@ public class OverviewBarPositionInSongIndicator : MonoBehaviour, INeedInjection
 
     private void UpdatePosition(double positionInSongInPercent)
     {
-        float x = (float)positionInSongInPercent;
-
-        rectTransform.anchorMin = new Vector2(x, rectTransform.anchorMin.y);
-        rectTransform.anchorMax = new Vector2(x, rectTransform.anchorMax.y);
-        rectTransform.anchoredPosition = Vector2.zero;
+        float xPercent = (float)positionInSongInPercent;
+        overviewAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent, LengthUnit.Percent));
     }
 }
