@@ -32,7 +32,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public NoteAreaDragHandler noteAreaDragHandler;
     
     [InjectedInInspector]
-    public NoteAreaContextMenuHandler noteAreaContextMenuHandler;
+    public NoteAreaContextMenuControl noteAreaContextMenuControl;
 
     [InjectedInInspector]
     public EditorNoteDisplayer editorNoteDisplayer;
@@ -386,17 +386,19 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
         bb.BindExistingInstance(noteAreaDragHandler);
-        bb.BindExistingInstance(noteAreaContextMenuHandler);
+        bb.BindExistingInstance(noteAreaContextMenuControl);
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(selectionControl);
+        bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(midiFileImporter);
         bb.BindExistingInstance(songEditorCopyPasteManager);
+        bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }

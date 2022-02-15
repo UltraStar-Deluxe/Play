@@ -11,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public abstract class AbstractDragControl<EVENT>
+public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener
 {
     private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
 
@@ -20,22 +20,25 @@ public abstract class AbstractDragControl<EVENT>
     private EVENT dragStartEvent;
     private int pointerId;
 
-    private Vector3 dragStartPosition;
-
     private DragControlPointerEvent dragControlPointerDownEvent;
     public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
 
-    public VisualElement TargetVisualElement { get; private set; }
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement targetVisualElement;
 
-    protected readonly UIDocument uiDocument;
-    protected readonly PanelHelper panelHelper;
-    protected readonly GameObject gameObject;
+    [Inject]
+    protected UIDocument uiDocument;
 
-	protected AbstractDragControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
+    [Inject]
+    protected GameObject gameObject;
+
+    [Inject]
+    protected Injector injector;
+
+    protected PanelHelper panelHelper;
+
+    public virtual void OnInjectionFinished()
     {
-        this.uiDocument = uiDocument;
-        this.TargetVisualElement = targetVisualElement;
-        this.gameObject = gameObject;
         this.panelHelper = new PanelHelper(uiDocument);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         targetVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
@@ -105,7 +108,6 @@ public abstract class AbstractDragControl<EVENT>
         }
 
         DragState.Value = EDragState.Dragging;
-        dragStartPosition = eventData.Position;
         pointerId = eventData.PointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
@@ -167,9 +169,9 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
         // Target coordinates in pixels
-        float targetWidthInPixels = TargetVisualElement.contentRect.width;
-        float targetHeightInPixels = TargetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
+        float targetWidthInPixels = targetVisualElement.contentRect.width;
+        float targetHeightInPixels = targetVisualElement.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(targetVisualElement.resolvedStyle.left, targetVisualElement.resolvedStyle.top);
 
         float rectTransformXDistanceInPixels = targetPosInPixels.x - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
         float rectTransformYDistanceInPixels = targetPosInPixels.y - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
@@ -205,9 +207,9 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 screenPosInPixels = eventData.Position;
 
         // Target coordinate in pixels
-        float targetWidthInPixels = TargetVisualElement.contentRect.width;
-        float targetHeightInPixels = TargetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
+        float targetWidthInPixels = targetVisualElement.contentRect.width;
+        float targetHeightInPixels = targetVisualElement.contentRect.height;
+        Vector2 targetPosInPixels = new Vector2(targetVisualElement.resolvedStyle.left, targetVisualElement.resolvedStyle.top);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(

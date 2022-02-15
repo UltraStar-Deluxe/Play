@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INeedInjection
+public class EditorSentenceContextMenuControl : ContextMenuControl
 {
     [Inject]
     private DeleteSentencesAction deleteSentencesAction;
@@ -21,15 +21,17 @@ public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INee
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
     private EditorSentenceControl sentenceControl;
 
-    protected override void FillContextMenu(ContextMenu contextMenu)
+    public override void OnInjectionFinished()
     {
-        if (sentenceControl == null)
-        {
-            sentenceControl = GetComponent<EditorSentenceControl>();
-        }
+        base.OnInjectionFinished();
+        FillContextMenuAction = FillContextMenu;
+    }
 
+    private void FillContextMenu(ContextMenuPopupControl contextMenu)
+    {
         List<Sentence> selectedSentences = new List<Sentence> { sentenceControl.Sentence };
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));

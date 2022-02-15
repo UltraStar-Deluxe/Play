@@ -776,6 +776,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         BindingBuilder bb = new BindingBuilder();
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(songRouletteControl);
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);

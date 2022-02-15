@@ -8,11 +8,12 @@ using UniInject;
 using UniRx;
 using System.Text;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
+public class EditorNoteContextMenuControl : ContextMenuControl
 {
     [Inject]
     private SongMeta songMeta;
@@ -47,35 +48,38 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
-    [Inject]
-    private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
-    
-    [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
+    // [Inject]
+    // private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
+    //
+    // [Inject]
+    // private NoteAreaDragHandler noteAreaDragHandler;
     
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
-    
+
+    [Inject]
     private EditorNoteControl noteControl;
+
+    public override void OnInjectionFinished()
+    {
+        base.OnInjectionFinished();
+        FillContextMenuAction = FillContextMenu;
+    }
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         // This ContextMenu could open although a drag is in progress.
-        if (noteAreaContextMenuHandler.IsDrag
-            || noteAreaDragHandler.DragDistance.magnitude > AbstractContextMenuHandler.DragDistanceThreshold)
-        {
-            return;
-        }
+        // if (noteAreaContextMenuHandler.IsDrag
+        //     || noteAreaDragHandler.DragDistance.magnitude > ContextMenuControl.DragDistanceThreshold)
+        // {
+        //     return;
+        // }
         
         base.CheckOpenContextMenuFromInputAction(context);
     }
 
-    protected override void FillContextMenu(ContextMenu contextMenu)
+    private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
-        if (noteControl == null)
-        {
-            noteControl = GetComponent<EditorNoteControl>();
-        }
         if (!selectionControl.IsSelected(noteControl.Note))
         {
             selectionControl.SetSelection(new List<EditorNoteControl> { noteControl });
@@ -93,14 +97,14 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
     }
 
-    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
         if (spaceBetweenNotesAction.CanExecute(selectedNotes))
         {
             contextMenu.AddItem("Add space between notes", () =>
             {
-                SpaceBetweenNotesButton spaceBetweenNotesButton = FindObjectOfType<SpaceBetweenNotesButton>(true);
+                SpaceBetweenNotesButton spaceBetweenNotesButton = GameObject.FindObjectOfType<SpaceBetweenNotesButton>(true);
                 if (int.TryParse(spaceBetweenNotesButton.numberOfBeatsInputField.text, out int spaceInBeats))
                 {
                     spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
@@ -109,13 +113,13 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
     }
 
-    private void FillContextMenuToDeleteNotes(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
     }
 
-    private void FillContextMenuToSplitAndMergeNotes(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToSplitAndMergeNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         if (splitNotesAction.CanExecute(selectedNotes))
         {
@@ -127,7 +131,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
     }
 
-    private void FillContextMenuToSetNoteType(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToSetNoteType(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Golden))
@@ -157,7 +161,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
     }
 
-    private void FillContextMenuToMergeSentences(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToMergeSentences(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         if (mergeSentencesAction.CanExecute(selectedNotes))
         {
@@ -167,7 +171,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
     }
 
-    private void FillContextMenuToMoveToOtherVoice(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToMoveToOtherVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
         bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceName);
@@ -193,7 +197,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
     }
 
-    private void FillContextMenuToMoveToOtherSentence(ContextMenu contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToMoveToOtherSentence(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
         bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);

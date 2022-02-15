@@ -44,9 +44,13 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private GeneralDragControl dragControl;
 
+    private ContextMenuControl contextMenuControl;
+
     public void OnInjectionFinished()
     {
-        dragControl = new GeneralDragControl(uiDocument, videoArea, songEditorSceneControl.gameObject);
+        dragControl = injector
+            .WithRootVisualElement(videoArea)
+            .CreateAndInject<GeneralDragControl>();
         dragControl.AddListener(this);
 
         videoArea.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
@@ -56,7 +60,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             cursorManager.SetCursorTextVisible(false);
         });
 
-        new ContextMenuControl(uiDocument, videoArea, songEditorSceneControl.gameObject, injector, FillContextMenu);
+        contextMenuControl = injector
+            .WithRootVisualElement(videoArea)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
     }
 
     public void CancelDrag()

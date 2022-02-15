@@ -82,6 +82,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.noteAreaPositionInSongIndicator)]
     private VisualElement noteAreaPositionInSongIndicator;
 
+    private NoteAreaContextMenuControl contextMenuControl;
+
     private PanelHelper panelHelper;
 
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
@@ -125,6 +127,10 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         ViewportEventStream.Subscribe(_ => UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis));
 
         noteAreaVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
+
+        contextMenuControl = injector
+            .WithRootVisualElement(noteAreaVisualElement)
+            .CreateAndInject<NoteAreaContextMenuControl>();
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)

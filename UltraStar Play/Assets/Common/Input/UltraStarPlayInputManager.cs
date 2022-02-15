@@ -74,7 +74,6 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         {
             Log.Logger.Error(e, "Could not enable enhanced touch support");
         }
-        ContextMenu.OpenContextMenus.Clear();
 
         if (inputDeviceIcon != null)
         {

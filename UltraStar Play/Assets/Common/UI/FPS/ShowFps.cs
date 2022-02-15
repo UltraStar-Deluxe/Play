@@ -1,11 +1,12 @@
 ﻿using System;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Label = UnityEngine.UIElements.Label;
 using UniRx;
 
-public class ShowFps : MonoBehaviour
+public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -20,22 +21,27 @@ public class ShowFps : MonoBehaviour
     [ReadOnly]
     public int fps;
 
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private UIDocument uiDocument;
+
     private float deltaTime;
     private int frameCount;
 
     private Label fpsLabel;
 
-    private void Start()
+    public void OnInjectionFinished()
     {
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
-        if (uiDocument != null)
-        {
-            CreateLabel(uiDocument.rootVisualElement);
+        CreateLabel(uiDocument.rootVisualElement);
 
-            DragToMoveControl dragToMoveControl = new DragToMoveControl(uiDocument, fpsLabel, gameObject);
-            dragToMoveControl.MovedEventStream
-                .Subscribe(newPositionInPx => lastFpsLabelPositionInPx = newPositionInPx);
-        }
+        DragToMoveControl dragToMoveControl = injector
+            .WithRootVisualElement(fpsLabel)
+            .WithBindingForInstance(gameObject)
+            .CreateAndInject<DragToMoveControl>();
+        dragToMoveControl.MovedEventStream
+            .Subscribe(newPositionInPx => lastFpsLabelPositionInPx = newPositionInPx);
     }
 
     private void CreateLabel(VisualElement parent)

@@ -96,6 +96,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
 
         showFpsInstance = Instantiate(showFpsPrefab, CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+        injector.Inject(showFpsInstance);
         // Move to front
         showFpsInstance.transform.SetAsLastSibling();
         showFpsInstance.transform.position = new Vector3(20, 20, 0);
