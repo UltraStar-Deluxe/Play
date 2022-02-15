@@ -15656,7 +15656,7 @@ GameObject:
   - component: {fileID: 1946012172}
   - component: {fileID: 1946012173}
   m_Layer: 5
-  m_Name: EditorUiIssueDisplayer
+  m_Name: EditorIssueDisplayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15689,7 +15689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d913cd4e6657ba84b929b03850e27c01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  issuePrefab: {fileID: 8116091596721666920, guid: ce395b9c7740d3346a3a8333ddb16a44,
+  editorIssueUi: {fileID: 9197481963319205126, guid: 63217d6b73437ba4d91a9a24efb40c8b,
     type: 3}
 --- !u!1 &1955661598
 GameObject:
@@ -15903,7 +15903,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 369a208eb5e25774cbac9c32e26ee4e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiNoteContainer: {fileID: 0}
 --- !u!1 &1975547980
 GameObject:
   m_ObjectHideFlags: 0

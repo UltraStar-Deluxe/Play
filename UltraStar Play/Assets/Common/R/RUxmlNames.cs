@@ -138,7 +138,10 @@ public static partial class R
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
+        public const string issueImage = "issueImage";
+        public const string issueLabel = "issueLabel";
         public const string issuesSideBarContainer = "issuesSideBarContainer";
+        public const string issueUiRoot = "issueUiRoot";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
         public const string ItemPicker = "ItemPicker";

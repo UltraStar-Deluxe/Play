@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using PrimeInputActions;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public static class InputUtils
@@ -123,5 +124,17 @@ public static class InputUtils
         }
 
         return pointerPanelCoordinates;
+    }
+
+    public static bool IsPointerOverVisualElement(VisualElement visualElement, PanelHelper panelHelper)
+    {
+        Vector2 pointerPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
+        pointerPositionInPanelCoordinates = new Vector2(pointerPositionInPanelCoordinates.x,
+            pointerPositionInPanelCoordinates.y);
+        Rect rect = visualElement.worldBound;
+        return rect.xMin <= pointerPositionInPanelCoordinates.x
+               && pointerPositionInPanelCoordinates.x <= rect.xMax
+               && rect.yMin <= pointerPositionInPanelCoordinates.y
+               && pointerPositionInPanelCoordinates.y <= rect.yMax;
     }
 }

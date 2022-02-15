@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -14,7 +13,7 @@ using UnityEngine.UIElements;
 public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [InjectedInInspector]
-    public EditorUiIssue issuePrefab;
+    public VisualTreeAsset editorIssueUi;
 
     [Inject]
     private NoteAreaControl noteAreaControl;
@@ -33,8 +32,6 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
 
     private IReadOnlyCollection<SongIssue> issues = new List<SongIssue>();
 
-    private float issuePrefabWidthInPixels;
-
     private ViewportEvent lastViewportEvent;
     private float lastSongMetaBpm;
 
@@ -45,8 +42,6 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
 
     private void Start()
     {
-        issuePrefabWidthInPixels = issuePrefab.GetComponent<RectTransform>().rect.width;
-
         UpdateIssues();
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
@@ -86,22 +81,24 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
 
     private void CreateUiIssue(SongIssue issue)
     {
-        // EditorUiIssue uiIssue = Instantiate(issuePrefab, noteAreaIssues.transform);
-        // injector.Inject(uiIssue);
-        // uiIssue.Init(issue);
+        VisualElement visualElement = editorIssueUi.CloneTree().Children().First();
+        EditorIssueControl editorIssueControl = injector
+            .WithRootVisualElement(visualElement)
+            .WithBindingForInstance(issue)
+            .CreateAndInject<EditorIssueControl>();
+        noteAreaIssues.Add(visualElement);
 
-        // PositionUiIssue(uiIssue, issue.StartBeat);
+        editorIssueControl.VisualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            PositionEditorIssueControl(editorIssueControl.VisualElement, issue.StartBeat);
+        });
     }
 
-    private void PositionUiIssue(EditorUiIssue uiIssue, int beat)
+    private void PositionEditorIssueControl(VisualElement visualElement, int beat)
     {
-        RectTransform uiIssueRectTransform = uiIssue.GetComponent<RectTransform>();
-
-        float widthPercent = issuePrefabWidthInPixels / noteAreaIssues.contentRect.width;
+        float widthPercent = visualElement.contentRect.width / noteAreaIssues.contentRect.width;
         float xPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(beat);
-        uiIssueRectTransform.anchorMin = new Vector2(xPercent, 0);
-        uiIssueRectTransform.anchorMax = new Vector2(xPercent + widthPercent, 1);
-        uiIssueRectTransform.anchoredPosition = Vector2.zero;
-        uiIssueRectTransform.sizeDelta = Vector2.zero;
+        visualElement.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
     }
 }
