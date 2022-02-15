@@ -58,7 +58,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new Dictionary<Note, EditorNoteControl>();
+    public IReadOnlyCollection<EditorNoteControl> EditorNoteControls => noteToControlMap.Values;
+
     private readonly Dictionary<Sentence, EditorSentenceControl> sentenceToControlMap = new Dictionary<Sentence, EditorSentenceControl>();
+    public IReadOnlyCollection<EditorSentenceControl> EditorSentenceControls => sentenceToControlMap.Values;
 
     public void OnInjectionFinished()
     {

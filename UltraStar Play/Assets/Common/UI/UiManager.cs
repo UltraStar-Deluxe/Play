@@ -45,9 +45,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset contextMenuSeparatorUi;
 
     [InjectedInInspector]
-    public Tooltip tooltipPrefab;
-
-    [InjectedInInspector]
     public ShowFps showFpsPrefab;
 
     private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();

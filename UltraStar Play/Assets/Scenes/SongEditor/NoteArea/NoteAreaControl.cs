@@ -551,13 +551,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public bool IsPointerOver()
     {
-        Vector2 pointerPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        pointerPositionInPanelCoordinates = new Vector2(pointerPositionInPanelCoordinates.x,
-            pointerPositionInPanelCoordinates.y);
-        Rect rect = noteAreaVisualElement.worldBound;
-        return rect.xMin <= pointerPositionInPanelCoordinates.x
-               && pointerPositionInPanelCoordinates.x <= rect.xMax
-               && rect.yMin <= pointerPositionInPanelCoordinates.y
-               && pointerPositionInPanelCoordinates.y <= rect.yMax;
+        return InputUtils.IsPointerOverVisualElement(noteAreaVisualElement, panelHelper);
     }
 }

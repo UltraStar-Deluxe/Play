@@ -674,6 +674,11 @@ Label.tinyFont {
     -unity-text-outline-color: rgba(64, 64, 64, 0.75);
 }
 
+.tooltip {
+    font-size: var(--font-size-xs);
+    -unity-font-style: bold;
+}
+
 #root.singScenePlayerUi {
     padding-top: 10px;
     padding-bottom: 10px;

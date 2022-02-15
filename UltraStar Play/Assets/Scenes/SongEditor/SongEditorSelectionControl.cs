@@ -13,9 +13,6 @@ using UnityEngine.EventSystems;
 
 public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 {
-    [InjectedInInspector]
-    public RectTransform uiNoteContainer;
-
     [Inject]
     private EventSystem eventSystem;
 
@@ -54,8 +51,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void ClearSelection()
     {
-        EditorNoteControl[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorNoteControl>();
-        foreach (EditorNoteControl uiNote in uiNotes)
+        foreach (EditorNoteControl uiNote in editorNoteDisplayer.EditorNoteControls)
         {
             uiNote.SetSelected(false);
         }
@@ -300,13 +296,12 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private List<EditorNoteControl> GetSortedVisibleUiNotes()
     {
-        EditorNoteControl[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorNoteControl>();
-        if (uiNotes.IsNullOrEmpty())
+        if (editorNoteDisplayer.EditorNoteControls.IsNullOrEmpty())
         {
             return new List<EditorNoteControl>();
         }
 
-        List<EditorNoteControl> sortedUiNote = new List<EditorNoteControl>(uiNotes);
+        List<EditorNoteControl> sortedUiNote = new List<EditorNoteControl>(editorNoteDisplayer.EditorNoteControls);
         sortedUiNote.Sort(EditorNoteControl.comparerByStartBeat);
         return sortedUiNote;
     }
