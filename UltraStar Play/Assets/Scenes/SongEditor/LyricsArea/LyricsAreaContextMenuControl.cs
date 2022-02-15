@@ -11,15 +11,19 @@ using System.Text;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class LyricsAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjection
+public class LyricsAreaContextMenuControl : ContextMenuControl
 {
     [Inject]
     private LyricsAreaControl lyricsAreaControl;
 
-    protected override void FillContextMenu(ContextMenu contextMenu)
+    public override void OnInjectionFinished()
+    {
+        base.OnInjectionFinished();
+        FillContextMenuAction = FillContextMenu;
+    }
+
+    private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
         contextMenu.AddItem("Refresh", () => lyricsAreaControl.UpdateLyrics());
     }
-
-
 }

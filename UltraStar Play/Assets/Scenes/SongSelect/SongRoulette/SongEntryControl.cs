@@ -76,6 +76,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private Injector injector;
+
     public string Name { get; set; }
 
     public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
@@ -311,8 +314,10 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
 
-        // // Add itself as IDragListener to be notified when its RectTransform is dragged.
-        dragControl = new GeneralDragControl(uiDocument, songButton, songRouletteControl.gameObject);
+        // Add itself as IDragListener to be notified when its RectTransform is dragged.
+        dragControl = injector
+            .WithRootVisualElement(songButton)
+            .CreateAndInject<GeneralDragControl>();
         dragControl.AddListener(this);
 
         // Ignore button click after dragging

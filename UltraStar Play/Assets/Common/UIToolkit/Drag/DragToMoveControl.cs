@@ -1,7 +1,6 @@
 ﻿using System;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEvent>
 {
@@ -12,9 +11,9 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
     private readonly Subject<Vector2> movedEventStream = new Subject<Vector2>();
     public IObservable<Vector2> MovedEventStream => movedEventStream;
 
-    public DragToMoveControl(UIDocument uiDocument, VisualElement targetVisualElement, GameObject gameObject)
-        : base(uiDocument, targetVisualElement, gameObject)
+    public override void OnInjectionFinished()
     {
+        base.OnInjectionFinished();
         // Add itself as listener, such that dragging on the VisualElement will move it.
         AddListener(this);
     }
@@ -22,16 +21,16 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
         dragStartPositionInPx = new Vector2(
-            TargetVisualElement.resolvedStyle.left,
-            TargetVisualElement.resolvedStyle.top);
+            targetVisualElement.resolvedStyle.left,
+            targetVisualElement.resolvedStyle.top);
         isCanceled = false;
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
         Vector2 newPosition = new Vector2(
-            dragEvent.ScreenCoordinateInPixels.CurrentPosition.x - TargetVisualElement.resolvedStyle.width / 2,
-            dragEvent.ScreenCoordinateInPixels.CurrentPosition.y - TargetVisualElement.resolvedStyle.height / 2);
+            dragEvent.ScreenCoordinateInPixels.CurrentPosition.x - targetVisualElement.resolvedStyle.width / 2,
+            dragEvent.ScreenCoordinateInPixels.CurrentPosition.y - targetVisualElement.resolvedStyle.height / 2);
         MoveTo(newPosition);
     }
 
@@ -53,8 +52,8 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
 
     private void MoveTo(Vector2 positionInPx)
     {
-        TargetVisualElement.style.left = positionInPx.x;
-        TargetVisualElement.style.top = positionInPx.y;
+        targetVisualElement.style.left = positionInPx.x;
+        targetVisualElement.style.top = positionInPx.y;
         movedEventStream.OnNext(positionInPx);
     }
 }

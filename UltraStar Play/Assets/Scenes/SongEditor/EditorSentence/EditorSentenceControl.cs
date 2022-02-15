@@ -47,6 +47,11 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private CursorManager cursorManager;
 
+    [Inject]
+    private Injector injector;
+
+    private EditorSentenceContextMenuControl contextMenuControl;
+
     public bool IsPointerOver { get; private set; }
     public bool IsPointerOverRightHandle { get; private set; }
 
@@ -65,6 +70,11 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
             Color color = songEditorSceneControl.GetColorForVoice(Sentence.Voice);
             SetColor(color);
         }
+
+        contextMenuControl = injector
+            .WithRootVisualElement(VisualElement)
+            .WithBindingForInstance(this)
+            .CreateAndInject<EditorSentenceContextMenuControl>();
     }
 
     public void SetColor(Color color)

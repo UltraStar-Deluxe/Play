@@ -20,6 +20,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.lyricsAreaTextField)]
     private TextField textField;
 
+    [Inject(UxmlName = R.UxmlNames.lyricsArea)]
+    private VisualElement lyricsArea;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -28,6 +31,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private Injector injector;
+
+    private LyricsAreaContextMenuControl contextMenuControl;
 
     private Voice voice;
     public Voice Voice
@@ -67,6 +75,10 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
+
+        contextMenuControl = injector
+            .WithRootVisualElement(lyricsArea)
+            .CreateAndInject<LyricsAreaContextMenuControl>();
     }
 
     public void Update()

@@ -156,6 +156,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private SimpleDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
 
+    private ContextMenuControl contextMenuControl;
+
     private void Start()
     {
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
@@ -238,7 +240,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Register ContextMenu
-        ContextMenuControl contextMenuControl = new ContextMenuControl(uiDocument, doubleClickToTogglePauseElement, gameObject, injector, FillContextMenu);
+        contextMenuControl = injector
+            .WithRootVisualElement(doubleClickToTogglePauseElement)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
     }
 
     private void InitDummySingers()
@@ -644,6 +649,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(gameObject);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);

@@ -430,8 +430,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void OnSongButtonClicked(SongMeta songMeta)
     {
-        if (ContextMenu.IsAnyContextMenuOpen
-            || IsDrag
+        if (IsDrag
             || IsFlickGesture)
         {
             return;

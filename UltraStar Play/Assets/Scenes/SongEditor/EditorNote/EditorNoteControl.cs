@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using PrimeInputActions;
+using UniInject.Extensions;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -77,6 +78,9 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     private UiManager uiManager;
 
     [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
     public Note Note { get; private set; }
 
     private Vector2 pointerDownPosition;
@@ -94,6 +98,8 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
+    private EditorNoteContextMenuControl contextMenuControl;
+
     public void OnInjectionFinished()
     {
         UpdateHandles();
@@ -109,6 +115,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         VisualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(), TrickleDown.TrickleDown);
+
+        contextMenuControl = injector
+            .WithRootVisualElement(VisualElement)
+            .WithBindingForInstance(this)
+            .CreateAndInject<EditorNoteContextMenuControl>();
 
         SyncWithNote();
     }
