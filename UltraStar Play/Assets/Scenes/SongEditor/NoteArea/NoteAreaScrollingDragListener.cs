@@ -13,7 +13,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class NoteAreaScrollingDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     private const float TouchGestureMoveInSameDirectionThreshold = 100f;
     
@@ -21,7 +21,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
     private NoteAreaControl noteAreaControl;
 
     [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
+    private NoteAreaDragControl noteAreaDragControl;
 
     private int viewportXBeginDrag;
     private int viewportYBeginDrag;
@@ -30,9 +30,9 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
 
     private float twoFingerGestureStartDistance;
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        noteAreaDragHandler.AddListener(this);
+        noteAreaDragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)

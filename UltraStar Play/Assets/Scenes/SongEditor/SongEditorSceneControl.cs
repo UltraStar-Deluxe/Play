@@ -29,12 +29,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongEditorSelectionControl selectionControl;
 
     [InjectedInInspector]
-    public NoteAreaDragHandler noteAreaDragHandler;
-    
-    [InjectedInInspector]
-    public NoteAreaContextMenuControl noteAreaContextMenuControl;
-
-    [InjectedInInspector]
     public EditorNoteDisplayer editorNoteDisplayer;
 
     [InjectedInInspector]
@@ -57,6 +51,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private UIDocument uiDocument;
 
     [Inject]
     private UiManager uiManager;
@@ -161,6 +158,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
         saveButton.RegisterCallbackButtonTriggered(() => SaveSong());
         statusBarSongInfoLabel.text = $"{SongMeta.Artist} - {SongMeta.Title}";
+
+        if (uiDocument.rootVisualElement.focusController.focusedElement != null)
+        {
+            uiDocument.rootVisualElement.focusController.focusedElement.Blur();
+        }
     }
 
     private void Update()
@@ -385,8 +387,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
-        bb.BindExistingInstance(noteAreaDragHandler);
-        bb.BindExistingInstance(noteAreaContextMenuControl);
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);

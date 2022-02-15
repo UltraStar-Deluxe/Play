@@ -32,9 +32,6 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     [Inject]
     protected GameObject gameObject;
 
-    [Inject]
-    protected Injector injector;
-
     protected PanelHelper panelHelper;
 
     public virtual void OnInjectionFinished()
@@ -164,18 +161,21 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenPosInPixels = eventData.Position;
+        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        Vector2 screenPosInPixels = new Vector2(
+            eventData.Position.x,
+            screenSizePanelCoordinates.y - eventData.Position.y);
         Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
         // Target coordinates in pixels
-        float targetWidthInPixels = targetVisualElement.contentRect.width;
-        float targetHeightInPixels = targetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(targetVisualElement.resolvedStyle.left, targetVisualElement.resolvedStyle.top);
+        float targetWidthInPixels = targetVisualElement.worldBound.width;
+        float targetHeightInPixels = targetVisualElement.worldBound.height;
 
-        float rectTransformXDistanceInPixels = targetPosInPixels.x - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
-        float rectTransformYDistanceInPixels = targetPosInPixels.y - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
-        Vector2 rectTransformDistanceInPixels = new Vector2(rectTransformXDistanceInPixels, rectTransformYDistanceInPixels);
+        Vector2 localPosInPixels = new Vector2(
+            eventData.LocalPosition.x,
+            targetHeightInPixels - eventData.LocalPosition.y);
+        Vector2 localDistanceInPixels = localPosInPixels - localDragStartEvent.LocalCoordinateInPixels.StartPosition;
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
@@ -188,15 +188,14 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 deltaInPixels,
                 GetReferenceResolution()),
             new DragCoordinate(
-                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
-                rectTransformDistanceInPixels,
+                localDragStartEvent.LocalCoordinateInPixels.StartPosition,
+                localDistanceInPixels,
                 deltaInPixels),
             CreateDragCoordinateInPercent(
-                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
-                rectTransformDistanceInPixels,
+                localDragStartEvent.LocalCoordinateInPixels.StartPosition,
+                localDistanceInPixels,
                 deltaInPixels,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
-            localDragStartEvent.RaycastResultsDragStart,
             localDragStartEvent.InputButton);
         return result;
     }
@@ -204,12 +203,17 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenPosInPixels = eventData.Position;
+        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        Vector2 screenPosInPixels = new Vector2(
+            eventData.Position.x,
+            screenSizePanelCoordinates.y - eventData.Position.y);
 
         // Target coordinate in pixels
         float targetWidthInPixels = targetVisualElement.contentRect.width;
         float targetHeightInPixels = targetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(targetVisualElement.resolvedStyle.left, targetVisualElement.resolvedStyle.top);
+        Vector2 localPosInPixels = new Vector2(
+            eventData.LocalPosition.x,
+            targetHeightInPixels - eventData.LocalPosition.y);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
@@ -222,15 +226,14 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 Vector2.zero,
                 GetReferenceResolution()),
             new DragCoordinate(
-                targetPosInPixels,
+                localPosInPixels,
                 Vector2.zero,
                 Vector2.zero),
             CreateDragCoordinateInPercent(
-                targetPosInPixels,
+                localPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
-            null,
             eventData.Button);
         return result;
     }

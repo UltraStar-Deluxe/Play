@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
     private SongEditorSelectionControl selectionControl;
@@ -30,11 +30,11 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
+    [Inject]
     private EditorSentenceControl sentenceControl;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private EditorUiSentenceDragHandler editorUiSentenceDragHandler;
+    [Inject]
+    private EditorSentenceDragControl editorSentenceDragControl;
 
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
@@ -50,12 +50,9 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
         StretchRight
     }
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        if (editorUiSentenceDragHandler != null)
-        {
-            editorUiSentenceDragHandler.AddListener(this);
-        }
+        editorSentenceDragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
