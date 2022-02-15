@@ -21,16 +21,16 @@ public class EditorSentenceContextMenuHandler : AbstractContextMenuHandler, INee
     [Inject]
     private SongMeta songMeta;
 
-    private EditorUiSentence uiSentence;
+    private EditorSentenceControl sentenceControl;
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        if (uiSentence == null)
+        if (sentenceControl == null)
         {
-            uiSentence = GetComponent<EditorUiSentence>();
+            sentenceControl = GetComponent<EditorSentenceControl>();
         }
 
-        List<Sentence> selectedSentences = new List<Sentence> { uiSentence.Sentence };
+        List<Sentence> selectedSentences = new List<Sentence> { sentenceControl.Sentence };
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));

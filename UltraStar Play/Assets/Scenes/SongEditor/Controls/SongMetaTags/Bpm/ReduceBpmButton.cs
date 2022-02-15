@@ -19,7 +19,7 @@ public class ReduceBpmButton : MonoBehaviour, INeedInjection
     private SongMeta songMeta;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private ChangeBpmAction changeBpmAction;

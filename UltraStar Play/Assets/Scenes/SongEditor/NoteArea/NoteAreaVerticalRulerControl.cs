@@ -15,7 +15,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     private SongMeta songMeta;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
@@ -40,7 +40,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
             UpdateMidiNoteLines();
         });
 
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
+        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -64,8 +64,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     {
         dynamicTexture.ClearTexture();
 
-        int minMidiNote = noteArea.MinMidiNoteInViewport;
-        int maxMidiNote = noteArea.MaxMidiNoteInViewport;
+        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
             // Notes are drawn on lines and between lines alternatingly.
@@ -86,8 +86,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     {
         horizontalGridLabelContainer.Clear();
 
-        int minMidiNote = noteArea.MinMidiNoteInViewport;
-        int maxMidiNote = noteArea.MaxMidiNoteInViewport;
+        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
             CreateLabelForMidiNote(midiNote);
@@ -101,8 +101,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        float yPercent = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
-        float heightPercent = noteArea.HeightForSingleNote;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote);
+        float heightPercent = noteAreaControl.HeightForSingleNote;
         label.style.left = 0;
         label.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         label.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
@@ -115,7 +115,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void DrawHorizontalGridLine(int midiNote, Color color)
     {
-        float yPercent = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote);
         int y = (int)(yPercent * dynamicTexture.TextureHeight);
         for (int x = 0; x < dynamicTexture.TextureWidth; x++)
         {

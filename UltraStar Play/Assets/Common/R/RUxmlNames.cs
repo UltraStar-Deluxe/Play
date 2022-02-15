@@ -111,6 +111,7 @@ public static partial class R
         public const string gameOptionsButton = "gameOptionsButton";
         public const string genreLabel = "genreLabel";
         public const string genrePropertyContainer = "genrePropertyContainer";
+        public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string hiddenContinueButton = "hiddenContinueButton";
@@ -151,6 +152,7 @@ public static partial class R
         public const string languagePropertyContainer = "languagePropertyContainer";
         public const string layersSideBarContainer = "layersSideBarContainer";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
+        public const string leftHandle = "leftHandle";
         public const string leftLyricsOverlay = "leftLyricsOverlay";
         public const string leftSideBar = "leftSideBar";
         public const string leftSideBarMainColumn = "leftSideBarMainColumn";
@@ -197,12 +199,17 @@ public static partial class R
         public const string noSongsFoundLabel = "noSongsFoundLabel";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";
+        public const string note = "note";
         public const string noteArea = "noteArea";
+        public const string noteAreaIssues = "noteAreaIssues";
+        public const string noteAreaNotes = "noteAreaNotes";
         public const string noteAreaPositionInSongIndicator = "noteAreaPositionInSongIndicator";
         public const string noteAreaSelectionFrame = "noteAreaSelectionFrame";
+        public const string noteAreaSentences = "noteAreaSentences";
         public const string noteContainer = "noteContainer";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
         public const string noteEntry = "noteEntry";
+        public const string noteImage = "noteImage";
         public const string noteLabel = "noteLabel";
         public const string noteLines = "noteLines";
         public const string NoteUi = "NoteUi";
@@ -226,6 +233,7 @@ public static partial class R
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
+        public const string pitchLabel = "pitchLabel";
         public const string playerEntry = "playerEntry";
         public const string playerImage = "playerImage";
         public const string playerInfoContainer = "playerInfoContainer";
@@ -266,6 +274,7 @@ public static partial class R
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
         public const string resolutionContainer = "resolutionContainer";
+        public const string rightHandle = "rightHandle";
         public const string rightLyricsOverlay = "rightLyricsOverlay";
         public const string rightSide = "rightSide";
         public const string rightSideBar = "rightSideBar";
@@ -293,8 +302,14 @@ public static partial class R
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
+        public const string selectionIndicator = "selectionIndicator";
         public const string semanticVersionText = "semanticVersionText";
+        public const string sentence = "sentence";
+        public const string sentenceImage = "sentenceImage";
+        public const string sentenceLabel = "sentenceLabel";
+        public const string sentenceLines = "sentenceLines";
         public const string sentenceRatingContainer = "sentenceRatingContainer";
+        public const string sentenceUiRoot = "sentenceUiRoot";
         public const string settingsButton = "settingsButton";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string showFpsContainer = "showFpsContainer";

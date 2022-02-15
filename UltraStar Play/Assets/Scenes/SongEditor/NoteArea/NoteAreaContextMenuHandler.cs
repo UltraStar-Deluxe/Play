@@ -23,7 +23,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private SongEditorSelectionControl selectionControl;
@@ -53,17 +53,17 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
         
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        int beat = (int)noteArea.GetHorizontalMousePositionInBeats();
-        int midiNote = noteArea.GetVerticalMousePositionInMidiNote();
+        int beat = (int)noteAreaControl.GetHorizontalMousePositionInBeats();
+        int midiNote = noteAreaControl.GetVerticalMousePositionInMidiNote();
 
-        contextMenu.AddItem("Fit vertical", () => noteArea.FitViewportVerticalToNotes());
+        contextMenu.AddItem("Fit vertical", () => noteAreaControl.FitViewportVerticalToNotes());
 
         Sentence sentenceAtBeat = SongMetaUtils.GetSentencesAtBeat(songMeta, beat).FirstOrDefault();
         if (sentenceAtBeat != null)
         {
             int minBeat = sentenceAtBeat.MinBeat - 1;
             int maxBeat = sentenceAtBeat.ExtendedMaxBeat + 1;
-            contextMenu.AddItem("Fit horizontal to sentence ", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
+            contextMenu.AddItem("Fit horizontal to sentence ", () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
         }
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
@@ -71,7 +71,7 @@ public class NoteAreaContextMenuHandler : AbstractContextMenuHandler, INeedInjec
         {
             int minBeat = selectedNotes.Select(it => it.StartBeat).Min() - 1;
             int maxBeat = selectedNotes.Select(it => it.EndBeat).Max() + 1;
-            contextMenu.AddItem("Fit horizontal to selection", () => noteArea.FitViewportHorizontal(minBeat, maxBeat));
+            contextMenu.AddItem("Fit horizontal to selection", () => noteAreaControl.FitViewportHorizontal(minBeat, maxBeat));
         }
 
         if (selectedNotes.Count > 0

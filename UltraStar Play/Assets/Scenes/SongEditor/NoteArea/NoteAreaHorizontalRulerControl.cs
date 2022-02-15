@@ -16,7 +16,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     private SongMeta songMeta;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
@@ -43,7 +43,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             UpdateLabels();
         });
 
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
+        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -73,8 +73,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         }
         dynamicTexture.ClearTexture();
 
-        int viewportStartBeat = noteArea.MinBeatInViewport;
-        int viewportEndBeat = noteArea.MaxBeatInViewport;
+        int viewportStartBeat = noteAreaControl.MinBeatInViewport;
+        int viewportEndBeat = noteAreaControl.MaxBeatInViewport;
         int viewportWidthInBeats = viewportEndBeat - viewportStartBeat;
 
         int drawStepRough = viewportWidthInBeats / 12;
@@ -122,8 +122,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     {
         verticalGridLabelContainer.Clear();
 
-        int viewportStartBeat = noteArea.MinBeatInViewport;
-        int viewportEndBeat = noteArea.MaxBeatInViewport;
+        int viewportStartBeat = noteAreaControl.MinBeatInViewport;
+        int viewportEndBeat = noteAreaControl.MaxBeatInViewport;
         int viewportWidthInBeats = viewportEndBeat - viewportStartBeat;
 
         int drawStepRough = viewportWidthInBeats / 12;
@@ -172,8 +172,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        float widthPercent = (float)(labelWidthInMillis / noteArea.ViewportWidth);
-        float xPercent = (float)((beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth) - widthPercent / 2;
+        float widthPercent = (float)(labelWidthInMillis / noteAreaControl.ViewportWidth);
+        float xPercent = (float)((beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth) - widthPercent / 2;
         label.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
         label.style.top = 0;
         label.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
@@ -183,7 +183,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private void DrawVerticalGridLine(double beatPosInMillis, Color color)
     {
-        double xPercent = (beatPosInMillis - noteArea.ViewportX) / noteArea.ViewportWidth;
+        double xPercent = (beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
         int x = (int)(xPercent * dynamicTexture.TextureWidth);
         for (int y = 0; y < dynamicTexture.TextureHeight; y++)
         {

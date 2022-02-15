@@ -18,7 +18,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
     private const float TouchGestureMoveInSameDirectionThreshold = 100f;
     
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private NoteAreaDragHandler noteAreaDragHandler;
@@ -46,8 +46,8 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         twoFingerGestureStartDistance = -1;
-        viewportXBeginDrag = noteArea.ViewportX;
-        viewportYBeginDrag = noteArea.ViewportY;
+        viewportXBeginDrag = noteAreaControl.ViewportX;
+        viewportYBeginDrag = noteAreaControl.ViewportY;
     }
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
@@ -78,7 +78,7 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
         
         int newViewportX = viewportXBeginDrag - dragEvent.MillisDistance;
         int newViewportY = viewportYBeginDrag - dragEvent.MidiNoteDistance;
-        noteArea.SetViewport(newViewportX, newViewportY, noteArea.ViewportWidth, noteArea.ViewportHeight);
+        noteAreaControl.SetViewport(newViewportX, newViewportY, noteAreaControl.ViewportWidth, noteAreaControl.ViewportHeight);
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)

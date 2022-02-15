@@ -34,9 +34,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        overviewArea.RegisterCallback<PointerDownEvent>(evt => ScrollToPointer(evt), TrickleDown.TrickleDown);
-        overviewArea.RegisterCallback<PointerMoveEvent>(evt => ScrollToPointer(evt), TrickleDown.TrickleDown);
-
+        RegisterPointerEvents();
         positionInSongIndicatorControl = injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaPositionInSongIndicatorControl>();
@@ -64,14 +62,29 @@ public class OverviewAreaControl : IInjectionFinishedListener
         });
     }
 
-    public void Update()
+    private void RegisterPointerEvents()
     {
+        bool isPointerDown = false;
+        overviewArea.RegisterCallback<PointerDownEvent>(evt =>
+        {
+            isPointerDown = true;
+            ScrollToPointer(evt);
+        }, TrickleDown.TrickleDown);
 
+        overviewArea.RegisterCallback<PointerMoveEvent>(evt =>
+        {
+            if (isPointerDown)
+            {
+                ScrollToPointer(evt);
+            }
+        }, TrickleDown.TrickleDown);
+
+        overviewArea.RegisterCallback<PointerUpEvent>(evt => isPointerDown = false, TrickleDown.TrickleDown);
     }
 
     private void ScrollToPointer(IPointerEvent evt)
     {
-        double xPercent = evt.localPosition.x + overviewArea.contentRect.width;
+        double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
         double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
     }

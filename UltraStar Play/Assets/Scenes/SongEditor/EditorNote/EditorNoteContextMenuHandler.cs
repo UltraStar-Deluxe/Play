@@ -56,7 +56,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
     
-    private EditorUiNote uiNote;
+    private EditorNoteControl noteControl;
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
@@ -72,13 +72,13 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
 
     protected override void FillContextMenu(ContextMenu contextMenu)
     {
-        if (uiNote == null)
+        if (noteControl == null)
         {
-            uiNote = GetComponent<EditorUiNote>();
+            noteControl = GetComponent<EditorNoteControl>();
         }
-        if (!selectionControl.IsSelected(uiNote.Note))
+        if (!selectionControl.IsSelected(noteControl.Note))
         {
-            selectionControl.SetSelection(new List<EditorUiNote> { uiNote });
+            selectionControl.SetSelection(new List<EditorNoteControl> { noteControl });
         }
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
@@ -123,7 +123,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         }
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
-            contextMenu.AddItem("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, uiNote.Note));
+            contextMenu.AddItem("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
 
@@ -163,7 +163,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         {
             contextMenu.AddSeparator();
             contextMenu.AddItem("Merge sentences",
-                () => mergeSentencesAction.ExecuteAndNotify(selectedNotes, uiNote.Note));
+                () => mergeSentencesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
 
@@ -195,13 +195,13 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
 
     private void FillContextMenuToMoveToOtherSentence(ContextMenu contextMenu, List<Note> selectedNotes)
     {
-        bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, uiNote.Note);
-        bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, uiNote.Note);
+        bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
+        bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);
         if (canMoveToPreviousSentence)
         {
             contextMenu.AddSeparator();
             contextMenu.AddItem("Move to previous sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(uiNote.Note));
+                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(noteControl.Note));
         }
         if (!canMoveToPreviousSentence && canMoveToNextSentence)
         {
@@ -210,7 +210,7 @@ public class EditorNoteContextMenuHandler : AbstractContextMenuHandler
         if (canMoveToNextSentence)
         {
             contextMenu.AddItem("Move to next sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(uiNote.Note));
+                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(noteControl.Note));
         }
     }
 }

@@ -34,7 +34,7 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
         string midiFilePath = settings.SongEditorSettings.MidiFilePath;
         if (!File.Exists(midiFilePath))
         {
-            uiManager.CreateNotification("File does not exist.", Colors.red);
+            uiManager.CreateNotificationVisualElement("File does not exist.", "error");
             return;
         }
 
@@ -47,12 +47,12 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
                 layerManager.AddNoteToLayer(ESongEditorLayer.MidiFile, loadedNote);
             }
             editorNoteDisplayer.UpdateNotes();
-            uiManager.CreateNotification("Loaded MIDI file successfully");
+            uiManager.CreateNotificationVisualElement("Loaded MIDI file successfully");
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            uiManager.CreateNotification($"Loading MIDI file failed: {e.Message}", Colors.red);
+            uiManager.CreateNotificationVisualElement($"Loading MIDI file failed: {e.Message}", "error");
         }
     }
 

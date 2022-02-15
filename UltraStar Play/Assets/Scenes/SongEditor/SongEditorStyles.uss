@@ -4,7 +4,8 @@
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
     --control-color-accent2: rgb(70, 96, 124);
-
+    --selection-color-transparent: rgba(21, 88, 219, 0.5);
+    --recording-button-color: rgb(200, 32, 32);
     background-color: rgb(50, 50, 50);
 }
 
@@ -22,7 +23,7 @@
     -unity-background-image-tint-color: rgb(196, 196, 196);
 }
 
-#keyboard {
+#virtualPiano {
     background-color: rgb(49, 51, 53);
 }
 
@@ -32,7 +33,17 @@
 
 Button.recording
 {
-    background-color: rgb(200, 32, 32);
+    background-color: var(--recording-button-color);
+}
+
+Button.recording:focus
+{
+    background-color: var(--recording-button-color);
+}
+
+Button.recording:hover
+{
+    background-color: var(--recording-button-color);
 }
 
 .virtualPianoKey.whiteKey {

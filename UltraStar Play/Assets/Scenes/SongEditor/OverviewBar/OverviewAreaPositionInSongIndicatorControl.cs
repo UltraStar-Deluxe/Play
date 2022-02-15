@@ -30,6 +30,6 @@ public class OverviewAreaPositionInSongIndicatorControl : MonoBehaviour, INeedIn
     private void UpdatePosition(double positionInSongInPercent)
     {
         float xPercent = (float)positionInSongInPercent;
-        overviewAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent, LengthUnit.Percent));
+        overviewAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
     }
 }

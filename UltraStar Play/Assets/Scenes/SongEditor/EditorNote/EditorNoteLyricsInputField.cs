@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 {
-    public EditorUiNote EditorUiNote => uiEditorNote;
+    public EditorNoteControl EditorNoteControl => editorNoteControl;
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -22,7 +22,7 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private InputField inputField;
 
-    private EditorUiNote uiEditorNote;
+    private EditorNoteControl editorNoteControl;
 
     private static readonly Regex whitespaceRegex = new Regex(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -55,9 +55,9 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
         return addedChar;
     }
 
-    public void Init(EditorUiNote uiEditorNote, string text)
+    public void Init(EditorNoteControl editorNoteControl, string text)
     {
-        this.uiEditorNote = uiEditorNote;
+        this.editorNoteControl = editorNoteControl;
         Text = text;
     }
 
@@ -91,8 +91,8 @@ public class EditorNoteLyricsInputField : MonoBehaviour, INeedInjection
 
         if (!IsOnlyWhitespace(inputFieldText))
         {
-            uiEditorNote.Note.SetText(newText);
-            uiEditorNote.SetLyrics(newText);
+            editorNoteControl.Note.SetText(newText);
+            editorNoteControl.SetLyrics(newText);
 
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
         }

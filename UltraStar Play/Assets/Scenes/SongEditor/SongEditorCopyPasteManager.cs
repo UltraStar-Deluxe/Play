@@ -99,7 +99,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     private void ClearCopiedNotes()
     {
         List<Note> notes = layerManager.GetNotes(ESongEditorLayer.CopyPaste);
-        notes.ForEach(note => editorNoteDisplayer.DeleteNote(note));
+        notes.ForEach(note => editorNoteDisplayer.DeleteNoteControl(note));
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
     }
 
@@ -146,7 +146,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         // Remove any old copied notes from the Ui.
         foreach (Note note in CopiedNotes)
         {
-            editorNoteDisplayer.DeleteNote(note);
+            editorNoteDisplayer.DeleteNoteControl(note);
         }
 
         ClearCopiedNotes();

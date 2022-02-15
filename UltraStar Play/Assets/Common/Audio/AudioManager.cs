@@ -39,13 +39,13 @@ public class AudioManager : MonoBehaviour
         {
             AudioListener.volume = volumeBeforeMute;
             volumeBeforeMute = -1;
-            UiManager.Instance.CreateNotification("Unmute");
+            UiManager.Instance.CreateNotificationVisualElement("Unmute");
         }
         else
         {
             volumeBeforeMute = AudioListener.volume;
             AudioListener.volume = 0;
-            UiManager.Instance.CreateNotification("Mute");
+            UiManager.Instance.CreateNotificationVisualElement("Mute");
         }
     }
 

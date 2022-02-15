@@ -24,7 +24,7 @@ public class MicPitchOutOfViewportIndicator : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     void Start()
     {
@@ -40,8 +40,8 @@ public class MicPitchOutOfViewportIndicator : MonoBehaviour, INeedInjection
                 return;
             }
             int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
-            pitchAboveImage.SetAlpha(shiftedMidiNote > noteArea.MaxMidiNoteInViewport ? 1 : 0);
-            pitchBelowImage.SetAlpha(shiftedMidiNote < noteArea.MinMidiNoteInViewport ? 1 : 0);
+            pitchAboveImage.SetAlpha(shiftedMidiNote > noteAreaControl.MaxMidiNoteInViewport ? 1 : 0);
+            pitchBelowImage.SetAlpha(shiftedMidiNote < noteAreaControl.MinMidiNoteInViewport ? 1 : 0);
         });
     }
 }

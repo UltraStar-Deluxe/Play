@@ -67,19 +67,19 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
         isCanceled = false;
         GameObject raycastTarget = dragEvent.GeneralDragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
-        EditorUiNote dragStartUiNote = raycastTarget.GetComponent<EditorUiNote>();
-        if (dragStartUiNote == null)
+        EditorNoteControl dragStartNoteControl = raycastTarget.GetComponent<EditorNoteControl>();
+        if (dragStartNoteControl == null)
         {
             CancelDrag();
             return;
         }
 
-        if (!selectionControl.IsSelected(dragStartUiNote.Note))
+        if (!selectionControl.IsSelected(dragStartNoteControl.Note))
         {
-            selectionControl.SetSelection(new List<EditorUiNote> { dragStartUiNote });
+            selectionControl.SetSelection(new List<EditorNoteControl> { dragStartNoteControl });
         }
 
-        dragAction = GetDragAction(dragStartUiNote, dragEvent);
+        dragAction = GetDragAction(dragStartNoteControl, dragEvent);
 
         selectedNotes = selectionControl.GetSelectedNotes();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
@@ -177,13 +177,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
         }
     }
 
-    private DragAction GetDragAction(EditorUiNote dragStartUiNote, NoteAreaDragEvent dragEvent)
+    private DragAction GetDragAction(EditorNoteControl dragStartNoteControl, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        if (dragStartNoteControl.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchLeft;
         }
-        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        else if (dragStartNoteControl.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchRight;
         }
