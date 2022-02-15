@@ -11,6 +11,7 @@ using UniRx;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 using PrimeInputActions;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
@@ -64,6 +65,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private ExtendNotesAction extendNotesAction;
 
+    [Inject]
+    private UIDocument uiDocument;
+
     private bool inputFieldHasFocusOld;
 
     private Vector2[] zoomStartTouchPositions;
@@ -88,26 +92,26 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Show / hide help
         InputManager.GetInputAction(R.InputActions.usplay_toggleHelp).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => inputActionInfoOverlay.SetActive(!inputActionInfoOverlay.activeSelf));
         
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = 0);
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToEndOfSong).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = songAudioPlayer.DurationOfSongInMillis - 1);
         
         // Play / pause
         InputManager.GetInputAction(R.InputActions.songEditor_togglePlayPause).PerformedAsObservable()
             .Where(_ => !InputUtils.IsKeyboardControlPressed())
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.ToggleAudioPlayPause());
 
         // Play only the selected notes
         InputManager.GetInputAction(R.InputActions.songEditor_playSelectedNotes).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => PlayAudioInRangeOfNotes(selectionControl.GetSelectedNotes()));
         
         // Stop playback or return to last scene
@@ -116,7 +120,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Select all notes
         InputManager.GetInputAction(R.InputActions.songEditor_selectAll).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => selectionControl.SelectAll());
         
         // Select next / previous note
@@ -128,7 +132,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Deselect notes
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(cancelNoteSelectionPriority)
-            .Where(_ => !InputUtils.AnyKeyboardModifierPressed() && !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !InputUtils.AnyKeyboardModifierPressed() && !AnyInputFieldHasFocus())
             .Where(_ => selectionControl.HasSelectedNotes())
             .Subscribe(_ =>
             {
@@ -138,75 +142,75 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Delete notes
         InputManager.GetInputAction(R.InputActions.songEditor_delete).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => deleteNotesAction.ExecuteAndNotify(selectionControl.GetSelectedNotes()));
         
         // Undo
         InputManager.GetInputAction(R.InputActions.songEditor_undo).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => historyManager.Undo());
         
         // Redo
         InputManager.GetInputAction(R.InputActions.songEditor_redo).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => historyManager.Redo());
         
         // Save
         InputManager.GetInputAction(R.InputActions.songEditor_save).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.SaveSong());
         
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.StartEditingNoteText());
         
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(OnNavigate);
         
         // Make golden / freestyle / normal
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeGolden).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
             .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Golden));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeFreestyle).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
             .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Freestyle));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeNormal).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
             .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Normal));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeRap).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
             .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.Rap));
         
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeRapGolden).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.AnyKeyboardModifierPressed())
             .Subscribe(_ => toggleNoteTypeAction.ExecuteAndNotify(selectionControl.GetSelectedNotes(), ENoteType.RapGolden));
         
         // Zoom and scroll with mouse wheel
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(OnScrollWheel);
         
         // Zoom horizontal with shortcuts
         InputManager.GetInputAction(R.InputActions.songEditor_zoomInHorizontal).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.IsKeyboardShiftPressed())
             .Subscribe(context =>
             {
                 noteAreaControl.ZoomHorizontal(1);
             });
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutHorizontal).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => !InputUtils.IsKeyboardShiftPressed())
             .Subscribe(context =>
             {
@@ -215,14 +219,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
         // Zoom vertical with shortcuts
         InputManager.GetInputAction(R.InputActions.songEditor_zoomInVertical).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Where(_ => InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).ReadValue<float>() == 0)
             .Subscribe(context =>
             {
                 noteAreaControl.ZoomVertical(1);
             });
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
     }
 
@@ -232,7 +236,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             songAudioPlayer.PauseAudio();
         }
-        else if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        else if (AnyInputFieldHasFocus())
         {
             // Deselect TextArea
             eventSystem.SetSelectedGameObject(null);
@@ -247,7 +251,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        if (AnyInputFieldHasFocus())
         {
             return;
         }
@@ -347,7 +351,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void Update()
     {
-        bool inputFieldHasFocus = GameObjectUtils.InputFieldHasFocus(eventSystem);
+        bool inputFieldHasFocus = AnyInputFieldHasFocus();
         if (inputFieldHasFocus)
         {
             inputFieldHasFocusOld = true;
@@ -385,7 +389,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private void UpdateTouchInputForZoom()
     {
         if (Touchscreen.current == null
-            || GameObjectUtils.InputFieldHasFocus(eventSystem))
+            || AnyInputFieldHasFocus())
         {
             return;
         }
@@ -452,7 +456,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (modifier != EKeyboardModifier.None
             // Yass shortcuts only work with a keyboard.
             || Keyboard.current == null
-            || GameObjectUtils.InputFieldHasFocus(eventSystem))
+            || AnyInputFieldHasFocus())
         {
             return;
         }
@@ -562,5 +566,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             return new List<Note>();
         }
+    }
+
+    private bool AnyInputFieldHasFocus()
+    {
+        return uiDocument.rootVisualElement.focusController.focusedElement is TextField;
     }
 }

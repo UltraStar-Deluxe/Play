@@ -101,8 +101,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote);
         float heightPercent = noteAreaControl.HeightForSingleNote;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         label.style.left = 0;
         label.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         label.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
