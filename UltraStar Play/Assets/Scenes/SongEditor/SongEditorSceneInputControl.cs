@@ -75,6 +75,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
+        eventSystem.sendNavigationEvents = false;
+
         UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel | 2 Finger Pinch-gesture"));
         UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Vertical", "Ctrl+Shift+Mouse Wheel | 2 Finger Pinch-gesture"));
         UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Scroll Horizontal", "Mouse Wheel | Arrow Keys | 2 Finger Drag | Middle Mouse Button+Drag"));

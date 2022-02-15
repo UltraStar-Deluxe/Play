@@ -10,7 +10,7 @@ using PrimeInputActions;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
-public class ContextMenuControl : GeneralDragControl
+public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
 {
     public const float DragDistanceThreshold = 10f;
 
@@ -18,9 +18,23 @@ public class ContextMenuControl : GeneralDragControl
 
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
 
-    public override void OnInjectionFinished()
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement targetVisualElement;
+
+    [Inject]
+    protected UIDocument uiDocument;
+
+    [Inject]
+    protected GameObject gameObject;
+
+    [Inject]
+    protected Injector injector;
+
+    protected PanelHelper panelHelper;
+
+    public virtual void OnInjectionFinished()
     {
-        base.OnInjectionFinished();
+        panelHelper = new PanelHelper(uiDocument);
 
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
@@ -31,10 +45,7 @@ public class ContextMenuControl : GeneralDragControl
     {
         if (Pointer.current == null
             || !context.ReadValueAsButton()
-            || IsDragging
-            || Touch.activeTouches.Count >= 2
-            || targetVisualElement == null
-            || uiDocument == null)
+            || Touch.activeTouches.Count >= 2)
         {
             return;
         }

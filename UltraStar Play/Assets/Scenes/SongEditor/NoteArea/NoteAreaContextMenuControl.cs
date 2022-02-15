@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaContextMenuControl : ContextMenuControl
+public class NoteAreaContextMenuControl : ContextMenuControl, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
     private SongMeta songMeta;
@@ -37,22 +37,26 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     [Inject]
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
     
-    // [Inject]
-    // private NoteAreaDragHandler noteAreaDragHandler;
+    [Inject]
+    private NoteAreaDragControl noteAreaDragControl;
+
+    private Vector2 dragDistanceInPx;
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
+
+        noteAreaDragControl.AddListener(this);
     }
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         // This ContextMenu could open although a drag is in progress.
-        // if (noteAreaDragHandler.DragDistance.magnitude > ContextMenuControl.DragDistanceThreshold)
-        // {
-        //     return;
-        // }
+        if (dragDistanceInPx.magnitude > ContextMenuControl.DragDistanceThreshold)
+        {
+            return;
+        }
         
         base.CheckOpenContextMenuFromInputAction(context);
     }
@@ -103,5 +107,30 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             contextMenu.AddSeparator();
             contextMenu.AddItem("Set Gap to playback position", () => setMusicGapAction.ExecuteAndNotify());
         }
+    }
+
+    public void OnBeginDrag(NoteAreaDragEvent dragEvent)
+    {
+        dragDistanceInPx = Vector2.zero;
+    }
+
+    public void OnDrag(NoteAreaDragEvent dragEvent)
+    {
+        dragDistanceInPx = dragEvent.GeneralDragEvent.LocalCoordinateInPixels.Distance;
+    }
+
+    public void OnEndDrag(NoteAreaDragEvent dragEvent)
+    {
+        dragDistanceInPx = Vector2.zero;
+    }
+
+    public void CancelDrag()
+    {
+        dragDistanceInPx = Vector2.zero;
+    }
+
+    public bool IsCanceled()
+    {
+        return false;
     }
 }

@@ -14,11 +14,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
-    [InjectedInInspector]
-    public RectTransform selectionFrame;
-
     [Inject]
     private SongEditorSelectionControl selectionControl;
 
@@ -26,10 +23,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     private NoteAreaControl noteAreaControl;
 
     [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
-
-    [Inject]
-    private Canvas canvas;
+    private NoteAreaDragControl noteAreaDragControl;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
@@ -50,14 +44,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     private NoteAreaDragEvent startDragEvent;
     private NoteAreaDragEvent lastDragEvent;
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        noteAreaDragHandler.AddListener(this);
-    }
-
-    void Update()
-    {
-        UpdateScroll();
+        noteAreaDragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
@@ -70,8 +59,6 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
             CancelDrag();
             return;
         }
-
-        selectionFrame.gameObject.SetActive(true);
 
         noteAreaSelectionFrame.ShowByDisplay();
         noteAreaSelectionFrame.style.width = 0;
@@ -96,14 +83,12 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     {
         lastDragEvent = dragEvent;
         scrollAmount = Vector2.zero;
-        selectionFrame.gameObject.SetActive(false);
         noteAreaSelectionFrame.HideByDisplay();
     }
 
     public void CancelDrag()
     {
         scrollAmount = Vector2.zero;
-        selectionFrame.gameObject.SetActive(false);
         noteAreaSelectionFrame.HideByDisplay();
         isCanceled = true;
     }
@@ -191,50 +176,11 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private void UpdateSelectionFrame(NoteAreaDragEvent currentDragEvent)
     {
-        Vector3 canvasScale = canvas.transform.localScale;
-        if (canvasScale.x == 0 || canvasScale.y == 0)
-        {
-            return;
-        }
-
         // Coordinates in milliseconds and midi-note
         int startBeat = GetDragStartBeat();
         int endBeat = GetDragEndBeat(currentDragEvent);
         int startMidiNote = GetDragStartMidiNote();
         int endMidiNote = GetDragEndMidiNote(currentDragEvent);
-
-        // Min and max coordinates in pixels
-        float minX = noteAreaControl.BeatToPixels(noteAreaControl.MinBeatInViewport);
-        float maxX = noteAreaControl.BeatToPixels(noteAreaControl.MinBeatInViewport + noteAreaControl.ViewportWidthInBeats);
-        float minY = noteAreaControl.MidiNoteToPixels(noteAreaControl.MinMidiNoteInViewport);
-        float maxY = noteAreaControl.MidiNoteToPixels(noteAreaControl.MinMidiNoteInViewport + noteAreaControl.ViewportHeight);
-
-        // Calculate selection frame start
-        float fromX = noteAreaControl.BeatToPixels(startBeat);
-        fromX = NumberUtils.Limit(fromX, minX, maxX);
-        float fromY = noteAreaControl.MidiNoteToPixels(startMidiNote);
-        fromY = NumberUtils.Limit(fromY, minY, maxY);
-
-        // Calculate selection frame end
-        float toX = noteAreaControl.BeatToPixels(endBeat);
-        toX = NumberUtils.Limit(toX, minX, maxX);
-        float toY = noteAreaControl.MidiNoteToPixels(endMidiNote);
-        toY = NumberUtils.Limit(toY, minY, maxY);
-
-        if (toX < fromX)
-        {
-            ObjectUtils.Swap(ref toX, ref fromX);
-        }
-        if (toY < fromY)
-        {
-            ObjectUtils.Swap(ref toY, ref fromY);
-        }
-
-        float width = (toX - fromX) / canvasScale.x;
-        float height = (toY - fromY) / canvasScale.y;
-
-        selectionFrame.position = new Vector2(fromX, fromY);
-        selectionFrame.sizeDelta = new Vector2(width, height);
 
         int fromBeat = Mathf.Min(startBeat, endBeat);
         int toBeat = Mathf.Max(startBeat, endBeat);
@@ -254,16 +200,16 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     private void UpdateScrollAmount(NoteAreaDragEvent dragEvent)
     {
         int scrollAmountX = 200;
-        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.Distance.x) - scrollBorderPercent) * 1000;
+        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.LocalCoordinateInPercent.Distance.x) - scrollBorderPercent) * 1000;
 
         int scrollAmountY = 1;
 
         // X-Coordinate
-        if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.x > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x > (1 - scrollBorderPercent))
         {
             scrollAmount = new Vector2(scrollAmountX, scrollAmount.y);
         }
-        else if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.x < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x < scrollBorderPercent)
         {
             scrollAmount = new Vector2(-scrollAmountX, scrollAmount.y);
         }
@@ -273,11 +219,11 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         // Y-Coordinate
-        if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
         {
             scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
         }
-        else if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
         {
             scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
         }

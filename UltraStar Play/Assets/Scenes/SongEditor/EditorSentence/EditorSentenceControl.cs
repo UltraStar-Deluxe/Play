@@ -51,6 +51,8 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     private Injector injector;
 
     private EditorSentenceContextMenuControl contextMenuControl;
+    private EditorSentenceDragControl dragControl;
+    private ManipulateSentenceDragListener dragListener;
 
     public bool IsPointerOver { get; private set; }
     public bool IsPointerOverRightHandle { get; private set; }
@@ -75,6 +77,18 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
             .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(this)
             .CreateAndInject<EditorSentenceContextMenuControl>();
+
+        dragControl = injector
+            .WithRootVisualElement(VisualElement)
+            .WithBindingForInstance(this)
+            .CreateAndInject<EditorSentenceDragControl>();
+
+        dragListener = injector
+            .WithRootVisualElement(VisualElement)
+            .WithBindingForInstance(this)
+            .WithBindingForInstance(dragControl)
+            .WithBindingForInstance(contextMenuControl)
+            .CreateAndInject<ManipulateSentenceDragListener>();
     }
 
     public void SetColor(Color color)
