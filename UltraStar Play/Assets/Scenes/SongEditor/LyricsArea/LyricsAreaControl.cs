@@ -64,6 +64,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             }
         });
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+
+        textField.doubleClickSelectsWord = true;
+        textField.tripleClickSelectsLine = true;
     }
 
     public void Update()

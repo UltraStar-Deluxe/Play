@@ -31,7 +31,7 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
     private SongMeta songMeta;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private EditorUiSentence uiSentence;
+    private EditorSentenceControl sentenceControl;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     private EditorUiSentenceDragHandler editorUiSentenceDragHandler;
@@ -68,9 +68,9 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
 
         isCanceled = false;
 
-        dragAction = GetDragAction(uiSentence, dragEvent);
+        dragAction = GetDragAction(sentenceControl, dragEvent);
 
-        selectedNotes = uiSentence.Sentence.Notes.ToList();
+        selectedNotes = sentenceControl.Sentence.Notes.ToList();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
@@ -139,12 +139,12 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
             Note noteClone = note.Clone();
             noteToSnapshotOfNoteMap.Add(note, noteClone);
         }
-        linebreakBeatSnapshot = uiSentence.Sentence.LinebreakBeat;
+        linebreakBeatSnapshot = sentenceControl.Sentence.LinebreakBeat;
     }
 
-    private DragAction GetDragAction(EditorUiSentence dragStartUiSentence, NoteAreaDragEvent dragEvent)
+    private DragAction GetDragAction(EditorSentenceControl dragStartSentenceControl, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiSentence.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        if (dragStartSentenceControl.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchRight;
         }
@@ -171,7 +171,7 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
 
     private void ChangeLinebreakBeat(NoteAreaDragEvent dragEvent)
     {
-        uiSentence.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
+        sentenceControl.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
     }
 }

@@ -22,7 +22,7 @@ public class SpaceBetweenNotesAction : INeedInjection
     {
         if (spaceInBeats <= 0)
         {
-            uiManager.CreateNotification("Minimum amount of space (in beats) must be greater than 0.");
+            uiManager.CreateNotificationVisualElement("Minimum amount of space (in beats) must be greater than 0.");
             return;
         }
 

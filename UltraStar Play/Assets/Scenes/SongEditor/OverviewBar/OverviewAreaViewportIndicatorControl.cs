@@ -14,14 +14,14 @@ public class OverviewAreaViewportIndicatorControl : INeedInjection, IInjectionFi
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject(UxmlName = R.UxmlNames.overviewAreaViewportIndicator)]
     private VisualElement overviewAreaViewportIndicator;
 
     public void OnInjectionFinished()
     {
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
+        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)

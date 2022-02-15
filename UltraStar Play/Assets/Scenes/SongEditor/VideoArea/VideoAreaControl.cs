@@ -105,7 +105,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     private void RemoveVideoGap()
     {
         setVideoGapAction.ExecuteAndNotify(0);
-        uiManager.CreateNotification("VideoGap reset to 0");
+        uiManager.CreateNotificationVisualElement("VideoGap reset to 0");
     }
 
     protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)

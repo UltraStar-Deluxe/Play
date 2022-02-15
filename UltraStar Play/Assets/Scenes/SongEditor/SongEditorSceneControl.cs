@@ -14,7 +14,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
+public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, IInjectionFinishedListener
 {
     [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
@@ -29,9 +29,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     public SongEditorSelectionControl selectionControl;
 
     [InjectedInInspector]
-    public NoteArea noteArea;
-
-    [InjectedInInspector]
     public NoteAreaDragHandler noteAreaDragHandler;
     
     [InjectedInInspector]
@@ -42,9 +39,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
 
     [InjectedInInspector]
     public MicPitchTracker micPitchTracker;
-
-    [InjectedInInspector]
-    public Canvas canvas;
 
     [InjectedInInspector]
     public GraphicRaycaster graphicRaycaster;
@@ -63,6 +57,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
     
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private UiManager uiManager;
 
     [Inject(UxmlName = R.UxmlNames.togglePlaybackButton)]
     private Button togglePlaybackButton;
@@ -95,10 +92,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
 
     public double StopPlaybackAfterPositionInSongInMillis { get; set; }
 
-    private OverviewAreaControl overviewAreaControl;
-    private VideoAreaControl videoAreaControl;
-    private SongEditorVirtualPianoControl songEditorVirtualPianoControl;
-    private LyricsAreaControl lyricsAreaControl;
+    private readonly OverviewAreaControl overviewAreaControl = new OverviewAreaControl();
+    private readonly VideoAreaControl videoAreaControl = new VideoAreaControl();
+    private readonly SongEditorVirtualPianoControl songEditorVirtualPianoControl = new SongEditorVirtualPianoControl();
+    private readonly LyricsAreaControl lyricsAreaControl = new LyricsAreaControl();
+    private readonly NoteAreaControl noteAreaControl = new NoteAreaControl();
 
     public SongMeta SongMeta
     {
@@ -121,33 +119,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         }
     }
 
-    public List<IBinding> GetBindings()
-    {
-        BindingBuilder bb = new BindingBuilder();
-        // Note that the SceneData and SongMeta are loaded on access here if not done yet.
-        bb.BindExistingInstance(SceneData);
-        bb.BindExistingInstance(SongMeta);
-        bb.BindExistingInstance(songAudioPlayer);
-        bb.BindExistingInstance(songVideoPlayer);
-        bb.BindExistingInstance(noteArea);
-        bb.BindExistingInstance(noteAreaDragHandler);
-        bb.BindExistingInstance(noteAreaContextMenuHandler);
-        bb.BindExistingInstance(songEditorLayerManager);
-        bb.BindExistingInstance(micPitchTracker);
-        bb.BindExistingInstance(songEditorNoteRecorder);
-        bb.BindExistingInstance(selectionControl);
-        bb.BindExistingInstance(editorNoteDisplayer);
-        bb.BindExistingInstance(canvas);
-        bb.BindExistingInstance(graphicRaycaster);
-        bb.BindExistingInstance(historyManager);
-        bb.BindExistingInstance(songMetaChangeEventStream);
-        bb.BindExistingInstance(midiFileImporter);
-        bb.BindExistingInstance(songEditorCopyPasteManager);
-        bb.BindExistingInstance(this);
-        return bb.GetBindings();
-    }
-
-    void Awake()
+    private void Awake()
     {
         Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
 
@@ -157,13 +129,17 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
     }
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        overviewAreaControl = injector.CreateAndInject<OverviewAreaControl>();
-        videoAreaControl = injector.CreateAndInject<VideoAreaControl>();
-        songEditorVirtualPianoControl = injector.CreateAndInject<SongEditorVirtualPianoControl>();
-        lyricsAreaControl = injector.CreateAndInject<LyricsAreaControl>();
+        injector.Inject(overviewAreaControl);
+        injector.Inject(videoAreaControl);
+        injector.Inject(songEditorVirtualPianoControl);
+        injector.Inject(lyricsAreaControl);
+        injector.Inject(noteAreaControl);
+    }
 
+    private void Start()
+    {
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
 
@@ -303,11 +279,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateNotification("Saving the file failed:\n" + e.Message);
+            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
             return;
         }
 
-        UiManager.Instance.CreateNotification("Saved file");
+        uiManager.CreateNotificationVisualElement("Saved file");
     }
 
     private void CreateCopyOfFile(string filePath)
@@ -324,11 +300,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            UiManager.Instance.CreateNotification("Creating a copy of the original file failed:\n" + e.Message);
+            uiManager.CreateNotificationVisualElement("Creating a copy of the original file failed:\n" + e.Message);
             return;
         }
 
-        UiManager.Instance.CreateNotification("Created copy of original file");
+        uiManager.CreateNotificationVisualElement("Created copy of original file");
     }
 
     public void ContinueToSingScene()
@@ -392,11 +368,36 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection
         if (selectedNotes.Count == 1)
         {
             Note selectedNote = selectedNotes.FirstOrDefault();
-            EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(selectedNote);
-            if (uiNote != null)
+            EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(selectedNote);
+            if (noteControl != null)
             {
-                uiNote.StartEditingNoteText();
+                noteControl.StartEditingNoteText();
             }
         }
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        // Note that the SceneData and SongMeta are loaded on access here if not done yet.
+        bb.BindExistingInstance(SceneData);
+        bb.BindExistingInstance(SongMeta);
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(noteAreaControl);
+        bb.BindExistingInstance(noteAreaDragHandler);
+        bb.BindExistingInstance(noteAreaContextMenuHandler);
+        bb.BindExistingInstance(songEditorLayerManager);
+        bb.BindExistingInstance(micPitchTracker);
+        bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(selectionControl);
+        bb.BindExistingInstance(editorNoteDisplayer);
+        bb.BindExistingInstance(graphicRaycaster);
+        bb.BindExistingInstance(historyManager);
+        bb.BindExistingInstance(songMetaChangeEventStream);
+        bb.BindExistingInstance(midiFileImporter);
+        bb.BindExistingInstance(songEditorCopyPasteManager);
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }

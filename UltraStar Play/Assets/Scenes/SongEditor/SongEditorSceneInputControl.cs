@@ -28,8 +28,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorSceneControl songEditorSceneControl;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private NoteArea noteArea;
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private SongEditorSelectionControl selectionControl;
@@ -203,14 +203,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => !InputUtils.IsKeyboardShiftPressed())
             .Subscribe(context =>
             {
-                noteArea.ZoomHorizontal(1);
+                noteAreaControl.ZoomHorizontal(1);
             });
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutHorizontal).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Where(_ => !InputUtils.IsKeyboardShiftPressed())
             .Subscribe(context =>
             {
-                noteArea.ZoomHorizontal(-1);
+                noteAreaControl.ZoomHorizontal(-1);
             });
 
         // Zoom vertical with shortcuts
@@ -219,11 +219,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).ReadValue<float>() == 0)
             .Subscribe(context =>
             {
-                noteArea.ZoomVertical(1);
+                noteAreaControl.ZoomVertical(1);
             });
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
-            .Subscribe(context => noteArea.ZoomVertical(-1));
+            .Subscribe(context => noteAreaControl.ZoomVertical(-1));
     }
 
     private void OnBack(InputAction.CallbackContext context)
@@ -253,32 +253,32 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
 
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
-        
+
         int scrollDirection = Math.Sign(context.ReadValue<Vector2>().y);
-        if (scrollDirection != 0 && noteArea.IsPointerOver)
+        if (scrollDirection != 0 && noteAreaControl.IsPointerOver())
         {
             // Scroll horizontal in NoteArea with no modifier
             if (modifier == EKeyboardModifier.None)
             {
-                noteArea.ScrollHorizontal(scrollDirection);
+                noteAreaControl.ScrollHorizontal(scrollDirection);
             }
 
             // Zoom horizontal in NoteArea with Ctrl
             if (modifier == EKeyboardModifier.Ctrl)
             {
-                noteArea.ZoomHorizontal(scrollDirection);
+                noteAreaControl.ZoomHorizontal(scrollDirection);
             }
 
             // Scroll vertical in NoteArea with Shift
             if (modifier == EKeyboardModifier.Shift)
             {
-                noteArea.ScrollVertical(scrollDirection);
+                noteAreaControl.ScrollVertical(scrollDirection);
             }
 
             // Zoom vertical in NoteArea with Ctrl + Shift
             if (modifier == EKeyboardModifier.CtrlShift)
             {
-                noteArea.ZoomVertical(scrollDirection);
+                noteAreaControl.ZoomVertical(scrollDirection);
             }
         }
     }
@@ -295,11 +295,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             {
                 if (direction.x < 0)
                 {
-                    noteArea.ScrollHorizontal(-1);
+                    noteAreaControl.ScrollHorizontal(-1);
                 }
                 if (direction.x > 0)
                 {
-                    noteArea.ScrollHorizontal(1);
+                    noteAreaControl.ScrollHorizontal(1);
                 }
             }
             
@@ -427,11 +427,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             if (Math.Abs(distanceDifference.x) > PinchGestureMagnitudeThresholdInPixels)
             {
-                noteArea.ZoomHorizontal(Math.Sign(distanceDifference.x));
+                noteAreaControl.ZoomHorizontal(Math.Sign(distanceDifference.x));
             }
             if (Math.Abs(distanceDifference.y) > PinchGestureMagnitudeThresholdInPixels)
             {
-                noteArea.ZoomVertical(Math.Sign(distanceDifference.y));
+                noteAreaControl.ZoomVertical(Math.Sign(distanceDifference.y));
             }
             
             zoomStartTouchPositions = new Vector2[] { firstFinger.screenPosition, secondFinger.screenPosition };
@@ -527,11 +527,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // scroll left with h, scroll right with j
         if (Keyboard.current.hKey.wasReleasedThisFrame)
         {
-            noteArea.ScrollHorizontal(-1);
+            noteAreaControl.ScrollHorizontal(-1);
         }
         if (Keyboard.current.jKey.wasReleasedThisFrame)
         {
-            noteArea.ScrollHorizontal(1);
+            noteAreaControl.ScrollHorizontal(1);
         }
     }
 

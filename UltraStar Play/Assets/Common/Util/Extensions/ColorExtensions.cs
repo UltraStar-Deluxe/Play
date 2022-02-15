@@ -35,6 +35,15 @@ public static class ColorExtensions
         return Color.HSVToRGB(color.r, color.g, color.b).WithAlpha(color.a);
     }
 
+    public static Color Multiply(this Color color, float factor, bool includeAlpha = false)
+    {
+        float newR = NumberUtils.Limit(color.r * factor, 0, 1);
+        float newG = NumberUtils.Limit(color.g * factor, 0, 1);
+        float newB = NumberUtils.Limit(color.b * factor, 0, 1);
+        float newAlpha = includeAlpha ? NumberUtils.Limit(color.a * factor, 0, 1) : color.a;
+        return new Color(newR, newG, newB, newAlpha);
+    }
+
     ///////////////////////////////////////////////////////
     // Color32
     ///////////////////////////////////////////////////////

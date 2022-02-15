@@ -54,8 +54,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void ClearSelection()
     {
-        EditorUiNote[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorUiNote>();
-        foreach (EditorUiNote uiNote in uiNotes)
+        EditorNoteControl[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorNoteControl>();
+        foreach (EditorNoteControl uiNote in uiNotes)
         {
             uiNote.SetSelected(false);
         }
@@ -68,26 +68,26 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         SetSelection(allNotes);
     }
 
-    public void AddToSelection(List<EditorUiNote> uiNotes)
+    public void AddToSelection(List<EditorNoteControl> uiNotes)
     {
-        foreach (EditorUiNote uiNote in uiNotes)
+        foreach (EditorNoteControl uiNote in uiNotes)
         {
             AddToSelection(uiNote);
         }
     }
 
-    public void RemoveFromSelection(List<EditorUiNote> uiNotes)
+    public void RemoveFromSelection(List<EditorNoteControl> uiNotes)
     {
-        foreach (EditorUiNote uiNote in uiNotes)
+        foreach (EditorNoteControl uiNote in uiNotes)
         {
             RemoveFromSelection(uiNote);
         }
     }
 
-    public void SetSelection(List<EditorUiNote> uiNotes)
+    public void SetSelection(List<EditorNoteControl> uiNotes)
     {
         ClearSelection();
-        foreach (EditorUiNote uiNote in uiNotes)
+        foreach (EditorNoteControl uiNote in uiNotes)
         {
             AddToSelection(uiNote);
         }
@@ -104,10 +104,10 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             }
             selectedNotes.Add(note);
 
-            EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
-            if (uiNote != null)
+            EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
+            if (noteControl != null)
             {
-                uiNote.SetSelected(true);
+                noteControl.SetSelected(true);
             }
         }
     }
@@ -120,17 +120,17 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     public void AddToSelection(Note note)
     {
         selectedNotes.Add(note);
-        EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
-        if (uiNote != null)
+        EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
+        if (noteControl != null)
         {
-            uiNote.SetSelected(true);
+            noteControl.SetSelected(true);
         }
     }
 
-    public void AddToSelection(EditorUiNote uiNote)
+    public void AddToSelection(EditorNoteControl noteControl)
     {
-        uiNote.SetSelected(true);
-        selectedNotes.Add(uiNote.Note);
+        noteControl.SetSelected(true);
+        selectedNotes.Add(noteControl.Note);
     }
 
     public void RemoveFromSelection(List<Note> notes)
@@ -141,17 +141,17 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     public void RemoveFromSelection(Note note)
     {
         selectedNotes.Remove(note);
-        EditorUiNote uiNote = editorNoteDisplayer.GetUiNoteForNote(note);
-        if (uiNote != null)
+        EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
+        if (noteControl != null)
         {
-            uiNote.SetSelected(false);
+            noteControl.SetSelected(false);
         }
     }
 
-    public void RemoveFromSelection(EditorUiNote uiNote)
+    public void RemoveFromSelection(EditorNoteControl noteControl)
     {
-        uiNote.SetSelected(false);
-        selectedNotes.Remove(uiNote.Note);
+        noteControl.SetSelected(false);
+        selectedNotes.Remove(noteControl.Note);
     }
 
     public void SelectNextNote(bool updatePositionInSong = true)
@@ -165,7 +165,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             if (lyricsInputField != null)
             {
                 wasEditingLyrics = true;
-                SetSelection(new List<EditorUiNote> { lyricsInputField.EditorUiNote });
+                SetSelection(new List<EditorNoteControl> { lyricsInputField.EditorNoteControl });
             }
         }
 
@@ -226,7 +226,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             if (lyricsInputField != null)
             {
                 wasEditingLyrics = true;
-                SetSelection(new List<EditorUiNote> { lyricsInputField.EditorUiNote });
+                SetSelection(new List<EditorNoteControl> { lyricsInputField.EditorNoteControl });
             }
         }
 
@@ -278,36 +278,36 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private void SelectFirstVisibleNote()
     {
-        List<EditorUiNote> sortedUiNotes = GetSortedVisibleUiNotes();
+        List<EditorNoteControl> sortedUiNotes = GetSortedVisibleUiNotes();
         if (sortedUiNotes.IsNullOrEmpty())
         {
             return;
         }
 
-        SetSelection(new List<EditorUiNote> { sortedUiNotes.First() });
+        SetSelection(new List<EditorNoteControl> { sortedUiNotes.First() });
     }
 
     private void SelectLastVisibleNote()
     {
-        List<EditorUiNote> sortedUiNotes = GetSortedVisibleUiNotes();
+        List<EditorNoteControl> sortedUiNotes = GetSortedVisibleUiNotes();
         if (sortedUiNotes.IsNullOrEmpty())
         {
             return;
         }
 
-        SetSelection(new List<EditorUiNote> { sortedUiNotes.Last() });
+        SetSelection(new List<EditorNoteControl> { sortedUiNotes.Last() });
     }
 
-    private List<EditorUiNote> GetSortedVisibleUiNotes()
+    private List<EditorNoteControl> GetSortedVisibleUiNotes()
     {
-        EditorUiNote[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorUiNote>();
+        EditorNoteControl[] uiNotes = uiNoteContainer.GetComponentsInChildren<EditorNoteControl>();
         if (uiNotes.IsNullOrEmpty())
         {
-            return new List<EditorUiNote>();
+            return new List<EditorNoteControl>();
         }
 
-        List<EditorUiNote> sortedUiNote = new List<EditorUiNote>(uiNotes);
-        sortedUiNote.Sort(EditorUiNote.comparerByStartBeat);
+        List<EditorNoteControl> sortedUiNote = new List<EditorNoteControl>(uiNotes);
+        sortedUiNote.Sort(EditorNoteControl.comparerByStartBeat);
         return sortedUiNote;
     }
 }

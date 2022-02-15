@@ -164,7 +164,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         LoadVoices(undoState);
         LoadSongMetaTags(undoState);
 
-        editorNoteDisplayer.ClearUiNotes();
+        editorNoteDisplayer.ClearNoteControls();
 
         songMetaChangeEventStream.OnNext(new LoadedMementoEvent());
 

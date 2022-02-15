@@ -6,26 +6,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    [InjectedInInspector]
-    public RectTransform uiIssueContainer;
-
     [InjectedInInspector]
     public EditorUiIssue issuePrefab;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private SongMeta songMeta;
 
     [Inject]
     private Injector injector;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaIssues)]
+    private VisualElement noteAreaIssues;
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -37,18 +38,18 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
     private ViewportEvent lastViewportEvent;
     private float lastSongMetaBpm;
 
-    public void OnSceneInjectionFinished()
+    public void OnInjectionFinished()
     {
         songMetaChangeEventStream.Subscribe(_ => UpdateIssues());
     }
 
-    void Start()
+    private void Start()
     {
         issuePrefabWidthInPixels = issuePrefab.GetComponent<RectTransform>().rect.width;
 
         UpdateIssues();
 
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
+        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -72,11 +73,11 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
 
     private void DrawIssues()
     {
-        uiIssueContainer.DestroyAllDirectChildren();
+        noteAreaIssues.Clear();
 
         foreach (SongIssue issue in issues)
         {
-            if (noteArea.IsBeatInViewport(issue.StartBeat))
+            if (noteAreaControl.IsBeatInViewport(issue.StartBeat))
             {
                 CreateUiIssue(issue);
             }
@@ -85,21 +86,21 @@ public class EditorUiIssueDisplayer : MonoBehaviour, INeedInjection, ISceneInjec
 
     private void CreateUiIssue(SongIssue issue)
     {
-        EditorUiIssue uiIssue = Instantiate(issuePrefab, uiIssueContainer.transform);
-        injector.Inject(uiIssue);
-        uiIssue.Init(issue);
+        // EditorUiIssue uiIssue = Instantiate(issuePrefab, noteAreaIssues.transform);
+        // injector.Inject(uiIssue);
+        // uiIssue.Init(issue);
 
-        PositionUiIssue(uiIssue, issue.StartBeat);
+        // PositionUiIssue(uiIssue, issue.StartBeat);
     }
 
     private void PositionUiIssue(EditorUiIssue uiIssue, int beat)
     {
         RectTransform uiIssueRectTransform = uiIssue.GetComponent<RectTransform>();
 
-        float xPercent = (float)noteArea.GetHorizontalPositionForBeat(beat);
-        float anchorWidth = issuePrefabWidthInPixels / uiIssueContainer.rect.width;
+        float widthPercent = issuePrefabWidthInPixels / noteAreaIssues.contentRect.width;
+        float xPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(beat);
         uiIssueRectTransform.anchorMin = new Vector2(xPercent, 0);
-        uiIssueRectTransform.anchorMax = new Vector2(xPercent + anchorWidth, 1);
+        uiIssueRectTransform.anchorMax = new Vector2(xPercent + widthPercent, 1);
         uiIssueRectTransform.anchoredPosition = Vector2.zero;
         uiIssueRectTransform.sizeDelta = Vector2.zero;
     }

@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="sentenceUiRoot" style="width: 100%; height: 10px; position: absolute;">
+        <ui:VisualElement name="sentence" style="position: absolute; width: 100%; height: 100%; overflow: hidden;">
+            <ui:VisualElement name="sentenceImage" style="background-image: none; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: rgb(126, 167, 179);" />
+            <ui:VisualElement name="selectionIndicator" style="position: absolute; height: 100%; width: 100%; background-color: rgba(21, 88, 219, 0.5); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgba(32, 32, 32, 0.88); border-right-color: rgba(32, 32, 32, 0.88); border-top-color: rgba(32, 32, 32, 0.88); border-bottom-color: rgba(32, 32, 32, 0.88); display: flex;" />
+            <ui:VisualElement name="leftHandle" style="position: absolute; height: 100%; width: 25%; background-color: rgba(21, 88, 219, 0.5);" />
+            <ui:VisualElement name="rightHandle" style="position: absolute; height: 100%; width: 25%; background-color: rgba(21, 88, 219, 0.5); right: 0;" />
+        </ui:VisualElement>
+        <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="sentenceLabel" class="tinyFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold; width: 100%; height: 100%; -unity-text-align: middle-center; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; overflow: visible; position: absolute; white-space: normal;" />
+    </ui:VisualElement>
+</ui:UXML>

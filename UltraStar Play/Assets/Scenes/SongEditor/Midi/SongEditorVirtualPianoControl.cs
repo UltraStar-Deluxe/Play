@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Injector injector;
@@ -25,7 +25,7 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
 
     public void OnInjectionFinished()
     {
-        noteArea.ViewportEventStream.Subscribe(OnViewportChanged);
+        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -43,8 +43,8 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
     {
         virtualPiano.Clear();
 
-        int minMidiNote = noteArea.MinMidiNoteInViewport;
-        int maxMidiNote = noteArea.MaxMidiNoteInViewport;
+        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
             CreatePianoKeyForMidiNote(midiNote);
@@ -60,8 +60,8 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
             .CreateAndInject<VirtualPianoKeyControl>();
         keyControl.MidiNote = midiNote;
 
-        float heightPercent = noteArea.HeightForSingleNote * 0.8f;
-        float yPercent = (float)noteArea.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
+        float heightPercent = noteAreaControl.HeightForSingleNote * 0.8f;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         float widthPercent = MidiUtils.IsWhitePianoKey(midiNote) ? 0.9f : 0.7f;
         visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
         visualElement.style.bottom = new StyleLength(new Length(100 * yPercent, LengthUnit.Percent));

@@ -35,8 +35,12 @@
                 <ui:VisualElement name="verticalGrid" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);">
                     <ui:VisualElement name="verticalGridLabelContainer" style="position: absolute; width: 100%; height: 100%;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="noteAreaPositionInSongIndicator" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute;" />
+                <ui:VisualElement name="sentenceLines" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaNotes" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaSentences" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaIssues" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="noteAreaSelectionFrame" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
+                <ui:VisualElement name="noteAreaPositionInSongIndicator" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
             </ui:VisualElement>
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: 180px;">
                 <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
@@ -50,7 +54,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="overviewArea" class="panel" style="height: 32px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
+        <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
             <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
             <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
         </ui:VisualElement>
