@@ -122,6 +122,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             .CreateAndInject<NoteAreaVerticalRulerControl>();
 
         UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis);
+        ViewportEventStream.Subscribe(_ => UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis));
 
         noteAreaVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
     }

@@ -360,4 +360,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         }
         return sortedNotes[noteIndex];
     }
+
+    public bool InputFieldHasFocus()
+    {
+        return textField.focusController.focusedElement == textField;
+    }
 }

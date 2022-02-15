@@ -49,19 +49,25 @@ public class VirtualPianoKeyControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        visualElement.RegisterCallback<PointerDownEvent>(evt =>
+        visualElement.RegisterCallback<PointerDownEvent>(evt => PlayMidiNote());
+        visualElement.RegisterCallback<PointerUpEvent>(evt => StopMidiNote());
+        visualElement.RegisterCallback<PointerLeaveEvent>(evt => StopMidiNote());
+    }
+
+    private void PlayMidiNote()
+    {
+        StopMidiNote();
+        if (midiNote > -1)
         {
-            if (midiNote > -1)
-            {
-                midiManager.PlayMidiNote(midiNote);
-            }
-        });
-        visualElement.RegisterCallback<PointerUpEvent>(evt =>
+            midiManager.PlayMidiNote(midiNote);
+        }
+    }
+
+    private void StopMidiNote()
+    {
+        if (midiNote > -1)
         {
-            if (midiNote > -1)
-            {
-                midiManager.StopMidiNote(midiNote);
-            }
-        });
+            midiManager.StopMidiNote(midiNote);
+        }
     }
 }
