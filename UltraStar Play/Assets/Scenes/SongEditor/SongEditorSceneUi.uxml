@@ -57,6 +57,7 @@
         <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
             <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
             <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
+            <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />
         </ui:VisualElement>
         <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">
             <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />

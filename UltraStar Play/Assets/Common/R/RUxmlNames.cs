@@ -224,6 +224,7 @@ public static partial class R
         public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
         public const string overviewArea = "overviewArea";
+        public const string overviewAreaLabel = "overviewAreaLabel";
         public const string overviewAreaPositionInSongIndicator = "overviewAreaPositionInSongIndicator";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string partyButton = "partyButton";

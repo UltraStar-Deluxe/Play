@@ -21,6 +21,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.overviewArea)]
     private VisualElement overviewArea;
 
+    [Inject(UxmlName = R.UxmlNames.overviewAreaLabel)]
+    private Label overviewAreaLabel;
+
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -57,6 +60,8 @@ public class OverviewAreaControl : IInjectionFinishedListener
                 // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
                 AudioClip audioClip = AudioManager.Instance.LoadAudioClip(SongMetaUtils.GetAbsoluteSongAudioPath(songMeta), false);
                 audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewArea);
+                // Waveform color is same as text color
+                audioWaveFormVisualization.waveformColor = overviewAreaLabel.resolvedStyle.color;
                 audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
             }
         });
