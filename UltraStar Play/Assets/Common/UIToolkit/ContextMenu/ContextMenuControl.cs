@@ -62,7 +62,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         float distance = Vector2.Distance(evt.position, pointerDownPosition);
         if (distance > DragDistanceThreshold)
         {

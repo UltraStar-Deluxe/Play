@@ -157,6 +157,11 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             .CreateAndInject<NoteAreaContextMenuControl>();
     }
 
+    public void Update()
+    {
+        selectionDragListener.UpdateAutoScroll();
+    }
+
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
@@ -538,40 +543,30 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         SetViewport(x, y, width, height);
     }
 
-    public float MillisecondsToPixels(int millis)
+    public float MillisecondsToPixelDistance(int millis)
     {
         Rect rect = noteAreaVisualElement.worldBound;
-        return rect.x + rect.width * ((float)(millis - MinMillisecondsInViewport) / ViewportWidth);
+        return millis * rect.width / ViewportWidth;
     }
 
-    public float BeatToPixels(int beat)
+    public float MidiNotesToPixelDistance(int midiNotes)
     {
         Rect rect = noteAreaVisualElement.worldBound;
-        return rect.x + rect.width * ((float)(beat - MinBeatInViewport) / ViewportWidthInBeats);
-    }
-
-    public float MidiNoteToPixels(int midiNote)
-    {
-        Rect rect = noteAreaVisualElement.worldBound;
-        return rect.y + rect.height * ((float)(midiNote - MinMidiNoteInViewport) / ViewportHeight);
-    }
-
-    public int PixelsToMilliseconds(float x)
-    {
-        Rect rect = noteAreaVisualElement.worldBound;
-        return (int)(MinMillisecondsInViewport + ViewportWidth * ((x - rect.x) / rect.width));
+        return midiNotes * rect.height / ViewportHeight;
     }
 
     public int PixelsToBeat(float x)
     {
         Rect rect = noteAreaVisualElement.worldBound;
-        return (int)(MinBeatInViewport + ViewportWidthInBeats * ((x - rect.x) / rect.width));
+        return (int)Math.Round(MinBeatInViewport + ViewportWidthInBeats * ((x - rect.x) / rect.width));
     }
 
     public int PixelsToMidiNote(float y)
     {
         Rect rect = noteAreaVisualElement.worldBound;
-        return (int)(MinMidiNoteInViewport + ViewportHeight * ((y - rect.y) / rect.height));
+        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        float yFromBottom = screenSizePanelCoordinates.y - rect.height - rect.y;
+        return (int)Math.Round(MinMidiNoteInViewport + ViewportHeight * ((y - yFromBottom) / rect.height));
     }
 
     private void UpdatePositionInSongIndicator(double positionInSongInMillis)

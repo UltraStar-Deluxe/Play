@@ -18,13 +18,13 @@ public class NoteAreaDragControl : AbstractDragControl<NoteAreaDragEvent>
     {
         GeneralDragEvent generalDragEvent = CreateGeneralDragEventStart(eventData);
 
-        int midiNoteDragStart = (int)(noteAreaControl.ViewportY + generalDragEvent.LocalCoordinateInPercent.StartPosition.y * noteAreaControl.ViewportHeight);
+        int midiNoteDragStart = (int)Mathf.Round(noteAreaControl.ViewportY + generalDragEvent.LocalCoordinateInPercent.StartPosition.y * noteAreaControl.ViewportHeight);
         int midiNoteDistance = 0;
 
-        int positionInSongInMillisDragStart = (int)(noteAreaControl.ViewportX + generalDragEvent.LocalCoordinateInPercent.StartPosition.x * noteAreaControl.ViewportWidth);
+        int positionInSongInMillisDragStart = (int)Mathf.Round(noteAreaControl.ViewportX + generalDragEvent.LocalCoordinateInPercent.StartPosition.x * noteAreaControl.ViewportWidth);
         int millisDistance = 0;
 
-        int positionInSongInBeatsDragStart = (int)(noteAreaControl.MinBeatInViewport + generalDragEvent.LocalCoordinateInPercent.StartPosition.x * noteAreaControl.ViewportWidthInBeats);
+        int positionInSongInBeatsDragStart = (int)Mathf.Round(noteAreaControl.MinBeatInViewport + generalDragEvent.LocalCoordinateInPercent.StartPosition.x * noteAreaControl.ViewportWidthInBeats);
         int beatDistance = 0;
 
         NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,

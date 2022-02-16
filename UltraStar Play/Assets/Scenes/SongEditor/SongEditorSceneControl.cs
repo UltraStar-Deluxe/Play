@@ -177,6 +177,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         lyricsAreaControl.Update();
+
+        noteAreaControl.Update();
     }
 
     private void OnAudioPlaybackStopped(double positionInSongInMillis)
