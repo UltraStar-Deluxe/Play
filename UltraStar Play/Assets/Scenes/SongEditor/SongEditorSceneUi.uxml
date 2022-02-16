@@ -51,6 +51,7 @@
                 <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 100%; height: 80px; align-items: center; justify-content: center; flex-shrink: 0;">
                     <ui:VisualElement name="noVideoImage" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
                     <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                    <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" class="textOutline" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

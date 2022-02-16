@@ -139,7 +139,6 @@ public static partial class R
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string issueImage = "issueImage";
-        public const string issueLabel = "issueLabel";
         public const string issuesSideBarContainer = "issuesSideBarContainer";
         public const string issueUiRoot = "issueUiRoot";
         public const string itemIndexLabel = "itemIndexLabel";
@@ -418,6 +417,7 @@ public static partial class R
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
         public const string videoArea = "videoArea";
+        public const string videoAreaLabel = "videoAreaLabel";
         public const string videoIcon = "videoIcon";
         public const string videoImage = "videoImage";
         public const string videoLegend = "videoLegend";
