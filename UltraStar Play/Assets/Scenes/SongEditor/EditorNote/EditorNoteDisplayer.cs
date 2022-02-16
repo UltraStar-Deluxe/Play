@@ -5,15 +5,14 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
 public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    private static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
-    private static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
+    public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
+    public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
 
     [InjectedInInspector]
     public VisualTreeAsset editorNoteUi;

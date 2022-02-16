@@ -56,6 +56,10 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
+            <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
             <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
             <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />

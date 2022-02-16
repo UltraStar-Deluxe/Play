@@ -177,24 +177,6 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private void UpdateSelectionFrame(NoteAreaDragEvent currentDragEvent)
     {
-        // float scrollAmountSumXInPx = noteAreaControl.MillisecondsToPixelDistance((int)scrollAmountSum.x);
-        // float scrollAmountSumYInPx = noteAreaControl.MidiNotesToPixelDistance((int)scrollAmountSum.y);
-        // float startX = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.StartPosition.x - scrollAmountSumXInPx;
-        // float currentX = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.CurrentPosition.x;
-        // float startY = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.StartPosition.y - scrollAmountSumYInPx;
-        // float currentY = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.CurrentPosition.y;
-        //
-        // float minX = Mathf.Min(startX, currentX);
-        // float maxX = Mathf.Max(startX, currentX);
-        // float minY = Mathf.Min(startY, currentY);
-        // float maxY = Mathf.Max(startY, currentY);
-        //
-        // noteAreaSelectionFrame.style.left = minX;
-        // noteAreaSelectionFrame.style.bottom = minY;
-        // noteAreaSelectionFrame.style.width = maxX - minX;
-        // noteAreaSelectionFrame.style.height = maxY - minY;
-
-        // Coordinates in milliseconds and midi-note
         int startBeat = GetDragStartBeat();
         int endBeat = GetDragEndBeat(currentDragEvent);
         int startMidiNote = GetDragStartMidiNote();
