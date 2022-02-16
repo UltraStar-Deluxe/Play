@@ -16,6 +16,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
+    private static readonly float scrollBorderPercent = 0.05f;
+
     [Inject]
     private SongEditorSelectionControl selectionControl;
 
@@ -33,8 +35,6 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
     private VisualElement noteAreaSelectionFrame;
-
-    private readonly float scrollBorderPercent = 0.05f;
 
     private bool isCanceled;
 
@@ -171,11 +171,29 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         }
 
         return (startBeat <= note.StartBeat && note.EndBeat <= endBeat)
-            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote);
+            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote)
+            && Mathf.Abs(startMidiNote - endMidiNote) > 0;
     }
 
     private void UpdateSelectionFrame(NoteAreaDragEvent currentDragEvent)
     {
+        // float scrollAmountSumXInPx = noteAreaControl.MillisecondsToPixelDistance((int)scrollAmountSum.x);
+        // float scrollAmountSumYInPx = noteAreaControl.MidiNotesToPixelDistance((int)scrollAmountSum.y);
+        // float startX = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.StartPosition.x - scrollAmountSumXInPx;
+        // float currentX = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.CurrentPosition.x;
+        // float startY = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.StartPosition.y - scrollAmountSumYInPx;
+        // float currentY = currentDragEvent.GeneralDragEvent.LocalCoordinateInPixels.CurrentPosition.y;
+        //
+        // float minX = Mathf.Min(startX, currentX);
+        // float maxX = Mathf.Max(startX, currentX);
+        // float minY = Mathf.Min(startY, currentY);
+        // float maxY = Mathf.Max(startY, currentY);
+        //
+        // noteAreaSelectionFrame.style.left = minX;
+        // noteAreaSelectionFrame.style.bottom = minY;
+        // noteAreaSelectionFrame.style.width = maxX - minX;
+        // noteAreaSelectionFrame.style.height = maxY - minY;
+
         // Coordinates in milliseconds and midi-note
         int startBeat = GetDragStartBeat();
         int endBeat = GetDragEndBeat(currentDragEvent);
@@ -233,7 +251,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         }
     }
 
-    private void UpdateScroll()
+    public void UpdateAutoScroll()
     {
         if (scrollAmount.x != 0)
         {
