@@ -21,6 +21,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.overviewArea)]
     private VisualElement overviewArea;
 
+    [Inject(UxmlName = R.UxmlNames.overviewAreaWaveform)]
+    private VisualElement overviewAreaWaveform;
+
     [Inject(UxmlName = R.UxmlNames.overviewAreaLabel)]
     private Label overviewAreaLabel;
 
@@ -32,6 +35,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
+    private OverviewAreaNoteVisualizer noteVisualizer;
+    private OverviewAreaSentenceVisualizer sentenceVisualizer;
+    private OverviewAreaIssueVisualizer issueVisualizer;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
@@ -46,6 +52,18 @@ public class OverviewAreaControl : IInjectionFinishedListener
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaViewportIndicatorControl>();
 
+        noteVisualizer = injector
+            .WithRootVisualElement(overviewArea)
+            .CreateAndInject<OverviewAreaNoteVisualizer>();
+
+        issueVisualizer = injector
+            .WithRootVisualElement(overviewArea)
+            .CreateAndInject<OverviewAreaIssueVisualizer>();
+
+        sentenceVisualizer = injector
+            .WithRootVisualElement(overviewArea)
+            .CreateAndInject<OverviewAreaSentenceVisualizer>();
+
         // Create the audio waveform image.
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
@@ -59,7 +77,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
             {
                 // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
                 AudioClip audioClip = AudioManager.Instance.LoadAudioClip(SongMetaUtils.GetAbsoluteSongAudioPath(songMeta), false);
-                audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewArea);
+                audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform);
                 // Waveform color is same as text color
                 audioWaveFormVisualization.waveformColor = overviewAreaLabel.resolvedStyle.color;
                 audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);

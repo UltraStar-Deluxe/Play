@@ -39,7 +39,7 @@ public class OverviewAreaViewportIndicatorControl : INeedInjection, IInjectionFi
         float xMinPercent = (float)startPercent;
         float widthPercent = (float)(endPercent - startPercent);
 
-        overviewAreaViewportIndicator.style.left = new StyleLength(new Length(xMinPercent, LengthUnit.Percent));
-        overviewAreaViewportIndicator.style.width = new StyleLength(new Length(widthPercent, LengthUnit.Percent));
+        overviewAreaViewportIndicator.style.left = new StyleLength(new Length(xMinPercent * 100, LengthUnit.Percent));
+        overviewAreaViewportIndicator.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
     }
 }
