@@ -50,22 +50,24 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
+    [Inject(UxmlName = R.UxmlNames.noteArea)]
+    private VisualElement noteArea;
+
     private EditorSentenceContextMenuControl contextMenuControl;
-    private EditorSentenceDragControl dragControl;
     private ManipulateSentenceDragListener dragListener;
 
     public bool IsPointerOver { get; private set; }
     public bool IsPointerOverRightHandle { get; private set; }
-
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
 
     public void OnInjectionFinished()
     {
         rightHandle.HideByDisplay();
         leftHandle.HideByDisplay();
         selectionIndicator.HideByDisplay();
-        disposables.Add(uiManager.MousePositionChangeEventStream
-            .Subscribe(_ => OnPointerPositionChanged()));
+
+        VisualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
+        VisualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
+        VisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt));
 
         if (Sentence.Voice != null)
         {
@@ -78,15 +80,9 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
             .WithBindingForInstance(this)
             .CreateAndInject<EditorSentenceContextMenuControl>();
 
-        dragControl = injector
-            .WithRootVisualElement(VisualElement)
-            .WithBindingForInstance(this)
-            .CreateAndInject<EditorSentenceDragControl>();
-
         dragListener = injector
             .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(this)
-            .WithBindingForInstance(dragControl)
             .WithBindingForInstance(contextMenuControl)
             .CreateAndInject<ManipulateSentenceDragListener>();
     }
@@ -101,32 +97,21 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
         sentenceLabel.text = label;
     }
 
-    private void OnPointerPositionChanged()
+    private void OnPointerMove(IPointerEvent evt)
     {
-        if (IsPointerOver)
+        Vector2 localPoint = evt.localPosition;
+        float width = VisualElement.worldBound.width;
+        double xPercent = localPoint.x / width;
+        if (xPercent > (1 - handleWidthInPercent))
         {
-            OnPointerOver();
+            OnPointerOverRightHandle();
+        }
+        else
+        {
+            OnPointerOverCenter();
         }
 
         UpdateHandles();
-    }
-
-    private void OnPointerOver()
-    {
-        // Vector3 mousePosition = Input.mousePosition;
-        // Vector2 localPoint = RectTransform.InverseTransformPoint(mousePosition);
-        // float width = RectTransform.rect.width;
-        // double xPercent = (localPoint.x + (width / 2)) / width;
-        // if (xPercent > (1 - handleWidthInPercent))
-        // {
-        //     OnPointerOverRightHandle();
-        // }
-        // else
-        // {
-        //     OnPointerOverCenter();
-        // }
-        //
-        // UpdateHandles();
     }
 
     private void OnPointerOverCenter()
@@ -147,12 +132,12 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
         rightHandle.SetVisibleByDisplay(isRightHandleVisible);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    private void OnPointerEnter()
     {
         IsPointerOver = true;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    private void OnPointerExit()
     {
         IsPointerOver = false;
         IsPointerOverRightHandle = false;
@@ -160,18 +145,17 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
         cursorManager.SetDefaultCursor();
     }
 
-    public bool IsPositionOverRightHandle(Vector2 position)
+    public bool IsPositionOverRightHandle(Vector2 screenPosition)
     {
-        // Vector2 localPoint = RectTransform.InverseTransformPoint(position);
-        // float width = RectTransform.rect.width;
-        // double xPercent = (localPoint.x + (width / 2)) / width;
-        // return (xPercent > (1 - handleWidthInPercent));
-        return false;
+        Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
+        float width = VisualElement.worldBound.width;
+        double xPercent = localPoint.x / width;
+        return xPercent > (1 - handleWidthInPercent);
     }
 
     public void Dispose()
     {
-        disposables.ForEach(it => it.Dispose());
+        dragListener.Dispose();
         VisualElement.RemoveFromHierarchy();
     }
 }

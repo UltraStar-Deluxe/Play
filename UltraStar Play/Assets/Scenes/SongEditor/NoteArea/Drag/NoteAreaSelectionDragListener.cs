@@ -31,6 +31,9 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
+    [Inject]
     private SongMeta songMeta;
 
     [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
@@ -54,7 +57,18 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         isCanceled = false;
         lastDragEvent = dragEvent;
         startDragEvent = dragEvent;
-        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
+
+        Note dragStartNote = songEditorSceneControl
+            .GetAllNotes()
+            .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
+                                    && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
+                                    && note.MidiNote <= dragEvent.MidiNoteDragStart
+                                    && dragEvent.MidiNoteDragStart <= note.MidiNote);
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left
+            // This is a drag gesture to manipulate notes, not to select notes
+            || dragStartNote != null
+            // This is a drag gesture to manipulate sentences, not to select notes
+            || dragEvent.GeneralDragEvent.LocalCoordinateInPercent.StartPosition.y < 0.05f)
         {
             CancelDrag();
             return;

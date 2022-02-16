@@ -5,11 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using PrimeInputActions;
-using UniInject.Extensions;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -48,8 +44,6 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     // private ShowWhiteSpaceText uiText;
 
-    // private NoteAreaDragHandler noteAreaDragHandler;
-    
     [Inject]
     private SongMeta songMeta;
 
@@ -105,16 +99,12 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         UpdateHandles();
         disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
             .Subscribe(_ => UpdateHandles()));
-        disposables.Add(noteAreaControl.ViewportEventStream
-            .Subscribe(_ => UpdateFontSize()));
-        disposables.Add(uiManager.MousePositionChangeEventStream
-            .Subscribe(_ => OnPointerMove()));
 
         VisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit(evt), TrickleDown.TrickleDown);
-        VisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(), TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
 
         contextMenuControl = injector
             .WithRootVisualElement(VisualElement)
@@ -136,46 +126,27 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             Color color = songEditorSceneControl.GetColorForVoice(Note.Sentence.Voice);
             SetColor(color);
         }
-        UpdateFontSize();
     }
 
-    private void OnPointerMove()
+    private void OnPointerMove(IPointerEvent evt)
     {
-        if (IsPointerOver)
+        Vector2 localPoint = evt.localPosition;
+        float width = VisualElement.worldBound.width;
+        double xPercent = localPoint.x / width;
+        if (xPercent < handleWidthInPercent)
         {
-            OnPointerOver();
+            OnPointerOverLeftHandle();
+        }
+        else if (xPercent > (1 - handleWidthInPercent))
+        {
+            OnPointerOverRightHandle();
+        }
+        else
+        {
+            OnPointerOverCenter();
         }
 
         UpdateHandles();
-    }
-
-    private void UpdateFontSize()
-    {
-        // float fontSize = noteArea.HeightForSingleNote * 200;
-        // fontSize = Mathf.Min(fontSize, maxFontSize);
-        // lyricsLabel.style.fontSize = new StyleLength(new Length(fontSize, LengthUnit.Pixel));
-    }
-
-    private void OnPointerOver()
-    {
-        // Vector3 mousePosition = Input.mousePosition;
-        // Vector2 localPoint = RectTransform.InverseTransformPoint(mousePosition);
-        // float width = RectTransform.rect.width;
-        // double xPercent = (localPoint.x + (width / 2)) / width;
-        // if (xPercent < handleWidthInPercent)
-        // {
-        //     OnPointerOverLeftHandle();
-        // }
-        // else if (xPercent > (1 - handleWidthInPercent))
-        // {
-        //     OnPointerOverRightHandle();
-        // }
-        // else
-        // {
-        //     OnPointerOverCenter();
-        // }
-        //
-        // UpdateHandles();
     }
 
     private void OnPointerOverCenter()
@@ -226,22 +197,20 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         rightHandle.SetVisibleByDisplay(isRightHandleVisible);
     }
 
-    public bool IsPositionOverLeftHandle(Vector2 position)
+    public bool IsPositionOverLeftHandle(Vector2 screenPosition)
     {
-        // Vector2 localPoint = RectTransform.InverseTransformPoint(position);
-        // float width = RectTransform.rect.width;
-        // double xPercent = (localPoint.x + (width / 2)) / width;
-        // return (xPercent < handleWidthInPercent);r
-        return false;
+        Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
+        float width = VisualElement.worldBound.width;
+        double xPercent = localPoint.x / width;
+        return xPercent < handleWidthInPercent;
     }
 
-    public bool IsPositionOverRightHandle(Vector2 position)
+    public bool IsPositionOverRightHandle(Vector2 screenPosition)
     {
-        // Vector2 localPoint = RectTransform.InverseTransformPoint(position);
-        // float width = RectTransform.rect.width;
-        // double xPercent = (localPoint.x + (width / 2)) / width;
-        // return (xPercent > (1 - handleWidthInPercent));
-        return false;
+        Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
+        float width = VisualElement.worldBound.width;
+        double xPercent = localPoint.x / width;
+        return xPercent > (1 - handleWidthInPercent);
     }
 
     public void OnPointerClick(IPointerEvent ped)
@@ -391,19 +360,4 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         disposables.Clear();
         VisualElement.RemoveFromHierarchy();
     }
-
-    // public void OnBeginDrag(PointerEventData eventData)
-    // {
-    //     noteAreaDragHandler.OnBeginDrag(eventData);
-    // }
-    //
-    // public void OnDrag(PointerEventData eventData)
-    // {
-    //     noteAreaDragHandler.OnDrag(eventData);
-    // }
-    //
-    // public void OnEndDrag(PointerEventData eventData)
-    // {
-    //     noteAreaDragHandler.OnEndDrag(eventData);
-    // }
 }

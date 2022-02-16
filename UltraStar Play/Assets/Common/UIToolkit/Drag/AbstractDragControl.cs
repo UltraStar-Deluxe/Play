@@ -65,13 +65,13 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         dragListeners.Remove(listener);
     }
 
-    private void OnPointerDown(PointerDownEvent evt)
+    protected virtual void OnPointerDown(IPointerEvent evt)
     {
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
         DragState.Value = EDragState.ReadyForDrag;
     }
 
-    private void OnPointerMove(PointerMoveEvent evt)
+    protected virtual void OnPointerMove(IPointerEvent evt)
     {
         if (DragState.Value == EDragState.ReadyForDrag)
         {
@@ -87,7 +87,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         }
     }
 
-    private void OnPointerUp(PointerUpEvent evt)
+    protected virtual void OnPointerUp(IPointerEvent evt)
     {
         if (DragState.Value == EDragState.Dragging)
         {
@@ -97,7 +97,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         DragState.Value = EDragState.WaitingForPointerDown;
     }
 
-    private void OnBeginDrag(DragControlPointerEvent eventData)
+    protected virtual void OnBeginDrag(DragControlPointerEvent eventData)
     {
         if (IsDragging)
         {
@@ -110,7 +110,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
-    private void OnDrag(DragControlPointerEvent eventData)
+    protected virtual void OnDrag(DragControlPointerEvent eventData)
     {
         if (DragState.Value == EDragState.IgnoreDrag
             || !IsDragging
@@ -123,7 +123,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
-    private void OnEndDrag(DragControlPointerEvent eventData)
+    protected virtual void OnEndDrag(DragControlPointerEvent eventData)
     {
         if (DragState.Value != EDragState.Dragging
             || eventData.PointerId != pointerId)
@@ -136,7 +136,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         DragState.Value = EDragState.ReadyForDrag;
     }
 
-    private void CancelDrag()
+    protected virtual void CancelDrag()
     {
         if (DragState.Value == EDragState.IgnoreDrag)
         {
@@ -147,9 +147,9 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
 
-    private void NotifyListeners(Action<IDragListener<EVENT>> action, bool includeCanceledListeners)
+    protected void NotifyListeners(Action<IDragListener<EVENT>> action, bool includeCanceledListeners)
     {
-        foreach (IDragListener<EVENT> listener in dragListeners)
+        foreach (IDragListener<EVENT> listener in dragListeners.ToList())
         {
             if (includeCanceledListeners || !listener.IsCanceled())
             {
