@@ -83,7 +83,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private VisualElement noteAreaPositionInSongIndicator;
 
     private NoteAreaContextMenuControl contextMenuControl;
-    private NoteAreaDragControl dragControl;
+    public NoteAreaDragControl DragControl { get; private set; }
     private NoteAreaScrollingDragListener scrollingDragListener;
     private NoteAreaSelectionDragListener selectionDragListener;
     private ManipulateNotesDragListener manipulateNotesDragListener;
@@ -132,28 +132,28 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         noteAreaVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
 
-        dragControl = injector
+        DragControl = injector
             .WithRootVisualElement(noteAreaVisualElement)
             .CreateAndInject<NoteAreaDragControl>();
 
         scrollingDragListener = injector
             .WithRootVisualElement(noteAreaVisualElement)
-            .WithBindingForInstance(dragControl)
+            .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaScrollingDragListener>();
 
         selectionDragListener = injector
             .WithRootVisualElement(noteAreaVisualElement)
-            .WithBindingForInstance(dragControl)
+            .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaSelectionDragListener>();
 
         manipulateNotesDragListener = injector
             .WithRootVisualElement(noteAreaVisualElement)
-            .WithBindingForInstance(dragControl)
+            .WithBindingForInstance(DragControl)
             .CreateAndInject<ManipulateNotesDragListener>();
 
         contextMenuControl = injector
             .WithRootVisualElement(noteAreaVisualElement)
-            .WithBindingForInstance(dragControl)
+            .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaContextMenuControl>();
     }
 

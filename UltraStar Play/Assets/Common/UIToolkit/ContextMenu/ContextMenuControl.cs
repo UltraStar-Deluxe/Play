@@ -40,9 +40,9 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
-        targetVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt));
-        targetVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt));
-        targetVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt));
+        targetVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)

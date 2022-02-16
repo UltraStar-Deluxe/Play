@@ -47,9 +47,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public ShowFps showFpsPrefab;
 
-    private readonly Subject<Vector3> mousePositionChangeEventStream = new Subject<Vector3>();
-    public IObservable<Vector3> MousePositionChangeEventStream => mousePositionChangeEventStream;
-
     private Canvas canvas;
     private RectTransform canvasRectTransform;
 
@@ -58,8 +55,6 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [Inject(Optional = true)]
     private UIDocument uiDocument;
-
-    private Vector3 lastMousePosition;
 
     private ShowFps showFpsInstance;
 
@@ -78,12 +73,6 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private void Update()
     {
-        if (lastMousePosition != Input.mousePosition)
-        {
-            mousePositionChangeEventStream.OnNext(Input.mousePosition);
-        }
-        lastMousePosition = Input.mousePosition;
-
         ContextMenuPopupControl.OpenContextMenuPopups
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }

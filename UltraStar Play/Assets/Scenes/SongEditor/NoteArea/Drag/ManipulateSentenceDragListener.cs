@@ -34,7 +34,7 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
     private EditorSentenceControl sentenceControl;
 
     [Inject]
-    private EditorSentenceDragControl editorSentenceDragControl;
+    private NoteAreaControl noteAreaControl;
 
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
@@ -52,12 +52,13 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
 
     public void OnInjectionFinished()
     {
-        editorSentenceDragControl.AddListener(this);
+        noteAreaControl.DragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
-        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left
+            || !sentenceControl.IsPointerOver)
         {
             CancelDrag();
             return;
@@ -110,7 +111,6 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
 
     public void CancelDrag()
     {
-        Debug.Log("CancelDrag");
         isCanceled = true;
         foreach (KeyValuePair<Note, Note> noteAndSnapshotOfNote in noteToSnapshotOfNoteMap)
         {
@@ -170,5 +170,10 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
     {
         sentenceControl.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+    }
+
+    public void Dispose()
+    {
+        noteAreaControl.DragControl.RemoveListener(this);
     }
 }
