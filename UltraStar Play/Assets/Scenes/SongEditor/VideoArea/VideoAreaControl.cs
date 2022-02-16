@@ -39,6 +39,9 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     [Inject(UxmlName = R.UxmlNames.videoArea)]
     private VisualElement videoArea;
 
+    [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
+    private Label videoAreaLabel;
+
     private bool isCanceled;
     private float videoGapAtDragStart;
 
@@ -48,6 +51,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     public void OnInjectionFinished()
     {
+        videoAreaLabel.HideByDisplay();
+
         dragControl = injector
             .WithRootVisualElement(videoArea)
             .CreateAndInject<GeneralDragControl>();
@@ -91,13 +96,14 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnDrag(GeneralDragEvent dragEvent)
     {
         setVideoGapAction.Execute(GetNewVideoGap(dragEvent));
-        cursorManager.SetCursorText("VideoGap: " + songMeta.VideoGap);
+        videoAreaLabel.ShowByDisplay();
+        videoAreaLabel.text = $"VideoGap: {songMeta.VideoGap}";
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)
     {
         setVideoGapAction.ExecuteAndNotify(GetNewVideoGap(dragEvent));
-        cursorManager.SetCursorTextVisible(false);
+        videoAreaLabel.HideByDisplay();
     }
 
     private float GetNewVideoGap(GeneralDragEvent dragEvent)

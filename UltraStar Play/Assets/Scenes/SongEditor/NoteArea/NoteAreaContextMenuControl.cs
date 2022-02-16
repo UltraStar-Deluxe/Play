@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaContextMenuControl : ContextMenuControl, IDragListener<NoteAreaDragEvent>
+public class NoteAreaContextMenuControl : ContextMenuControl
 {
     [Inject]
     private SongMeta songMeta;
@@ -46,8 +46,6 @@ public class NoteAreaContextMenuControl : ContextMenuControl, IDragListener<Note
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
-
-        noteAreaDragControl.AddListener(this);
     }
 
     protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
@@ -107,30 +105,5 @@ public class NoteAreaContextMenuControl : ContextMenuControl, IDragListener<Note
             contextMenu.AddSeparator();
             contextMenu.AddItem("Set Gap to playback position", () => setMusicGapAction.ExecuteAndNotify());
         }
-    }
-
-    public void OnBeginDrag(NoteAreaDragEvent dragEvent)
-    {
-        dragDistanceInPx = Vector2.zero;
-    }
-
-    public void OnDrag(NoteAreaDragEvent dragEvent)
-    {
-        dragDistanceInPx = dragEvent.GeneralDragEvent.LocalCoordinateInPixels.Distance;
-    }
-
-    public void OnEndDrag(NoteAreaDragEvent dragEvent)
-    {
-        dragDistanceInPx = Vector2.zero;
-    }
-
-    public void CancelDrag()
-    {
-        dragDistanceInPx = Vector2.zero;
-    }
-
-    public bool IsCanceled()
-    {
-        return false;
     }
 }

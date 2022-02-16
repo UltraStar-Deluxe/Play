@@ -7,6 +7,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using PrimeInputActions;
+using UniRx.Triggers;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -32,20 +33,55 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
 
     protected PanelHelper panelHelper;
 
+    private bool isDrag;
+    private bool isPointerDown;
+    private Vector2 pointerDownPosition;
+
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
+        targetVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt));
+        targetVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt));
+        targetVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt));
 
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
             .AddTo(gameObject);
     }
 
+    private void OnPointerDown(IPointerEvent evt)
+    {
+        isDrag = false;
+        isPointerDown = true;
+        pointerDownPosition = evt.position;
+    }
+
+    private void OnPointerMove(IPointerEvent evt)
+    {
+        if (!isPointerDown)
+        {
+            return;
+        }
+        
+        float distance = Vector2.Distance(evt.position, pointerDownPosition);
+        if (distance > DragDistanceThreshold)
+        {
+            isDrag = true;
+        }
+    }
+
+    private void OnPointerUp(IPointerEvent evt)
+    {
+        isPointerDown = false;
+        isDrag = false;
+    }
+
     protected virtual void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
     {
         if (Pointer.current == null
             || !context.ReadValueAsButton()
-            || Touch.activeTouches.Count >= 2)
+            || Touch.activeTouches.Count >= 2
+            || isDrag)
         {
             return;
         }
