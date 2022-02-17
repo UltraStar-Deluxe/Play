@@ -41,6 +41,7 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
+        public const string closeHelpOverlayButton = "closeHelpOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
@@ -116,6 +117,9 @@ public static partial class R
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
+        public const string helpContainer = "helpContainer";
+        public const string helpOverlay = "helpOverlay";
+        public const string helpScrollView = "helpScrollView";
         public const string hiddenContinueButton = "hiddenContinueButton";
         public const string highScoreContainer = "highScoreContainer";
         public const string highscoreEntry = "highscoreEntry";

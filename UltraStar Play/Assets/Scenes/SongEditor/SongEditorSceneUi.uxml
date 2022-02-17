@@ -56,7 +56,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
-            <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%; visibility: hidden;" />
             <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
@@ -70,6 +70,16 @@
         </ui:VisualElement>
         <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
             <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" class="transparentBackgroundColor" style="position: absolute; height: 100%; display: flex; width: 100%;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="helpOverlay" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none;">
+            <ui:VisualElement name="helpOverlayDialog" class="panel" style="position: absolute; width: 400px; height: 300px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="helpScrollView" style="flex-grow: 1; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                    <ui:VisualElement name="helpContainer" class="smallerFont" style="min-height: 20px; flex-grow: 1; width: 100%;" />
+                </ui:ScrollView>
+                <ui:VisualElement name="row" style="align-items: center; width: 100%; min-height: auto; min-width: auto; flex-direction: row; justify-content: space-around;">
+                    <ui:Button text="Close" display-tooltip-when-elided="true" name="closeHelpOverlayButton" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
