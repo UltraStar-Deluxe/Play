@@ -93,6 +93,8 @@ public static partial class R
         public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
         public const string editionPropertyContainer = "editionPropertyContainer";
+        public const string editLyricsPopup = "editLyricsPopup";
+        public const string editLyricsPopupTextField = "editLyricsPopupTextField";
         public const string editPlaylistButton = "editPlaylistButton";
         public const string editPlaylistDialog = "editPlaylistDialog";
         public const string editPlaylistDialogTitle = "editPlaylistDialogTitle";

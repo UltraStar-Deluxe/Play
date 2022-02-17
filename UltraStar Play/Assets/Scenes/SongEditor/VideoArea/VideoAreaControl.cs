@@ -59,11 +59,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         dragControl.AddListener(this);
 
         videoArea.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
-        videoArea.RegisterCallback<PointerLeaveEvent>(evt =>
-        {
-            cursorManager.SetDefaultCursor();
-            cursorManager.SetCursorTextVisible(false);
-        });
+        videoArea.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
 
         contextMenuControl = injector
             .WithRootVisualElement(videoArea)

@@ -232,9 +232,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
 
-        // Rebuild whole UI
-        LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
-
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());

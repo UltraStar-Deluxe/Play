@@ -84,7 +84,7 @@ public class UiManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        showFpsInstance = Instantiate(showFpsPrefab, CanvasUtils.FindCanvas().GetComponent<RectTransform>());
+        showFpsInstance = Instantiate(showFpsPrefab);
         injector.Inject(showFpsInstance);
         // Move to front
         showFpsInstance.transform.SetAsLastSibling();
@@ -99,15 +99,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void FindCanvas()
-    {
-        if (canvas == null)
-        {
-            canvas = CanvasUtils.FindCanvas();
-            canvasRectTransform = canvas.GetComponent<RectTransform>();
-        }
-    }
-
     public void DestroyAllDebugPoints()
     {
         foreach (RectTransform debugPoint in debugPoints)
@@ -115,17 +106,6 @@ public class UiManager : MonoBehaviour, INeedInjection
             GameObject.Destroy(debugPoint.gameObject);
         }
         debugPoints.Clear();
-    }
-
-    public RectTransform CreateDebugPoint(RectTransform parent = null)
-    {
-        if (parent == null)
-        {
-            parent = CanvasUtils.FindCanvas().GetComponent<RectTransform>();
-        }
-        RectTransform debugPoint = GameObject.Instantiate(debugPositionIndicatorPrefab, parent);
-        debugPoints.Add(debugPoint);
-        return debugPoint;
     }
 
     public Label CreateNotificationVisualElement(

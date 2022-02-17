@@ -68,5 +68,8 @@
             <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />
             <ui:Label text="The Artist - The Title" display-tooltip-when-elided="true" name="statusBarSongInfoLabel" class="tinyFont" />
         </ui:VisualElement>
+        <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
+            <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" class="transparentBackgroundColor" style="position: absolute; height: 100%; display: flex; width: 100%;" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

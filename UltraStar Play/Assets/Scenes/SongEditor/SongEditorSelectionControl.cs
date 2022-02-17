@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -30,6 +31,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
+
+    [Inject]
+    private UIDocument uiDocument;
     
     private readonly NoteHashSet selectedNotes = new NoteHashSet();
 
@@ -152,17 +156,14 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void SelectNextNote(bool updatePositionInSong = true)
     {
+        EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
         bool wasEditingLyrics = false;
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        if (editorNoteControl != null)
         {
             // Finish this lyrics editing and select following note directly in lyrics editing mode.
-            GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
-            EditorNoteLyricsInputField lyricsInputField = selectedGameObject.GetComponentInChildren<EditorNoteLyricsInputField>();
-            if (lyricsInputField != null)
-            {
-                wasEditingLyrics = true;
-                SetSelection(new List<EditorNoteControl> { lyricsInputField.EditorNoteControl });
-            }
+            wasEditingLyrics = true;
+            editorNoteControl.SubmitAndCloseLyricsDialog();
+            SetSelection(new List<EditorNoteControl> { editorNoteControl });
         }
 
         if (selectedNotes.Count == 0)
@@ -190,6 +191,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             }
         }
 
+        // Unity should not select another VisualElement when using tab on keyboard
+        uiDocument.rootVisualElement.focusController.focusedElement?.Blur();
+
         if (nextNote != null)
         {
             SetSelection(new List<Note> { nextNote });
@@ -214,16 +218,13 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     public void SelectPreviousNote(bool updatePositionInSong = true)
     {
         bool wasEditingLyrics = false;
-        if (GameObjectUtils.InputFieldHasFocus(eventSystem))
+        EditorNoteControl editorNoteControl = editorNoteDisplayer.EditorNoteControls.FirstOrDefault(it => it.IsEditingLyrics());
+        if (editorNoteControl != null)
         {
             // Finish this lyrics editing and select following note directly in lyrics editing mode.
-            GameObject selectedGameObject = eventSystem.currentSelectedGameObject;
-            EditorNoteLyricsInputField lyricsInputField = selectedGameObject.GetComponentInChildren<EditorNoteLyricsInputField>();
-            if (lyricsInputField != null)
-            {
-                wasEditingLyrics = true;
-                SetSelection(new List<EditorNoteControl> { lyricsInputField.EditorNoteControl });
-            }
+            wasEditingLyrics = true;
+            editorNoteControl.SubmitAndCloseLyricsDialog();
+            SetSelection(new List<EditorNoteControl> { editorNoteControl });
         }
 
         if (selectedNotes.Count == 0)
