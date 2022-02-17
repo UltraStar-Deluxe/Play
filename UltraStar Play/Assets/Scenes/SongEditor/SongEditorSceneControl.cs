@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PrimeInputActions;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,7 +50,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public SongEditorCopyPasteManager songEditorCopyPasteManager;
-    
+
+    [Inject]
+    private UltraStarPlayInputManager inputManager;
+
     [Inject]
     private Injector injector;
 
@@ -81,6 +86,18 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
+
+    [Inject(UxmlName = R.UxmlNames.toggleHelpButton)]
+    private Button toggleHelpButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeHelpOverlayButton)]
+    private Button closeHelpOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.helpOverlay)]
+    private VisualElement helpOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.helpContainer)]
+    private VisualElement helpContainer;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
@@ -118,6 +135,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return sceneData;
         }
     }
+
+    public bool IsHelpVisible => helpOverlay.IsVisibleByDisplay();
 
     private void Awake()
     {
@@ -159,15 +178,76 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         exitSceneButton.RegisterCallbackButtonTriggered(() => ReturnToLastScene());
         undoButton.RegisterCallbackButtonTriggered(() => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
+        toggleHelpButton.RegisterCallbackButtonTriggered(() => ToggleHelp());
+        closeHelpOverlayButton.RegisterCallbackButtonTriggered(() => CloseHelp());
         saveButton.RegisterCallbackButtonTriggered(() => SaveSong());
         statusBarSongInfoLabel.text = $"{SongMeta.Artist} - {SongMeta.Title}";
 
+        CloseHelp();
         HideEditLyricsPopup();
+
+        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         if (uiDocument.rootVisualElement.focusController.focusedElement != null)
         {
             uiDocument.rootVisualElement.focusController.focusedElement.Blur();
         }
+    }
+
+    public void CloseHelp()
+    {
+        helpOverlay.HideByDisplay();
+    }
+
+    public void ToggleHelp()
+    {
+        if (helpOverlay.IsVisibleByDisplay())
+        {
+            CloseHelp();
+        }
+        else
+        {
+            helpOverlay.ShowByDisplay();
+            UpdateInputLegend();
+        }
+    }
+
+    private void UpdateInputLegend()
+    {
+        helpContainer.Clear();
+
+        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+            TranslationManager.GetTranslation(R.Messages.back),
+            helpContainer);
+
+        List<InputActionInfo> inputActionInfos = new List<InputActionInfo>();
+        if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
+        {
+            inputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel"));
+            inputActionInfos.Add(new InputActionInfo("Zoom Vertical", "Ctrl+Shift+Mouse Wheel"));
+            inputActionInfos.Add(new InputActionInfo("Scroll Horizontal", "Mouse Wheel | Arrow Keys | Middle Mouse Button+Drag"));
+            inputActionInfos.Add(new InputActionInfo("Scroll Vertical", "Shift+Mouse Wheel | Shift+Arrow Keys | Middle Mouse Button+Drag"));
+            inputActionInfos.Add(new InputActionInfo("Move Note Horizontal", "Shift+Arrow Keys | 1 (Numpad) | 3 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Move Note Vertical", "Shift+Arrow Keys | Minus (Numpad) | Plus (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Move Note Vertical One Octave", "Ctrl+Shift+Arrow Keys"));
+            inputActionInfos.Add(new InputActionInfo("Move Left Side Of Note", "Ctrl+Arrow Keys | Divide (Numpad) | Multiply (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Move Right side Of Note", "Alt+Arrow Keys | 7 (Numpad) | 8 (Numpad) | 9 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Select Next Note", "6 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Select Previous Note", "4 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Play Selected Notes", "5 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Toggle Play / Pause", "Double Click"));
+            inputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));
+        }
+        else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
+        {
+            inputActionInfos.Add(new InputActionInfo("Zoom", "2 Finger Pinch Gesture"));
+            inputActionInfos.Add(new InputActionInfo("Scroll", "2 Finger Drag"));
+            inputActionInfos.Add(new InputActionInfo("Toggle Play Pause", "Double Tap"));
+            inputActionInfos.Add(new InputActionInfo(TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
+                TranslationManager.GetTranslation(R.Messages.action_longPress)));
+        }
+
+        inputActionInfos.ForEach(inputActionInfo => helpContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
     }
 
     public void HideEditLyricsPopup()

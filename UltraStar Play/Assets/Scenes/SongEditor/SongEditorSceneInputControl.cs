@@ -22,10 +22,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     
     public static readonly int cancelCopyPriority = 20;
     public static readonly int cancelNoteSelectionPriority = 10;
-    
-    [InjectedInInspector]
-    public GameObject inputActionInfoOverlay;
-    
+
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -77,25 +74,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     {
         eventSystem.sendNavigationEvents = false;
 
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel | 2 Finger Pinch-gesture"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Zoom Vertical", "Ctrl+Shift+Mouse Wheel | 2 Finger Pinch-gesture"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Scroll Horizontal", "Mouse Wheel | Arrow Keys | 2 Finger Drag | Middle Mouse Button+Drag"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Scroll Vertical", "Shift+Mouse Wheel | Shift+Arrow Keys | 2 Finger Drag | Middle Mouse Button+Drag"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Horizontal", "Shift+Arrow Keys | 1 (Numpad) | 3 (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Vertical", "Shift+Arrow Keys | Minus (Numpad) | Plus (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Note Vertical One Octave", "Ctrl+Shift+Arrow Keys"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Left Side Of Note", "Ctrl+Arrow Keys | Divide (Numpad) | Multiply (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Move Right side Of Note", "Alt+Arrow Keys | 7 (Numpad) | 8 (Numpad) | 9 (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Select Next Note", "6 (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Select Previous Note", "4 (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Play Selected Notes", "5 (Numpad)"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Toggle Play Pause", "Double Click"));
-        UltraStarPlayInputManager.AdditionalInputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));
-        
         // Show / hide help
         InputManager.GetInputAction(R.InputActions.usplay_toggleHelp).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => inputActionInfoOverlay.SetActive(!inputActionInfoOverlay.activeSelf));
+            .Subscribe(_ => songEditorSceneControl.ToggleHelp());
         
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
@@ -234,7 +216,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack(InputAction.CallbackContext context)
     {
-        if (songAudioPlayer.IsPlaying)
+        if (songEditorSceneControl.IsHelpVisible)
+        {
+            songEditorSceneControl.CloseHelp();
+        }
+        else if (songAudioPlayer.IsPlaying)
         {
             songAudioPlayer.PauseAudio();
         }

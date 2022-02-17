@@ -79,3 +79,9 @@ Button.recording:hover {
     border-color: rgb(50, 50, 50);
     border-width: 1px;
 }
+
+.inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+    white-space: normal;
+}
