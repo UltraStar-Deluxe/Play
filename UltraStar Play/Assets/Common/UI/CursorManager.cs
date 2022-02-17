@@ -24,23 +24,6 @@ public class CursorManager : MonoBehaviour, INeedInjection
     private static readonly Vector2 cursorTopLeftCorner = Vector2.zero;
     private static readonly Vector2 cursorCenter = new Vector2(cursorWidth / 2f, cursorWidth / 2f);
 
-    [InjectedInInspector]
-    public Text cursorUiTextPrefab;
-
-    public Text CursorUiText
-    {
-        get
-        {
-            if (cursorUiText == null)
-            {
-                Canvas canvas = CanvasUtils.FindCanvas();
-                cursorUiText = Instantiate(cursorUiTextPrefab, canvas.transform);
-            }
-            return cursorUiText;
-        }
-    }
-    private Text cursorUiText;
-
     [Inject]
     private SettingsManager settingsManager;
 
@@ -53,16 +36,11 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     public ECursor CurrentCursor { get; private set; } = ECursor.Default;
 
-    void Start()
+    private void Start()
     {
         settingsManager.Settings.GraphicSettings
             .ObserveEveryValueChanged(it => it.useImageAsCursor).Subscribe(newValue => SetDefaultCursor());
         SetDefaultCursor();
-    }
-
-    void Update()
-    {
-        UpdateCursorText();
     }
 
     public void SetCursor(ECursor cursor)
@@ -155,29 +133,5 @@ public class CursorManager : MonoBehaviour, INeedInjection
     private bool UseImageAsCursor()
     {
         return settingsManager.Settings.GraphicSettings.useImageAsCursor;
-    }
-
-    public void SetCursorText(string value, bool setVisible = true)
-    {
-        if (setVisible)
-        {
-            SetCursorTextVisible(true);
-        }
-        CursorUiText.text = value;
-    }
-
-    public void SetCursorTextVisible(bool isVisible)
-    {
-        CursorUiText.enabled = isVisible;
-    }
-
-    private void UpdateCursorText()
-    {
-        if (!CursorUiText.enabled)
-        {
-            return;
-        }
-
-        CursorUiText.GetComponent<RectTransform>().position = Input.mousePosition;
     }
 }

@@ -79,6 +79,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject(UxmlName = R.UxmlNames.statusBarSongInfoLabel)]
     private Label statusBarSongInfoLabel;
 
+    [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
+    private VisualElement editLyricsPopup;
+
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
     private double positionInSongInMillisWhenPlaybackStarted;
@@ -159,10 +162,19 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         saveButton.RegisterCallbackButtonTriggered(() => SaveSong());
         statusBarSongInfoLabel.text = $"{SongMeta.Artist} - {SongMeta.Title}";
 
+        HideEditLyricsPopup();
+
         if (uiDocument.rootVisualElement.focusController.focusedElement != null)
         {
             uiDocument.rootVisualElement.focusController.focusedElement.Blur();
         }
+    }
+
+    public void HideEditLyricsPopup()
+    {
+        // There is an exception in Unity code when the TextField becomes visible later (via display property).
+        // Thus, keep it always "visible", but outside of the screen area.
+        editLyricsPopup.style.top = -1000;
     }
 
     private void Update()

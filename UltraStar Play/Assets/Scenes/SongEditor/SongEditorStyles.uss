@@ -1,5 +1,4 @@
 #songEditorRoot {
-    /* Overwrite variables for song editor */
     --text-color: rgb(208, 208, 208);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
@@ -31,18 +30,15 @@
     background-color: rgb(43, 43, 43);
 }
 
-Button.recording
-{
+Button.recording {
     background-color: var(--recording-button-color);
 }
 
-Button.recording:focus
-{
+Button.recording:focus {
     background-color: var(--recording-button-color);
 }
 
-Button.recording:hover
-{
+Button.recording:hover {
     background-color: var(--recording-button-color);
 }
 

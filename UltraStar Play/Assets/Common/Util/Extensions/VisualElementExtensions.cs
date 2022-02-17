@@ -111,6 +111,7 @@ public static class VisualElementExtensions
             {
                 wasExecuted = true;
                 callback(evt);
+                visualElement.UnregisterCallback<TEventType>(RunCallbackIfNotDoneYet, useTrickleDown);
             }
         }
 

@@ -42,7 +42,8 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.pitchLabel)]
     private Label pitchLabel;
 
-    // private ShowWhiteSpaceText uiText;
+    [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
+    private VisualElement editLyricsPopup;
 
     [Inject]
     private SongMeta songMeta;
@@ -79,7 +80,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private Vector2 pointerDownPosition;
 
-    private EditorNoteLyricsInputField activeLyricsInputField;
+    private EditorNoteLyricsInputControl lyricsInputControl;
 
     private bool isPlayingMidiSound;
 
@@ -236,6 +237,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         if (isDoubleClick)
         {
             StartEditingNoteText();
+            songAudioPlayer.PauseAudio();
             return;
         }
 
@@ -261,20 +263,21 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void SetLyrics(string newText)
     {
+        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newText);
         switch (Note.Type)
         {
             case ENoteType.Freestyle:
-                lyricsLabel.text = $"<i><b><color=#c00000>{newText}</color></b></i>";
+                lyricsLabel.text = $"<i><b><color=#c00000>{visibleWhitespaceText}</color></b></i>";
                 break;
             case ENoteType.Golden:
-                lyricsLabel.text = $"<b>{newText}</b>";
+                lyricsLabel.text = $"<b>{visibleWhitespaceText}</b>";
                 break;
             case ENoteType.Rap:
             case ENoteType.RapGolden:
-                lyricsLabel.text = $"<i><b><color=#ffa500ff>{newText}</color></b></i>";
+                lyricsLabel.text = $"<i><b><color=#ffa500ff>{visibleWhitespaceText}</color></b></i>";
                 break;
             default:
-                lyricsLabel.text = newText;
+                lyricsLabel.text = visibleWhitespaceText;
                 break;
         }
     }
@@ -291,31 +294,27 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void StartEditingNoteText()
     {
-        // if (activeLyricsInputField != null)
-        // {
-        //     return;
-        // }
-        //
-        // activeLyricsInputField = Instantiate(lyricsInputFieldPrefab, transform);
-        // injector.Inject(activeLyricsInputField);
-        // activeLyricsInputField.Init(this, Note.Text);
-        //
-        // // Set min width of input field
-        // RectTransform inputFieldRectTransform = activeLyricsInputField.GetComponent<RectTransform>();
-        // Canvas canvas = CanvasUtils.FindCanvas();
-        // float canvasWidth = canvas.GetComponent<RectTransform>().rect.width;
-        // if ((inputFieldRectTransform.rect.width / canvasWidth) < 0.1)
-        // {
-        //     inputFieldRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, canvasWidth * 0.1f);
-        // }
+        // Position TextField
+        float margin = 5;
+        float width = Mathf.Max(VisualElement.worldBound.width + margin * 2, 150);
+        float height = VisualElement.worldBound.height + margin * 2;
+        editLyricsPopup.style.position = new StyleEnum<Position>(Position.Absolute);
+        editLyricsPopup.style.left = VisualElement.worldBound.x - width / 2;
+        editLyricsPopup.style.top = VisualElement.worldBound.y - margin;
+        editLyricsPopup.style.width = width;
+        editLyricsPopup.style.height = height;
+
+        lyricsInputControl = injector
+            .WithBindingForInstance(this)
+            .CreateAndInject<EditorNoteLyricsInputControl>();
     }
 
-    public void OnPointerEnter(IPointerEvent eventData)
+    private void OnPointerEnter(IPointerEvent eventData)
     {
         IsPointerOver = true;
     }
 
-    public void OnPointerExit(IPointerEvent eventData)
+    private void OnPointerExit(IPointerEvent eventData)
     {
         IsPointerOver = false;
         IsPointerOverCenter = false;
@@ -325,7 +324,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         cursorManager.SetDefaultCursor();
     }
 
-    public void OnPointerDown(IPointerEvent eventData)
+    private void OnPointerDown(IPointerEvent eventData)
     {
         pointerDownPosition = eventData.position;
         // Play midi sound via Ctrl
@@ -336,7 +335,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    public void OnPointerUp(IPointerEvent eventData)
+    private void OnPointerUp(IPointerEvent eventData)
     {
         if (isPlayingMidiSound)
         {
@@ -359,5 +358,16 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         disposables.ForEach(it => it.Dispose());
         disposables.Clear();
         VisualElement.RemoveFromHierarchy();
+    }
+
+    public bool IsEditingLyrics()
+    {
+        return lyricsInputControl != null
+               && lyricsInputControl.IsActive();
+    }
+
+    public void SubmitAndCloseLyricsDialog()
+    {
+        lyricsInputControl.SubmitAndCloseLyricsDialog();
     }
 }
