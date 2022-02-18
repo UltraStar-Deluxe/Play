@@ -1903,7 +1903,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a54e66cb0dc7ca4cb35745a09f109f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputActionInfoOverlay: {fileID: 0}
 --- !u!4 &182898103
 Transform:
   m_ObjectHideFlags: 0
@@ -3929,12 +3928,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  issueSideBarEntryUi: {fileID: 9197481963319205126, guid: b207eaf7fa785bc44974a629c740fc6f,
+    type: 3}
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 7185040230624864619}
   songEditorNoteRecorder: {fileID: 1231934095}
   selectionControl: {fileID: 1965697893}
-  noteAreaDragHandler: {fileID: 0}
-  noteAreaContextMenuHandler: {fileID: 0}
   editorNoteDisplayer: {fileID: 191584246}
   micPitchTracker: {fileID: 906383520}
   graphicRaycaster: {fileID: 1225693713}

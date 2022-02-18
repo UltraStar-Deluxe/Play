@@ -19,32 +19,26 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
     private NoteAreaControl noteAreaControl;
 
     [Inject]
-    private SongMeta songMeta;
+    private SongEditorIssueAnalyzerControl issueAnalyzerControl;
 
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongMeta songMeta;
+
     [Inject(UxmlName = R.UxmlNames.noteAreaIssues)]
     private VisualElement noteAreaIssues;
-
-    [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
-
-    private IReadOnlyCollection<SongIssue> issues = new List<SongIssue>();
 
     private ViewportEvent lastViewportEvent;
     private float lastSongMetaBpm;
 
+    private IReadOnlyCollection<SongIssue> lastIssues;
+
     public void OnInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(_ => UpdateIssues());
-    }
-
-    private void Start()
-    {
-        UpdateIssues();
-
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
+        issueAnalyzerControl.IssuesEventStream.Subscribe(issues => DrawIssues(issues));
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -52,31 +46,26 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || songMeta.Bpm != lastSongMetaBpm)
+            || !songMeta.Bpm.NearlyEquals(lastSongMetaBpm, 0.01f))
         {
             lastSongMetaBpm = songMeta.Bpm;
-            UpdateIssues();
+            DrawIssues(lastIssues);
         }
         lastViewportEvent = viewportEvent;
     }
 
-    private void UpdateIssues()
+    private void DrawIssues(IReadOnlyCollection<SongIssue> issues)
     {
-        issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
-        DrawIssues();
-    }
-
-    private void DrawIssues()
-    {
+        lastIssues = issues;
         noteAreaIssues.Clear();
 
-        foreach (SongIssue issue in issues)
+        if (issues.IsNullOrEmpty())
         {
-            if (noteAreaControl.IsBeatInViewport(issue.StartBeat))
-            {
-                CreateUiIssue(issue);
-            }
+            return;
         }
+
+        issues.Where(issue => noteAreaControl.IsBeatInViewport(issue.StartBeat))
+            .ForEach(issue => CreateUiIssue(issue));
     }
 
     private void CreateUiIssue(SongIssue issue)

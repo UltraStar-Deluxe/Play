@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ProTrans;
 using UnityEngine;
 using UnityEngine.UI;
 using UniInject;
@@ -150,6 +151,12 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
 
     private void MoveNotesHorizontal(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
+        if (notes.IsNullOrEmpty()
+            || dragEvent.BeatDistance == 0)
+        {
+            return;
+        }
+
         foreach (Note note in notes)
         {
             Note noteSnapshot = noteToSnapshotOfNoteMap[note];
@@ -168,6 +175,11 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
 
     private void ChangeLinebreakBeat(NoteAreaDragEvent dragEvent)
     {
+        if (dragEvent.BeatDistance == 0)
+        {
+            return;
+        }
+
         sentenceControl.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
     }
