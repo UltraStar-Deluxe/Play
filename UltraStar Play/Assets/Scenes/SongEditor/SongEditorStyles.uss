@@ -8,10 +8,6 @@
     background-color: rgb(50, 50, 50);
 }
 
-#leftSideBar {
-    --control-width: 80px;
-}
-
 .panel {
     background-color: rgb(60, 63, 65);
     border-width: 1px;
@@ -80,8 +76,28 @@ Button.recording:hover {
     border-width: 1px;
 }
 
+#leftSideBar {
+    --control-width: 80px;
+}
+
+.secondarySideBarPanel {
+    display: none;
+    width: 200px;
+    height: 100%;
+    padding: 5px;
+}
+
+.secondarySideBarTitle {
+    font-size: var(--font-size-s);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 10px;
+}
+
 .inputLegendLabel {
     width: 100%;
     -unity-text-align: middle-left;
     white-space: normal;
+    margin-bottom: 10px;
+    font-size: var(--font-size-xs);
 }

@@ -50,6 +50,8 @@ public static partial class R
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
         public const string scoreRow = "scoreRow";
+        public const string secondarySideBarPanel = "secondarySideBarPanel";
+        public const string secondarySideBarTitle = "secondarySideBarTitle";
         public const string singingLyrics = "singingLyrics";
         public const string singScenePlayerUi = "singScenePlayerUi";
         public const string smallControl = "smallControl";

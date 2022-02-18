@@ -65,6 +65,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private SongEditorSideBarControl songEditorSideBarControl;
+
     private bool inputFieldHasFocusOld;
 
     private Vector2[] zoomStartTouchPositions;
@@ -74,11 +77,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     {
         eventSystem.sendNavigationEvents = false;
 
-        // Show / hide help
-        InputManager.GetInputAction(R.InputActions.usplay_toggleHelp).PerformedAsObservable()
-            .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songEditorSceneControl.ToggleHelp());
-        
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -216,9 +214,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack(InputAction.CallbackContext context)
     {
-        if (songEditorSceneControl.IsHelpVisible)
+        if (songEditorSideBarControl.IsAnySideBarContainerVisible)
         {
-            songEditorSceneControl.CloseHelp();
+            songEditorSideBarControl.HideSideBarContainers();
         }
         else if (songAudioPlayer.IsPlaying)
         {
