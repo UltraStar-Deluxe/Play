@@ -115,6 +115,7 @@ public static partial class R
         public const string genrePropertyContainer = "genrePropertyContainer";
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
+        public const string goToIssueButton = "goToIssueButton";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string helpSideBarContainer = "helpSideBarContainer";
         public const string helpTitle = "helpTitle";
@@ -142,7 +143,10 @@ public static partial class R
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
+        public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
+        public const string issueMessageLabel = "issueMessageLabel";
+        public const string issuePositionLabel = "issuePositionLabel";
         public const string issuesSideBarContainer = "issuesSideBarContainer";
         public const string issuesTitle = "issuesTitle";
         public const string issueUiRoot = "issueUiRoot";

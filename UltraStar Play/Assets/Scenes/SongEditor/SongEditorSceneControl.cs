@@ -3,14 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using UnityEngine.UIElements;
-using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -18,6 +15,9 @@ using IBinding = UniInject.IBinding;
 
 public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, IInjectionFinishedListener
 {
+    [InjectedInInspector]
+    public VisualTreeAsset issueSideBarEntryUi;
+
     [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
 
@@ -82,6 +82,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly LyricsAreaControl lyricsAreaControl = new LyricsAreaControl();
     private readonly NoteAreaControl noteAreaControl = new NoteAreaControl();
     private readonly SongEditorSideBarControl sideBarControl = new SongEditorSideBarControl();
+    private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new SongEditorIssueAnalyzerControl();
 
     public SongMeta SongMeta
     {
@@ -122,6 +123,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(lyricsAreaControl);
         injector.Inject(noteAreaControl);
         injector.Inject(sideBarControl);
+        injector.Inject(issueAnalyzerControl);
     }
 
     private void Start()
@@ -382,8 +384,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(midiFileImporter);
         bb.BindExistingInstance(songEditorCopyPasteManager);
+        bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
+        bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         return bb.GetBindings();
     }
 }

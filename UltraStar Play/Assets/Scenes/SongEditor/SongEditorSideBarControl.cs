@@ -4,9 +4,13 @@ using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
 using UniRx;
+using UnityEngine;
 
 public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListener
 {
+    [Inject(Key = nameof(issueSideBarEntryUi))]
+    private VisualTreeAsset issueSideBarEntryUi;
+
     [Inject(UxmlName = R.UxmlNames.togglePlaybackButton)]
     private Button togglePlaybackButton;
 
@@ -73,9 +77,20 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private SongEditorNoteRecorder songEditorNoteRecorder;
 
+    [Inject]
+    private SongEditorIssueAnalyzerControl issueAnalyzerControl;
+
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private SongMeta songMeta;
+
     private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
+
+    private IReadOnlyCollection<SongIssue> lastIssues;
 
     public void OnInjectionFinished()
     {
@@ -100,7 +115,49 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
+        issuesSideBarContainer.RegisterCallback<GeometryChangedEvent>(evt =>
+        {
+            if (issuesSideBarContainer.style.display == new StyleEnum<DisplayStyle>(DisplayStyle.Flex))
+            {
+                UpdateIssueSideBar(lastIssues);
+            }
+        });
+        issueAnalyzerControl.IssuesEventStream
+            .Subscribe(issues => UpdateIssueSideBar(issues));
+
         InitTabGroup();
+    }
+
+    private void UpdateIssueSideBar(IReadOnlyCollection<SongIssue> issues)
+    {
+        lastIssues = issues;
+
+        ClearSideBar(issuesSideBarContainer);
+        if (issues.IsNullOrEmpty()
+            || !issuesSideBarContainer.IsVisibleByDisplay())
+        {
+            return;
+        }
+        issues.ForEach(issue => CreateSideBarIssueUi(issue));
+    }
+
+    private void CreateSideBarIssueUi(SongIssue issue)
+    {
+        VisualElement visualElement = issueSideBarEntryUi.CloneTree().Children().First();
+        issuesSideBarContainer.Add(visualElement);
+
+        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
+        visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(() => GoToIssue(issue));
+        visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
+        visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
+        visualElement.Q<VisualElement>(R.UxmlNames.issueImage).style.unityBackgroundImageTintColor = SongIssueUtils.GetColorForIssue(issue);
+    }
+
+    private void GoToIssue(SongIssue issue)
+    {
+        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        songAudioPlayer.PositionInSongInMillis = issueStartPositionInMillis;
     }
 
     private void InitTabGroup()
@@ -121,10 +178,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void UpdateInputLegend()
     {
-        helpSideBarContainer.Children()
-            .Where(it => it != helpTitle)
-            .ToList()
-            .ForEach(it => it.RemoveFromHierarchy());
+        ClearSideBar(helpSideBarContainer);
 
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
             TranslationManager.GetTranslation(R.Messages.back),
@@ -160,4 +214,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         inputActionInfos.ForEach(inputActionInfo => helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
     }
 
+    private void ClearSideBar(VisualElement visualElement)
+    {
+        visualElement.Children()
+            .Where(it => !it.ClassListContains("secondarySideBarTitle"))
+            .ToList()
+            .ForEach(it => it.RemoveFromHierarchy());
+    }
 }
