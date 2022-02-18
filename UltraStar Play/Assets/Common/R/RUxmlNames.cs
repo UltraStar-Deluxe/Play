@@ -41,7 +41,6 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
-        public const string closeHelpOverlayButton = "closeHelpOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
@@ -117,9 +116,8 @@ public static partial class R
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
-        public const string helpContainer = "helpContainer";
-        public const string helpOverlay = "helpOverlay";
-        public const string helpScrollView = "helpScrollView";
+        public const string helpSideBarContainer = "helpSideBarContainer";
+        public const string helpTitle = "helpTitle";
         public const string hiddenContinueButton = "hiddenContinueButton";
         public const string highScoreContainer = "highScoreContainer";
         public const string highscoreEntry = "highscoreEntry";
@@ -146,6 +144,7 @@ public static partial class R
         public const string ipAddressLabel = "ipAddressLabel";
         public const string issueImage = "issueImage";
         public const string issuesSideBarContainer = "issuesSideBarContainer";
+        public const string issuesTitle = "issuesTitle";
         public const string issueUiRoot = "issueUiRoot";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
@@ -159,6 +158,7 @@ public static partial class R
         public const string languageImage = "languageImage";
         public const string languagePropertyContainer = "languagePropertyContainer";
         public const string layersSideBarContainer = "layersSideBarContainer";
+        public const string layersTitle = "layersTitle";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
         public const string leftHandle = "leftHandle";
         public const string leftLyricsOverlay = "leftLyricsOverlay";
@@ -325,6 +325,7 @@ public static partial class R
         public const string sentenceUiRoot = "sentenceUiRoot";
         public const string settingsButton = "settingsButton";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
+        public const string settingsTitle = "settingsTitle";
         public const string showFpsContainer = "showFpsContainer";
         public const string SingingLyricsUi = "SingingLyricsUi";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
@@ -360,6 +361,7 @@ public static partial class R
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewVideoImage = "songPreviewVideoImage";
         public const string songPropertiesSideBarContainer = "songPropertiesSideBarContainer";
+        public const string songPropertiesTitle = "songPropertiesTitle";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
@@ -404,7 +406,7 @@ public static partial class R
         public const string toggleFavoriteIcon = "toggleFavoriteIcon";
         public const string toggleHelpButton = "toggleHelpButton";
         public const string toggleIssuesButton = "toggleIssuesButton";
-        public const string toggleLayers = "toggleLayers";
+        public const string toggleLayersButton = "toggleLayersButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleSettingsButton = "toggleSettingsButton";
