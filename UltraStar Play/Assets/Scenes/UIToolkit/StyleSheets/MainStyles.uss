@@ -121,6 +121,8 @@
     border-radius: 0;
     align-items: center;
     justify-content: center;
+    padding: 6px 6px 5px 5px;
+    margin: 2px 2px 2px 2px;
 }
 
 .unity-button:hover {
@@ -709,14 +711,13 @@ Label.tinyFont {
 }
 
 .contextMenuSeparator {
-    width: 95%;
     height: 1px;
     background-color: rgb(92, 92, 92);
 }
 
 .contextMenu {
     background-color: rgb(64, 64, 64);
-    padding: 5px;
+    padding: 2px;
 }
 
 .contextMenu Button {

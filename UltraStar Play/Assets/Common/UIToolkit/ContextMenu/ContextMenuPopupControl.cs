@@ -54,7 +54,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         visualElement = uiManager.contextMenuUi.CloneTree().Children().First();
         visualElement.style.left = position.x;
         visualElement.style.top = position.y;
-        uiDocument.rootVisualElement.Add(visualElement);
+        uiDocument.rootVisualElement.Children().First().Add(visualElement);
         // Remove dummy items
         visualElement.Clear();
 

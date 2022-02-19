@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -83,7 +84,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
         label.style.left = pos.x;
         label.style.bottom = pos.y;
 
-        uiDocument.rootVisualElement.Add(label);
+        uiDocument.rootVisualElement.Children().First().Add(label);
 
         label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, panelHelper));
     }
