@@ -9,7 +9,7 @@
                         <ui:Button text="Play/Pause" display-tooltip-when-elided="true" name="togglePlaybackButton" />
                         <ui:Button text="Record" display-tooltip-when-elided="true" name="toggleRecordingButton" />
                         <ui:Button text="Issues" display-tooltip-when-elided="true" name="toggleIssuesButton" />
-                        <ui:Button text="Song&#10;Properties" display-tooltip-when-elided="true" name="toggleSongPropertiesButton" />
+                        <ui:Button text="Properties" display-tooltip-when-elided="true" name="toggleSongPropertiesButton" />
                         <ui:Button text="Layers" display-tooltip-when-elided="true" name="toggleLayersButton" />
                         <ui:Button text="Settings" display-tooltip-when-elided="true" name="toggleSettingsButton" />
                         <ui:Button text="Help" display-tooltip-when-elided="true" name="toggleHelpButton" />
@@ -25,7 +25,7 @@
                         <ui:Label text="Issues" display-tooltip-when-elided="true" name="issuesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
                     </ui:ScrollView>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="layersSideBarContainer" class="secondarySideBarPanel">
-                        <ui:Label text="Layers" display-tooltip-when-elided="true" name="layersTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                        <ui:Label text="Note Layers" display-tooltip-when-elided="true" name="layersTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
                     </ui:ScrollView>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel">
                         <ui:Label text="Song Properties" display-tooltip-when-elided="true" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />

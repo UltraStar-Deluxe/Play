@@ -123,7 +123,7 @@ public class UiManager : MonoBehaviour, INeedInjection
             notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
                 .Children()
                 .First();
-            uiDocument.rootVisualElement.Add(notificationOverlay);
+            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
         }
 
         TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();

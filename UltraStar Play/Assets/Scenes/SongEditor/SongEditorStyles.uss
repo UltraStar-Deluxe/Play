@@ -5,6 +5,22 @@
     --control-color-accent2: rgb(70, 96, 124);
     --selection-color-transparent: rgba(21, 88, 219, 0.5);
     --recording-button-color: rgb(200, 32, 32);
+
+    --font-size-xxs: 8px;
+    --font-size-xs: 10px;
+    --font-size-s: 11px;
+    --font-size: 14px;
+    --font-size-l: 18px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 24px;
+
+    --control-height: 25px;
+    --control-width: 80px;
+    --control-width-half: 40px;
+    --control-width-large: 100px;
+    --control-height-large: 40px;
+    --control-height-small: 20px;
+
     background-color: rgb(50, 50, 50);
 }
 
