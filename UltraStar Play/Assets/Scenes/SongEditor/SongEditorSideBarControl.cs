@@ -87,6 +87,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SongMeta songMeta;
 
     private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
+    private readonly SongEditorSideBarPropertiesControl propertiesControl = new SongEditorSideBarPropertiesControl();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
@@ -126,6 +127,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(issues => UpdateIssueSideBar(issues));
 
         InitTabGroup();
+
+        injector.Inject(propertiesControl);
     }
 
     private void UpdateIssueSideBar(IReadOnlyCollection<SongIssue> issues)

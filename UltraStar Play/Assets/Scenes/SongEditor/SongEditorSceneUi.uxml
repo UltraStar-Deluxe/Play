@@ -27,8 +27,14 @@
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="layersSideBarContainer" class="secondarySideBarPanel">
                         <ui:Label text="Note Layers" display-tooltip-when-elided="true" name="layersTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
                     </ui:ScrollView>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel" style="display: none;">
                         <ui:Label text="Song Properties" display-tooltip-when-elided="true" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                        <ui:Label text="BPM" display-tooltip-when-elided="true" name="bpmLabel" style="margin-bottom: 5px;" />
+                        <ui:TextField picking-mode="Ignore" value="999" text="999" name="bpmTextField" style="margin-bottom: 5px;" />
+                        <ui:Button text="Set BPM&#10;keep note duration" display-tooltip-when-elided="true" name="setBpmKeepNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-bottom: 5px; height: 40px; margin-top: 0;" />
+                        <ui:Button text="Set BPM&#10;change note duration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
+                        <ui:Button text="Click to find BPM" display-tooltip-when-elided="true" name="detectBpmButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 1px;" />
+                        <ui:Label text="No clicks yet" display-tooltip-when-elided="true" name="detectBpmLabel" style="-unity-text-align: upper-center;" />
                     </ui:ScrollView>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="settingsSideBarContainer" class="secondarySideBarPanel">
                         <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
@@ -56,7 +62,7 @@
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: 180px;">
                 <ui:VisualElement name="lyricsArea" class="panel" style="width: 100%; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="flex-grow: 2; width: 100%; height: 100%;">
-                        <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="transparentBackgroundColor smallFont" style="height: 100%; white-space: normal;" />
+                        <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="smallFont" style="height: 100%; white-space: normal;" />
                     </ui:ScrollView>
                 </ui:VisualElement>
                 <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 100%; height: 80px; align-items: center; justify-content: center; flex-shrink: 0;">

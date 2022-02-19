@@ -19,6 +19,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public VisualTreeAsset issueSideBarEntryUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset songPropertySideBarEntryUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset dialogUi;
+
+    [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
 
     [InjectedInInspector]
@@ -388,6 +394,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
+        bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);
+        bb.Bind(nameof(dialogUi)).ToExistingInstance(dialogUi);
         return bb.GetBindings();
     }
 }

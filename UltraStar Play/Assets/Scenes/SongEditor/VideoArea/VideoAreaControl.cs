@@ -47,8 +47,6 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private GeneralDragControl dragControl;
 
-    private ContextMenuControl contextMenuControl;
-
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
@@ -60,11 +58,6 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         videoArea.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
         videoArea.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
-
-        contextMenuControl = injector
-            .WithRootVisualElement(videoArea)
-            .CreateAndInject<ContextMenuControl>();
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
     }
 
     public void CancelDrag()
@@ -109,16 +102,5 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         // Round to 2 decimal places
         float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);
         return newVideoGap;
-    }
-
-    private void RemoveVideoGap()
-    {
-        setVideoGapAction.ExecuteAndNotify(0);
-        uiManager.CreateNotificationVisualElement("VideoGap reset to 0");
-    }
-
-    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
-    {
-        contextMenuPopup.AddItem("Remove VideoGap", () => RemoveVideoGap());
     }
 }

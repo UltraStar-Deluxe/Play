@@ -164,7 +164,9 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
-        if (changeEvent is BpmChangeEvent || changeEvent is LoadedMementoEvent)
+        if (changeEvent
+            is SongPropertyChangedEvent { SongProperty: ESongProperty.Bpm }
+            or LoadedMementoEvent)
         {
             SetViewportHorizontal(ViewportX, ViewportWidth);
         }

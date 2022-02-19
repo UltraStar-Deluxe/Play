@@ -28,6 +28,8 @@ public static partial class R
         public const string bottomContent = "bottomContent";
         public const string bottomLyricsContainer = "bottomLyricsContainer";
         public const string bottomRow = "bottomRow";
+        public const string bpmLabel = "bpmLabel";
+        public const string bpmTextField = "bpmTextField";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonContainer = "buttonContainer";
         public const string buttonDescription = "buttonDescription";
@@ -69,6 +71,8 @@ public static partial class R
         public const string deleteButton = "deleteButton";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
+        public const string detectBpmButton = "detectBpmButton";
+        public const string detectBpmLabel = "detectBpmLabel";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
@@ -278,6 +282,8 @@ public static partial class R
         public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
+        public const string propertyNameLabel = "propertyNameLabel";
+        public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
         public const string ratePlayersContainer = "ratePlayersContainer";
         public const string ratingImage = "ratingImage";
@@ -327,6 +333,8 @@ public static partial class R
         public const string sentenceLines = "sentenceLines";
         public const string sentenceRatingContainer = "sentenceRatingContainer";
         public const string sentenceUiRoot = "sentenceUiRoot";
+        public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
+        public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
@@ -366,6 +374,7 @@ public static partial class R
         public const string songPreviewVideoImage = "songPreviewVideoImage";
         public const string songPropertiesSideBarContainer = "songPropertiesSideBarContainer";
         public const string songPropertiesTitle = "songPropertiesTitle";
+        public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";

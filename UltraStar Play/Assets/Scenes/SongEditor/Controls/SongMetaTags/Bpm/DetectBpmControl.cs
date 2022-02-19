@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine.UIElements;
 
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
-
-public class CountBpmButton : MonoBehaviour, INeedInjection
+public class DetectBpmControl
 {
     private int clickCount;
     private float startTime;
+    private float lastClickTime;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private Button button;
-
-    public Text uiText;
-
-    private void Start()
+    public DetectBpmControl(Button button, Label label)
     {
-        button.OnClickAsObservable().Subscribe(_ =>
+        button.RegisterCallbackButtonTriggered(() =>
         {
-            StopAllCoroutines();
+            // Automatically reset the counter after a very long delay
+            if (Time.time - lastClickTime > 2)
+            {
+                ResetCount();
+            }
 
             if (clickCount == 0)
             {
                 startTime = Time.time;
-                uiText.text = "First clicks";
+                label.text = "First clicks";
             }
             else
             {
@@ -37,7 +35,7 @@ public class CountBpmButton : MonoBehaviour, INeedInjection
                 if (durationInSeconds > 1)
                 {
                     float bpm = 60 * clickCount / durationInSeconds;
-                    uiText.text = $"{bpm.ToString("0.00")} BPM";
+                    label.text = $"{bpm.ToString("0.00", CultureInfo.InvariantCulture)} BPM";
                 }
             }
 
@@ -45,8 +43,7 @@ public class CountBpmButton : MonoBehaviour, INeedInjection
             // (on first click, there is no duration yet)
             clickCount++;
 
-            // Automatically reset the counter after a very long delay
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(2, ResetCount));
+            lastClickTime = Time.time;
         });
     }
 

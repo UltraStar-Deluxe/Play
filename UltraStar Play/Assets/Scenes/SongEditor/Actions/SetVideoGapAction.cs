@@ -34,6 +34,6 @@ public class SetVideoGapAction : INeedInjection
     public void ExecuteAndNotify(float newVideoGap)
     {
         Execute(newVideoGap);
-        songMetaChangeEventStream.OnNext(new VideoGapChangedEvent());
+        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.VideoGap));
     }
 }
