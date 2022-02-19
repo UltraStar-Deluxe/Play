@@ -41,6 +41,13 @@ public class SimpleDialogControl
         return button;
     }
 
+    public TextField AddTextField()
+    {
+        TextField textField = new TextField();
+        buttonContainer.Add(textField);
+        return textField;
+    }
+
     public void CloseDialog()
     {
         parentVisualElement.Remove(dialogRootVisualElement);

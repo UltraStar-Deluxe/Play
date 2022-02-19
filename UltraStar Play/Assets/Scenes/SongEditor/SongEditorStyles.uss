@@ -1,5 +1,6 @@
 #songEditorRoot {
     --text-color: rgb(208, 208, 208);
+    --text-color-inverted: rgb(64, 64, 64);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
     --control-color-accent2: rgb(70, 96, 124);
@@ -76,11 +77,6 @@ Button.recording:hover {
 
 .virtualPianoKey.blackKey:focus {
     background-color: var(--control-color-accent2);
-}
-
-#unity-text-input {
-    color: var(--text-color);
-    border-width: 0;
 }
 
 .tooltip {

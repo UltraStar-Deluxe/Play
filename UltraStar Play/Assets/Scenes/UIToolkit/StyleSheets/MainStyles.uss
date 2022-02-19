@@ -1,5 +1,9 @@
 :root {
     --text-color: white;
+    --text-color-inverted: rgb(64, 64, 64);
+    --text-color-accent1: lightgrey;
+    --text-color-error: rgb(200, 48, 48);
+    --text-color-warning: rgb(200, 200, 48);
     --font-size-xxs: 10px;
     --font-size-xs: 12px;
     --font-size-s: 14px;
@@ -7,9 +11,6 @@
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
-    --text-color-accent1: lightgrey;
-    --text-color-error: rgb(200, 48, 48);
-    --text-color-warning: rgb(200, 200, 48);
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
@@ -31,6 +32,20 @@
 .unity-base-text-field {
     height: var(--control-height);
     -unity-text-align: middle-left;
+    margin: 0;
+}
+
+.unity-base-text-field__input {
+    --unity-cursor-color: var(--text-color-inverted);
+    color: var(--text-color-inverted);
+    font-size: var(--font-size-s);
+    margin: 0;
+    padding: 0 5px;
+    overflow: visible;
+}
+
+.unity-base-text-field.disabled .unity-base-text-field__input {
+    background-color: rgb(146, 148, 150);
 }
 
 .unity-base-text-field__input:focus {
@@ -198,10 +213,6 @@
 
 .transparentBackgroundColor:focus {
     background-color: rgba(0, 0, 0, 0);
-}
-
-#unity-text-input {
-    --unity-cursor-color: var(--text-color)
 }
 
 .transparentBackgroundColor #unity-text-input {

@@ -38,6 +38,6 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
     public void ExecuteAndNotify(float newBpm)
     {
         Execute(newBpm);
-        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
+        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 }

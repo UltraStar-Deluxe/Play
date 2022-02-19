@@ -83,7 +83,6 @@ public class SongMeta
      * Edition of the song, usually either the game it was ripped from or the TV show it was featured in.
      */
     public string Edition { get; set; }
-    public float End { get; set; }
     /**
      * Shift in millisecond for the lyrics relative to the audio file.
      */
@@ -101,7 +100,6 @@ public class SongMeta
      * Default is false.
      */
     public bool Relative { get; set; }
-    public float Start { get; set; }
     /**
      * Beat at which a preview of the song should begin.
      * Thus, this beat should start the most memorable part of a song as a preview.
@@ -119,16 +117,22 @@ public class SongMeta
      * Delay in seconds for the video playback relative to the audio file.
      */
     public float VideoGap { get; set; }
+    /**
+     * Year in which the song was released.
+     */
     public uint Year { get; set; }
+
+    public float Start { get; set; }
+    public float End { get; set; }
 
     private List<Voice> voices = new List<Voice>();
 
-    private readonly Dictionary<string, string> unkownHeaderEntries = new Dictionary<string, string>();
-    public IReadOnlyDictionary<string, string> UnkownHeaderEntries
+    private readonly Dictionary<string, string> unknownHeaderEntries = new Dictionary<string, string>();
+    public IReadOnlyDictionary<string, string> UnknownHeaderEntries
     {
         get
         {
-            return unkownHeaderEntries;
+            return unknownHeaderEntries;
         }
     }
 
@@ -201,9 +205,9 @@ public class SongMeta
         voiceNames.Remove(voice.Name);
     }
 
-    public void AddUnkownHeaderEntry(string key, string value)
+    public void SetUnknownHeaderEntry(string key, string value)
     {
-        unkownHeaderEntries.Add(key, value);
+        unknownHeaderEntries[key] = value;
     }
 
     public void Reload()
