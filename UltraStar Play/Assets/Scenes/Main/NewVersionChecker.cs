@@ -19,16 +19,18 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        isRemoteVersionFileDownloadDone = false;
-        remoteVersionFileContent = null;
+        isGetTagsRequestDone = false;
+        isGetVersionFileRequestDone = false;
         dialogWasShown = false;
     }
 
-    private static readonly string remoteVersionFileUrl = "https://raw.githubusercontent.com/UltraStar-Deluxe/Play/master/UltraStar%20Play/Assets/VERSION.txt";
+    private static readonly string remoteVersionFileUrlPattern = "https://raw.githubusercontent.com/UltraStar-Deluxe/Play/{branchOrTag}/UltraStar%20Play/Assets/VERSION.txt";
+    private static readonly string getTagsUrl = "https://api.github.com/repos/UltraStar-Deluxe/Play/tags";
 
     // Static variables, to persist these values across scene changes.
-    private static bool isRemoteVersionFileDownloadDone;
-    private static string remoteVersionFileContent;
+    private static bool isGetTagsRequestDone;
+    private static bool isGetVersionFileRequestDone;
+    private static string tagsJson;
     private static bool dialogWasShown;
 
     [InjectedInInspector]
@@ -44,60 +46,97 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     private Injector injector;
 
     [Inject]
-    private UIDocument uiDoc;
+    private UIDocument uiDocument;
 
-    private UnityWebRequest webRequest;
-
-    void Start()
+    private void Start()
     {
         if (dialogWasShown)
         {
-            // The dialog has been shown before in this run
+            // The dialog has been shown before during this application execution. Do not show again.
             gameObject.SetActive(false);
         }
-        else if (!isRemoteVersionFileDownloadDone)
+        else if (!isGetTagsRequestDone)
         {
-            StartRemoteVersionFileDownload();
-        }
-        else if (!remoteVersionFileContent.IsNullOrEmpty())
-        {
-            CheckForNewVersion();
+            StartGetTagsRequest(getTagsUrl);
         }
     }
 
-    void Update()
+    private void StartGetTagsRequest(string url)
     {
-        if (!isRemoteVersionFileDownloadDone)
-        {
-            UpdateRemoteVersionFileDownload();
-        }
+        Debug.Log($"Getting tags from: {url}");
+        UnityWebRequest getTagsWebRequest = UnityWebRequest.Get(url);
+        getTagsWebRequest.SendWebRequest()
+            .AsAsyncOperationObservable()
+            .Subscribe(_ => UpdateGetTagsRequest(getTagsWebRequest),
+                exception => Debug.LogException(exception),
+                () => UpdateGetTagsRequest(getTagsWebRequest));
     }
 
-    private void StartRemoteVersionFileDownload()
+    private void UpdateGetTagsRequest(UnityWebRequest webRequest)
     {
-        webRequest = UnityWebRequest.Get(remoteVersionFileUrl);
-        webRequest.SendWebRequest();
-    }
-
-    private void UpdateRemoteVersionFileDownload()
-    {
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        if (isGetTagsRequestDone
+            || !webRequest.isDone)
         {
-            Debug.LogError("Error downloading version file: " + remoteVersionFileUrl + "\n"
-                + webRequest.error);
-            isRemoteVersionFileDownloadDone = true;
             return;
         }
-        if (webRequest.isDone)
-        {
-            remoteVersionFileContent = webRequest.downloadHandler.text;
-            isRemoteVersionFileDownloadDone = true;
 
-            CheckForNewVersion();
+        isGetTagsRequestDone = true;
+        if (webRequest.result is not UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Getting tags from '{webRequest.url}'"
+                           + $" has result {webRequest.result}.\n{webRequest.error}");
+            return;
         }
+
+        string getTagsResponse = webRequest.downloadHandler.text;
+        List<RepositoryTagDto> repositoryTagDtos = JsonConverter.FromJson<List<RepositoryTagDto>>(getTagsResponse);
+        if (repositoryTagDtos == null)
+        {
+            return;
+        }
+
+        RepositoryTagDto newestTagDto = FindNewestTagDto(repositoryTagDtos);
+        if (newestTagDto == null)
+        {
+            return;
+        }
+
+        StartGetRemoteVersionFileRequest(newestTagDto.name);
     }
 
-    private void CheckForNewVersion()
+    private void StartGetRemoteVersionFileRequest(string branchOrTag)
+    {
+        string url = GetRemoteVersionFileUrl(branchOrTag);
+        Debug.Log($"Getting version file from: {url}");
+        UnityWebRequest getVersionFileWebRequest = UnityWebRequest.Get(url);
+        getVersionFileWebRequest.SendWebRequest()
+            .AsAsyncOperationObservable()
+            .Subscribe(_ => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest),
+                exception => Debug.LogException(exception),
+                () => UpdateGetRemoteVersionFileRequest(getVersionFileWebRequest));
+    }
+
+    private void UpdateGetRemoteVersionFileRequest(UnityWebRequest webRequest)
+    {
+        if (isGetVersionFileRequestDone
+            || !webRequest.isDone)
+        {
+            return;
+        }
+
+        isGetVersionFileRequestDone = true;
+        if (webRequest.result is not UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Getting version file from '{webRequest.url}'"
+                           + $" has result {webRequest.result}.\n{webRequest.error}");
+            return;
+        }
+
+        string remoteVersionFileContent = webRequest.downloadHandler.text;
+        CheckForNewVersion(remoteVersionFileContent);
+    }
+
+    private void CheckForNewVersion(string remoteVersionFileContent)
     {
         Dictionary<string, string> remoteVersionProperties = PropertiesFileParser.ParseText(remoteVersionFileContent);
         Dictionary<string, string> localVersionProperties = PropertiesFileParser.ParseText(localVersionTextAsset.text);
@@ -113,12 +152,17 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
         localVersionProperties.TryGetValue("release", out string localRelease);
 
-        // (localRelease is smaller), or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
         try
         {
             if (CompareVersionString(localRelease, remoteRelease) < 0)
             {
+                // (localRelease is smaller)
+                // or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
                 CreateNewVersionAvailableDialog(remoteVersionProperties);
+            }
+            else
+            {
+                Debug.Log($"No new release available (localRelease: {localRelease}, remoteRelease: {remoteRelease})");
             }
         }
         catch (CompareVersionException ex)
@@ -131,14 +175,16 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     {
         VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree();
         dialogRootVisualElement.AddToClassList("overlay");
-        NewVersionDialog newVersionDialog = new NewVersionDialog(dialogRootVisualElement, uiDoc.rootVisualElement, remoteVersionProperties);
+        NewVersionDialog newVersionDialog = new NewVersionDialog(dialogRootVisualElement,
+            uiDocument.rootVisualElement.Children().First(),
+            remoteVersionProperties);
         injector.WithRootVisualElement(dialogRootVisualElement).Inject(newVersionDialog);
         dialogWasShown = true;
     }
 
     /**
      * Compares the versions strings a and b.
-     * @return (-1 if a < b), (1 if b < a), (0 if a == b)
+     * @return (-1 if a < b), (+1 if b < a), (0 if a == b)
      */
     public static int CompareVersionString(string versionA, string versionB)
     {
@@ -181,5 +227,30 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         }
 
         return 0;
+    }
+
+    private string GetRemoteVersionFileUrl(string branchOrTag)
+    {
+        return remoteVersionFileUrlPattern.Replace("{branchOrTag}", branchOrTag);
+    }
+
+    private RepositoryTagDto FindNewestTagDto(IEnumerable<RepositoryTagDto> tagDtos)
+    {
+        RepositoryTagDto newestTagDto = null;
+        foreach (RepositoryTagDto tagDto in tagDtos)
+        {
+            if (newestTagDto == null
+                || CompareVersionString(newestTagDto.name, tagDto.name) < 0)
+            {
+                newestTagDto = tagDto;
+            }
+        }
+
+        return newestTagDto;
+    }
+
+    private class RepositoryTagDto
+    {
+        public string name;
     }
 }
