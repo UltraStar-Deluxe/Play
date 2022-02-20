@@ -165,6 +165,10 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageImage = "languageImage";
         public const string languagePropertyContainer = "languagePropertyContainer";
+        public const string layerColor = "layerColor";
+        public const string layerEnabledToggle = "layerEnabledToggle";
+        public const string layerEntryUiRoot = "layerEntryUiRoot";
+        public const string layerNameLabel = "layerNameLabel";
         public const string layersSideBarContainer = "layersSideBarContainer";
         public const string layersTitle = "layersTitle";
         public const string leadingPlayerIcon = "leadingPlayerIcon";

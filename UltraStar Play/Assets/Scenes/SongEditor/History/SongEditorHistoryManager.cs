@@ -220,10 +220,10 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
     {
         foreach (SongEditorLayer layer in undoState.Layers)
         {
-            layerManager.ClearLayer(layer.LayerKey);
+            layerManager.ClearLayer(layer.LayerEnum);
             foreach (Note note in layer.GetNotes())
             {
-                layerManager.AddNoteToLayer(layer.LayerKey, note);
+                layerManager.AddNoteToLayer(layer.LayerEnum, note);
             }
         }
     }

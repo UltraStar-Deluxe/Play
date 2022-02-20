@@ -45,7 +45,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
     {
-        if (viewportEvent == null)
+        if (viewportEvent == null
+            || dynamicTexture == null)
         {
             return;
         }
