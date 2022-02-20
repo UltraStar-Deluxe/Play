@@ -12,14 +12,17 @@ using UniRx;
 
 public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerKeyToLayerMap = CreateLayerKeyToLayerMap();
+    private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerEnumToLayerMap = CreateLayerEnumToLayerMap();
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
     private Settings settings;
-    
+
+    private Subject<LayerChangedEvent> layerChangedEventStream = new Subject<LayerChangedEvent>();
+    public IObservable<LayerChangedEvent> LayerChangedEventStream => layerChangedEventStream;
+
     public void OnSceneInjectionFinished()
     {
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
@@ -35,62 +38,63 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
     }
     
-    public void AddNoteToLayer(ESongEditorLayer layerKey, Note note)
+    public void AddNoteToLayer(ESongEditorLayer layerEnum, Note note)
     {
-        layerKeyToLayerMap[layerKey].AddNote(note);
+        layerEnumToLayerMap[layerEnum].AddNote(note);
     }
 
-    public void ClearLayer(ESongEditorLayer layerKey)
+    public void ClearLayer(ESongEditorLayer layerEnum)
     {
-        layerKeyToLayerMap[layerKey].ClearNotes();
+        layerEnumToLayerMap[layerEnum].ClearNotes();
     }
 
-    public List<Note> GetNotes(ESongEditorLayer layerKey)
+    public List<Note> GetNotes(ESongEditorLayer layerEnum)
     {
-        return layerKeyToLayerMap[layerKey].GetNotes();
+        return layerEnumToLayerMap[layerEnum].GetNotes();
     }
 
-    public Color GetColor(ESongEditorLayer layerKey)
+    public Color GetColor(ESongEditorLayer layerEnum)
     {
-        return layerKeyToLayerMap[layerKey].Color;
+        return layerEnumToLayerMap[layerEnum].Color;
     }
 
-    public bool IsLayerEnabled(ESongEditorLayer layerKey)
+    public bool IsLayerEnabled(ESongEditorLayer layerEnum)
     {
-        return layerKeyToLayerMap[layerKey].IsEnabled;
+        return layerEnumToLayerMap[layerEnum].IsEnabled;
     }
 
-    public void SetLayerEnabled(ESongEditorLayer layerKey, bool newValue)
+    public void SetLayerEnabled(ESongEditorLayer layerEnum, bool newValue)
     {
-        layerKeyToLayerMap[layerKey].IsEnabled = newValue;
+        layerEnumToLayerMap[layerEnum].IsEnabled = newValue;
+        layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
     public List<SongEditorLayer> GetLayers()
     {
-        return new List<SongEditorLayer>(layerKeyToLayerMap.Values);
+        return new List<SongEditorLayer>(layerEnumToLayerMap.Values);
     }
 
-    private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerKeyToLayerMap()
+    private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerEnumToLayerMap()
     {
         Dictionary<ESongEditorLayer, SongEditorLayer> result = new Dictionary<ESongEditorLayer, SongEditorLayer>();
-        List<ESongEditorLayer> layerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
-        foreach (ESongEditorLayer layerKey in layerKeys)
+        List<ESongEditorLayer> layerEnums = EnumUtils.GetValuesAsList<ESongEditorLayer>();
+        foreach (ESongEditorLayer layerEnum in layerEnums)
         {
-            result.Add(layerKey, new SongEditorLayer(layerKey));
+            result.Add(layerEnum, new SongEditorLayer(layerEnum));
         }
-        result[ESongEditorLayer.MicRecording].Color = Colors.coral;
-        result[ESongEditorLayer.ButtonRecording].Color = Colors.indigo;
+        result[ESongEditorLayer.MicRecording].Color = Colors.CreateColor("#1D67C2");
+        result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA");
         result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 200);
-        result[ESongEditorLayer.MidiFile].Color = Colors.mediumVioletRed;
+        result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799");
         return result;
     }
 
     public List<Note> GetAllNotes()
     {
         List<Note> notes = new List<Note>();
-        foreach (ESongEditorLayer layerKey in layerKeyToLayerMap.Keys)
+        foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
         {
-            List<Note> notesOfLayer = GetNotes(layerKey);
+            List<Note> notesOfLayer = GetNotes(layerEnum);
             notes.AddRange(notesOfLayer);
         }
         return notes;
@@ -105,7 +109,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     public void RemoveNoteFromAllLayers(Note note)
     {
-        foreach (SongEditorLayer layer in layerKeyToLayerMap.Values)
+        foreach (SongEditorLayer layer in layerEnumToLayerMap.Values)
         {
             layer.RemoveNote(note);
         }

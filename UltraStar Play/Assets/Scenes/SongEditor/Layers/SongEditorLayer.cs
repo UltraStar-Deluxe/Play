@@ -5,15 +5,15 @@ using UnityEngine;
 [Serializable]
 public class SongEditorLayer
 {
-    public ESongEditorLayer LayerKey { get; private set; }
+    public ESongEditorLayer LayerEnum { get; private set; }
     public bool IsEnabled { get; set; } = true;
     public Color Color { get; set; } = Colors.indigo;
 
     private readonly List<Note> notes = new List<Note>();
 
-    public SongEditorLayer(ESongEditorLayer layerKey)
+    public SongEditorLayer(ESongEditorLayer layerEnum)
     {
-        this.LayerKey = layerKey;
+        this.LayerEnum = layerEnum;
     }
 
     public void AddNote(Note note)
@@ -33,7 +33,7 @@ public class SongEditorLayer
 
     public SongEditorLayer CloneDeep()
     {
-        SongEditorLayer clone = new SongEditorLayer(LayerKey);
+        SongEditorLayer clone = new SongEditorLayer(LayerEnum);
         clone.Color = Color;
         clone.IsEnabled = IsEnabled;
         foreach (Note note in notes)

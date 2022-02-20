@@ -15,7 +15,6 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 {
     public static readonly IComparer<EditorNoteControl> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
-    private static readonly float maxFontSize = 14;
     private static readonly double handleWidthInPercent = 0.25;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]

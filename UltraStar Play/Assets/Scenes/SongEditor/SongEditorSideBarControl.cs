@@ -88,6 +88,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new SongEditorSideBarPropertiesControl();
+    private readonly SongEditorSideBarLayersControl sideBarLayersControl = new SongEditorSideBarLayersControl();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
@@ -95,6 +96,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     public void OnInjectionFinished()
     {
+        injector.Inject(propertiesControl);
+        injector.Inject(sideBarLayersControl);
+
         togglePlaybackButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -127,8 +131,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(issues => UpdateIssueSideBar(issues));
 
         InitTabGroup();
-
-        injector.Inject(propertiesControl);
     }
 
     private void UpdateIssueSideBar(IReadOnlyCollection<SongIssue> issues)

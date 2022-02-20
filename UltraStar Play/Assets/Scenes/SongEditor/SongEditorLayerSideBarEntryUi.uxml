@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="layerEntryUiRoot" class="smallFont" style="width: 100%; height: auto; align-items: center; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-bottom: 2px; padding-top: 2px;">
+        <ui:VisualElement name="layerColor" class="roundCorners" style="width: 20px; height: 20px; background-color: rgb(32, 168, 72); flex-shrink: 0;" />
+        <ui:Label text="Layer 01" display-tooltip-when-elided="true" name="layerNameLabel" style="margin-left: 10px;" />
+        <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+        <ui:Toggle name="layerEnabledToggle" class="smallControl" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+    </ui:VisualElement>
+</ui:UXML>

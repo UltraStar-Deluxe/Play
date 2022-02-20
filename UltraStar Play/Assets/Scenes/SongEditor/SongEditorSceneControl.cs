@@ -22,6 +22,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public VisualTreeAsset songPropertySideBarEntryUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset songEditorLayerSideBarEntryUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
@@ -76,7 +79,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private double positionInSongInMillisWhenPlaybackStarted;
 
-    private readonly Dictionary<Voice, Color> voiceToColorMap = new Dictionary<Voice, Color>();
+    private readonly Dictionary<string, Color> voiceNameToColorMap = new Dictionary<string, Color>();
 
     private bool audioWaveFormInitialized;
 
@@ -183,7 +186,15 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public Color GetColorForVoice(Voice voice)
     {
-        if (voiceToColorMap.TryGetValue(voice, out Color color))
+        string voiceName = voice.Name == Voice.soloVoiceName
+            ? Voice.firstVoiceName
+            : voice.Name;
+        return GetColorForVoiceName(voiceName);
+    }
+
+    public Color GetColorForVoiceName(string voiceName)
+    {
+        if (voiceNameToColorMap.TryGetValue(voiceName, out Color color))
         {
             return color;
         }
@@ -191,7 +202,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             // Define colors for the voices.
             CreateVoiceToColorMap();
-            return voiceToColorMap[voice];
+            return voiceNameToColorMap[voiceName];
         }
     }
 
@@ -220,26 +231,15 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void CreateVoiceToColorMap()
     {
-        List<Color32> colors = new List<Color32> {
-            ThemeManager.GetColor(R.Color.deviceColor_1),
-            ThemeManager.GetColor(R.Color.deviceColor_2),
-            ThemeManager.GetColor(R.Color.deviceColor_3),
-            ThemeManager.GetColor(R.Color.deviceColor_4),
-            ThemeManager.GetColor(R.Color.deviceColor_5),
-            ThemeManager.GetColor(R.Color.deviceColor_6)
+        List<Color> colors = new List<Color> {
+            Colors.CreateColor("#2ecc71"),
+            Colors.CreateColor("#9b59b6"),
         };
         int index = 0;
-        foreach (Voice v in SongMeta.GetVoices())
+        foreach (Color color in colors)
         {
-            if (index < colors.Count)
-            {
-                voiceToColorMap[v] = colors[index];
-            }
-            else
-            {
-                // fallback color
-                voiceToColorMap[v] = Colors.beige;
-            }
+            string voiceName = "P" + (index + 1);
+            voiceNameToColorMap[voiceName] = colors[index];
             index++;
         }
     }
@@ -395,6 +395,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);
+        bb.Bind(nameof(songEditorLayerSideBarEntryUi)).ToExistingInstance(songEditorLayerSideBarEntryUi);
         bb.Bind(nameof(dialogUi)).ToExistingInstance(dialogUi);
         return bb.GetBindings();
     }
