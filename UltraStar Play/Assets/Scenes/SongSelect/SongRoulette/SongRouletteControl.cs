@@ -53,6 +53,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     private readonly Subject<SongSelection> selectionClickedEventStream = new Subject<SongSelection>();
     public IObservable<SongSelection> SelectionClickedEventStream => selectionClickedEventStream;
 
+    public int SongEntryPlaceholderCount => songEntryPlaceholderControls.Count;
+
     private int SelectedSongIndex
     {
         get
@@ -412,13 +414,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         SelectSongByIndex(songIndex);
     }
 
-    private SongMeta GetSongAtIndex(int nextIndex)
+    public SongMeta GetSongAtIndex(int index)
     {
         if (songs.Count == 0)
         {
             return null;
         }
-        int wrappedIndex = (nextIndex < 0) ? nextIndex + songs.Count : nextIndex;
+        int wrappedIndex = (index < 0) ? index + songs.Count : index;
         int wrappedIndexModulo = wrappedIndex % songs.Count;
         if (wrappedIndexModulo < 0)
         {
