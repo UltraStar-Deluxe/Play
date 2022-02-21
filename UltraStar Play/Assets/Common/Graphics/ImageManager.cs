@@ -4,7 +4,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
 
 // Handles loading and caching of images.
 public static class ImageManager
@@ -82,22 +81,6 @@ public static class ImageManager
     private static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new HashSet<Sprite>();
-        // Iterate over all sprites in the scene that are referenced by an Image or ISpriteHolder
-        // and remember them as still in use.
-        foreach (Transform transform in GameObject.FindObjectsOfType<Transform>())
-        {
-            Image image = transform.GetComponent<Image>();
-            if (image != null)
-            {
-                usedSprites.Add(image.sprite);
-            }
-            ISpriteHolder spriteHolder = transform.GetComponent<ISpriteHolder>();
-            if (spriteHolder != null)
-            {
-                usedSprites.Add(spriteHolder.GetSprite());
-            }
-        }
-
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
         UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
         if (uiDocument != null)
