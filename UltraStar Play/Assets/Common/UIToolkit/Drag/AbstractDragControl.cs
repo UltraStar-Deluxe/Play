@@ -136,7 +136,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         DragState.Value = EDragState.ReadyForDrag;
     }
 
-    protected virtual void CancelDrag()
+    public virtual void CancelDrag()
     {
         if (DragState.Value == EDragState.IgnoreDrag)
         {

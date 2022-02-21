@@ -39,8 +39,9 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
         OnDrag(dragEvent);
     }
 
-    public void CancelDrag()
+    public override void CancelDrag()
     {
+        base.CancelDrag();
         MoveTo(dragStartPositionInPx);
         isCanceled = true;
     }
@@ -53,7 +54,7 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
     private void MoveTo(Vector2 positionInPx)
     {
         targetVisualElement.style.left = positionInPx.x;
-        targetVisualElement.style.top = positionInPx.y;
+        targetVisualElement.style.bottom = positionInPx.y;
         movedEventStream.OnNext(positionInPx);
     }
 }
