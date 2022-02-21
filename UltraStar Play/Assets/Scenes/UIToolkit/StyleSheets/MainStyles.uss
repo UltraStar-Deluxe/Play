@@ -632,6 +632,11 @@ Label.tinyFont {
     background-color: rgba(32, 32, 32, 0.88);
 }
 
+#menuOverlay .inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+}
+
 .songDetailOverlayLabel {
     width: 100%;
     font-size: var(--font-size-s);
