@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UniRx;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -21,7 +19,6 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private const float PinchGestureMagnitudeThresholdInPixels = 100f;
     
     public static readonly int cancelCopyPriority = 20;
-    public static readonly int cancelNoteSelectionPriority = 10;
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private SongEditorSceneControl songEditorSceneControl;
@@ -111,17 +108,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => selectionControl.SelectNextNote());
         InputManager.GetInputAction(R.InputActions.songEditor_selectPreviousNote).PerformedAsObservable()
             .Subscribe(_ => selectionControl.SelectPreviousNote());
-        
-        // Deselect notes
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(cancelNoteSelectionPriority)
-            .Where(_ => !InputUtils.AnyKeyboardModifierPressed() && !AnyInputFieldHasFocus())
-            .Where(_ => selectionControl.HasSelectedNotes())
-            .Subscribe(_ =>
-            {
-                selectionControl.ClearSelection();
-                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
-            });
-        
+
         // Delete notes
         InputManager.GetInputAction(R.InputActions.songEditor_delete).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -214,13 +201,21 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack(InputAction.CallbackContext context)
     {
-        if (songEditorSideBarControl.IsAnySideBarContainerVisible)
+        if (songEditorSceneControl.IsAnyDialogOpen)
+        {
+            songEditorSceneControl.CloseAllOpenDialogs();
+        }
+        else if (songEditorSideBarControl.IsAnySideBarContainerVisible)
         {
             songEditorSideBarControl.HideSideBarContainers();
         }
         else if (songAudioPlayer.IsPlaying)
         {
             songAudioPlayer.PauseAudio();
+        }
+        else if (selectionControl.HasSelectedNotes())
+        {
+            selectionControl.ClearSelection();
         }
         else if (AnyInputFieldHasFocus())
         {

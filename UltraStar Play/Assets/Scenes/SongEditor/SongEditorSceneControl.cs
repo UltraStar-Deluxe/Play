@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
 using UniRx;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -44,9 +45,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public MicPitchTracker micPitchTracker;
-
-    [InjectedInInspector]
-    public GraphicRaycaster graphicRaycaster;
 
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
@@ -113,6 +111,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return sceneData;
         }
     }
+
+    private readonly List<SimpleDialogControl> openDialogControls = new List<SimpleDialogControl>();
+    public bool IsAnyDialogOpen => openDialogControls.Count > 0;
 
     private void Awake()
     {
@@ -369,6 +370,38 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
+    public void CreateNumberInputDialog(string title, string message, Action<float> useNumberCallback)
+    {
+        SimpleDialogControl dialogControl = new SimpleDialogControl(
+            dialogUi,
+            uiDocument.rootVisualElement.Children().First(),
+            title,
+            message);
+        TextField numberTextField = dialogControl.AddTextField();
+        numberTextField.style.flexGrow = 1;
+        Button okButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
+        {
+            if (float.TryParse(numberTextField.value, NumberStyles.Any, CultureInfo.InvariantCulture, out float numberValue))
+            {
+                useNumberCallback(numberValue);
+            }
+            dialogControl.CloseDialog();
+        });
+        okButton.Focus();
+
+        dialogControl.DialogClosedEventStream
+            .Subscribe(_ => openDialogControls.Remove(dialogControl));
+
+        openDialogControls.Add(dialogControl);
+    }
+
+    public void CloseAllOpenDialogs()
+    {
+        openDialogControls
+            .ToList()
+            .ForEach(it => it.CloseDialog());
+    }
+
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new BindingBuilder();
@@ -385,7 +418,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(sideBarControl);
-        bb.BindExistingInstance(graphicRaycaster);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(midiFileImporter);
