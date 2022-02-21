@@ -3,12 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
-using System.Text;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -48,12 +44,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
-    // [Inject]
-    // private NoteAreaContextMenuHandler noteAreaContextMenuHandler;
-    //
-    // [Inject]
-    // private NoteAreaDragHandler noteAreaDragHandler;
-    
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -64,18 +54,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
-    }
-
-    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
-    {
-        // This ContextMenu could open although a drag is in progress.
-        // if (noteAreaContextMenuHandler.IsDrag
-        //     || noteAreaDragHandler.DragDistance.magnitude > ContextMenuControl.DragDistanceThreshold)
-        // {
-        //     return;
-        // }
-        
-        base.CheckOpenContextMenuFromInputAction(context);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
@@ -100,17 +78,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        if (spaceBetweenNotesAction.CanExecute(selectedNotes))
-        {
-            contextMenu.AddItem("Add space between notes", () =>
-            {
-                SpaceBetweenNotesButton spaceBetweenNotesButton = GameObject.FindObjectOfType<SpaceBetweenNotesButton>(true);
-                if (int.TryParse(spaceBetweenNotesButton.numberOfBeatsInputField.text, out int spaceInBeats))
-                {
-                    spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
-                }
-            });
-        }
+        contextMenu.AddItem("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
@@ -216,5 +184,27 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             contextMenu.AddItem("Move to next sentence",
                 () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(noteControl.Note));
         }
+    }
+
+    private void CreateAddSpaceBetweenNotesDialog()
+    {
+        void DoAddSpaceBetweenNotes(int spaceInBeats)
+        {
+            List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+            if (selectedNotes.IsNullOrEmpty())
+            {
+                // Perform on all notes, but per voice
+                songMeta.GetVoices()
+                    .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(SongMetaUtils.GetAllNotes(voice), (int)spaceInBeats));
+            }
+            else
+            {
+                spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, (int)spaceInBeats);
+            }
+        }
+
+        songEditorSceneControl.CreateNumberInputDialog("Add space between notes",
+            "Enter the number of beats that should be the minimal distance between adjacent notes.",
+            spaceInBeats => DoAddSpaceBetweenNotes((int)spaceInBeats));
     }
 }

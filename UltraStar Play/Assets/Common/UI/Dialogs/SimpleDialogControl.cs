@@ -1,4 +1,5 @@
 ﻿using System;
+using UniRx;
 using UnityEngine.UIElements;
 
 public class SimpleDialogControl
@@ -8,6 +9,9 @@ public class SimpleDialogControl
 
     private readonly VisualElement buttonContainer;
     public VisualElement DialogTitleImage { get; private set; }
+
+    private Subject<bool> dialogClosedEventStream = new Subject<bool>();
+    public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
 
     public SimpleDialogControl(
         VisualTreeAsset dialogUi,
@@ -51,5 +55,6 @@ public class SimpleDialogControl
     public void CloseDialog()
     {
         parentVisualElement.Remove(dialogRootVisualElement);
+        dialogClosedEventStream.OnNext(true);
     }
 }

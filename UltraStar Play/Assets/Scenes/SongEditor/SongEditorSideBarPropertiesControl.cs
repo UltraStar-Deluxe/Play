@@ -12,9 +12,6 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     [Inject(Key = nameof(songPropertySideBarEntryUi))]
     private VisualTreeAsset songPropertySideBarEntryUi;
 
-    [Inject(Key = nameof(dialogUi))]
-    private VisualTreeAsset dialogUi;
-
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
@@ -51,6 +48,9 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private SongEditorSceneControl songEditorSceneControl;
+
     private DetectBpmControl detectBpmControl;
 
     private readonly List<SongPropertyInputControl> songPropertyInputControls = new List<SongPropertyInputControl>();
@@ -67,9 +67,9 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         bpmTextField.value = songMeta.Bpm.ToString("0.00", CultureInfo.InvariantCulture);
 
         setBpmChangeNoteDurationButton.RegisterCallbackButtonTriggered(() =>
-            CreateNumberInputDialog("Set BPM and change note duration", "Enter new BPM value", newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog("Set BPM and change note duration", "Enter new BPM value", newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
         setBpmKeepNoteDurationButton.RegisterCallbackButtonTriggered(() =>
-            CreateNumberInputDialog("Set BPM but keep note duration", "Enter new BPM value", newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog("Set BPM but keep note duration", "Enter new BPM value", newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
     }
 
     private void CreateSongPropertiesInputControls()
@@ -200,27 +200,6 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         });
 
         bpmTextField.value = songMeta.Bpm.ToString("0.00", CultureInfo.InvariantCulture);
-    }
-
-    private SimpleDialogControl CreateNumberInputDialog(string title, string message, Action<float> useNumberCallback)
-    {
-        SimpleDialogControl dialogControl = new SimpleDialogControl(
-            dialogUi,
-            uiDocument.rootVisualElement.Children().First(),
-            title,
-            message);
-        TextField numberTextField = dialogControl.AddTextField();
-        numberTextField.style.flexGrow = 1;
-        Button okButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
-        {
-            if (float.TryParse(numberTextField.value, NumberStyles.Any, CultureInfo.InvariantCulture, out float numberValue))
-            {
-                useNumberCallback(numberValue);
-            }
-            dialogControl.CloseDialog();
-        });
-        okButton.Focus();
-        return dialogControl;
     }
 
     private class SongPropertyInputControl

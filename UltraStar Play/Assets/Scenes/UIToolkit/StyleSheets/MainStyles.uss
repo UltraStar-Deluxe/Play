@@ -155,6 +155,8 @@
 .unity-toggle {
     width: var(--control-height);
     height: var(--control-height);
+    margin: 0;
+    padding: 0;
 }
 
 .unity-toggle VisualElement {
@@ -781,6 +783,8 @@ Label.tinyFont {
 .unity-base-slider {
     width: 100%;
     min-width: auto;
+    margin: 0;
+    padding: 0;
 }
 
 .unity-base-slider--vertical {

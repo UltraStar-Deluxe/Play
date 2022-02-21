@@ -6,7 +6,6 @@
     --control-color-accent2: rgb(70, 96, 124);
     --selection-color-transparent: rgba(21, 88, 219, 0.5);
     --recording-button-color: rgb(200, 32, 32);
-
     --font-size-xxs: 8px;
     --font-size-xs: 10px;
     --font-size-s: 11px;
@@ -14,14 +13,12 @@
     --font-size-l: 18px;
     --font-size-xl: 20px;
     --font-size-xxl: 24px;
-
     --control-height: 25px;
     --control-width: 80px;
     --control-width-half: 40px;
     --control-width-large: 100px;
     --control-height-large: 40px;
     --control-height-small: 20px;
-
     background-color: rgb(50, 50, 50);
 }
 
@@ -96,7 +93,7 @@ Button.recording:hover {
     display: none;
     width: 200px;
     height: 100%;
-    padding: 5px;
+    padding: 2px;
 }
 
 .secondarySideBarTitle {
@@ -112,4 +109,19 @@ Button.recording:hover {
     white-space: normal;
     margin-bottom: 10px;
     font-size: var(--font-size-xs);
+}
+
+.songEditorSettingsGroup {
+    border-color: var(--text-color);
+    border-top-width: 1px;
+    width: 100%;
+    min-height: 50px;
+    border-radius: 5px;
+    padding: 2px;
+    margin-bottom: 10px;
+}
+
+.songEditorSettingsGroupTitle {
+    -unity-text-align: upper-center;
+    -unity-font-style: bold;
 }
