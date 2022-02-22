@@ -119,4 +119,16 @@ public static class WebRequestUtils
         return uri.StartsWith("http://")
                || uri.StartsWith("https://");
     }
+
+    public static bool ResourceExists(string uri)
+    {
+        if (uri.StartsWith("file://")
+            && !File.Exists(uri.Replace("file://", "")))
+        {
+            return false;
+        }
+
+        // Assume that the resource exists.
+        return true;
+    }
 }

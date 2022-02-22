@@ -22,6 +22,11 @@ public static class ImageManager
 
     private static CoroutineManager coroutineManager;
 
+    public static Sprite LoadSpriteFromFile(string path)
+    {
+        return LoadSprite("file://" + path);
+    }
+
     public static Sprite LoadSprite(string path)
     {
         if (spriteCache.TryGetValue(path, out CachedSprite cachedSprite)

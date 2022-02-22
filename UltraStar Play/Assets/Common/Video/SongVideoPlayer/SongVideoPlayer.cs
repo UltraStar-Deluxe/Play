@@ -161,16 +161,15 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void LoadVideo(string videoUrl)
+    public void LoadVideo(string uri)
     {
-        if (!WebRequestUtils.IsHttpOrHttpsUri(videoUrl)
-            && !File.Exists(videoUrl.Replace("file://", "")))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogWarning("Video does not exist: " + videoUrl);
+            Debug.LogWarning("Video file resource does not exist: " + uri);
             return;
         }
 
-        videoPlayer.url = videoUrl;
+        videoPlayer.url = uri;
         // The url is empty if loading the video failed.
         HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
         // For now, only load the video. Starting it is done from the outside.
@@ -300,16 +299,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
-        if (File.Exists(backgroundImagePath))
+        string backgroundUri = SongMetaUtils.GetBackgroundUri(SongMeta);
+        if (!WebRequestUtils.ResourceExists(backgroundUri))
         {
-            LoadBackgroundImage(backgroundImagePath);
-        }
-        else
-        {
-            Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
+            Debug.LogWarning("Showing cover image because background image resource does not exist: " + backgroundUri);
             ShowCoverImageAsBackground();
         }
+
+        LoadBackgroundImage(backgroundUri);
     }
 
     private void ShowCoverImageAsBackground()
@@ -319,15 +316,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        string coverImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Cover;
-        if (File.Exists(coverImagePath))
+        string coverUri = SongMetaUtils.GetCoverUri(SongMeta);
+        if (!WebRequestUtils.ResourceExists(coverUri))
         {
-            LoadBackgroundImage(coverImagePath);
+            Debug.LogWarning("Cover image resource does not exist: " + coverUri);
+            return;
         }
-        else
-        {
-            Debug.LogWarning("Cover image '" + coverImagePath + "'does not exist.");
-        }
+
+        LoadBackgroundImage(coverUri);
     }
 
     private void LoadBackgroundImage(string imagePath)

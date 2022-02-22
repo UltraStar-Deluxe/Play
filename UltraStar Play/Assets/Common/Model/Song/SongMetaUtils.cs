@@ -2,38 +2,44 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using ProTrans;
 using UnityEngine;
 
 public static class SongMetaUtils
 {
-    public static string GetAbsoluteSongVideoPath(SongMeta songMeta)
+    public static string GetCoverUri(SongMeta songMeta)
     {
-        if (songMeta.Video.IsNullOrEmpty())
-        {
-            return "";
-        }
-
-        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Video))
-        {
-            return songMeta.Video;
-        }
-
-        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
+        return GetUri(songMeta, songMeta.Cover);
     }
 
-    public static string GetAbsoluteSongAudioPath(SongMeta songMeta)
+    public static string GetBackgroundUri(SongMeta songMeta)
     {
-        if (songMeta.Mp3.IsNullOrEmpty())
+        return GetUri(songMeta, songMeta.Background);
+    }
+
+    public static string GetVideoUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.Video);
+    }
+
+    public static string GetAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.Mp3);
+    }
+
+    private static string GetUri(SongMeta songMeta, string pathOrUri)
+    {
+        if (pathOrUri.IsNullOrEmpty())
         {
             return "";
         }
 
-        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3))
+        if (WebRequestUtils.IsHttpOrHttpsUri(pathOrUri))
         {
-            return songMeta.Mp3;
+            return pathOrUri;
         }
 
-        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
+        return "file://" + songMeta.Directory + Path.DirectorySeparatorChar + pathOrUri;
     }
 
     public static string GetAbsoluteSongMetaPath(SongMeta songMeta)

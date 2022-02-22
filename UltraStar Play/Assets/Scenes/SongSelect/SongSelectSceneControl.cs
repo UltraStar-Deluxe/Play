@@ -624,10 +624,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             // Check that the audio file exists
             if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
             {
-                string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
-                if (!File.Exists(audioPath))
+                string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
+                if (!WebRequestUtils.ResourceExists(audioUri))
                 {
-                    uiManager.CreateNotificationVisualElement("Audio file does not exist: " + audioPath);
+                    string message = "Audio file resource does not exist: " + audioUri;
+                    Debug.Log(message);
+                    uiManager.CreateNotificationVisualElement(message);
                     return;
                 }
             }
@@ -636,7 +638,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             songAudioPlayer.Init(SelectedSong);
             if (!songAudioPlayer.HasAudioClip)
             {
-                uiManager.CreateNotificationVisualElement("Audio file could not be loaded.\nPlease use a supported format.");
+                string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+                Debug.Log(message);
+                uiManager.CreateNotificationVisualElement(message);
                 return;
             }
 
