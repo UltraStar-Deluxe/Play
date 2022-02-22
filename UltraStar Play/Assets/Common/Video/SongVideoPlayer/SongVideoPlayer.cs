@@ -82,7 +82,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public bool HasLoadedVideo { get; private set; }
     public bool HasLoadedBackgroundImage { get; private set; }
-    private string videoPath;
+    private string videoUrl;
 
     private float nextSyncTimeInSeconds;
 
@@ -161,15 +161,16 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void LoadVideo(string videoPath)
+    public void LoadVideo(string videoUrl)
     {
-        if (!File.Exists(videoPath))
+        if (!WebRequestUtils.IsHttpOrHttpsUri(videoUrl)
+            && !File.Exists(videoUrl.Replace("file://", "")))
         {
-            Debug.LogWarning("Video does not exist: " + videoPath);
+            Debug.LogWarning("Video does not exist: " + videoUrl);
             return;
         }
 
-        videoPlayer.url = "file://" + videoPath;
+        videoPlayer.url = videoUrl;
         // The url is empty if loading the video failed.
         HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
         // For now, only load the video. Starting it is done from the outside.
@@ -353,11 +354,19 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        videoPath = "";
+        videoUrl = "";
         if (!string.IsNullOrEmpty(songMeta.Video))
         {
-            videoPath = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
-            LoadVideo(videoPath);
+            if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Video))
+            {
+                videoUrl = songMeta.Video;
+                LoadVideo(videoUrl);
+            }
+            else
+            {
+                videoUrl = "file://" + songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
+                LoadVideo(videoUrl);
+            }
         }
     }
 

@@ -182,7 +182,8 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
                 Debug.LogWarning("Unsupported video format: " + songMeta.Video);
                 songMeta.Video = "";
             }
-            else if (!File.Exists(SongMetaUtils.GetAbsoluteSongVideoPath(songMeta)))
+            else if (!WebRequestUtils.IsHttpOrHttpsUri(songMeta.Video)
+                     && !File.Exists(SongMetaUtils.GetAbsoluteSongVideoPath(songMeta)))
             {
                 Debug.LogWarning("Video file does not exist: " + SongMetaUtils.GetAbsoluteSongVideoPath(songMeta));
                 songMeta.Video = "";
