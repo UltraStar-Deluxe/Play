@@ -64,7 +64,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public bool HasLoadedVideo { get; private set; }
     public bool HasLoadedBackgroundImage { get; private set; }
-    private string videoUrl;
 
     private float nextSyncTimeInSeconds;
 
@@ -328,29 +327,17 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         });
     }
 
-    private void InitVideo(SongMeta songMeta)
+    private void InitVideo(SongMeta initSongMeta)
     {
         UnloadVideo();
 
-        if (songMeta == null)
+        if (initSongMeta == null
+            || initSongMeta.Video.IsNullOrEmpty())
         {
             return;
         }
 
-        videoUrl = "";
-        if (!string.IsNullOrEmpty(songMeta.Video))
-        {
-            if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Video))
-            {
-                videoUrl = songMeta.Video;
-                LoadVideo(videoUrl);
-            }
-            else
-            {
-                videoUrl = "file://" + songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
-                LoadVideo(videoUrl);
-            }
-        }
+        LoadVideo(SongMetaUtils.GetVideoUri(initSongMeta));
     }
 
     void OnEnable()
