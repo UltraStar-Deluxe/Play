@@ -40,28 +40,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     [Inject(UxmlName = R.UxmlNames.songImage, Optional = true)]
     private VisualElement backgroundImageVisualElement;
-    public VisualElement BackgroundImageVisualElement
-    {
-        get
-        {
-            return backgroundImageVisualElement;
-        }
-        set
-        {
-            backgroundImageVisualElement = value;
-            if (HasLoadedBackgroundImage
-                && backgroundImageVisualElement != null)
-            {
-                backgroundImageVisualElement.ShowByDisplay();
-                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
-            }
-        }
-    }
 
     public bool forceSyncOnForwardJumpInTheSong;
 
-    // Optional SongAudioPlayer.
-    // If set, then the video playback is synchronized with the position in the SongAudioPlayer.
+    // SongAudioPlayer to synchronize the playback position with.
     [Inject]
     public SongAudioPlayer SongAudioPlayer { get; private set; }
 
@@ -88,8 +70,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private IDisposable jumpBackInSongEventStreamDisposable;
     private IDisposable jumpForwardInSongEventStreamDisposable;
-
-    private Sprite coverImageSprite;
 
     public string videoPlayerErrorMessage;
 
@@ -311,12 +291,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void ShowCoverImageAsBackground()
     {
-        if (string.IsNullOrEmpty(SongMeta.Cover))
+        string coverUri = SongMetaUtils.GetCoverUri(SongMeta);
+        if (coverUri.IsNullOrEmpty())
         {
             return;
         }
 
-        string coverUri = SongMetaUtils.GetCoverUri(SongMeta);
         if (!WebRequestUtils.ResourceExists(coverUri))
         {
             Debug.LogWarning("Cover image resource does not exist: " + coverUri);
@@ -326,19 +306,26 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         LoadBackgroundImage(coverUri);
     }
 
-    private void LoadBackgroundImage(string imagePath)
+    private void LoadBackgroundImage(string backgroundUri)
     {
-        coverImageSprite = ImageManager.LoadSprite(imagePath);
-        if (backgroundImage != null)
+        if (backgroundUri.IsNullOrEmpty())
         {
-            backgroundImage.sprite = coverImageSprite;
+            return;
         }
-        if (backgroundImageVisualElement != null)
+
+        ImageManager.LoadSpriteFromUri(backgroundUri, loadedSprite =>
         {
-            backgroundImageVisualElement.ShowByDisplay();
-            backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
-        }
-        HasLoadedBackgroundImage = true;
+            if (backgroundImage != null)
+            {
+                backgroundImage.sprite = loadedSprite;
+            }
+            if (backgroundImageVisualElement != null)
+            {
+                backgroundImageVisualElement.ShowByDisplay();
+                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+            }
+            HasLoadedBackgroundImage = true;
+        });
     }
 
     private void InitVideo(SongMeta songMeta)

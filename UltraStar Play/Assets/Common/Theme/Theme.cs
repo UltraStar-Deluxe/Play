@@ -57,7 +57,8 @@ public class Theme
         Sprite sprite = null;
         if (File.Exists(fullImagePath))
         {
-            sprite = ImageManager.LoadSpriteFromFile(fullImagePath);
+            // sprite = ImageManager.LoadSpriteFromFile(fullImagePath);
+            return null;
         }
         else if (ParentTheme != null)
         {
