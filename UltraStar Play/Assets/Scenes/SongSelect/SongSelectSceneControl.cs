@@ -316,6 +316,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         focusableNavigator.FocusSongRoulette();
+
+        songAudioPlayer.AudioClipLoadedEventStream
+            .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
     }
 
     private void UpdateNextAndPreviousSongButtonLabels()
@@ -370,7 +373,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
     }
 
-    void Update()
+    private void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
         if (songMetas.Count != SongMetaManager.Instance.GetSongMetas().Count
@@ -413,7 +416,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             : "";
         songIndexLabel.text = (selection.SongIndex + 1) + "\nof " + selection.SongsCount;
 
-        UpdateSongDurationLabel(selectedSong);
+        // The song duration requires loading the audio file.
+        // Loading every song only to show its duration is slow (e.g. when scrolling through songs).
+        // Instead, the label is updated when the AudioClip has been loaded.
+        durationLabel.text = "";
 
         bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
         videoIndicator.SetVisibleByVisibility(hasVideo);
@@ -431,11 +437,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private void UpdateSongDurationLabel(SongMeta songMeta)
+    private void UpdateSongDurationLabel(double durationInMillis)
     {
-        songAudioPlayer.Init(songMeta);
-        int min = (int)Math.Floor(songAudioPlayer.DurationOfSongInMillis / 1000 / 60);
-        int seconds = (int)Math.Floor((songAudioPlayer.DurationOfSongInMillis / 1000) % 60);
+        int min = (int)Math.Floor(durationInMillis / 1000 / 60);
+        int seconds = (int)Math.Floor((durationInMillis / 1000) % 60);
         durationLabel.text = $"{min}:{seconds.ToString().PadLeft(2, '0')}";
     }
 
