@@ -186,7 +186,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         string coverUri = SongMetaUtils.GetCoverUri(coverSongMeta);
         if (coverUri.IsNullOrEmpty())
         {
-            return;
+            // Try the background image as fallback
+            coverUri = SongMetaUtils.GetBackgroundUri(coverSongMeta);
+            if (coverUri.IsNullOrEmpty())
+            {
+                return;
+            }
         }
 
         if (!WebRequestUtils.ResourceExists(coverUri))
