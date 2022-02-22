@@ -106,10 +106,9 @@ public class AudioManager : MonoBehaviour
 
     private AudioClip LoadAndCacheAudioClip(string uri, bool streamAudio)
     {
-        if (!WebRequestUtils.IsHttpOrHttpsUri(uri)
-            && !File.Exists(uri.Replace("file://", "")))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogError("File does not exist: " + uri);
+            Debug.LogError("Audio file resource does not exist: " + uri);
             return null;
         }
 

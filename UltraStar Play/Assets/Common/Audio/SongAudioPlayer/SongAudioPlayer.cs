@@ -218,8 +218,8 @@ public class SongAudioPlayer : MonoBehaviour
     {
         this.SongMeta = songMeta;
 
-        string songPath = SongMetaUtils.GetAbsoluteSongAudioPath(songMeta);
-        AudioClip audioClip = AudioManager.Instance.LoadAudioClip(songPath);
+        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+        AudioClip audioClip = AudioManager.Instance.LoadAudioClip(audioUri);
         if (audioClip != null)
         {
             audioPlayer.clip = audioClip;

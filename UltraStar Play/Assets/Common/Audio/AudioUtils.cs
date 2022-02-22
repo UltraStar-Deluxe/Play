@@ -12,10 +12,9 @@ public static class AudioUtils
     // Use the cached version of the AudioManager for the normal game logic.
     public static AudioClip GetAudioClipUncached(string uri, bool streamAudio)
     {
-        if (!WebRequestUtils.IsHttpOrHttpsUri(uri)
-            && !File.Exists(uri))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogWarning($"Can not open audio file because it does not exist: {uri}");
+            Debug.LogWarning($"Audio file resource does not exist: {uri}");
             return null;
         }
 
