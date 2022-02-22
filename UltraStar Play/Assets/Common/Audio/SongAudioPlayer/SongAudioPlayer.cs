@@ -206,7 +206,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         if (IsPlaying)
         {
@@ -216,10 +216,14 @@ public class SongAudioPlayer : MonoBehaviour
 
     public void Init(SongMeta songMeta)
     {
-        this.SongMeta = songMeta;
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
 
+        this.SongMeta = songMeta;
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        AudioClip audioClip = AudioManager.Instance.LoadAudioClip(audioUri);
+        AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(audioUri);
         if (audioClip != null)
         {
             audioPlayer.clip = audioClip;

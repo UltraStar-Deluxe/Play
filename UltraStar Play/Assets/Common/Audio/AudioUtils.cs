@@ -26,7 +26,8 @@ public static class AudioUtils
                 throw new ArgumentException("Streaming of MP3 audio is not supported. Please use OGG audio instead.");
             }
 
-            AudioClip audioClip = LoadMp3(uri);
+            string filePath = uri.Replace("file://", "");
+            AudioClip audioClip = LoadMp3(filePath);
             return audioClip;
         }
         else

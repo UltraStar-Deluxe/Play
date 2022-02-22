@@ -51,11 +51,11 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
     {
-        return LoadAudioClip("file://" + path, streamAudio);
+        return LoadAudioClipFromUri("file://" + path, streamAudio);
     }
 
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
-    public AudioClip LoadAudioClip(string uri, bool streamAudio = true)
+    public AudioClip LoadAudioClipFromUri(string uri, bool streamAudio = true)
     {
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
@@ -71,28 +71,6 @@ public class AudioManager : MonoBehaviour
         }
 
         return LoadAndCacheAudioClip(uri, streamAudio);
-    }
-
-    public void LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
-    {
-        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
-            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
-        {
-            onSuccess(cachedAudioClip.FullAudioClip);
-            return;
-        }
-
-        Action<AudioClip> doCacheAudioClipThenOnSuccess = (loadedAudioClip) =>
-        {
-            AddAudioClipToCache(uri, loadedAudioClip, true);
-            onSuccess(loadedAudioClip);
-        };
-
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, doCacheAudioClipThenOnSuccess, onFailure));
     }
 
     public static void ClearCache()
