@@ -113,4 +113,10 @@ public static class WebRequestUtils
             onSuccess(webRequest.downloadHandler.text);
         }
     }
+
+    public static bool IsHttpOrHttpsUri(string uri)
+    {
+        return uri.StartsWith("http://")
+               || uri.StartsWith("https://");
+    }
 }
