@@ -19,31 +19,16 @@ public class SongAudioPlayer : MonoBehaviour
     private int positionInSongInMillisFrame;
 
     private readonly Subject<double> playbackStoppedEventStream = new Subject<double>();
-    public ISubject<double> PlaybackStoppedEventStream
-    {
-        get
-        {
-            return playbackStoppedEventStream;
-        }
-    }
+    public IObservable<double> PlaybackStoppedEventStream => playbackStartedEventStream;
 
     private readonly Subject<double> playbackStartedEventStream = new Subject<double>();
-    public ISubject<double> PlaybackStartedEventStream
-    {
-        get
-        {
-            return playbackStartedEventStream;
-        }
-    }
+    public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
 
     private readonly Subject<double> positionInSongEventStream = new Subject<double>();
-    public ISubject<double> PositionInSongEventStream
-    {
-        get
-        {
-            return positionInSongEventStream;
-        }
-    }
+    public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
+
+    private readonly Subject<AudioClip> audioClipLoadedEventStream = new Subject<AudioClip>();
+    public IObservable<AudioClip> AudioClipLoadedEventStream => audioClipLoadedEventStream;
 
     public IObservable<Pair<double>> JumpBackInSongEventStream
     {
@@ -228,6 +213,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             audioPlayer.clip = audioClip;
             DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+            audioClipLoadedEventStream.OnNext(audioClip);
         }
         else
         {
