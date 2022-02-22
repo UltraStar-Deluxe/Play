@@ -13,11 +13,26 @@ public static class SongMetaUtils
             return "";
         }
 
+        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Video))
+        {
+            return songMeta.Video;
+        }
+
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
     }
 
     public static string GetAbsoluteSongAudioPath(SongMeta songMeta)
     {
+        if (songMeta.Mp3.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3))
+        {
+            return songMeta.Mp3;
+        }
+
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
     }
 
@@ -39,8 +54,8 @@ public static class SongMetaUtils
 
     public static Sentence FindExistingSentenceForNote(IReadOnlyCollection<Sentence> sentences, Note note)
     {
-        return sentences.Where(sentence => (sentence.MinBeat <= note.StartBeat)
-                                        && (note.EndBeat <= sentence.ExtendedMaxBeat)).FirstOrDefault();
+        return sentences.FirstOrDefault(sentence => (sentence.MinBeat <= note.StartBeat)
+                                                    && (note.EndBeat <= sentence.ExtendedMaxBeat));
     }
 
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)

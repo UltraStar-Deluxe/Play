@@ -622,11 +622,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             }
 
             // Check that the audio file exists
-            string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
-            if (!File.Exists(audioPath))
+            if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
             {
-                uiManager.CreateNotificationVisualElement("Audio file does not exist: " + audioPath);
-                return;
+                string audioPath = SongMetaUtils.GetAbsoluteSongAudioPath(SelectedSong);
+                if (!File.Exists(audioPath))
+                {
+                    uiManager.CreateNotificationVisualElement("Audio file does not exist: " + audioPath);
+                    return;
+                }
             }
 
             // Check that the used audio format can be loaded.
