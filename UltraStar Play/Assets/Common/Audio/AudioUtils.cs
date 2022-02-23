@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,29 +10,35 @@ public static class AudioUtils
 {
     // This method should only be called from tests and the AudioManager.
     // Use the cached version of the AudioManager for the normal game logic.
-    public static AudioClip GetAudioClipUncached(string path, bool streamAudio)
+    public static AudioClip GetAudioClipUncached(string uri, bool streamAudio)
     {
-        if (!System.IO.File.Exists(path))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogWarning($"Can not open audio file because it does not exist: {path}");
+            Debug.LogWarning($"Audio file resource does not exist: {uri}");
             return null;
         }
-        string fileExtension = System.IO.Path.GetExtension(path);
 
+        string fileExtension = Path.GetExtension(uri);
         if (fileExtension.ToLowerInvariant().Equals(".mp3"))
         {
-            AudioClip audioClip = LoadMp3(path);
+            if (WebRequestUtils.IsHttpOrHttpsUri(uri))
+            {
+                throw new ArgumentException("Streaming of MP3 audio is not supported. Please use OGG audio instead.");
+            }
+
+            string filePath = uri.Replace("file://", "");
+            AudioClip audioClip = LoadMp3(filePath);
             return audioClip;
         }
         else
         {
-            return LoadAudio(path, streamAudio);
+            return LoadAudio(uri, streamAudio);
         }
     }
 
-    private static AudioClip LoadAudio(string path, bool streamAudio)
+    private static AudioClip LoadAudio(string uri, bool streamAudio)
     {
-        using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip("file://" + path, AudioType.UNKNOWN))
+        using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.UNKNOWN))
         {
             DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
             downloadHandler.streamAudio = streamAudio;
@@ -39,7 +46,7 @@ public static class AudioUtils
             webRequest.SendWebRequest();
             if (webRequest.isNetworkError || webRequest.isHttpError)
             {
-                Debug.LogError("Error Loading Audio: " + path);
+                Debug.LogError("Error Loading Audio: " + uri);
                 Debug.LogError(webRequest.error);
                 return null;
             }
@@ -54,7 +61,7 @@ public static class AudioUtils
 
     public static AudioClip LoadMp3(string path)
     {
-        string filename = System.IO.Path.GetFileNameWithoutExtension(path);
+        string filename = Path.GetFileNameWithoutExtension(path);
         MpegFile mpegFile = new MpegFile(path);
         if (mpegFile == null || mpegFile.Length < 1)
         {

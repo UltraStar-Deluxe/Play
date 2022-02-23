@@ -40,28 +40,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     [Inject(UxmlName = R.UxmlNames.songImage, Optional = true)]
     private VisualElement backgroundImageVisualElement;
-    public VisualElement BackgroundImageVisualElement
-    {
-        get
-        {
-            return backgroundImageVisualElement;
-        }
-        set
-        {
-            backgroundImageVisualElement = value;
-            if (HasLoadedBackgroundImage
-                && backgroundImageVisualElement != null)
-            {
-                backgroundImageVisualElement.ShowByDisplay();
-                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
-            }
-        }
-    }
 
     public bool forceSyncOnForwardJumpInTheSong;
 
-    // Optional SongAudioPlayer.
-    // If set, then the video playback is synchronized with the position in the SongAudioPlayer.
+    // SongAudioPlayer to synchronize the playback position with.
     [Inject]
     public SongAudioPlayer SongAudioPlayer { get; private set; }
 
@@ -82,14 +64,11 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public bool HasLoadedVideo { get; private set; }
     public bool HasLoadedBackgroundImage { get; private set; }
-    private string videoPath;
 
     private float nextSyncTimeInSeconds;
 
     private IDisposable jumpBackInSongEventStreamDisposable;
     private IDisposable jumpForwardInSongEventStreamDisposable;
-
-    private Sprite coverImageSprite;
 
     public string videoPlayerErrorMessage;
 
@@ -161,15 +140,15 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void LoadVideo(string videoPath)
+    public void LoadVideo(string uri)
     {
-        if (!File.Exists(videoPath))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogWarning("Video does not exist: " + videoPath);
+            Debug.LogWarning("Video file resource does not exist: " + uri);
             return;
         }
 
-        videoPlayer.url = "file://" + videoPath;
+        videoPlayer.url = uri;
         // The url is empty if loading the video failed.
         HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
         // For now, only load the video. Starting it is done from the outside.
@@ -299,66 +278,66 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        string backgroundImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Background;
-        if (File.Exists(backgroundImagePath))
+        string backgroundUri = SongMetaUtils.GetBackgroundUri(SongMeta);
+        if (!WebRequestUtils.ResourceExists(backgroundUri))
         {
-            LoadBackgroundImage(backgroundImagePath);
-        }
-        else
-        {
-            Debug.LogWarning("Background image '" + backgroundImagePath + "'does not exist. Showing cover instead.");
+            Debug.LogWarning("Showing cover image because background image resource does not exist: " + backgroundUri);
             ShowCoverImageAsBackground();
         }
+
+        LoadBackgroundImage(backgroundUri);
     }
 
     private void ShowCoverImageAsBackground()
     {
-        if (string.IsNullOrEmpty(SongMeta.Cover))
+        string coverUri = SongMetaUtils.GetCoverUri(SongMeta);
+        if (coverUri.IsNullOrEmpty())
         {
             return;
         }
 
-        string coverImagePath = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Cover;
-        if (File.Exists(coverImagePath))
+        if (!WebRequestUtils.ResourceExists(coverUri))
         {
-            LoadBackgroundImage(coverImagePath);
+            Debug.LogWarning("Cover image resource does not exist: " + coverUri);
+            return;
         }
-        else
-        {
-            Debug.LogWarning("Cover image '" + coverImagePath + "'does not exist.");
-        }
+
+        LoadBackgroundImage(coverUri);
     }
 
-    private void LoadBackgroundImage(string imagePath)
+    private void LoadBackgroundImage(string backgroundUri)
     {
-        coverImageSprite = ImageManager.LoadSprite(imagePath);
-        if (backgroundImage != null)
+        if (backgroundUri.IsNullOrEmpty())
         {
-            backgroundImage.sprite = coverImageSprite;
+            return;
         }
-        if (backgroundImageVisualElement != null)
+
+        ImageManager.LoadSpriteFromUri(backgroundUri, loadedSprite =>
         {
-            backgroundImageVisualElement.ShowByDisplay();
-            backgroundImageVisualElement.style.backgroundImage = new StyleBackground(coverImageSprite);
-        }
-        HasLoadedBackgroundImage = true;
+            if (backgroundImage != null)
+            {
+                backgroundImage.sprite = loadedSprite;
+            }
+            if (backgroundImageVisualElement != null)
+            {
+                backgroundImageVisualElement.ShowByDisplay();
+                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+            }
+            HasLoadedBackgroundImage = true;
+        });
     }
 
-    private void InitVideo(SongMeta songMeta)
+    private void InitVideo(SongMeta initSongMeta)
     {
         UnloadVideo();
 
-        if (songMeta == null)
+        if (initSongMeta == null
+            || initSongMeta.Video.IsNullOrEmpty())
         {
             return;
         }
 
-        videoPath = "";
-        if (!string.IsNullOrEmpty(songMeta.Video))
-        {
-            videoPath = songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
-            LoadVideo(videoPath);
-        }
+        LoadVideo(SongMetaUtils.GetVideoUri(initSongMeta));
     }
 
     void OnEnable()

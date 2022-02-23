@@ -38,7 +38,7 @@ public class Theme
         AudioClip audioClip = null;
         if (File.Exists(fullAudioPath))
         {
-            audioClip = audioManager.LoadAudioClip(fullAudioPath);
+            audioClip = audioManager.LoadAudioClipFromFile(fullAudioPath);
         }
         else if (ParentTheme != null)
         {
@@ -57,7 +57,7 @@ public class Theme
         Sprite sprite = null;
         if (File.Exists(fullImagePath))
         {
-            sprite = ImageManager.LoadSprite(fullImagePath);
+            return null;
         }
         else if (ParentTheme != null)
         {

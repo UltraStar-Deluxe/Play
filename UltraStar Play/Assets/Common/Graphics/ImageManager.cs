@@ -22,29 +22,9 @@ public static class ImageManager
 
     private static CoroutineManager coroutineManager;
 
-    public static Sprite LoadSprite(string path)
+    public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
-        if (spriteCache.TryGetValue(path, out CachedSprite cachedSprite)
-            && cachedSprite.Sprite != null)
-        {
-            return cachedSprite.Sprite;
-        }
-
-        if (!File.Exists(path))
-        {
-            Debug.LogError("File does not exist: " + path);
-            return null;
-        }
-
-        Sprite sprite = CreateNewSpriteUncached(path);
-        if (sprite == null)
-        {
-            Debug.LogError("Could not create sprite from path: " + path);
-            return null;
-        }
-
-        AddSpriteToCache(sprite, path);
-        return sprite;
+        LoadSpriteFromUri("file://" + path, onSuccess, onFailure);
     }
 
     public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
@@ -53,6 +33,12 @@ public static class ImageManager
             && cachedSprite.Sprite != null)
         {
             onSuccess(cachedSprite.Sprite);
+            return;
+        }
+
+        if (!WebRequestUtils.ResourceExists(uri))
+        {
+            Debug.LogError("Image resource does not exist: " + uri);
             return;
         }
 
@@ -68,24 +54,6 @@ public static class ImageManager
             coroutineManager = CoroutineManager.Instance;
         }
         coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
-    }
-
-    public static Texture2D LoadTextureUncached(string path)
-    {
-        int width = 256;
-        int height = 256;
-        byte[] bytes = File.ReadAllBytes(path);
-        Texture2D texture = new Texture2D(width, height, TextureFormat.RGB24, false);
-        texture.filterMode = FilterMode.Trilinear;
-        texture.LoadImage(bytes);
-        return texture;
-    }
-
-    private static Sprite CreateNewSpriteUncached(string path)
-    {
-        Texture2D texture = LoadTextureUncached(path);
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1.0f);
-        return sprite;
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)

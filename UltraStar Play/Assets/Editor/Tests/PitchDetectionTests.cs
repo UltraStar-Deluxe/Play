@@ -34,8 +34,8 @@ public class PitchDetectionTests
         foreach (KeyValuePair<string, string> pathAndNoteName in pathToExpectedMidiNoteNameMap)
         {
             // Load the audio clip
-            string path = pathAndNoteName.Key;
-            AudioClip audioClip = AudioUtils.GetAudioClipUncached(path, false);
+            string uri = "file://" + pathAndNoteName.Key;
+            AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, false);
             float[] samples = new float[audioClip.samples];
             audioClip.GetData(samples, 0);
 
@@ -45,11 +45,11 @@ public class PitchDetectionTests
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, 0, samples.Length - 1, micProfile);
 
             // Check result
-            Assert.NotNull(pitchEvent, $"No pitch detected when analyzing {path}");
+            Assert.NotNull(pitchEvent, $"No pitch detected when analyzing audio resource {uri}");
             string expectedName = pathAndNoteName.Value;
             string analyzedName = MidiUtils.GetAbsoluteName(pitchEvent.MidiNote);
             Assert.AreEqual(expectedName, analyzedName,
-                $"Expected {expectedName} but was {analyzedName} when analyzing {path}");
+                $"Expected {expectedName} but was {analyzedName} when analyzing audio resource {uri}");
         }
     }
 

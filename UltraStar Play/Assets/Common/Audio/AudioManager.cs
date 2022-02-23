@@ -49,10 +49,15 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // When streamAudio is false, all audio data is loaded at once in a blocking way.
-    public AudioClip LoadAudioClip(string path, bool streamAudio = true)
+    public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
     {
-        if (audioClipCache.TryGetValue(path, out CachedAudioClip cachedAudioClip)
+        return LoadAudioClipFromUri("file://" + path, streamAudio);
+    }
+
+    // When streamAudio is false, all audio data is loaded at once in a blocking way.
+    public AudioClip LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    {
+        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
@@ -65,29 +70,7 @@ public class AudioManager : MonoBehaviour
             }
         }
 
-        return LoadAndCacheAudioClip(path, streamAudio);
-    }
-
-    public void LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
-    {
-        if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
-            && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
-        {
-            onSuccess(cachedAudioClip.FullAudioClip);
-            return;
-        }
-
-        Action<AudioClip> doCacheAudioClipThenOnSuccess = (loadedAudioClip) =>
-        {
-            AddAudioClipToCache(uri, loadedAudioClip, true);
-            onSuccess(loadedAudioClip);
-        };
-
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-        coroutineManager.StartCoroutine(WebRequestUtils.LoadAudioClipFromUri(uri, doCacheAudioClipThenOnSuccess, onFailure));
+        return LoadAndCacheAudioClip(uri, streamAudio);
     }
 
     public static void ClearCache()
@@ -99,22 +82,22 @@ public class AudioManager : MonoBehaviour
         audioClipCache.Clear();
     }
 
-    private AudioClip LoadAndCacheAudioClip(string path, bool streamAudio)
+    private AudioClip LoadAndCacheAudioClip(string uri, bool streamAudio)
     {
-        if (!File.Exists(path))
+        if (!WebRequestUtils.ResourceExists(uri))
         {
-            Debug.LogError("File does not exist: " + path);
+            Debug.LogError("Audio file resource does not exist: " + uri);
             return null;
         }
 
-        AudioClip audioClip = AudioUtils.GetAudioClipUncached(path, streamAudio);
+        AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, streamAudio);
         if (audioClip == null)
         {
-            Debug.LogError("Could not load AudioClip from path: " + path);
+            Debug.LogError("Could not load AudioClip: " + uri);
             return null;
         }
 
-        AddAudioClipToCache(path, audioClip, streamAudio);
+        AddAudioClipToCache(uri, audioClip, streamAudio);
         return audioClip;
     }
 

@@ -97,7 +97,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public void StartSongPreview(SongSelection songSelection)
     {
         if (songRouletteControl.IsDrag
-            || songRouletteControl.IsFlickGesture)
+            || songRouletteControl.IsFlickGesture
+            || !gameObject.activeInHierarchy)
         {
             return;
         }

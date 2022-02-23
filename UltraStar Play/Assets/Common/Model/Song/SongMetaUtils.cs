@@ -2,23 +2,44 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using ProTrans;
 using UnityEngine;
 
 public static class SongMetaUtils
 {
-    public static string GetAbsoluteSongVideoPath(SongMeta songMeta)
+    public static string GetCoverUri(SongMeta songMeta)
     {
-        if (songMeta.Video.IsNullOrEmpty())
+        return GetUri(songMeta, songMeta.Cover);
+    }
+
+    public static string GetBackgroundUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.Background);
+    }
+
+    public static string GetVideoUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.Video);
+    }
+
+    public static string GetAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.Mp3);
+    }
+
+    private static string GetUri(SongMeta songMeta, string pathOrUri)
+    {
+        if (pathOrUri.IsNullOrEmpty())
         {
             return "";
         }
 
-        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Video;
-    }
+        if (WebRequestUtils.IsHttpOrHttpsUri(pathOrUri))
+        {
+            return pathOrUri;
+        }
 
-    public static string GetAbsoluteSongAudioPath(SongMeta songMeta)
-    {
-        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Mp3;
+        return "file://" + songMeta.Directory + Path.DirectorySeparatorChar + pathOrUri;
     }
 
     public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
@@ -39,8 +60,8 @@ public static class SongMetaUtils
 
     public static Sentence FindExistingSentenceForNote(IReadOnlyCollection<Sentence> sentences, Note note)
     {
-        return sentences.Where(sentence => (sentence.MinBeat <= note.StartBeat)
-                                        && (note.EndBeat <= sentence.ExtendedMaxBeat)).FirstOrDefault();
+        return sentences.FirstOrDefault(sentence => (sentence.MinBeat <= note.StartBeat)
+                                                    && (note.EndBeat <= sentence.ExtendedMaxBeat));
     }
 
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
