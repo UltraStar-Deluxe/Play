@@ -182,9 +182,9 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
                 Debug.LogWarning("Unsupported video format: " + songMeta.Video);
                 songMeta.Video = "";
             }
-            else if (!File.Exists(SongMetaUtils.GetAbsoluteSongVideoPath(songMeta)))
+            else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetVideoUri(songMeta)))
             {
-                Debug.LogWarning("Video file does not exist: " + SongMetaUtils.GetAbsoluteSongVideoPath(songMeta));
+                Debug.LogWarning("Video file resource does not exist: " + SongMetaUtils.GetVideoUri(songMeta));
                 songMeta.Video = "";
             }
         }
@@ -196,9 +196,9 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             Debug.LogWarning("Unsupported audio format: " + songMeta.Mp3);
             return false;
         }
-        else if (!File.Exists(SongMetaUtils.GetAbsoluteSongAudioPath(songMeta)))
+        else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetAudioUri(songMeta)))
         {
-            Debug.LogWarning("Audio file does not exist: " + SongMetaUtils.GetAbsoluteSongAudioPath(songMeta));
+            Debug.LogWarning("Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta));
             return false;
         }
 

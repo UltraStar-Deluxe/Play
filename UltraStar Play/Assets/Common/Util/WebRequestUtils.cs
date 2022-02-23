@@ -37,80 +37,21 @@ public static class WebRequestUtils
         }
     }
 
-    // Do not use this method directly!
-    // Instead, use the AudioManager where AudioClips are cached and released when no longer needed.
-    public static IEnumerator LoadAudioClipFromUri(string uri, Action<AudioClip> onSuccess, Action<UnityWebRequest> onFailure = null)
+    public static bool IsHttpOrHttpsUri(string uri)
     {
-        using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.UNKNOWN))
-        {
-            DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
-            downloadHandler.streamAudio = true;
-            webRequest.SendWebRequest();
-
-            while (!webRequest.isDone)
-            {
-                yield return null;
-            }
-
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-            {
-                if (onFailure != null)
-                {
-                    onFailure(webRequest);
-                    yield break;
-                }
-
-                Debug.LogError("Error loading AudioClip from: " + uri);
-                Debug.LogError(webRequest.error);
-                yield break;
-            }
-
-            onSuccess(downloadHandler.audioClip);
-        }
+        return uri.StartsWith("http://")
+               || uri.StartsWith("https://");
     }
 
-    public static void LoadTextFromUri(CoroutineManager coroutineManager, string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
+    public static bool ResourceExists(string uri)
     {
-        // Immediately load file if possible
-        if (uri.StartsWith("file://"))
+        if (!uri.IsNullOrEmpty()
+            && uri.StartsWith("file://")
+            && !File.Exists(uri.Replace("file://", "")))
         {
-            string path = uri.Substring(7);
-            if (File.Exists(path))
-            {
-                string content = File.ReadAllText(path);
-                onSuccess(content);
-                return;
-            }
+            return false;
         }
 
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTextFromUriCoroutine(uri, onSuccess, onFailure));
-    }
-
-    private static IEnumerator LoadTextFromUriCoroutine(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
-    {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
-        {
-            webRequest.SendWebRequest();
-
-            while (!webRequest.isDone)
-            {
-                yield return null;
-            }
-
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-            {
-                if (onFailure != null)
-                {
-                    onFailure(webRequest);
-                    yield break;
-                }
-
-                Debug.LogError("Error loading text from: " + uri);
-                Debug.LogError(webRequest.error);
-                yield break;
-            }
-
-            onSuccess(webRequest.downloadHandler.text);
-        }
+        return !uri.IsNullOrEmpty();
     }
 }
