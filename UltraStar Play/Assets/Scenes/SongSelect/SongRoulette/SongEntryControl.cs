@@ -189,22 +189,28 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private void UpdateCover(SongMeta coverSongMeta)
     {
-        if (coverSongMeta.Cover.IsNullOrEmpty())
+        string coverUri = SongMetaUtils.GetCoverUri(coverSongMeta);
+        if (coverUri.IsNullOrEmpty())
         {
+            // Try the background image as fallback
+            coverUri = SongMetaUtils.GetBackgroundUri(coverSongMeta);
+            if (coverUri.IsNullOrEmpty())
+            {
+                return;
+            }
+        }
+
+        if (!WebRequestUtils.ResourceExists(coverUri))
+        {
+            Debug.Log("Cover image resource does not exist: " + coverUri);
             return;
         }
 
-        string coverPath = SongMetaUtils.GetAbsoluteSongCoverPath(coverSongMeta);
-        if (File.Exists(coverPath))
+        ImageManager.LoadSpriteFromUri(coverUri, loadedSprite =>
         {
-            Sprite sprite = ImageManager.LoadSprite(coverPath);
-            songImageOuter.style.backgroundImage = new StyleBackground(sprite);
-            songImageInner.style.backgroundImage = new StyleBackground(sprite);
-        }
-        else
-        {
-            Debug.Log("Cover does not exist: " + coverPath);
-        }
+            songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
+            songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
+        });
     }
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)

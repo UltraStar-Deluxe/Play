@@ -76,7 +76,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
             using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
             {
                 // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-                AudioClip audioClip = AudioManager.Instance.LoadAudioClip(SongMetaUtils.GetAbsoluteSongAudioPath(songMeta), false);
+                AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
                 audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform);
                 // Waveform color is same as text color
                 audioWaveFormVisualization.waveformColor = overviewAreaLabel.resolvedStyle.color;
