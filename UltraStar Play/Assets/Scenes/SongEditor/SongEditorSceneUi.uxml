@@ -4,20 +4,56 @@
     <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
         <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
             <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
-                <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont" style="height: 100%; border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView">
-                        <ui:Button text="Play/Pause" display-tooltip-when-elided="true" name="togglePlaybackButton" />
-                        <ui:Button text="Record" display-tooltip-when-elided="true" name="toggleRecordingButton" />
-                        <ui:Button text="Issues" display-tooltip-when-elided="true" name="toggleIssuesButton" />
-                        <ui:Button text="Properties" display-tooltip-when-elided="true" name="toggleSongPropertiesButton" />
-                        <ui:Button text="Layers" display-tooltip-when-elided="true" name="toggleLayersButton" />
-                        <ui:Button text="Settings" display-tooltip-when-elided="true" name="toggleSettingsButton" />
-                        <ui:Button text="Help" display-tooltip-when-elided="true" name="toggleHelpButton" />
-                        <ui:Button text="Undo" display-tooltip-when-elided="true" name="undoButton" />
-                        <ui:Button text="Redo" display-tooltip-when-elided="true" name="redoButton" />
-                        <ui:Button text="Save" display-tooltip-when-elided="true" name="saveButton" />
-                        <ui:Button text="Back" display-tooltip-when-elided="true" name="exitSceneButton" />
-                        <ui:Button text="&lt;" display-tooltip-when-elided="true" name="toggleSideBarSizeButton" />
+                <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="height: 100%;">
+                        <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
+                            <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/play_arrow_white_24dp.svg?fileID=7388822144124034973&amp;guid=59a9a5409059d3849a01945b28f504dc&amp;type=3#play_arrow_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
+                            <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/fiber_manual_record_white_24dp.svg?fileID=7388822144124034973&amp;guid=b9823aab60674b74392496963ed16156&amp;type=3#fiber_manual_record_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
+                            <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSongPropertiesButton">
+                            <ui:Label text="Properties" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/queue_music_white_24dp.svg?fileID=7388822144124034973&amp;guid=d1b7cdd6ee30d01479efe45e8d3d8daf&amp;type=3#queue_music_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleLayersButton">
+                            <ui:Label text="Layers" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/layers_white_24dp.svg?fileID=7388822144124034973&amp;guid=d08499116bf7a8b4abcab1bd77a25949&amp;type=3#layers_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSettingsButton">
+                            <ui:Label text="Settings" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/settings_white_24dp.svg?fileID=7388822144124034973&amp;guid=12ed75580d6e33342af3ffd0e8b3e86a&amp;type=3#settings_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
+                            <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/help_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=088f9b8e2490ed44a862efc470dafb60&amp;type=3#help_outline_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="undoButton">
+                            <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/undo_white_24dp.svg?fileID=7388822144124034973&amp;guid=31518e25db47ae84795efbfa5af09c2e&amp;type=3#undo_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="redoButton">
+                            <ui:Label text="Redo" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/redo_white_24dp.svg?fileID=7388822144124034973&amp;guid=80a849cb32dd9ab4cabe7a8f76428888&amp;type=3#redo_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="saveButton">
+                            <ui:Label text="Save" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/save_white_24dp.svg?fileID=7388822144124034973&amp;guid=1df45a561456adb488385eb58e84e237&amp;type=3#save_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="exitSceneButton">
+                            <ui:Label text="Back" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/arrow_back_white_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
+                            <ui:Label display-tooltip-when-elided="true" name="label" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/unfold_less_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=1380d7f505c7b8b49a5d4a25bf03ab3d&amp;type=3#unfold_less_horizontal_white_24dp&apos;);" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/unfold_more_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=9c1a6809250de8b4782b910be636a423&amp;type=3#unfold_more_horizontal_white_24dp&apos;);" />
+                        </ui:Button>
                     </ui:ScrollView>
                 </ui:VisualElement>
                 <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="border-top-width: 0; border-bottom-width: 0; display: flex; height: 100%; flex-direction: row;">
@@ -37,7 +73,7 @@
                         <ui:Button text="Set BPM&#10;change note duration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
                     </ui:ScrollView>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="settingsSideBarContainer" class="secondarySideBarPanel smallFont" style="display: flex;">
-                        <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold; display: none;" />
+                        <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold; display: flex;" />
                         <ui:Label text="Editing" display-tooltip-when-elided="true" name="editingTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="editingGroup" class="songEditorSettingsGroup">
                             <ui:VisualElement name="adjustFollowingNotesContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
@@ -140,7 +176,7 @@
                     </ui:ScrollView>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="virtualPiano" style="height: 100%; width: 32px;" />
+            <ui:VisualElement name="virtualPiano" style="height: 100%; width: 28px;" />
             <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">
                 <ui:VisualElement name="horizontalGrid" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0);">
                     <ui:VisualElement name="horizontalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
