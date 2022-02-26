@@ -85,8 +85,44 @@ Button.recording:hover {
     border-width: 1px;
 }
 
-#leftSideBar {
-    --control-width: 80px;
+.leftSideBar {
+    width: 80px;
+    height: 100%;
+    transition: width 0.5s;
+}
+
+.leftSideBar Button {
+    padding: 6px;
+    width: 100%;
+}
+
+.leftSideBar Label {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: var(--text-color);
+}
+
+.leftSideBar .icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+    display: none;
+}
+
+.leftSideBar.small {
+    width: 40px;
+}
+
+.leftSideBar.small Label {
+    display: none;
+}
+
+.leftSideBar.small .icon {
+    display: flex;
 }
 
 .secondarySideBarPanel {

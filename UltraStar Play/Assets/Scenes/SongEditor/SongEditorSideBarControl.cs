@@ -11,6 +11,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(Key = nameof(issueSideBarEntryUi))]
     private VisualTreeAsset issueSideBarEntryUi;
 
+    [Inject(UxmlName = R.UxmlNames.leftSideBarMainColumn)]
+    private VisualElement leftSideBarMainColumn;
+
     [Inject(UxmlName = R.UxmlNames.togglePlaybackButton)]
     private Button togglePlaybackButton;
 
@@ -61,6 +64,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject(UxmlName = R.UxmlNames.toggleSettingsButton)]
     private Button toggleSettingsButton;
+
+    [Inject(UxmlName = R.UxmlNames.toggleSideBarSizeButton)]
+    private Button toggleSideBarSizeButton;
 
     [Inject]
     private Injector injector;
@@ -129,6 +135,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         issueAnalyzerControl.IssuesEventStream
             .Subscribe(issues => UpdateIssueSideBar(issues));
+
+        toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() => leftSideBarMainColumn.ToggleInClassList("small"));
 
         InitTabGroup();
     }
