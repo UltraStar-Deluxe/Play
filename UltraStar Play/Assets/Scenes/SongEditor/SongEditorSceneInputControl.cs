@@ -522,7 +522,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private void PlayAudioInRangeOfNotes(List<Note> notes)
     {
-        if (songAudioPlayer.IsPlaying)
+        if (songAudioPlayer.IsPlaying
+            || notes.IsNullOrEmpty())
         {
             return;
         }

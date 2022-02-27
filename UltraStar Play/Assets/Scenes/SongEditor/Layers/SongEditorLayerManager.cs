@@ -20,7 +20,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     [Inject]
     private Settings settings;
 
-    private Subject<LayerChangedEvent> layerChangedEventStream = new Subject<LayerChangedEvent>();
+    private readonly Subject<LayerChangedEvent> layerChangedEventStream = new Subject<LayerChangedEvent>();
     public IObservable<LayerChangedEvent> LayerChangedEventStream => layerChangedEventStream;
 
     public void OnSceneInjectionFinished()

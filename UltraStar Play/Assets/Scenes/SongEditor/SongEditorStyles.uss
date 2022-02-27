@@ -114,7 +114,7 @@ Button.recording:hover {
 }
 
 .leftSideBar.small {
-    width: 40px;
+    width: 30px;
 }
 
 .leftSideBar.small Label {
@@ -129,7 +129,14 @@ Button.recording:hover {
     display: none;
     width: 200px;
     height: 100%;
-    padding: 2px;
+    padding-left: 2px;
+    padding-right: 0px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.secondarySideBarPanel #unity-content-container {
+    padding-right: 2px;
 }
 
 .secondarySideBarTitle {
@@ -160,4 +167,9 @@ Button.recording:hover {
 .songEditorSettingsGroupTitle {
     -unity-text-align: upper-center;
     -unity-font-style: bold;
+}
+
+ScrollView #unity-content-container {
+    padding-right: 2px;
+    padding-bottom: 2px;
 }

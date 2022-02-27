@@ -20,6 +20,9 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
+    [Inject]
+    private Settings settings;
+
     [Inject(UxmlName = R.UxmlNames.horizontalGridLabelContainer)]
     private VisualElement horizontalGridLabelContainer;
 
@@ -41,6 +44,10 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         });
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
+
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
+            .Where(_ => dynamicTexture != null)
+            .Subscribe(_ => UpdateMidiNoteLines());
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -116,11 +123,21 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void DrawHorizontalGridLine(int midiNote, Color color)
     {
+        int height = settings.SongEditorSettings.GridSizeInDevicePixels;
+        if (height <= 0)
+        {
+            return;
+        }
+
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote);
-        int y = (int)(yPercent * dynamicTexture.TextureHeight);
+        int fromY = (int)(yPercent * dynamicTexture.TextureHeight);
+        int toY = fromY + height;
         for (int x = 0; x < dynamicTexture.TextureWidth; x++)
         {
-            dynamicTexture.SetPixel(x, y, color);
+            for (int y = fromY; y < toY && y < dynamicTexture.TextureHeight; y++)
+            {
+                dynamicTexture.SetPixel(x, y, color);
+            }
         }
     }
 }

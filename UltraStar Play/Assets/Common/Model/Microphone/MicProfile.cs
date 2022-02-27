@@ -35,6 +35,8 @@ public class MicProfile
         }
     }
 
+    public bool IsEnabledAndConnected => IsEnabled && IsConnected;
+
     public MicProfile()
     {
     }

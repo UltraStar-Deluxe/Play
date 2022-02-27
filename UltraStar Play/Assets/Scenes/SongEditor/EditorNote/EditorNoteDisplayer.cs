@@ -123,6 +123,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
             .ObserveEveryValueChanged(it => it.HideVoices.Count)
             .Subscribe(_ => OnHideVoicesChanged())
             .AddTo(this);
+
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.SentenceLineSizeInDevicePixels)
+            .Where(_ => sentenceLinesDynamicTexture != null)
+            .Subscribe(_ => UpdateSentences());
+
+        songEditorLayerManager.LayerChangedEventStream
+            .Subscribe(_ => UpdateNotesAndSentences());
     }
 
     private void DeleteSentence(Sentence sentence)
@@ -152,7 +160,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         UpdateNotesAndSentences();
     }
 
-    public bool IsVoiceVisible(Voice voice)
+    private bool IsVoiceVisible(Voice voice)
     {
         if (voice == null)
         {
@@ -312,7 +320,24 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
             {
                 DrawNotesInLayer(layerKey);
             }
+            else
+            {
+                ClearNotesInLayer(layerKey);
+            }
         }
+    }
+
+    private void ClearNotesInLayer(ESongEditorLayer layerKey)
+    {
+        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
+            .Where(note => note.Sentence == null).ToList();
+        notesInLayer.ForEach(note =>
+        {
+            if (noteToControlMap.TryGetValue(note, out EditorNoteControl noteControl))
+            {
+                DeleteNoteControl(noteControl);
+            }
+        });
     }
 
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
@@ -415,10 +440,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
             return;
         }
 
-        int widthInPx = 10;
-        int xTarget = (int)(xPercent * sentenceLinesDynamicTexture.TextureWidth);
+        int width = settings.SongEditorSettings.SentenceLineSizeInDevicePixels;
+        int xFrom = (int)(xPercent * sentenceLinesDynamicTexture.TextureWidth);
+        int xTo = xFrom + width;
 
-        for (int x = xTarget; x < xTarget + widthInPx && x < sentenceLinesDynamicTexture.TextureWidth - 1; x++)
+        for (int x = xFrom; x < xTo && x < sentenceLinesDynamicTexture.TextureWidth; x++)
         {
             for (int y = 0; y < sentenceLinesDynamicTexture.TextureHeight; y++)
             {

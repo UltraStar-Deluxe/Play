@@ -27,6 +27,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R.UxmlNames.verticalGrid)]
     private VisualElement verticalGrid;
 
+    [Inject]
+    private Settings settings;
+
     private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
@@ -44,6 +47,10 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         });
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
+
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
+            .Where(_ => dynamicTexture != null)
+            .Subscribe(_ => UpdateLines());
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -183,11 +190,21 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private void DrawVerticalGridLine(double beatPosInMillis, Color color)
     {
-        double xPercent = (beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
-        int x = (int)(xPercent * dynamicTexture.TextureWidth);
-        for (int y = 0; y < dynamicTexture.TextureHeight; y++)
+        int width = settings.SongEditorSettings.GridSizeInDevicePixels;
+        if (width <= 0)
         {
-            dynamicTexture.SetPixel(x, y, color);
+            return;
+        }
+
+        double xPercent = (beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
+        int fromX = (int)(xPercent * dynamicTexture.TextureWidth);
+        int toX = fromX + width;
+        for (int x = fromX; x < toX && x < dynamicTexture.TextureWidth; x++)
+        {
+            for (int y = 0; y < dynamicTexture.TextureHeight; y++)
+            {
+                dynamicTexture.SetPixel(x, y, color);
+            }
         }
     }
 }

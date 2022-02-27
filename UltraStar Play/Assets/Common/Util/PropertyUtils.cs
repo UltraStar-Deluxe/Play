@@ -62,4 +62,56 @@ public static class PropertyUtils
             }
         };
     }
+
+    public static Func<int> CreateIntGetterFromStringGetter(Func<string> valueGetter, int defaultValue = 0)
+    {
+        return () =>
+        {
+            string value = valueGetter();
+            if (value.IsNullOrEmpty())
+            {
+                return defaultValue;
+            }
+
+            return int.TryParse(value, out int result)
+                ? result
+                : defaultValue;
+        };
+    }
+
+    public static Func<float> CreateFloatGetterFromStringGetter(Func<string> valueGetter, float defaultValue = 0)
+    {
+        return () =>
+        {
+            string value = valueGetter();
+            if (value.IsNullOrEmpty())
+            {
+                return defaultValue;
+            }
+
+            return float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out float result)
+                ? result
+                : defaultValue;
+        };
+    }
+
+    public static bool TrySetIntFromString(string stringValue, Action<int> valueSetter)
+    {
+        if (int.TryParse(stringValue, out int intValue))
+        {
+            valueSetter(intValue);
+            return true;
+        }
+        return false;
+    }
+
+    public static bool TrySetFloatFromString(string stringValue, Action<float> valueSetter)
+    {
+        if (float.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float floatValue))
+        {
+            valueSetter(floatValue);
+            return true;
+        }
+        return false;
+    }
 }

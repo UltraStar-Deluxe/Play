@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CircularBuffer;
 
 public static class CollectionExtensions
@@ -209,5 +210,15 @@ public static class CollectionExtensions
             }
         }
         return maxElement;
+    }
+
+    public static Dictionary<TValue, TKey> ToInvertedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> source)
+    {
+        Dictionary<TValue, TKey> result = new Dictionary<TValue, TKey>();
+        foreach (KeyValuePair<TKey, TValue> entry in source)
+        {
+            result[entry.Value] = entry.Key;
+        }
+        return result;
     }
 }
