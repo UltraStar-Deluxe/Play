@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -18,6 +19,25 @@ public static class MidiUtils
     private static readonly int[] whiteKeyRelativeMidiNotes = { 0, 2, 4, 5, 7, 9, 11 };
     // Black keys: C# = 1, D# = 3, F# = 6, G# = 8, A# = 10
     private static readonly int[] blackKeyRelativeMidiNotes = { 1, 3, 6, 8, 10 };
+
+    private static Dictionary<int, string> midiNoteToAbsoluteName = CreateMidiNoteToAbsoluteNameMap();
+    private static Dictionary<string, int> absoluteNameToMidiNote = CreateAbsoluteNameToMidiNoteMap();
+
+    private static Dictionary<int, string> CreateMidiNoteToAbsoluteNameMap()
+    {
+        Dictionary<int, string> result = new Dictionary<int, string>();
+        for (int midiNote = 21; midiNote <= 127; midiNote++)
+        {
+            result.Add(midiNote, GetAbsoluteName(midiNote));
+        }
+
+        return result;
+    }
+
+    private static Dictionary<string, int> CreateAbsoluteNameToMidiNoteMap()
+    {
+        return CreateMidiNoteToAbsoluteNameMap().ToInvertedDictionary();
+    }
 
     public static int GetOctave(int midiNote)
     {
@@ -148,5 +168,16 @@ public static class MidiUtils
                 + $"midiNote {midiNote}, targetMidiNote: {targetMidiNote}, displayed: {midiNoteOnOctaveOfTargetNote}");
         }
         return midiNoteOnOctaveOfTargetNote;
+    }
+
+    public static bool TryParseMidiNoteName(string midiNoteName, out int midiNote)
+    {
+        if (absoluteNameToMidiNote.TryGetValue(midiNoteName.ToUpperInvariant(), out int lookupMidiNote))
+        {
+            midiNote = lookupMidiNote;
+            return true;
+        }
+        midiNote = 0;
+        return false;
     }
 }

@@ -19,14 +19,6 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    private SongEditorSettings EditorSettings
-    {
-        get
-        {
-            return settings.SongEditorSettings;
-        }
-    }
-
     [Inject]
     private SongMeta songMeta;
 
@@ -50,25 +42,45 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private bool hasRecordedNotes;
 
-    private bool isRecording;
+    private bool isRecordingEnabled;
 
-    public bool IsRecordingEnabled { get; set; }
-
-    void Start()
+    public bool IsRecordingEnabled
     {
-        micPitchTracker.MicProfile = settings.MicProfiles.FirstOrDefault(it => it.IsEnabled && it.IsConnected);
+        get
+        {
+            return isRecordingEnabled;
+        }
 
-        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource).Subscribe(OnNoteRecordingSourceChanged);
-        songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying).Subscribe(OnSongIsPlayingChanged);
+        set
+        {
+            isRecordingEnabled = value;
+            StartOrStopRecording();
+        }
+    }
+
+    private void Start()
+    {
+        micPitchTracker.MicProfile = settings.SongEditorSettings.MicProfile;
+
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.MicProfile)
+            .Subscribe(newValue =>
+            {
+                micPitchTracker.MicProfile = newValue;
+                StartOrStopRecording();
+            });
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.RecordingSource)
+            .Subscribe(_ => StartOrStopRecording());
+        songAudioPlayer
+            .ObserveEveryValueChanged(it => it.IsPlaying)
+            .Subscribe(_ => StartOrStopRecording());
+
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
         micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
-        if (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone)
-        {
-            micPitchTracker.MicSampleRecorder.StartRecording();
-        }
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)
@@ -103,26 +115,33 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void UpdateRecordingViaButtonClick()
     {
-        if (!IsRecordingEnabled)
+        if (!IsRecordingEnabled
+            || settings.SongEditorSettings.RecordingSource != ESongEditorRecordingSource.KeyboardButton)
         {
             return;
         }
 
-        // Record notes via button click.
-        bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
-        if (keyboardButtonRecordingEnabled)
+        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+        if (Keyboard.current != null
+            && Keyboard.current.anyKey.isPressed)
         {
-            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-            if (Keyboard.current != null && Keyboard.current.f8Key.isPressed)
+            // Check if the required key is pressed
+            List<string> pressedKeysDisplayNames = Keyboard.current.allControls
+                .Where(inputControl => inputControl.IsPressed())
+                .Select(inputControl => inputControl.displayName.ToUpperInvariant())
+                .ToList();
+            if (pressedKeysDisplayNames.Contains(settings.SongEditorSettings.ButtonDisplayNameForButtonRecording.ToUpperInvariant()))
             {
-                RecordNote(EditorSettings.MidiNoteForButtonRecording, positionInSongInMillis, ESongEditorLayer.ButtonRecording);
+                RecordNote(settings.SongEditorSettings.MidiNoteForButtonRecording,
+                    positionInSongInMillis,
+                    ESongEditorLayer.ButtonRecording);
             }
-            else
-            {
-                lastRecordedNote = null;
-                // The pitch is always detected (either the keyboard is down or not).
-                lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
-            }
+        }
+        else
+        {
+            lastRecordedNote = null;
+            // The pitch is always detected (either the keyboard is down or not).
+            lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
         }
     }
 
@@ -133,8 +152,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (!isRecording
-            || lastPitchDetectedFrame == Time.frameCount)
+        if (lastPitchDetectedFrame == Time.frameCount)
         {
             return;
         }
@@ -145,8 +163,8 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - EditorSettings.MicDelayInMillis;
-        int midiNote = pitchEvent.MidiNote + (EditorSettings.MicOctaveOffset * 12);
+        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis;
+        int midiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
         RecordNote(midiNote, positionInSongInMillis, ESongEditorLayer.MicRecording);
     }
 
@@ -247,42 +265,6 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnNoteRecordingSourceChanged(ESongEditorRecordingSource recordingSource)
-    {
-        bool micRecordingEnabled = (recordingSource == ESongEditorRecordingSource.Microphone);
-        if (!micRecordingEnabled && isRecording)
-        {
-            StopRecording();
-        }
-        else if (micRecordingEnabled && songAudioPlayer.IsPlaying && !isRecording)
-        {
-            StartRecording();
-        }
-
-        if (micRecordingEnabled)
-        {
-            micPitchTracker.MicSampleRecorder.StartRecording();
-        }
-        else
-        {
-            micPitchTracker.MicSampleRecorder.StopRecording();
-        }
-    }
-
-    private void OnSongIsPlayingChanged(bool isPlaying)
-    {
-        bool micRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone);
-        if (!isPlaying && isRecording)
-        {
-            StopRecording();
-        }
-        else if (isPlaying && !isRecording
-                 && micRecordingEnabled && micPitchTracker.MicProfile != null)
-        {
-            StartRecording();
-        }
-    }
-
     private List<Note> GetUpcomingSortedRecordedNotes()
     {
         int currentBeat = GetCurrentBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
@@ -296,7 +278,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         switch (settings.SongEditorSettings.RecordingSource)
         {
-            case ESongEditorRecordingSource.KeyboardButton_F8:
+            case ESongEditorRecordingSource.KeyboardButton:
                 return ESongEditorLayer.ButtonRecording;
             case ESongEditorRecordingSource.Microphone:
                 return ESongEditorLayer.MicRecording;
@@ -311,13 +293,21 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         return currentBeat;
     }
 
-    private void StopRecording()
+    private void StartOrStopRecording()
     {
-        isRecording = false;
-    }
+        bool shouldBeRecoding = isRecordingEnabled
+                                && songAudioPlayer.IsPlaying
+                                && settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone
+                                && settings.SongEditorSettings.MicProfile != null
+                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected;
 
-    private void StartRecording()
-    {
-        isRecording = true;
+        if (!shouldBeRecoding && micPitchTracker.MicSampleRecorder.IsRecording)
+        {
+            micPitchTracker.MicSampleRecorder.StopRecording();
+        }
+        else if (shouldBeRecoding && !micPitchTracker.MicSampleRecorder.IsRecording)
+        {
+            micPitchTracker.MicSampleRecorder.StartRecording();
+        }
     }
 }

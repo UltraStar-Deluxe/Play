@@ -28,6 +28,7 @@ public static partial class R
         public const string inputLegendLabel = "inputLegendLabel";
         public const string itemPickerButton = "itemPickerButton";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
+        public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
         public const string marginBottomSmaller = "marginBottomSmaller";
@@ -57,6 +58,8 @@ public static partial class R
         public const string smallControl = "smallControl";
         public const string smallerFont = "smallerFont";
         public const string smallFont = "smallFont";
+        public const string songEditorSettingsGroup = "songEditorSettingsGroup";
+        public const string songEditorSettingsGroupTitle = "songEditorSettingsGroupTitle";
         public const string startButtonClass = "startButtonClass";
         public const string textOutline = "textOutline";
         public const string timeBar = "timeBar";

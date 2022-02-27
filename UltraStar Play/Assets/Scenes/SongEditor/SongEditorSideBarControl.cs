@@ -72,6 +72,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private Injector injector;
 
     [Inject]
+    private Settings settings;
+
+    [Inject]
     private UltraStarPlayInputManager inputManager;
 
     [Inject]
@@ -95,6 +98,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new SongEditorSideBarPropertiesControl();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new SongEditorSideBarLayersControl();
+    private readonly SongEditorSideBarSettingsControl sideBarSettingsControl = new SongEditorSideBarSettingsControl();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
@@ -104,6 +108,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         injector.Inject(propertiesControl);
         injector.Inject(sideBarLayersControl);
+        injector.Inject(sideBarSettingsControl);
 
         togglePlaybackButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(() =>
@@ -136,9 +141,25 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         issueAnalyzerControl.IssuesEventStream
             .Subscribe(issues => UpdateIssueSideBar(issues));
 
-        toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() => leftSideBarMainColumn.ToggleInClassList("small"));
+        toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() =>
+            settings.SongEditorSettings.SmallLeftSideBar = !settings.SongEditorSettings.SmallLeftSideBar);
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.SmallLeftSideBar)
+            .Subscribe(newValue => UpdateLeftSideBarClasses());
+        UpdateLeftSideBarClasses();
 
         InitTabGroup();
+    }
+
+    private void UpdateLeftSideBarClasses()
+    {
+        if (settings.SongEditorSettings.SmallLeftSideBar)
+        {
+            leftSideBarMainColumn.AddToClassList("small");
+        }
+        else
+        {
+            leftSideBarMainColumn.RemoveFromClassList("small");
+        }
     }
 
     private void UpdateIssueSideBar(IReadOnlyCollection<SongIssue> issues)
