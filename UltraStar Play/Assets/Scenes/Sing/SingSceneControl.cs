@@ -659,7 +659,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         string voiceName = GetVoiceName(playerProfile);
         IReadOnlyCollection<Voice> voices = sceneData.SelectedSongMeta.GetVoices();
-        Voice matchingVoice = voices.FirstOrDefault(it => it.Name == voiceName);
+        Voice matchingVoice = voices.FirstOrDefault(it => it.VoiceNameEquals(voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;

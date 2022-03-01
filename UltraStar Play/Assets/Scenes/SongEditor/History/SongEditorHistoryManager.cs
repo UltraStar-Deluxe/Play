@@ -184,7 +184,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         foreach (Voice voiceMemento in undoState.Voices)
         {
             Voice matchingVoiceInSongMeta = voicesInSongMeta
-                .Where(it => it.Name == voiceMemento.Name).FirstOrDefault();
+                .FirstOrDefault(voice => voice.VoiceNameEquals(voiceMemento.Name));
             if (matchingVoiceInSongMeta == null)
             {
                 // Create new voice
@@ -208,7 +208,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         foreach (Voice voiceInSongMeta in new List<Voice>(voicesInSongMeta))
         {
             Voice matchingVoiceMemento = undoState.Voices
-                .Where(it => it.Name == voiceInSongMeta.Name).FirstOrDefault();
+                .FirstOrDefault(voice => voice.VoiceNameEquals(voiceInSongMeta.Name));
             if (matchingVoiceMemento == null)
             {
                 songMeta.RemoveVoice(voiceInSongMeta);

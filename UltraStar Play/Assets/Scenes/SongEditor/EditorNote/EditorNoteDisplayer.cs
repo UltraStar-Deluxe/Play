@@ -146,31 +146,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
     {
         // Remove notes of hidden voices
         List<Note> notVisibleNotes = noteToControlMap.Keys
-            .Where(note => !IsVoiceVisible(note.Sentence?.Voice))
+            .Where(note => !songEditorLayerManager.IsVoiceVisible(note.Sentence?.Voice))
             .ToList();
         notVisibleNotes.ForEach(note => DeleteNoteControl(note));
 
         // Remove sentences of hidden voices
         List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
-            .Where(sentence => !IsVoiceVisible(sentence.Voice))
+            .Where(sentence => !songEditorLayerManager.IsVoiceVisible(sentence.Voice))
             .ToList();
         notVisibleSentences.ForEach(sentence => DeleteSentence(sentence));
 
         // Draw any notes that are now (again) visible.
         UpdateNotesAndSentences();
-    }
-
-    private bool IsVoiceVisible(Voice voice)
-    {
-        if (voice == null)
-        {
-            return true;
-        }
-
-        bool isHidden = settings.SongEditorSettings.HideVoices.Contains(voice.Name)
-            || (voice.Name == Voice.soloVoiceName
-                && settings.SongEditorSettings.HideVoices.Contains(Voice.firstVoiceName));
-        return !isHidden;
     }
 
     public void ClearNoteControls()
@@ -214,7 +201,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
 
         foreach (Voice voice in voices)
         {
-            if (IsVoiceVisible(voice))
+            if (songEditorLayerManager.IsVoiceVisible(voice))
             {
                 DrawSentencesInVoice(voice);
             }
@@ -327,7 +314,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         }
     }
 
-    private void ClearNotesInLayer(ESongEditorLayer layerKey)
+    public void ClearNotesInLayer(ESongEditorLayer layerKey)
     {
         List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
             .Where(note => note.Sentence == null).ToList();
@@ -364,7 +351,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         IEnumerable<Voice> voices = songMeta.GetVoices();
         foreach (Voice voice in voices)
         {
-            if (IsVoiceVisible(voice))
+            if (songEditorLayerManager.IsVoiceVisible(voice))
             {
                 DrawNotesInVoice(voice);
             }

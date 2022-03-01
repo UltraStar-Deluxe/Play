@@ -102,9 +102,16 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     public List<Note> GetAllVisibleNotes()
     {
-        return GetAllNotes()
-            .Where(IsVisible)
-            .ToList();
+        List<Note> notes = new List<Note>();
+        foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
+        {
+            if (IsLayerEnabled(layerEnum))
+            {
+                List<Note> notesOfLayer = GetNotes(layerEnum);
+                notes.AddRange(notesOfLayer);
+            }
+        }
+        return notes;
     }
 
     public void RemoveNoteFromAllLayers(Note note)
@@ -117,7 +124,42 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     public bool IsVisible(Note note)
     {
-        return note.Sentence?.Voice == null
-            || !settings.SongEditorSettings.HideVoices.Contains(note.Sentence.Voice.Name);
+        if (note.Sentence?.Voice != null)
+        {
+            return IsVoiceVisible(note.Sentence.Voice);
+        }
+
+        if (TryGetLayer(note, out SongEditorLayer layer))
+        {
+            return IsLayerEnabled(layer.LayerEnum);
+        }
+
+        return true;
+    }
+
+    private bool TryGetLayer(Note note, out SongEditorLayer layer)
+    {
+        foreach (SongEditorLayer songEditorLayer in GetLayers())
+        {
+            if (songEditorLayer.ContainsNote(note))
+            {
+                layer = songEditorLayer;
+                return true;
+            }
+        }
+
+        layer = null;
+        return false;
+    }
+
+    public bool IsVoiceVisible(Voice voice)
+    {
+        return !IsVoiceHidden(voice);
+    }
+
+    public bool IsVoiceHidden(Voice voice)
+    {
+        return voice != null
+               && settings.SongEditorSettings.HideVoices.AnyMatch(voiceName => voice.VoiceNameEquals(voiceName));
     }
 }

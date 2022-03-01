@@ -134,6 +134,11 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             voice = songMeta.GetVoices().FirstOrDefault();
         }
 
+        if (voice == null)
+        {
+            return;
+        }
+
         // Add the notes to the voice
         moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, CopiedNotes, voice.Name);
         ClearCopiedNotes();

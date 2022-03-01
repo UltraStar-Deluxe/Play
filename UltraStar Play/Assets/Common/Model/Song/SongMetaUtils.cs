@@ -67,9 +67,7 @@ public static class SongMetaUtils
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
     {
         Voice matchingVoice = songMeta.GetVoices()
-            .FirstOrDefault(voice => voice.Name == voiceName
-                                     || (voiceName.IsNullOrEmpty() && voice.Name == Voice.firstVoiceName)
-                                     || (voiceName == Voice.firstVoiceName && voice.Name.IsNullOrEmpty()));
+            .FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;
@@ -77,7 +75,7 @@ public static class SongMetaUtils
 
         // Create new voice.
         // Set voice identifier for solo voice because this is not a solo song anymore.
-        Voice soloVoice = songMeta.GetVoices().Where(it => it.Name == Voice.soloVoiceName).FirstOrDefault();
+        Voice soloVoice = songMeta.GetVoices().FirstOrDefault(it => it.Name == Voice.soloVoiceName);
         if (soloVoice != null)
         {
             soloVoice.SetName(Voice.firstVoiceName);
@@ -207,12 +205,17 @@ public static class SongMetaUtils
 
     public static string GetLyrics(SongMeta songMeta, string voiceName)
     {
-        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.Name == voiceName);
+        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
         if (voice == null)
         {
             return "";
         }
 
+        return GetLyrics(songMeta, voice);
+    }
+
+    public static string GetLyrics(SongMeta songMeta, Voice voice)
+    {
         StringBuilder sb = new StringBuilder();
         voice.Sentences.ForEach(sentence =>
         {
