@@ -378,6 +378,7 @@ public static partial class R
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
+        public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
         public const string selectionIndicator = "selectionIndicator";
         public const string semanticVersionText = "semanticVersionText";
         public const string sentence = "sentence";

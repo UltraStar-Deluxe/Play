@@ -22,6 +22,9 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private SongEditorSelectionControl selectionControl;
+
+    [Inject]
     private Settings settings;
 
     [Inject]
@@ -58,6 +61,10 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
 
         visualElement.Q<VisualElement>(R.UxmlNames.layerColor).style.backgroundColor = layerManager.GetColor(layer.LayerEnum);
         visualElement.Q<Label>(R.UxmlNames.layerNameLabel).text = layer.LayerEnum.ToString();
+        visualElement.Q<Button>(R.UxmlNames.selectAllNotesOfLayerButton).RegisterCallbackButtonTriggered(() =>
+        {
+            selectionControl.SetSelection(layerManager.GetNotes(layer.LayerEnum));
+        });
         Toggle toggle = visualElement.Q<Toggle>(R.UxmlNames.layerEnabledToggle);
         toggle.value = layerManager.IsLayerEnabled(layer.LayerEnum);
         toggle.RegisterValueChangedCallback(evt =>
@@ -84,6 +91,14 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
 
         visualElement.Q<VisualElement>(R.UxmlNames.layerColor).style.backgroundColor = songEditorSceneControl.GetColorForVoiceName(voiceName);
         visualElement.Q<Label>(R.UxmlNames.layerNameLabel).text = voiceName.Replace("P", "Player ");
+        visualElement.Q<Button>(R.UxmlNames.selectAllNotesOfLayerButton).RegisterCallbackButtonTriggered(() =>
+        {
+            Voice voice = songMeta.GetVoice(voiceName);
+            if (voice != null)
+            {
+                selectionControl.SetSelection(SongMetaUtils.GetAllNotes(voice));
+            }
+        });
         Toggle toggle = visualElement.Q<Toggle>(R.UxmlNames.layerEnabledToggle);
         toggle.value = !isHidden;
         toggle.RegisterValueChangedCallback(evt => OnVoiceVisibleToggleChanged(voiceName, evt.newValue));

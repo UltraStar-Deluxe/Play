@@ -801,3 +801,7 @@ Label.tinyFont {
     width: 10px;
     left: 1px;
 }
+
+.textColorTint {
+    -unity-background-image-tint-color: var(--text-color);
+}
