@@ -137,7 +137,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return true;
     }
 
-    private bool TryGetLayer(Note note, out SongEditorLayer layer)
+    public bool TryGetLayer(Note note, out SongEditorLayer layer)
     {
         foreach (SongEditorLayer songEditorLayer in GetLayers())
         {
