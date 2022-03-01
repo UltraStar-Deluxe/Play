@@ -53,9 +53,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongEditorLayerManager songEditorLayerManager;
 
     [InjectedInInspector]
-    public SongEditorMidiFileImporter midiFileImporter;
-
-    [InjectedInInspector]
     public SongEditorCopyPasteManager songEditorCopyPasteManager;
 
     [Inject]
@@ -372,18 +369,63 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public void CreateNumberInputDialog(string title, string message, Action<float> useNumberCallback)
     {
+        void UseValueCallback(string text)
+        {
+            text = text.Trim();
+            if (float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out float numberValue))
+            {
+                useNumberCallback(numberValue);
+            }
+        }
+
+        CreateTextInputDialog(title,
+            message,
+            "",
+            UseValueCallback);
+    }
+
+    public void CreatePathInputDialog(
+        string title,
+        string message,
+        string initialValue,
+        Action<string> usePathCallback)
+    {
+        void UseValueCallback(string path)
+        {
+            path = path.Trim();
+            if (!File.Exists(path))
+            {
+                Debug.Log($"File does not exist: {path}");
+                uiManager.CreateNotificationVisualElement($"File does not exist");
+            }
+            usePathCallback(path);
+        }
+
+        CreateTextInputDialog(title,
+            message,
+            initialValue,
+            UseValueCallback);
+    }
+
+    public void CreateTextInputDialog(
+        string title,
+        string message,
+        string initialValue,
+        Action<string> useValueCallback)
+    {
         SimpleDialogControl dialogControl = new SimpleDialogControl(
             dialogUi,
             uiDocument.rootVisualElement.Children().First(),
             title,
             message);
-        TextField numberTextField = dialogControl.AddTextField();
-        numberTextField.style.flexGrow = 1;
+        TextField textField = dialogControl.AddTextField();
+        textField.value = initialValue;
+        textField.style.flexGrow = 1;
         Button okButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
         {
-            if (float.TryParse(numberTextField.value, NumberStyles.Any, CultureInfo.InvariantCulture, out float numberValue))
+            if (!textField.value.IsNullOrEmpty())
             {
-                useNumberCallback(numberValue);
+                useValueCallback(textField.value);
             }
             dialogControl.CloseDialog();
         });
@@ -420,7 +462,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(sideBarControl);
         bb.BindExistingInstance(historyManager);
         bb.BindExistingInstance(songMetaChangeEventStream);
-        bb.BindExistingInstance(midiFileImporter);
         bb.BindExistingInstance(songEditorCopyPasteManager);
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(gameObject);

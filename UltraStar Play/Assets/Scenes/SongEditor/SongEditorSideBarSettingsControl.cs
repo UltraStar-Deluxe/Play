@@ -89,14 +89,27 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.buttonRecordingContainer)]
     private VisualElement buttonRecordingContainer;
 
+    [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
+    private Button importMidiFileButton;
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    [Inject]
+    private SongEditorSceneControl songEditorSceneControl;
+
+    [Inject]
+    private Injector injector;
+
+    private readonly SongEditorMidiFileImporter midiFileImporter = new SongEditorMidiFileImporter();
+
     public void OnInjectionFinished()
     {
+        injector.Inject(midiFileImporter);
+
         // Editing settings
         Bind(adjustFollowingNotesToggle,
             () => settings.SongEditorSettings.AdjustFollowingNotes,
@@ -177,6 +190,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
+        importMidiFileButton.RegisterCallbackButtonTriggered(() => CreateImportMidiFileDialog());
+
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,
             () => settings.SongEditorSettings.ShowLyricsArea,
@@ -207,6 +222,18 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(sentenceLineSizeTextField,
             () => settings.SongEditorSettings.SentenceLineSizeInDevicePixels.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.SentenceLineSizeInDevicePixels = newIntValue));
+    }
+
+    private void CreateImportMidiFileDialog()
+    {
+        songEditorSceneControl.CreatePathInputDialog("Import MIDI File",
+            "Enter the absolute path to the MIDI file.",
+            settings.SongEditorSettings.LastMidiFilePath,
+            path =>
+            {
+                settings.SongEditorSettings.LastMidiFilePath = path;
+                midiFileImporter.ImportMidiFile(path);
+            });
     }
 
     private void UpdateRecordingSettingsVisibility()

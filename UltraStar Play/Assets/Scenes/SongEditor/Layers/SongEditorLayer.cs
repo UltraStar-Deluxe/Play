@@ -10,6 +10,7 @@ public class SongEditorLayer
     public Color Color { get; set; } = Colors.indigo;
 
     private readonly List<Note> notes = new List<Note>();
+    private readonly HashSet<Note> notesHashSet = new HashSet<Note>();
 
     public SongEditorLayer(ESongEditorLayer layerEnum)
     {
@@ -19,11 +20,18 @@ public class SongEditorLayer
     public void AddNote(Note note)
     {
         notes.Add(note);
+        notesHashSet.Add(note);
     }
 
     public void RemoveNote(Note note)
     {
         notes.Remove(note);
+        notesHashSet.Remove(note);
+    }
+
+    public bool ContainsNote(Note note)
+    {
+        return notesHashSet.Contains(note);
     }
 
     public List<Note> GetNotes()
@@ -36,11 +44,11 @@ public class SongEditorLayer
         SongEditorLayer clone = new SongEditorLayer(LayerEnum);
         clone.Color = Color;
         clone.IsEnabled = IsEnabled;
-        foreach (Note note in notes)
+        notes.ForEach(note =>
         {
             Note noteCopy = note.Clone();
             clone.AddNote(noteCopy);
-        }
+        });
         return clone;
     }
 

@@ -23,7 +23,7 @@ public class SongEditorSettings
     public float MidiGain { get; set; } = 1;
     public bool MidiSoundPlayAlongEnabled { get; set; } = true;
     public int MidiPlaybackOffsetInMillis { get; set; }
-    public string MidiFilePath { get; set; } = "";
+    public string LastMidiFilePath { get; set; } = "";
 
     // Option to show / hide voices.
     // Contains the names of the voices that should be hidden.

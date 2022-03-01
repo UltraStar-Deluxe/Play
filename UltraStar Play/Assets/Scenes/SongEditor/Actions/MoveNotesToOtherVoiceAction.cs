@@ -83,6 +83,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         {
             return false;
         }
-        return note.Sentence != null && voiceNames.Contains(note.Sentence.Voice.Name);
+        return note.Sentence != null
+               && voiceNames.AnyMatch(voiceName => note.Sentence.Voice.VoiceNameEquals(voiceName));
     }
 }

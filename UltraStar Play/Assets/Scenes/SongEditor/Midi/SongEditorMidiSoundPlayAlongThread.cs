@@ -3,12 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using UniInject;
+using UnityEngine;
 
-public class SongEditorMidiSoundPlayAlongThread
+public class SongEditorMidiSoundPlayAlongThread : INeedInjection
 {
-    private readonly Settings settings;
-    private readonly SongMeta songMeta;
-    private readonly MidiManager midiManager;
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
+    private MidiManager midiManager;
+
+    [Inject]
+    private SongEditorLayerManager layerManager;
+
     private ThreadPool.PoolHandle poolHandle;
 
     private bool isStopped;
@@ -18,13 +29,6 @@ public class SongEditorMidiSoundPlayAlongThread
     private DateTime playbackStartDateTime = DateTime.Now;
 
     private int lastPlayedMidiNote = -1;
-
-    public SongEditorMidiSoundPlayAlongThread(Settings settings, SongMeta songMeta, MidiManager midiManager)
-    {
-        this.settings = settings;
-        this.songMeta = songMeta;
-        this.midiManager = midiManager;
-    }
 
     public void Start(int positionInSongInMillis)
     {
@@ -138,16 +142,20 @@ public class SongEditorMidiSoundPlayAlongThread
     // Compute the upcoming notes, i.e., the visible notes that have not yet been finished at the playback position.
     private List<Note> GetUpcomingSortedNotes(double positionInSongInMillis)
     {
-        List<Note> result = songMeta.GetVoices()
-            .Where(voice => settings.SongEditorSettings.HideVoices.IsNullOrEmpty()
-                            || !settings.SongEditorSettings.HideVoices.Contains(voice.Name))
+        List<Note> notesInSongMeta = songMeta.GetVoices()
+            .Where(voice => layerManager.IsVoiceVisible(voice))
             .SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes)
+            .ToList();
+        List<Note> allNotes = notesInSongMeta
+            .Union(layerManager.GetAllVisibleNotes())
+            .ToList();
+        List<Note> allUpcomingNotes = allNotes
             .Where(note => !note.IsFreestyle && !note.IsRap)
             .Where(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat) > positionInSongInMillis)
             .ToList();
-        result.Sort(Note.comparerByStartBeat);
-        return result;
+        allUpcomingNotes.Sort(Note.comparerByStartBeat);
+        return allUpcomingNotes;
     }
 
     public class SongEditorMidiSoundPlayAlongException : Exception
