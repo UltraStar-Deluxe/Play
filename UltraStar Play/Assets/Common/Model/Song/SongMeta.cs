@@ -3,6 +3,7 @@ using System.Text;
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 
 [Serializable]
 public class SongMeta
@@ -167,6 +168,11 @@ public class SongMeta
         Gap = 0;
         Relative = false;
         Start = 0;
+    }
+
+    public Voice GetVoice(string voiceName)
+    {
+        return GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
     }
 
     public IReadOnlyList<Voice> GetVoices()

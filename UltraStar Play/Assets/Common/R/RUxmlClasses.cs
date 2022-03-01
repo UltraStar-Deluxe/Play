@@ -61,6 +61,7 @@ public static partial class R
         public const string songEditorSettingsGroup = "songEditorSettingsGroup";
         public const string songEditorSettingsGroupTitle = "songEditorSettingsGroupTitle";
         public const string startButtonClass = "startButtonClass";
+        public const string textColorTint = "textColorTint";
         public const string textOutline = "textOutline";
         public const string timeBar = "timeBar";
         public const string tinyFont = "tinyFont";
