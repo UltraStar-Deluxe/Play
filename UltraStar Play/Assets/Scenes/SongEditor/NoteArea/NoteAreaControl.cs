@@ -537,12 +537,39 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         // 10 seconds
         int width = DefaultViewportWidthInMillis;
         // Start at the beginning
-        int x = Math.Max(0, (int)songAudioPlayer.PositionInSongInMillis - 1000);
+        int x;
+        if (songAudioPlayer.PositionInSongInMillis <= 0)
+        {
+            int startOfFirstNoteInMillis = GetStartOfFirstNoteInMillis();
+            songAudioPlayer.PositionInSongInMillis = startOfFirstNoteInMillis;
+            x = Math.Max(0, startOfFirstNoteInMillis - 1000);
+        }
+        else
+        {
+            x = Math.Max(0, (int)songAudioPlayer.PositionInSongInMillis - 1000);
+        }
         // Full range of notes. At least one octave
         int height = Math.Max(12, maxMidiNote - minMidiNote + 2);
         // Center the notes
         int y = minMidiNote - 1;
         SetViewport(x, y, width, height);
+    }
+
+    private int GetStartOfFirstNoteInMillis()
+    {
+        List<Note> allNotes = SongMetaUtils.GetAllNotes(songMeta);
+        if (allNotes.IsNullOrEmpty())
+        {
+            return 0;
+        }
+
+        Note firstNote = allNotes.FindMinElement(note => note.StartBeat);
+        if (firstNote != null)
+        {
+            return (int)BpmUtils.BeatToMillisecondsInSong(songMeta, firstNote.StartBeat);
+        }
+
+        return 0;
     }
 
     public float MillisecondsToPixelDistance(int millis)
