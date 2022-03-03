@@ -19,7 +19,7 @@ public class SongAudioPlayer : MonoBehaviour
     private int positionInSongInMillisFrame;
 
     private readonly Subject<double> playbackStoppedEventStream = new Subject<double>();
-    public IObservable<double> PlaybackStoppedEventStream => playbackStartedEventStream;
+    public IObservable<double> PlaybackStoppedEventStream => playbackStoppedEventStream;
 
     private readonly Subject<double> playbackStartedEventStream = new Subject<double>();
     public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
