@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
 using UniRx;
 using System.Text;
-using TMPro;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -22,6 +20,12 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.lyricsArea)]
     private VisualElement lyricsArea;
+
+    [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice1Button)]
+    private Button lyricsAreaVoice1Button;
+
+    [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice2Button)]
+    private Button lyricsAreaVoice2Button;
 
     [Inject]
     private SongMeta songMeta;
@@ -47,6 +51,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         set
         {
             voice = value;
+            UpdateVoiceButtons();
             UpdateLyrics();
         }
     }
@@ -79,6 +84,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         contextMenuControl = injector
             .WithRootVisualElement(lyricsArea)
             .CreateAndInject<LyricsAreaContextMenuControl>();
+
+        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.firstVoiceName));
+        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.secondVoiceName));
+
+        UpdateVoiceButtons();
     }
 
     public void Update()
@@ -140,6 +150,33 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 || changeEvent is LoadedMementoEvent))
         {
             UpdateLyrics();
+        }
+    }
+
+    private void UpdateVoiceButtons()
+    {
+        if (voice == null
+            || songMeta.GetVoices().Count <= 1)
+        {
+           lyricsAreaVoice1Button.HideByDisplay();
+           lyricsAreaVoice2Button.HideByDisplay();
+        }
+        else
+        {
+            lyricsAreaVoice1Button.ShowByDisplay();
+            lyricsAreaVoice2Button.ShowByDisplay();
+
+            if (voice.Name == Voice.soloVoiceName
+                || voice.Name == Voice.firstVoiceName)
+            {
+                lyricsAreaVoice1Button.AddToClassList("selected");
+                lyricsAreaVoice2Button.RemoveFromClassList("selected");
+            }
+            else if (voice.Name == Voice.secondVoiceName)
+            {
+                lyricsAreaVoice1Button.RemoveFromClassList("selected");
+                lyricsAreaVoice2Button.AddToClassList("selected");
+            }
         }
     }
 

@@ -201,6 +201,8 @@ public static partial class R
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaTextField = "lyricsAreaTextField";
+        public const string lyricsAreaVoice1Button = "lyricsAreaVoice1Button";
+        public const string lyricsAreaVoice2Button = "lyricsAreaVoice2Button";
         public const string lyricsContainer = "lyricsContainer";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsOnNotesContainer = "lyricsOnNotesContainer";
@@ -518,6 +520,7 @@ public static partial class R
         public const string videoLegendIcon = "videoLegendIcon";
         public const string videoLegendLabel = "videoLegendLabel";
         public const string virtualPiano = "virtualPiano";
+        public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";

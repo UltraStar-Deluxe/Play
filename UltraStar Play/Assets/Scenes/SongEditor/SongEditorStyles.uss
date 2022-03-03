@@ -52,6 +52,18 @@ Button.recording:hover {
     background-color: var(--recording-button-color);
 }
 
+Button.selected {
+    background-color: var(--control-color-accent2);
+}
+
+Button.selected:focus {
+    background-color: var(--control-color-accent2);
+}
+
+Button.selected:hover {
+    background-color: var(--control-color-accent2);
+}
+
 .virtualPianoKey.whiteKey {
     background-color: white;
 }

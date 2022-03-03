@@ -208,9 +208,13 @@
             </ui:VisualElement>
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">
                 <ui:VisualElement name="lyricsArea" class="panel" style="width: 180px; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="flex-grow: 2; width: 100%; height: 100%;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="width: 100%; height: auto; flex-grow: 1;">
                         <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
                     </ui:ScrollView>
+                    <ui:VisualElement name="voiceButtonRow" class="smallFont" style="flex-direction: row; flex-shrink: 0;">
+                        <ui:Button text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" style="width: 40px; height: 20px;" />
+                        <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" style="width: 40px; height: 20px;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 80px; align-items: center; justify-content: center; flex-shrink: 0;">
                     <ui:VisualElement name="noVideoImage" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
