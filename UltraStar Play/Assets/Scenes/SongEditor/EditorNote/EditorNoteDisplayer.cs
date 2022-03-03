@@ -133,7 +133,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
             .Subscribe(_ => UpdateNotesAndSentences());
     }
 
-    private void DeleteSentence(Sentence sentence)
+    public void DeleteSentences(List<Sentence> sentences)
+    {
+        sentences.ForEach(sentence => DeleteSentence(sentence));
+    }
+
+    public void DeleteSentence(Sentence sentence)
     {
         if (sentenceToControlMap.TryGetValue(sentence, out EditorSentenceControl editorSentenceControl))
         {

@@ -23,6 +23,7 @@ public class DeleteSentencesAction : INeedInjection
             return;
         }
 
+        editorNoteDisplayer.DeleteSentences(selectedSentences);
         foreach (Sentence sentence in selectedSentences)
         {
             deleteNotesAction.Execute(new List<Note>(sentence.Notes));

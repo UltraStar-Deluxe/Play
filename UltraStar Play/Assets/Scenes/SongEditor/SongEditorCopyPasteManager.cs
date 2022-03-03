@@ -37,7 +37,10 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
-    
+
+    [Inject]
+    private DeleteNotesAction deleteNotesAction;
+
     public List<Note> CopiedNotes
     {
         get
@@ -56,6 +59,11 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Subscribe(_ => CopySelectedNotes());
+
+        // Cut action
+        InputManager.GetInputAction(R.InputActions.songEditor_cut).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => CutSelectedNotes());
         
         // Paste action
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
@@ -134,7 +142,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         {
             List<Note> copiedNotesFromVoice = CopiedNotes
                 .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalLayer == null
-                                     && copiedNoteToOriginalDataMap[copiedNote].OriginalSentence?.Voice == voice)
+                                     && copiedNoteToOriginalDataMap[copiedNote].OriginalVoice == voice)
                 .ToList();
             copiedNotesFromVoice.ForEach(copiedNote => layerManager.RemoveNoteFromAllLayers(copiedNote));
             moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, copiedNotesFromVoice, voice.Name);
@@ -144,6 +152,18 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         ClearCopiedNotes();
 
         songMetaChangeEventStream.OnNext(new NotesPastedEvent());
+    }
+
+    public void CutSelectedNotes()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        CopySelectedNotes();
+        deleteNotesAction.Execute(selectedNotes);
+        songMetaChangeEventStream.OnNext(new NotesCutEvent());
     }
 
     public void CopySelectedNotes()
@@ -160,6 +180,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             {
                 OriginalLayer = layer,
                 OriginalSentence = note.Sentence,
+                OriginalVoice = note.Sentence?.Voice,
             };
 
             copiedNote.SetSentence(null);
@@ -176,5 +197,6 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     {
         public SongEditorLayer OriginalLayer { get; set; }
         public Sentence OriginalSentence { get; set; }
+        public Voice OriginalVoice { get; set; }
     }
 }
