@@ -222,6 +222,9 @@ public static partial class R
         public const string micListOverlay = "micListOverlay";
         public const string micOctaveOffsetContainer = "micOctaveOffsetContainer";
         public const string micOctaveOffsetTextField = "micOctaveOffsetTextField";
+        public const string micPitchIndicator = "micPitchIndicator";
+        public const string micPitchOutOfRangeIndicatorBottom = "micPitchOutOfRangeIndicatorBottom";
+        public const string micPitchOutOfRangeIndicatorTop = "micPitchOutOfRangeIndicatorTop";
         public const string micRecordingContainer = "micRecordingContainer";
         public const string micScrollView = "micScrollView";
         public const string micVisualizationContainer = "micVisualizationContainer";
@@ -237,6 +240,7 @@ public static partial class R
         public const string midiVelocityContainer = "midiVelocityContainer";
         public const string midiVelocityLabel = "midiVelocityLabel";
         public const string midiVelocitySlider = "midiVelocitySlider";
+        public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
         public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
         public const string musicGroup = "musicGroup";
         public const string musicPlaybackSpeedContainer = "musicPlaybackSpeedContainer";
