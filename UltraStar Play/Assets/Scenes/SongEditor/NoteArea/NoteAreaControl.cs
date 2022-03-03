@@ -77,7 +77,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private UIDocument uiDocument;
 
     [Inject(UxmlName = R.UxmlNames.noteArea)]
-    private VisualElement noteAreaVisualElement;
+    public VisualElement VisualElement { get; private set; }
 
     [Inject(UxmlName = R.UxmlNames.noteAreaPositionInSongIndicator)]
     private VisualElement noteAreaPositionInSongIndicator;
@@ -87,6 +87,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private NoteAreaScrollingDragListener scrollingDragListener;
     private NoteAreaSelectionDragListener selectionDragListener;
     private ManipulateNotesDragListener manipulateNotesDragListener;
+    private SongEditorMicPitchIndicatorControl micPitchIndicatorControl;
 
     private PanelHelper panelHelper;
 
@@ -110,7 +111,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             songAudioPlayer.PositionInSongInMillis = songMeta.Gap - DefaultViewportWidthInMillis * 0.25f;
         }
-        noteAreaVisualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        VisualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             InitializeViewport();
         });
@@ -120,41 +121,43 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
         injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .CreateAndInject<NoteAreaHorizontalRulerControl>();
 
         injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .CreateAndInject<NoteAreaVerticalRulerControl>();
 
         UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis);
         ViewportEventStream.Subscribe(_ => UpdatePositionInSongIndicator(songAudioPlayer.PositionInSongInMillis));
 
-        noteAreaVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerClick(evt), TrickleDown.TrickleDown);
 
         DragControl = injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .CreateAndInject<NoteAreaDragControl>();
 
         scrollingDragListener = injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaScrollingDragListener>();
 
         selectionDragListener = injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaSelectionDragListener>();
 
         manipulateNotesDragListener = injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(DragControl)
             .CreateAndInject<ManipulateNotesDragListener>();
 
         contextMenuControl = injector
-            .WithRootVisualElement(noteAreaVisualElement)
+            .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaContextMenuControl>();
+
+        micPitchIndicatorControl = injector.CreateAndInject<SongEditorMicPitchIndicatorControl>();
     }
 
     public void Update()
@@ -251,8 +254,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             return 0;
         }
-        int indexInViewport = midiNote - ViewportY;
-        return (double)indexInViewport / ViewportHeight;
+        return (double)(midiNote - ViewportY) / ViewportHeight;
     }
 
     public double GetHorizontalPositionForMillis(double positionInSongInMillis)
@@ -295,8 +297,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int GetHorizontalMousePositionInMillis()
     {
         Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        float width = noteAreaVisualElement.contentRect.width;
-        double xPercent = (mousePositionInPanelCoordinates.x - noteAreaVisualElement.worldBound.x) / width;
+        float width = VisualElement.contentRect.width;
+        double xPercent = (mousePositionInPanelCoordinates.x - VisualElement.worldBound.x) / width;
         return ViewportX + (int)(xPercent * ViewportWidth);
     }
 
@@ -310,8 +312,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int GetVerticalMousePositionInMidiNote()
     {
         Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        float height = noteAreaVisualElement.contentRect.height;
-        double yPercent = (mousePositionInPanelCoordinates.y - noteAreaVisualElement.worldBound.y) / height;
+        float height = VisualElement.contentRect.height;
+        double yPercent = (mousePositionInPanelCoordinates.y - VisualElement.worldBound.y) / height;
         return ViewportY + (int)Math.Round(yPercent * ViewportHeight);
     }
 
@@ -320,8 +322,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         double viewportChangeInPercent = 0.25;
 
         Vector2 zoomPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        float width = noteAreaVisualElement.worldBound.width;
-        double xPercent = (zoomPositionInPanelCoordinates.x - noteAreaVisualElement.worldBound.x) / width;
+        float width = VisualElement.worldBound.width;
+        double xPercent = (zoomPositionInPanelCoordinates.x - VisualElement.worldBound.x) / width;
 
         double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportWidth = (int)(ViewportWidth * zoomFactor);
@@ -362,8 +364,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         double viewportChangeInPercent = 0.25;
 
         Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        float height = noteAreaVisualElement.contentRect.height;
-        double yPercent = (mousePositionInPanelCoordinates.y - noteAreaVisualElement.worldBound.y) / height;
+        float height = VisualElement.contentRect.height;
+        double yPercent = (mousePositionInPanelCoordinates.y - VisualElement.worldBound.y) / height;
 
         double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportHeight = (int)(ViewportHeight * zoomFactor);
@@ -524,7 +526,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         }
 
         Vector2 localPoint = ped.localPosition;
-        float rectWidth = noteAreaVisualElement.worldBound.width;
+        float rectWidth = VisualElement.worldBound.width;
         double xPercent = localPoint.x / rectWidth;
         double positionInSongInMillis = ViewportX + (ViewportWidth * xPercent);
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
@@ -574,25 +576,25 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public float MillisecondsToPixelDistance(int millis)
     {
-        Rect rect = noteAreaVisualElement.worldBound;
+        Rect rect = VisualElement.worldBound;
         return millis * rect.width / ViewportWidth;
     }
 
     public float MidiNotesToPixelDistance(int midiNotes)
     {
-        Rect rect = noteAreaVisualElement.worldBound;
+        Rect rect = VisualElement.worldBound;
         return midiNotes * rect.height / ViewportHeight;
     }
 
     public int PixelsToBeat(float x)
     {
-        Rect rect = noteAreaVisualElement.worldBound;
+        Rect rect = VisualElement.worldBound;
         return (int)Math.Round(MinBeatInViewport + ViewportWidthInBeats * ((x - rect.x) / rect.width));
     }
 
     public int PixelsToMidiNote(float y)
     {
-        Rect rect = noteAreaVisualElement.worldBound;
+        Rect rect = VisualElement.worldBound;
         Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
         float yFromBottom = screenSizePanelCoordinates.y - rect.height - rect.y;
         return (int)Math.Round(MinMidiNoteInViewport + ViewportHeight * ((y - yFromBottom) / rect.height));
@@ -606,6 +608,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public bool IsPointerOver()
     {
-        return InputUtils.IsPointerOverVisualElement(noteAreaVisualElement, panelHelper);
+        return InputUtils.IsPointerOverVisualElement(VisualElement, panelHelper);
     }
 }
