@@ -64,9 +64,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject]
     private UiManager uiManager;
 
-    [Inject(UxmlName = R.UxmlNames.statusBarSongInfoLabel)]
-    private Label statusBarSongInfoLabel;
-
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
 
@@ -87,6 +84,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly NoteAreaControl noteAreaControl = new NoteAreaControl();
     private readonly SongEditorSideBarControl sideBarControl = new SongEditorSideBarControl();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new SongEditorIssueAnalyzerControl();
+    private readonly SongEditorStatusBarControl statusBarControl = new SongEditorStatusBarControl();
 
     public SongMeta SongMeta
     {
@@ -131,14 +129,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(noteAreaControl);
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
+        injector.Inject(statusBarControl);
     }
 
     private void Start()
     {
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
-
-        statusBarSongInfoLabel.text = $"{SongMeta.Artist} - {SongMeta.Title}";
 
         HideEditLyricsPopup();
 

@@ -457,6 +457,7 @@ public static partial class R
         public const string startButton = "startButton";
         public const string statusBar = "statusBar";
         public const string statusBarControlHintLabel = "statusBarControlHintLabel";
+        public const string statusBarPositionInfoLabel = "statusBarPositionInfoLabel";
         public const string statusBarSongInfoLabel = "statusBarSongInfoLabel";
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
