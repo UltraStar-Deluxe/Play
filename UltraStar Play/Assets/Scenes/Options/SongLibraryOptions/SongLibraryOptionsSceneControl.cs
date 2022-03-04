@@ -45,7 +45,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void Start()
     {
         settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
-            .Subscribe(onNext => UpdateSongFolderList());
+            .Subscribe(onNext => UpdateSongFolderList())
+            .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {

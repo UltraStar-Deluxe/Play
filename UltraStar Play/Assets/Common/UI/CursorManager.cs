@@ -39,7 +39,9 @@ public class CursorManager : MonoBehaviour, INeedInjection
     private void Start()
     {
         settingsManager.Settings.GraphicSettings
-            .ObserveEveryValueChanged(it => it.useImageAsCursor).Subscribe(newValue => SetDefaultCursor());
+            .ObserveEveryValueChanged(it => it.useImageAsCursor)
+            .Subscribe(newValue => SetDefaultCursor())
+            .AddTo(gameObject);
         SetDefaultCursor();
     }
 

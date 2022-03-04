@@ -12,7 +12,7 @@ using UniRx;
 
 public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMode>
 {
-    public FullscreenModePickerControl(ItemPicker itemPicker)
+    public FullscreenModePickerControl(ItemPicker itemPicker, GameObject gameObject)
         : base(itemPicker, EnumUtils.GetValuesAsList<FullScreenMode>())
     {
         if (Application.isEditor)
@@ -32,7 +32,8 @@ public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMo
                     {
                         Selection.Value = newFullScreenMode;
                     }
-                });
+                })
+                .AddTo(gameObject);
         }
         Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode = newValue);
     }

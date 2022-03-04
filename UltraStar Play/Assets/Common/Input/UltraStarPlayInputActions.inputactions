@@ -687,6 +687,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "anyKeyboardModifierPressedOrReleased",
+                    "type": "PassThrough",
+                    "id": "6488710e-bfad-4b93-a377-0691556792d0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "space",
                     "type": "Button",
                     "id": "0a9f81a5-3a55-4442-9b07-ee4731c6a3db",
@@ -1330,6 +1339,39 @@
                     "action": "toggleFavoritePlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "141afdaa-008c-4d94-914b-45f73a51e520",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "068ec473-9517-4f97-a379-eafac0c2062c",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26818c7e-cf65-41ca-bb29-23b39aba1acd",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

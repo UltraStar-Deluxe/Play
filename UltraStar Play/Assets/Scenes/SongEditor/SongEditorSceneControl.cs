@@ -461,6 +461,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(songEditorCopyPasteManager);
         bb.BindExistingInstance(issueAnalyzerControl);
+        bb.BindExistingInstance(statusBarControl);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);

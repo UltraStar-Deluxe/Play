@@ -59,6 +59,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.showStatusBarToggle)]
     private Toggle showStatusBarToggle;
 
+    [Inject(UxmlName = R.UxmlNames.showControlHintsToggle)]
+    private Toggle showControlHintsToggle;
+
     [Inject(UxmlName = R.UxmlNames.showVideoAreaToggle)]
     private Toggle showVideoAreaToggle;
 
@@ -94,6 +97,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private GameObject gameObject;
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -174,7 +180,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording = newValue);
 
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.RecordingSource)
-            .Subscribe(_ => UpdateRecordingSettingsVisibility());
+            .Subscribe(_ => UpdateRecordingSettingsVisibility())
+            .AddTo(gameObject);
 
         // MIDI settings
         Bind(midiNotePlayAlongToggle,
@@ -199,6 +206,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(showStatusBarToggle,
             () => settings.SongEditorSettings.ShowStatusBar,
             newValue => settings.SongEditorSettings.ShowStatusBar = newValue);
+        Bind(showControlHintsToggle,
+            () => settings.SongEditorSettings.ShowControlHints,
+            newValue => settings.SongEditorSettings.ShowControlHints = newValue);
         Bind(showVideoAreaToggle,
             () => settings.SongEditorSettings.ShowVideoArea,
             newValue => settings.SongEditorSettings.ShowVideoArea = newValue);
@@ -207,13 +217,17 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.ShowVirtualPianoArea = newValue);
 
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowLyricsArea)
-            .Subscribe(newValue => lyricsArea.SetVisibleByDisplay(newValue));
+            .Subscribe(newValue => lyricsArea.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowStatusBar)
-            .Subscribe(newValue => statusBar.SetVisibleByDisplay(newValue));
+            .Subscribe(newValue => statusBar.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowVideoArea)
-            .Subscribe(newValue => videoArea.SetVisibleByDisplay(newValue));
+            .Subscribe(newValue => videoArea.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowVirtualPianoArea)
-            .Subscribe(newValue => virtualPiano.SetVisibleByDisplay(newValue));
+            .Subscribe(newValue => virtualPiano.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
 
         // Grid size
         Bind(gridSizeTextField,
@@ -268,7 +282,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         {
             this.ObserveEveryValueChanged(_ => valueGetter())
                 .Where(newValue => !object.Equals(baseField.value, newValue))
-                .Subscribe(newValue => baseField.value = newValue);
+                .Subscribe(newValue => baseField.value = newValue)
+                .AddTo(gameObject);
         }
     }
 }

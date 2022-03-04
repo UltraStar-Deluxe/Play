@@ -95,6 +95,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private GameObject gameObject;
+
     private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new SongEditorSideBarPropertiesControl();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new SongEditorSideBarLayersControl();
@@ -144,7 +147,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() =>
             settings.SongEditorSettings.SmallLeftSideBar = !settings.SongEditorSettings.SmallLeftSideBar);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.SmallLeftSideBar)
-            .Subscribe(newValue => UpdateLeftSideBarClasses());
+            .Subscribe(newValue => UpdateLeftSideBarClasses())
+            .AddTo(gameObject);
         UpdateLeftSideBarClasses();
 
         InitTabGroup();

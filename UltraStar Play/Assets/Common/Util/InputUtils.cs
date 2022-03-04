@@ -95,6 +95,14 @@ public static class InputUtils
                && (Keyboard.current.leftCtrlKey.isPressed
                    || Keyboard.current.rightCtrlKey.isPressed);
     }
+
+    public static bool IsAnyKeyboardModifierPressed()
+    {
+        return IsKeyboardShiftPressed()
+               || IsKeyboardControlPressed()
+               || IsKeyboardAltPressed();
+    }
+
     
     public static bool IsKeyboardAltPressed()
     {
@@ -103,9 +111,9 @@ public static class InputUtils
                    || Keyboard.current.rightAltKey.isPressed);
     }
 
-    public static bool WasPressedOrReleasedInThisFrame(KeyControl key)
+    public static bool WasPressedOrReleasedInThisFrame(ButtonControl buttonControl)
     {
-        return key.wasPressedThisFrame || key.wasReleasedThisFrame;
+        return buttonControl.wasPressedThisFrame || buttonControl.wasReleasedThisFrame;
     }
 
     public static Vector2 GetMousePosition()

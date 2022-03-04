@@ -119,24 +119,26 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                 break;
 
             case DragAction.StretchLeft:
-                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
+                if (InputUtils.IsKeyboardShiftPressed()
+                    || selectedNotes.Count == 1)
                 {
-                    StretchNotesLeft(dragEvent, selectedNotes);
+                    ExtendNotesLeft(dragEvent, selectedNotes);
                 }
                 else
                 {
-                    ExtendNotesLeft(dragEvent, selectedNotes);
+                    StretchNotesLeft(dragEvent, selectedNotes);
                 }
                 break;
 
             case DragAction.StretchRight:
-                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
+                if (InputUtils.IsKeyboardShiftPressed()
+                    || selectedNotes.Count == 1)
                 {
-                    StretchNotesRight(dragEvent, selectedNotes, true);
+                    ExtendNotesRight(dragEvent, selectedNotes, true);
                 }
                 else
                 {
-                    ExtendNotesRight(dragEvent, selectedNotes, true);
+                    StretchNotesRight(dragEvent, selectedNotes, true);
                 }
                 break;
             default:
@@ -282,7 +284,14 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     private void StretchNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
     {
-        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot) ? noteSnapshot : null)
+            .Where(note => note != null)
+            .ToList();
+        if (snapshotNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = maxBeatInSelection;
@@ -292,19 +301,28 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
         foreach (Note note in notes)
         {
-            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            if (!noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
             {
-                // Stretch/shrink StartBeat and EndBeat relative to selection
-                float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
-                float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
-                note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
+                continue;
             }
+
+            // Stretch/shrink StartBeat and EndBeat relative to selection
+            float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
+            note.SetStartAndEndBeat((int)newStartBeat, (int)newEndBeat);
         }
     }
 
     private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
-        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot) ? noteSnapshot : null)
+            .Where(note => note != null)
+            .ToList();
+        if (snapshotNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = minBeatInSelection;
@@ -314,7 +332,11 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            if (!noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            {
+                continue;
+            }
+
             // Stretch/shrink StartBeat and EndBeat relative to selection
             float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);

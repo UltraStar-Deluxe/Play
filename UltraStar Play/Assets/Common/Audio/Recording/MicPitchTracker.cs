@@ -69,7 +69,8 @@ public class MicPitchTracker : MonoBehaviour, INeedInjection
 
         audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
         settings.AudioSettings.ObserveEveryValueChanged(it => it.pitchDetectionAlgorithm)
-            .Subscribe(OnPitchDetectionAlgorithmChanged);
+            .Subscribe(OnPitchDetectionAlgorithmChanged)
+            .AddTo(gameObject);
     }
 
     void Update()
