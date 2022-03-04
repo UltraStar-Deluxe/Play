@@ -37,6 +37,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     
     private readonly NoteHashSet selectedNotes = new NoteHashSet();
 
+    private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new Subject<NoteSelectionChangeEvent>();
+    public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
+
     public List<Note> GetSelectedNotes()
     {
         return new List<Note>(selectedNotes);
@@ -55,6 +58,12 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void ClearSelection()
     {
+        ClearSelectionWithoutNotify();
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void ClearSelectionWithoutNotify()
+    {
         foreach (EditorNoteControl uiNote in editorNoteDisplayer.EditorNoteControls)
         {
             uiNote.SetSelected(false);
@@ -72,8 +81,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     {
         foreach (EditorNoteControl uiNote in uiNotes)
         {
-            AddToSelection(uiNote);
+            AddToSelectionWithoutNotify(uiNote);
         }
+        FireNoteSelectionChangedEvent();
     }
 
     public void RemoveFromSelection(List<EditorNoteControl> uiNotes)
@@ -86,16 +96,23 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void SetSelection(List<EditorNoteControl> uiNotes)
     {
-        ClearSelection();
+        ClearSelectionWithoutNotify();
         foreach (EditorNoteControl uiNote in uiNotes)
         {
-            AddToSelection(uiNote);
+            AddToSelectionWithoutNotify(uiNote);
         }
+        FireNoteSelectionChangedEvent();
     }
 
     public void SetSelection(List<Note> notes)
     {
-        ClearSelection();
+        SetSelectionWithoutNotify(notes);
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void SetSelectionWithoutNotify(List<Note> notes)
+    {
+        ClearSelectionWithoutNotify();
         foreach (Note note in notes)
         {
             if (!layerManager.IsVisible(note))
@@ -110,14 +127,22 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
                 noteControl.SetSelected(true);
             }
         }
+        FireNoteSelectionChangedEvent();
     }
 
     public void AddToSelection(List<Note> notes)
     {
-        notes.ForEach(AddToSelection);
+        notes.ForEach(AddToSelectionWithoutNotify);
+        FireNoteSelectionChangedEvent();
     }
 
     public void AddToSelection(Note note)
+    {
+        AddToSelectionWithoutNotify(note);
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void AddToSelectionWithoutNotify(Note note)
     {
         selectedNotes.Add(note);
         EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
@@ -129,16 +154,29 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void AddToSelection(EditorNoteControl noteControl)
     {
+        AddToSelectionWithoutNotify(noteControl);
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void AddToSelectionWithoutNotify(EditorNoteControl noteControl)
+    {
         noteControl.SetSelected(true);
         selectedNotes.Add(noteControl.Note);
     }
 
     public void RemoveFromSelection(List<Note> notes)
     {
-        notes.ForEach(RemoveFromSelection);
+        notes.ForEach(RemoveFromSelectionWithoutNotify);
+        FireNoteSelectionChangedEvent();
     }
 
     public void RemoveFromSelection(Note note)
+    {
+        RemoveFromSelectionWithoutNotify(note);
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void RemoveFromSelectionWithoutNotify(Note note)
     {
         selectedNotes.Remove(note);
         EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
@@ -150,8 +188,19 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     public void RemoveFromSelection(EditorNoteControl noteControl)
     {
+        RemoveFromSelectionWithoutNotify(noteControl);
+        FireNoteSelectionChangedEvent();
+    }
+
+    private void RemoveFromSelectionWithoutNotify(EditorNoteControl noteControl)
+    {
         noteControl.SetSelected(false);
         selectedNotes.Remove(noteControl.Note);
+    }
+
+    private void FireNoteSelectionChangedEvent()
+    {
+        noteSelectionChangeEventStream.OnNext(new NoteSelectionChangeEvent(selectedNotes));
     }
 
     public void SelectNextNote(bool updatePositionInSong = true)

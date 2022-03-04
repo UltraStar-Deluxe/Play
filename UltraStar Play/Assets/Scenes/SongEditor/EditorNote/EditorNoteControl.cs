@@ -77,6 +77,9 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     public Note Note { get; private set; }
 
+    [Inject]
+    private SongEditorStatusBarControl statusBarControl;
+
     private Vector2 pointerDownPosition;
 
     private EditorNoteLyricsInputControl lyricsInputControl;
@@ -155,6 +158,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         IsPointerOverLeftHandle = false;
         IsPointerOverRightHandle = false;
         SetCursorForGestureOrMusicNoteCursor(ECursor.Grab);
+        statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void OnPointerOverRightHandle()
@@ -163,6 +167,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         IsPointerOverLeftHandle = false;
         IsPointerOverRightHandle = true;
         SetCursorForGestureOrMusicNoteCursor(ECursor.ArrowsLeftRight);
+        statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void OnPointerOverLeftHandle()
@@ -171,6 +176,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         IsPointerOverLeftHandle = true;
         IsPointerOverRightHandle = false;
         SetCursorForGestureOrMusicNoteCursor(ECursor.ArrowsLeftRight);
+        statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void SetCursorForGestureOrMusicNoteCursor(ECursor cursor)
@@ -311,6 +317,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     private void OnPointerEnter(IPointerEvent eventData)
     {
         IsPointerOver = true;
+        statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void OnPointerExit(IPointerEvent eventData)
@@ -321,6 +328,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         IsPointerOverRightHandle = false;
         UpdateHandles();
         cursorManager.SetDefaultCursor();
+        statusBarControl.OnPointerExitNoteControl(this);
     }
 
     private void OnPointerDown(IPointerEvent eventData)

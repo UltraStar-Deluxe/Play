@@ -39,6 +39,7 @@ public static partial class R
         public static readonly string ui_trackedDeviceOrientation = "ui/trackedDeviceOrientation";
         public static readonly string ui_trackedDevicePosition = "ui/trackedDevicePosition";
         public static readonly string usplay_anyKeyboardModifier = "usplay/anyKeyboardModifier";
+        public static readonly string usplay_anyKeyboardModifierPressedOrReleased = "usplay/anyKeyboardModifierPressedOrReleased";
         public static readonly string usplay_back = "usplay/back";
         public static readonly string usplay_closeContextMenu = "usplay/closeContextMenu";
         public static readonly string usplay_enter = "usplay/enter";

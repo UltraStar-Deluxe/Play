@@ -68,13 +68,16 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             {
                 micPitchTracker.MicProfile = newValue;
                 StartOrStopRecording();
-            });
+            })
+            .AddTo(gameObject);
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.RecordingSource)
-            .Subscribe(_ => StartOrStopRecording());
+            .Subscribe(_ => StartOrStopRecording())
+            .AddTo(gameObject);
         songAudioPlayer
             .ObserveEveryValueChanged(it => it.IsPlaying)
-            .Subscribe(_ => StartOrStopRecording());
+            .Subscribe(_ => StartOrStopRecording())
+            .AddTo(gameObject);
 
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);

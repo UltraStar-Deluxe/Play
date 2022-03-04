@@ -110,27 +110,31 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
                 {
                     sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
                 }
-            });
+            })
+            .AddTo(gameObject);
 
         foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
         {
             songEditorLayerManager
                 .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
-                .Subscribe(_ => UpdateNotes());
+                .Subscribe(_ => UpdateNotes())
+                .AddTo(gameObject);
         }
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.HideVoices.Count)
             .Subscribe(_ => OnHideVoicesChanged())
-            .AddTo(this);
+            .AddTo(gameObject);
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.SentenceLineSizeInDevicePixels)
             .Where(_ => sentenceLinesDynamicTexture != null)
-            .Subscribe(_ => UpdateSentences());
+            .Subscribe(_ => UpdateSentences())
+            .AddTo(gameObject);
 
         songEditorLayerManager.LayerChangedEventStream
-            .Subscribe(_ => UpdateNotesAndSentences());
+            .Subscribe(_ => UpdateNotesAndSentences())
+            .AddTo(gameObject);
     }
 
     public void DeleteSentences(List<Sentence> sentences)

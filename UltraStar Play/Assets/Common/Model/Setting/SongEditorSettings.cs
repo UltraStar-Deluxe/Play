@@ -36,6 +36,7 @@ public class SongEditorSettings
     public bool ShowStatusBar { get; set; } = true;
     public bool ShowVirtualPianoArea { get; set; } = true;
     public bool SmallLeftSideBar { get; set; }
+    public bool ShowControlHints { get; set; } = true;
 
     public int GridSizeInDevicePixels { get; set; } = 1;
     public int SentenceLineSizeInDevicePixels { get; set; } = 2;

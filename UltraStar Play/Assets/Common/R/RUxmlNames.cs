@@ -400,6 +400,8 @@ public static partial class R
         public const string settingsButton = "settingsButton";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
+        public const string showControlHintContainer = "showControlHintContainer";
+        public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showFpsContainer = "showFpsContainer";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";

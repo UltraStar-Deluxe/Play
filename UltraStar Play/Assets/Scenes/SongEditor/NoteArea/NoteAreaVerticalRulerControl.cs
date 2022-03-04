@@ -29,6 +29,9 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.horizontalGrid)]
     private VisualElement horizontalGrid;
 
+    [Inject]
+    private GameObject gameObject;
+
     private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
@@ -47,7 +50,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
             .Where(_ => dynamicTexture != null)
-            .Subscribe(_ => UpdateMidiNoteLines());
+            .Subscribe(_ => UpdateMidiNoteLines())
+            .AddTo(gameObject);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)

@@ -30,6 +30,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private GameObject gameObject;
+
     private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
@@ -50,7 +53,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
             .Where(_ => dynamicTexture != null)
-            .Subscribe(_ => UpdateLines());
+            .Subscribe(_ => UpdateLines())
+            .AddTo(gameObject);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
