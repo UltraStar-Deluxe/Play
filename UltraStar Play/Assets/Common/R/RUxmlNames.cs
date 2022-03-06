@@ -162,6 +162,8 @@ public static partial class R
         public const string inputLegend = "inputLegend";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string internetOptionsButton = "internetOptionsButton";
+        public const string invalidValueIcon = "invalidValueIcon";
+        public const string invalidValueLabel = "invalidValueLabel";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
@@ -290,6 +292,7 @@ public static partial class R
         public const string notificationOverlay = "notificationOverlay";
         public const string noVideoImage = "noVideoImage";
         public const string nPlayerLayout = "nPlayerLayout";
+        public const string okButton = "okButton";
         public const string onePlayerLayout = "onePlayerLayout";
         public const string onlineHighScoreContainer = "onlineHighScoreContainer";
         public const string openSongEditorButton = "openSongEditorButton";
@@ -513,6 +516,8 @@ public static partial class R
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldContainer = "urlTextFieldContainer";
+        public const string validationWarningContainer = "validationWarningContainer";
+        public const string valueTextField = "valueTextField";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

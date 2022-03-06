@@ -14,7 +14,7 @@ using UniRx;
  * Workaround for automatically escaped characters (e.g. \n) in TextField.
  * See https://forum.unity.com/threads/preventing-escaped-characters-in-textfield.1071425/
  */
-public class BackslashReplacingTextFieldControl : MonoBehaviour, INeedInjection
+public class BackslashReplacingTextFieldControl
 {
     private const string BackslashReplacement = "＼";
 

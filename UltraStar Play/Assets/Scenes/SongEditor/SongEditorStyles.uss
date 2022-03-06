@@ -19,11 +19,12 @@
     --control-width-large: 100px;
     --control-height-large: 40px;
     --control-height-small: 20px;
+    --panel-background-color: rgb(60, 63, 65);
     background-color: rgb(50, 50, 50);
 }
 
 .panel {
-    background-color: rgb(60, 63, 65);
+    background-color: var(--panel-background-color);
     border-width: 1px;
     border-color: rgb(50, 50, 50);
 }
@@ -184,4 +185,8 @@ Button.selected:hover {
 ScrollView #unity-content-container {
     padding-right: 2px;
     padding-bottom: 2px;
+}
+
+.dialogBackground {
+    background-color: var(--panel-background-color);
 }

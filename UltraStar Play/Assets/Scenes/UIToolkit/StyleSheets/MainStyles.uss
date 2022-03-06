@@ -805,3 +805,7 @@ Label.tinyFont {
 .textColorTint {
     -unity-background-image-tint-color: var(--text-color);
 }
+
+.dialogBackground {
+    background-color: rgb(14, 28, 42);
+}

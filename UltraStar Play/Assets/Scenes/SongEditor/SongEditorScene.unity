@@ -482,7 +482,9 @@ MonoBehaviour:
     type: 3}
   songEditorLayerSideBarEntryUi: {fileID: 9197481963319205126, guid: f7331bd5e668dc44c902112067f71395,
     type: 3}
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+  messageDialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+    type: 3}
+  valueInputDialogUi: {fileID: 9197481963319205126, guid: 0d374fac569eff64b9de8e9306202e43,
     type: 3}
   songAudioPlayer: {fileID: 698439736}
   songVideoPlayer: {fileID: 7185040230624864619}
