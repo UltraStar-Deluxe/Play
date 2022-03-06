@@ -23,7 +23,10 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
     public void OnInjectionFinished()
     {
         UpdateIssues();
-        songMetaChangeEventStream.Subscribe(_ => UpdateIssues());
+        songMetaChangeEventStream
+            // When there is no new change to the song for some time, then update the issues.
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(_ => UpdateIssues());
     }
 
     private void UpdateIssues()

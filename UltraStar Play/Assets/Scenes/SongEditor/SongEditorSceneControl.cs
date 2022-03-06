@@ -473,11 +473,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         TextField textField = dialogControl.AddTextField();
         textField.value = initialValue;
         textField.style.flexGrow = 1;
+        new BackslashReplacingTextFieldControl(textField);
         Button okButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
         {
             if (!textField.value.IsNullOrEmpty())
             {
-                useValueCallback(textField.value);
+                useValueCallback(BackslashReplacingTextFieldControl.UnescapeBackslashes(textField.value));
             }
             dialogControl.CloseDialog();
         });
