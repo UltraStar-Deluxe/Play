@@ -1,15 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using ProTrans;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
-using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -61,15 +58,20 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
         if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left
             || !sentenceControl.IsPointerOver)
         {
-            CancelDrag();
+            AbortDrag();
             return;
         }
 
         isCanceled = false;
-
         dragAction = GetDragAction(sentenceControl, dragEvent);
 
         selectedNotes = sentenceControl.Sentence.Notes.ToList();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            AbortDrag();
+            return;
+        }
+
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
@@ -108,6 +110,11 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
             noteToSnapshotOfNoteMap.Clear();
             songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
+    }
+
+    private void AbortDrag()
+    {
+        isCanceled = true;
     }
 
     public void CancelDrag()

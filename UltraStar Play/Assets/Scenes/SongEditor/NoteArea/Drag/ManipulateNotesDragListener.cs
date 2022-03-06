@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,7 +16,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     private SongEditorSelectionControl selectionControl;
 
     [Inject]
-    private NoteAreaDragControl noteAreaDragControl;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -57,14 +55,14 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     public void OnInjectionFinished()
     {
-        noteAreaDragControl.AddListener(this);
+        noteAreaControl.DragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
         if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
-            CancelDrag();
+            AbortDrag();
             return;
         }
 
@@ -87,9 +85,15 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             selectionControl.SetSelection(new List<EditorNoteControl> { dragStartNoteControl });
         }
 
+        selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            AbortDrag();
+            return;
+        }
+
         dragAction = GetDragAction(dragStartNoteControl, dragEvent);
 
-        selectedNotes = selectionControl.GetSelectedNotes();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
@@ -104,6 +108,11 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
     {
+        if (selectedNotes.Count <= 0)
+        {
+            return;
+        }
+
         switch (dragAction)
         {
             case DragAction.Move:
@@ -142,7 +151,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                 }
                 break;
             default:
-                throw new UnityException("Unkown drag action: " + dragAction);
+                throw new UnityException("Unknown drag action: " + dragAction);
         }
 
         editorNoteDisplayer.UpdateNotesAndSentences();
@@ -156,6 +165,11 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             noteToSnapshotOfNoteMap.Clear();
             songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
+    }
+
+    private void AbortDrag()
+    {
+        isCanceled = true;
     }
 
     public void CancelDrag()
