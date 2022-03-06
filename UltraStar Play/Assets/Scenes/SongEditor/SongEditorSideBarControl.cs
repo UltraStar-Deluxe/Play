@@ -131,6 +131,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         exitSceneButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ReturnToLastScene());
         saveButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.SaveSong());
 
+        // Hide save button if AutoSave is enabled
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)
+            .Subscribe(autoSave => saveButton.SetVisibleByDisplay(!autoSave))
+            .AddTo(gameObject);
+
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 

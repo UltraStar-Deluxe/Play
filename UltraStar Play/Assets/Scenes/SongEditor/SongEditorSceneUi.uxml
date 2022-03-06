@@ -81,6 +81,11 @@
                                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                                 <ui:Toggle name="adjustFollowingNotesToggle" class="smallControl" />
                             </ui:VisualElement>
+                            <ui:VisualElement name="autoSaveContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Auto save" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="autoSaveToggle" class="smallControl" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Music" display-tooltip-when-elided="true" name="musicTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="musicGroup" class="songEditorSettingsGroup">
