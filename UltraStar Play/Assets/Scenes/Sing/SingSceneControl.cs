@@ -153,7 +153,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private TimeBarControl timeBarControl;
 
-    private SimpleDialogControl dialogControl;
+    private MessageDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
 
     private ContextMenuControl contextMenuControl;
@@ -210,7 +210,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
             string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
                 "playerNameCsv", playerNameCsv);
-            dialogControl = new SimpleDialogControl(dialogUi, background, title, message);
+            dialogControl = new MessageDialogControl(dialogUi, background, title, message);
             dialogControl.DialogTitleImage.ShowByDisplay();
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);

@@ -26,7 +26,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public VisualTreeAsset songEditorLayerSideBarEntryUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
+    public VisualTreeAsset valueInputDialogUi;
 
     [InjectedInInspector]
     public SongAudioPlayer songAudioPlayer;
@@ -116,7 +116,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    private readonly List<SimpleDialogControl> openDialogControls = new List<SimpleDialogControl>();
+    private readonly List<IDialogControl> openDialogControls = new List<IDialogControl>();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
 
     private void Awake()
@@ -430,10 +430,19 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             }
         }
 
-        CreateTextInputDialog(title,
+        TextInputDialogControl dialogControl = new TextInputDialogControl(
+            valueInputDialogUi,
+            uiDocument.rootVisualElement.Children().First(),
+            title,
             message,
-            "",
-            UseValueCallback);
+            "");
+
+        dialogControl.SubmitValueEventStream
+            .Subscribe(newValue => UseValueCallback(newValue));
+
+        openDialogControls.Add(dialogControl);
+        dialogControl.DialogClosedEventStream
+            .Subscribe(_ => openDialogControls.Remove(dialogControl));
     }
 
     public void CreatePathInputDialog(
@@ -453,41 +462,19 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             usePathCallback(path);
         }
 
-        CreateTextInputDialog(title,
-            message,
-            initialValue,
-            UseValueCallback);
-    }
-
-    public void CreateTextInputDialog(
-        string title,
-        string message,
-        string initialValue,
-        Action<string> useValueCallback)
-    {
-        SimpleDialogControl dialogControl = new SimpleDialogControl(
-            dialogUi,
+        PathInputDialogControl dialogControl = new PathInputDialogControl(
+            valueInputDialogUi,
             uiDocument.rootVisualElement.Children().First(),
             title,
-            message);
-        TextField textField = dialogControl.AddTextField();
-        textField.value = initialValue;
-        textField.style.flexGrow = 1;
-        new BackslashReplacingTextFieldControl(textField);
-        Button okButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
-        {
-            if (!textField.value.IsNullOrEmpty())
-            {
-                useValueCallback(BackslashReplacingTextFieldControl.UnescapeBackslashes(textField.value));
-            }
-            dialogControl.CloseDialog();
-        });
-        okButton.Focus();
+            message,
+            initialValue);
 
-        dialogControl.DialogClosedEventStream
-            .Subscribe(_ => openDialogControls.Remove(dialogControl));
+        dialogControl.SubmitValueEventStream
+            .Subscribe(newValue => UseValueCallback(newValue));
 
         openDialogControls.Add(dialogControl);
+        dialogControl.DialogClosedEventStream
+            .Subscribe(_ => openDialogControls.Remove(dialogControl));
     }
 
     public void CloseAllOpenDialogs()
@@ -523,7 +510,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);
         bb.Bind(nameof(songEditorLayerSideBarEntryUi)).ToExistingInstance(songEditorLayerSideBarEntryUi);
-        bb.Bind(nameof(dialogUi)).ToExistingInstance(dialogUi);
         return bb.GetBindings();
     }
 }

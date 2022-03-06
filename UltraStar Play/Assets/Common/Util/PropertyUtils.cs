@@ -114,4 +114,13 @@ public static class PropertyUtils
         }
         return false;
     }
+
+    public static float GetFloatFromString(string stringValue, float defaultValue)
+    {
+        if (float.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float floatValue))
+        {
+            return floatValue;
+        }
+        return defaultValue;
+    }
 }

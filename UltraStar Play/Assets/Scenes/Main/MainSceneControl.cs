@@ -56,7 +56,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    private SimpleDialogControl closeGameDialogControl;
+    private MessageDialogControl closeGameDialogControl;
 
     private void Start()
     {
@@ -160,7 +160,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
             return;
         }
 
-        closeGameDialogControl = new SimpleDialogControl(
+        closeGameDialogControl = new MessageDialogControl(
             quitGameDialogUxml,
             uiDoc.rootVisualElement,
             TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title),

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Linq;
 using UniRx;
 using UnityEngine.UIElements;
 
-public class SimpleDialogControl
+public class MessageDialogControl : IDialogControl
 {
     private readonly VisualElement dialogRootVisualElement;
     private readonly VisualElement parentVisualElement;
@@ -10,22 +11,23 @@ public class SimpleDialogControl
     private readonly VisualElement buttonContainer;
     public VisualElement DialogTitleImage { get; private set; }
 
-    private Subject<bool> dialogClosedEventStream = new Subject<bool>();
+    private readonly Subject<bool> dialogClosedEventStream = new Subject<bool>();
     public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
 
-    public SimpleDialogControl(
+    public MessageDialogControl(
         VisualTreeAsset dialogUi,
         VisualElement parentVisualElement,
         string title,
         string message)
     {
         dialogRootVisualElement = dialogUi.CloneTree();
+        dialogRootVisualElement.AddToClassList("overlay");
+
         buttonContainer = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogButtonContainer);
         DialogTitleImage = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogTitleImage);
         Label dialogTitle = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogTitle);
         Label dialogMessage = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogMessage);
 
-        dialogRootVisualElement.AddToClassList("overlay");
         dialogTitle.text = title;
         dialogMessage.text = message;
 
@@ -43,13 +45,6 @@ public class SimpleDialogControl
         button.RegisterCallbackButtonTriggered(callback);
 
         return button;
-    }
-
-    public TextField AddTextField()
-    {
-        TextField textField = new TextField();
-        buttonContainer.Add(textField);
-        return textField;
     }
 
     public void CloseDialog()
