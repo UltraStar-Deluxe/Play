@@ -64,8 +64,16 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
+
+    private IDisposable autoSaveDisposable;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
@@ -101,6 +109,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             if (sceneData == null)
             {
+                // Use of SceneNavigator.Instance because injection might not have been completed yet.
                 sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SongEditorSceneData>();
             }
             return sceneData;
@@ -142,6 +151,52 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         if (uiDocument.rootVisualElement.focusController.focusedElement != null)
         {
             uiDocument.rootVisualElement.focusController.focusedElement.Blur();
+        }
+
+        InitAutoSave();
+    }
+
+    private void InitAutoSave()
+    {
+        if (settings.SongEditorSettings.AutoSave)
+        {
+            RegisterAutoSaveEvent();
+        }
+
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)
+            .Subscribe(autoSave =>
+            {
+                if (autoSave)
+                {
+                    RegisterAutoSaveEvent();
+                }
+                else
+                {
+                    UnregisterAutoSaveEvent();
+                }
+            })
+            .AddTo(gameObject);
+
+        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => DoAutoSaveIfEnabled());
+    }
+
+    private void RegisterAutoSaveEvent()
+    {
+        UnregisterAutoSaveEvent();
+
+        autoSaveDisposable = songMetaChangeEventStream
+            // When there has been no new event for a second, then save
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(evt => DoAutoSaveIfEnabled())
+            .AddTo(gameObject);
+    }
+
+    private void UnregisterAutoSaveEvent()
+    {
+        if (autoSaveDisposable != null)
+        {
+            autoSaveDisposable.Dispose();
+            autoSaveDisposable = null;
         }
     }
 
@@ -239,13 +294,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    public void OnBackButtonClicked()
+    private void DoAutoSaveIfEnabled()
     {
-        ReturnToLastScene();
-    }
+        if (!settings.SongEditorSettings.AutoSave)
+        {
+            return;
+        }
 
-    public void OnSaveButtonClicked()
-    {
         SaveSong();
     }
 
@@ -310,7 +365,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             singSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
         singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);
     }
 
     public void ContinueToSongSelectScene()
@@ -325,7 +380,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             songSelectSceneData = new SongSelectSceneData();
             songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
         }
-        SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
     public void ReturnToLastScene()

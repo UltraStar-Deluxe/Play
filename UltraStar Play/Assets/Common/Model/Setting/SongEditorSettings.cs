@@ -4,6 +4,8 @@ using System.Collections.Generic;
 [Serializable]
 public class SongEditorSettings
 {
+    public bool AutoSave { get; set; } = true;
+
     public float MusicVolume { get; set; } = 1;
     public float MusicPlaybackSpeed { get; set; } = 1;
 

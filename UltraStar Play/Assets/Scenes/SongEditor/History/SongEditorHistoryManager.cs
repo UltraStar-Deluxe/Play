@@ -18,7 +18,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         songMetaToSongEditorMementoMap.Clear();
     }
 
-    private static readonly int maxHistoryLength = 20;
+    private static readonly int maxHistoryLength = 30;
 
     // Static reference to last state to load it when opening the song editor scene
     // (e.g. after switching editor > sing > editor).
@@ -41,19 +41,15 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChangeEvent);
+        songMetaChangeEventStream
+            .Where(evt => IsUndoable(evt))
+            // When there is no new change to the song for some time, then record an undo-state.
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(_ => AddUndoState())
+            .AddTo(gameObject);
     }
 
-    private void OnSongMetaChangeEvent(SongMetaChangeEvent changeEvent)
-    {
-        if (changeEvent.Undoable
-            && !(changeEvent is LoadedMementoEvent))
-        {
-            AddUndoState();
-        }
-    }
-
-    void Start()
+    private void Start()
     {
         // Restore the last state of the editor for this song.
         if (songMetaToSongEditorMementoMap.TryGetValue(songMeta, out SongEditorMemento memento))
@@ -226,5 +222,11 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
                 layerManager.AddNoteToLayer(layer.LayerEnum, note);
             }
         }
+    }
+
+    private bool IsUndoable(SongMetaChangeEvent evt)
+    {
+        return evt.Undoable
+               && evt is not LoadedMementoEvent;
     }
 }

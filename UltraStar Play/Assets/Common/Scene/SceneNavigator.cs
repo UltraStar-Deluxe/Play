@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneNavigator : MonoBehaviour
 {
+    private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new Subject<BeforeSceneChangeEvent>();
+    public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -30,10 +34,11 @@ public class SceneNavigator : MonoBehaviour
 
     public void LoadScene(EScene scene)
     {
+        beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
         SceneManager.LoadScene((int)scene);
     }
 
-    public void AddSceneData(SceneData sceneData)
+    private void AddSceneData(SceneData sceneData)
     {
         staticSceneDatas[sceneData.GetType()] = sceneData;
     }

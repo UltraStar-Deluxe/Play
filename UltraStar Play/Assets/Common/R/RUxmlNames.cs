@@ -16,6 +16,8 @@ public static partial class R
         public const string appOptionsButton = "appOptionsButton";
         public const string artistPropertyContainer = "artistPropertyContainer";
         public const string audioWaveForm = "audioWaveForm";
+        public const string autoSaveContainer = "autoSaveContainer";
+        public const string autoSaveToggle = "autoSaveToggle";
         public const string avatarPicker = "avatarPicker";
         public const string b = "b";
         public const string backButton = "backButton";

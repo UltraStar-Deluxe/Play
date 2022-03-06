@@ -12,6 +12,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.adjustFollowingNotesToggle)]
     private Toggle adjustFollowingNotesToggle;
 
+    [Inject(UxmlName = R.UxmlNames.autoSaveToggle)]
+    private Toggle autoSaveToggle;
+
     [Inject(UxmlName = R.UxmlNames.musicVolumeSlider)]
     private Slider musicVolumeSlider;
 
@@ -120,6 +123,10 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(adjustFollowingNotesToggle,
             () => settings.SongEditorSettings.AdjustFollowingNotes,
             newValue => settings.SongEditorSettings.AdjustFollowingNotes = newValue);
+
+        Bind(autoSaveToggle,
+            () => settings.SongEditorSettings.AutoSave,
+            newValue => settings.SongEditorSettings.AutoSave = newValue);
 
         // Volume and playback speed settings
         Bind(musicVolumeSlider,
