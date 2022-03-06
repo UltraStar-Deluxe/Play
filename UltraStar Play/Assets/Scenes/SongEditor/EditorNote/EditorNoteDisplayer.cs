@@ -62,6 +62,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
     private readonly Dictionary<Sentence, EditorSentenceControl> sentenceToControlMap = new Dictionary<Sentence, EditorSentenceControl>();
     public IReadOnlyCollection<EditorSentenceControl> EditorSentenceControls => sentenceToControlMap.Values;
 
+    private int lastFullUpdateFrame;
+
     public void OnInjectionFinished()
     {
         songMetaChangeEventStream.Subscribe(evt =>
