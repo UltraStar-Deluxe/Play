@@ -1,8 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(Text))]
 public class ShowWhiteSpaceText : MonoBehaviour
 {
     // Unicode BULLET (U+2022).
@@ -11,55 +9,10 @@ public class ShowWhiteSpaceText : MonoBehaviour
     // Unicode DOWNWARDS ARROW WITH CORNER LEFTWARDS (U+21B5)
     public static readonly string newlineReplacement = "↵\n";
 
-    private Text uiText;
-
-    // Breaking here with the code style to use the same "text" property name as Unity's standard Text Component.
-    public string text
-    {
-        get
-        {
-            return ReplaceVisibleCharactersWithWhiteSpace(uiText.text);
-        }
-        set
-        {
-            uiText.text = ReplaceWhiteSpaceWithVisibleCharacters(value);
-        }
-    }
-
-    public float PreferredWidth => uiText.preferredWidth;
-    public float PreferredHeight => uiText.preferredHeight;
-
-    public int FontSize
-    {
-        get
-        {
-            return uiText.fontSize;
-        }
-        set
-        {
-            uiText.fontSize = value;
-        }
-    }
-
-    private void Awake()
-    {
-        uiText = GetComponent<Text>();
-    }
-
-    void Start()
-    {
-        UpdateUiText();
-    }
-
-    void UpdateUiText()
-    {
-        uiText.text = ReplaceWhiteSpaceWithVisibleCharacters(uiText.text);
-    }
-
     public static string ReplaceVisibleCharactersWithWhiteSpace(string text)
     {
         return text.Replace(spaceReplacement, " ")
-            .Replace("\n", "")
+            .Replace("↵\n", "\n")
             .Replace("↵", "\n");
     }
 

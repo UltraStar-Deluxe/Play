@@ -39,8 +39,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
-    private LyricsAreaContextMenuControl contextMenuControl;
-
     private Voice voice;
     public Voice Voice
     {
@@ -58,8 +56,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private int lastCaretPosition;
 
-    private bool newlineAdded;
-
     private LyricsAreaMode lyricsAreaMode = LyricsAreaMode.ViewMode;
 
     private string lastEditModeText;
@@ -68,22 +64,35 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         voice = songMeta.GetVoices()[0];
         UpdateLyrics();
-        textField.RegisterCallback<FocusEvent>(evt => OnBeginEdit());
+        textField.RegisterCallback<FocusEvent>(evt =>
+        {
+            OnBeginEdit();
+        });
         textField.RegisterCallback<BlurEvent>(evt =>
         {
             if (lyricsAreaMode == LyricsAreaMode.EditMode)
             {
-                OnEndEdit(textField.text);
+                OnEndEdit(BackslashReplacingTextFieldControl.UnescapeBackslashes(textField.text));
             }
         });
+
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
-        contextMenuControl = injector
-            .WithRootVisualElement(lyricsArea)
-            .CreateAndInject<LyricsAreaContextMenuControl>();
+        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
+        // Replace white space with visible characters when in edit mode
+        backslashReplacingTextFieldControl.ValueChangedEventStream
+            .Subscribe(newValue =>
+            {
+                if (lyricsAreaMode == LyricsAreaMode.EditMode)
+                {
+                    string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newValue);
+                    string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
+                    textField.SetValueWithoutNotify(visibleWhiteSpaceText);
+                }
+            });
 
         lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.firstVoiceName));
         lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.secondVoiceName));
@@ -95,18 +104,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         if (lyricsAreaMode == LyricsAreaMode.EditMode)
         {
-            // Add visible character to the newline
-            if (newlineAdded)
-            {
-                int caretPosition = textField.cursorIndex;
-                string newInputFieldText = textField.text
-                    .Replace("\n", "")
-                    .Replace("↵", ShowWhiteSpaceText.newlineReplacement);
-                SetInputFieldText(newInputFieldText);
-                textField.SelectRange(caretPosition + 1, caretPosition + 1);
-                newlineAdded = false;
-            }
-
             // Immediately apply changed lyrics to notes, but do not record it in the history.
             if (lastEditModeText != textField.text)
             {
@@ -124,23 +121,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             lastCaretPosition = textField.cursorIndex;
             SyncPositionInSongWithSelectedText();
         }
-    }
-
-    private char OnValidateInput(string text, int charIndex, char addedChar)
-    {
-        if (addedChar == ' ')
-        {
-            return ShowWhiteSpaceText.spaceReplacement[0];
-        }
-        if (addedChar == '\n'
-            && (charIndex == 0
-                || text.Length < charIndex
-                || text[charIndex - 1] != ShowWhiteSpaceText.newlineReplacement[0]))
-        {
-            newlineAdded = true;
-            return ShowWhiteSpaceText.newlineReplacement[0];
-        }
-        return addedChar;
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
