@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.IO;
+using UnityEngine;
 
 public static class ApplicationUtils
 {
@@ -66,5 +68,13 @@ public static class ApplicationUtils
             fileExtension = fileExtension.Substring(1);
         }
         return fileExtension.ToLowerInvariant();
+    }
+
+    public static int ComparePaths(string path1, string path2)
+    {
+        return string.Compare(
+            Path.GetFullPath(path1).TrimEnd('\\'),
+            Path.GetFullPath(path2).TrimEnd('\\'),
+            StringComparison.InvariantCultureIgnoreCase);
     }
 }

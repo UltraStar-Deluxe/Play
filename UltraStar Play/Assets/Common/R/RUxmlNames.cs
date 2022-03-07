@@ -75,6 +75,7 @@ public static partial class R
         public const string ContextMenuSeparatorUi = "ContextMenuSeparatorUi";
         public const string continueButton = "continueButton";
         public const string createPlaylistButton = "createPlaylistButton";
+        public const string createSongButton = "createSongButton";
         public const string currentSentenceContainer = "currentSentenceContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
@@ -176,7 +177,6 @@ public static partial class R
         public const string itemIndexLabel = "itemIndexLabel";
         public const string itemLabel = "itemLabel";
         public const string ItemPicker = "ItemPicker";
-        public const string jukeboxButton = "jukeboxButton";
         public const string label = "label";
         public const string Label = "Label";
         public const string labels = "labels";

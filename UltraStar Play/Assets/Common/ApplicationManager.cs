@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class ApplicationManager : MonoBehaviour
@@ -85,5 +86,27 @@ public class ApplicationManager : MonoBehaviour
                 return Array.Empty<string>();
             }
         }
+    }
+
+    public static string PersistentTempPath()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "Temp");
+        //Create Directory if it does not exist
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
+    }
+
+    public static string PersistentSongsPath()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "Songs");
+        //Create Directory if it does not exist
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
     }
 }

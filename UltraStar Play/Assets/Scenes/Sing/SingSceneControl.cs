@@ -469,13 +469,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
         }
 
-        SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
-        songEditorSceneData.PreviousSceneData = SceneData;
-        songEditorSceneData.PreviousScene = EScene.SingScene;
-        songEditorSceneData.PositionInSongInMillis = PositionInSongInMillis;
-        songEditorSceneData.SelectedSongMeta = SongMeta;
-        songEditorSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
-        songEditorSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
+        SongEditorSceneData songEditorSceneData = new SongEditorSceneData
+        {
+            PreviousSceneData = SceneData,
+            PreviousScene = EScene.SingScene,
+            PositionInSongInMillis = PositionInSongInMillis,
+            SelectedSongMeta = SongMeta,
+            PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap,
+            SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles,
+        };
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 

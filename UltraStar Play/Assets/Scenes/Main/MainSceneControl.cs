@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
@@ -19,6 +21,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     [InjectedInInspector]
     public VisualTreeAsset quitGameDialogUxml;
+
+    [InjectedInInspector]
+    public CreateSongFromTemplateControl createSongFromTemplateControl;
 
     [Inject]
     private UIDocument uiDoc;
@@ -44,8 +49,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.partyButton)]
     private Button partyButton;
 
-    [Inject(UxmlName = R.UxmlNames.jukeboxButton)]
-    private Button jukeboxButton;
+    [Inject(UxmlName = R.UxmlNames.createSongButton)]
+    private Button createSongButton;
 
     [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
@@ -65,12 +70,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
+        createSongButton.RegisterCallbackButtonTriggered(() => createSongFromTemplateControl.CreateNewSongFromTemplateAndContinueToSongEditor());
 
         InitButtonDescription(startButton, R.Messages.mainScene_button_sing_description);
         InitButtonDescription(settingsButton, R.Messages.mainScene_button_settings_description);
         InitButtonDescription(aboutButton, R.Messages.mainScene_button_about_description);
         InitButtonDescription(quitButton, R.Messages.mainScene_button_quit_description);
-        InitButtonDescription(jukeboxButton, R.Messages.mainScene_button_description_noImplementation);
+        // InitButtonDescription(createSongButton, "Create an empty song from template");
         InitButtonDescription(partyButton, R.Messages.mainScene_button_description_noImplementation);
 
         UpdateVersionInfoText();
@@ -108,7 +114,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-        jukeboxButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);
+        // createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
         aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
