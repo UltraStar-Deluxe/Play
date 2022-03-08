@@ -226,10 +226,19 @@
                         <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" style="width: 40px; height: 20px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 80px; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <ui:VisualElement name="noVideoImage" picking-mode="Ignore" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
-                    <ui:VisualElement name="videoImage" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
-                    <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" />
+                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 80px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
+                    <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%;">
+                        <ui:VisualElement name="noVideoImage" picking-mode="Ignore" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
+                        <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                        <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit;" />
+                        <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit;" />
+                        <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">
+                        <ui:Button text="V" display-tooltip-when-elided="true" name="showVideoButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                        <ui:Button text="CO" display-tooltip-when-elided="true" name="showCoverButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                        <ui:Button text="BG" display-tooltip-when-elided="true" name="showBackgroundButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

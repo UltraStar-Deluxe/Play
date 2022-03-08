@@ -405,8 +405,10 @@ public static partial class R
         public const string settingsButton = "settingsButton";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
+        public const string showBackgroundButton = "showBackgroundButton";
         public const string showControlHintContainer = "showControlHintContainer";
         public const string showControlHintsToggle = "showControlHintsToggle";
+        public const string showCoverButton = "showCoverButton";
         public const string showFpsContainer = "showFpsContainer";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
@@ -414,6 +416,7 @@ public static partial class R
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showVideoAreaContainer = "showVideoAreaContainer";
         public const string showVideoAreaToggle = "showVideoAreaToggle";
+        public const string showVideoButton = "showVideoButton";
         public const string showVirtualPianoContainer = "showVirtualPianoContainer";
         public const string showVirtualPianoToggle = "showVirtualPianoToggle";
         public const string SingingLyricsUi = "SingingLyricsUi";
@@ -424,8 +427,10 @@ public static partial class R
         public const string singThisSongButton = "singThisSongButton";
         public const string sizeLabel = "sizeLabel";
         public const string songArtist = "songArtist";
+        public const string songBackgroundImage = "songBackgroundImage";
         public const string songButton = "songButton";
         public const string songContainer = "songContainer";
+        public const string songCoverImage = "songCoverImage";
         public const string songDetailOverlay = "songDetailOverlay";
         public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
         public const string songEditorRoot = "songEditorRoot";
@@ -522,6 +527,7 @@ public static partial class R
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
         public const string videoArea = "videoArea";
+        public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";
         public const string videoIcon = "videoIcon";
         public const string videoImage = "videoImage";
