@@ -350,6 +350,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         uiManager.CreateNotificationVisualElement("Created copy of original file");
     }
 
+    public void RestartSongEditorScene()
+    {
+        sceneNavigator.LoadScene(EScene.SongEditorScene, sceneData);
+    }
+
     public void ContinueToSingScene()
     {
         SingSceneData singSceneData;
