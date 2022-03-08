@@ -7,8 +7,8 @@ using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
-using System.Globalization;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UIElements.Button;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -36,11 +36,29 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     [Inject]
     private Injector injector;
 
-    [Inject(UxmlName = R.UxmlNames.videoArea)]
-    private VisualElement videoArea;
-
     [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
     private Label videoAreaLabel;
+
+    [Inject(UxmlName = R.UxmlNames.songCoverImage)]
+    private VisualElement songCoverImage;
+
+    [Inject(UxmlName = R.UxmlNames.songBackgroundImage)]
+    private VisualElement songBackgroundImage;
+
+    [Inject(UxmlName = R.UxmlNames.noVideoImage)]
+    private VisualElement noVideoImage;
+
+    [Inject(UxmlName = R.UxmlNames.videoImage)]
+    private VisualElement videoImage;
+
+    [Inject(UxmlName = R.UxmlNames.showVideoButton)]
+    private Button showVideoButton;
+
+    [Inject(UxmlName = R.UxmlNames.showCoverButton)]
+    private Button showCoverButton;
+
+    [Inject(UxmlName = R.UxmlNames.showBackgroundButton)]
+    private Button showBackgroundButton;
 
     private bool isCanceled;
     private float videoGapAtDragStart;
@@ -50,14 +68,66 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
+        if (!songMeta.Video.IsNullOrEmpty())
+        {
+            ShowVideoImage();
+        }
+        else if (!songMeta.Cover.IsNullOrEmpty())
+        {
+            ShowCoverImage();
+        }
+        else if (!songMeta.Background.IsNullOrEmpty())
+        {
+            ShowBackgroundImage();
+        }
+
+        // Init cover and background image
+        if (!songMeta.Background.IsNullOrEmpty())
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+
+        // Init cover and background image
+        if (!songMeta.Cover.IsNullOrEmpty())
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+
+        showVideoButton.RegisterCallbackButtonTriggered(() => ShowVideoImage());
+        showBackgroundButton.RegisterCallbackButtonTriggered(() => ShowBackgroundImage());
+        showCoverButton.RegisterCallbackButtonTriggered(() => ShowCoverImage());
 
         dragControl = injector
-            .WithRootVisualElement(videoArea)
+            .WithRootVisualElement(videoImage)
             .CreateAndInject<GeneralDragControl>();
         dragControl.AddListener(this);
 
-        videoArea.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
-        videoArea.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
+        videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
+        videoImage.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
+    }
+
+    private void ShowVideoImage()
+    {
+        noVideoImage.ShowByDisplay();
+        videoImage.ShowByDisplay();
+        songBackgroundImage.HideByDisplay();
+        songCoverImage.HideByDisplay();
+    }
+
+    private void ShowBackgroundImage()
+    {
+        noVideoImage.HideByDisplay();
+        videoImage.HideByDisplay();
+        songBackgroundImage.ShowByDisplay();
+        songCoverImage.HideByDisplay();
+    }
+
+    private void ShowCoverImage()
+    {
+        noVideoImage.HideByDisplay();
+        videoImage.HideByDisplay();
+        songBackgroundImage.HideByDisplay();
+        songCoverImage.ShowByDisplay();
     }
 
     public void CancelDrag()
