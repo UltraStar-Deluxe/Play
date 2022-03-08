@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class OverviewAreaPositionInSongIndicatorControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class OverviewAreaPositionInSongIndicatorControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongAudioPlayer songAudioPlayer;
