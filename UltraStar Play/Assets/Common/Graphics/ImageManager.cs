@@ -26,6 +26,26 @@ public static class ImageManager
         LoadSpriteFromUri("file://" + path, onSuccess, onFailure);
     }
 
+    public static void ReloadImage(string uri, UIDocument uiDocument)
+    {
+        if (!spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
+            || cachedSprite.Sprite == null)
+        {
+            // Nothing using this right now. No need to reload anything.
+        }
+
+        // Find VisualElements that use this sprite. Update them with a new sprite.
+        List<VisualElement> visualElementsUsingTheSprite = uiDocument.rootVisualElement.Query<VisualElement>()
+            .Where(visualElement => visualElement.style.backgroundImage == new StyleBackground(cachedSprite.Sprite))
+            .ToList();
+
+        // Remove from cache before reloading.
+        RemoveCachedSprite(cachedSprite);
+
+        LoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
+            .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
+    }
+
     public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)

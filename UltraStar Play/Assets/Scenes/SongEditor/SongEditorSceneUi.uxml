@@ -230,8 +230,12 @@
                     <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%;">
                         <ui:VisualElement name="noVideoImage" picking-mode="Ignore" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
                         <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit;" />
+                        <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                            <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                            <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                        </ui:VisualElement>
                         <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">

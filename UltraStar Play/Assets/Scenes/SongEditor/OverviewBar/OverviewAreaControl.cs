@@ -33,6 +33,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private AudioManager audioManager;
+
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
     private OverviewAreaNoteVisualizer noteVisualizer;
@@ -67,22 +70,33 @@ public class OverviewAreaControl : IInjectionFinishedListener
         // Create the audio waveform image.
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            if (!songAudioPlayer.HasAudioClip
-                || songAudioPlayer.AudioClip.samples <= 0)
-            {
-                return;
-            }
-
-            using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
-            {
-                // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-                AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
-                audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform);
-                // Waveform color is same as text color
-                audioWaveFormVisualization.waveformColor = overviewAreaLabel.resolvedStyle.color;
-                audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
-            }
+            UpdateAudioWaveForm();
         });
+    }
+
+    public void UpdateAudioWaveForm()
+    {
+        if (!songAudioPlayer.HasAudioClip
+            || songAudioPlayer.AudioClip.samples <= 0)
+        {
+            return;
+        }
+
+        if (audioWaveFormVisualization == null)
+        {
+            audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform)
+            {
+                // Waveform color is same as text color
+                WaveformColor = overviewAreaLabel.resolvedStyle.color
+            };
+        }
+
+        using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
+        {
+            // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
+            AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
+        }
     }
 
     private void RegisterPointerEvents()

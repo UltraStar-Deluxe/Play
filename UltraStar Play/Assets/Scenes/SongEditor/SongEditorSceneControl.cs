@@ -506,6 +506,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(sideBarControl);
         bb.BindExistingInstance(historyManager);
+        bb.BindExistingInstance(overviewAreaControl);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(songEditorCopyPasteManager);
         bb.BindExistingInstance(issueAnalyzerControl);

@@ -222,6 +222,11 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    public void ReloadAudio()
+    {
+        Init(SongMeta);
+    }
+
     public void PauseAudio()
     {
         if (audioPlayer.isPlaying)
