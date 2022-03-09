@@ -212,11 +212,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878474830ae8ee9428aaa74ff7e97a56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  songTemplateTxtFile: {fileID: 4900000, guid: 187942757f8f6ac44adbf490e6146dd7, type: 3}
+  songTemplateTxtFile: {fileID: 4900000, guid: d6c8331b03ca00649befee7b063f8cda, type: 3}
   songTemplateCover: {fileID: 4900000, guid: 64a33e42792a0b844be35a6d28ef55be, type: 3}
   songTemplateBackground: {fileID: 4900000, guid: eee02bb202ba30b4b92771c8479a247f,
     type: 3}
   songTemplateAudio: {fileID: 4900000, guid: 3af4cea7179afe246a69d2d42a347154, type: 3}
+  songTemplateVideo: {fileID: 4900000, guid: bcb0e2a77213acc44af9f8172791933e, type: 3}
 --- !u!1 &891474970
 GameObject:
   m_ObjectHideFlags: 0
