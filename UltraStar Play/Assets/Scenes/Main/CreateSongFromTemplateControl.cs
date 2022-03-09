@@ -25,6 +25,9 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public TextAsset songTemplateAudio;
 
+    [InjectedInInspector]
+    public TextAsset songTemplateVideo;
+
     [Inject]
     private Settings settings;
 
@@ -86,6 +89,9 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
 
         string newSongBackgroundFile = newSongFolderAbsolutePath + "/Artist - Title [BG].jpg";
         File.WriteAllBytes(newSongBackgroundFile, songTemplateBackground.bytes);
+
+        string newSongVideoFile = newSongFolderAbsolutePath + "/Artist - Title.vp8";
+        File.WriteAllBytes(newSongVideoFile, songTemplateVideo.bytes);
 
         // Add song folder to settings if not done yet
         List<string> songDirs = settings.GameSettings.songDirs;
