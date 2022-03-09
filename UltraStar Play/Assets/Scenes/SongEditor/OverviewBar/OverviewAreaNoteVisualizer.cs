@@ -102,6 +102,12 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
                 ObjectUtils.Swap(ref xStart, ref xEnd);
             }
 
+            xEnd = xEnd < dynamicTexture.TextureWidth
+                ? xEnd
+                : dynamicTexture.TextureWidth - 1;
+            yEnd = yEnd < dynamicTexture.TextureHeight
+                ? yEnd
+                : dynamicTexture.TextureHeight - 1;
             dynamicTexture.DrawRectByCorners(xStart, yStart, xEnd, yEnd, color);
         }
     }
