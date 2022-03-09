@@ -24,58 +24,150 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
+    private SongVideoPlayer songVideoPlayer;
+
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    [Inject]
+    private OverviewAreaControl overviewAreaControl;
+
+    private string FolderPath => songMeta.Directory;
+
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
-    private readonly HashSet<string> changedMediaFiles = new HashSet<string>();
+    private readonly HashSet<string> changedVideoFiles = new HashSet<string>();
+    private readonly HashSet<string> changedAudioFiles = new HashSet<string>();
+    private readonly HashSet<string> changedImageFiles = new HashSet<string>();
 
     private void Start()
     {
-        string path = songMeta.Directory;
-        if (!Directory.Exists(path))
+        if (FolderPath.IsNullOrEmpty()
+            || !Directory.Exists(FolderPath))
         {
             return;
         }
 
-        List<string> filters = new List<string> { "*.ogg", "*.mp3", "*.wav",
-            "*.jpg", "*.png",
-            "*.vp8", "*.webm", "*.mp4", "*.mpeg", "*.mpg", "*.avi", "*.wmv"  };
-        filters.ForEach(filter =>
-        {
-            FileSystemWatcher fileSystemWatcher = new FileSystemWatcher(path, filter);
-            disposables.Add(fileSystemWatcher);
+        // Media formats supported in Unity editor.
+        // Note: Not all of these formats are supported by Unity at runtime.
+        List<string> videoFilters = new List<string> { "*.asf", "*.avi", "*.dv", "*.m4v", "*.mov",
+            "*.mp4", "*.mpg", "*.mpeg", "*.ogv", "*.vp8", "*.webm", "*.wmv"};
+        List<string> audioFilters = new List<string> { "*.aiff", "*.aif", "*.it", "*.mp3", "*.mod", "*.ogg",
+            "*.s3m", "*.wav", "*.xm" };
+        List<string> imageFilters = new List<string> { "*.bmp", "*.jpg", "*.png", "*.psd", "*.tiff", "*.tga"};
+        videoFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnVideoFileChanged));
+        imageFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnImageFileChanged));
+        audioFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnAudioFileChanged));
 
-            fileSystemWatcher.Changed += OnFileChanged;
-            fileSystemWatcher.IncludeSubdirectories = false;
-            fileSystemWatcher.EnableRaisingEvents = true;
-        });
-
-        Debug.Log("Watching song media files in: " + path);
+        Debug.Log("Watching song media files in: " + FolderPath);
     }
 
     private void Update()
     {
-        if (changedMediaFiles.IsNullOrEmpty())
+        if (!changedVideoFiles.IsNullOrEmpty())
+        {
+            ReloadVideoFiles(changedVideoFiles);
+            changedVideoFiles.Clear();
+        }
+
+        if (!changedImageFiles.IsNullOrEmpty())
+        {
+            ReloadImageFiles(changedImageFiles);
+            changedImageFiles.Clear();
+        }
+
+        if (!changedAudioFiles.IsNullOrEmpty())
+        {
+            ReloadAudioFiles(changedAudioFiles);
+            changedAudioFiles.Clear();
+        }
+    }
+
+    private void ReloadAudioFiles(HashSet<string> changedFiles)
+    {
+        if (songMeta.Mp3.IsNullOrEmpty())
         {
             return;
         }
 
-        string changedFileNamesCsv = string.Join(",", changedMediaFiles.Select(path => Path.GetFileName(path)));
-        changedMediaFiles.Clear();
+        songAudioPlayer.ReloadAudio();
+        overviewAreaControl.UpdateAudioWaveForm();
 
-        // TODO: Reload media files without restart of SongEditorScene
-        Debug.Log($"Restarting SongEditorScene because of changed media files: {changedFileNamesCsv}");
-        uiManager.CreateNotificationVisualElement($"Restarting SongEditorScene because of changed media files:\n{changedFileNamesCsv}");
-
-        // Clear cache to see changed media files
-        ImageManager.ClearCache();
-        AudioManager.ClearCache();
-        songEditorSceneControl.RestartSongEditorScene();
+        string changedFileNamesCsv = string.Join(",", changedFiles.Select(path => Path.GetFileName(path)));
+        Debug.Log($"Reloaded audio because of changed files: {changedFileNamesCsv}");
     }
 
-    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    private void ReloadImageFiles(HashSet<string> changedFiles)
     {
-        // Do not any Unity API because we are not in the main thread.
-        changedMediaFiles.Add(e.FullPath);
+        if (songMeta.Cover.IsNullOrEmpty()
+            && songMeta.Background.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        if (!songMeta.Cover.IsNullOrEmpty())
+        {
+            ImageManager.ReloadImage(SongMetaUtils.GetCoverUri(songMeta), uiDocument);
+        }
+
+        if (!songMeta.Background.IsNullOrEmpty())
+        {
+            ImageManager.ReloadImage(SongMetaUtils.GetBackgroundUri(songMeta), uiDocument);
+        }
+
+        string changedFileNamesCsv = string.Join(",", changedFiles.Select(path => Path.GetFileName(path)));
+        Debug.Log($"Reloaded cover and background because of changed files: {changedFileNamesCsv}");
+    }
+
+    private void ReloadVideoFiles(IEnumerable<string> changedFiles)
+    {
+        if (songMeta.Video.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        songVideoPlayer.ReloadVideo();
+        string changedFileNamesCsv = string.Join(",", changedFiles.Select(path => Path.GetFileName(path)));
+        Debug.Log($"Reloaded video because of changed files: {changedFileNamesCsv}");
+    }
+
+    private void CreateFileSystemWatcher(string filter, FileSystemEventHandler fileSystemEventHandler)
+    {
+        FileSystemWatcher fileSystemWatcher = new FileSystemWatcher(FolderPath, filter);
+        disposables.Add(fileSystemWatcher);
+
+        fileSystemWatcher.Changed += fileSystemEventHandler;
+        fileSystemWatcher.Created += fileSystemEventHandler;
+        // Handle the other RenamedEventArgs also by using the fileSystemEventHandler
+        fileSystemWatcher.Renamed += (sender, evt) => fileSystemEventHandler.Invoke(sender, evt);
+        fileSystemWatcher.NotifyFilter = NotifyFilters.FileName
+                                         | NotifyFilters.DirectoryName
+                                         | NotifyFilters.LastWrite
+                                         | NotifyFilters.CreationTime;
+        fileSystemWatcher.IncludeSubdirectories = false;
+        fileSystemWatcher.EnableRaisingEvents = true;
+    }
+
+    private void OnVideoFileChanged(object sender, FileSystemEventArgs e)
+    {
+        // Do not use Unity API because we are not in the main thread.
+        changedVideoFiles.Add(e.FullPath);
+    }
+
+    private void OnAudioFileChanged(object sender, FileSystemEventArgs e)
+    {
+        // Do not use Unity API because we are not in the main thread.
+        changedAudioFiles.Add(e.FullPath);
+    }
+
+    private void OnImageFileChanged(object sender, FileSystemEventArgs e)
+    {
+        // Do not use Unity API because we are not in the main thread.
+        changedImageFiles.Add(e.FullPath);
     }
 
     private void OnDestroy()

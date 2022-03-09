@@ -128,6 +128,11 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
+    public void ReloadVideo()
+    {
+        InitVideo(SongMeta);
+    }
+
     public void StartVideoOrShowBackgroundImage()
     {
         if (HasLoadedVideo)
