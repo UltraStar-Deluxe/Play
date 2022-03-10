@@ -12,7 +12,7 @@
             <ui:VisualElement name="invalidValueIcon" class="iconImageTextSized" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); margin-right: 5px; visibility: hidden;" />
             <ui:Label text="Warning about invalid value" display-tooltip-when-elided="true" name="invalidValueLabel" style="visibility: hidden;" />
         </ui:VisualElement>
-        <ui:TextField picking-mode="Ignore" value="filler text" text="filler text" name="valueTextField" style="flex-grow: 1; flex-shrink: 1; margin-bottom: 20px;" />
+        <ui:TextField picking-mode="Ignore" name="valueTextField" style="flex-grow: 1; flex-shrink: 1; margin-bottom: 20px;" />
         <ui:VisualElement name="dialogButtonContainer" style="flex-direction: row; justify-content: space-around; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: center;">
             <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelButton" style="width: 80px;" />
             <ui:Button text="OK" display-tooltip-when-elided="true" name="okButton" style="width: 80px;" />

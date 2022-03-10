@@ -1,17 +1,12 @@
 ﻿using System;
 using System.IO;
-using UnityEngine.UIElements;
 
 public class PathInputDialogControl : TextInputDialogControl
 {
-    public PathInputDialogControl(
-        VisualTreeAsset dialogUi,
-        VisualElement parentVisualElement,
-        string title,
-        string message,
-        string initialTextValue)
-        : base(dialogUi, parentVisualElement, title, message, initialTextValue)
+    public override void OnInjectionFinished()
     {
+        base.OnInjectionFinished();
+
         ValidateValueCallback = newValue =>
         {
             if (newValue.IsNullOrEmpty())
