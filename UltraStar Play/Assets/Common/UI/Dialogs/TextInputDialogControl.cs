@@ -1,61 +1,116 @@
 ﻿using System;
-using System.Linq;
+using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
 
-public class TextInputDialogControl : IDialogControl
+public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
-    private readonly VisualElement dialogRootVisualElement;
-    private readonly VisualElement parentVisualElement;
+    [Inject(UxmlName = R.UxmlNames.dialogTitle)]
+    protected Label dialogTitle;
 
-    private readonly VisualElement invalidValueIcon;
-    private readonly Label invalidValueLabel;
-    private readonly Button okButton;
+    [Inject(UxmlName = R.UxmlNames.dialogMessage)]
+    protected Label dialogMessage;
 
-    private readonly Subject<bool> dialogClosedEventStream = new Subject<bool>();
-    public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
+    [Inject(UxmlName = R.UxmlNames.invalidValueIcon)]
+    protected VisualElement invalidValueIcon;
+
+    [Inject(UxmlName = R.UxmlNames.invalidValueLabel)]
+    protected Label invalidValueLabel;
+
+    [Inject(UxmlName = R.UxmlNames.valueTextField)]
+    protected TextField textField;
+
+    [Inject(UxmlName = R.UxmlNames.okButton)]
+    protected Button okButton;
+
+    [Inject(UxmlName = R.UxmlNames.cancelButton)]
+    protected Button cancelButton;
+
+    private BackslashReplacingTextFieldControl backslashReplacingTextFieldControl;
 
     private readonly Subject<string> submitValueEventStream = new Subject<string>();
     public IObservable<string> SubmitValueEventStream => submitValueEventStream;
 
     public Func<string, ValueInputDialogValidationResult> ValidateValueCallback { get; set; } = DefaultValidateValueCallback;
 
-    public TextInputDialogControl(
-        VisualTreeAsset dialogUi,
-        VisualElement parentVisualElement,
-        string title,
-        string message,
-        string initialTextValue)
+    public string Title
     {
-        dialogRootVisualElement = dialogUi.CloneTree();
-        dialogRootVisualElement.AddToClassList("overlay");
+        get
+        {
+            return dialogTitle.text;
+        }
 
-        Label dialogTitle = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogTitle);
-        dialogTitle.text = title;
+        set
+        {
+            dialogTitle.text = value;
+        }
+    }
 
-        Label dialogMessage = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogMessage);
-        dialogMessage.text = message;
+    public string Message
+    {
+        get
+        {
+            return dialogMessage.text;
+        }
 
-        invalidValueIcon = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.invalidValueIcon);
-        invalidValueLabel = dialogRootVisualElement.Q<Label>(R.UxmlNames.invalidValueLabel);
+        set
+        {
+            dialogMessage.text = value;
+        }
+    }
 
-        TextField textField = dialogRootVisualElement.Q<TextField>(R.UxmlNames.valueTextField);
-        textField.value = initialTextValue;
-        textField.Focus();
+    public string Value
+    {
+        get
+        {
+            return textField.value;
+        }
 
-        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
-        backslashReplacingTextFieldControl.ValueChangedEventStream
-            .Subscribe(newValue => ValidateValue(newValue, true));
+        set
+        {
+            textField.value = value;
+        }
+    }
 
-        okButton = dialogRootVisualElement.Q<Button>(R.UxmlNames.okButton);
+    private string initialValue = "";
+    public string InitialValue
+    {
+        get
+        {
+            return initialValue;
+        }
+
+        set
+        {
+            initialValue = value;
+            Value = value;
+
+            // Do not show an error if the user has not done anything yet.
+            // But do not allow the user to continue if invalid either (okButton would still be disabled).
+            HideValidationMessage();
+        }
+    }
+
+    public virtual void OnInjectionFinished()
+    {
         okButton.RegisterCallbackButtonTriggered(() => TrySubmitValue(textField.value));
-        Button cancelButton = dialogRootVisualElement.Q<Button>(R.UxmlNames.cancelButton);
         cancelButton.RegisterCallbackButtonTriggered(() => CloseDialog());
 
-        this.parentVisualElement = parentVisualElement;
-        parentVisualElement.Add(dialogRootVisualElement);
+        if (backslashReplacingTextFieldControl == null)
+        {
+            backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
+            backslashReplacingTextFieldControl.ValueChangedEventStream
+                .Subscribe(newValue => ValidateValue(newValue, true));
+        }
 
-        ValidateValue(initialTextValue, false);
+        cancelButton.Focus();
+        InitialValue = "";
+        ValidateValue(InitialValue, false);
+    }
+
+    public void Reset()
+    {
+        Value = initialValue;
     }
 
     private void TrySubmitValue(string textValue)
@@ -72,14 +127,14 @@ public class TextInputDialogControl : IDialogControl
     {
         if (ValidateValueCallback == null)
         {
-            HideValidationMessage();
+            HideValidationMessageAndEnableOkButton();
             return;
         }
 
         ValueInputDialogValidationResult validationResult = ValidateValueCallback(textValue);
         if (validationResult.Severity == EValueInputDialogValidationResultSeverity.None)
         {
-            HideValidationMessage();
+            HideValidationMessageAndEnableOkButton();
         }
         else
         {
@@ -102,13 +157,18 @@ public class TextInputDialogControl : IDialogControl
         }
     }
 
+    private void HideValidationMessageAndEnableOkButton()
+    {
+        HideValidationMessage();
+        okButton.SetEnabled(true);
+    }
+
     private void HideValidationMessage()
     {
         invalidValueIcon.HideByVisibility();
         invalidValueLabel.HideByVisibility();
         invalidValueIcon.RemoveFromClassList("warning");
         invalidValueIcon.RemoveFromClassList("error");
-        okButton.SetEnabled(true);
     }
 
     private static ValueInputDialogValidationResult DefaultValidateValueCallback(string newValue)
@@ -118,11 +178,5 @@ public class TextInputDialogControl : IDialogControl
             return ValueInputDialogValidationResult.CreateErrorResult("Enter a value please");
         }
         return ValueInputDialogValidationResult.CreateValidResult();
-    }
-
-    public void CloseDialog()
-    {
-        parentVisualElement.Remove(dialogRootVisualElement);
-        dialogClosedEventStream.OnNext(true);
     }
 }

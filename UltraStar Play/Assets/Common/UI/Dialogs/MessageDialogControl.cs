@@ -1,55 +1,56 @@
 ﻿using System;
-using System.Linq;
-using UniRx;
+using UniInject;
 using UnityEngine.UIElements;
 
-public class MessageDialogControl : IDialogControl
+public class MessageDialogControl : AbstractDialogControl
 {
-    private readonly VisualElement dialogRootVisualElement;
-    private readonly VisualElement parentVisualElement;
-
-    private readonly VisualElement buttonContainer;
+    [Inject(UxmlName = R.UxmlNames.dialogTitleImage)]
     public VisualElement DialogTitleImage { get; private set; }
 
-    private readonly Subject<bool> dialogClosedEventStream = new Subject<bool>();
-    public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
+    [Inject(UxmlName = R.UxmlNames.dialogTitle)]
+    private Label dialogTitle;
 
-    public MessageDialogControl(
-        VisualTreeAsset dialogUi,
-        VisualElement parentVisualElement,
-        string title,
-        string message)
+    [Inject(UxmlName = R.UxmlNames.dialogMessage)]
+    private Label dialogMessage;
+
+    [Inject(UxmlName = R.UxmlNames.dialogButtonContainer)]
+    private VisualElement dialogButtonContainer;
+
+    public string Title
     {
-        dialogRootVisualElement = dialogUi.CloneTree();
-        dialogRootVisualElement.AddToClassList("overlay");
+        get
+        {
+            return dialogTitle.text;
+        }
 
-        buttonContainer = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogButtonContainer);
-        DialogTitleImage = dialogRootVisualElement.Q<VisualElement>(R.UxmlNames.dialogTitleImage);
-        Label dialogTitle = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogTitle);
-        Label dialogMessage = dialogRootVisualElement.Q<Label>(R.UxmlNames.dialogMessage);
+        set
+        {
+            dialogTitle.text = value;
+        }
+    }
 
-        dialogTitle.text = title;
-        dialogMessage.text = message;
+    public string Message
+    {
+        get
+        {
+            return dialogMessage.text;
+        }
 
-        this.parentVisualElement = parentVisualElement;
-        parentVisualElement.Add(dialogRootVisualElement);
+        set
+        {
+            dialogMessage.text = value;
+        }
     }
 
     public Button AddButton(string text, Action callback)
     {
         Button button = new Button();
-        buttonContainer.Add(button);
+        dialogButtonContainer.Add(button);
 
         button.text = text;
         button.focusable = true;
         button.RegisterCallbackButtonTriggered(callback);
 
         return button;
-    }
-
-    public void CloseDialog()
-    {
-        parentVisualElement.Remove(dialogRootVisualElement);
-        dialogClosedEventStream.OnNext(true);
     }
 }

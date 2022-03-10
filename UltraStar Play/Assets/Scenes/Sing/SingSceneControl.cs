@@ -210,7 +210,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
             string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
                 "playerNameCsv", playerNameCsv);
-            dialogControl = new MessageDialogControl(dialogUi, background, title, message);
+
+            VisualElement visualElement = dialogUi.CloneTree();
+            visualElement.AddToClassList("overlay");
+            background.Add(visualElement);
+
+            dialogControl = injector
+                .WithRootVisualElement(visualElement)
+                .CreateAndInject<MessageDialogControl>();
+            dialogControl.Title = title;
+            dialogControl.Message = message;
             dialogControl.DialogTitleImage.ShowByDisplay();
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);

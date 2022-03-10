@@ -435,12 +435,15 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             }
         }
 
-        TextInputDialogControl dialogControl = new TextInputDialogControl(
-            valueInputDialogUi,
-            uiDocument.rootVisualElement.Children().First(),
-            title,
-            message,
-            "");
+        VisualElement visualElement = valueInputDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        TextInputDialogControl dialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<TextInputDialogControl>();
+        dialogControl.Title = title;
+        dialogControl.Message = message;
 
         dialogControl.SubmitValueEventStream
             .Subscribe(newValue => UseValueCallback(newValue));
@@ -467,12 +470,16 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             usePathCallback(path);
         }
 
-        PathInputDialogControl dialogControl = new PathInputDialogControl(
-            valueInputDialogUi,
-            uiDocument.rootVisualElement.Children().First(),
-            title,
-            message,
-            initialValue);
+        VisualElement visualElement = valueInputDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        PathInputDialogControl dialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<PathInputDialogControl>();
+        dialogControl.Title = title;
+        dialogControl.Message = message;
+        dialogControl.InitialValue = initialValue;
 
         dialogControl.SubmitValueEventStream
             .Subscribe(newValue => UseValueCallback(newValue));

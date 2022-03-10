@@ -10,23 +10,33 @@ using UniInject;
 using UniRx;
 using PrimeInputActions;
 using ProTrans;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset quitGameDialogUxml;
+    public VisualTreeAsset quitGameDialogUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset newSongDialogUi;
 
     [InjectedInInspector]
     public CreateSongFromTemplateControl createSongFromTemplateControl;
 
     [Inject]
-    private UIDocument uiDoc;
+    private UIDocument uiDocument;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -61,7 +71,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    private MessageDialogControl closeGameDialogControl;
+    private MessageDialogControl quitGameDialogControl;
+    private NewSongDialogControl newSongDialogControl;
+
+    public bool IsNewSongDialogOpen => newSongDialogControl != null;
+    public bool IsCloseGameDialogOpen => quitGameDialogControl != null;
 
     private void Start()
     {
@@ -70,7 +84,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
-        createSongButton.RegisterCallbackButtonTriggered(() => createSongFromTemplateControl.CreateNewSongFromTemplateAndContinueToSongEditor());
+        createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
         InitButtonDescription(startButton, R.Messages.mainScene_button_sing_description);
         InitButtonDescription(settingsButton, R.Messages.mainScene_button_settings_description);
@@ -83,20 +97,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
         sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => ToggleCloseGameDialog());
-    }
-
-    private void ToggleCloseGameDialog()
-    {
-        if (closeGameDialogControl != null)
-        {
-            CloseQuitGameDialog();
-        }
-        else
-        {
-            OpenQuitGameDialog();
-        }
+        songMetaManager.ScanFilesIfNotDoneYet();
     }
 
     private void InitButtonDescription(Button button, string i18nCode)
@@ -146,33 +147,77 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         }
     }
 
-    private void CloseQuitGameDialog()
+    public void CloseQuitGameDialog()
     {
-        if (closeGameDialogControl == null)
+        if (quitGameDialogControl == null)
         {
             return;
         }
 
-        closeGameDialogControl.CloseDialog();
-        closeGameDialogControl = null;
+        quitGameDialogControl.CloseDialog();
+        quitGameDialogControl = null;
         // Must not immediately focus next button or it will trigger as well
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
     }
 
-    private void OpenQuitGameDialog()
+    public void OpenQuitGameDialog()
     {
-        if (closeGameDialogControl != null)
+        if (quitGameDialogControl != null)
         {
             return;
         }
 
-        closeGameDialogControl = new MessageDialogControl(
-            quitGameDialogUxml,
-            uiDoc.rootVisualElement,
-            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title),
-            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message));
-        Button yesButton = closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
+        VisualElement visualElement = quitGameDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        quitGameDialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<MessageDialogControl>();
+        quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
+        quitGameDialogControl.Message = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message);
+
+        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
+        Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
-        closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
+    }
+
+    public void OpenNewSongDialog()
+    {
+        if (newSongDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement visualElement = newSongDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        newSongDialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<NewSongDialogControl>();
+
+        newSongDialogControl.DialogClosedEventStream
+            .Subscribe(_ => newSongDialogControl = null);
+    }
+
+    public void CloseNewSongDialog()
+    {
+        if (newSongDialogControl == null)
+        {
+            return;
+        }
+
+        newSongDialogControl.CloseDialog();
+        newSongDialogControl = null;
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(createSongFromTemplateControl);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }
