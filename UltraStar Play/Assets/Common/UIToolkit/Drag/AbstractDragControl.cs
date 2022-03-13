@@ -38,8 +38,9 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     {
         this.panelHelper = new PanelHelper(uiDocument);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        // Drag gesture may leave the target visual element. Thus, listen on the rootVisualElement for the pointer events.
+        uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
@@ -171,9 +172,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         float targetWidthInPixels = targetVisualElement.worldBound.width;
         float targetHeightInPixels = targetVisualElement.worldBound.height;
 
-        Vector2 localPosInPixels = new Vector2(
-            eventData.LocalPosition.x,
-            eventData.LocalPosition.y);
+        Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
         Vector2 localDistanceInPixels = localPosInPixels - localDragStartEvent.LocalCoordinateInPixels.StartPosition;
 
         GeneralDragEvent result = new GeneralDragEvent(
@@ -209,9 +208,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         // Target coordinate in pixels
         float targetWidthInPixels = targetVisualElement.contentRect.width;
         float targetHeightInPixels = targetVisualElement.contentRect.height;
-        Vector2 localPosInPixels = new Vector2(
-            eventData.LocalPosition.x,
-            eventData.LocalPosition.y);
+        Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
