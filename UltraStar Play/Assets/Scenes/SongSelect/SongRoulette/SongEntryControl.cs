@@ -10,11 +10,12 @@ using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniRx;
+using UniRx.Triggers;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener, ITranslator
+public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener, ITranslator, IDisposable
 {
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -43,8 +44,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songEntryDuetIcon)]
     private VisualElement duetIcon;
 
-    [Inject(UxmlName = R.UxmlNames.songButton)]
-    private Button songButton;
+    [Inject(UxmlName = R.UxmlNames.songEntryUiRoot)]
+    private VisualElement songEntryUiRoot;
 
     [Inject(UxmlName = R.UxmlNames.songMenuOverlay)]
     private VisualElement songOverlayMenu;
@@ -133,6 +134,10 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private GeneralDragControl dragControl;
 
+    private Vector3 pointerDownEventPosition = Vector3.zero;
+    private IEnumerator showSongMenuOverlayCoroutine = null;
+    private bool isPointerDown;
+
     public SongEntryControl(
         VisualElement visualElement,
         SongEntryPlaceholderControl targetPlaceholderControl,
@@ -155,11 +160,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         if (TargetPlaceholderControl == null)
         {
             songRouletteControl.RemoveSongRouletteItem(this);
-            if (songRouletteControl.DragSongRouletteItem == this)
-            {
-                OnEndDrag(null);
-            }
-            VisualElement.RemoveFromHierarchy();
+            Dispose();
             return;
         }
         
@@ -215,11 +216,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
+        // Debug.Log($"begin drag: {dragEvent.ScreenCoordinateInPixels.StartPosition}");
         songRouletteControl.OnBeginDrag(this);
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
+        // Debug.Log($"drag: {dragEvent.ScreenCoordinateInPixels.Distance}");
         songRouletteControl.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
     }
 
@@ -316,7 +319,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
         // Add itself as IDragListener to be notified when its RectTransform is dragged.
         dragControl = injector
-            .WithRootVisualElement(songButton)
+            .WithRootVisualElement(songEntryUiRoot)
             .CreateAndInject<GeneralDragControl>();
         dragControl.AddListener(this);
 
@@ -329,67 +332,65 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         });
         
-        songButton.RegisterCallbackButtonTriggered(() =>
-        {
-            if (!ignoreNextClickEvent)
-            {
-                clickEventStream.OnNext(true);
-            }
-            ignoreNextClickEvent = false;
-        });
-
-        RegisterLongPressToOpenSongMenu();
-        UpdateTranslation();
-    }
-
-    private void RegisterLongPressToOpenSongMenu()
-    {
-        Vector3 pointerDownEventPosition = Vector3.zero;
-        IEnumerator showSongMenuOverlayCoroutine = null;
-
-        void StopCoroutine()
-        {
-            if (showSongMenuOverlayCoroutine != null)
-            {
-                songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
-                showSongMenuOverlayCoroutine = null;
-            }
-        }
-
-        void StartCoroutine()
-        {
-            StopCoroutine();
-
-            showSongMenuOverlayCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
-            {
-                if (songRouletteControl.SelectedSongEntryControl != this)
-                {
-                    songRouletteControl.SelectSong(songMeta);
-                }
-                ignoreNextClickEvent = true;
-                ShowSongMenuOverlay();
-            });
-            songRouletteControl.StartCoroutine(showSongMenuOverlayCoroutine);
-        }
-
-        songButton.RegisterCallback<PointerDownEvent>(evt =>
-        {
-            pointerDownEventPosition = evt.position;
-            StartCoroutine();
-        }, TrickleDown.TrickleDown);
-        songButton.RegisterCallback<PointerUpEvent>(_ =>
-        {
-            StopCoroutine();
-        }, TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
 
         // Stop coroutine when dragging
         dragControl.DragState.Subscribe(dragState =>
         {
             if (dragState == EDragState.Dragging)
             {
-                StopCoroutine();
+                StopShowSongMenuOverlayCoroutine();
             }
         });
+
+        UpdateTranslation();
+    }
+
+    private void OnPointerDown(PointerDownEvent evt)
+    {
+        isPointerDown = true;
+        pointerDownEventPosition = evt.position;
+        StartShowSongMenuOverlayCoroutine();
+    }
+
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        if (isPointerDown
+            && !dragControl.IsDragging
+            && !ignoreNextClickEvent)
+        {
+            clickEventStream.OnNext(true);
+        }
+        isPointerDown = false;
+        StopShowSongMenuOverlayCoroutine();
+        ignoreNextClickEvent = false;
+    }
+
+    private void StartShowSongMenuOverlayCoroutine()
+    {
+        StopShowSongMenuOverlayCoroutine();
+
+        showSongMenuOverlayCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
+        {
+            if (songRouletteControl.SelectedSongEntryControl != this
+                && isPointerDown)
+            {
+                songRouletteControl.SelectSong(songMeta);
+            }
+            ignoreNextClickEvent = true;
+            ShowSongMenuOverlay();
+        });
+        songRouletteControl.StartCoroutine(showSongMenuOverlayCoroutine);
+    }
+
+    private void StopShowSongMenuOverlayCoroutine()
+    {
+        if (showSongMenuOverlayCoroutine != null)
+        {
+            songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
+            showSongMenuOverlayCoroutine = null;
+        }
     }
 
     public void ShowSongMenuOverlay()
@@ -435,16 +436,22 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
     }
 
-    public void FocusSongButton()
-    {
-        songButton.Focus();
-    }
-
     public void UpdateTranslation()
     {
         singThisSongButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_startButton);
         openSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongFolder);
         openSongEditorButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongEditor);
         closeSongOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
+    }
+
+    public void Dispose()
+    {
+        TargetPlaceholderControl = null;
+        VisualElement.RemoveFromHierarchy();
+        if (songRouletteControl.DragSongRouletteItem == this)
+        {
+            OnEndDrag(null);
+        }
+        dragControl?.Dispose();
     }
 }

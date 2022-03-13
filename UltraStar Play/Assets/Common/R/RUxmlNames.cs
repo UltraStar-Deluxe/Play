@@ -442,8 +442,6 @@ public static partial class R
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
-        public const string songButton = "songButton";
-        public const string songContainer = "songContainer";
         public const string songCoverImage = "songCoverImage";
         public const string songCoverLabel = "songCoverLabel";
         public const string songDetailOverlay = "songDetailOverlay";
@@ -453,6 +451,7 @@ public static partial class R
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
+        public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songImage = "songImage";
         public const string songImageInner = "songImageInner";
         public const string songImageOuter = "songImageOuter";

@@ -32,11 +32,13 @@ public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 
     private Label fpsLabel;
 
+    private DragToMoveControl dragToMoveControl;
+
     public void OnInjectionFinished()
     {
         CreateLabel(uiDocument.rootVisualElement);
 
-        DragToMoveControl dragToMoveControl = injector
+        dragToMoveControl = injector
             .WithRootVisualElement(fpsLabel)
             .WithBindingForInstance(gameObject)
             .CreateAndInject<DragToMoveControl>();
@@ -81,9 +83,7 @@ public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 
     private void OnDestroy()
     {
-        if (fpsLabel != null)
-        {
-            fpsLabel.RemoveFromHierarchy();
-        }
+        fpsLabel?.RemoveFromHierarchy();
+        dragToMoveControl?.Dispose();
     }
 }

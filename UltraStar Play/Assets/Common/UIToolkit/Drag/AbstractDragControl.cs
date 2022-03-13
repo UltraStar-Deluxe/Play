@@ -11,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener
+public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
 
@@ -34,6 +34,8 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected PanelHelper panelHelper;
 
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+
     public virtual void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
@@ -42,7 +44,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
         uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
             .Subscribe(_ =>
             {
@@ -50,7 +52,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 // Cancel other callbacks. To do so, this subscription has a higher priority.
                 InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
             })
-            .AddTo(gameObject);
+            .AddTo(gameObject));
     }
 
     protected abstract EVENT CreateDragEventStart(DragControlPointerEvent eventData);
@@ -69,15 +71,15 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected virtual void OnPointerDown(IPointerEvent evt)
     {
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
-        DragState.Value = EDragState.ReadyForDrag;
+        DragState.Value = EDragState.WaitingForDistanceThreshold;
     }
 
     protected virtual void OnPointerMove(IPointerEvent evt)
     {
-        if (DragState.Value == EDragState.ReadyForDrag)
+        if (DragState.Value == EDragState.WaitingForDistanceThreshold)
         {
-            Vector2 pointerMoveDistance =  evt.position - dragControlPointerDownEvent.Position;
-            if (pointerMoveDistance.magnitude > InputUtils.DragDistanceThresholdInPx)
+            float pointerMoveDistance =  Vector2.Distance(evt.position,dragControlPointerDownEvent.Position);
+            if (pointerMoveDistance > InputUtils.DragDistanceThresholdInPx)
             {
                 OnBeginDrag(dragControlPointerDownEvent);
             }
@@ -113,7 +115,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected virtual void OnDrag(DragControlPointerEvent eventData)
     {
-        if (DragState.Value == EDragState.IgnoreDrag
+        if (DragState.Value == EDragState.Canceled
             || !IsDragging
             || eventData.PointerId != pointerId)
         {
@@ -134,17 +136,17 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
-        DragState.Value = EDragState.ReadyForDrag;
+        DragState.Value = EDragState.WaitingForPointerDown;
     }
 
     public virtual void CancelDrag()
     {
-        if (DragState.Value == EDragState.IgnoreDrag)
+        if (DragState.Value == EDragState.Canceled)
         {
             return;
         }
 
-        DragState.Value = EDragState.IgnoreDrag;
+        DragState.Value = EDragState.Canceled;
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
 
@@ -239,5 +241,21 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         Vector2 distanceInPercent = distanceInPixels / fullSize;
         Vector2 deltaInPercent = deltaInPixels / fullSize;
         return new DragCoordinate(startPosInPercent, distanceInPercent, deltaInPercent);
+    }
+
+    public void Dispose()
+    {
+        if (targetVisualElement != null)
+        {
+            targetVisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        }
+        if (uiDocument != null
+            && uiDocument.rootVisualElement != null)
+        {
+            uiDocument.rootVisualElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+            uiDocument.rootVisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        }
+
+        disposables.ForEach(it => it.Dispose());
     }
 }

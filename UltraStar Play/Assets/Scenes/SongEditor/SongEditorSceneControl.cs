@@ -156,6 +156,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         InitAutoSave();
     }
 
+    private void OnDestroy()
+    {
+        videoAreaControl.Dispose();
+    }
+
     private void InitAutoSave()
     {
         if (settings.SongEditorSettings.AutoSave)
