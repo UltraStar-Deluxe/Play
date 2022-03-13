@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine.Assertions.Must;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -20,37 +21,67 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
     {
-        Voice voice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
-        Sentence createdSentence = null;
+        Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
         List<Sentence> changedSentences = new List<Sentence>();
         List<Sentence> removedSentences = new List<Sentence>();
-        foreach (Note note in selectedNotes)
+        List<Sentence> createdSentences = new List<Sentence>();
+
+        List<SentenceWithRange> createdSentencesWithRange = new List<SentenceWithRange>();
+
+        List<Sentence> sortedTargetSentences = targetVoice.Sentences.ToList();
+        sortedTargetSentences.Sort(Sentence.comparerByStartBeat);
+
+        selectedNotes.Sort(Note.comparerByStartBeat);
+        selectedNotes.ForEach(note =>
         {
             Sentence oldSentence = note.Sentence;
-            // Find a sentence in the new voice for the note
-            Sentence sentenceForNote = SongMetaUtils.FindExistingSentenceForNote(voice.Sentences, note);
-            if (sentenceForNote == null)
+            // Find or create a sentence in the target voice for the note
+            Sentence targetSentence;
+            Sentence existingTargetSentence = SongMetaUtils.FindExistingSentenceForNote(sortedTargetSentences, note);
+            if (existingTargetSentence == null)
             {
-                // Create new sentence in the voice.
-                // Use the min and max value from the sentence of the original note if possible.
-                if (note.Sentence != null)
+                SentenceWithRange existingSentenceWithRange = createdSentencesWithRange
+                    .FirstOrDefault(sentenceWithRange => sentenceWithRange.ContainsBeatRange(note.StartBeat, note.EndBeat));
+                if (existingSentenceWithRange != null)
                 {
-                    sentenceForNote = new Sentence(note.Sentence.MinBeat, note.Sentence.MaxBeat);
+                    existingTargetSentence = existingSentenceWithRange.Sentence;
                 }
-                else if (createdSentence != null)
-                {
-                    sentenceForNote = createdSentence;
-                }
-                else
-                {
-                    createdSentence = new Sentence();
-                    sentenceForNote = createdSentence;
-                }
-                sentenceForNote.SetVoice(voice);
             }
-            sentenceForNote.AddNote(note);
 
-            changedSentences.Add(sentenceForNote);
+            if (existingTargetSentence != null)
+            {
+                targetSentence = existingTargetSentence;
+            }
+            else
+            {
+                // Create sentence to fill the gap between adjacent sentences.
+                Sentence previousSentence = sortedTargetSentences
+                    .LastOrDefault(sentence => sentence.MaxBeat < note.StartBeat);
+                Sentence nextSentence = sortedTargetSentences
+                    .LastOrDefault(sentence => sentence.MinBeat > note.EndBeat);
+                int newSentenceFromBeat = previousSentence != null
+                    ? previousSentence.ExtendedMaxBeat
+                    : int.MinValue;
+                int newSentenceUntilBeat = nextSentence != null
+                    ? nextSentence.MinBeat
+                    : int.MaxValue;
+                Sentence createdSentence = new Sentence(newSentenceFromBeat, newSentenceUntilBeat);
+                createdSentence.SetVoice(targetVoice);
+
+                createdSentences.Add(createdSentence);
+                sortedTargetSentences.Add(createdSentence);
+                sortedTargetSentences.Sort(Sentence.comparerByStartBeat);
+
+                // Remember this sentence with its full range (that fills the gap between adjacent sentences)
+                // The MinBeat and MaxBeat of the sentence will change to fit the notes,
+                // such that the original range has to be stored in a dedicated data structure.
+                createdSentencesWithRange.Add(new SentenceWithRange(createdSentence, newSentenceFromBeat, newSentenceUntilBeat));
+
+                targetSentence = createdSentence;
+            }
+            targetSentence.AddNote(note);
+
+            changedSentences.Add(targetSentence);
             if (oldSentence != null)
             {
                 // Remove old sentence if empty now
@@ -64,13 +95,15 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                     changedSentences.Add(oldSentence);
                 }
             }
-        }
+        });
 
-        // Fit changed sentences to their notes (make them as small as possible)
-        foreach (Sentence sentence in changedSentences)
+        // Fit sentences to their notes (make them as small as possible)
+        changedSentences
+            .Union(createdSentences)
+            .ForEach(sentence =>
         {
             sentence.FitToNotes();
-        }
+        });
 
         return new MovedNotesToVoiceEvent(selectedNotes, changedSentences, removedSentences);
     }
@@ -90,5 +123,25 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         }
         return note.Sentence != null
                && voiceNames.AnyMatch(voiceName => note.Sentence.Voice.VoiceNameEquals(voiceName));
+    }
+
+    private class SentenceWithRange
+    {
+        public Sentence Sentence { get; private set; }
+        public int FromBeat { get; private set; }
+        public int UntilBeat { get; private set; }
+
+        public SentenceWithRange(Sentence sentence, int fromBeat, int untilBeat)
+        {
+            Sentence = sentence;
+            FromBeat = fromBeat;
+            UntilBeat = untilBeat;
+        }
+
+        public bool ContainsBeatRange(int fromBeat, int untilBeat)
+        {
+            return FromBeat <= fromBeat
+                   && untilBeat <= UntilBeat;
+        }
     }
 }
