@@ -58,10 +58,9 @@ public static class SongMetaUtils
         return sentence.MinBeat <= beat && beat <= sentence.ExtendedMaxBeat;
     }
 
-    public static Sentence FindExistingSentenceForNote(IReadOnlyCollection<Sentence> sentences, Note note)
+    public static Sentence FindExistingSentenceForNote(IEnumerable<Sentence> sentences, Note note)
     {
-        return sentences.FirstOrDefault(sentence => (sentence.MinBeat <= note.StartBeat)
-                                                    && (note.EndBeat <= sentence.ExtendedMaxBeat));
+        return sentences.FirstOrDefault(sentence => sentence.ContainsBeatRange(note.StartBeat, note.EndBeat));
     }
 
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)

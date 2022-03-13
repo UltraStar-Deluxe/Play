@@ -91,7 +91,7 @@ public class Sentence : ISerializationCallbackReceiver
         UpdateMinAndMaxBeat(false);
     }
 
-    public void AddNote(Note note)
+    public void AddNote(Note note, bool keepLineBreakBeatOverhang = true)
     {
         if (note == null)
         {
@@ -106,7 +106,7 @@ public class Sentence : ISerializationCallbackReceiver
         notes.Add(note);
         note.SetSentence(this);
 
-        UpdateMinAndMaxBeat();
+        UpdateMinAndMaxBeat(keepLineBreakBeatOverhang);
     }
 
     public void RemoveNote(Note note)
@@ -146,6 +146,12 @@ public class Sentence : ISerializationCallbackReceiver
         ExtendedMaxBeat = Math.Max(MaxBeat, LinebreakBeat);
     }
 
+    public bool ContainsBeatRange(int fromBeat, int untilBeat)
+    {
+        return MinBeat <= fromBeat
+               && untilBeat <= ExtendedMaxBeat;
+    }
+
     public void UpdateMinBeat()
     {
         if (notes.Count > 0)
@@ -164,7 +170,8 @@ public class Sentence : ISerializationCallbackReceiver
 
             // Keep distance from MaxBeat to LinebreakBeat when moving notes
             if (keepLinebreakBeatOverhang
-                && lastMaxBeat != MaxBeat)
+                && lastMaxBeat != MaxBeat
+                && LinebreakBeat < int.MaxValue - lastLinebreakBeatOverhang)
             {
                 LinebreakBeat = MaxBeat + lastLinebreakBeatOverhang;
                 ExtendedMaxBeat = LinebreakBeat;
