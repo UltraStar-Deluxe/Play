@@ -56,7 +56,7 @@ public class SettingsManager : MonoBehaviour
         {
             initializedResolution = true;
             // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
-            Settings.GraphicSettings.resolution = ApplicationUtils.GetCurrentAppResolution();
+            Settings.GraphicSettings.resolution = ApplicationUtils.GetScreenResolution();
         }
     }
 

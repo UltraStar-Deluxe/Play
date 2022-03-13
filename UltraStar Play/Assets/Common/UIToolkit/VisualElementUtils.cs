@@ -5,10 +5,10 @@ public static class VisualElementUtils
 {
     public static void MoveVisualElementFullyInsideScreen(VisualElement visualElement, PanelHelper panelHelper)
     {
-        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
-        float overshootRight = visualElement.worldBound.xMax - screenSizePanelCoordinates.x;
+        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
+        float overshootRight = visualElement.worldBound.xMax - screenSizeInPanelCoordinates.x;
         float overshootLeft = visualElement.worldBound.xMin;
-        float overshootBottom = visualElement.worldBound.yMax - screenSizePanelCoordinates.y;
+        float overshootBottom = visualElement.worldBound.yMax - screenSizeInPanelCoordinates.y;
         float overshootTop = visualElement.worldBound.yMin;
 
         Vector2 shift = Vector2.zero;

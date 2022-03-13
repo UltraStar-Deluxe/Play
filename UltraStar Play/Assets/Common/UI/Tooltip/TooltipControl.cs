@@ -82,7 +82,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
         label.text = TooltipText;
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.left = pos.x;
-        label.style.bottom = pos.y;
+        label.style.top = pos.y;
 
         uiDocument.rootVisualElement.Children().First().Add(label);
 
