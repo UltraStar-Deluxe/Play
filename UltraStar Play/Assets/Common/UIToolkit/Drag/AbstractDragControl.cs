@@ -161,10 +161,9 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
         Vector2 screenPosInPixels = new Vector2(
             eventData.Position.x,
-            screenSizeInPanelCoordinates.y - eventData.Position.y);
+            eventData.Position.y);
         Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
@@ -174,7 +173,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
         Vector2 localPosInPixels = new Vector2(
             eventData.LocalPosition.x,
-            targetHeightInPixels - eventData.LocalPosition.y);
+            eventData.LocalPosition.y);
         Vector2 localDistanceInPixels = localPosInPixels - localDragStartEvent.LocalCoordinateInPixels.StartPosition;
 
         GeneralDragEvent result = new GeneralDragEvent(
@@ -203,17 +202,16 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
         Vector2 screenPosInPixels = new Vector2(
             eventData.Position.x,
-            screenSizeInPanelCoordinates.y - eventData.Position.y);
+            eventData.Position.y);
 
         // Target coordinate in pixels
         float targetWidthInPixels = targetVisualElement.contentRect.width;
         float targetHeightInPixels = targetVisualElement.contentRect.height;
         Vector2 localPosInPixels = new Vector2(
             eventData.LocalPosition.x,
-            targetHeightInPixels - eventData.LocalPosition.y);
+            eventData.LocalPosition.y);
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(

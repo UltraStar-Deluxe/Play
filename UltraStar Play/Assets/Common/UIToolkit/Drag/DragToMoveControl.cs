@@ -54,7 +54,7 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
     private void MoveTo(Vector2 positionInPx)
     {
         targetVisualElement.style.left = positionInPx.x;
-        targetVisualElement.style.bottom = positionInPx.y;
+        targetVisualElement.style.top = positionInPx.y;
         movedEventStream.OnNext(positionInPx);
     }
 }

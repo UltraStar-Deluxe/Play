@@ -59,7 +59,7 @@ public static class VisualElementUtils
             else if (visualElement.style.bottom != new StyleLength(StyleKeyword.Null)
                      && visualElement.style.bottom != new StyleLength(StyleKeyword.Auto))
             {
-                visualElement.style.bottom = visualElement.style.bottom.value.value + shift.y;
+                visualElement.style.top = visualElement.style.bottom.value.value + shift.y;
             }
         }
     }

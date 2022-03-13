@@ -55,7 +55,7 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
             {
                 micPitchIndicator.ShowByDisplay();
                 float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(shiftedMidiNote);
-                micPitchIndicator.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+                micPitchIndicator.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
             }
             else
             {

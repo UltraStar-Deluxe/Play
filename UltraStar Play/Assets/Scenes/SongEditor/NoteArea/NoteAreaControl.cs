@@ -595,9 +595,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int PixelsToMidiNote(float y)
     {
         Rect rect = VisualElement.worldBound;
-        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
-        float yFromBottom = screenSizeInPanelCoordinates.y - rect.height - rect.y;
-        return (int)Math.Round(MinMidiNoteInViewport + ViewportHeight * ((y - yFromBottom) / rect.height));
+        return (int)Math.Round(MinMidiNoteInViewport + ViewportHeight * ((y - rect.y) / rect.height));
     }
 
     private void UpdatePositionInSongIndicator(double positionInSongInMillis)

@@ -57,7 +57,7 @@ public class StarParticleControl : INeedInjection
     public void SetPosition(Vector2 pos)
     {
         VisualElement.style.left = new StyleLength(new Length(pos.x, LengthUnit.Percent));
-        VisualElement.style.bottom = new StyleLength(new Length(pos.y, LengthUnit.Percent));
+        VisualElement.style.top = new StyleLength(new Length(pos.y, LengthUnit.Percent));
     }
 
     public void SetScale(Vector2 scale)
