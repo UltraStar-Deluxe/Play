@@ -32,7 +32,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (changeEvent is MovedNotesToVoiceEvent mntve)
         {
-            mntve.notes
+            mntve.Notes
                 .Where(note => note.Sentence != null)
                 .ForEach(note => RemoveNoteFromAllLayers(note));
         }
