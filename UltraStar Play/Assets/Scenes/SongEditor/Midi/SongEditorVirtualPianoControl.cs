@@ -64,10 +64,10 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         float widthPercent = MidiUtils.IsWhitePianoKey(midiNote) ? 0.9f : 0.7f;
         visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
-        visualElement.style.bottom = new StyleLength(new Length(100 * yPercent, LengthUnit.Percent));
-        visualElement.style.height = new StyleLength(new Length(100 * heightPercent, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
         visualElement.style.left = 0;
-        visualElement.style.width = new StyleLength(new Length(100 * widthPercent, LengthUnit.Percent));
+        visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
 
         virtualPiano.Add(visualElement);
     }

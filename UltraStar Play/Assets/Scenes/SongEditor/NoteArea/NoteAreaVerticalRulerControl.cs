@@ -116,7 +116,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         float heightPercent = noteAreaControl.HeightForSingleNote;
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         label.style.left = 0;
-        label.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        label.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         label.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
 
         string midiNoteName = MidiUtils.GetAbsoluteName(midiNote);

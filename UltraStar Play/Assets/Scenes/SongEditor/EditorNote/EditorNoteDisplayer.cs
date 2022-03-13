@@ -486,7 +486,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         float widthPercent = xEndPercent - xStartPercent;
 
         visualElement.style.left = new StyleLength(new Length(xStartPercent * 100, LengthUnit.Percent));
-        visualElement.style.bottom = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
         visualElement.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }

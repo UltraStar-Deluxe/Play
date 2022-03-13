@@ -125,7 +125,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             Application.OpenURL("file://" + newSongFolderAbsolutePath);
         }
 
-        string message = $"Created empty song from template: \n{newSongFolderAbsolutePath}";
+        string message = $"Created new song from template in: \n{newSongFolderAbsolutePath}";
         Debug.Log(message);
         uiManager.CreateNotificationVisualElement(message);
 

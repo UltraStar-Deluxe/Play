@@ -113,7 +113,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
         visualElement.style.left = new StyleLength(new Length(xStartPercent, LengthUnit.Percent));
         visualElement.style.width = new StyleLength(new Length(xEndPercent - xStartPercent, LengthUnit.Percent));
-        visualElement.style.bottom = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
         visualElement.style.height = new StyleLength(new Length(yEndPercent - yStartPercent, LengthUnit.Percent));
     }
 
