@@ -8,7 +8,7 @@
     /**
      * Pointer is down but not moved over threshold distance yet.
      */
-    ReadyForDrag,
+    WaitingForDistanceThreshold,
 
     /**
      * Pointer is down and moved over threshold distance. Still dragging.
@@ -18,5 +18,5 @@
     /**
      * CancelDrag was called since last PointerDownEvent.
      */
-    IgnoreDrag
+    Canceled
 }

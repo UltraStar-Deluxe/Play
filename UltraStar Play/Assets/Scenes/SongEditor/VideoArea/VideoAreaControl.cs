@@ -13,7 +13,7 @@ using Button = UnityEngine.UIElements.Button;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDragListener<GeneralDragEvent>
+public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDragListener<GeneralDragEvent>, IDisposable
 {
     [Inject]
     private CursorManager cursorManager;
@@ -172,5 +172,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         // Round to 2 decimal places
         float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);
         return newVideoGap;
+    }
+
+    public void Dispose()
+    {
+        dragControl?.Dispose();
     }
 }

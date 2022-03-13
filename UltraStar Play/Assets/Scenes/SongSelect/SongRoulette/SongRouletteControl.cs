@@ -241,8 +241,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void RemoveSongRouletteItem(SongEntryControl songRouletteItem)
     {
-        songRouletteItem.TargetPlaceholderControl = null;
-        songRouletteItem.VisualElement.RemoveFromHierarchy();
+        songRouletteItem.Dispose();
         songEntryControls.Remove(songRouletteItem);
         SlotListControl.ListItems.Remove(songRouletteItem);
     }
