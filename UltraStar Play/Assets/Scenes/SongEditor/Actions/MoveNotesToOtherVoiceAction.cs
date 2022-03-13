@@ -79,7 +79,8 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     private static bool HasVoice(Note note, string[] voiceNames)
     {
-        if (voiceNames.IsNullOrEmpty())
+        if (voiceNames.IsNullOrEmpty()
+            || note == null)
         {
             return false;
         }

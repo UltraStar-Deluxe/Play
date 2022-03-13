@@ -22,7 +22,7 @@ public static partial class R
         public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";
         public static readonly string songEditor_toggleNoteTypeRap = "songEditor/toggleNoteTypeRap";
         public static readonly string songEditor_toggleNoteTypeRapGolden = "songEditor/toggleNoteTypeRapGolden";
-        public static readonly string songEditor_togglePlayPause = "songEditor/togglePlayPause";
+        public static readonly string songEditor_togglePause = "songEditor/togglePause";
         public static readonly string songEditor_undo = "songEditor/undo";
         public static readonly string songEditor_zoomInHorizontal = "songEditor/zoomInHorizontal";
         public static readonly string songEditor_zoomInVertical = "songEditor/zoomInVertical";

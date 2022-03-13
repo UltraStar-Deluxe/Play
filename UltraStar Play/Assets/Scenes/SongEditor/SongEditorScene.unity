@@ -419,7 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfac381e8120d2d41b8da847760356a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Title
+  defaultSongName: Summer Wine
   defaultSongNamePasteBin: 'Summer Wine
 
     EmptyTitle
@@ -431,9 +431,7 @@ MonoBehaviour:
 
     Marry You
 
-    Hakuna matata
-
-    Title'
+    Hakuna matata'
 --- !u!4 &321425754
 Transform:
   m_ObjectHideFlags: 0

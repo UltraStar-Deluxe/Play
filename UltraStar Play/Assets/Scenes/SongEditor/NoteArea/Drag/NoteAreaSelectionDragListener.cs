@@ -36,6 +36,9 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     [Inject]
     private SongMeta songMeta;
 
+    [Inject(UxmlName = R.UxmlNames.noteAreaSentences)]
+    private VisualElement noteAreaSentences;
+
     [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
     private VisualElement noteAreaSelectionFrame;
 
@@ -58,17 +61,22 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         lastDragEvent = dragEvent;
         startDragEvent = dragEvent;
 
-        Note dragStartNote = songEditorSceneControl
-            .GetAllNotes()
-            .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
-                                    && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
-                                    && note.MidiNote <= dragEvent.MidiNoteDragStart
-                                    && dragEvent.MidiNoteDragStart <= note.MidiNote);
-        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left
-            // This is a drag gesture to manipulate notes, not to select notes
-            || dragStartNote != null
-            // This is a drag gesture to manipulate sentences, not to select notes
-            || dragEvent.GeneralDragEvent.LocalCoordinateInPercent.StartPosition.y < 0.05f)
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
+        {
+            CancelDrag();
+            return;
+        }
+
+        // Check whether this is a drag gesture to manipulate notes, not to select notes
+        Vector2 dragStartPositionInPx = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition;
+        if (editorNoteDisplayer.AnyNoteControlContainsPosition(dragStartPositionInPx))
+        {
+            CancelDrag();
+            return;
+        }
+
+        // Check whether this is a drag gesture to manipulate sentences, not to select notes
+        if (editorNoteDisplayer.AnySentenceControlContainsPosition(dragStartPositionInPx))
         {
             CancelDrag();
             return;

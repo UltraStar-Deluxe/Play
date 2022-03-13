@@ -338,6 +338,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         });
     }
 
+    public bool AnyNoteControlContainsPosition(Vector2 pos)
+    {
+        return EditorNoteControls.AnyMatch(editorNoteControl =>
+            editorNoteControl.VisualElement.worldBound.Contains(pos));
+    }
+
+    public bool AnySentenceControlContainsPosition(Vector2 pos)
+    {
+        return EditorSentenceControls.AnyMatch(editorSentenceControl =>
+            editorSentenceControl.VisualElement.worldBound.Contains(pos));
+    }
+
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
     {
         List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
