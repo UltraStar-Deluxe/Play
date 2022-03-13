@@ -76,6 +76,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
                 noteAreaSentences.Clear();
                 sentenceToControlMap.Clear();
             }
+
+            if (evt is MovedNotesToVoiceEvent movedNotesToVoiceEvent)
+            {
+                // Sentences might have been removed because they did not contain any notes anymore.
+                DeleteSentences(movedNotesToVoiceEvent.RemovedSentences);
+            }
+
             ReloadSentences();
             UpdateNotesAndSentences();
         });
@@ -139,7 +146,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
             .AddTo(gameObject);
     }
 
-    public void DeleteSentences(List<Sentence> sentences)
+    public void DeleteSentences(IReadOnlyCollection<Sentence> sentences)
     {
         sentences.ForEach(sentence => DeleteSentence(sentence));
     }

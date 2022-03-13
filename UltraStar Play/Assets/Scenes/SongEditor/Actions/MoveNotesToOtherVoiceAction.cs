@@ -18,11 +18,12 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
     }
 
-    public void MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
     {
         Voice voice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
         Sentence createdSentence = null;
         List<Sentence> changedSentences = new List<Sentence>();
+        List<Sentence> removedSentences = new List<Sentence>();
         foreach (Note note in selectedNotes)
         {
             Sentence oldSentence = note.Sentence;
@@ -55,6 +56,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                 // Remove old sentence if empty now
                 if (oldSentence.Notes.Count == 0 && oldSentence.Voice != null)
                 {
+                    removedSentences.Add(oldSentence);
                     oldSentence.SetVoice(null);
                 }
                 else
@@ -69,12 +71,14 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         {
             sentence.FitToNotes();
         }
+
+        return new MovedNotesToVoiceEvent(selectedNotes, changedSentences, removedSentences);
     }
 
     public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
     {
-        MoveNotesToVoice(songMeta, selectedNotes, voiceName);
-        songMetaChangeEventStream.OnNext(new MovedNotesToVoiceEvent(selectedNotes));
+        MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceName);
+        songMetaChangeEventStream.OnNext(movedNotesToVoiceEvent);
     }
 
     private static bool HasVoice(Note note, string[] voiceNames)
