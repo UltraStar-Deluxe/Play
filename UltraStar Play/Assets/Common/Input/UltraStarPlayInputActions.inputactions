@@ -418,17 +418,6 @@
                 },
                 {
                     "name": "",
-                    "id": "47053697-7bc8-4d45-9a82-a37461a0c324",
-                    "path": "<XRController>/trigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "click",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "6f0c2fd6-6a1b-4a97-afb8-aabce8d074d1",
                     "path": "<Mouse>/scroll",
                     "interactions": "",
