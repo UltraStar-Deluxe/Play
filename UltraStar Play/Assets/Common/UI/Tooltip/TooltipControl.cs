@@ -8,6 +8,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 {
     private static readonly float defaultShowDelayInSeconds = 1f;
     private static readonly float defaultCloseDelayInSeconds = 0.2f;
+    private static readonly Vector2 tooltipOffsetInPx = new Vector2(10, 10);
 
     public float ShowDelayInSeconds { get; set; } = defaultShowDelayInSeconds;
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;
@@ -26,6 +27,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     private PanelHelper panelHelper;
     private IEnumerator showTooltipCoroutine;
     private IEnumerator closeTooltipCoroutine;
+
 
     public void OnInjectionFinished()
     {
@@ -74,7 +76,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper);
+        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true) + tooltipOffsetInPx;
 
         label = new Label();
         label.AddToClassList("tooltip");

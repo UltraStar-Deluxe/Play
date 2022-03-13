@@ -83,7 +83,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songAudioPlayer.PositionInSongInMillis = songAudioPlayer.DurationOfSongInMillis - 1);
         
         // Play / pause
-        InputManager.GetInputAction(R.InputActions.songEditor_togglePlayPause).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.songEditor_togglePause).PerformedAsObservable()
             .Where(_ => !InputUtils.IsKeyboardControlPressed())
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.ToggleAudioPlayPause());

@@ -1398,7 +1398,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "togglePlayPause",
+                    "name": "togglePause",
                     "type": "Button",
                     "id": "4e6aa313-73d8-48ae-bf17-d1034a2f5517",
                     "expectedControlType": "Button",
@@ -1635,7 +1635,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "togglePlayPause",
+                    "action": "togglePause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1646,7 +1646,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "togglePlayPause",
+                    "action": "togglePause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

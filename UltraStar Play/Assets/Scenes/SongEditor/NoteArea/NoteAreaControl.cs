@@ -76,6 +76,9 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
     [Inject(UxmlName = R.UxmlNames.noteArea)]
     public VisualElement VisualElement { get; private set; }
 
@@ -101,6 +104,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     }
 
     private float lastClickTime;
+    private Vector2 lastClickPosition;
 
     public void OnInjectionFinished()
     {
@@ -500,32 +504,40 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         viewportEventStream.OnNext(viewportEvent);
     }
 
-    private void OnPointerClick(IPointerEvent ped)
+    private void OnPointerClick(IPointerEvent evt)
     {
         // Only listen to left mouse button. Right mouse button is for context menu.
-        if (ped.button != 0)
+        if (evt.button != 0)
         {
             return;
         }
 
         // Ignore any drag motion. Dragging is used to select notes.
-        float dragDistance = Vector2.Distance(ped.position, ped.position);
+        float dragDistance = Vector2.Distance(evt.position, evt.position);
         bool isDrag = dragDistance > 5f;
         if (isDrag)
         {
             return;
         }
 
+        if (editorNoteDisplayer.AnyNoteControlContainsPosition(evt.position)
+            || editorNoteDisplayer.AnySentenceControlContainsPosition(evt.position))
+        {
+            return;
+        }
+
         // Toggle play pause with double click / double tap
         bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
+        bool isNearLastClickPosition = Vector2.Distance(lastClickPosition, evt.position) < 5;
         lastClickTime = Time.time;
-        if (isDoubleClick)
+        lastClickPosition = evt.position;
+        if (isDoubleClick && isNearLastClickPosition)
         {
             songEditorSceneControl.ToggleAudioPlayPause();
             return;
         }
 
-        Vector2 localPoint = ped.localPosition;
+        Vector2 localPoint = evt.localPosition;
         float rectWidth = VisualElement.worldBound.width;
         double xPercent = localPoint.x / rectWidth;
         double positionInSongInMillis = ViewportX + (ViewportWidth * xPercent);
