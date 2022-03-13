@@ -77,7 +77,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         if (DragState.Value == EDragState.ReadyForDrag)
         {
             Vector2 pointerMoveDistance =  evt.position - dragControlPointerDownEvent.Position;
-            if (pointerMoveDistance.magnitude > 5f)
+            if (pointerMoveDistance.magnitude > InputUtils.DragDistanceThresholdInPx)
             {
                 OnBeginDrag(dragControlPointerDownEvent);
             }

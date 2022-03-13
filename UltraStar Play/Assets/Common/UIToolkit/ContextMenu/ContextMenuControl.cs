@@ -4,17 +4,13 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UniRx;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using PrimeInputActions;
-using UniRx.Triggers;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
 {
-    public const float DragDistanceThreshold = 10f;
-
     private static readonly Vector2 popupOffset = new Vector2(2, 2);
 
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
@@ -40,9 +36,9 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
-        targetVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
@@ -64,7 +60,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         }
 
         float distance = Vector2.Distance(evt.position, pointerDownPosition);
-        if (distance > DragDistanceThreshold)
+        if (distance > InputUtils.DragDistanceThresholdInPx)
         {
             isDrag = true;
         }
