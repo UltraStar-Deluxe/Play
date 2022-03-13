@@ -39,25 +39,12 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     [Inject]
     private NoteAreaDragControl noteAreaDragControl;
 
-    private Vector2 dragDistanceInPx;
-
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
     }
 
-    protected override void CheckOpenContextMenuFromInputAction(InputAction.CallbackContext context)
-    {
-        // This ContextMenu could open although a drag is in progress.
-        if (dragDistanceInPx.magnitude > ContextMenuControl.DragDistanceThreshold)
-        {
-            return;
-        }
-        
-        base.CheckOpenContextMenuFromInputAction(context);
-    }
-        
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
         int beat = (int)noteAreaControl.GetHorizontalMousePositionInBeats();

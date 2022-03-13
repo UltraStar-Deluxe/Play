@@ -8,7 +8,8 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 public static class InputUtils
 {
     public const float DoubleClickThresholdInSeconds = 0.3f;
-    
+    public const float DragDistanceThresholdInPx = 5f;
+
     public static EKeyboardModifier GetCurrentKeyboardModifier()
     {
         if (Keyboard.current == null)
