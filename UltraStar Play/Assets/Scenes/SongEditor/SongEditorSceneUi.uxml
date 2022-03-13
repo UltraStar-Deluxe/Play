@@ -206,7 +206,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="sentenceLines" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="noteAreaNotes" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 10px; position: absolute; background-color: rgba(0, 0, 0, 0); bottom: 0;" />
                 <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
                 <ui:VisualElement name="noteAreaPositionInSongIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
@@ -263,7 +263,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
-            <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" class="transparentBackgroundColor" style="position: absolute; height: 100%; display: flex; width: 100%;" />
+            <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
