@@ -127,8 +127,8 @@ public static class InputUtils
         Vector2 pointerPanelCoordinates = panelHelper.ScreenToPanel(pointerScreenCoordinates);
         if (invertY)
         {
-            Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
-            return new Vector2(pointerPanelCoordinates.x, screenSizePanelCoordinates.y - pointerPanelCoordinates.y);
+            Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
+            return new Vector2(pointerPanelCoordinates.x, screenSizeInPanelCoordinates.y - pointerPanelCoordinates.y);
         }
 
         return pointerPanelCoordinates;

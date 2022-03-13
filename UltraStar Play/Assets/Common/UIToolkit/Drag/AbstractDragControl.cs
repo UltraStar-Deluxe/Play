@@ -161,10 +161,10 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
         Vector2 screenPosInPixels = new Vector2(
             eventData.Position.x,
-            screenSizePanelCoordinates.y - eventData.Position.y);
+            screenSizeInPanelCoordinates.y - eventData.Position.y);
         Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
@@ -186,7 +186,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
                 deltaInPixels,
-                GetReferenceResolution()),
+                ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper)),
             new DragCoordinate(
                 localDragStartEvent.LocalCoordinateInPixels.StartPosition,
                 localDistanceInPixels,
@@ -203,10 +203,10 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
         Vector2 screenPosInPixels = new Vector2(
             eventData.Position.x,
-            screenSizePanelCoordinates.y - eventData.Position.y);
+            screenSizeInPanelCoordinates.y - eventData.Position.y);
 
         // Target coordinate in pixels
         float targetWidthInPixels = targetVisualElement.contentRect.width;
@@ -224,7 +224,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 screenPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
-                GetReferenceResolution()),
+                ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper)),
             new DragCoordinate(
                 localPosInPixels,
                 Vector2.zero,
@@ -236,12 +236,6 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
             eventData.Button);
         return result;
-    }
-
-    private Vector2 GetReferenceResolution()
-    {
-        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
-        return screenSizePanelCoordinates;
     }
 
     private DragCoordinate CreateDragCoordinateInPercent(Vector2 startPosInPixels, Vector2 distanceInPixels, Vector2 deltaInPixels, Vector2 fullSize)
