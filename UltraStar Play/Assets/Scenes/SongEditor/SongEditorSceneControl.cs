@@ -186,7 +186,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         autoSaveDisposable = songMetaChangeEventStream
             // When there has been no new event for a second, then save
-            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(evt => DoAutoSaveIfEnabled())
             .AddTo(gameObject);
     }

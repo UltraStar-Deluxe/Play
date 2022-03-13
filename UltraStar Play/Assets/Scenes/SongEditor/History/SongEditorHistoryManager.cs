@@ -44,7 +44,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         songMetaChangeEventStream
             .Where(evt => IsUndoable(evt))
             // When there is no new change to the song for some time, then record an undo-state.
-            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => AddUndoState())
             .AddTo(gameObject);
     }
