@@ -25,6 +25,10 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public const int ViewportMinWidth = 1000;
     public int ViewportMaxWidth => (int)songAudioPlayer.DurationOfSongInMillis;
 
+    public const int MinViewportY = 0;
+    public const int MaxViewportY = 127;
+    public const int MaxMidiNoteInViewport = MaxViewportY + ViewportMaxHeight;
+
     // The first midi note that is visible in the viewport
     public int ViewportY { get; private set; }
     // The number of midi notes that are visible in the viewport
@@ -49,8 +53,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int MinMillisecondsInViewport { get; private set; }
     public int MaxMillisecondsInViewport { get; private set; }
 
-    public int MinMidiNoteInViewport { get; private set; }
-    public int MaxMidiNoteInViewport { get; private set; }
+    public int MinMidiNoteInCurrentViewport { get; private set; }
+    public int MaxMidiNoteInCurrentViewport { get; private set; }
 
     public double MillisecondsPerBeat { get; private set; }
     public float HeightForSingleNote { get; private set; }
@@ -237,8 +241,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public bool IsNoteVisible(Note note)
     {
         // Check y axis, which is the midi note
-        bool isMidiNoteOk = (note.MidiNote >= MinMidiNoteInViewport)
-                         && (note.MidiNote <= MaxMidiNoteInViewport);
+        bool isMidiNoteOk = (note.MidiNote >= MinMidiNoteInCurrentViewport)
+                         && (note.MidiNote <= MaxMidiNoteInCurrentViewport);
         if (!isMidiNoteOk)
         {
             return false;
@@ -279,7 +283,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public bool IsInViewport(Note note)
     {
         return note.StartBeat <= MaxBeatInViewport && note.EndBeat >= MinBeatInViewport
-            && note.MidiNote <= MaxMidiNoteInViewport && note.MidiNote >= MinMidiNoteInViewport;
+            && note.MidiNote <= MaxMidiNoteInCurrentViewport && note.MidiNote >= MinMidiNoteInCurrentViewport;
     }
 
     public bool IsInViewport(Sentence sentence)
@@ -452,18 +456,18 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void SetViewportYWithoutChangeEvent(int newViewportY)
     {
-        if (newViewportY < 0)
+        if (newViewportY < MinViewportY)
         {
-            newViewportY = 0;
+            newViewportY = MinViewportY;
         }
-        if (newViewportY > 127)
+        if (newViewportY > MaxViewportY)
         {
-            newViewportY = 127;
+            newViewportY = MaxViewportY;
         }
 
         ViewportY = newViewportY;
-        MinMidiNoteInViewport = ViewportY;
-        MaxMidiNoteInViewport = ViewportY + ViewportHeight;
+        MinMidiNoteInCurrentViewport = ViewportY;
+        MaxMidiNoteInCurrentViewport = ViewportY + ViewportHeight;
     }
 
     private void SetViewportHeightWithoutChangeEvent(int newViewportHeight)
@@ -478,7 +482,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         }
 
         ViewportHeight = newViewportHeight;
-        MaxMidiNoteInViewport = ViewportY + ViewportHeight;
+        MaxMidiNoteInCurrentViewport = ViewportY + ViewportHeight;
         HeightForSingleNote = 1f / ViewportHeight;
     }
 
@@ -607,7 +611,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int PixelsToMidiNote(float y)
     {
         Rect rect = VisualElement.worldBound;
-        return (int)Math.Round(MinMidiNoteInViewport + ViewportHeight * ((y - rect.y) / rect.height));
+        return (int)Math.Round(MinMidiNoteInCurrentViewport + ViewportHeight * ((y - rect.y) / rect.height));
     }
 
     private void UpdatePositionInSongIndicator(double positionInSongInMillis)
