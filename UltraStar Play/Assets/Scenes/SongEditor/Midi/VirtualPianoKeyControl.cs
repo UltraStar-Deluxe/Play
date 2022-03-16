@@ -30,28 +30,28 @@ public class VirtualPianoKeyControl : INeedInjection, IInjectionFinishedListener
 
             if (MidiUtils.IsBlackPianoKey(midiNote))
             {
-                visualElement.RemoveFromClassList("whiteKey");
-                visualElement.AddToClassList("blackKey");
+                VisualElement.RemoveFromClassList("whiteKey");
+                VisualElement.AddToClassList("blackKey");
             }
             else
             {
-                visualElement.AddToClassList("whiteKey");
-                visualElement.RemoveFromClassList("blackKey");
+                VisualElement.AddToClassList("whiteKey");
+                VisualElement.RemoveFromClassList("blackKey");
             }
         }
     }
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    private VisualElement visualElement;
+    public VisualElement VisualElement { get; private set; }
 
     [Inject]
     private MidiManager midiManager;
 
     public void OnInjectionFinished()
     {
-        visualElement.RegisterCallback<PointerDownEvent>(evt => PlayMidiNote());
-        visualElement.RegisterCallback<PointerUpEvent>(evt => StopMidiNote());
-        visualElement.RegisterCallback<PointerLeaveEvent>(evt => StopMidiNote());
+        VisualElement.RegisterCallback<PointerDownEvent>(evt => PlayMidiNote());
+        VisualElement.RegisterCallback<PointerUpEvent>(evt => StopMidiNote());
+        VisualElement.RegisterCallback<PointerLeaveEvent>(evt => StopMidiNote());
     }
 
     private void PlayMidiNote()
@@ -69,5 +69,15 @@ public class VirtualPianoKeyControl : INeedInjection, IInjectionFinishedListener
         {
             midiManager.StopMidiNote(midiNote);
         }
+    }
+
+    public void Show()
+    {
+        VisualElement.ShowByDisplay();
+    }
+
+    public void Hide()
+    {
+        VisualElement.HideByDisplay();
     }
 }
