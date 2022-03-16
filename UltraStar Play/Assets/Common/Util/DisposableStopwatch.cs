@@ -39,7 +39,9 @@ public class DisposableStopwatch : IDisposable
     private void LogTextWithPlaceholders(Stopwatch sw, string textWithPlaceholders, float logPeriodInSeconds)
     {
         string millis = sw.ElapsedMilliseconds.ToString();
-        string logText = textWithPlaceholders.Replace("<millis>", millis);
+        string logText = textWithPlaceholders
+            .Replace("<millis>", millis)
+            .Replace("<ms>", millis);
         if (logPeriodInSeconds <= 0)
         {
             // Log immediately
