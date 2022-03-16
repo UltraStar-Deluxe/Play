@@ -11,6 +11,10 @@ public class ObjectPool<T>
     private readonly Action<T> onFreeObject;
     private readonly Action<T> onUseObject;
 
+    public int FreeObjectsCount => freeObjects.Count;
+    public int UsedObjectsCount => usedObjects.Count;
+    public int Count => FreeObjectsCount + UsedObjectsCount;
+
     public ObjectPool(Action<T> onFreeObject = null, Action<T> onUseObject = null)
     {
         this.onFreeObject = onFreeObject;
