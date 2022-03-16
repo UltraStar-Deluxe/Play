@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
 using UniRx;
-using System;
-using System.ComponentModel;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -35,6 +33,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
+
+    private readonly Label[] labels = new Label[NoteAreaControl.MaxMidiNoteInViewport + 1];
 
     public void OnInjectionFinished()
     {
@@ -76,8 +76,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     {
         dynamicTexture.ClearTexture();
 
-        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
-        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
+        int minMidiNote = noteAreaControl.MinMidiNoteInCurrentViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInCurrentViewport;
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
             // Notes are drawn on lines and between lines alternatingly.
@@ -96,33 +96,64 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void UpdateMidiNoteLabels()
     {
-        horizontalGridLabelContainer.Clear();
+        int minMidiNote = noteAreaControl.MinMidiNoteInCurrentViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInCurrentViewport;
 
-        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
-        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
+        for (int midiNote = NoteAreaControl.MinViewportY; midiNote < minMidiNote; midiNote++)
+        {
+            if (labels[midiNote] != null)
+            {
+                labels[midiNote].HideByDisplay();
+            }
+        }
+
         for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
         {
-            CreateLabelForMidiNote(midiNote);
+            if (labels[midiNote] == null)
+            {
+                labels[midiNote] = CreateLabelForMidiNote(midiNote);
+            }
+            else
+            {
+                UpdateMidiNoteLabelPosition(labels[midiNote], midiNote);
+                labels[midiNote].ShowByDisplay();
+            }
+        }
+
+        for (int midiNote = maxMidiNote + 1; midiNote <= NoteAreaControl.MaxMidiNoteInViewport; midiNote++)
+        {
+            if (labels[midiNote] != null)
+            {
+                labels[midiNote].HideByDisplay();
+            }
         }
     }
 
-    private void CreateLabelForMidiNote(int midiNote)
+    private Label CreateLabelForMidiNote(int midiNote)
     {
         Label label = new Label();
         label.AddToClassList("tinyFont");
+        label.enableRichText = false;
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
-
-        float heightPercent = noteAreaControl.HeightForSingleNote;
-        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         label.style.left = 0;
-        label.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
-        label.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
 
         string midiNoteName = MidiUtils.GetAbsoluteName(midiNote);
         label.text = midiNoteName;
 
+        UpdateMidiNoteLabelPosition(label, midiNote);
+
         horizontalGridLabelContainer.Add(label);
+
+        return label;
+    }
+
+    private void UpdateMidiNoteLabelPosition(Label label, int midiNote)
+    {
+        float heightPercent = noteAreaControl.HeightForSingleNote;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
+        label.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        label.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }
 
     private void DrawHorizontalGridLine(int midiNote, Color color)

@@ -47,10 +47,10 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
             }
 
             int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
-            micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(shiftedMidiNote > noteAreaControl.MaxMidiNoteInViewport);
-            micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(shiftedMidiNote < noteAreaControl.MinMidiNoteInViewport);
+            micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(shiftedMidiNote > noteAreaControl.MaxMidiNoteInCurrentViewport);
+            micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(shiftedMidiNote < noteAreaControl.MinMidiNoteInCurrentViewport);
 
-            if (noteAreaControl.MinMidiNoteInViewport < shiftedMidiNote
+            if (noteAreaControl.MinMidiNoteInCurrentViewport < shiftedMidiNote
                 && shiftedMidiNote < noteAreaControl.MaxMillisecondsInViewport)
             {
                 micPitchIndicator.ShowByDisplay();
