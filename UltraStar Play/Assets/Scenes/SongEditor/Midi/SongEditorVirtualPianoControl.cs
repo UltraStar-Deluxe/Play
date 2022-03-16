@@ -44,7 +44,7 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
             .Subscribe(OnViewportChanged);
 
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowVirtualPianoArea)
-            .Subscribe(_ => UpdatePianoKeys());
+            .Subscribe(newValue => UpdatePianoKeys(newValue));
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -58,32 +58,30 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
         lastViewportEvent = viewportEvent;
     }
 
-    private void UpdatePianoKeys()
+    private void UpdatePianoKeys(bool force = false)
     {
-        if (!virtualPiano.IsVisibleByDisplay())
+        if (!virtualPiano.IsVisibleByDisplay()
+            && !force)
         {
             return;
         }
 
-        using (new DisposableStopwatch("UpdatePianoKeys took <millis>"))
+        int minMidiNote = noteAreaControl.MinMidiNoteInCurrentViewport;
+        int maxMidiNote = noteAreaControl.MaxMidiNoteInCurrentViewport;
+        for (int midiNote = 0; midiNote < minMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
         {
-            int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
-            int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
-            for (int midiNote = 0; midiNote < minMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
-            {
-                virtualPianoKeyControls[midiNote].Hide();
-            }
+            virtualPianoKeyControls[midiNote].Hide();
+        }
 
-            for (int midiNote = minMidiNote; midiNote <= maxMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
-            {
-                virtualPianoKeyControls[midiNote].Show();
-                UpdatePosition(virtualPianoKeyControls[midiNote]);
-            }
+        for (int midiNote = minMidiNote; midiNote <= maxMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+        {
+            virtualPianoKeyControls[midiNote].Show();
+            UpdatePosition(virtualPianoKeyControls[midiNote]);
+        }
 
-            for (int midiNote = maxMidiNote + 1; midiNote <= MidiUtils.MaxMidiNote; midiNote++)
-            {
-                virtualPianoKeyControls[midiNote].Hide();
-            }
+        for (int midiNote = maxMidiNote + 1; midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+        {
+            virtualPianoKeyControls[midiNote].Hide();
         }
     }
 
