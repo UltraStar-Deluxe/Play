@@ -10,6 +10,7 @@ public static class MidiUtils
     public const int SingableNoteMin = 36;
     public const int SingableNoteMax = 84;
     public const int SingableNoteRange = 49;
+    public const int MaxMidiNote = 127;
 
     // Concert pitch A4 (440 Hz)
     public const int MidiNoteConcertPitch = 69;

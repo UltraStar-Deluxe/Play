@@ -21,11 +21,30 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
     [Inject(UxmlName = R.UxmlNames.virtualPiano)]
     private VisualElement virtualPiano;
 
+    [Inject]
+    private Settings settings;
+
     private ViewportEvent lastViewportEvent;
+
+    private readonly VirtualPianoKeyControl[] virtualPianoKeyControls = new VirtualPianoKeyControl[MidiUtils.MaxMidiNote + 1];
 
     public void OnInjectionFinished()
     {
-        noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
+        virtualPiano.Clear();
+
+        // Creating lots of VisualElements every frame has bad performance.
+        // Instead, a pool of VisualElements is created once here and then hidden/shown and positioned every frame as needed.
+        for (int midiNote = 0; midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+        {
+            virtualPianoKeyControls[midiNote] = CreatePianoKeyForMidiNote(midiNote);
+            virtualPianoKeyControls[midiNote].Hide();
+        }
+
+        noteAreaControl.ViewportEventStream
+            .Subscribe(OnViewportChanged);
+
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowVirtualPianoArea)
+            .Subscribe(_ => UpdatePianoKeys());
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -41,17 +60,34 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
 
     private void UpdatePianoKeys()
     {
-        virtualPiano.Clear();
-
-        int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
-        int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
-        for (int midiNote = minMidiNote; midiNote <= maxMidiNote; midiNote++)
+        if (!virtualPiano.IsVisibleByDisplay())
         {
-            CreatePianoKeyForMidiNote(midiNote);
+            return;
+        }
+
+        using (new DisposableStopwatch("UpdatePianoKeys took <millis>"))
+        {
+            int minMidiNote = noteAreaControl.MinMidiNoteInViewport;
+            int maxMidiNote = noteAreaControl.MaxMidiNoteInViewport;
+            for (int midiNote = 0; midiNote < minMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+            {
+                virtualPianoKeyControls[midiNote].Hide();
+            }
+
+            for (int midiNote = minMidiNote; midiNote <= maxMidiNote && midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+            {
+                virtualPianoKeyControls[midiNote].Show();
+                UpdatePosition(virtualPianoKeyControls[midiNote]);
+            }
+
+            for (int midiNote = maxMidiNote + 1; midiNote <= MidiUtils.MaxMidiNote; midiNote++)
+            {
+                virtualPianoKeyControls[midiNote].Hide();
+            }
         }
     }
 
-    private void CreatePianoKeyForMidiNote(int midiNote)
+    private VirtualPianoKeyControl CreatePianoKeyForMidiNote(int midiNote)
     {
         VisualElement visualElement = new VisualElement();
         visualElement.AddToClassList("virtualPianoKey");
@@ -60,15 +96,22 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
             .CreateAndInject<VirtualPianoKeyControl>();
         keyControl.MidiNote = midiNote;
 
+        virtualPiano.Add(visualElement);
+
+        return keyControl;
+    }
+
+    private void UpdatePosition(VirtualPianoKeyControl keyControl)
+    {
         float heightPercent = noteAreaControl.HeightForSingleNote * 0.8f;
-        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
-        float widthPercent = MidiUtils.IsWhitePianoKey(midiNote) ? 0.9f : 0.7f;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(keyControl.MidiNote) - heightPercent / 2;
+        float widthPercent = MidiUtils.IsWhitePianoKey(keyControl.MidiNote) ? 0.9f : 0.7f;
+
+        VisualElement visualElement = keyControl.VisualElement;
         visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
         visualElement.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         visualElement.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
         visualElement.style.left = 0;
         visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
-
-        virtualPiano.Add(visualElement);
     }
 }
