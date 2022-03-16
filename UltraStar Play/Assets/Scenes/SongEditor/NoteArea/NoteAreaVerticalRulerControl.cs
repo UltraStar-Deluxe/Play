@@ -43,7 +43,11 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
             dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, horizontalGrid);
             dynamicTexture.backgroundColor = new Color(0, 0, 0, 0);
             UpdateMidiNoteLabels();
-            UpdateMidiNoteLines();
+
+            if (settings.SongEditorSettings.GridSizeInDevicePixels > 0)
+            {
+                UpdateMidiNoteLines();
+            }
         });
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
