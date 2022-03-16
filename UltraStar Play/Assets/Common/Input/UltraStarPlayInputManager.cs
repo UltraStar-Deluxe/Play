@@ -45,8 +45,11 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         }
         private set
         {
-            inputDeviceEnum = value;
-            inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+            if (inputDeviceEnum != value)
+            {
+                inputDeviceEnum = value;
+                inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+            }
         }
     }
 
