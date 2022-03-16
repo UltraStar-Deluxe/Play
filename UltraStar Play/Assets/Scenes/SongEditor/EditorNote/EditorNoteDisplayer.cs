@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 {
     public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
     public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
@@ -64,39 +64,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
 
     private int lastFullUpdateFrame;
 
-    public void OnInjectionFinished()
-    {
-        songMetaChangeEventStream.Subscribe(evt =>
-        {
-            if (evt is LoadedMementoEvent)
-            {
-                // The object instances have changed. All maps must be cleared.
-                noteAreaNotes.Clear();
-                noteToControlMap.Clear();
-                noteAreaSentences.Clear();
-                sentenceToControlMap.Clear();
-            }
-
-            if (evt is MovedNotesToVoiceEvent movedNotesToVoiceEvent)
-            {
-                // Sentences might have been removed because they did not contain any notes anymore.
-                DeleteSentences(movedNotesToVoiceEvent.RemovedSentences);
-            }
-
-            ReloadSentences();
-            UpdateNotesAndSentences();
-        });
-
-        sentenceLines.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
-        {
-            if (sentenceLinesDynamicTexture == null)
-            {
-                sentenceLinesDynamicTexture = new DynamicTexture(gameObject, sentenceLines);
-                UpdateSentences();
-            }
-        });
-    }
-
     private void Start()
     {
         noteAreaNotes.Clear();
@@ -110,25 +77,48 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, IInjectionFini
         noteAreaControl.ViewportEventStream.Subscribe(_ =>
         {
             UpdateNotesAndSentences();
+        }).AddTo(gameObject);;
+
+        songMetaChangeEventStream.Subscribe(evt =>
+        {
+            if (evt is LoadedMementoEvent)
+            {
+                // The object instances have changed. All maps must be cleared.
+                noteAreaNotes.Clear();
+                noteToControlMap.Clear();
+                noteAreaSentences.Clear();
+                sentenceToControlMap.Clear();
+            }
+            else if (evt is SentencesDeletedEvent sde)
+            {
+                sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
+            }
+            else if (evt is MovedNotesToVoiceEvent movedNotesToVoiceEvent)
+            {
+                // Sentences might have been removed because they did not contain any notes anymore.
+                DeleteSentences(movedNotesToVoiceEvent.RemovedSentences);
+            }
+
+            ReloadSentences();
+            UpdateNotesAndSentences();
+        }).AddTo(gameObject);
+
+        sentenceLines.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            if (sentenceLinesDynamicTexture == null)
+            {
+                sentenceLinesDynamicTexture = new DynamicTexture(gameObject, sentenceLines);
+                UpdateSentences();
+            }
         });
 
-        songMetaChangeEventStream
-            .Subscribe(evt =>
-            {
-                if (evt is SentencesDeletedEvent sde)
-                {
-                    sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
-                }
-            })
-            .AddTo(gameObject);
-
-        foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
+        EnumUtils.GetValuesAsList<ESongEditorLayer>().ForEach(layer =>
         {
             songEditorLayerManager
                 .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
                 .Subscribe(_ => UpdateNotes())
                 .AddTo(gameObject);
-        }
+        });
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.HideVoices.Count)
