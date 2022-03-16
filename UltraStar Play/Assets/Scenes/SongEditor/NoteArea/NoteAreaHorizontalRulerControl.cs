@@ -70,7 +70,12 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             || songMeta.Bpm != lastSongMetaBpm)
         {
             lastSongMetaBpm = songMeta.Bpm;
-            UpdateLines();
+
+            if (settings.SongEditorSettings.GridSizeInDevicePixels > 0)
+            {
+                UpdateLines();
+            }
+
             UpdateLabels();
         }
         lastViewportEvent = viewportEvent;
