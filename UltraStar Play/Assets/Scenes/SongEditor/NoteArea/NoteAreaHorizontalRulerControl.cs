@@ -39,6 +39,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private float lastSongMetaBpm;
 
+    private readonly VisualElementPool<Label> labelPool = new VisualElementPool<Label>();
+
     public void OnInjectionFinished()
     {
         verticalGrid.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
@@ -87,6 +89,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         {
             return;
         }
+
         dynamicTexture.ClearTexture();
 
         int viewportStartBeat = noteAreaControl.MinBeatInViewport;
@@ -136,7 +139,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private void UpdateLabels()
     {
-        verticalGridLabelContainer.Clear();
+        labelPool.FreeAllObjects();
 
         int viewportStartBeat = noteAreaControl.MinBeatInViewport;
         int viewportEndBeat = noteAreaControl.MaxBeatInViewport;
@@ -166,35 +169,51 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
             {
-                Label label = CreateLabel(beatPosInMillis, labelWidthInMillis, verticalGridLabelContainer);
-                label.text = beat.ToString();
+                if (!labelPool.TryGetFreeObject(out Label label))
+                {
+                    label = CreateLabel(verticalGridLabelContainer);
+                    labelPool.AddUsedObject(label);
+                }
+
+                UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
                 label.style.top = 12;
+                label.text = beat.ToString();
             }
 
             bool hasSecondLabel = drawStepVeryRough > 0 && (beat % drawStepVeryRough == 0);
             if (hasSecondLabel)
             {
                 double beatPosInSeconds = beatPosInMillis / 1000;
-                Label label = CreateLabel(beatPosInMillis, labelWidthInMillis, verticalGridLabelContainer);
+                if (!labelPool.TryGetFreeObject(out Label label))
+                {
+                    label = CreateLabel(verticalGridLabelContainer);
+                    labelPool.AddUsedObject(label);
+                }
+
+                UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
+                label.style.top = 0;
                 label.text = beatPosInSeconds.ToString("F3", CultureInfo.InvariantCulture) + " s";
             }
         }
     }
 
-    private Label CreateLabel(double beatPosInMillis, double labelWidthInMillis, VisualElement container)
+    private Label CreateLabel(VisualElement container)
     {
         Label label = new Label();
         label.AddToClassList("tinyFont");
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
+        container.Add(label);
+        return label;
+    }
+
+    private void UpdateLabelPosition(Label label, double beatPosInMillis, double labelWidthInMillis)
+    {
         float widthPercent = (float)(labelWidthInMillis / noteAreaControl.ViewportWidth);
         float xPercent = (float)((beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth) - widthPercent / 2;
         label.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
-        label.style.top = 0;
         label.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
-        container.Add(label);
-        return label;
     }
 
     private void DrawVerticalGridLine(double beatPosInMillis, Color color)
