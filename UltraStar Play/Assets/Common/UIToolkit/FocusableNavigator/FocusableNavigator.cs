@@ -37,6 +37,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     public virtual void Start()
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         eventSystem.sendNavigationEvents = false;
 
         if (focusLastElementIfNothingFocused)
@@ -53,6 +58,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     protected virtual void Update()
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         if (uiDocument == null)
         {
             // Injection failed

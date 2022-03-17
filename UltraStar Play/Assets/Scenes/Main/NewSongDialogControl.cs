@@ -57,6 +57,8 @@ public class NewSongDialogControl : AbstractDialogControl, IInjectionFinishedLis
         UpdateOkButtonEnabled();
         artistTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
         titleTextField.RegisterValueChangedCallback(evt => UpdateOkButtonEnabled());
+
+        cancelButton.Focus();
     }
 
     private void UpdateOkButtonEnabled()
