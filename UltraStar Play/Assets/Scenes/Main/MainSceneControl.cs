@@ -86,12 +86,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
-        InitButtonDescription(startButton, R.Messages.mainScene_button_sing_description);
-        InitButtonDescription(settingsButton, R.Messages.mainScene_button_settings_description);
-        InitButtonDescription(aboutButton, R.Messages.mainScene_button_about_description);
-        InitButtonDescription(quitButton, R.Messages.mainScene_button_quit_description);
-        // InitButtonDescription(createSongButton, "Create an empty song from template");
-        InitButtonDescription(partyButton, R.Messages.mainScene_button_description_noImplementation);
+        InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
+        InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
+        InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
+        InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
+        InitButtonDescription(createSongButton, "Create an empty song from template");
+        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
 
         UpdateVersionInfoText();
 
@@ -100,10 +100,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         songMetaManager.ScanFilesIfNotDoneYet();
     }
 
-    private void InitButtonDescription(Button button, string i18nCode)
+    private void InitButtonDescription(Button button, string description)
     {
-        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
-        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
+        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = description);
+        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = description);
     }
 
     public void UpdateTranslation()
@@ -198,7 +198,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             .CreateAndInject<NewSongDialogControl>();
 
         newSongDialogControl.DialogClosedEventStream
-            .Subscribe(_ => newSongDialogControl = null);
+            .Subscribe(_ =>
+            {
+                newSongDialogControl = null;
+                createSongButton.Focus();
+            });
     }
 
     public void CloseNewSongDialog()
