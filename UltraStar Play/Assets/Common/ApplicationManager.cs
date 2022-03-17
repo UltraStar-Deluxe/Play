@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UniInject;
 using UnityEngine;
 
-public class ApplicationManager : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     public static ApplicationManager Instance
     {
@@ -18,14 +22,17 @@ public class ApplicationManager : MonoBehaviour
     [Range(-1, 60)]
     public int targetFrameRate = 30;
 
-    void Start()
+    [Inject]
+    private Settings settings;
+
+    public void OnInjectionFinished()
     {
-        targetFrameRate = SettingsManager.Instance.Settings.GraphicSettings.targetFps;
+        targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
     }
 
-    void Update()
+    private void Update()
     {
         if (Application.targetFrameRate != targetFrameRate)
         {

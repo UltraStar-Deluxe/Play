@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UniInject;
 using UniRx;
 using System.Linq;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -99,13 +100,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private PanelHelper panelHelper;
 
     private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
-    public ISubject<ViewportEvent> ViewportEventStream
-    {
-        get
-        {
-            return viewportEventStream;
-        }
-    }
+    public IObservable<ViewportEvent> ViewportEventStream => viewportEventStream;
 
     private float lastClickTime;
     private Vector2 lastClickPosition;

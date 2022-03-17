@@ -79,13 +79,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream
-            .Buffer(new TimeSpan(0, 0, 0, 0, 80))
             .Subscribe(_ =>
             {
-                using (new DisposableStopwatch("Update because of ViewportEvent took: <millis>"))
-                {
-                    UpdateNotesAndSentences();
-                }
+                UpdateNotesAndSentences();
                 lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
             }).AddTo(gameObject);
 
@@ -225,14 +221,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateSentenceControls()
     {
-        using (new DisposableStopwatch("UpdateSentenceControls took <ms>"))
-        {
-            List<Voice> visibleVoices = songMeta.GetVoices()
-                .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
-                .ToList();
+        List<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
 
-            visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
-        }
+        visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
     }
 
     private void RemoveSentenceMarkerLines()
@@ -248,32 +241,29 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateSentenceMarkerLines()
     {
-        using (new DisposableStopwatch("UpdateSentenceMarkerLines took <ms>"))
+        if (settings.SongEditorSettings.SentenceLineSizeInDevicePixels <= 0
+            || sentenceLinesDynamicTexture == null)
         {
-            if (settings.SongEditorSettings.SentenceLineSizeInDevicePixels <= 0
-                || sentenceLinesDynamicTexture == null)
-            {
-                return;
-            }
-
-            if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
-            {
-                if (lastViewportWidthInMillis <= HideElementThresholdInMillis)
-                {
-                    RemoveSentenceMarkerLines();
-                    lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
-                }
-                return;
-            }
-
-            List<Voice> visibleVoices = songMeta.GetVoices()
-                .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
-                .ToList();
-
-            sentenceLinesDynamicTexture.ClearTexture();
-            visibleVoices.ForEach(voice => DrawSentenceMarkerLineForVoice(voice));
-            sentenceLinesDynamicTexture.ApplyTexture();
+            return;
         }
+
+        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        {
+            if (lastViewportWidthInMillis <= HideElementThresholdInMillis)
+            {
+                RemoveSentenceMarkerLines();
+                lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
+            }
+            return;
+        }
+
+        List<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
+
+        sentenceLinesDynamicTexture.ClearTexture();
+        visibleVoices.ForEach(voice => DrawSentenceMarkerLineForVoice(voice));
+        sentenceLinesDynamicTexture.ApplyTexture();
     }
 
     private void CreateSentenceControlForVoice(Voice voice)
@@ -303,19 +293,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     public void UpdateNotes()
     {
-        using (new DisposableStopwatch("UpdateNotes took <ms>"))
+        if (gameObject == null
+            || !gameObject.activeInHierarchy)
         {
-            if (gameObject == null
-                || !gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            HideNoteControlsOutsideOfViewport();
-
-            DrawNotesInSongFile();
-            DrawNotesInLayers();
+            return;
         }
+
+        HideNoteControlsOutsideOfViewport();
+
+        DrawNotesInSongFile();
+        DrawNotesInLayers();
     }
 
     public EditorNoteControl GetNoteControl(Note note)

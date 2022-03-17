@@ -73,6 +73,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
 
+    [Inject]
+    private ApplicationManager applicationManager;
+
     private IDisposable autoSaveDisposable;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
@@ -154,6 +157,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
+
+        // The song editor does not need a high frame rate
+        applicationManager.targetFrameRate = 30;
     }
 
     private void OnDestroy()
