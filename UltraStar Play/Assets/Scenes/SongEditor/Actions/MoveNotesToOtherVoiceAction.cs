@@ -81,6 +81,12 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
             }
             targetSentence.AddNote(note);
 
+            // Set lyrics if none yet (otherwise, there is a warning because of missing lyrics)
+            if (note.Text.IsNullOrEmpty())
+            {
+                note.SetText(" ");
+            }
+
             changedSentences.Add(targetSentence);
             if (oldSentence != null)
             {
