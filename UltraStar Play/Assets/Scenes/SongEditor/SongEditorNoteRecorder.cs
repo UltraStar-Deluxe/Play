@@ -263,7 +263,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             else
             {
                 songEditorLayerManager.RemoveNoteFromAllLayers(note);
-                editorNoteDisplayer.DeleteNoteControl(note);
+                editorNoteDisplayer.RemoveNoteControl(note);
             }
         }
     }
