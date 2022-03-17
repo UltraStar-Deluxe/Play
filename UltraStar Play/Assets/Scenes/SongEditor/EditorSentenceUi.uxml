@@ -7,6 +7,6 @@
             <ui:VisualElement name="leftHandle" style="position: absolute; height: 100%; width: 25%; background-color: rgba(21, 88, 219, 0.5);" />
             <ui:VisualElement name="rightHandle" style="position: absolute; height: 100%; width: 25%; background-color: rgba(21, 88, 219, 0.5); right: 0;" />
         </ui:VisualElement>
-        <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="sentenceLabel" picking-mode="Ignore" class="tinyFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold; width: 100%; height: 100%; -unity-text-align: middle-center; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; overflow: visible; position: absolute; white-space: normal;" />
+        <ui:Label text="Lorem ipsum" display-tooltip-when-elided="true" name="sentenceLabel" picking-mode="Ignore" class="tinyFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold; width: 100%; height: 100%; -unity-text-align: middle-center; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; overflow: visible; position: absolute; white-space: nowrap;" />
     </ui:VisualElement>
 </ui:UXML>
