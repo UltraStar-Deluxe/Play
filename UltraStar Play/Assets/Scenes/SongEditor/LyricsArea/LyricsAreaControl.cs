@@ -131,6 +131,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         {
             UpdateLyrics();
         }
+
+        if (changeEvent is MovedNotesToVoiceEvent)
+        {
+            UpdateVoiceButtons();
+        }
     }
 
     private void UpdateVoiceButtons()
