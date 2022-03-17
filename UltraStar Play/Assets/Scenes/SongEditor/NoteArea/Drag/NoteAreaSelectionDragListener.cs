@@ -157,7 +157,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private int GetDragEndBeat(NoteAreaDragEvent currentDragEvent)
     {
-        return noteAreaControl.PixelsToBeat(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.x);
+        return noteAreaControl.ScreenPixelPositionToBeat(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.x);
     }
 
     private int GetDragStartMidiNote()
@@ -167,7 +167,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private int GetDragEndMidiNote(NoteAreaDragEvent currentDragEvent)
     {
-        return noteAreaControl.PixelsToMidiNote(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.y);
+        return noteAreaControl.ScreenPixelPositionToMidiNote(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.y);
     }
 
     private bool IsInSelectionFrame(
@@ -214,7 +214,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         float widthPercent = (float)(toBeat - fromBeat) / noteAreaControl.ViewportWidthInBeats;
         float heightPercent = (float)(toMidiNote - fromMidiNote) / noteAreaControl.ViewportHeight;
         noteAreaSelectionFrame.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
-        noteAreaSelectionFrame.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.top = new StyleLength(new Length((yPercent - heightPercent) * 100, LengthUnit.Percent));
         noteAreaSelectionFrame.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
         noteAreaSelectionFrame.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }
