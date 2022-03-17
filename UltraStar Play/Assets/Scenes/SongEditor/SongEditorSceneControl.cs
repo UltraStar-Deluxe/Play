@@ -264,26 +264,19 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    // Returns the notes in the song as well as the notes in the layers in no particular order.
-    public List<Note> GetAllNotes()
-    {
-        List<Note> result = new List<Note>();
-        List<Note> notesInVoices = SongMetaUtils.GetAllNotes(SongMeta);
-        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
-        result.AddRange(notesInVoices);
-        result.AddRange(notesInLayers);
-        return result;
-    }
-    
     public List<Note> GetAllVisibleNotes()
     {
         List<Note> result = new List<Note>();
-        List<Note> notesInVoices = SongMetaUtils.GetAllNotes(SongMeta)
+        List<Note> notesInVoices = SongMeta.GetVoices()
+            // Second voice is drawn on top of first voice. Thus, start with second voice.
+            .Reverse()
+            .SelectMany(voice => voice.Sentences)
+            .SelectMany(sentence => sentence.Notes)
             .Where(note => songEditorLayerManager.IsVisible(note))
             .ToList();
         List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
-        result.AddRange(notesInVoices);
         result.AddRange(notesInLayers);
+        result.AddRange(notesInVoices);
         return result;
     }
 
