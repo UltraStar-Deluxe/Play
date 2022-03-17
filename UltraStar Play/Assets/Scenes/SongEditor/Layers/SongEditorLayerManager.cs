@@ -82,10 +82,10 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             result.Add(layerEnum, new SongEditorLayer(layerEnum));
         }
-        result[ESongEditorLayer.MicRecording].Color = Colors.CreateColor("#1D67C2");
-        result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA");
+        result[ESongEditorLayer.MicRecording].Color = Colors.CreateColor("#1D67C2", 200);
+        result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA", 200);
         result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 200);
-        result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799");
+        result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799", 200);
         return result;
     }
 
