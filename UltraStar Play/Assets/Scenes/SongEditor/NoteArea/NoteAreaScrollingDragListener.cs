@@ -77,7 +77,7 @@ public class NoteAreaScrollingDragListener : INeedInjection, IInjectionFinishedL
         }
         
         int newViewportX = viewportXBeginDrag - dragEvent.MillisDistance;
-        int newViewportY = viewportYBeginDrag - dragEvent.MidiNoteDistance;
+        int newViewportY = viewportYBeginDrag + dragEvent.MidiNoteDistance;
         noteAreaControl.SetViewport(newViewportX, newViewportY, noteAreaControl.ViewportWidth, noteAreaControl.ViewportHeight);
     }
 

@@ -257,7 +257,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             return 0;
         }
-        return (double)(midiNote - ViewportY) / ViewportHeight;
+        return 1 - (double)(midiNote - ViewportY) / ViewportHeight;
     }
 
     public double GetHorizontalPositionForMillis(double positionInSongInMillis)
@@ -315,9 +315,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public int GetVerticalMousePositionInMidiNote()
     {
         Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        float height = VisualElement.contentRect.height;
-        double yPercent = (mousePositionInPanelCoordinates.y - VisualElement.worldBound.y) / height;
-        return ViewportY + (int)Math.Round(yPercent * ViewportHeight);
+        return ScreenPixelPositionToMidiNote(mousePositionInPanelCoordinates.y);
     }
 
     public void ZoomHorizontal(int direction)
@@ -597,16 +595,22 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         return midiNotes * rect.height / ViewportHeight;
     }
 
-    public int PixelsToBeat(float x)
+    public int ScreenPixelPositionToMillis(float x)
+    {
+        Rect rect = VisualElement.worldBound;
+        return (int)Math.Round(ViewportX + ViewportWidth * ((x - rect.x) / rect.width));
+    }
+
+    public int ScreenPixelPositionToBeat(float x)
     {
         Rect rect = VisualElement.worldBound;
         return (int)Math.Round(MinBeatInViewport + ViewportWidthInBeats * ((x - rect.x) / rect.width));
     }
 
-    public int PixelsToMidiNote(float y)
+    public int ScreenPixelPositionToMidiNote(float y)
     {
         Rect rect = VisualElement.worldBound;
-        return (int)Math.Round(MinMidiNoteInCurrentViewport + ViewportHeight * ((y - rect.y) / rect.height));
+        return (int)Math.Round(MinMidiNoteInCurrentViewport + ViewportHeight * (1 - (y - rect.y) / rect.height));
     }
 
     private void UpdatePositionInSongIndicator(double positionInSongInMillis)
