@@ -229,7 +229,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         {
             if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
             {
-                int newMidiNote = noteSnapshot.MidiNote + dragEvent.MidiNoteDistance;
+                int newMidiNote = noteSnapshot.MidiNote - dragEvent.MidiNoteDistance;
                 note.SetMidiNote(newMidiNote);
                 note.SetStartAndEndBeat(noteSnapshot.StartBeat, noteSnapshot.EndBeat);
             }
