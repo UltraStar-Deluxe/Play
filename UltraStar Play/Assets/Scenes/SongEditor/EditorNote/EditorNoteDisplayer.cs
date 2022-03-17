@@ -14,6 +14,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
     public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
 
+    private const int HideElementThresholdInMillis = 60 * 1000;
+
     [InjectedInInspector]
     public VisualTreeAsset editorNoteUi;
 
@@ -64,7 +66,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private int lastFullUpdateFrame;
 
-    private int lastViewportWidthInBeats;
+    private int lastViewportWidthInMillis;
 
     private void Start()
     {
@@ -76,13 +78,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         ReloadSentences();
 
         UpdateNotesAndSentences();
-        noteAreaControl.ViewportEventStream.Subscribe(_ =>
-        {
-            using (new DisposableStopwatch("Update because of ViewportEvent took: <millis>"))
+        noteAreaControl.ViewportEventStream
+            .Subscribe(_ =>
             {
-                UpdateNotesAndSentences();
-            }
-        }).AddTo(gameObject);
+                using (new DisposableStopwatch("Update because of ViewportEvent took: <millis>"))
+                {
+                    UpdateNotesAndSentences();
+                }
+                lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
+            }).AddTo(gameObject);
 
         songMetaChangeEventStream.Subscribe(evt =>
         {
@@ -96,12 +100,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             }
             else if (evt is SentencesDeletedEvent sde)
             {
-                sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
+                sde.Sentences.ForEach(sentence => RemoveSentence(sentence));
             }
             else if (evt is MovedNotesToVoiceEvent movedNotesToVoiceEvent)
             {
                 // Sentences might have been removed because they did not contain any notes anymore.
-                DeleteSentences(movedNotesToVoiceEvent.RemovedSentences);
+                RemoveSentences(movedNotesToVoiceEvent.RemovedSentences);
             }
 
             ReloadSentences();
@@ -150,12 +154,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
     }
 
-    public void DeleteSentences(IReadOnlyCollection<Sentence> sentences)
+    public void RemoveSentences(IReadOnlyCollection<Sentence> sentences)
     {
-        sentences.ForEach(sentence => DeleteSentence(sentence));
+        sentences.ForEach(sentence => RemoveSentence(sentence));
     }
 
-    public void DeleteSentence(Sentence sentence)
+    public void RemoveSentence(Sentence sentence)
     {
         if (sentenceToControlMap.TryGetValue(sentence, out EditorSentenceControl editorSentenceControl))
         {
@@ -170,13 +174,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         List<Note> notVisibleNotes = noteToControlMap.Keys
             .Where(note => !songEditorLayerManager.IsVoiceVisible(note.Sentence?.Voice))
             .ToList();
-        notVisibleNotes.ForEach(note => DeleteNoteControl(note));
+        notVisibleNotes.ForEach(note => RemoveNoteControl(note));
 
         // Remove sentences of hidden voices
         List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
             .Where(sentence => !songEditorLayerManager.IsVoiceVisible(sentence.Voice))
             .ToList();
-        notVisibleSentences.ForEach(sentence => DeleteSentence(sentence));
+        notVisibleSentences.ForEach(sentence => RemoveSentence(sentence));
 
         // Draw any notes that are now (again) visible.
         UpdateNotesAndSentences();
@@ -251,17 +255,15 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 return;
             }
 
-            int viewportWidthInBeats = noteAreaControl.MaxBeatInViewport - noteAreaControl.MinBeatInViewport;
-            if (viewportWidthInBeats > 1200)
+            if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
             {
-                if (lastViewportWidthInBeats <= 1200)
+                if (lastViewportWidthInMillis <= HideElementThresholdInMillis)
                 {
                     RemoveSentenceMarkerLines();
-                    lastViewportWidthInBeats = viewportWidthInBeats;
+                    lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
                 }
                 return;
             }
-            lastViewportWidthInBeats = viewportWidthInBeats;
 
             List<Voice> visibleVoices = songMeta.GetVoices()
                 .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
@@ -308,7 +310,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 return;
             }
 
-            DestroyNoteControlsOutsideOfViewport();
+            HideNoteControlsOutsideOfViewport();
 
             DrawNotesInSongFile();
             DrawNotesInLayers();
@@ -327,31 +329,43 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    public void DeleteNoteControl(EditorNoteControl noteControl)
+    public void RemoveNoteControl(EditorNoteControl noteControl)
     {
         noteControl.Dispose();
         noteToControlMap.Remove(noteControl.Note);
     }
 
-    public void DeleteNoteControl(Note note)
+    public void RemoveNoteControl(Note note)
     {
         if (noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
-            DeleteNoteControl(editorNoteControl);
+            RemoveNoteControl(editorNoteControl);
         }
     }
 
-    private void DestroyNoteControlsOutsideOfViewport()
+    private void HideNoteControlsOutsideOfViewport()
     {
         ICollection<EditorNoteControl> editorNoteControls = new List<EditorNoteControl>(noteToControlMap.Values);
         foreach (EditorNoteControl editorNoteControl in editorNoteControls)
         {
             Note note = editorNoteControl.Note;
-            if (!noteAreaControl.IsInViewport(note))
+            if (noteAreaControl.IsInViewport(note))
             {
-                DeleteNoteControl(editorNoteControl);
+                continue;
             }
+
+            HideNoteControl(editorNoteControl);
         }
+    }
+
+    private void HideNoteControl(EditorNoteControl editorNoteControl)
+    {
+        editorNoteControl.VisualElement.HideByDisplay();
+    }
+
+    private void ShowNoteControl(EditorNoteControl editorNoteControl)
+    {
+        editorNoteControl.VisualElement.ShowByDisplay();
     }
 
     private void DrawNotesInLayers()
@@ -377,7 +391,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         {
             if (noteToControlMap.TryGetValue(note, out EditorNoteControl noteControl))
             {
-                DeleteNoteControl(noteControl);
+                RemoveNoteControl(noteControl);
             }
         });
     }
@@ -415,14 +429,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        IEnumerable<Voice> voices = songMeta.GetVoices();
-        foreach (Voice voice in voices)
-        {
-            if (songEditorLayerManager.IsVoiceVisible(voice))
-            {
-                DrawNotesInVoice(voice);
-            }
-        }
+        IEnumerable<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
+        visibleVoices.ForEach(voice => DrawNotesInVoice(voice));
     }
 
     private void DrawNotesInVoice(Voice voice)
@@ -541,6 +551,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
 
         PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        ShowNoteControl(editorNoteControl);
+
+        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        {
+            editorNoteControl.HideLabels();
+        }
+        else
+        {
+            editorNoteControl.ShowLabels();
+        }
 
         return editorNoteControl;
     }

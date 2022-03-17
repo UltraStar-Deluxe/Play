@@ -106,7 +106,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     private void ClearCopiedNotes()
     {
-        CopiedNotes.ForEach(copiedNote => editorNoteDisplayer.DeleteNoteControl(copiedNote));
+        CopiedNotes.ForEach(copiedNote => editorNoteDisplayer.RemoveNoteControl(copiedNote));
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
         copiedNoteToOriginalDataMap.Clear();
     }

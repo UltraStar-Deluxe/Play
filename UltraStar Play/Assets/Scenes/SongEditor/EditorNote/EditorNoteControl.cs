@@ -377,4 +377,16 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     {
         lyricsInputControl.SubmitAndCloseLyricsDialog();
     }
+
+    public void HideLabels()
+    {
+        lyricsLabel.HideByDisplay();
+        pitchLabel.HideByDisplay();
+    }
+
+    public void ShowLabels()
+    {
+        lyricsLabel.ShowByDisplay();
+        pitchLabel.ShowByDisplay();
+    }
 }
