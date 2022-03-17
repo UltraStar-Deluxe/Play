@@ -127,7 +127,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         if (lyricsAreaMode == LyricsAreaMode.ViewMode
             && (changeEvent is LyricsChangedEvent
-                || changeEvent is LoadedMementoEvent))
+                || changeEvent is LoadedMementoEvent
+                || changeEvent is MovedNotesToVoiceEvent))
         {
             UpdateLyrics();
         }
