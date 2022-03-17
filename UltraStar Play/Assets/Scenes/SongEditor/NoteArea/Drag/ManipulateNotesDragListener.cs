@@ -33,6 +33,9 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
+    [Inject]
+    private SongEditorLayerManager layerManager;
+
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
 
@@ -67,7 +70,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         }
 
         Note dragStartNote = songEditorSceneControl
-            .GetAllNotes()
+            .GetAllVisibleNotes()
             .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
                                     && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
                                     && note.MidiNote <= dragEvent.MidiNoteDragStart
