@@ -157,9 +157,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
-
-        // The song editor does not need a high frame rate
-        applicationManager.targetFrameRate = 30;
     }
 
     private void OnDestroy()
