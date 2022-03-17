@@ -79,6 +79,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream
+            .Buffer(new TimeSpan(0, 0, 0, 0, 80))
             .Subscribe(_ =>
             {
                 using (new DisposableStopwatch("Update because of ViewportEvent took: <millis>"))
