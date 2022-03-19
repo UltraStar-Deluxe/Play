@@ -101,7 +101,13 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
-        devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+        if (!TryReSelectLastMicProfile())
+        {
+            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+        }
+        devicePickerControl.Selection
+            .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
+
         amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationContainer.Q<ItemPicker>(), amplificationItems);
         amplificationPickerControl.GetLabelTextFunction = item => item + " %";
         noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
@@ -169,6 +175,24 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                         "error");
                 }
             });
+    }
+
+    private bool TryReSelectLastMicProfile()
+    {
+        if (settings.LastMicProfileNameInRecordingOptionsScene.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        MicProfile lastMicProfile = devicePickerControl.Items
+            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene);
+        if (lastMicProfile == null)
+        {
+            return false;
+        }
+
+        devicePickerControl.SelectItem(lastMicProfile);
+        return true;
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool isEnabled)

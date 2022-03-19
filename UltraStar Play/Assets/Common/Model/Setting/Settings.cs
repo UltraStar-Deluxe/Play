@@ -1,8 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 [Serializable]
 public class Settings
@@ -12,6 +10,7 @@ public class Settings
     public AudioSettings AudioSettings { get; set; } = new AudioSettings();
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
     public List<MicProfile> MicProfiles { get; set; } = new List<MicProfile>();
+    public string LastMicProfileNameInRecordingOptionsScene { get; set; }
 
     public SongEditorSettings SongEditorSettings { get; set; } = new SongEditorSettings();
     public SongSelectSettings SongSelectSettings { get; set; } = new SongSelectSettings();
