@@ -320,6 +320,7 @@ public static partial class R
         public const string overviewAreaWaveform = "overviewAreaWaveform";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
+        public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
         public const string pauseOverlayTitle = "pauseOverlayTitle";
         public const string phraseBonusScore = "phraseBonusScore";
@@ -336,6 +337,7 @@ public static partial class R
         public const string playerUi = "playerUi";
         public const string PlayerUi = "PlayerUi";
         public const string playerUiContainer = "playerUiContainer";
+        public const string playIcon = "playIcon";
         public const string playlistChooserButton = "playlistChooserButton";
         public const string playlistChooserContainer = "playlistChooserContainer";
         public const string playlistChooserDropdownContainer = "playlistChooserDropdownContainer";

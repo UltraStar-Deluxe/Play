@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -67,6 +68,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject(UxmlName = R.UxmlNames.toggleSideBarSizeButton)]
     private Button toggleSideBarSizeButton;
+
+    [Inject(UxmlName = R.UxmlNames.playIcon)]
+    private VisualElement playIcon;
+
+    [Inject(UxmlName = R.UxmlNames.pauseIcon)]
+    private VisualElement pauseIcon;
 
     [Inject]
     private Injector injector;
@@ -156,7 +163,24 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .AddTo(gameObject);
         UpdateLeftSideBarClasses();
 
+        songAudioPlayer.PlaybackStartedEventStream
+            .Subscribe(_ => ShowPauseIcon());
+        songAudioPlayer.PlaybackStoppedEventStream
+            .Subscribe(_ => ShowPlayIcon());
+
         InitTabGroup();
+    }
+
+    private void ShowPlayIcon()
+    {
+        playIcon.ShowByDisplay();
+        pauseIcon.HideByDisplay();
+    }
+
+    private void ShowPauseIcon()
+    {
+        playIcon.HideByDisplay();
+        pauseIcon.ShowByDisplay();
     }
 
     private void UpdateLeftSideBarClasses()

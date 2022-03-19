@@ -8,7 +8,8 @@
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" style="height: 100%;">
                         <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
                             <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
-                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/play_arrow_white_24dp.svg?fileID=7388822144124034973&amp;guid=59a9a5409059d3849a01945b28f504dc&amp;type=3#play_arrow_white_24dp&apos;);" />
+                            <ui:VisualElement name="playIcon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/play_arrow_white_24dp.svg?fileID=7388822144124034973&amp;guid=59a9a5409059d3849a01945b28f504dc&amp;type=3#play_arrow_white_24dp&apos;);" />
+                            <ui:VisualElement name="pauseIcon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/pause_white_24dp.svg?fileID=7388822144124034973&amp;guid=fcf413d9fad5a384886a8b51d4794c5e&amp;type=3#pause_white_24dp&apos;); display: none;" />
                         </ui:Button>
                         <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
                             <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
