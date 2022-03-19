@@ -302,10 +302,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return;
         }
 
-        SaveSong();
+        SaveSong(true);
     }
 
-    public void SaveSong()
+    public void SaveSong(bool isAutoSave=false)
     {
         string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
 
@@ -327,7 +327,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return;
         }
 
-        uiManager.CreateNotificationVisualElement("Saved file");
+        if (!isAutoSave)
+        {
+            uiManager.CreateNotificationVisualElement("Saved file");
+        }
     }
 
     private void CreateCopyOfFile(string filePath)
