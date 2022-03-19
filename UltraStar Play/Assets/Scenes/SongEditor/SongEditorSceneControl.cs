@@ -233,8 +233,16 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void OnAudioPlaybackStopped(double positionInSongInMillis)
     {
-        // Jump to last position in song when playback stops
-        songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+        // Go to last position in song when playback stopped
+        bool invertedGoToLastPlaybackPositionBehavior = InputUtils.IsKeyboardControlPressed();
+        bool goToLastPlaybackPosition = (settings.SongEditorSettings.GoToLastPlaybackPosition &&
+                                         !invertedGoToLastPlaybackPositionBehavior)
+                                        || (!settings.SongEditorSettings.GoToLastPlaybackPosition &&
+                                            invertedGoToLastPlaybackPositionBehavior);
+        if (goToLastPlaybackPosition)
+        {
+            songAudioPlayer.PositionInSongInMillis = positionInSongInMillisWhenPlaybackStarted;
+        }
     }
 
     private void OnAudioPlaybackStarted(double positionInSongInMillis)
@@ -309,12 +317,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
 
-        // Create backup of original file if not done yet.
-        if (SettingsManager.Instance.Settings.SongEditorSettings.SaveCopyOfOriginalFile)
-        {
-            CreateCopyOfFile(songFile);
-        }
-
         try
         {
             // Write the song data structure to the file.
@@ -331,32 +333,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             uiManager.CreateNotificationVisualElement("Saved file");
         }
-    }
-
-    private void CreateCopyOfFile(string filePath)
-    {
-        try
-        {
-            string backupFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename.Replace(".txt", ".txt.bak");
-            if (File.Exists(backupFile))
-            {
-                return;
-            }
-            File.Copy(filePath, backupFile);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            uiManager.CreateNotificationVisualElement("Creating a copy of the original file failed:\n" + e.Message);
-            return;
-        }
-
-        uiManager.CreateNotificationVisualElement("Created copy of original file");
-    }
-
-    public void RestartSongEditorScene()
-    {
-        sceneNavigator.LoadScene(EScene.SongEditorScene, sceneData);
     }
 
     public void ContinueToSingScene()

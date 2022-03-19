@@ -146,6 +146,9 @@ public static partial class R
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string goToIssueButton = "goToIssueButton";
+        public const string goToLastPlaybackPositionContainer = "goToLastPlaybackPositionContainer";
+        public const string goToLastPlaybackPositionLabel = "goToLastPlaybackPositionLabel";
+        public const string goToLastPlaybackPositionToggle = "goToLastPlaybackPositionToggle";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string gridGroup = "gridGroup";
         public const string gridSizeContainer = "gridSizeContainer";
