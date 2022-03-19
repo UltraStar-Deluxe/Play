@@ -241,7 +241,6 @@ public static partial class R
         public const string micListOverlay = "micListOverlay";
         public const string micOctaveOffsetContainer = "micOctaveOffsetContainer";
         public const string micOctaveOffsetTextField = "micOctaveOffsetTextField";
-        public const string micPitchIndicator = "micPitchIndicator";
         public const string micPitchOutOfRangeIndicatorBottom = "micPitchOutOfRangeIndicatorBottom";
         public const string micPitchOutOfRangeIndicatorTop = "micPitchOutOfRangeIndicatorTop";
         public const string micRecordingContainer = "micRecordingContainer";

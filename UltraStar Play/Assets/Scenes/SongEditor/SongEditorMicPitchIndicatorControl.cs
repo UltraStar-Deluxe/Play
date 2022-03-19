@@ -18,9 +18,6 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
     [Inject(UxmlName = R.UxmlNames.micPitchOutOfRangeIndicatorBottom)]
     private VisualElement micPitchOutOfRangeIndicatorBottom;
 
-    [Inject(UxmlName = R.UxmlNames.micPitchIndicator)]
-    private VisualElement micPitchIndicator;
-
     [Inject]
     private MicPitchTracker micPitchTracker;
 
@@ -32,7 +29,6 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
 
     public void OnInjectionFinished()
     {
-        micPitchIndicator.HideByDisplay();
         micPitchOutOfRangeIndicatorTop.HideByDisplay();
         micPitchOutOfRangeIndicatorBottom.HideByDisplay();
 
@@ -42,25 +38,12 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
             {
                 micPitchOutOfRangeIndicatorTop.HideByDisplay();
                 micPitchOutOfRangeIndicatorBottom.HideByDisplay();
-                micPitchIndicator.HideByDisplay();
                 return;
             }
 
             int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
             micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(shiftedMidiNote > noteAreaControl.MaxMidiNoteInCurrentViewport);
             micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(shiftedMidiNote < noteAreaControl.MinMidiNoteInCurrentViewport);
-
-            if (noteAreaControl.MinMidiNoteInCurrentViewport < shiftedMidiNote
-                && shiftedMidiNote < noteAreaControl.MaxMillisecondsInViewport)
-            {
-                micPitchIndicator.ShowByDisplay();
-                float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(shiftedMidiNote);
-                micPitchIndicator.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
-            }
-            else
-            {
-                micPitchIndicator.HideByDisplay();
-            }
         });
     }
 }
