@@ -176,23 +176,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
                 }
 
                 UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
-                label.style.top = 12;
-                label.text = beat.ToString();
-            }
-
-            bool hasSecondLabel = drawStepVeryRough > 0 && (beat % drawStepVeryRough == 0);
-            if (hasSecondLabel)
-            {
-                double beatPosInSeconds = beatPosInMillis / 1000;
-                if (!labelPool.TryGetFreeObject(out Label label))
-                {
-                    label = CreateLabel(verticalGridLabelContainer);
-                    labelPool.AddUsedObject(label);
-                }
-
-                UpdateLabelPosition(label, beatPosInMillis, labelWidthInMillis);
                 label.style.top = 0;
-                label.text = beatPosInSeconds.ToString("F3", CultureInfo.InvariantCulture) + " s";
+                label.text = beat.ToString();
             }
         }
     }
