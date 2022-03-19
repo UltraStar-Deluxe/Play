@@ -6,8 +6,6 @@ using UnityEngine;
 using UniInject;
 using UniRx;
 using System.Text.RegularExpressions;
-using System.Xml;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
