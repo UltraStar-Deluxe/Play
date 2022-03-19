@@ -23,6 +23,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private void Start()
     {
+        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);
@@ -32,6 +33,11 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private void Update()
     {
         UpdateWaveForm();
+    }
+
+    private void OnDestroy()
+    {
+        pitchEventStreamDisposable?.Dispose();
     }
 
     private void UpdateWaveForm()
@@ -64,16 +70,6 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }
-    }
-
-    void OnEnable()
-    {
-        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
-    }
-
-    void OnDisable()
-    {
-        pitchEventStreamDisposable?.Dispose();
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
