@@ -8,6 +8,7 @@ public class SongEditorSettings
 
     public float MusicVolume { get; set; } = 1;
     public float MusicPlaybackSpeed { get; set; } = 1;
+    public bool GoToLastPlaybackPosition { get; set; } = true;
 
     // Recording in SongEditorScene
     public ESongEditorRecordingSource RecordingSource { get; set; }
@@ -30,8 +31,6 @@ public class SongEditorSettings
     // Option to show / hide voices.
     // Contains the names of the voices that should be hidden.
     public List<string> HideVoices { get; private set; } = new List<string>();
-
-    public bool SaveCopyOfOriginalFile { get; set; }
 
     public bool ShowLyricsArea { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;

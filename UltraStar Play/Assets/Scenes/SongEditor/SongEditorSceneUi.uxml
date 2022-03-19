@@ -90,6 +90,11 @@
                         </ui:VisualElement>
                         <ui:Label text="Music" display-tooltip-when-elided="true" name="musicTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="musicGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="goToLastPlaybackPositionContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Jump back on pause" display-tooltip-when-elided="true" name="goToLastPlaybackPositionLabel" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="goToLastPlaybackPositionToggle" class="smallControl" />
+                            </ui:VisualElement>
                             <ui:VisualElement name="musicVolumeContainer" style="width: 100%; flex-direction: column; align-items: stretch; margin-bottom: 10px;">
                                 <ui:Label text="Volume" display-tooltip-when-elided="true" name="musicVolumeLabel" />
                                 <ui:Slider picking-mode="Ignore" value="42" high-value="100" name="musicVolumeSlider" />

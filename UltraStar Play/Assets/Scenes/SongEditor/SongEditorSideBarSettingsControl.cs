@@ -15,6 +15,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.autoSaveToggle)]
     private Toggle autoSaveToggle;
 
+    [Inject(UxmlName = R.UxmlNames.goToLastPlaybackPositionToggle)]
+    private Toggle goToLastPlaybackPositionToggle;
+
     [Inject(UxmlName = R.UxmlNames.musicVolumeSlider)]
     private Slider musicVolumeSlider;
 
@@ -128,7 +131,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.AutoSave,
             newValue => settings.SongEditorSettings.AutoSave = newValue);
 
-        // Volume and playback speed settings
+        // Music settings
+        Bind(goToLastPlaybackPositionToggle,
+            () => settings.SongEditorSettings.GoToLastPlaybackPosition,
+            newValue => settings.SongEditorSettings.GoToLastPlaybackPosition = newValue);
+
         Bind(musicVolumeSlider,
             () => settings.AudioSettings.VolumePercent,
             newValue => settings.AudioSettings.VolumePercent = (int) newValue);
