@@ -18,6 +18,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     private const float ViewportAutomaticScrollingJumpPercent = 0.333f;
     private const int DefaultViewportWidthInMillis = 8000;
 
+    private const float DoubleClickToTogglePlayPauseDistanceThresholdInPx = 5f;
+
     public const int ViewportMinHeight = 12;
     // A piano has 88 keys.
     public const int ViewportMaxHeight = 88;
@@ -525,7 +527,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         // Toggle play pause with double click / double tap
         bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
-        bool isNearLastClickPosition = Vector2.Distance(lastClickPosition, evt.position) < 5;
+        bool isNearLastClickPosition = Vector2.Distance(lastClickPosition, evt.position) < DoubleClickToTogglePlayPauseDistanceThresholdInPx;
         lastClickTime = Time.time;
         lastClickPosition = evt.position;
         if (isDoubleClick && isNearLastClickPosition)
