@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
 using UnityEngine.Video;
@@ -10,6 +11,14 @@ using Image = UnityEngine.UI.Image;
 
 public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
+    private static readonly HashSet<string> ignoredVideoFiles = new HashSet<string>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        ignoredVideoFiles.Clear();
+    }
+
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
 
@@ -110,7 +119,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoPlayerErrorMessage = "";
             UnloadVideo();
             // Do not attempt to load the video again
-            SongMeta.Video = "";
+            ignoredVideoFiles.Add(songMeta.Video);
         }
 
         if (!HasLoadedVideo)
@@ -337,7 +346,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         UnloadVideo();
 
         if (initSongMeta == null
-            || initSongMeta.Video.IsNullOrEmpty())
+            || initSongMeta.Video.IsNullOrEmpty()
+            || ignoredVideoFiles.Contains(initSongMeta.Video))
         {
             return;
         }
