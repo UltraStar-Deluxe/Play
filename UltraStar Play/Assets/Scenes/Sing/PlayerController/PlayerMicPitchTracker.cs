@@ -10,7 +10,7 @@ using System.Linq;
 
 // Analyzes the recorded mic input of a player to find the pitch for beats in the song.
 [RequireComponent(typeof(MicSampleRecorder))]
-public partial class PlayerPitchTracker : MonoBehaviour, INeedInjection
+public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 {
     [Inject]
     private SongAudioPlayer songAudioPlayer;
