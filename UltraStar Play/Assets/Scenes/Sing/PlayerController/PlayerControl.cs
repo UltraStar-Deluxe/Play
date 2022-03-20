@@ -17,7 +17,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public PlayerNoteRecorder PlayerNoteRecorder { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public PlayerPitchTracker PlayerPitchTracker { get; private set; }
+    public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public MicSampleRecorder MicSampleRecorder { get; private set; }
@@ -89,7 +89,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     {
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
         newInjector.AddBindingForInstance(MicSampleRecorder);
-        newInjector.AddBindingForInstance(PlayerPitchTracker);
+        newInjector.AddBindingForInstance(PlayerMicPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
         newInjector.AddBindingForInstance(PlayerScoreController);
         newInjector.AddBindingForInstance(PlayerUiControl);

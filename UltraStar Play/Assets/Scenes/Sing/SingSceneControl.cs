@@ -455,7 +455,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.PlayerScoreController.NextBeatToScore = nextBeatToScore;
-            playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
+            playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
 

@@ -70,7 +70,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     public int NextBeatToScore { get; set; }
 
     [Inject]
-    private PlayerPitchTracker playerPitchTracker;
+    private PlayerMicPitchTracker playerMicPitchTracker;
 
     [Inject]
     private Voice voice;
@@ -102,12 +102,12 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     {
         UpdateMaxScores(voice.Sentences);
 
-        playerPitchTracker.BeatAnalyzedEventStream.Subscribe(OnBeatAnalyzed);
-        playerPitchTracker.NoteAnalyzedEventStream.Subscribe(OnNoteAnalyzed);
-        playerPitchTracker.SentenceAnalyzedEventStream.Subscribe(OnSentenceAnalyzed);
+        playerMicPitchTracker.BeatAnalyzedEventStream.Subscribe(OnBeatAnalyzed);
+        playerMicPitchTracker.NoteAnalyzedEventStream.Subscribe(OnNoteAnalyzed);
+        playerMicPitchTracker.SentenceAnalyzedEventStream.Subscribe(OnSentenceAnalyzed);
     }
 
-    private void OnBeatAnalyzed(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private void OnBeatAnalyzed(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
     {
         // Check if pitch was detected where a note is expected in the song
         if (beatAnalyzedEvent.PitchEvent == null
@@ -156,17 +156,17 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private bool IsPerfectHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private bool IsPerfectHit(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
     {
         return MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote) == MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote);
     }
 
-    private bool IsGoodHit(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private bool IsGoodHit(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
     {
         return beatAnalyzedEvent.NoteAtBeat.MidiNote == beatAnalyzedEvent.RoundedRecordedMidiNote;
     }
 
-    private void OnNoteAnalyzed(PlayerPitchTracker.NoteAnalyzedEvent noteAnalyzedEvent)
+    private void OnNoteAnalyzed(PlayerMicPitchTracker.NoteAnalyzedEvent noteAnalyzedEvent)
     {
         if (noteAnalyzedEvent.Note.EndBeat < NextBeatToScore)
         {
@@ -184,7 +184,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private void OnSentenceAnalyzed(PlayerPitchTracker.SentenceAnalyzedEvent sentenceAnalyzedEvent)
+    private void OnSentenceAnalyzed(PlayerMicPitchTracker.SentenceAnalyzedEvent sentenceAnalyzedEvent)
     {
         if (sentenceAnalyzedEvent.Sentence.MaxBeat < NextBeatToScore)
         {

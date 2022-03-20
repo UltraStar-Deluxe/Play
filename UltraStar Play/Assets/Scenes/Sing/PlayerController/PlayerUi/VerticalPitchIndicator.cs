@@ -19,7 +19,7 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
     public ScrollingNoteStreamDisplayer scrollingNoteStreamDisplayer;
 
     [Inject]
-    private PlayerPitchTracker playerPitchTracker;
+    private PlayerMicPitchTracker playerMicPitchTracker;
 
     [Inject]
     private MicSampleRecorder micSampleRecorder;
@@ -79,7 +79,7 @@ public class VerticalPitchIndicator : MonoBehaviour, INeedInjection, IExcludeFro
             return;
         }
 
-        PitchEvent pitchEvent = playerPitchTracker.GetPitchEventOfSamples(micSampleRecorder.MicSamples.Length - 1 - samplesPerBeat, micSampleRecorder.MicSamples.Length - 1);
+        PitchEvent pitchEvent = playerMicPitchTracker.GetPitchEventOfSamples(micSampleRecorder.MicSamples.Length - 1 - samplesPerBeat, micSampleRecorder.MicSamples.Length - 1);
         if (pitchEvent != null)
         {
             // Shift midi note to octave of last recorded midi note (can be different because PlayerPitchTracker is rounding towards the target note)
