@@ -98,7 +98,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
 
         if (createVideo)
         {
-            string videoFileName = $"{artistAndTitle}.vp8";
+            string videoFileName = $"{artistAndTitle}.webm";
             string videoFilePath = newSongFolderAbsolutePath + $"/{videoFileName}";
             File.WriteAllBytes(videoFilePath, songTemplateVideo.bytes);
             txtFileContent = txtFileContent.Replace("${videoTag}", $"#VIDEO:{videoFileName}");
