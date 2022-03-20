@@ -53,6 +53,7 @@ public static class ApplicationUtils
             or "mpg"
             or "mpeg"
             or "vp8"
+            or "webm"
             or "m4v"
             or "mov"
             or "dv"
