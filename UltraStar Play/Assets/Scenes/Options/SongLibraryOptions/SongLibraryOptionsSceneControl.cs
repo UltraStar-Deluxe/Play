@@ -122,9 +122,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 warningLabel.text = "File does not exist.";
             }
         }
-        CheckFolderExists(songDir);
 
         TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
+        textField.value = songDir;
         BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
         backslashReplacingTextFieldControl.ValueChangedEventStream
             .Subscribe(newValueUnescaped =>
@@ -141,6 +141,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 UpdateSongFolderList();
                 backButton.Focus();
             });
+
+        CheckFolderExists(songDir);
+
         return result;
     }
 }
