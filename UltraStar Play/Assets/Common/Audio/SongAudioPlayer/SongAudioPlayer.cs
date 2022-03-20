@@ -114,27 +114,6 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public double CurrentBeat
-    {
-        get
-        {
-            if (audioPlayer.clip == null)
-            {
-                return 0;
-            }
-            else
-            {
-                double millisInSong = PositionInSongInMillis;
-                double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
-                if (result < 0)
-                {
-                    result = 0;
-                }
-                return result;
-            }
-        }
-    }
-
     public bool IsPlaying
     {
         get
@@ -243,5 +222,22 @@ public class SongAudioPlayer : MonoBehaviour
             audioPlayer.Play();
             playbackStartedEventStream.OnNext(PositionInSongInMillis);
         }
+    }
+
+    public double GetCurrentBeat(bool allowNegativeResult)
+    {
+        if (audioPlayer.clip == null)
+        {
+            return 0;
+        }
+
+        double millisInSong = PositionInSongInMillis;
+        double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+        if (result < 0
+            && !allowNegativeResult)
+        {
+            result = 0;
+        }
+        return result;
     }
 }

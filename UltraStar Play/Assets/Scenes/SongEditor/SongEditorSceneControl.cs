@@ -44,7 +44,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public EditorNoteDisplayer editorNoteDisplayer;
 
     [InjectedInInspector]
-    public MicPitchTracker micPitchTracker;
+    public SongEditorMicPitchTracker songEditorMicPitchTracker;
 
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
@@ -486,7 +486,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
         bb.BindExistingInstance(songEditorLayerManager);
-        bb.BindExistingInstance(micPitchTracker);
+        bb.BindExistingInstance(songEditorMicPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);

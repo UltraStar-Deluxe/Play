@@ -63,7 +63,7 @@ public class SongEditorMidiFileImporter : INeedInjection
     private List<Note> ShiftNotesToPlaybackPosition(List<Note> notes)
     {
         Note firstNote = notes.FindMinElement(note => note.StartBeat);
-        int playbackPositionInBeats = (int)Math.Round(songAudioPlayer.CurrentBeat);
+        int playbackPositionInBeats = (int)Math.Round(songAudioPlayer.GetCurrentBeat(true));
         int difference = playbackPositionInBeats - firstNote.StartBeat;
         if (difference == 0)
         {

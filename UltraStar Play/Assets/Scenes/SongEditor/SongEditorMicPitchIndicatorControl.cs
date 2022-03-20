@@ -19,7 +19,7 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
     private VisualElement micPitchOutOfRangeIndicatorBottom;
 
     [Inject]
-    private MicPitchTracker micPitchTracker;
+    private SongEditorMicPitchTracker micPitchTracker;
 
     [Inject]
     private Settings settings;

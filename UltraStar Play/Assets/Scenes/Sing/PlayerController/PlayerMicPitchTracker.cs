@@ -8,7 +8,10 @@ using System.Linq;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-// Analyzes the recorded mic input of a player to find the pitch for beats in the song.
+/**
+ * Analyzes each beat of a player in the sing scene.
+ * Thereby, it applies some additional rounding an joker rules.
+ */
 [RequireComponent(typeof(MicSampleRecorder))]
 public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 {
