@@ -15,7 +15,7 @@ public class DoubleClickControl
     private readonly Subject<bool> doublePointerDownEventStream = new Subject<bool>();
     public IObservable<bool> DoublePointerDownEventStream => doublePointerDownEventStream;
 
-    private Dictionary<int, float> buttonToLastPointerDownTime = new Dictionary<int, float>();
+    private readonly Dictionary<int, float> buttonToLastPointerDownTime = new Dictionary<int, float>();
 
     /**
      * List of buttons that should trigger a double click event.

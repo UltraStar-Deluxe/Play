@@ -154,7 +154,6 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         if (isReadOnly)
         {
             textField.AddToClassList("disabled");
-            // textField.SetEnabled(false);
             textField.RegisterValueChangedCallback(evt =>
             {
                 // Reset to old value

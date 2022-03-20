@@ -39,7 +39,6 @@ public class OverviewAreaControl : IInjectionFinishedListener
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
     private OverviewAreaNoteVisualizer noteVisualizer;
-    private OverviewAreaSentenceVisualizer sentenceVisualizer;
     private OverviewAreaIssueVisualizer issueVisualizer;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
@@ -62,10 +61,6 @@ public class OverviewAreaControl : IInjectionFinishedListener
         issueVisualizer = injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaIssueVisualizer>();
-
-        sentenceVisualizer = injector
-            .WithRootVisualElement(overviewArea)
-            .CreateAndInject<OverviewAreaSentenceVisualizer>();
 
         // Create the audio waveform image.
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>

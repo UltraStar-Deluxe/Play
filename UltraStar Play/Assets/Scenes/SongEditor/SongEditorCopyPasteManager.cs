@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
@@ -49,7 +48,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new Dictionary<Note, OriginalNoteCopyData>();
+    private readonly Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new Dictionary<Note, OriginalNoteCopyData>();
 
     void Start()
     {

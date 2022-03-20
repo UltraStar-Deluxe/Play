@@ -134,8 +134,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private GeneralDragControl dragControl;
 
-    private Vector3 pointerDownEventPosition = Vector3.zero;
-    private IEnumerator showSongMenuOverlayCoroutine = null;
+    private IEnumerator showSongMenuOverlayCoroutine;
     private bool isPointerDown;
 
     public SongEntryControl(
@@ -216,13 +215,11 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
-        // Debug.Log($"begin drag: {dragEvent.ScreenCoordinateInPixels.StartPosition}");
         songRouletteControl.OnBeginDrag(this);
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
-        // Debug.Log($"drag: {dragEvent.ScreenCoordinateInPixels.Distance}");
         songRouletteControl.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
     }
 
@@ -332,8 +329,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         });
         
-        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
-        songEntryUiRoot.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerDownEvent>(_ => OnPointerDown(), TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerUpEvent>(_ => OnPointerUp(), TrickleDown.TrickleDown);
 
         // Stop coroutine when dragging
         dragControl.DragState.Subscribe(dragState =>
@@ -347,14 +344,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         UpdateTranslation();
     }
 
-    private void OnPointerDown(PointerDownEvent evt)
+    private void OnPointerDown()
     {
         isPointerDown = true;
-        pointerDownEventPosition = evt.position;
         StartShowSongMenuOverlayCoroutine();
     }
 
-    private void OnPointerUp(PointerUpEvent evt)
+    private void OnPointerUp()
     {
         if (isPointerDown
             && !dragControl.IsDragging

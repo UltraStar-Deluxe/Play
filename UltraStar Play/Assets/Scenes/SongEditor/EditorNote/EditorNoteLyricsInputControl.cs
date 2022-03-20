@@ -84,14 +84,14 @@ public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedLi
     private void RegisterEvents()
     {
         textField.RegisterValueChangedCallback(ValueChangedCallback);
-        textField.RegisterCallback<BlurEvent>(BlurCallback);
+        textField.RegisterCallback<BlurEvent>(OnBlur);
         isActive = true;
     }
 
     private void UnregisterEvents()
     {
         textField.UnregisterValueChangedCallback(ValueChangedCallback);
-        textField.UnregisterCallback<BlurEvent>(BlurCallback);
+        textField.UnregisterCallback<BlurEvent>(OnBlur);
         isActive = false;
     }
 
@@ -100,7 +100,7 @@ public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedLi
         OnTextFieldValueChanged(evt.newValue);
     }
 
-    private void BlurCallback(BlurEvent evt)
+    private void OnBlur(BlurEvent evt)
     {
         SubmitAndCloseLyricsDialog();
         UnregisterEvents();

@@ -67,7 +67,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
-        FillContextMenuToAddSpaceBetweenNotes(contextMenu, selectedNotes);
+        FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
@@ -75,7 +75,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
     }
 
-    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
     {
         contextMenu.AddSeparator();
         contextMenu.AddItem("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
@@ -195,11 +195,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             {
                 // Perform on all notes, but per voice
                 songMeta.GetVoices()
-                    .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(SongMetaUtils.GetAllNotes(voice), (int)spaceInBeats));
+                    .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(SongMetaUtils.GetAllNotes(voice), spaceInBeats));
             }
             else
             {
-                spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, (int)spaceInBeats);
+                spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
             }
         }
 

@@ -151,11 +151,8 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             drawStepRough = Math.Max(1, (int)Math.Log10(viewportWidthInBeats) * 8);
         }
 
-        int drawStepVeryRough = drawStepRough * 2;
-
         if (viewportWidthInBeats <= 48)
         {
-            drawStepVeryRough = 6;
             drawStepRough = 4;
         }
 
