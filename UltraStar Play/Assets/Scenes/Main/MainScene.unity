@@ -217,7 +217,7 @@ MonoBehaviour:
   songTemplateBackground: {fileID: 4900000, guid: eee02bb202ba30b4b92771c8479a247f,
     type: 3}
   songTemplateAudio: {fileID: 4900000, guid: 3af4cea7179afe246a69d2d42a347154, type: 3}
-  songTemplateVideo: {fileID: 4900000, guid: bcb0e2a77213acc44af9f8172791933e, type: 3}
+  songTemplateVideo: {fileID: 4900000, guid: a61e3cabad0bf5c428a51505feb59260, type: 3}
 --- !u!1 &891474970
 GameObject:
   m_ObjectHideFlags: 0
