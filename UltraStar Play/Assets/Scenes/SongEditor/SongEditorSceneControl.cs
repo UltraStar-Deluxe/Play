@@ -146,8 +146,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void Start()
     {
-        songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnAudioPlaybackStarted);
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnAudioPlaybackStopped);
+        songAudioPlayer.PlaybackStartedEventStream
+            .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
+        songAudioPlayer.PlaybackStoppedEventStream
+            .Subscribe(_ => OnAudioPlaybackStopped());
 
         HideEditLyricsPopup();
 
@@ -231,7 +233,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         noteAreaControl.Update();
     }
 
-    private void OnAudioPlaybackStopped(double positionInSongInMillis)
+    private void OnAudioPlaybackStopped()
     {
         // Go to last position in song when playback stopped
         bool invertedGoToLastPlaybackPositionBehavior = InputUtils.IsKeyboardControlPressed();

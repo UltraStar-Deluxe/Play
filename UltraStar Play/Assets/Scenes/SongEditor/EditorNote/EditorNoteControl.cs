@@ -105,8 +105,8 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
         VisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
-        VisualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter(evt), TrickleDown.TrickleDown);
-        VisualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit(evt), TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter(), TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit(), TrickleDown.TrickleDown);
         VisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
 
         contextMenuControl = injector
@@ -314,13 +314,13 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             .CreateAndInject<EditorNoteLyricsInputControl>();
     }
 
-    private void OnPointerEnter(IPointerEvent eventData)
+    private void OnPointerEnter()
     {
         IsPointerOver = true;
         statusBarControl.OnPointerOverNoteControl(this);
     }
 
-    private void OnPointerExit(IPointerEvent eventData)
+    private void OnPointerExit()
     {
         IsPointerOver = false;
         IsPointerOverCenter = false;

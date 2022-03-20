@@ -90,7 +90,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
         InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
         InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
-        InitButtonDescription(createSongButton, "Create an empty song from template");
+        InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
         InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
 
         UpdateVersionInfoText();
@@ -115,7 +115,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-        // createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);
+        createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
         aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);

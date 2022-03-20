@@ -38,7 +38,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         panelHelper = new PanelHelper(uiDocument);
         uiDocument.rootVisualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
         uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
-        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt), TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(), TrickleDown.TrickleDown);
 
         InputManager.GetInputAction(R.InputActions.usplay_openContextMenu).PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
@@ -66,7 +66,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void OnPointerUp(IPointerEvent evt)
+    private void OnPointerUp()
     {
         isPointerDown = false;
         isDrag = false;
