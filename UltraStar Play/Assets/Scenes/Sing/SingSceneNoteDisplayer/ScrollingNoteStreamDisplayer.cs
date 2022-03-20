@@ -303,13 +303,13 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     private int CalculateDisplayAreaMinBeat()
     {
         // This is an over-approximation of the visible displayArea
-        return (int)songAudioPlayer.CurrentBeat - displayedBeats / 2;
+        return (int)songAudioPlayer.GetCurrentBeat(false) - displayedBeats / 2;
     }
 
     private int CalculateDisplayAreaMaxBeat()
     {
         // This is an over-approximation of the visible displayArea
-        return (int)songAudioPlayer.CurrentBeat + displayedBeats;
+        return (int)songAudioPlayer.GetCurrentBeat(false) + displayedBeats;
     }
 
     private VisualElement CreateRecordingPositionIndicator()

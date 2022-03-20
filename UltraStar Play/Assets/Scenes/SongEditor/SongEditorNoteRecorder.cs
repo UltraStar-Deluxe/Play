@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private MicPitchTracker micPitchTracker;
+    private SongEditorMicPitchTracker micPitchTracker;
 
     [Inject]
     private Settings settings;

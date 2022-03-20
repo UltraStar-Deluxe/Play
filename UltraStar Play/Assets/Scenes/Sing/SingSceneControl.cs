@@ -144,7 +144,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         get
         {
-            return songAudioPlayer.CurrentBeat;
+            return songAudioPlayer.GetCurrentBeat(false);
         }
     }
 
