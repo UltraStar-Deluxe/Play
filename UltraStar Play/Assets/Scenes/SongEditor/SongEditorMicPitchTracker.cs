@@ -23,6 +23,8 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
 
     private int nextBeatToAnalyze;
 
+    private int MicDelayInMillis => settings.SongEditorSettings.MicDelayInMillis;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -43,7 +45,7 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
     protected override void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         int firstBeatToAnalyze = nextBeatToAnalyze;
-        float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicProfile.DelayInMillis;
+        float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicDelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillisConsideringMicDelay);
         for (int beatToAnalyze = firstBeatToAnalyze; beatToAnalyze < currentBeatConsideringMicDelay; beatToAnalyze++)
         {
@@ -60,12 +62,12 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
         int beatLengthInSamples = (int)(beatLengthInMillis * MicSampleRecorder.SampleRateHz / 1000f);
 
         // The newest sample in the buffer corresponds to (positionInSong - micDelay)
-        float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicProfile.DelayInMillis;
+        float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicDelayInMillis;
         float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
-        float distanceToNewestSamplesInSamples = distanceToNewestSamplesInMillis * MicSampleRecorder.SampleRateHz / 1000f;
+        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * MicSampleRecorder.SampleRateHz / 1000f);
         distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, MicSampleRecorder.MicSamples.Length - 1);
 
-        int endIndex = MicSampleRecorder.MicSamples.Length - (int)distanceToNewestSamplesInSamples;
+        int endIndex = MicSampleRecorder.MicSamples.Length - distanceToNewestSamplesInSamples;
         int startIndex = endIndex - beatLengthInSamples;
         endIndex = NumberUtils.Limit(endIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
         startIndex = NumberUtils.Limit(startIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
@@ -78,6 +80,14 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
         PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(MicSampleRecorder.MicSamples, startIndex, endIndex, MicProfile);
 
         // Notify listeners
-        pitchEventStream.OnNext(pitchEvent);
+        if (pitchEvent == null)
+        {
+            pitchEventStream.OnNext(null);
+        }
+        else
+        {
+            int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
+            pitchEventStream.OnNext(new BeatPitchEvent(shiftedMidiNote, beat));
+        }
     }
 }

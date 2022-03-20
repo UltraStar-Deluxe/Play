@@ -41,9 +41,8 @@ public class SongEditorMicPitchIndicatorControl : INeedInjection, IInjectionFini
                 return;
             }
 
-            int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
-            micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(shiftedMidiNote > noteAreaControl.MaxMidiNoteInCurrentViewport);
-            micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(shiftedMidiNote < noteAreaControl.MinMidiNoteInCurrentViewport);
+            micPitchOutOfRangeIndicatorTop.SetVisibleByDisplay(pitchEvent.MidiNote > noteAreaControl.MaxMidiNoteInCurrentViewport);
+            micPitchOutOfRangeIndicatorBottom.SetVisibleByDisplay(pitchEvent.MidiNote < noteAreaControl.MinMidiNoteInCurrentViewport);
         });
     }
 }
