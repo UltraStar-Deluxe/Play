@@ -89,7 +89,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => SetScoreLabelText(totalScoreContainer, interpolatedValue));
 
         // Score bar (animated)
-        float playerScorePercent = playerScoreData.TotalScore / PlayerScoreController.MaxScore;
+        float playerScorePercent = (float)playerScoreData.TotalScore / PlayerScoreController.MaxScore;
         float minScoreBarHeightInPercent = 5f;
         float maxScoreBarHeightInPercent = minScoreBarHeightInPercent + ((100f - minScoreBarHeightInPercent) * playerScorePercent);
         LeanTween.value(singingResultsSceneControl.gameObject, minScoreBarHeightInPercent, maxScoreBarHeightInPercent, animationTimeInSeconds)
