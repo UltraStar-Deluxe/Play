@@ -148,7 +148,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             int lineIndex = (int)Math.Floor(i / 2f);
             // The even noteRows are drawn between the lines. Thus they have an offset of half the line height.
             float lineOffset = ((i % 2) == 0) ? 0 : (lineHeightPercent / 2);
-            noteRowToYPercent[i] = ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
+            noteRowToYPercent[i] = 1 - ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
         }
 
         lineDisplayer.LineCount = lineCount;
