@@ -11,14 +11,14 @@ using CSharpSynth.Wave;
 
 // Takes the analyzed pitches from the PlayerPitchTracker and creates display events to draw recorded notes.
 // For example, multiple beats next to each other can be considered as one note.
-[RequireComponent(typeof(PlayerPitchTracker))]
+[RequireComponent(typeof(PlayerMicPitchTracker))]
 public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public PlayerPitchTracker PlayerPitchTracker { get; private set; }
+    public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     private RecordedNote lastRecordedNote;
-    private PlayerPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
+    private PlayerMicPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
 
     private Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new Subject<RecordedNoteStartedEvent>();
     public IObservable<RecordedNoteStartedEvent> RecordedNoteStartedEventStream
@@ -41,11 +41,11 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public void OnInjectionFinished()
     {
-        PlayerPitchTracker.BeatAnalyzedEventStream
+        PlayerMicPitchTracker.BeatAnalyzedEventStream
             .Subscribe(OnBeatAnalyzed);
     }
 
-    private void OnBeatAnalyzed(PlayerPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private void OnBeatAnalyzed(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
     {
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
         if (lastRecordedNote != null

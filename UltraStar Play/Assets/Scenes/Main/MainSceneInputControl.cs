@@ -14,11 +14,33 @@ using PrimeInputActions;
 public class MainSceneInputControl : MonoBehaviour, INeedInjection
 {
     [Inject]
+    private MainSceneControl mainSceneControl;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
     
 	private void Start()
     {
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongSelectScene));
+
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+            .Subscribe(_ => OnBack());
+    }
+
+    private void OnBack()
+    {
+        if (mainSceneControl.IsNewSongDialogOpen)
+        {
+            mainSceneControl.CloseNewSongDialog();
+        }
+        else if (mainSceneControl.IsCloseGameDialogOpen)
+        {
+            mainSceneControl.CloseQuitGameDialog();
+        }
+        else
+        {
+            mainSceneControl.OpenQuitGameDialog();
+        }
     }
 }

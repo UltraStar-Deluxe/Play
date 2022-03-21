@@ -20,6 +20,9 @@ public class CharacterQuickJumpCharacterControl : INeedInjection, IInjectionFini
     [Inject]
     private CharacterQuickJumpListControl characterQuickJumpListControl;
 
+    [Inject]
+    private GameObject gameObject;
+
     public char Character { get; private set; }
 
     public VisualElement VisualElement { get; private set; }
@@ -50,6 +53,7 @@ public class CharacterQuickJumpCharacterControl : INeedInjection, IInjectionFini
         characterButton.RegisterCallbackButtonTriggered(() => characterQuickJumpListControl.DoCharacterQuickJump(Character));
         this.ObserveEveryValueChanged(me => me.Character)
             .WhereNotNull()
-            .Subscribe(newCharacter => label.text = newCharacter.ToString().ToUpperInvariant());
+            .Subscribe(newCharacter => label.text = newCharacter.ToString().ToUpperInvariant())
+            .AddTo(gameObject);
     }
 }

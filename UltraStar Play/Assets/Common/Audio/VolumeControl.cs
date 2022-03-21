@@ -22,7 +22,8 @@ public class VolumeControl : MonoBehaviour, INeedInjection
         UpdateVolumeInScene();
         settings.AudioSettings
             .ObserveEveryValueChanged(audioSettings => audioSettings.VolumePercent)
-            .Subscribe(newValue => UpdateVolumeInScene());
+            .Subscribe(newValue => UpdateVolumeInScene())
+            .AddTo(gameObject);
     }
 
     private void UpdateVolumeInScene()

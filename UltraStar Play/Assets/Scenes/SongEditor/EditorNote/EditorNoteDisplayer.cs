@@ -5,26 +5,31 @@ using System.Linq;
 using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 {
+    public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
+    public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
+
+    private const int HideElementThresholdInMillis = 60 * 1000;
 
     [InjectedInInspector]
-    public EditorUiNote notePrefab;
-    [InjectedInInspector]
-    public RectTransform noteContainer;
+    public VisualTreeAsset editorNoteUi;
 
     [InjectedInInspector]
-    public DynamicallyCreatedImage sentenceLinesImage;
+    public VisualTreeAsset editorSentenceUi;
 
-    [InjectedInInspector]
-    public EditorUiSentence sentenceMarkerRectanglePrefab;
+    [Inject(UxmlName = R.UxmlNames.noteAreaNotes)]
+    private VisualElement noteAreaNotes;
 
-    [InjectedInInspector]
-    public RectTransform sentenceMarkerRectangleContainer;
+    [Inject(UxmlName = R.UxmlNames.sentenceLines)]
+    private VisualElement sentenceLines;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaSentences)]
+    public VisualElement noteAreaSentences;
 
     [Inject]
     private SongMeta songMeta;
@@ -33,7 +38,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private Injector injector;
@@ -45,112 +50,144 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
     private Settings settings;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private SongEditorSceneControl songEditorSceneControl;
+
+    private DynamicTexture sentenceLinesDynamicTexture;
 
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
 
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
-    private readonly Dictionary<Note, EditorUiNote> noteToEditorUiNoteMap = new Dictionary<Note, EditorUiNote>();
-    private readonly Dictionary<Sentence, EditorUiSentence> sentenceToEditorUiSentenceMap = new Dictionary<Sentence, EditorUiSentence>();
+    private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new Dictionary<Note, EditorNoteControl>();
+    public IReadOnlyCollection<EditorNoteControl> EditorNoteControls => noteToControlMap.Values;
 
-    public void OnSceneInjectionFinished()
+    private readonly Dictionary<Sentence, EditorSentenceControl> sentenceToControlMap = new Dictionary<Sentence, EditorSentenceControl>();
+    public IReadOnlyCollection<EditorSentenceControl> EditorSentenceControls => sentenceToControlMap.Values;
+
+    private int lastFullUpdateFrame;
+
+    private int lastViewportWidthInMillis;
+
+    private void Start()
     {
+        noteAreaNotes.Clear();
+        noteToControlMap.Clear();
+        noteAreaSentences.Clear();
+        sentenceToControlMap.Clear();
+
+        ReloadSentences();
+
+        UpdateNotesAndSentences();
+        noteAreaControl.ViewportEventStream
+            .Subscribe(_ =>
+            {
+                UpdateNotesAndSentences();
+                lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
+            }).AddTo(gameObject);
+
         songMetaChangeEventStream.Subscribe(evt =>
         {
             if (evt is LoadedMementoEvent)
             {
                 // The object instances have changed. All maps must be cleared.
-                noteContainer.DestroyAllDirectChildren();
-                noteToEditorUiNoteMap.Clear();
-                sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
-                sentenceToEditorUiSentenceMap.Clear();
+                noteAreaNotes.Clear();
+                noteToControlMap.Clear();
+                noteAreaSentences.Clear();
+                sentenceToControlMap.Clear();
             }
+            else if (evt is SentencesDeletedEvent sde)
+            {
+                sde.Sentences.ForEach(sentence => RemoveSentence(sentence));
+            }
+            else if (evt is MovedNotesToVoiceEvent movedNotesToVoiceEvent)
+            {
+                // Sentences might have been removed because they did not contain any notes anymore.
+                RemoveSentences(movedNotesToVoiceEvent.RemovedSentences);
+            }
+
             ReloadSentences();
             UpdateNotesAndSentences();
-        });
-    }
+        }).AddTo(gameObject);
 
-    void Start()
-    {
-        noteContainer.DestroyAllDirectChildren();
-        noteToEditorUiNoteMap.Clear();
-        sentenceMarkerRectangleContainer.DestroyAllDirectChildren();
-        sentenceToEditorUiSentenceMap.Clear();
-
-        ReloadSentences();
-
-        noteArea.ViewportEventStream.Subscribe(_ =>
+        sentenceLines.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            UpdateNotesAndSentences();
+            if (sentenceLinesDynamicTexture == null)
+            {
+                sentenceLinesDynamicTexture = new DynamicTexture(gameObject, sentenceLines);
+                UpdateSentences();
+            }
         });
 
-        songMetaChangeEventStream
-            .Subscribe(evt =>
-            {
-                if (evt is SentencesDeletedEvent sde)
-                {
-                    sde.Sentences.ForEach(sentence => DeleteSentence(sentence));
-                }
-            });
-
-        foreach (ESongEditorLayer layer in EnumUtils.GetValuesAsList<ESongEditorLayer>())
+        EnumUtils.GetValuesAsList<ESongEditorLayer>().ForEach(layer =>
         {
             songEditorLayerManager
                 .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
-                .Subscribe(_ => UpdateNotes());
-        }
+                .Subscribe(_ => UpdateNotes())
+                .AddTo(gameObject);
+        });
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.HideVoices.Count)
             .Subscribe(_ => OnHideVoicesChanged())
-            .AddTo(this);
+            .AddTo(gameObject);
+
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.SentenceLineSizeInDevicePixels)
+            .Subscribe(newValue =>
+            {
+                if (newValue <= 0)
+                {
+                    RemoveSentenceMarkerLines();
+                }
+                else
+                {
+                    UpdateSentenceMarkerLines();
+                }
+            })
+            .AddTo(gameObject);
+
+        songEditorLayerManager.LayerChangedEventStream
+            .Subscribe(_ => UpdateNotesAndSentences())
+            .AddTo(gameObject);
     }
 
-    private void DeleteSentence(Sentence sentence)
+    public void RemoveSentences(IReadOnlyCollection<Sentence> sentences)
     {
-        if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+        sentences.ForEach(sentence => RemoveSentence(sentence));
+    }
+
+    public void RemoveSentence(Sentence sentence)
+    {
+        if (sentenceToControlMap.TryGetValue(sentence, out EditorSentenceControl editorSentenceControl))
         {
-            Destroy(uiSentence.gameObject);
-            sentenceToEditorUiSentenceMap.Remove(sentence);
+            editorSentenceControl.Dispose();
+            sentenceToControlMap.Remove(sentence);
         }
     }
 
     private void OnHideVoicesChanged()
     {
         // Remove notes of hidden voices
-        List<Note> notVisibleNotes = noteToEditorUiNoteMap.Keys
-            .Where(note => !IsVoiceVisible(note.Sentence?.Voice))
+        List<Note> notVisibleNotes = noteToControlMap.Keys
+            .Where(note => !songEditorLayerManager.IsVoiceVisible(note.Sentence?.Voice))
             .ToList();
-        notVisibleNotes.ForEach(note => DeleteNote(note));
+        notVisibleNotes.ForEach(note => RemoveNoteControl(note));
 
         // Remove sentences of hidden voices
-        List<Sentence> notVisibleSentences = sentenceToEditorUiSentenceMap.Keys
-            .Where(sentence => !IsVoiceVisible(sentence.Voice))
+        List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
+            .Where(sentence => !songEditorLayerManager.IsVoiceVisible(sentence.Voice))
             .ToList();
-        notVisibleSentences.ForEach(sentence => DeleteSentence(sentence));
+        notVisibleSentences.ForEach(sentence => RemoveSentence(sentence));
 
         // Draw any notes that are now (again) visible.
         UpdateNotesAndSentences();
     }
 
-    public bool IsVoiceVisible(Voice voice)
+    public void ClearNoteControls()
     {
-        if (voice == null)
-        {
-            return true;
-        }
-
-        bool isHidden = settings.SongEditorSettings.HideVoices.Contains(voice.Name)
-            || (voice.Name == Voice.soloVoiceName
-                && settings.SongEditorSettings.HideVoices.Contains(Voice.firstVoiceName));
-        return !isHidden;
-    }
-
-    public void ClearUiNotes()
-    {
-        noteContainer.DestroyAllDirectChildren();
-        noteToEditorUiNoteMap.Clear();
+        noteAreaNotes.Clear();
+        noteToControlMap.Values.ForEach(editorNoteControl => editorNoteControl.Dispose());
+        noteToControlMap.Clear();
     }
 
     public void ReloadSentences()
@@ -177,72 +214,102 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         {
             return;
         }
-        sentenceLinesImage.ClearTexture();
 
-        IEnumerable<Voice> voices = songMeta.GetVoices();
-
-        foreach (Voice voice in voices)
-        {
-            if (IsVoiceVisible(voice))
-            {
-                DrawSentencesInVoice(voice);
-            }
-        }
-        sentenceLinesImage.ApplyTexture();
+        UpdateSentenceControls();
+        UpdateSentenceMarkerLines();
     }
 
-    private void DrawSentencesInVoice(Voice voice)
+    private void UpdateSentenceControls()
     {
-        int viewportWidthInBeats = noteArea.MaxBeatInViewport - noteArea.MinBeatInViewport;
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
 
-        int sentenceIndex = 0;
-        foreach (Sentence sentence in sortedSentencesOfVoice)
+        visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
+    }
+
+    private void RemoveSentenceMarkerLines()
+    {
+        if (sentenceLinesDynamicTexture == null)
         {
-            if (noteArea.IsInViewport(sentence))
+            return;
+        }
+
+        sentenceLinesDynamicTexture.ClearTexture();
+        sentenceLinesDynamicTexture.ApplyTexture();
+    }
+
+    private void UpdateSentenceMarkerLines()
+    {
+        if (settings.SongEditorSettings.SentenceLineSizeInDevicePixels <= 0
+            || sentenceLinesDynamicTexture == null)
+        {
+            return;
+        }
+
+        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        {
+            if (lastViewportWidthInMillis <= HideElementThresholdInMillis)
             {
-                float xStartPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.MinBeat);
-                float xEndPercent = (float)noteArea.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
+                RemoveSentenceMarkerLines();
+                lastViewportWidthInMillis = noteAreaControl.ViewportWidth;
+            }
+            return;
+        }
 
-                // Do not draw the sentence marker lines, when there are too many beats
-                if (viewportWidthInBeats < 1200)
-                {
-                    CreateSentenceMarkerLine(xStartPercent, Colors.saddleBrown, 0);
-                    CreateSentenceMarkerLine(xEndPercent, Colors.black, 20);
-                }
+        List<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
 
-                UpdateOrCreateUiSentence(sentence, xStartPercent, xEndPercent, sentenceIndex);
+        sentenceLinesDynamicTexture.ClearTexture();
+        visibleVoices.ForEach(voice => DrawSentenceMarkerLineForVoice(voice));
+        sentenceLinesDynamicTexture.ApplyTexture();
+    }
+
+    private void CreateSentenceControlForVoice(Voice voice)
+    {
+        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        int sentenceIndex = 0;
+        sortedSentencesOfVoice.ForEach(sentence =>
+        {
+            if (noteAreaControl.IsInViewport(sentence))
+            {
+                float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.MinBeat);
+                float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
+
+                UpdateOrCreateSentenceControl(sentence, xStartPercent, xEndPercent, sentenceIndex);
             }
             else
             {
-                if (sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+                if (sentenceToControlMap.TryGetValue(sentence, out EditorSentenceControl editorSentenceControl))
                 {
-                    Destroy(uiSentence.gameObject);
+                    editorSentenceControl.Dispose();
+                    sentenceToControlMap.Remove(sentence);
                 }
-                sentenceToEditorUiSentenceMap.Remove(sentence);
             }
             sentenceIndex++;
-        }
+        });
     }
 
     public void UpdateNotes()
     {
-        if (gameObject == null 
+        if (gameObject == null
             || !gameObject.activeInHierarchy)
         {
             return;
         }
-        DestroyUiNotesOutsideOfViewport();
+
+        HideNoteControlsOutsideOfViewport();
 
         DrawNotesInSongFile();
         DrawNotesInLayers();
     }
 
-    public EditorUiNote GetUiNoteForNote(Note note)
+    public EditorNoteControl GetNoteControl(Note note)
     {
-        if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))
+        if (noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
-            return uiNote;
+            return editorNoteControl;
         }
         else
         {
@@ -250,32 +317,43 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         }
     }
 
-    public void DeleteUiNote(EditorUiNote uiNote)
+    public void RemoveNoteControl(EditorNoteControl noteControl)
     {
-        noteToEditorUiNoteMap.Remove(uiNote.Note);
-        Destroy(uiNote.gameObject);
+        noteControl.Dispose();
+        noteToControlMap.Remove(noteControl.Note);
     }
 
-    public void DeleteNote(Note note)
+    public void RemoveNoteControl(Note note)
     {
-        if (noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote uiNote))
+        if (noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
-            DeleteUiNote(uiNote);
+            RemoveNoteControl(editorNoteControl);
         }
     }
 
-    private void DestroyUiNotesOutsideOfViewport()
+    private void HideNoteControlsOutsideOfViewport()
     {
-        ICollection<EditorUiNote> editorUiNotes = new List<EditorUiNote>(noteToEditorUiNoteMap.Values);
-        foreach (EditorUiNote editorUiNote in editorUiNotes)
+        ICollection<EditorNoteControl> editorNoteControls = new List<EditorNoteControl>(noteToControlMap.Values);
+        foreach (EditorNoteControl editorNoteControl in editorNoteControls)
         {
-            Note note = editorUiNote.Note;
-            if (!noteArea.IsInViewport(note))
+            Note note = editorNoteControl.Note;
+            if (noteAreaControl.IsInViewport(note))
             {
-                Destroy(editorUiNote.gameObject);
-                noteToEditorUiNoteMap.Remove(note);
+                continue;
             }
+
+            HideNoteControl(editorNoteControl);
         }
+    }
+
+    private void HideNoteControl(EditorNoteControl editorNoteControl)
+    {
+        editorNoteControl.VisualElement.HideByDisplay();
+    }
+
+    private void ShowNoteControl(EditorNoteControl editorNoteControl)
+    {
+        editorNoteControl.VisualElement.ShowByDisplay();
     }
 
     private void DrawNotesInLayers()
@@ -286,7 +364,36 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
             {
                 DrawNotesInLayer(layerKey);
             }
+            else
+            {
+                ClearNotesInLayer(layerKey);
+            }
         }
+    }
+
+    public void ClearNotesInLayer(ESongEditorLayer layerKey)
+    {
+        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
+            .Where(note => note.Sentence == null).ToList();
+        notesInLayer.ForEach(note =>
+        {
+            if (noteToControlMap.TryGetValue(note, out EditorNoteControl noteControl))
+            {
+                RemoveNoteControl(noteControl);
+            }
+        });
+    }
+
+    public bool AnyNoteControlContainsPosition(Vector2 pos)
+    {
+        return EditorNoteControls.AnyMatch(editorNoteControl =>
+            editorNoteControl.VisualElement.worldBound.Contains(pos));
+    }
+
+    public bool AnySentenceControlContainsPosition(Vector2 pos)
+    {
+        return EditorSentenceControls.AnyMatch(editorSentenceControl =>
+            editorSentenceControl.VisualElement.worldBound.Contains(pos));
     }
 
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
@@ -294,144 +401,169 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection, ISceneInjectio
         List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
             .Where(note => note.Sentence == null).ToList();
         List<Note> notesInViewport = notesInLayer
-            .Where(note => noteArea.IsInViewport(note))
+            .Where(note => noteAreaControl.IsInViewport(note))
             .ToList();
 
         Color layerColor = songEditorLayerManager.GetColor(layerKey);
         foreach (Note note in notesInViewport)
         {
-            EditorUiNote uiNote = UpdateOrCreateUiNote(note);
-            if (uiNote != null)
+            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note);
+            if (noteControl != null)
             {
-                uiNote.SetColor(layerColor);
+                noteControl.SetColor(layerColor);
             }
         }
     }
 
     private void DrawNotesInSongFile()
     {
-        IEnumerable<Voice> voices = songMeta.GetVoices();
-        foreach (Voice voice in voices)
-        {
-            if (IsVoiceVisible(voice))
-            {
-                DrawNotesInVoice(voice);
-            }
-        }
+        IEnumerable<Voice> visibleVoices = songMeta.GetVoices()
+            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .ToList();
+        visibleVoices.ForEach(voice => DrawNotesInVoice(voice));
     }
 
     private void DrawNotesInVoice(Voice voice)
     {
         List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
         List<Sentence> sentencesInViewport = sortedSentencesOfVoice
-            .Where(sentence => noteArea.IsInViewport(sentence))
+            .Where(sentence => noteAreaControl.IsInViewport(sentence))
             .ToList();
 
         List<Note> notesInViewport = sentencesInViewport
                 .SelectMany(sentence => sentence.Notes)
-                .Where(note => noteArea.IsInViewport(note))
+                .Where(note => noteAreaControl.IsInViewport(note))
                 .ToList();
 
         foreach (Note note in notesInViewport)
         {
-            UpdateOrCreateUiNote(note);
+            UpdateOrCreateNoteControl(note);
         }
     }
 
-    private void UpdateOrCreateUiSentence(Sentence sentence, float xStartPercent, float xEndPercent, int sentenceIndex)
+    private void UpdateOrCreateSentenceControl(Sentence sentence, float xStartPercent, float xEndPercent, int sentenceIndex)
     {
-        if (!sentenceToEditorUiSentenceMap.TryGetValue(sentence, out EditorUiSentence uiSentence))
+        if (!sentenceToControlMap.TryGetValue(sentence, out EditorSentenceControl editorSentenceControl))
         {
-            uiSentence = Instantiate(sentenceMarkerRectanglePrefab, sentenceMarkerRectangleContainer);
-            sentenceToEditorUiSentenceMap[sentence] = uiSentence;
-
-            injector.InjectAllComponentsInChildren(uiSentence);
-            uiSentence.Init(sentence);
+            VisualElement sentenceVisualElement = editorSentenceUi.CloneTree().Children().First();
+            editorSentenceControl = injector
+                .WithRootVisualElement(sentenceVisualElement)
+                .WithBindingForInstance(sentence)
+                .CreateAndInject<EditorSentenceControl>();
+            sentenceToControlMap[sentence] = editorSentenceControl;
+            noteAreaSentences.Add(sentenceVisualElement);
         }
 
         string label = (sentenceIndex + 1).ToString();
-        uiSentence.SetText(label);
+        editorSentenceControl.SetText(label);
 
         // Update color
         if (sentence.Voice != null)
         {
-            Color color = songEditorSceneController.GetColorForVoice(sentence.Voice);
-            uiSentence.SetColor(color);
+            Color color = songEditorSceneControl.GetColorForVoice(sentence.Voice);
+            editorSentenceControl.SetColor(color);
 
             // Make sentence rectangles alternating light/dark
             bool isDark = (sentenceIndex % 2) == 0;
             if (isDark)
             {
-                uiSentence.backgroundImage.MultiplyColor(0.66f);
+                Color darkColor = songEditorSceneControl.GetColorForVoice(sentence.Voice).Multiply(0.66f);
+                editorSentenceControl.SetColor(darkColor);
             }
         }
 
-        PositionUiSentence(uiSentence.RectTransform, xStartPercent, xEndPercent);
+        PositionSentenceControl(editorSentenceControl.VisualElement, xStartPercent, xEndPercent);
     }
 
-    private void PositionUiSentence(RectTransform uiSentenceRectTransform, float xStartPercent, float xEndPercent)
+    private void PositionSentenceControl(VisualElement visualElement, float xStartPercent, float xEndPercent)
     {
-        uiSentenceRectTransform.anchorMin = new Vector2(xStartPercent, 0);
-        uiSentenceRectTransform.anchorMax = new Vector2(xEndPercent, 1);
-        uiSentenceRectTransform.anchoredPosition = Vector2.zero;
-        uiSentenceRectTransform.sizeDelta = Vector2.zero;
+        float widthPercent = xEndPercent - xStartPercent;
+        visualElement.style.left = new StyleLength(new Length(xStartPercent * 100, LengthUnit.Percent));
+        visualElement.style.bottom = 0;
+        visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
     }
 
-    private void CreateSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
+    private void DrawSentenceMarkerLineForVoice(Voice voice)
     {
-        if (xPercent < 0 || xPercent > 1)
+        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        sortedSentencesOfVoice.ForEach(sentence =>
+        {
+            float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.MinBeat);
+            float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
+
+            DrawSentenceMarkerLine(xStartPercent, sentenceStartLineColor, 0);
+            DrawSentenceMarkerLine(xEndPercent, sentenceEndLineColor, 20);
+        });
+    }
+
+    private void DrawSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
+    {
+        if (xPercent < 0
+            || xPercent > 1)
         {
             return;
         }
 
-        int x = (int)(xPercent * sentenceLinesImage.TextureWidth);
+        int width = settings.SongEditorSettings.SentenceLineSizeInDevicePixels;
+        int xFrom = (int)(xPercent * sentenceLinesDynamicTexture.TextureWidth);
+        int xTo = xFrom + width;
 
-        for (int y = 0; y < sentenceLinesImage.TextureHeight; y++)
+        for (int x = xFrom; x < xTo && x < sentenceLinesDynamicTexture.TextureWidth; x++)
         {
-            // Make it dashed
-            if (((y + yDashOffset) % 40) < 20)
+            for (int y = 0; y < sentenceLinesDynamicTexture.TextureHeight; y++)
             {
-                sentenceLinesImage.SetPixel(x, y, color);
-                // Make it 2 pixels wide
-                if (x < sentenceLinesImage.TextureWidth - 1)
+                // Make it dashed
+                if (((y + yDashOffset) % 40) < 20)
                 {
-                    sentenceLinesImage.SetPixel(x + 1, y, color);
+                    sentenceLinesDynamicTexture.SetPixel(x, y, color);
                 }
             }
         }
     }
 
-    private EditorUiNote UpdateOrCreateUiNote(Note note)
+    private EditorNoteControl UpdateOrCreateNoteControl(Note note)
     {
-        if (!noteToEditorUiNoteMap.TryGetValue(note, out EditorUiNote editorUiNote))
+        if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
-            editorUiNote = Instantiate(notePrefab, noteContainer);
-            injector.Inject(editorUiNote);
-            injector.Inject(editorUiNote.GetComponent<EditorNoteContextMenuHandler>());
-            editorUiNote.Init(note);
-
-            noteToEditorUiNoteMap.Add(note, editorUiNote);
+            VisualElement noteVisualElement = editorNoteUi.CloneTree().Children().First();
+            editorNoteControl = injector
+                .WithRootVisualElement(noteVisualElement)
+                .WithBindingForInstance(note)
+                .CreateAndInject<EditorNoteControl>();
+            noteToControlMap.Add(note, editorNoteControl);
+            noteAreaNotes.Add(noteVisualElement);
         }
         else
         {
-            editorUiNote.SyncWithNote();
+            editorNoteControl.SyncWithNote();
         }
 
-        PositionUiNote(editorUiNote.RectTransform, note.MidiNote, note.StartBeat, note.EndBeat);
+        PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        ShowNoteControl(editorNoteControl);
 
-        return editorUiNote;
+        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        {
+            editorNoteControl.HideLabels();
+        }
+        else
+        {
+            editorNoteControl.ShowLabels();
+        }
+
+        return editorNoteControl;
     }
 
-    private void PositionUiNote(RectTransform uiNoteRectTransform, int midiNote, int startBeat, int endBeat)
+    private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat)
     {
-        float y = (float)noteArea.GetVerticalPositionForMidiNote(midiNote);
-        float xStart = (float)noteArea.GetHorizontalPositionForBeat(startBeat);
-        float xEnd = (float)noteArea.GetHorizontalPositionForBeat(endBeat);
-        float height = noteArea.HeightForSingleNote;
+        float heightPercent = noteAreaControl.HeightForSingleNote;
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
+        float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(startBeat);
+        float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(endBeat);
+        float widthPercent = xEndPercent - xStartPercent;
 
-        uiNoteRectTransform.anchorMin = new Vector2(xStart, y - height / 2f);
-        uiNoteRectTransform.anchorMax = new Vector2(xEnd, y + height / 2f);
-        uiNoteRectTransform.anchoredPosition = Vector2.zero;
-        uiNoteRectTransform.sizeDelta = Vector2.zero;
+        visualElement.style.left = new StyleLength(new Length(xStartPercent * 100, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }
 }

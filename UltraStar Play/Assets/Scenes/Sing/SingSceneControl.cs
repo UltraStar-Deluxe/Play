@@ -62,7 +62,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public SongVideoPlayer songVideoPlayer;
 
     [Inject]
-    private Injector sceneInjector;
+    private Injector injector;
 
     [Inject]
     private Settings settings;
@@ -93,6 +93,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
+
+    [Inject]
+    private UIDocument uiDocument;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
 
@@ -141,7 +144,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         get
         {
-            return songAudioPlayer.CurrentBeat;
+            return songAudioPlayer.GetCurrentBeat(false);
         }
     }
 
@@ -150,8 +153,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private TimeBarControl timeBarControl;
 
-    private SimpleDialogControl dialogControl;
+    private MessageDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
+
+    private ContextMenuControl contextMenuControl;
 
     private void Start()
     {
@@ -205,7 +210,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
             string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
                 "playerNameCsv", playerNameCsv);
-            dialogControl = new SimpleDialogControl(dialogUi, background, title, message);
+
+            VisualElement visualElement = dialogUi.CloneTree();
+            visualElement.AddToClassList("overlay");
+            background.Add(visualElement);
+
+            dialogControl = injector
+                .WithRootVisualElement(visualElement)
+                .CreateAndInject<MessageDialogControl>();
+            dialogControl.Title = title;
+            dialogControl.Message = message;
             dialogControl.DialogTitleImage.ShowByDisplay();
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
@@ -227,16 +241,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
 
-        // Rebuild whole UI
-        LayoutRebuilder.ForceRebuildLayoutImmediate(CanvasUtils.FindCanvas().GetComponent<RectTransform>());
-
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Register ContextMenu
-        SingSceneContextMenuControl singSceneContextMenuControl = new SingSceneContextMenuControl(doubleClickToTogglePauseElement, gameObject);
-        sceneInjector.Inject(singSceneContextMenuControl);
+        contextMenuControl = injector
+            .WithRootVisualElement(doubleClickToTogglePauseElement)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
     }
 
     private void InitDummySingers()
@@ -248,7 +261,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             if (dummySinger.playerIndexToSimulate < PlayerControls.Count)
             {
                 dummySinger.SetPlayerControl(PlayerControls[dummySinger.playerIndexToSimulate]);
-                sceneInjector.Inject(dummySinger);
+                injector.Inject(dummySinger);
             }
             else
             {
@@ -309,7 +322,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         SingingLyricsControl CreateSingingLyricsControl(VisualElement visualElement, PlayerControl playerController)
         {
-            Injector lyricsControlInjector = UniInjectUtils.CreateInjector(sceneInjector);
+            Injector lyricsControlInjector = UniInjectUtils.CreateInjector(injector);
             lyricsControlInjector.AddBindingForInstance(playerController);
             SingingLyricsControl singingLyricsControl = lyricsControlInjector
                 .WithRootVisualElement(visualElement)
@@ -364,7 +377,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void InitTimeBar()
     {
         timeBarControl = new TimeBarControl();
-        sceneInjector.Inject(timeBarControl);
+        injector.Inject(timeBarControl);
         timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
     }
 
@@ -442,7 +455,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.PlayerScoreController.NextBeatToScore = nextBeatToScore;
-            playerController.PlayerPitchTracker.SkipToBeat(CurrentBeat);
+            playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
 
@@ -465,13 +478,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
         }
 
-        SongEditorSceneData songEditorSceneData = new SongEditorSceneData();
-        songEditorSceneData.PreviousSceneData = SceneData;
-        songEditorSceneData.PreviousScene = EScene.SingScene;
-        songEditorSceneData.PositionInSongInMillis = PositionInSongInMillis;
-        songEditorSceneData.SelectedSongMeta = SongMeta;
-        songEditorSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
-        songEditorSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
+        SongEditorSceneData songEditorSceneData = new SongEditorSceneData
+        {
+            PreviousSceneData = SceneData,
+            PreviousScene = EScene.SingScene,
+            PositionInSongInMillis = PositionInSongInMillis,
+            SelectedSongMeta = SongMeta,
+            PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap,
+            SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles,
+        };
         SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
@@ -541,7 +556,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         PlayerControl playerControl = GameObject.Instantiate<PlayerControl>(playerControlPrefab);
 
-        Injector playerControlInjector = UniInjectUtils.CreateInjector(sceneInjector);
+        Injector playerControlInjector = UniInjectUtils.CreateInjector(injector);
         playerControlInjector.AddBindingForInstance(playerProfile);
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
@@ -642,6 +657,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(gameObject);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
@@ -654,7 +670,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         string voiceName = GetVoiceName(playerProfile);
         IReadOnlyCollection<Voice> voices = sceneData.SelectedSongMeta.GetVoices();
-        Voice matchingVoice = voices.FirstOrDefault(it => it.Name == voiceName);
+        Voice matchingVoice = voices.FirstOrDefault(it => it.VoiceNameEquals(voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;
@@ -707,5 +723,19 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         dialogControl.CloseDialog();
         dialogControl = null;
+    }
+
+    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
+            () => TogglePlayPause());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
+            () => Restart());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+            () => SkipToNextSingableNote());
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
+            () => FinishScene(false));
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            () => OpenSongInEditor());
     }
 }

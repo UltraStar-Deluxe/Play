@@ -9,7 +9,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
+public class SongEditorMidiFileImporter : INeedInjection
 {
     [Inject]
     private SongMeta songMeta;
@@ -29,31 +29,55 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    public void ImportMidiFile()
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
+    public void ImportMidiFile(string midiFilePath)
     {
-        string midiFilePath = settings.SongEditorSettings.MidiFilePath;
         if (!File.Exists(midiFilePath))
         {
-            uiManager.CreateNotification("File does not exist.", Colors.red);
+            Debug.Log($"File does not exist: {midiFilePath}");
+            uiManager.CreateNotificationVisualElement("File does not exist");
             return;
         }
 
         try
         {
             List<Note> loadedNotes = LoadNotesFromMidiFile(midiFilePath);
+            // Shift notes such that the first note starts at the current playback position
+            loadedNotes = ShiftNotesToPlaybackPosition(loadedNotes);
+
+            editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
             layerManager.ClearLayer(ESongEditorLayer.MidiFile);
-            foreach (Note loadedNote in loadedNotes)
-            {
-                layerManager.AddNoteToLayer(ESongEditorLayer.MidiFile, loadedNote);
-            }
+            loadedNotes.ForEach(loadedNote => layerManager.AddNoteToLayer(ESongEditorLayer.MidiFile, loadedNote));
             editorNoteDisplayer.UpdateNotes();
-            uiManager.CreateNotification("Loaded MIDI file successfully");
+            uiManager.CreateNotificationVisualElement("Loaded MIDI file successfully");
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            uiManager.CreateNotification($"Loading MIDI file failed: {e.Message}", Colors.red);
+            uiManager.CreateNotificationVisualElement($"Loading MIDI file failed: {e.Message}", "error");
         }
+    }
+
+    private List<Note> ShiftNotesToPlaybackPosition(List<Note> notes)
+    {
+        Note firstNote = notes.FindMinElement(note => note.StartBeat);
+        int playbackPositionInBeats = (int)Math.Round(songAudioPlayer.GetCurrentBeat(true));
+        int difference = playbackPositionInBeats - firstNote.StartBeat;
+        if (difference == 0)
+        {
+            return notes;
+        }
+
+        return notes
+            .Select(note => new Note(
+                note.Type,
+                note.StartBeat + difference,
+                note.Length,
+                note.TxtPitch,
+                note.Text))
+            .ToList();
     }
 
     private List<Note> LoadNotesFromMidiFile(string midiFilePath)
@@ -67,18 +91,22 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
         }
 
         Dictionary<int, Note> midiPitchToNoteUnderConstruction = new Dictionary<int, Note>();
-        foreach (MidiEvent midiEvent in midiFile.Tracks.SelectMany(track => track.MidiEvents))
+        midiFile.Tracks.ForEach(track =>
         {
-            if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
+            midiPitchToNoteUnderConstruction.Clear();
+            track.MidiEvents.ForEach(midiEvent =>
             {
-                HandleStartOfNote(midiEvent, midiPitchToNoteUnderConstruction);
-            }
+                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
+                {
+                    HandleStartOfNote(midiEvent, midiPitchToNoteUnderConstruction);
+                }
 
-            if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
-            {
-                HandleEndOfNote(midiEvent, midiPitchToNoteUnderConstruction, loadedNotes);
-            }
-        }
+                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
+                {
+                    HandleEndOfNote(midiEvent, midiPitchToNoteUnderConstruction, loadedNotes);
+                }
+            });
+        });
         Debug.Log("Loaded notes from midi file: " + loadedNotes.Count);
         return loadedNotes;
     }
@@ -87,9 +115,9 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
     {
         int midiPitch = midiEvent.parameter1;
         int deltaTimeInMillis = GetDeltaTimeInMillis(midiEvent);
+        int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
         if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
         {
-            int endBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis);
             if (endBeat > existingNote.StartBeat)
             {
                 existingNote.SetEndBeat(endBeat);
@@ -103,7 +131,7 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.LogWarning($"No Note for pitch {midiPitch} is beeing constructed. Ignoring this Note_Off event.");
+            Debug.LogWarning($"No Note for pitch {MidiUtils.GetAbsoluteName(midiPitch)} is being constructed. Ignoring this Note_Off event at {deltaTimeInMillis} ms.");
         }
     }
 
@@ -112,7 +140,7 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
         int midiPitch = midiEvent.parameter1;
         int deltaTimeInMillis = GetDeltaTimeInMillis(midiEvent);
         Note newNote = new Note();
-        int startBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis);
+        int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
         newNote.SetStartAndEndBeat(startBeat, startBeat);
         newNote.SetMidiNote(midiPitch);
 
@@ -124,10 +152,10 @@ public class SongEditorMidiFileImporter : MonoBehaviour, INeedInjection
         midiPitchToNoteUnderConstruction[midiPitch] = newNote;
     }
 
-    private int GetDeltaTimeInMillis(MidiEvent midiEvent)
+    private static int GetDeltaTimeInMillis(MidiEvent midiEvent)
     {
         uint deltaTimeInSamples = midiEvent.deltaTime;
-        int deltaTimeInMillis = (int)(deltaTimeInSamples / (MidiManager.midiStreamSampleRateHz / 1000));
+        int deltaTimeInMillis = (int)Math.Round(deltaTimeInSamples / (MidiManager.midiStreamSampleRateHz / 1000.0));
         return deltaTimeInMillis;
     }
 }

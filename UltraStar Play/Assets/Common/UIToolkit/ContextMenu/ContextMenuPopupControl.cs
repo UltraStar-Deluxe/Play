@@ -54,7 +54,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         visualElement = uiManager.contextMenuUi.CloneTree().Children().First();
         visualElement.style.left = position.x;
         visualElement.style.top = position.y;
-        uiDocument.rootVisualElement.Add(visualElement);
+        uiDocument.rootVisualElement.Children().First().Add(visualElement);
         // Remove dummy items
         visualElement.Clear();
 
@@ -73,7 +73,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
             if (currentSize != lastSize
                 || currentPosition != lastPosition)
             {
-                MoveContextMenuFullyInsideScreen();
+                VisualElementUtils.MoveVisualElementFullyInsideScreen(visualElement, panelHelper);
             }
 
             lastSize = currentSize;
@@ -130,30 +130,5 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private static void CloseAllOpenContextMenus()
     {
         OpenContextMenuPopups.ToList().ForEach(contextMenu => contextMenu.CloseContextMenu());
-    }
-
-    private void MoveContextMenuFullyInsideScreen()
-    {
-        Vector2 screenSizePanelCoordinates = panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
-        float xOvershoot = visualElement.worldBound.xMax - screenSizePanelCoordinates.x;
-        float yOvershoot = visualElement.worldBound.yMax - screenSizePanelCoordinates.y;
-
-        Vector2 shift = new Vector2(
-            xOvershoot > 0 ? xOvershoot : 0,
-            yOvershoot > 0 ? yOvershoot : 0);
-
-        if (shift == Vector2.zero)
-        {
-            return;
-        }
-
-        if (shift.x != 0)
-        {
-            visualElement.style.left = visualElement.style.left.value.value - shift.x;
-        }
-        if (shift.y != 0)
-        {
-            visualElement.style.top = visualElement.style.top.value.value - shift.y;
-        }
     }
 }

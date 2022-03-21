@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="songPropertyEntryUiRoot" style="width: 100%; height: auto; align-items: flex-start; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; flex-direction: column;">
+        <ui:Label text="Property Name" name="propertyNameLabel" style="-unity-text-align: upper-left;" />
+        <ui:TextField picking-mode="Ignore" value="Property value" text="Property value" name="propertyTextField" mask-character="123" style="width: 100%; margin-top: 5px;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,5 +1,9 @@
 :root {
     --text-color: white;
+    --text-color-inverted: rgb(64, 64, 64);
+    --text-color-accent1: lightgrey;
+    --text-color-error: rgb(200, 48, 48);
+    --text-color-warning: rgb(200, 200, 48);
     --font-size-xxs: 10px;
     --font-size-xs: 12px;
     --font-size-s: 14px;
@@ -7,9 +11,6 @@
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
-    --text-color-accent1: lightgrey;
-    --text-color-error: rgb(200, 48, 48);
-    --text-color-warning: rgb(200, 200, 48);
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
@@ -31,6 +32,20 @@
 .unity-base-text-field {
     height: var(--control-height);
     -unity-text-align: middle-left;
+    margin: 0;
+}
+
+.unity-base-text-field__input {
+    --unity-cursor-color: var(--text-color-inverted);
+    color: var(--text-color-inverted);
+    font-size: var(--font-size-s);
+    margin: 0;
+    padding: 0 5px;
+    overflow: visible;
+}
+
+.unity-base-text-field.disabled .unity-base-text-field__input {
+    background-color: rgb(146, 148, 150);
 }
 
 .unity-base-text-field__input:focus {
@@ -112,7 +127,7 @@
 
 .unity-button {
     background-color: var(--control-color);
-    color: rgb(255, 255, 255);
+    color: var(--text-color);
     width: var(--control-width);
     height: var(--control-height);
     font-size: var(--font-size);
@@ -121,6 +136,8 @@
     border-radius: 0;
     align-items: center;
     justify-content: center;
+    padding: 6px 6px 5px 5px;
+    margin: 2px 2px 2px 2px;
 }
 
 .unity-button:hover {
@@ -138,6 +155,8 @@
 .unity-toggle {
     width: var(--control-height);
     height: var(--control-height);
+    margin: 0;
+    padding: 0;
 }
 
 .unity-toggle VisualElement {
@@ -195,6 +214,10 @@
 }
 
 .transparentBackgroundColor:focus {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);
 }
 
@@ -335,6 +358,10 @@ TextInput {
 }
 
 .smallFont TextInput {
+    font-size: var(--font-size-s);
+}
+
+.smallFont .unity-text-element {
     font-size: var(--font-size-s);
 }
 
@@ -605,6 +632,11 @@ Label.tinyFont {
     background-color: rgba(32, 32, 32, 0.88);
 }
 
+#menuOverlay .inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+}
+
 .songDetailOverlayLabel {
     width: 100%;
     font-size: var(--font-size-s);
@@ -697,14 +729,13 @@ Label.tinyFont {
 }
 
 .contextMenuSeparator {
-    width: 95%;
     height: 1px;
     background-color: rgb(92, 92, 92);
 }
 
 .contextMenu {
     background-color: rgb(64, 64, 64);
-    padding: 5px;
+    padding: 2px;
 }
 
 .contextMenu Button {
@@ -729,4 +760,52 @@ Label.tinyFont {
     -unity-font-style: bold;
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(64, 64, 64, 0.5);
+}
+
+.fpsLabel {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: var(--font-size-xs);
+    -unity-text-align: middle-center;
+    padding: 10px;
+}
+
+.unity-scroller--vertical {
+    width: 12px;
+}
+
+.unity-scroller__low-button {
+    width: 100%;
+    display: none;
+}
+
+.unity-scroller__high-button {
+    width: 100%;
+    display: none;
+}
+
+.unity-base-slider {
+    width: 100%;
+    min-width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.unity-base-slider--vertical {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.unity-base-slider__dragger {
+    width: 10px;
+    left: 1px;
+}
+
+.textColorTint {
+    -unity-background-image-tint-color: var(--text-color);
+}
+
+.dialogBackground {
+    background-color: rgb(14, 28, 42);
 }

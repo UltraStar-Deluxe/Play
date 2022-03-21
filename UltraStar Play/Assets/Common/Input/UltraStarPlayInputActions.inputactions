@@ -418,17 +418,6 @@
                 },
                 {
                     "name": "",
-                    "id": "47053697-7bc8-4d45-9a82-a37461a0c324",
-                    "path": "<XRController>/trigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "click",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "6f0c2fd6-6a1b-4a97-afb8-aabce8d074d1",
                     "path": "<Mouse>/scroll",
                     "interactions": "",
@@ -681,6 +670,15 @@
                     "name": "anyKeyboardModifier",
                     "type": "Button",
                     "id": "ab50d342-f483-45f0-8352-217b86dea75e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "anyKeyboardModifierPressedOrReleased",
+                    "type": "PassThrough",
+                    "id": "6488710e-bfad-4b93-a377-0691556792d0",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -1330,6 +1328,39 @@
                     "action": "toggleFavoritePlaylistActive",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "141afdaa-008c-4d94-914b-45f73a51e520",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "068ec473-9517-4f97-a379-eafac0c2062c",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26818c7e-cf65-41ca-bb29-23b39aba1acd",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "anyKeyboardModifierPressedOrReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -1356,7 +1387,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "togglePlayPause",
+                    "name": "togglePause",
                     "type": "Button",
                     "id": "4e6aa313-73d8-48ae-bf17-d1034a2f5517",
                     "expectedControlType": "Button",
@@ -1593,7 +1624,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "togglePlayPause",
+                    "action": "togglePause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1604,7 +1635,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "togglePlayPause",
+                    "action": "togglePause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

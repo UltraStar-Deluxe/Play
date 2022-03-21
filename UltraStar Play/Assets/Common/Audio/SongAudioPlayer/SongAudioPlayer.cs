@@ -19,7 +19,7 @@ public class SongAudioPlayer : MonoBehaviour
     private int positionInSongInMillisFrame;
 
     private readonly Subject<double> playbackStoppedEventStream = new Subject<double>();
-    public IObservable<double> PlaybackStoppedEventStream => playbackStartedEventStream;
+    public IObservable<double> PlaybackStoppedEventStream => playbackStoppedEventStream;
 
     private readonly Subject<double> playbackStartedEventStream = new Subject<double>();
     public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
@@ -114,27 +114,6 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public double CurrentBeat
-    {
-        get
-        {
-            if (audioPlayer.clip == null)
-            {
-                return 0;
-            }
-            else
-            {
-                double millisInSong = PositionInSongInMillis;
-                double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
-                if (result < 0)
-                {
-                    result = 0;
-                }
-                return result;
-            }
-        }
-    }
-
     public bool IsPlaying
     {
         get
@@ -222,6 +201,11 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    public void ReloadAudio()
+    {
+        Init(SongMeta);
+    }
+
     public void PauseAudio()
     {
         if (audioPlayer.isPlaying)
@@ -238,5 +222,22 @@ public class SongAudioPlayer : MonoBehaviour
             audioPlayer.Play();
             playbackStartedEventStream.OnNext(PositionInSongInMillis);
         }
+    }
+
+    public double GetCurrentBeat(bool allowNegativeResult)
+    {
+        if (audioPlayer.clip == null)
+        {
+            return 0;
+        }
+
+        double millisInSong = PositionInSongInMillis;
+        double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+        if (result < 0
+            && !allowNegativeResult)
+        {
+            result = 0;
+        }
+        return result;
     }
 }

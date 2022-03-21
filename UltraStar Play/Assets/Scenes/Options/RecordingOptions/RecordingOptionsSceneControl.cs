@@ -86,6 +86,9 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicPitchTracker micPitchTracker;
+
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
@@ -101,7 +104,13 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
-        devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+        if (!TryReSelectLastMicProfile())
+        {
+            devicePickerControl.Selection.Value = devicePickerControl.Items[0];
+        }
+        devicePickerControl.Selection
+            .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
+
         amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationContainer.Q<ItemPicker>(), amplificationItems);
         amplificationPickerControl.GetLabelTextFunction = item => item + " %";
         noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
@@ -110,9 +119,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
         colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), GetColorItems());
         sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
-        sampleRatePickerControl.GetLabelTextFunction = item => item <= 0
-            ? TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto)
-            : item + " Hz";
+        sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
 
@@ -135,6 +142,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 serverSideConnectRequestManager.RemoveConnectedClientHandler(connectedClientHandler);
             }
         });
+        micPitchTracker.MicSampleRecorder
+            .ObserveEveryValueChanged(it => it.SampleRateHz)
+            .Subscribe(_ => UpdateSampleRateLabel());
+        micPitchTracker.MicSampleRecorder
+            .ObserveEveryValueChanged(it => it.IsRecording)
+            .Subscribe(_ => UpdateSampleRateLabel());
 
         // Reselect recording device of connected client, when the client has now connected
         serverSideConnectRequestManager.ClientConnectedEventStream
@@ -169,6 +182,41 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                         "error");
                 }
             });
+    }
+
+    private void UpdateSampleRateLabel()
+    {
+        sampleRatePickerControl.UpdateLabelText();
+    }
+
+    private string GetSampleRateLabel()
+    {
+        int item = sampleRatePickerControl.SelectedItem;
+        if (item <= 0)
+        {
+            // When "auto" is selected, then also show the automatically used sample rate.
+            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) +
+                   $"\n({micPitchTracker.MicSampleRecorder.SampleRateHz} Hz)";
+        }
+        return $"{item} Hz";
+    }
+
+    private bool TryReSelectLastMicProfile()
+    {
+        if (settings.LastMicProfileNameInRecordingOptionsScene.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        MicProfile lastMicProfile = devicePickerControl.Items
+            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene);
+        if (lastMicProfile == null)
+        {
+            return false;
+        }
+
+        devicePickerControl.SelectItem(lastMicProfile);
+        return true;
     }
 
     private void SetSelectedRecordingDeviceEnabled(bool isEnabled)

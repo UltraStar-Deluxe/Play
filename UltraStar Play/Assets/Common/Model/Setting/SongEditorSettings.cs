@@ -4,14 +4,19 @@ using System.Collections.Generic;
 [Serializable]
 public class SongEditorSettings
 {
+    public bool AutoSave { get; set; } = true;
+
     public float MusicVolume { get; set; } = 1;
     public float MusicPlaybackSpeed { get; set; } = 1;
+    public bool GoToLastPlaybackPosition { get; set; } = true;
 
     // Recording in SongEditorScene
     public ESongEditorRecordingSource RecordingSource { get; set; }
+    public MicProfile MicProfile { get; set; }
     public int MicOctaveOffset { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
+    public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -21,11 +26,19 @@ public class SongEditorSettings
     public float MidiGain { get; set; } = 1;
     public bool MidiSoundPlayAlongEnabled { get; set; } = true;
     public int MidiPlaybackOffsetInMillis { get; set; }
-    public string MidiFilePath { get; set; } = "";
+    public string LastMidiFilePath { get; set; } = "";
 
     // Option to show / hide voices.
     // Contains the names of the voices that should be hidden.
     public List<string> HideVoices { get; private set; } = new List<string>();
 
-    public bool SaveCopyOfOriginalFile { get; set; } = true;
+    public bool ShowLyricsArea { get; set; } = true;
+    public bool ShowVideoArea { get; set; } = true;
+    public bool ShowStatusBar { get; set; } = true;
+    public bool ShowVirtualPianoArea { get; set; } = true;
+    public bool SmallLeftSideBar { get; set; }
+    public bool ShowControlHints { get; set; } = true;
+
+    public int GridSizeInDevicePixels { get; set; } = 1;
+    public int SentenceLineSizeInDevicePixels { get; set; } = 2;
 }

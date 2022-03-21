@@ -8,35 +8,39 @@ using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
-    [InjectedInInspector]
-    public RectTransform selectionFrame;
+    private static readonly float scrollBorderPercent = 0.05f;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
+    private NoteAreaDragControl noteAreaDragControl;
 
     [Inject]
-    private Canvas canvas;
+    private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
-    private SongEditorSceneController songEditorSceneController;
+    private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
     private SongMeta songMeta;
 
-    private readonly float scrollBorderPercent = 0.05f;
+    [Inject(UxmlName = R.UxmlNames.noteAreaSentences)]
+    private VisualElement noteAreaSentences;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaSelectionFrame)]
+    private VisualElement noteAreaSelectionFrame;
 
     private bool isCanceled;
 
@@ -46,14 +50,9 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     private NoteAreaDragEvent startDragEvent;
     private NoteAreaDragEvent lastDragEvent;
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        noteAreaDragHandler.AddListener(this);
-    }
-
-    void Update()
-    {
-        UpdateScroll();
+        noteAreaDragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
@@ -61,20 +60,31 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         isCanceled = false;
         lastDragEvent = dragEvent;
         startDragEvent = dragEvent;
+
         if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
             CancelDrag();
             return;
         }
 
-        GameObject raycastTarget = dragEvent.GeneralDragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
-        if (raycastTarget != noteArea.gameObject)
+        // Check whether this is a drag gesture to manipulate notes, not to select notes
+        Vector2 dragStartPositionInPx = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition;
+        if (editorNoteDisplayer.AnyNoteControlContainsPosition(dragStartPositionInPx))
         {
             CancelDrag();
             return;
         }
 
-        selectionFrame.gameObject.SetActive(true);
+        // Check whether this is a drag gesture to manipulate sentences, not to select notes
+        if (editorNoteDisplayer.AnySentenceControlContainsPosition(dragStartPositionInPx))
+        {
+            CancelDrag();
+            return;
+        }
+
+        noteAreaSelectionFrame.ShowByDisplay();
+        noteAreaSelectionFrame.style.width = 0;
+        noteAreaSelectionFrame.style.height = 0;
     }
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
@@ -95,13 +105,13 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
     {
         lastDragEvent = dragEvent;
         scrollAmount = Vector2.zero;
-        selectionFrame.gameObject.SetActive(false);
+        noteAreaSelectionFrame.HideByDisplay();
     }
 
     public void CancelDrag()
     {
         scrollAmount = Vector2.zero;
-        selectionFrame.gameObject.SetActive(false);
+        noteAreaSelectionFrame.HideByDisplay();
         isCanceled = true;
     }
 
@@ -117,7 +127,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         int startMidiNote = GetDragStartMidiNote();
         int endMidiNote = GetDragEndMidiNote(currentDragEvent);
 
-        List<Note> visibleNotes = songEditorSceneController.GetAllVisibleNotes();
+        List<Note> visibleNotes = songEditorSceneControl.GetAllVisibleNotes();
         List<Note> selectedNotes = visibleNotes
             .Where(note => IsInSelectionFrame(note, startMidiNote, endMidiNote, startBeat, endBeat))
             .ToList();
@@ -127,16 +137,16 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         {
             if (InputUtils.IsKeyboardControlPressed())
             {
-                selectionController.RemoveFromSelection(selectedNotes);
+                selectionControl.RemoveFromSelection(selectedNotes);
             }
             else
             {
-                selectionController.AddToSelection(selectedNotes);
+                selectionControl.AddToSelection(selectedNotes);
             }
         }
         else
         {
-            selectionController.SetSelection(selectedNotes);
+            selectionControl.SetSelection(selectedNotes);
         }
     }
 
@@ -147,7 +157,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private int GetDragEndBeat(NoteAreaDragEvent currentDragEvent)
     {
-        return noteArea.PixelsToBeat(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.x);
+        return noteAreaControl.ScreenPixelPositionToBeat(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.x);
     }
 
     private int GetDragStartMidiNote()
@@ -157,7 +167,7 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
 
     private int GetDragEndMidiNote(NoteAreaDragEvent currentDragEvent)
     {
-        return noteArea.PixelsToMidiNote(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.y);
+        return noteAreaControl.ScreenPixelPositionToMidiNote(currentDragEvent.GeneralDragEvent.ScreenCoordinateInPixels.CurrentPosition.y);
     }
 
     private bool IsInSelectionFrame(
@@ -183,70 +193,45 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         return (startBeat <= note.StartBeat && note.EndBeat <= endBeat)
-            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote);
+            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote)
+            && Mathf.Abs(startMidiNote - endMidiNote) > 0;
     }
 
     private void UpdateSelectionFrame(NoteAreaDragEvent currentDragEvent)
     {
-        Vector3 canvasScale = canvas.transform.localScale;
-        if (canvasScale.x == 0 || canvasScale.y == 0)
-        {
-            return;
-        }
-
-        // Coordinates in milliseconds and midi-note
         int startBeat = GetDragStartBeat();
         int endBeat = GetDragEndBeat(currentDragEvent);
         int startMidiNote = GetDragStartMidiNote();
         int endMidiNote = GetDragEndMidiNote(currentDragEvent);
 
-        // Min and max coordinates in pixels
-        float minX = noteArea.BeatToPixels(noteArea.MinBeatInViewport);
-        float maxX = noteArea.BeatToPixels(noteArea.MinBeatInViewport + noteArea.ViewportWidthInBeats);
-        float minY = noteArea.MidiNoteToPixels(noteArea.MinMidiNoteInViewport);
-        float maxY = noteArea.MidiNoteToPixels(noteArea.MinMidiNoteInViewport + noteArea.ViewportHeight);
+        int fromBeat = Mathf.Min(startBeat, endBeat);
+        int toBeat = Mathf.Max(startBeat, endBeat);
+        int fromMidiNote = Mathf.Min(startMidiNote, endMidiNote);
+        int toMidiNote = Mathf.Max(startMidiNote, endMidiNote);
 
-        // Calculate selection frame start
-        float fromX = noteArea.BeatToPixels(startBeat);
-        fromX = NumberUtils.Limit(fromX, minX, maxX);
-        float fromY = noteArea.MidiNoteToPixels(startMidiNote);
-        fromY = NumberUtils.Limit(fromY, minY, maxY);
-
-        // Calculate selection frame end
-        float toX = noteArea.BeatToPixels(endBeat);
-        toX = NumberUtils.Limit(toX, minX, maxX);
-        float toY = noteArea.MidiNoteToPixels(endMidiNote);
-        toY = NumberUtils.Limit(toY, minY, maxY);
-
-        if (toX < fromX)
-        {
-            ObjectUtils.Swap(ref toX, ref fromX);
-        }
-        if (toY < fromY)
-        {
-            ObjectUtils.Swap(ref toY, ref fromY);
-        }
-
-        float width = (toX - fromX) / canvasScale.x;
-        float height = (toY - fromY) / canvasScale.y;
-
-        selectionFrame.position = new Vector2(fromX, fromY);
-        selectionFrame.sizeDelta = new Vector2(width, height);
+        float xPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(fromBeat);
+        float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(fromMidiNote);
+        float widthPercent = (float)(toBeat - fromBeat) / noteAreaControl.ViewportWidthInBeats;
+        float heightPercent = (float)(toMidiNote - fromMidiNote) / noteAreaControl.ViewportHeight;
+        noteAreaSelectionFrame.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.top = new StyleLength(new Length((yPercent - heightPercent) * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
+        noteAreaSelectionFrame.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
     }
 
     private void UpdateScrollAmount(NoteAreaDragEvent dragEvent)
     {
         int scrollAmountX = 200;
-        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.Distance.x) - scrollBorderPercent) * 1000;
+        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.LocalCoordinateInPercent.Distance.x) - scrollBorderPercent) * 1000;
 
         int scrollAmountY = 1;
 
         // X-Coordinate
-        if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.x > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x > (1 - scrollBorderPercent))
         {
             scrollAmount = new Vector2(scrollAmountX, scrollAmount.y);
         }
-        else if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.x < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x < scrollBorderPercent)
         {
             scrollAmount = new Vector2(-scrollAmountX, scrollAmount.y);
         }
@@ -256,11 +241,11 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         // Y-Coordinate
-        if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
         {
             scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
         }
-        else if (dragEvent.GeneralDragEvent.RectTransformCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
         {
             scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
         }
@@ -270,18 +255,18 @@ public class NoteAreaSelectionDragListener : MonoBehaviour, INeedInjection, IDra
         }
     }
 
-    private void UpdateScroll()
+    public void UpdateAutoScroll()
     {
         if (scrollAmount.x != 0)
         {
-            noteArea.SetViewportX(noteArea.ViewportX + (int)(scrollAmount.x));
+            noteAreaControl.SetViewportX(noteAreaControl.ViewportX + (int)(scrollAmount.x));
         }
 
         if (scrollAmount.y != 0
             && lastScrollVerticalTime + 0.1f < Time.time)
         {
             lastScrollVerticalTime = Time.time;
-            noteArea.SetViewportY(noteArea.ViewportY + (int)(scrollAmount.y));
+            noteAreaControl.SetViewportY(noteAreaControl.ViewportY + (int)(scrollAmount.y));
         }
 
         if (scrollAmount.x != 0

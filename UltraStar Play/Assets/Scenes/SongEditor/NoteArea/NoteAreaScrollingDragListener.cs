@@ -13,15 +13,15 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class NoteAreaScrollingDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     private const float TouchGestureMoveInSameDirectionThreshold = 100f;
     
     [Inject]
-    private NoteArea noteArea;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
+    private NoteAreaDragControl noteAreaDragControl;
 
     private int viewportXBeginDrag;
     private int viewportYBeginDrag;
@@ -30,9 +30,9 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
 
     private float twoFingerGestureStartDistance;
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        noteAreaDragHandler.AddListener(this);
+        noteAreaDragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
@@ -46,8 +46,8 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
         }
 
         twoFingerGestureStartDistance = -1;
-        viewportXBeginDrag = noteArea.ViewportX;
-        viewportYBeginDrag = noteArea.ViewportY;
+        viewportXBeginDrag = noteAreaControl.ViewportX;
+        viewportYBeginDrag = noteAreaControl.ViewportY;
     }
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
@@ -77,8 +77,8 @@ public class NoteAreaScrollingDragListener : MonoBehaviour, INeedInjection, IDra
         }
         
         int newViewportX = viewportXBeginDrag - dragEvent.MillisDistance;
-        int newViewportY = viewportYBeginDrag - dragEvent.MidiNoteDistance;
-        noteArea.SetViewport(newViewportX, newViewportY, noteArea.ViewportWidth, noteArea.ViewportHeight);
+        int newViewportY = viewportYBeginDrag + dragEvent.MidiNoteDistance;
+        noteAreaControl.SetViewport(newViewportX, newViewportY, noteAreaControl.ViewportWidth, noteAreaControl.ViewportHeight);
     }
 
     public void OnEndDrag(NoteAreaDragEvent dragEvent)

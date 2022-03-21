@@ -31,6 +31,6 @@ public class SetMusicGapAction : INeedInjection
     public void ExecuteAndNotify()
     {
         Execute();
-        songMetaChangeEventStream.OnNext(new MusicGapChangedEvent());
+        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

@@ -45,8 +45,11 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         }
         private set
         {
-            inputDeviceEnum = value;
-            inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+            if (inputDeviceEnum != value)
+            {
+                inputDeviceEnum = value;
+                inputDeviceChangeEventStream.OnNext(new InputDeviceChangeEvent());
+            }
         }
     }
 
@@ -74,7 +77,6 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         {
             Log.Logger.Error(e, "Could not enable enhanced touch support");
         }
-        ContextMenu.OpenContextMenus.Clear();
 
         if (inputDeviceIcon != null)
         {

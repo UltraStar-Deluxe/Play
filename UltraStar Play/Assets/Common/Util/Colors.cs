@@ -156,22 +156,27 @@ public static class Colors
 
     public static Color32 CreateColor(string hexColor, byte alpha = 255)
     {
+        if (hexColor.StartsWith("#"))
+        {
+            hexColor = hexColor.Substring(1);
+        }
+
         // ColorUtility.TryParseHtmlString cannot be called during serialization.
         // But this function can...
         try
         {
-            string hexR = hexColor.Substring(1, 2);
-            string hexG = hexColor.Substring(3, 2);
-            string hexB = hexColor.Substring(5, 2);
+            string hexR = hexColor.Substring(0, 2);
+            string hexG = hexColor.Substring(2, 2);
+            string hexB = hexColor.Substring(4, 2);
 
             byte intR = byte.Parse(hexR, System.Globalization.NumberStyles.HexNumber);
             byte intG = byte.Parse(hexG, System.Globalization.NumberStyles.HexNumber);
             byte intB = byte.Parse(hexB, System.Globalization.NumberStyles.HexNumber);
 
             byte intA;
-            if (hexColor.Length > 7)
+            if (hexColor.Length > 6)
             {
-                string hexA = hexColor.Substring(7, 2);
+                string hexA = hexColor.Substring(6, 2);
                 intA = byte.Parse(hexA, System.Globalization.NumberStyles.HexNumber);
             }
             else

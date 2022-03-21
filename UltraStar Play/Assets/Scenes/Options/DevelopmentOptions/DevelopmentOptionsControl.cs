@@ -41,11 +41,25 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private UiManager uiManager;
+
     private void Start()
     {
         new BoolPickerControl(showFpsContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.showFps,
-                  newValue => settings.DeveloperSettings.showFps = newValue);
+                  newValue =>
+                  {
+                      settings.DeveloperSettings.showFps = newValue;
+                      if (newValue)
+                      {
+                        uiManager.CreateShowFpsInstance();
+                      }
+                      else
+                      {
+                        uiManager.DestroyShowFpsInstance();
+                      }
+                  });
 
         new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
             .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,

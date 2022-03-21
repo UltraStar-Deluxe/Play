@@ -28,7 +28,7 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
 
         if (newBpm <= 60)
         {
-            uiManager.CreateNotification("New BPM is set much too low.");
+            uiManager.CreateNotificationVisualElement("New BPM is set much too low.");
             return;
         }
 
@@ -38,6 +38,6 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
     public void ExecuteAndNotify(float newBpm)
     {
         Execute(newBpm);
-        songMetaChangeEventStream.OnNext(new BpmChangeEvent());
+        songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));
     }
 }

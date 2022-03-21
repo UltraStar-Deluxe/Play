@@ -11,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public abstract class AbstractDragControl<EVENT>
+public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
 
@@ -20,24 +20,31 @@ public abstract class AbstractDragControl<EVENT>
     private EVENT dragStartEvent;
     private int pointerId;
 
-    private Vector3 dragStartPosition;
-
     private DragControlPointerEvent dragControlPointerDownEvent;
     public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
 
-    public VisualElement TargetVisualElement { get; private set; }
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement targetVisualElement;
 
-    protected readonly GameObject gameObject;
+    [Inject]
+    protected UIDocument uiDocument;
 
-	protected AbstractDragControl(VisualElement targetVisualElement, GameObject gameObject)
+    [Inject]
+    protected GameObject gameObject;
+
+    protected PanelHelper panelHelper;
+
+    private readonly List<IDisposable> disposables = new List<IDisposable>();
+
+    public virtual void OnInjectionFinished()
     {
-        this.TargetVisualElement = targetVisualElement;
-        this.gameObject = gameObject;
+        this.panelHelper = new PanelHelper(uiDocument);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
-        targetVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        // Drag gesture may leave the target visual element. Thus, listen on the rootVisualElement for the pointer events.
+        uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(10)
             .Where(_ => IsDragging)
             .Subscribe(_ =>
             {
@@ -45,7 +52,7 @@ public abstract class AbstractDragControl<EVENT>
                 // Cancel other callbacks. To do so, this subscription has a higher priority.
                 InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
             })
-            .AddTo(gameObject);
+            .AddTo(gameObject));
     }
 
     protected abstract EVENT CreateDragEventStart(DragControlPointerEvent eventData);
@@ -61,18 +68,18 @@ public abstract class AbstractDragControl<EVENT>
         dragListeners.Remove(listener);
     }
 
-    private void OnPointerDown(PointerDownEvent evt)
+    protected virtual void OnPointerDown(IPointerEvent evt)
     {
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
-        DragState.Value = EDragState.ReadyForDrag;
+        DragState.Value = EDragState.WaitingForDistanceThreshold;
     }
 
-    private void OnPointerMove(PointerMoveEvent evt)
+    protected virtual void OnPointerMove(IPointerEvent evt)
     {
-        if (DragState.Value == EDragState.ReadyForDrag)
+        if (DragState.Value == EDragState.WaitingForDistanceThreshold)
         {
-            Vector2 pointerMoveDistance =  evt.position - dragControlPointerDownEvent.Position;
-            if (pointerMoveDistance.magnitude > 5f)
+            float pointerMoveDistance =  Vector2.Distance(evt.position,dragControlPointerDownEvent.Position);
+            if (pointerMoveDistance > InputUtils.DragDistanceThresholdInPx)
             {
                 OnBeginDrag(dragControlPointerDownEvent);
             }
@@ -83,7 +90,7 @@ public abstract class AbstractDragControl<EVENT>
         }
     }
 
-    private void OnPointerUp(PointerUpEvent evt)
+    protected virtual void OnPointerUp(IPointerEvent evt)
     {
         if (DragState.Value == EDragState.Dragging)
         {
@@ -93,7 +100,7 @@ public abstract class AbstractDragControl<EVENT>
         DragState.Value = EDragState.WaitingForPointerDown;
     }
 
-    private void OnBeginDrag(DragControlPointerEvent eventData)
+    protected virtual void OnBeginDrag(DragControlPointerEvent eventData)
     {
         if (IsDragging)
         {
@@ -101,15 +108,14 @@ public abstract class AbstractDragControl<EVENT>
         }
 
         DragState.Value = EDragState.Dragging;
-        dragStartPosition = eventData.Position;
         pointerId = eventData.PointerId;
         dragStartEvent = CreateDragEventStart(eventData);
         NotifyListeners(listener => listener.OnBeginDrag(dragStartEvent), true);
     }
 
-    private void OnDrag(DragControlPointerEvent eventData)
+    protected virtual void OnDrag(DragControlPointerEvent eventData)
     {
-        if (DragState.Value == EDragState.IgnoreDrag
+        if (DragState.Value == EDragState.Canceled
             || !IsDragging
             || eventData.PointerId != pointerId)
         {
@@ -120,7 +126,7 @@ public abstract class AbstractDragControl<EVENT>
         NotifyListeners(listener => listener.OnDrag(dragEvent), false);
     }
 
-    private void OnEndDrag(DragControlPointerEvent eventData)
+    protected virtual void OnEndDrag(DragControlPointerEvent eventData)
     {
         if (DragState.Value != EDragState.Dragging
             || eventData.PointerId != pointerId)
@@ -130,23 +136,23 @@ public abstract class AbstractDragControl<EVENT>
 
         EVENT dragEvent = CreateDragEvent(eventData, dragStartEvent);
         NotifyListeners(listener => listener.OnEndDrag(dragEvent), false);
-        DragState.Value = EDragState.ReadyForDrag;
+        DragState.Value = EDragState.WaitingForPointerDown;
     }
 
-    private void CancelDrag()
+    public virtual void CancelDrag()
     {
-        if (DragState.Value == EDragState.IgnoreDrag)
+        if (DragState.Value == EDragState.Canceled)
         {
             return;
         }
 
-        DragState.Value = EDragState.IgnoreDrag;
+        DragState.Value = EDragState.Canceled;
         NotifyListeners(listener => listener.CancelDrag(), false);
     }
 
-    private void NotifyListeners(Action<IDragListener<EVENT>> action, bool includeCanceledListeners)
+    protected void NotifyListeners(Action<IDragListener<EVENT>> action, bool includeCanceledListeners)
     {
-        foreach (IDragListener<EVENT> listener in dragListeners)
+        foreach (IDragListener<EVENT> listener in dragListeners.ToList())
         {
             if (includeCanceledListeners || !listener.IsCanceled())
             {
@@ -158,18 +164,18 @@ public abstract class AbstractDragControl<EVENT>
     protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenPosInPixels = eventData.Position;
+        Vector2 screenPosInPixels = new Vector2(
+            eventData.Position.x,
+            eventData.Position.y);
         Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
         Vector2 deltaInPixels = eventData.DeltaPosition;
 
         // Target coordinates in pixels
-        float targetWidthInPixels = TargetVisualElement.contentRect.width;
-        float targetHeightInPixels = TargetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
+        float targetWidthInPixels = targetVisualElement.worldBound.width;
+        float targetHeightInPixels = targetVisualElement.worldBound.height;
 
-        float rectTransformXDistanceInPixels = targetPosInPixels.x - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.x;
-        float rectTransformYDistanceInPixels = targetPosInPixels.y - localDragStartEvent.RectTransformCoordinateInPixels.StartPosition.y;
-        Vector2 rectTransformDistanceInPixels = new Vector2(rectTransformXDistanceInPixels, rectTransformYDistanceInPixels);
+        Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
+        Vector2 localDistanceInPixels = localPosInPixels - localDragStartEvent.LocalCoordinateInPixels.StartPosition;
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
@@ -180,17 +186,16 @@ public abstract class AbstractDragControl<EVENT>
                 localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
                 deltaInPixels,
-                new Vector2(Screen.width, Screen.height)),
+                ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper)),
             new DragCoordinate(
-                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
-                rectTransformDistanceInPixels,
+                localDragStartEvent.LocalCoordinateInPixels.StartPosition,
+                localDistanceInPixels,
                 deltaInPixels),
             CreateDragCoordinateInPercent(
-                localDragStartEvent.RectTransformCoordinateInPixels.StartPosition,
-                rectTransformDistanceInPixels,
+                localDragStartEvent.LocalCoordinateInPixels.StartPosition,
+                localDistanceInPixels,
                 deltaInPixels,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
-            localDragStartEvent.RaycastResultsDragStart,
             localDragStartEvent.InputButton);
         return result;
     }
@@ -198,12 +203,14 @@ public abstract class AbstractDragControl<EVENT>
     protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenPosInPixels = eventData.Position;
+        Vector2 screenPosInPixels = new Vector2(
+            eventData.Position.x,
+            eventData.Position.y);
 
         // Target coordinate in pixels
-        float targetWidthInPixels = TargetVisualElement.contentRect.width;
-        float targetHeightInPixels = TargetVisualElement.contentRect.height;
-        Vector2 targetPosInPixels = new Vector2(TargetVisualElement.resolvedStyle.left, TargetVisualElement.resolvedStyle.top);
+        float targetWidthInPixels = targetVisualElement.contentRect.width;
+        float targetHeightInPixels = targetVisualElement.contentRect.height;
+        Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
 
         GeneralDragEvent result = new GeneralDragEvent(
             new DragCoordinate(
@@ -214,17 +221,16 @@ public abstract class AbstractDragControl<EVENT>
                 screenPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
-                new Vector2(Screen.width, Screen.height)),
+                ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper)),
             new DragCoordinate(
-                targetPosInPixels,
+                localPosInPixels,
                 Vector2.zero,
                 Vector2.zero),
             CreateDragCoordinateInPercent(
-                targetPosInPixels,
+                localPosInPixels,
                 Vector2.zero,
                 Vector2.zero,
                 new Vector2(targetWidthInPixels, targetHeightInPixels)),
-            null,
             eventData.Button);
         return result;
     }
@@ -235,5 +241,21 @@ public abstract class AbstractDragControl<EVENT>
         Vector2 distanceInPercent = distanceInPixels / fullSize;
         Vector2 deltaInPercent = deltaInPixels / fullSize;
         return new DragCoordinate(startPosInPercent, distanceInPercent, deltaInPercent);
+    }
+
+    public void Dispose()
+    {
+        if (targetVisualElement != null)
+        {
+            targetVisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        }
+        if (uiDocument != null
+            && uiDocument.rootVisualElement != null)
+        {
+            uiDocument.rootVisualElement.UnregisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
+            uiDocument.rootVisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
+        }
+
+        disposables.ForEach(it => it.Dispose());
     }
 }

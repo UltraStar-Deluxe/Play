@@ -4,7 +4,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
 
 // Handles loading and caching of images.
 public static class ImageManager
@@ -25,6 +24,26 @@ public static class ImageManager
     public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
         LoadSpriteFromUri("file://" + path, onSuccess, onFailure);
+    }
+
+    public static void ReloadImage(string uri, UIDocument uiDocument)
+    {
+        if (!spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
+            || cachedSprite.Sprite == null)
+        {
+            // Nothing using this right now. No need to reload anything.
+        }
+
+        // Find VisualElements that use this sprite. Update them with a new sprite.
+        List<VisualElement> visualElementsUsingTheSprite = uiDocument.rootVisualElement.Query<VisualElement>()
+            .Where(visualElement => visualElement.style.backgroundImage == new StyleBackground(cachedSprite.Sprite))
+            .ToList();
+
+        // Remove from cache before reloading.
+        RemoveCachedSprite(cachedSprite);
+
+        LoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
+            .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
     }
 
     public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
@@ -82,22 +101,6 @@ public static class ImageManager
     private static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new HashSet<Sprite>();
-        // Iterate over all sprites in the scene that are referenced by an Image or ISpriteHolder
-        // and remember them as still in use.
-        foreach (Transform transform in GameObject.FindObjectsOfType<Transform>())
-        {
-            Image image = transform.GetComponent<Image>();
-            if (image != null)
-            {
-                usedSprites.Add(image.sprite);
-            }
-            ISpriteHolder spriteHolder = transform.GetComponent<ISpriteHolder>();
-            if (spriteHolder != null)
-            {
-                usedSprites.Add(spriteHolder.GetSprite());
-            }
-        }
-
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
         UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
         if (uiDocument != null)

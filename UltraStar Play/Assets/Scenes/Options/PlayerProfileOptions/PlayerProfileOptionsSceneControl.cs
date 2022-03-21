@@ -39,7 +39,8 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     {
         UpdatePlayerProfileList();
         settings.ObserveEveryValueChanged(s => s.PlayerProfiles)
-            .Subscribe(onNext => UpdatePlayerProfileList());
+            .Subscribe(onNext => UpdatePlayerProfileList())
+            .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {

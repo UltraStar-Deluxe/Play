@@ -45,7 +45,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void Start()
     {
         settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
-            .Subscribe(onNext => UpdateSongFolderList());
+            .Subscribe(onNext => UpdateSongFolderList())
+            .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -101,7 +102,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private VisualElement CreateSongFolderEntry(string songDir, int indexInList)
     {
         VisualElement result = songFolderListEntryAsset.CloneTree();
-        TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
         VisualElement warningContainer = result.Q<VisualElement>(R.UxmlNames.warningContainer);
         Label warningLabel = warningContainer.Q<Label>(R.UxmlNames.warningLabel);
 
@@ -122,24 +122,17 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 warningLabel.text = "File does not exist.";
             }
         }
-        CheckFolderExists(songDir);
 
-        // Workaround for escaped characters
-        // (https://forum.unity.com/threads/preventing-escaped-characters-in-textfield.1071425/)
-        string backslashReplacement = "＼";
-        textField.RegisterValueChangedCallback(evt =>
-        {
-            string newValueEscaped = evt.newValue
-                .Replace("\\", backslashReplacement);
-            string newValueUnescaped = newValueEscaped.Replace(backslashReplacement, "\\");
+        TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
+        textField.value = songDir;
+        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
+        backslashReplacingTextFieldControl.ValueChangedEventStream
+            .Subscribe(newValueUnescaped =>
+            {
+                settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
+                CheckFolderExists(newValueUnescaped);
+            });
 
-            settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
-            CheckFolderExists(newValueUnescaped);
-
-            textField.SetValueWithoutNotify(newValueEscaped);
-        });
-
-        textField.value = songDir.Replace("\\", backslashReplacement);
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
         deleteButton.RegisterCallbackButtonTriggered(() =>
@@ -148,6 +141,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 UpdateSongFolderList();
                 backButton.Focus();
             });
+
+        CheckFolderExists(songDir);
+
         return result;
     }
 }

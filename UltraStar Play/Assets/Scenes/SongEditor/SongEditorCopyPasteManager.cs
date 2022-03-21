@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
@@ -24,7 +23,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -37,8 +36,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
-    
-    private Voice copiedVoice;
+
+    [Inject]
+    private DeleteNotesAction deleteNotesAction;
 
     public List<Note> CopiedNotes
     {
@@ -48,6 +48,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
     }
 
+    private readonly Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new Dictionary<Note, OriginalNoteCopyData>();
+
     void Start()
     {
         songAudioPlayer.PositionInSongEventStream.Subscribe(newMillis => MoveCopiedNotesToMillisInSong(newMillis));
@@ -56,6 +58,11 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
             .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
             .Subscribe(_ => CopySelectedNotes());
+
+        // Cut action
+        InputManager.GetInputAction(R.InputActions.songEditor_cut).PerformedAsObservable()
+            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Subscribe(_ => CutSelectedNotes());
         
         // Paste action
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
@@ -98,9 +105,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     private void ClearCopiedNotes()
     {
-        List<Note> notes = layerManager.GetNotes(ESongEditorLayer.CopyPaste);
-        notes.ForEach(note => editorNoteDisplayer.DeleteNote(note));
+        CopiedNotes.ForEach(copiedNote => editorNoteDisplayer.RemoveNoteControl(copiedNote));
         layerManager.ClearLayer(ESongEditorLayer.CopyPaste);
+        copiedNoteToOriginalDataMap.Clear();
     }
 
     public bool HasCopiedNotes()
@@ -114,55 +121,81 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
-        int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
-        Sentence sentenceAtBeatWithVoice = SongMetaUtils.GetSentencesAtBeat(songMeta, minBeat)
-            .Where(it => it.Voice != null).FirstOrDefault();
 
-        // Find voice to insert the notes into
-        Voice voice;
-        if (copiedVoice != null)
+        // Paste to original layer
+        layerManager.GetLayers().ForEach(layer =>
         {
-            voice = copiedVoice;
-        }
-        else if (sentenceAtBeatWithVoice != null)
+            List<Note> copiedNotesFromLayer = CopiedNotes
+                .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalLayer == layer)
+                .ToList();
+
+            copiedNotesFromLayer.ForEach(copiedNote =>
+            {
+                layerManager.RemoveNoteFromAllLayers(copiedNote);
+                layerManager.AddNoteToLayer(layer.LayerEnum, copiedNote);
+            });
+        });
+
+        // Paste to original voice
+        songMeta.GetVoices().ForEach(voice =>
         {
-            voice = sentenceAtBeatWithVoice.Voice;
-        }
-        else
-        {
-            voice = songMeta.GetVoices().FirstOrDefault();
-        }
+            List<Note> copiedNotesFromVoice = CopiedNotes
+                .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalLayer == null
+                                     && copiedNoteToOriginalDataMap[copiedNote].OriginalVoice == voice)
+                .ToList();
+            copiedNotesFromVoice.ForEach(copiedNote => layerManager.RemoveNoteFromAllLayers(copiedNote));
+            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, copiedNotesFromVoice, voice.Name);
+        });
 
         // Add the notes to the voice
-        moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, CopiedNotes, voice.Name);
         ClearCopiedNotes();
 
-        songMetaChangeEventStream.OnNext(new NotesAddedEvent());
+        songMetaChangeEventStream.OnNext(new NotesPastedEvent());
+    }
+
+    public void CutSelectedNotes()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        CopySelectedNotes();
+        deleteNotesAction.Execute(selectedNotes);
+        songMetaChangeEventStream.OnNext(new NotesCutEvent());
     }
 
     public void CopySelectedNotes()
     {
-        // Remove any old copied notes from the Ui.
-        foreach (Note note in CopiedNotes)
-        {
-            editorNoteDisplayer.DeleteNote(note);
-        }
-
         ClearCopiedNotes();
 
-        List<Note> selectedNotes = selectionController.GetSelectedNotes();
-        foreach (Note note in selectedNotes)
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        selectedNotes.ForEach(note =>
         {
-            copiedVoice = note.Sentence?.Voice;
-            Note noteCopy = note.Clone();
-            noteCopy.SetSentence(null);
-            CopiedNotes.Add(noteCopy);
-            layerManager.AddNoteToLayer(ESongEditorLayer.CopyPaste, noteCopy);
-        }
+            layerManager.TryGetLayer(note, out SongEditorLayer layer);
 
-        selectionController.ClearSelection();
+            Note copiedNote = note.Clone();
+            copiedNoteToOriginalDataMap[copiedNote] = new OriginalNoteCopyData
+            {
+                OriginalLayer = layer,
+                OriginalSentence = note.Sentence,
+                OriginalVoice = note.Sentence?.Voice,
+            };
+
+            copiedNote.SetSentence(null);
+            CopiedNotes.Add(copiedNote);
+            layerManager.AddNoteToLayer(ESongEditorLayer.CopyPaste, copiedNote);
+        });
+
+        selectionControl.ClearSelection();
 
         editorNoteDisplayer.UpdateNotes();
+    }
+
+    private class OriginalNoteCopyData
+    {
+        public SongEditorLayer OriginalLayer { get; set; }
+        public Sentence OriginalSentence { get; set; }
+        public Voice OriginalVoice { get; set; }
     }
 }
