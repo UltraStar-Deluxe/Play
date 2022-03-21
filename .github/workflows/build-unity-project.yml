@@ -46,7 +46,7 @@ jobs:
         run: sh download-dependencies.sh
       
       # Build Executables.
-      - uses: game-ci/unity-builder@v2
+      - uses: game-ci/unity-builder@9358a3a8903d6527767eb4f7094f1d2a6e39edee
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
