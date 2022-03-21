@@ -13,11 +13,6 @@ using UniRx;
 
 public class GeneralDragControl : AbstractDragControl<GeneralDragEvent>
 {
-    public GeneralDragControl(VisualElement targetVisualElement, GameObject gameObject)
-        : base(targetVisualElement, gameObject)
-    {
-    }
-
     protected override GeneralDragEvent CreateDragEventStart(DragControlPointerEvent eventData)
     {
         return CreateGeneralDragEventStart(eventData);

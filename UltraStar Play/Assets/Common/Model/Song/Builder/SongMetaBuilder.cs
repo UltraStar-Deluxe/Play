@@ -184,7 +184,7 @@ public static class SongMetaBuilder
                             res.Year = ConvertToUInt32(item.Value);
                             break;
                         default:
-                            res.AddUnkownHeaderEntry(item.Key, item.Value);
+                            res.SetUnknownHeaderEntry(item.Key, item.Value);
                             break;
                     }
                 }

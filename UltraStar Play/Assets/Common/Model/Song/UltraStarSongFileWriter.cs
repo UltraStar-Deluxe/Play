@@ -142,10 +142,7 @@ public static class UltraStarSongFileWriter
             AppendHeaderField(sb, "end", songMeta.End.ToString());
         }
 
-        foreach (KeyValuePair<string, string> unkownHeaderEntry in songMeta.UnkownHeaderEntries)
-        {
-            AppendHeaderField(sb, unkownHeaderEntry.Key, unkownHeaderEntry.Value);
-        }
+        songMeta.UnknownHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
     }
 
     private static void AppendHeaderField(StringBuilder sb, string key, string value)

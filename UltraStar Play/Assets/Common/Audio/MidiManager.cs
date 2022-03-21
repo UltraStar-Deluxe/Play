@@ -74,11 +74,13 @@ public class MidiManager : MonoBehaviour, INeedInjection
         // Synchronize with settings
         midiVelocity = settings.SongEditorSettings.MidiVelocity;
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiVelocity)
-            .Subscribe(newMidiVelocity => midiVelocity = newMidiVelocity);
+            .Subscribe(newMidiVelocity => midiVelocity = newMidiVelocity)
+            .AddTo(gameObject);
 
         midiGain = settings.SongEditorSettings.MidiGain;
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiGain)
-            .Subscribe(newMidiGain => midiGain = newMidiGain);
+            .Subscribe(newMidiGain => midiGain = newMidiGain)
+            .AddTo(gameObject);
     }
 
     private void Update()

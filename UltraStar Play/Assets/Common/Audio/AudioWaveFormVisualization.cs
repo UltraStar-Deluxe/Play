@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class AudioWaveFormVisualization : INeedInjection
 {
-    public Color waveformColor = Color.white;
+    public Color WaveformColor { get; set; }= Color.white;
 
     private readonly DynamicTexture dynTexture;
 
@@ -57,7 +57,7 @@ public class AudioWaveFormVisualization : INeedInjection
 
             // Draw the pixels
             int y = (int)(dynTexture.TextureHeight * (value + 1f) / 2f);
-            dynTexture.SetPixel(x, y, waveformColor);
+            dynTexture.SetPixel(x, y, WaveformColor);
         }
 
         // upload to the graphics card 
@@ -163,7 +163,7 @@ public class AudioWaveFormVisualization : INeedInjection
             int yMax = (int)(dynTexture.TextureHeight * (max + 1f) / 2f);
             for (int y = yMin; y < yMax; y++)
             {
-                dynTexture.SetPixel(x, y, waveformColor);
+                dynTexture.SetPixel(x, y, WaveformColor);
             }
         }
 

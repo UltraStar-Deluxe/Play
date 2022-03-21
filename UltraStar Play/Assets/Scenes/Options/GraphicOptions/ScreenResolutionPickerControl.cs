@@ -22,7 +22,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
         }
         else
         {
-            ScreenResolution currentScreenResolution = ApplicationUtils.GetCurrentAppResolution();
+            ScreenResolution currentScreenResolution = ApplicationUtils.GetScreenResolution();
             if (!TrySelectItem(currentScreenResolution, false))
             {
                 Selection.Value = GetBestMatchingScreenResolution(currentScreenResolution);

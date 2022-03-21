@@ -41,7 +41,7 @@ public class GraphicOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         if (PlatformUtils.IsStandalone)
         {
             new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>());
-            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>());
+            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>(), gameObject);
         }
         else
         {

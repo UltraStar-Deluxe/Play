@@ -124,7 +124,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void StartDownload()
     {
-        StartCoroutine(DownloadFileAsync(DownloadUrl, PersistentTempPath()));
+        StartCoroutine(DownloadFileAsync(DownloadUrl, ApplicationManager.PersistentTempPath()));
     }
 
     private void CancelDownload()
@@ -140,28 +140,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void FetchFileSize()
     {
         StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
-    }
-
-    private string PersistentTempPath()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "Temp");
-        //Create Directory if it does not exist
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-        return path;
-    }
-
-    private string PersistentSongsPath()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "Songs");
-        //Create Directory if it does not exist
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-        return path;
     }
 
     private IEnumerator DownloadFileAsync(string url, string targetFolder)
@@ -297,7 +275,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         AddToDebugAndUiLog("Preparing to unpack the downloaded song package.");
-        string songsPath = PersistentSongsPath();
+        string songsPath = ApplicationManager.PersistentSongsPath();
         PoolHandle handle = ThreadPool.QueueUserWorkItem(poolHandle =>
         {
             using (Stream tarStream = File.OpenRead(tarPath))

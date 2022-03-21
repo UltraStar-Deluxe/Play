@@ -19,6 +19,9 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private Injector injector;
+
     private SongEditorMidiSoundPlayAlongThread thread;
     private double positionInSongInMillisOld;
 
@@ -70,7 +73,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     private void StartThread()
     {
         midiManager.InitIfNotDoneYet();
-        thread = new SongEditorMidiSoundPlayAlongThread(settings, songMeta, midiManager);
+        thread = injector.CreateAndInject<SongEditorMidiSoundPlayAlongThread>();
         thread.Start((int)songAudioPlayer.PositionInSongInMillis);
     }
 }

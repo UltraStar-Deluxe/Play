@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using UniInject;
 using UniRx;
+using UnityEditor;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
@@ -63,7 +64,13 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             isSongScanFinished = false;
         }
     }
-    
+
+    public void ReloadSongMetas()
+    {
+        ResetSongMetas();
+        ScanFilesIfNotDoneYet();
+    }
+
     private void Start()
     {
         RescanIfSongFoldersChanged();
@@ -90,7 +97,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     {
         if (songMeta == null)
         {
-            throw new ArgumentNullException("songMeta");
+            throw new ArgumentNullException(nameof(songMeta));
         }
 
         songMetas.Add(songMeta);
@@ -145,10 +152,10 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             SongsSuccess = 0;
             SongsFailed = 0;
 
-            FolderScanner scannerTxt = new FolderScanner("*.txt");
+            FolderScanner txtScanner = new FolderScanner("*.txt");
 
             // Find all txt files in the song directories
-            txtFiles = ScanForTxtFiles(scannerTxt);
+            txtFiles = ScanForTxtFiles(txtScanner);
         }
 
         // Load the txt files in a background thread
@@ -207,7 +214,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
     private void LoadTxtFiles(List<string> txtFiles)
     {
-        txtFiles.ForEach(delegate (string path)
+        txtFiles.ForEach(path =>
         {
             try
             {
@@ -236,7 +243,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         });
     }
 
-    private List<string> ScanForTxtFiles(FolderScanner scannerTxt)
+    private List<string> ScanForTxtFiles(FolderScanner txtScanner)
     {
         List<string> txtFiles = new List<string>();
         List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
@@ -244,7 +251,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         {
             try
             {
-                List<string> txtFilesInSongDir = scannerTxt.GetFiles(songDir);
+                List<string> txtFilesInSongDir = txtScanner.GetFiles(songDir, true);
                 txtFiles.AddRange(txtFilesInSongDir);
             }
             catch (Exception ex)
@@ -278,7 +285,39 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         Debug.LogError("Song scan did not finish - timeout reached.");
     }
 
-    public class SongScanFinishedEvent
+    public List<SongMeta> LoadNewSongMetasFromFolder(string songFolder)
     {
+        List<SongMeta> result = new List<SongMeta>();
+        if (!Directory.Exists(songFolder))
+        {
+            return result;
+        }
+
+        FolderScanner txtScanner = new FolderScanner("*.txt");
+        List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
+
+        txtFiles.ForEach(path =>
+        {
+            try
+            {
+                SongMeta newSongMeta = SongMetaBuilder.ParseFile(path);
+                if (CheckSupportedMediaFormats(newSongMeta))
+                {
+                    result.Add(newSongMeta);
+                }
+            }
+            catch (SongMetaBuilderException e)
+            {
+                Debug.LogWarning("SongMetaBuilderException: " + path + "\n" + e.Message);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError(path);
+            }
+        });
+
+        result.ForEach(songMeta => Add(songMeta));
+        return result;
     }
 }

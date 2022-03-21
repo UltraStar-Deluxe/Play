@@ -1,0 +1,192 @@
+#songEditorRoot {
+    --text-color: rgb(208, 208, 208);
+    --text-color-inverted: rgb(64, 64, 64);
+    --control-color: rgb(88, 88, 88);
+    --control-color-accent1: rgb(103, 103, 103);
+    --control-color-accent2: rgb(70, 96, 124);
+    --selection-color-transparent: rgba(21, 88, 219, 0.5);
+    --recording-button-color: rgb(200, 32, 32);
+    --font-size-xxs: 8px;
+    --font-size-xs: 10px;
+    --font-size-s: 11px;
+    --font-size: 14px;
+    --font-size-l: 18px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 24px;
+    --control-height: 25px;
+    --control-width: 80px;
+    --control-width-half: 40px;
+    --control-width-large: 100px;
+    --control-height-large: 40px;
+    --control-height-small: 20px;
+    --panel-background-color: rgb(60, 63, 65);
+    background-color: rgb(50, 50, 50);
+}
+
+.panel {
+    background-color: var(--panel-background-color);
+    border-width: 1px;
+    border-color: rgb(50, 50, 50);
+}
+
+.icon {
+    -unity-background-image-tint-color: rgb(196, 196, 196);
+}
+
+#virtualPiano {
+    background-color: rgb(49, 51, 53);
+}
+
+#noteArea {
+    background-color: rgb(43, 43, 43);
+}
+
+Button.recording {
+    background-color: var(--recording-button-color);
+}
+
+Button.recording:focus {
+    background-color: var(--recording-button-color);
+}
+
+Button.recording:hover {
+    background-color: var(--recording-button-color);
+}
+
+Button.selected {
+    background-color: var(--control-color-accent2);
+}
+
+Button.selected:focus {
+    background-color: var(--control-color-accent2);
+}
+
+Button.selected:hover {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.whiteKey {
+    background-color: white;
+}
+
+.virtualPianoKey.blackKey {
+    background-color: black;
+}
+
+.virtualPianoKey.whiteKey:hover {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.blackKey:hover {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.whiteKey:focus {
+    background-color: var(--control-color-accent2);
+}
+
+.virtualPianoKey.blackKey:focus {
+    background-color: var(--control-color-accent2);
+}
+
+.tooltip {
+    font-size: var(--font-size-xs);
+    -unity-font-style: bold;
+    padding: 5px;
+    background-color: rgb(60, 63, 65);
+    border-color: rgb(50, 50, 50);
+    border-width: 1px;
+}
+
+.leftSideBar {
+    width: 80px;
+    height: 100%;
+    transition: width 0.5s;
+}
+
+.leftSideBar Button {
+    padding: 6px;
+    width: 100%;
+}
+
+.leftSideBar Label {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: var(--text-color);
+}
+
+.leftSideBar .icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+    display: none;
+}
+
+.leftSideBar.small {
+    width: 30px;
+}
+
+.leftSideBar.small Label {
+    display: none;
+}
+
+.leftSideBar.small .icon {
+    display: flex;
+}
+
+.secondarySideBarPanel {
+    display: none;
+    width: 200px;
+    height: 100%;
+    padding-left: 2px;
+    padding-right: 0px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.secondarySideBarPanel #unity-content-container {
+    padding-right: 2px;
+}
+
+.secondarySideBarTitle {
+    font-size: var(--font-size-s);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 10px;
+}
+
+.inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+    white-space: normal;
+    margin-bottom: 10px;
+    font-size: var(--font-size-xs);
+}
+
+.songEditorSettingsGroup {
+    border-color: var(--text-color);
+    border-top-width: 1px;
+    width: 100%;
+    min-height: 50px;
+    border-radius: 5px;
+    padding: 2px;
+    margin-bottom: 10px;
+}
+
+.songEditorSettingsGroupTitle {
+    -unity-text-align: upper-center;
+    -unity-font-style: bold;
+}
+
+ScrollView #unity-content-container {
+    padding-right: 2px;
+    padding-bottom: 2px;
+}
+
+.dialogBackground {
+    background-color: var(--panel-background-color);
+}

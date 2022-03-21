@@ -3,22 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
-    private NoteAreaDragHandler noteAreaDragHandler;
+    private NoteAreaControl noteAreaControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -31,6 +29,12 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
     [Inject]
     private SongMeta songMeta;
+
+    [Inject]
+    private SongEditorSceneControl songEditorSceneControl;
+
+    [Inject]
+    private SongEditorLayerManager layerManager;
 
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
@@ -52,36 +56,47 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
         Vertical
     }
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        noteAreaDragHandler.AddListener(this);
+        noteAreaControl.DragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
         if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
         {
-            CancelDrag();
+            AbortDrag();
             return;
         }
+
+        Note dragStartNote = songEditorSceneControl
+            .GetAllVisibleNotes()
+            .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
+                                    && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
+                                    && note.MidiNote <= dragEvent.MidiNoteDragStart
+                                    && dragEvent.MidiNoteDragStart <= note.MidiNote);
+        if (dragStartNote == null)
+        {
+            return;
+        }
+
+        EditorNoteControl dragStartNoteControl = editorNoteDisplayer.GetNoteControl(dragStartNote);
 
         isCanceled = false;
-        GameObject raycastTarget = dragEvent.GeneralDragEvent.RaycastResultsDragStart.Select(it => it.gameObject).FirstOrDefault();
-        EditorUiNote dragStartUiNote = raycastTarget.GetComponent<EditorUiNote>();
-        if (dragStartUiNote == null)
+        if (!selectionControl.IsSelected(dragStartNoteControl.Note))
         {
-            CancelDrag();
+            selectionControl.SetSelection(new List<EditorNoteControl> { dragStartNoteControl });
+        }
+
+        selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            AbortDrag();
             return;
         }
 
-        if (!selectionController.IsSelected(dragStartUiNote.Note))
-        {
-            selectionController.SetSelection(new List<EditorUiNote> { dragStartUiNote });
-        }
+        dragAction = GetDragAction(dragStartNoteControl, dragEvent);
 
-        dragAction = GetDragAction(dragStartUiNote, dragEvent);
-
-        selectedNotes = selectionController.GetSelectedNotes();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
@@ -96,6 +111,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
     public void OnDrag(NoteAreaDragEvent dragEvent)
     {
+        if (selectedNotes.Count <= 0)
+        {
+            return;
+        }
+
         switch (dragAction)
         {
             case DragAction.Move:
@@ -111,28 +131,30 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
                 break;
 
             case DragAction.StretchLeft:
-                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
+                if (InputUtils.IsKeyboardShiftPressed()
+                    || selectedNotes.Count == 1)
                 {
-                    StretchNotesLeft(dragEvent, selectedNotes);
+                    ExtendNotesLeft(dragEvent, selectedNotes);
                 }
                 else
                 {
-                    ExtendNotesLeft(dragEvent, selectedNotes);
+                    StretchNotesLeft(dragEvent, selectedNotes);
                 }
                 break;
 
             case DragAction.StretchRight:
-                if (InputUtils.IsKeyboardShiftPressed() && selectedNotes.Count > 1)
-                {
-                    StretchNotesRight(dragEvent, selectedNotes, true);
-                }
-                else
+                if (InputUtils.IsKeyboardShiftPressed()
+                    || selectedNotes.Count == 1)
                 {
                     ExtendNotesRight(dragEvent, selectedNotes, true);
                 }
+                else
+                {
+                    StretchNotesRight(dragEvent, selectedNotes, true);
+                }
                 break;
             default:
-                throw new UnityException("Unkown drag action: " + dragAction);
+                throw new UnityException("Unknown drag action: " + dragAction);
         }
 
         editorNoteDisplayer.UpdateNotesAndSentences();
@@ -146,6 +168,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
             noteToSnapshotOfNoteMap.Clear();
             songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
+    }
+
+    private void AbortDrag()
+    {
+        isCanceled = true;
     }
 
     public void CancelDrag()
@@ -177,13 +204,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
         }
     }
 
-    private DragAction GetDragAction(EditorUiNote dragStartUiNote, NoteAreaDragEvent dragEvent)
+    private DragAction GetDragAction(EditorNoteControl dragStartNoteControl, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiNote.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        if (dragStartNoteControl.IsPositionOverLeftHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchLeft;
         }
-        else if (dragStartUiNote.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        else if (dragStartNoteControl.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchRight;
         }
@@ -203,10 +230,12 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
     {
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            int newMidiNote = noteSnapshot.MidiNote + dragEvent.MidiNoteDistance;
-            note.SetMidiNote(newMidiNote);
-            note.SetStartAndEndBeat(noteSnapshot.StartBeat, noteSnapshot.EndBeat);
+            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            {
+                int newMidiNote = noteSnapshot.MidiNote - dragEvent.MidiNoteDistance;
+                note.SetMidiNote(newMidiNote);
+                note.SetStartAndEndBeat(noteSnapshot.StartBeat, noteSnapshot.EndBeat);
+            }
         }
 
         if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
@@ -219,11 +248,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
     {
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
-            int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
-            note.SetMidiNote(noteSnapshot.MidiNote);
-            note.SetStartAndEndBeat(newStartBeat, newEndBeat);
+            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            {
+                int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
+                int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
+                note.SetMidiNote(noteSnapshot.MidiNote);
+                note.SetStartAndEndBeat(newStartBeat, newEndBeat);
+            }
         }
 
         if (adjustFollowingNotesIfNeeded && settings.SongEditorSettings.AdjustFollowingNotes)
@@ -236,11 +267,13 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
     {
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
-            if (newEndBeat > noteSnapshot.StartBeat)
+            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
             {
-                note.SetEndBeat(newEndBeat);
+                int newEndBeat = noteSnapshot.EndBeat + dragEvent.BeatDistance;
+                if (newEndBeat > noteSnapshot.StartBeat)
+                {
+                    note.SetEndBeat(newEndBeat);
+                }
             }
         }
 
@@ -254,19 +287,28 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
     {
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
-            // Extend/trim StartBeat
-            int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
-            if (newStartBeat < noteSnapshot.EndBeat)
+            if (noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
             {
-                note.SetStartBeat(newStartBeat);
+                // Extend/trim StartBeat
+                int newStartBeat = noteSnapshot.StartBeat + dragEvent.BeatDistance;
+                if (newStartBeat < noteSnapshot.EndBeat)
+                {
+                    note.SetStartBeat(newStartBeat);
+                }
             }
         }
     }
 
     private void StretchNotesLeft(NoteAreaDragEvent dragEvent, List<Note> notes)
     {
-        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot) ? noteSnapshot : null)
+            .Where(note => note != null)
+            .ToList();
+        if (snapshotNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = maxBeatInSelection;
@@ -276,7 +318,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            if (!noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            {
+                continue;
+            }
+
             // Stretch/shrink StartBeat and EndBeat relative to selection
             float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
@@ -286,7 +332,14 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
     private void StretchNotesRight(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
-        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap[note]).ToList();
+        List<Note> snapshotNotes = notes.Select(note => noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot) ? noteSnapshot : null)
+            .Where(note => note != null)
+            .ToList();
+        if (snapshotNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
         int minBeatInSelection = snapshotNotes.Select(note => note.StartBeat).Min();
         int maxBeatInSelection = snapshotNotes.Select(note => note.EndBeat).Max();
         int anchorBeatInSelection = minBeatInSelection;
@@ -296,7 +349,11 @@ public class ManipulateNotesDragListener : MonoBehaviour, INeedInjection, IDragL
 
         foreach (Note note in notes)
         {
-            Note noteSnapshot = noteToSnapshotOfNoteMap[note];
+            if (!noteToSnapshotOfNoteMap.TryGetValue(note, out Note noteSnapshot))
+            {
+                continue;
+            }
+
             // Stretch/shrink StartBeat and EndBeat relative to selection
             float newStartBeat = anchorBeatInSelection + (noteSnapshot.StartBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);
             float newEndBeat = anchorBeatInSelection + (noteSnapshot.EndBeat - anchorBeatInSelection) * (1 + dragPercentRelativeToSelection);

@@ -25,6 +25,14 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     [Inject(UxmlName = R.UxmlNames.menuButton)]
     private VisualElement menuButton;
 
+    private void Awake()
+    {
+        // Disable default FocusableNavigator
+        FindObjectsOfType<FocusableNavigator>()
+            .Where(it => it != this)
+            .ForEach(it => it.gameObject.SetActive(false));
+    }
+
     public override void Start()
     {
         base.Start();

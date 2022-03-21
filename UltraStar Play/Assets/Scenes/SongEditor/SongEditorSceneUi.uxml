@@ -1,3 +1,274 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
+    <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
+        <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
+            <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
+                <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" style="height: 100%;">
+                        <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
+                            <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="playIcon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/play_arrow_white_24dp.svg?fileID=7388822144124034973&amp;guid=59a9a5409059d3849a01945b28f504dc&amp;type=3#play_arrow_white_24dp&apos;);" />
+                            <ui:VisualElement name="pauseIcon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/pause_white_24dp.svg?fileID=7388822144124034973&amp;guid=fcf413d9fad5a384886a8b51d4794c5e&amp;type=3#pause_white_24dp&apos;); display: none;" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
+                            <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/fiber_manual_record_white_24dp.svg?fileID=7388822144124034973&amp;guid=b9823aab60674b74392496963ed16156&amp;type=3#fiber_manual_record_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
+                            <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSongPropertiesButton">
+                            <ui:Label text="Properties" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/queue_music_white_24dp.svg?fileID=7388822144124034973&amp;guid=d1b7cdd6ee30d01479efe45e8d3d8daf&amp;type=3#queue_music_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleLayersButton">
+                            <ui:Label text="Layers" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/layers_white_24dp.svg?fileID=7388822144124034973&amp;guid=d08499116bf7a8b4abcab1bd77a25949&amp;type=3#layers_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSettingsButton">
+                            <ui:Label text="Settings" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/settings_white_24dp.svg?fileID=7388822144124034973&amp;guid=12ed75580d6e33342af3ffd0e8b3e86a&amp;type=3#settings_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
+                            <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/help_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=088f9b8e2490ed44a862efc470dafb60&amp;type=3#help_outline_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="undoButton">
+                            <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/undo_white_24dp.svg?fileID=7388822144124034973&amp;guid=31518e25db47ae84795efbfa5af09c2e&amp;type=3#undo_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="redoButton">
+                            <ui:Label text="Redo" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/redo_white_24dp.svg?fileID=7388822144124034973&amp;guid=80a849cb32dd9ab4cabe7a8f76428888&amp;type=3#redo_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="saveButton">
+                            <ui:Label text="Save" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/save_white_24dp.svg?fileID=7388822144124034973&amp;guid=1df45a561456adb488385eb58e84e237&amp;type=3#save_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="exitSceneButton">
+                            <ui:Label text="Back" display-tooltip-when-elided="true" name="label" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/arrow_back_white_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_white_24dp&apos;);" />
+                        </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
+                            <ui:Label display-tooltip-when-elided="true" name="label" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/unfold_less_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=1380d7f505c7b8b49a5d4a25bf03ab3d&amp;type=3#unfold_less_horizontal_white_24dp&apos;);" />
+                            <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/unfold_more_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=9c1a6809250de8b4782b910be636a423&amp;type=3#unfold_more_horizontal_white_24dp&apos;);" />
+                        </ui:Button>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="border-top-width: 0; border-bottom-width: 0; display: flex; height: 100%; flex-direction: row;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="issuesSideBarContainer" class="secondarySideBarPanel">
+                        <ui:Label text="Issues" display-tooltip-when-elided="true" name="issuesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                    </ui:ScrollView>
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="layersSideBarContainer" class="secondarySideBarPanel">
+                        <ui:Label text="Note Layers" display-tooltip-when-elided="true" name="layersTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                    </ui:ScrollView>
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel" style="display: none;">
+                        <ui:Label text="Song Properties" display-tooltip-when-elided="true" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                        <ui:Label text="BPM" display-tooltip-when-elided="true" name="bpmLabel" style="margin-bottom: 5px;" />
+                        <ui:TextField picking-mode="Ignore" value="999" text="999" name="bpmTextField" style="margin-bottom: 5px;" />
+                        <ui:Button text="Click to find BPM" display-tooltip-when-elided="true" name="detectBpmButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 1px;" />
+                        <ui:Label text="No clicks yet" display-tooltip-when-elided="true" name="detectBpmLabel" style="-unity-text-align: upper-center; margin-bottom: 5px;" />
+                        <ui:Button text="Set BPM&#10;keep note duration" display-tooltip-when-elided="true" name="setBpmKeepNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-bottom: 5px; height: 40px; margin-top: 0;" />
+                        <ui:Button text="Set BPM&#10;change note duration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
+                    </ui:ScrollView>
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="settingsSideBarContainer" class="secondarySideBarPanel smallFont" style="display: flex;">
+                        <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold; display: flex;" />
+                        <ui:Label text="Editing" display-tooltip-when-elided="true" name="editingTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="editingGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="adjustFollowingNotesContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Adjust following notes" display-tooltip-when-elided="true" name="adjustFollowingNotesLabel" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="adjustFollowingNotesToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="autoSaveContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Auto save" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="autoSaveToggle" class="smallControl" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label text="Music" display-tooltip-when-elided="true" name="musicTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="musicGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="goToLastPlaybackPositionContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Jump back on pause" display-tooltip-when-elided="true" name="goToLastPlaybackPositionLabel" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="goToLastPlaybackPositionToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="musicVolumeContainer" style="width: 100%; flex-direction: column; align-items: stretch; margin-bottom: 10px;">
+                                <ui:Label text="Volume" display-tooltip-when-elided="true" name="musicVolumeLabel" />
+                                <ui:Slider picking-mode="Ignore" value="42" high-value="100" name="musicVolumeSlider" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="musicPlaybackSpeedContainer" style="width: 100%; flex-direction: column; align-items: stretch; margin-bottom: 10px;">
+                                <ui:Label text="Playback Speed" display-tooltip-when-elided="true" name="musicPlaybackSpeedLabel" />
+                                <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" style="margin-bottom: 5px;" />
+                                <ui:Button text="Reset Playback Speed" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label text="Recording" display-tooltip-when-elided="true" name="recordingTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="recordingGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="recordingSourceContainer" style="margin-bottom: 10px;">
+                                <ui:Label text="Source" display-tooltip-when-elided="true" name="label" />
+                                <ItemPicker noPreviousButton="true" name="recordingSourceItemPicker" wrapAround="true" class="smallControl" style="width: auto;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="micRecordingContainer">
+                                <ui:VisualElement name="micDeviceContainer" style="margin-bottom: 10px;">
+                                    <ui:Label text="Microphone" display-tooltip-when-elided="true" name="label" />
+                                    <ItemPicker noPreviousButton="true" name="micDeviceItemPicker" wrapAround="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="micOctaveOffsetContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />
+                                    <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="micDelayContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Mic delay (ms)" display-tooltip-when-elided="true" name="label" />
+                                    <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                            <ui:VisualElement name="buttonRecordingContainer">
+                                <ui:VisualElement name="buttonRecordingButtonContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Button for recording" display-tooltip-when-elided="true" name="label" />
+                                    <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="buttonRecordingPitchContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Button recording pitch" display-tooltip-when-elided="true" name="label" />
+                                    <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="buttonRecordingPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label text="MIDI" display-tooltip-when-elided="true" name="midiTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="midiGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="midiSoundPlayAlongContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Play MIDI sounds" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="midiNotePlayAlongToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="midiGainContainer" style="width: 100%; flex-direction: column; align-items: stretch; margin-bottom: 10px;">
+                                <ui:Label text="Gain" display-tooltip-when-elided="true" name="midiGainLabel" />
+                                <ui:Slider picking-mode="Ignore" value="42" high-value="10" name="midiGainSlider" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="midiVelocityContainer" style="width: 100%; flex-direction: column; align-items: stretch; margin-bottom: 10px;">
+                                <ui:Label text="Velocity" display-tooltip-when-elided="true" name="midiVelocityLabel" />
+                                <ui:Slider picking-mode="Ignore" value="42" high-value="127" name="midiVelocitySlider" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="midiDelayContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Playback offset (ms)" display-tooltip-when-elided="true" name="label" />
+                                <ui:TextField picking-mode="Ignore" value="400" text="400" name="midiDelayTextField" class="smallControl" style="flex-grow: 1;" />
+                            </ui:VisualElement>
+                            <ui:Button text="Import MIDI File" display-tooltip-when-elided="true" name="importMidiFileButton" style="width: 100%;" />
+                        </ui:VisualElement>
+                        <ui:Label text="Layout" display-tooltip-when-elided="true" name="layoutTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="layoutGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="showLyricsAreaContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show lyrics" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showLyricsAreaToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="showVideoAreaContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show video" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showVideoAreaToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="showVirtualPianoContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show virtual piano" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showVirtualPianoToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="showStatusBarContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show status bar" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showStatusBarToggle" class="smallControl" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="showControlHintContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show control hints" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showControlHintsToggle" class="smallControl" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label text="Grid" display-tooltip-when-elided="true" name="gridTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="gridGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="gridSizeContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Grid size" display-tooltip-when-elided="true" name="label" />
+                                <ui:TextField picking-mode="Ignore" value="2" text="2" name="gridSizeTextField" class="smallControl" style="flex-grow: 1;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="sentenceLineSizeContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Phrase separator size" display-tooltip-when-elided="true" name="label" />
+                                <ui:TextField picking-mode="Ignore" value="4" text="4" name="sentenceLineSizeTextField" class="smallControl" style="flex-grow: 1;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="helpSideBarContainer" class="secondarySideBarPanel" style="flex-grow: 1; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                        <ui:Label text="Song Editor Controls" display-tooltip-when-elided="true" name="helpTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="virtualPiano" style="height: 100%; width: 28px;" />
+            <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">
+                <ui:VisualElement name="horizontalGrid" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0);">
+                    <ui:VisualElement name="horizontalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="verticalGrid" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);">
+                    <ui:VisualElement name="verticalGridLabelContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="sentenceLines" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaNotes" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaSentences" picking-mode="Ignore" style="width: 100%; height: 10px; position: absolute; background-color: rgba(0, 0, 0, 0); bottom: 0;" />
+                <ui:VisualElement name="noteAreaIssues" picking-mode="Ignore" style="width: 100%; height: 100%; position: absolute; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
+                <ui:VisualElement name="noteAreaPositionInSongIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
+                <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
+                    <ui:VisualElement name="micPitchOutOfRangeIndicatorTop" picking-mode="Ignore" class="textColorTint" style="position: absolute; left: 5px; top: 5px; width: 24px; height: 24px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: rgb(200, 33, 33);" />
+                    <ui:VisualElement name="micPitchOutOfRangeIndicatorBottom" picking-mode="Ignore" class="textColorTint" style="position: absolute; left: 5px; width: 24px; height: 24px; bottom: 5px; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; -unity-background-image-tint-color: rgb(200, 33, 33);" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">
+                <ui:VisualElement name="lyricsArea" class="panel" style="width: 180px; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="width: 100%; height: auto; flex-grow: 1;">
+                        <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
+                    </ui:ScrollView>
+                    <ui:VisualElement name="voiceButtonRow" class="smallFont" style="flex-direction: row; flex-shrink: 0;">
+                        <ui:Button text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" style="width: 40px; height: 20px;" />
+                        <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" style="width: 40px; height: 20px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 80px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
+                    <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%;">
+                        <ui:VisualElement name="noVideoImage" picking-mode="Ignore" class="icon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/ondemand_video_white_24dp.svg?fileID=7388822144124034973&amp;guid=fbcfbc830993a574e874f0584dc244c2&amp;type=3#ondemand_video_white_24dp&apos;); width: 90%; height: 90%; -unity-background-scale-mode: scale-to-fit; position: absolute; bottom: 0;" />
+                        <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                        <ui:VisualElement name="songBackgroundImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                            <ui:Label text="Background" display-tooltip-when-elided="true" name="songBackgroundLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="songCoverImage" style="width: 100%; height: 100%; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;">
+                            <ui:Label text="Cover" display-tooltip-when-elided="true" name="songCoverLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: lower-center;" />
+                        </ui:VisualElement>
+                        <ui:Label text="Video gap: -99" display-tooltip-when-elided="true" name="videoAreaLabel" picking-mode="Ignore" class="textOutline" style="position: absolute; width: 100%; height: 100%; -unity-text-align: middle-center;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="buttonContainer" style="flex-direction: column; width: auto; height: 100%;">
+                        <ui:Button text="V" display-tooltip-when-elided="true" name="showVideoButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                        <ui:Button text="CO" display-tooltip-when-elided="true" name="showCoverButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                        <ui:Button text="BG" display-tooltip-when-elided="true" name="showBackgroundButton" style="width: auto; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; height: auto;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
+            <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%; visibility: hidden;" />
+            <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
+            <ui:VisualElement name="overviewAreaPositionInSongIndicator" style="position: absolute; height: 100%; width: 1px; background-color: rgb(255, 0, 0);" />
+            <ui:Label display-tooltip-when-elided="true" name="overviewAreaLabel" />
+        </ui:VisualElement>
+        <ui:VisualElement name="statusBar" class="panel" style="width: 100%; height: auto; border-bottom-width: 0; border-left-width: 0; border-right-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 1px; padding-bottom: 1px; justify-content: space-between; align-items: center; flex-direction: row; flex-shrink: 0;">
+            <ui:Label text="StatusBar Control Hint" display-tooltip-when-elided="true" name="statusBarControlHintLabel" class="tinyFont" />
+            <ui:VisualElement name="rightSide" style="flex-direction: row;">
+                <ui:Label text="The Artist - The Title" display-tooltip-when-elided="true" name="statusBarSongInfoLabel" class="tinyFont" />
+                <ui:Label text="03:12" display-tooltip-when-elided="true" name="statusBarPositionInfoLabel" class="tinyFont" style="margin-left: 10px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
+            <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>

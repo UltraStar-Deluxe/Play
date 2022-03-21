@@ -83,7 +83,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public void SetName(string name)
     {
-        Name = name ?? throw new ArgumentNullException("Voice name cannot be null");
+        Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 
     public void OnBeforeSerialize()
@@ -128,5 +128,12 @@ public class Voice : ISerializationCallbackReceiver
             }
             return string.Compare(x.Name, y.Name, true, CultureInfo.InvariantCulture);
         }
+    }
+
+    public bool VoiceNameEquals(string otherVoiceName)
+    {
+        return otherVoiceName == Name
+               || (otherVoiceName.IsNullOrEmpty() && Name.IsNullOrEmpty())
+               || (otherVoiceName == firstVoiceName && Name == soloVoiceName);
     }
 }

@@ -1,27 +1,42 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using PrimeInputActions;
 using ProTrans;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset quitGameDialogUxml;
+    public VisualTreeAsset quitGameDialogUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset newSongDialogUi;
+
+    [InjectedInInspector]
+    public CreateSongFromTemplateControl createSongFromTemplateControl;
 
     [Inject]
-    private UIDocument uiDoc;
+    private UIDocument uiDocument;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -44,8 +59,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.partyButton)]
     private Button partyButton;
 
-    [Inject(UxmlName = R.UxmlNames.jukeboxButton)]
-    private Button jukeboxButton;
+    [Inject(UxmlName = R.UxmlNames.createSongButton)]
+    private Button createSongButton;
 
     [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
@@ -56,7 +71,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    private SimpleDialogControl closeGameDialogControl;
+    private MessageDialogControl quitGameDialogControl;
+    private NewSongDialogControl newSongDialogControl;
+
+    public bool IsNewSongDialogOpen => newSongDialogControl != null;
+    public bool IsCloseGameDialogOpen => quitGameDialogControl != null;
 
     private void Start()
     {
@@ -65,38 +84,26 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
+        createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
-        InitButtonDescription(startButton, R.Messages.mainScene_button_sing_description);
-        InitButtonDescription(settingsButton, R.Messages.mainScene_button_settings_description);
-        InitButtonDescription(aboutButton, R.Messages.mainScene_button_about_description);
-        InitButtonDescription(quitButton, R.Messages.mainScene_button_quit_description);
-        InitButtonDescription(jukeboxButton, R.Messages.mainScene_button_description_noImplementation);
-        InitButtonDescription(partyButton, R.Messages.mainScene_button_description_noImplementation);
+        InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
+        InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
+        InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
+        InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
+        InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
+        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
 
         UpdateVersionInfoText();
 
         sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => ToggleCloseGameDialog());
+        songMetaManager.ScanFilesIfNotDoneYet();
     }
 
-    private void ToggleCloseGameDialog()
+    private void InitButtonDescription(Button button, string description)
     {
-        if (closeGameDialogControl != null)
-        {
-            CloseQuitGameDialog();
-        }
-        else
-        {
-            OpenQuitGameDialog();
-        }
-    }
-
-    private void InitButtonDescription(Button button, string i18nCode)
-    {
-        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
-        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = TranslationManager.GetTranslation(i18nCode));
+        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = description);
+        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = description);
     }
 
     public void UpdateTranslation()
@@ -108,7 +115,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-        jukeboxButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_jukebox_label);
+        createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
         aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
@@ -140,33 +147,81 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         }
     }
 
-    private void CloseQuitGameDialog()
+    public void CloseQuitGameDialog()
     {
-        if (closeGameDialogControl == null)
+        if (quitGameDialogControl == null)
         {
             return;
         }
 
-        closeGameDialogControl.CloseDialog();
-        closeGameDialogControl = null;
+        quitGameDialogControl.CloseDialog();
+        quitGameDialogControl = null;
         // Must not immediately focus next button or it will trigger as well
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
     }
 
-    private void OpenQuitGameDialog()
+    public void OpenQuitGameDialog()
     {
-        if (closeGameDialogControl != null)
+        if (quitGameDialogControl != null)
         {
             return;
         }
 
-        closeGameDialogControl = new SimpleDialogControl(
-            quitGameDialogUxml,
-            uiDoc.rootVisualElement,
-            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title),
-            TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message));
-        Button yesButton = closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
+        VisualElement visualElement = quitGameDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        quitGameDialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<MessageDialogControl>();
+        quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
+        quitGameDialogControl.Message = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message);
+
+        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
+        Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
-        closeGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
+    }
+
+    public void OpenNewSongDialog()
+    {
+        if (newSongDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement visualElement = newSongDialogUi.CloneTree();
+        visualElement.AddToClassList("overlay");
+        uiDocument.rootVisualElement.Add(visualElement);
+
+        newSongDialogControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<NewSongDialogControl>();
+
+        newSongDialogControl.DialogClosedEventStream
+            .Subscribe(_ =>
+            {
+                newSongDialogControl = null;
+                createSongButton.Focus();
+            });
+    }
+
+    public void CloseNewSongDialog()
+    {
+        if (newSongDialogControl == null)
+        {
+            return;
+        }
+
+        newSongDialogControl.CloseDialog();
+        newSongDialogControl = null;
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(createSongFromTemplateControl);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }

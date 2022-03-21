@@ -38,10 +38,10 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
 
         int currentBeat = (int)singSceneControl.CurrentBeat;
-        int beatToAnalyze = playerControl.PlayerPitchTracker.BeatToAnalyze;
+        int beatToAnalyze = playerControl.PlayerMicPitchTracker.BeatToAnalyze;
         if (currentBeat <= 0
             || beatToAnalyze > currentBeat
-            || playerControl.PlayerPitchTracker.RecordingSentence == null)
+            || playerControl.PlayerMicPitchTracker.RecordingSentence == null)
         {
             return;
         }
@@ -53,8 +53,8 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
 
         PitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze, noteAtBeat);
-        playerControl.PlayerPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
-        playerControl.PlayerPitchTracker.GoToNextBeat();
+        playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
+        playerControl.PlayerMicPitchTracker.GoToNextBeat();
     }
 
     private bool TryFindPlayerControl()
@@ -87,7 +87,7 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     protected Note GetNoteAtBeat(int beat)
     {
-        Sentence recordingSentence = playerControl?.PlayerPitchTracker?.RecordingSentence;
+        Sentence recordingSentence = playerControl?.PlayerMicPitchTracker?.RecordingSentence;
         if (recordingSentence == null)
         {
             return null;

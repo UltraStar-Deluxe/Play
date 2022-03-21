@@ -14,18 +14,10 @@ using UnityEngine.InputSystem;
 public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 {
     [Inject]
-    private MicPitchTracker micPitchTracker;
+    private SongEditorMicPitchTracker micPitchTracker;
 
     [Inject]
     private Settings settings;
-
-    private SongEditorSettings EditorSettings
-    {
-        get
-        {
-            return settings.SongEditorSettings;
-        }
-    }
 
     [Inject]
     private SongMeta songMeta;
@@ -50,23 +42,48 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private bool hasRecordedNotes;
 
-    private bool isRecording;
+    private bool isRecordingEnabled;
 
-    void Start()
+    public bool IsRecordingEnabled
     {
-        micPitchTracker.MicProfile = settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
+        get
+        {
+            return isRecordingEnabled;
+        }
 
-        settings.SongEditorSettings.ObserveEveryValueChanged(it => it.RecordingSource).Subscribe(OnNoteRecordingSourceChanged);
-        songAudioPlayer.ObserveEveryValueChanged(it => it.IsPlaying).Subscribe(OnSongIsPlayingChanged);
+        set
+        {
+            isRecordingEnabled = value;
+            StartOrStopRecording();
+        }
+    }
+
+    private void Start()
+    {
+        micPitchTracker.MicProfile = settings.SongEditorSettings.MicProfile;
+
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.MicProfile)
+            .Subscribe(newValue =>
+            {
+                micPitchTracker.MicProfile = newValue;
+                StartOrStopRecording();
+            })
+            .AddTo(gameObject);
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.RecordingSource)
+            .Subscribe(_ => StartOrStopRecording())
+            .AddTo(gameObject);
+        songAudioPlayer
+            .ObserveEveryValueChanged(it => it.IsPlaying)
+            .Subscribe(_ => StartOrStopRecording())
+            .AddTo(gameObject);
+
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
         micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
-        if (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone)
-        {
-            micPitchTracker.MicSampleRecorder.StartRecording();
-        }
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)
@@ -80,7 +97,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     private void OnPlaybackStarted(double positionInSongInMillis)
     {
         hasRecordedNotes = false;
-        lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
+        lastPitchDetectedBeat = GetBeat(positionInSongInMillis);
         upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
     }
 
@@ -101,28 +118,44 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void UpdateRecordingViaButtonClick()
     {
-        // Record notes via button click.
-        bool keyboardButtonRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton_F8);
-        if (keyboardButtonRecordingEnabled)
+        if (!IsRecordingEnabled
+            || settings.SongEditorSettings.RecordingSource != ESongEditorRecordingSource.KeyboardButton)
         {
-            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-            if (Keyboard.current != null && Keyboard.current.f8Key.isPressed)
+            return;
+        }
+
+        int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+        if (Keyboard.current != null
+            && Keyboard.current.anyKey.isPressed)
+        {
+            // Check if the required key is pressed
+            List<string> pressedKeysDisplayNames = Keyboard.current.allControls
+                .Where(inputControl => inputControl.IsPressed())
+                .Select(inputControl => inputControl.displayName.ToUpperInvariant())
+                .ToList();
+            if (pressedKeysDisplayNames.Contains(settings.SongEditorSettings.ButtonDisplayNameForButtonRecording.ToUpperInvariant()))
             {
-                RecordNote(EditorSettings.MidiNoteForButtonRecording, positionInSongInMillis, ESongEditorLayer.ButtonRecording);
+                RecordNote(settings.SongEditorSettings.MidiNoteForButtonRecording,
+                    currentBeat,
+                    ESongEditorLayer.ButtonRecording);
             }
-            else
-            {
-                lastRecordedNote = null;
-                // The pitch is always detected (either the keyboard is down or not).
-                lastPitchDetectedBeat = GetCurrentBeat(positionInSongInMillis);
-            }
+        }
+        else
+        {
+            lastRecordedNote = null;
+            // The pitch is always detected (either the keyboard is down or not).
+            lastPitchDetectedBeat = currentBeat;
         }
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
-        if (!isRecording
-            || lastPitchDetectedFrame == Time.frameCount)
+        if (!IsRecordingEnabled)
+        {
+            return;
+        }
+
+        if (lastPitchDetectedFrame == Time.frameCount)
         {
             return;
         }
@@ -133,15 +166,15 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis - EditorSettings.MicDelayInMillis;
-        int midiNote = pitchEvent.MidiNote + (EditorSettings.MicOctaveOffset * 12);
-        RecordNote(midiNote, positionInSongInMillis, ESongEditorLayer.MicRecording);
+        if (pitchEvent is BeatPitchEvent beatPitchEvent)
+        {
+            RecordNote(beatPitchEvent.MidiNote, beatPitchEvent.Beat, ESongEditorLayer.MicRecording);
+        }
     }
 
-    private void RecordNote(int midiNote, double positionInSongInMillis, ESongEditorLayer targetLayer)
+    private void RecordNote(int midiNote, int beat, ESongEditorLayer targetLayer)
     {
-        int currentBeat = GetCurrentBeat(positionInSongInMillis);
-        if (currentBeat <= lastPitchDetectedBeat)
+        if (beat <= lastPitchDetectedBeat)
         {
             return;
         }
@@ -149,21 +182,17 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         if (lastRecordedNote != null
             && lastRecordedNote.MidiNote == midiNote)
         {
-            // Also fire the event for any skipped beats (e.g. because of low frame-rate)
-            for (int beat = lastPitchDetectedBeat; beat <= currentBeat; beat++)
-            {
-                ContinueLastRecordedNote(beat, targetLayer);
-            }
+            ContinueLastRecordedNote(beat, targetLayer);
         }
         else
         {
-            CreateNewRecordedNote(midiNote, currentBeat, targetLayer);
+            CreateNewRecordedNote(midiNote, beat, targetLayer);
         }
 
         editorNoteDisplayer.UpdateNotes();
 
         lastPitchDetectedFrame = Time.frameCount;
-        lastPitchDetectedBeat = currentBeat;
+        lastPitchDetectedBeat = beat;
         hasRecordedNotes = true;
     }
 
@@ -230,50 +259,14 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             else
             {
                 songEditorLayerManager.RemoveNoteFromAllLayers(note);
-                editorNoteDisplayer.DeleteNote(note);
+                editorNoteDisplayer.RemoveNoteControl(note);
             }
-        }
-    }
-
-    private void OnNoteRecordingSourceChanged(ESongEditorRecordingSource recordingSource)
-    {
-        bool micRecordingEnabled = (recordingSource == ESongEditorRecordingSource.Microphone);
-        if (!micRecordingEnabled && isRecording)
-        {
-            StopRecording();
-        }
-        else if (micRecordingEnabled && songAudioPlayer.IsPlaying && !isRecording)
-        {
-            StartRecording();
-        }
-
-        if (micRecordingEnabled)
-        {
-            micPitchTracker.MicSampleRecorder.StartRecording();
-        }
-        else
-        {
-            micPitchTracker.MicSampleRecorder.StopRecording();
-        }
-    }
-
-    private void OnSongIsPlayingChanged(bool isPlaying)
-    {
-        bool micRecordingEnabled = (settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone);
-        if (!isPlaying && isRecording)
-        {
-            StopRecording();
-        }
-        else if (isPlaying && !isRecording
-                 && micRecordingEnabled && micPitchTracker.MicProfile != null)
-        {
-            StartRecording();
         }
     }
 
     private List<Note> GetUpcomingSortedRecordedNotes()
     {
-        int currentBeat = GetCurrentBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
+        int currentBeat = GetBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
         ESongEditorLayer targetLayer = GetRecordingTargetLayer();
         List<Note> result = songEditorLayerManager.GetNotes(targetLayer).Where(note => (note.StartBeat >= currentBeat)).ToList();
         result.Sort(Note.comparerByStartBeat);
@@ -284,7 +277,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         switch (settings.SongEditorSettings.RecordingSource)
         {
-            case ESongEditorRecordingSource.KeyboardButton_F8:
+            case ESongEditorRecordingSource.KeyboardButton:
                 return ESongEditorLayer.ButtonRecording;
             case ESongEditorRecordingSource.Microphone:
                 return ESongEditorLayer.MicRecording;
@@ -293,19 +286,27 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private int GetCurrentBeat(double positionInSongInMillis)
+    private int GetBeat(double positionInSongInMillis)
     {
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
-        return currentBeat;
+        int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        return beat;
     }
 
-    private void StopRecording()
+    private void StartOrStopRecording()
     {
-        isRecording = false;
-    }
+        bool shouldBeRecoding = isRecordingEnabled
+                                && songAudioPlayer.IsPlaying
+                                && settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone
+                                && settings.SongEditorSettings.MicProfile != null
+                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected;
 
-    private void StartRecording()
-    {
-        isRecording = true;
+        if (!shouldBeRecoding && micPitchTracker.MicSampleRecorder.IsRecording)
+        {
+            micPitchTracker.MicSampleRecorder.StopRecording();
+        }
+        else if (shouldBeRecoding && !micPitchTracker.MicSampleRecorder.IsRecording)
+        {
+            micPitchTracker.MicSampleRecorder.StartRecording();
+        }
     }
 }

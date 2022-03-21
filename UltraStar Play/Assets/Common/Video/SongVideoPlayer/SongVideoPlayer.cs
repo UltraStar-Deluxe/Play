@@ -1,23 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
 using UnityEngine.Video;
-using System.IO;
-using ProTrans;
 using UniRx;
 using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
 
 public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
+    private static readonly HashSet<string> ignoredVideoFiles = new HashSet<string>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        ignoredVideoFiles.Clear();
+    }
+
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
-
-    [InjectedInInspector]
-    public Image backgroundImage;
-
-    [InjectedInInspector]
-    public Image videoImage;
 
     [Inject(UxmlName = R.UxmlNames.songVideoImage, Optional = true)]
     private VisualElement videoImageVisualElement;
@@ -45,7 +45,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     // SongAudioPlayer to synchronize the playback position with.
     [Inject]
-    public SongAudioPlayer SongAudioPlayer { get; private set; }
+    private SongAudioPlayer songAudioPlayer;
 
     private SongMeta songMeta;
     public SongMeta SongMeta
@@ -86,7 +86,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             jumpBackInSongEventStreamDisposable.Dispose();
         }
-        jumpBackInSongEventStreamDisposable = SongAudioPlayer.JumpBackInSongEventStream
+        jumpBackInSongEventStreamDisposable = songAudioPlayer.JumpBackInSongEventStream
             .Subscribe(_ => SyncVideoWithMusic(true));
 
         // Jump forward in song
@@ -96,7 +96,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
         if (forceSyncOnForwardJumpInTheSong)
         {
-            jumpForwardInSongEventStreamDisposable = SongAudioPlayer.JumpForwardInSongEventStream
+            jumpForwardInSongEventStreamDisposable = songAudioPlayer.JumpForwardInSongEventStream
                 .Subscribe(_ => SyncVideoWithMusic(true));
         }
     }
@@ -110,7 +110,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoPlayerErrorMessage = "";
             UnloadVideo();
             // Do not attempt to load the video again
-            SongMeta.Video = "";
+            if (songMeta != null)
+            {
+                ignoredVideoFiles.Add(songMeta.Video);
+            }
         }
 
         if (!HasLoadedVideo)
@@ -118,7 +121,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        if (SongAudioPlayer != null)
+        if (songAudioPlayer != null)
         {
             SyncVideoWithMusic(false);
         }
@@ -140,7 +143,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void LoadVideo(string uri)
+    private void LoadVideo(string uri)
     {
         if (!WebRequestUtils.ResourceExists(uri))
         {
@@ -152,18 +155,16 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // The url is empty if loading the video failed.
         HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
         // For now, only load the video. Starting it is done from the outside.
-        if (HasLoadedVideo)
+        if (!HasLoadedVideo)
         {
-            if (videoImage != null)
-            {
-                videoImage.gameObject.SetActive(true);
-            }
-            if (videoImageVisualElement != null)
-            {
-                videoImageVisualElement.ShowByDisplay();
-            }
-            videoPlayer.Pause();
+            return;
         }
+
+        if (videoImageVisualElement != null)
+        {
+            videoImageVisualElement.ShowByDisplay();
+        }
+        videoPlayer.Pause();
     }
 
     private void UnloadVideo()
@@ -181,10 +182,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void SyncVideoWithMusic(bool forceImmediateSync)
     {
-        SyncVideoPlayPause(SongAudioPlayer.PositionInSongInMillis);
+        SyncVideoPlayPause(songAudioPlayer.PositionInSongInMillis);
         if (videoPlayer.isPlaying || forceImmediateSync)
         {
-            SyncVideoWithMusic(SongAudioPlayer.PositionInSongInMillis, forceImmediateSync);
+            SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis, forceImmediateSync);
         }
     }
 
@@ -211,11 +212,11 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        bool songAudioPlayerIsPlaying = (SongAudioPlayer == null || SongAudioPlayer.IsPlaying);
+        bool songAudioPlayerIsPlaying = (songAudioPlayer == null || songAudioPlayer.IsPlaying);
 
         if ((!songAudioPlayerIsPlaying && videoPlayer.isPlaying)
             || (videoPlayer.length > 0
-                && (videoPlayer.length * 1000) <= SongAudioPlayer.PositionInSongInMillis))
+                && (videoPlayer.length * 1000) <= songAudioPlayer.PositionInSongInMillis))
         {
             videoPlayer.Pause();
         }
@@ -264,10 +265,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void ShowBackgroundImage()
     {
-        if (videoImage != null)
-        {
-            videoImage.gameObject.SetActive(false);
-        }
         if (videoImageVisualElement != null)
         {
             videoImageVisualElement.HideByDisplay();
@@ -314,10 +311,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         ImageManager.LoadSpriteFromUri(backgroundUri, loadedSprite =>
         {
-            if (backgroundImage != null)
-            {
-                backgroundImage.sprite = loadedSprite;
-            }
             if (backgroundImageVisualElement != null)
             {
                 backgroundImageVisualElement.ShowByDisplay();
@@ -327,12 +320,19 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         });
     }
 
+    public void ReloadVideo()
+    {
+        // This method is used in the SongEditor, but only on Standalone platform.
+        InitVideo(songMeta);
+    }
+
     private void InitVideo(SongMeta initSongMeta)
     {
         UnloadVideo();
 
         if (initSongMeta == null
-            || initSongMeta.Video.IsNullOrEmpty())
+            || initSongMeta.Video.IsNullOrEmpty()
+            || ignoredVideoFiles.Contains(initSongMeta.Video))
         {
             return;
         }

@@ -1,22 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using ProTrans;
 using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
 using UnityEngine.EventSystems;
-using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDragListener<NoteAreaDragEvent>
+public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinishedListener, IDragListener<NoteAreaDragEvent>
 {
     [Inject]
-    private SongEditorSelectionController selectionController;
+    private SongEditorSelectionControl selectionControl;
 
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
@@ -30,11 +28,11 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
     [Inject]
     private SongMeta songMeta;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private EditorUiSentence uiSentence;
+    [Inject]
+    private EditorSentenceControl sentenceControl;
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    private EditorUiSentenceDragHandler editorUiSentenceDragHandler;
+    [Inject]
+    private NoteAreaControl noteAreaControl;
 
     private List<Note> selectedNotes = new List<Note>();
     private List<Note> followingNotes = new List<Note>();
@@ -50,27 +48,30 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
         StretchRight
     }
 
-    void Start()
+    public void OnInjectionFinished()
     {
-        if (editorUiSentenceDragHandler != null)
-        {
-            editorUiSentenceDragHandler.AddListener(this);
-        }
+        noteAreaControl.DragControl.AddListener(this);
     }
 
     public void OnBeginDrag(NoteAreaDragEvent dragEvent)
     {
-        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left)
+        if (dragEvent.GeneralDragEvent.InputButton != (int)PointerEventData.InputButton.Left
+            || !sentenceControl.IsPointerOver)
         {
-            CancelDrag();
+            AbortDrag();
             return;
         }
 
         isCanceled = false;
+        dragAction = GetDragAction(sentenceControl, dragEvent);
 
-        dragAction = GetDragAction(uiSentence, dragEvent);
+        selectedNotes = sentenceControl.Sentence.Notes.ToList();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            AbortDrag();
+            return;
+        }
 
-        selectedNotes = uiSentence.Sentence.Notes.ToList();
         if (settings.SongEditorSettings.AdjustFollowingNotes)
         {
             followingNotes = SongMetaUtils.GetFollowingNotes(songMeta, selectedNotes);
@@ -111,9 +112,13 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
         }
     }
 
+    private void AbortDrag()
+    {
+        isCanceled = true;
+    }
+
     public void CancelDrag()
     {
-        Debug.Log("CancelDrag");
         isCanceled = true;
         foreach (KeyValuePair<Note, Note> noteAndSnapshotOfNote in noteToSnapshotOfNoteMap)
         {
@@ -139,12 +144,12 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
             Note noteClone = note.Clone();
             noteToSnapshotOfNoteMap.Add(note, noteClone);
         }
-        linebreakBeatSnapshot = uiSentence.Sentence.LinebreakBeat;
+        linebreakBeatSnapshot = sentenceControl.Sentence.LinebreakBeat;
     }
 
-    private DragAction GetDragAction(EditorUiSentence dragStartUiSentence, NoteAreaDragEvent dragEvent)
+    private DragAction GetDragAction(EditorSentenceControl dragStartSentenceControl, NoteAreaDragEvent dragEvent)
     {
-        if (dragStartUiSentence.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
+        if (dragStartSentenceControl.IsPositionOverRightHandle(dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition))
         {
             return DragAction.StretchRight;
         }
@@ -153,6 +158,12 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
 
     private void MoveNotesHorizontal(NoteAreaDragEvent dragEvent, List<Note> notes, bool adjustFollowingNotesIfNeeded)
     {
+        if (notes.IsNullOrEmpty()
+            || dragEvent.BeatDistance == 0)
+        {
+            return;
+        }
+
         foreach (Note note in notes)
         {
             Note noteSnapshot = noteToSnapshotOfNoteMap[note];
@@ -171,7 +182,17 @@ public class ManipulateSentenceDragListener : MonoBehaviour, INeedInjection, IDr
 
     private void ChangeLinebreakBeat(NoteAreaDragEvent dragEvent)
     {
-        uiSentence.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
+        if (dragEvent.BeatDistance == 0)
+        {
+            return;
+        }
+
+        sentenceControl.Sentence.SetLinebreakBeat(linebreakBeatSnapshot + dragEvent.BeatDistance);
         songMetaChangeEventStream.OnNext(new SentencesChangedEvent());
+    }
+
+    public void Dispose()
+    {
+        noteAreaControl.DragControl.RemoveListener(this);
     }
 }
