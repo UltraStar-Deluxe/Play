@@ -125,8 +125,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
         textField.value = songDir;
-        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
-        backslashReplacingTextFieldControl.ValueChangedEventStream
+        PathTextFieldControl pathTextFieldControl = new PathTextFieldControl(textField);
+        pathTextFieldControl.ValueChangedEventStream
             .Subscribe(newValueUnescaped =>
             {
                 settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
