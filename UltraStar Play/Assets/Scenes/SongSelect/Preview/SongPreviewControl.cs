@@ -201,7 +201,18 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
-        songAudioPlayer.Init(songMeta);
+        try
+        {
+            songAudioPlayer.Init(songMeta);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
+            uiManager.CreateNotificationVisualElement(errorMessage);
+            return;
+        }
+        
         songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
         songAudioPlayer.audioPlayer.volume = 0;
         if (songAudioPlayer.HasAudioClip)
