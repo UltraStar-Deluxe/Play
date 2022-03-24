@@ -8,8 +8,10 @@ using UniRx;
 using System.IO;
 using UnityEngine.Networking;
 using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.Zip;
 using static ThreadPool;
 using System.Text;
+using ICSharpCode.SharpZipLib.Core;
 using PrimeInputActions;
 using ProTrans;
 using UnityEngine.UIElements;
@@ -21,7 +23,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 {
     private static readonly List<string> defaultArchiveUrls = new List<string>
     {
-        "https://42.usplay.net/ultrastar-songs-cc.tar"
+        "https://github.com/UltraStar-Deluxe/songs-stream/archive/refs/heads/main.zip",
+        "https://42.usplay.net/ultrastar-songs-cc.tar",
     };
 
     [Inject]
@@ -73,6 +76,10 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private UnityWebRequest downloadRequest;
 
+    // The Ui log may only be filled from the main thread.
+    // This string caches new log lines for other threads.
+    private string newLogText;
+
     void Start()
     {
         statusLabel.text = "";
@@ -120,11 +127,32 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             downloadRequest = null;
             SetCanceledStatus();
         }
+
+        if (!newLogText.IsNullOrEmpty())
+        {
+            logText.value = newLogText + logText.value;
+            newLogText = "";
+        }
+    }
+
+    private string GetDownloadTargetPath(string url)
+    {
+        Uri uri = new Uri(url);
+        string filename = Path.GetFileName(uri.LocalPath);
+        string targetPath = ApplicationManager.PersistentTempPath() + "/" + filename;
+        return targetPath;
+    }
+
+    private DownloadHandler CreateDownloadHandler(string targetPath)
+    {
+        DownloadHandlerFile downloadHandler = new DownloadHandlerFile(targetPath);
+        downloadHandler.removeFileOnAbort = true;
+        return downloadHandler;
     }
 
     private void StartDownload()
     {
-        StartCoroutine(DownloadFileAsync(DownloadUrl, ApplicationManager.PersistentTempPath()));
+        StartCoroutine(DownloadFileAsync(DownloadUrl));
     }
 
     private void CancelDownload()
@@ -142,7 +170,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
     }
 
-    private IEnumerator DownloadFileAsync(string url, string targetFolder)
+    private IEnumerator DownloadFileAsync(string url)
     {
         if (downloadRequest != null
             && !downloadRequest.isDone)
@@ -159,13 +187,10 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         Debug.Log($"Started download: {url}");
         AddToUiLog($"Started download");
 
-        Uri uri = new Uri(url);
-        string filename = Path.GetFileName(uri.LocalPath);
-        string targetPath = Path.Combine(targetFolder, filename);
+        string targetPath = GetDownloadTargetPath(url);
+        DownloadHandler downloadHandler = CreateDownloadHandler(targetPath);
 
         downloadRequest = UnityWebRequest.Get(url);
-        DownloadHandlerFile downloadHandler = new DownloadHandlerFile(targetPath);
-        downloadHandler.removeFileOnAbort = true;
         downloadRequest.downloadHandler = downloadHandler;
 
         StartCoroutine(TrackProgressAsync());
@@ -181,7 +206,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         {
             statusLabel.text = "100%";
             AddToUiLog($"Download saved to {targetPath}. {downloadRequest.error}");
-            UnpackTar(targetPath);
+            UnpackArchive(targetPath);
         }
     }
 
@@ -224,7 +249,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void AddToUiLog(string message)
     {
-        logText.value = message + "\n" + logText.value;
+        newLogText += message + "\n";
     }
 
     public void UpdateFileSize()
@@ -241,34 +266,46 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             yield break;
         }
 
-        Debug.Log($"Fetching size of {url}");
-        using (UnityWebRequest request = UnityWebRequest.Head(url))
+        using UnityWebRequest request = UnityWebRequest.Head(url);
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
         {
-            yield return request.SendWebRequest();
-
-            if (request.isNetworkError || request.isHttpError)
+            Debug.LogError($"Error fetching size: {request.error}");
+            AddToUiLog($"Error fetching size: {request.error}");
+            ResetFileSizeText();
+        }
+        else
+        {
+            string contentLength = request.GetResponseHeader("Content-Length");
+            if (contentLength.IsNullOrEmpty())
             {
-
-                Debug.LogError($"Error fetching size: {request.error}");
-                AddToUiLog($"Error fetching size: {request.error}");
                 ResetFileSizeText();
             }
             else
             {
-                long size = Convert.ToInt64(request.GetResponseHeader("Content-Length"));
-                fileSize.text = (size / 1024 / 1024) + " MB";
+                long size = Convert.ToInt64(contentLength);
+                long kiloByte = size / 1024;
+                if (kiloByte > 1024)
+                {
+                    fileSize.text = Math.Round((double)kiloByte / 1024) + " MB";
+                }
+                else
+                {
+                    fileSize.text = Math.Round((double)kiloByte) + " KB";
+                }
             }
         }
     }
 
-    private void UnpackTar(string tarPath)
+    private void UnpackArchive(string archivePath)
     {
         if (downloadRequest == null)
         {
             return;
         }
 
-        if (!File.Exists(tarPath))
+        if (!File.Exists(archivePath))
         {
             AddToDebugAndUiLog("Can not unpack file because it does not exist on the storage! Did the download fail?", true);
             return;
@@ -278,27 +315,76 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         string songsPath = ApplicationManager.PersistentSongsPath();
         PoolHandle handle = ThreadPool.QueueUserWorkItem(poolHandle =>
         {
-            using (Stream tarStream = File.OpenRead(tarPath))
+            if (archivePath.ToLowerInvariant().EndsWith("tar"))
             {
-                using (TarArchive archive = TarArchive.CreateInputTarArchive(tarStream, Encoding.UTF8))
-                {
-                    try
-                    {
-                        archive.ExtractContents(songsPath);
-                        poolHandle.done = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
-                        SetErrorStatus();
-                    }
-                }
+                ExtractTarArchive(archivePath, songsPath, poolHandle);
+            }
+            else if (archivePath.ToLowerInvariant().EndsWith("zip"))
+            {
+                ExtractZipArchive(archivePath, songsPath, poolHandle);
             }
         });
-        StartCoroutine(TrackUnpackAsync(handle, tarPath, songsPath));
+        StartCoroutine(TrackUnpackAsync(handle, archivePath, songsPath));
     }
 
-    private IEnumerator TrackUnpackAsync(PoolHandle handle, string tarPath, string songsPath)
+    private void ExtractZipArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
+    {
+        using Stream archiveStream = File.OpenRead(archivePath);
+        using ZipFile zipFile = new ZipFile(archiveStream);
+
+        try
+        {
+            foreach (ZipEntry entry in zipFile)
+            {
+                ExtractZipEntry(zipFile, entry, targetFolder);
+            }
+
+            poolHandle.done = true;
+        }
+        catch (Exception ex)
+        {
+            AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
+            SetErrorStatus();
+        }
+    }
+
+    private void ExtractZipEntry(ZipFile zipFile, ZipEntry zipEntry, string targetFolder)
+    {
+        string entryPath = zipEntry.Name;
+        if (!zipEntry.IsFile)
+        {
+            string targetSubFolder = targetFolder + "/" + zipEntry.Name;
+            Directory.CreateDirectory(targetSubFolder);
+            return;
+        }
+
+        Debug.Log($"Extracting {entryPath}");
+        string targetFilePath = targetFolder + "/" + entryPath;
+
+        byte[] buffer = new byte[4096];
+        using Stream zipEntryStream = zipFile.GetInputStream(zipEntry);
+        using FileStream targetFileStream = File.Create(targetFilePath);
+        StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
+    }
+
+    private void ExtractTarArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
+    {
+        using Stream archiveStream = File.OpenRead(archivePath);
+        using TarArchive archive = TarArchive.CreateInputTarArchive(archiveStream, Encoding.UTF8);
+
+        try
+        {
+            archive.ExtractContents(targetFolder);
+            poolHandle.done = true;
+        }
+        catch (Exception ex)
+        {
+            AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
+            SetErrorStatus();
+        }
+    }
+
+    private IEnumerator TrackUnpackAsync(PoolHandle handle, string archivePath, string songsPath)
     {
         if (downloadRequest == null)
         {
@@ -329,7 +415,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         if (handle == null)
         {
-            AddToDebugAndUiLog($"Unpacking the song package failed. Handle was null for {tarPath}.", true);
+            AddToDebugAndUiLog($"Unpacking the song package failed. Handle was null for {archivePath}.", true);
             statusLabel.text = "Failed. Handle was null";
 
         }
@@ -354,12 +440,12 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
         else
         {
-            AddToDebugAndUiLog($"Unpacking the song package failed with an unknown error. Please check the log. File: {tarPath}", true);
+            AddToDebugAndUiLog($"Unpacking the song package failed with an unknown error. Please check the log. File: {archivePath}", true);
             statusLabel.text = "Failed";
         }
-        if (File.Exists(tarPath))
+        if (File.Exists(archivePath))
         {
-            File.Delete(tarPath);
+            File.Delete(archivePath);
         }
     }
 
@@ -380,6 +466,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void ResetFileSizeText()
     {
-        fileSize.text = "??? MB";
+        fileSize.text = "??? KB";
     }
 }
