@@ -26,7 +26,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
     [Inject(UxmlName = R.UxmlNames.cancelButton)]
     protected Button cancelButton;
 
-    private BackslashReplacingTextFieldControl backslashReplacingTextFieldControl;
+    protected BackslashReplacingTextFieldControl backslashReplacingTextFieldControl;
 
     private readonly Subject<string> submitValueEventStream = new Subject<string>();
     public IObservable<string> SubmitValueEventStream => submitValueEventStream;
@@ -123,7 +123,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
         }
     }
 
-    private void ValidateValue(string textValue, bool showMessageIfInvalid)
+    protected void ValidateValue(string textValue, bool showMessageIfInvalid)
     {
         if (ValidateValueCallback == null)
         {
