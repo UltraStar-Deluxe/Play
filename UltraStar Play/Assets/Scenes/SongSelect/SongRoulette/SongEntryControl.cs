@@ -319,6 +319,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             .WithRootVisualElement(songEntryUiRoot)
             .CreateAndInject<GeneralDragControl>();
         dragControl.AddListener(this);
+        // Only listen to left mouse button / touch gesture
+        dragControl.ButtonFilter = new List<int> { 0 };
 
         // Ignore button click after dragging
         dragControl.DragState.Subscribe(dragState =>
@@ -329,7 +331,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         });
         
-        songEntryUiRoot.RegisterCallback<PointerDownEvent>(_ => OnPointerDown(), TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
         songEntryUiRoot.RegisterCallback<PointerUpEvent>(_ => OnPointerUp(), TrickleDown.TrickleDown);
 
         // Stop coroutine when dragging
@@ -344,8 +346,16 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         UpdateTranslation();
     }
 
-    private void OnPointerDown()
+    private void OnPointerDown(IPointerEvent pointerEvent)
     {
+        if (pointerEvent.button == 1)
+        {
+            // Right click to open song menu
+            songRouletteControl.SelectSong(songMeta);
+            songRouletteControl.ShowSongMenuOverlay();
+            return;
+        }
+
         isPointerDown = true;
         StartShowSongMenuOverlayCoroutine();
     }
