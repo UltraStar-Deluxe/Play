@@ -99,9 +99,12 @@ public static class SongMetaBuilder
                 {
                     if (otherFields.ContainsKey(tag))
                     {
-                        throw new SongMetaBuilderException("Cannot set '" + tag + "' twice in file " + path);
+                        Debug.LogWarning($"Cannot set '{tag}' twice in file {path}");
                     }
-                    otherFields.Add(tag, val);
+                    else
+                    {
+                        otherFields[tag] = val;
+                    }
                 }
             }
 
