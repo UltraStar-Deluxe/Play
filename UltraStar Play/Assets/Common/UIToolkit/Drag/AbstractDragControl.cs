@@ -36,6 +36,8 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 
+    public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
+
     public virtual void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
@@ -70,6 +72,12 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected virtual void OnPointerDown(IPointerEvent evt)
     {
+        if (!ButtonFilter.IsNullOrEmpty()
+            && !ButtonFilter.Contains(evt.button))
+        {
+            return;
+        }
+
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
         DragState.Value = EDragState.WaitingForDistanceThreshold;
     }
@@ -92,6 +100,12 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected virtual void OnPointerUp(IPointerEvent evt)
     {
+        if (!ButtonFilter.IsNullOrEmpty()
+            && !ButtonFilter.Contains(evt.button))
+        {
+            return;
+        }
+
         if (DragState.Value == EDragState.Dragging)
         {
             OnEndDrag(new DragControlPointerEvent(evt));
