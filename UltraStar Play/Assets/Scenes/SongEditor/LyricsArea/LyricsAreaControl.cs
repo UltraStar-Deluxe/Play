@@ -62,6 +62,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
+        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = null;
+
         voice = songMeta.GetVoices()[0];
         UpdateLyrics();
         textField.RegisterCallback<FocusEvent>(evt =>
@@ -72,7 +74,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         {
             if (lyricsAreaMode == LyricsAreaMode.EditMode)
             {
-                OnEndEdit(BackslashReplacingTextFieldControl.UnescapeBackslashes(textField.text));
+                OnEndEdit(backslashReplacingTextFieldControl.UnescapeBackslashes(textField.text));
             }
         });
 
@@ -81,7 +83,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
-        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
+        backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
         // Replace white space with visible characters when in edit mode
         backslashReplacingTextFieldControl.ValueChangedEventStream
             .Subscribe(newValue =>
