@@ -16,15 +16,18 @@ using UniRx;
  */
 public class BackslashReplacingTextFieldControl
 {
-    private const string BackslashReplacement = "＼";
+    private const string DefaultBackslashReplacement = "＼";
 
     private TextField textField;
 
     private readonly Subject<string> valueChangedEventStream = new Subject<string>();
     public IObservable<string> ValueChangedEventStream => valueChangedEventStream;
 
-    public BackslashReplacingTextFieldControl(TextField textField)
+    private readonly string backslashReplacement;
+
+    public BackslashReplacingTextFieldControl(TextField textField, string backslashReplacement = DefaultBackslashReplacement)
     {
+        this.backslashReplacement = backslashReplacement;
         textField.RegisterValueChangedCallback(evt =>
         {
             string newValueEscaped = EscapeBackslashes(evt.newValue);
@@ -34,16 +37,16 @@ public class BackslashReplacingTextFieldControl
             valueChangedEventStream.OnNext(newValueUnescaped);
         });
 
-        textField.value = textField.value.Replace("\\", BackslashReplacement);
+        textField.value = textField.value.Replace("\\", backslashReplacement);
     }
 
-    public static string EscapeBackslashes(string text)
+    public string EscapeBackslashes(string text)
     {
-        return text.Replace("\\", BackslashReplacement);
+        return text.Replace("\\", backslashReplacement);
     }
 
-    public static string UnescapeBackslashes(string text)
+    public string UnescapeBackslashes(string text)
     {
-        return text.Replace(BackslashReplacement, "\\");
+        return text.Replace(backslashReplacement, "\\");
     }
 }

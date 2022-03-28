@@ -13,9 +13,9 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="urlContainer" style="width: 100%; flex-direction: row; align-items: flex-start; margin-bottom: 5px;">
-                <ui:Label text="Archive URL (tar file)" display-tooltip-when-elided="true" name="urlLabel" style="width: auto; margin-right: 20px;" />
+                <ui:Label text="Archive URL" display-tooltip-when-elided="true" name="urlLabel" style="width: auto; margin-right: 20px;" />
                 <ui:VisualElement name="urlTextFieldContainer" style="flex-grow: 1;">
-                    <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.tar" name="urlTextField" style="width: auto;" />
+                    <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.zip" name="urlTextField" style="width: auto;" />
                     <ui:DropdownField index="-1" name="urlChooser" style="flex-grow: 1;" />
                 </ui:VisualElement>
             </ui:VisualElement>

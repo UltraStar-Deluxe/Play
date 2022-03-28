@@ -1,10 +1,18 @@
 ﻿using System;
 using System.IO;
+using UniRx;
 
 public class PathInputDialogControl : TextInputDialogControl
 {
     public override void OnInjectionFinished()
     {
+        if (backslashReplacingTextFieldControl == null)
+        {
+            backslashReplacingTextFieldControl = new PathTextFieldControl(textField);
+            backslashReplacingTextFieldControl.ValueChangedEventStream
+                .Subscribe(newValue => ValidateValue(newValue, true));
+        }
+
         base.OnInjectionFinished();
 
         ValidateValueCallback = newValue =>
