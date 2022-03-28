@@ -31,4 +31,5 @@ You can support this project by
 ### 4. Support
 If you need help or found a bug, then visit the [chat](https://gitter.im/UltraStar-Deluxe/Play) or [issue tracker](https://github.com/UltraStar-Deluxe/Play/issues)
 
-You might also be interested in the more stable [UltraStar Deluxe](https://github.com/UltraStar-Deluxe/USDX) or similar projects such as [Performous](https://github.com/performous/performous) or [Vocaluxe](https://github.com/Vocaluxe/Vocaluxe).
+### 5. Follow us on Social Media
+UltraStar Play is on [Discord](https://discord.gg/NTgkzP6K), [Twitter](https://twitter.com/UltraStar_Play), [YouTube](https://www.youtube.com/channel/UCr481bd1jFp5d9wixQecwVw), [Facebook](https://www.facebook.com/UltraStar-Play-101984782475359)
