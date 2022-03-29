@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2373451776003756713}
   - component: {fileID: 7200366228149695045}
-  - component: {fileID: 2035081023799485612}
   m_Layer: 5
   m_Name: ShowFpsText
   m_TagString: Untagged
@@ -45,17 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c038ec799bea549b582079d30ad6b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fpsText: {fileID: 0}
   fps: 0
---- !u!114 &2035081023799485612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7734904436527758554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7040a670b7bd07f4881601dbf738c81b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
