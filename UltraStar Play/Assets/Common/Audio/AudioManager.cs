@@ -154,7 +154,7 @@ public class AudioManager : MonoBehaviour
             }
         }
 
-        private System.Diagnostics.Stopwatch stopwatch;
+        private readonly System.Diagnostics.Stopwatch stopwatch;
 
         public LoadingAudioClip(string path, DownloadHandlerAudioClip downloadHandler, Action<AudioClip> callback)
         {

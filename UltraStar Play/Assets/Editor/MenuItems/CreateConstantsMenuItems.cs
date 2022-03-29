@@ -9,7 +9,7 @@ using UnityEngine;
 
 public static class CreateConstantsMenuItems
 {
-    private static HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
+    private static readonly HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
         "static", "void", "readonly", "const",
         "using", "class", "enum", "interface", "new", "this", "override", "virtual",
         "string", "int", "float", "double", "short", "long", "bool",
