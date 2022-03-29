@@ -124,7 +124,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         // Therefor, consider the currently finished sentence and its predecessor.
         playerScoreController.SentenceScoreEventStream.Buffer(2, 1)
             // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.Perfect))
+            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.perfect))
             // Create an effect for these.
             .Subscribe(xs => CreatePerfectSentenceEffect());
 

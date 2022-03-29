@@ -209,7 +209,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
 
             // Score for a perfect sentence
-            if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
+            if (correctNotesPercentage >= SentenceRating.perfect.PercentageThreshold)
             {
                 ScoreData.PerfectSentenceCount++;
             }

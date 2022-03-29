@@ -38,7 +38,6 @@ public class LoadingSceneControl : MonoBehaviour
 
         // Wait for Theme and I18N resources
         TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
-        ThemeManager.Instance.ReloadThemes();
 
         FinishScene();
     }

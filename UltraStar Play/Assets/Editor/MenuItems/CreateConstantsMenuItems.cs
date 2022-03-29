@@ -25,41 +25,9 @@ public static class CreateConstantsMenuItems
     {
         EditorUtils.RefreshAssetsInStreamingAssetsFolder();
 
-        CreateConstantsForColors();
-        CreateConstantsForImageFiles();
-        CreateConstantsForAudioFiles();
         CreateConstantsForUxmlNamesAndClasses();
         ProTrans.CreateTranslationConstantsMenuItems.CreateTranslationConstants();
         PrimeInputActions.CreateInputActionConstantsMenuItems.CreateInputActionConstants();
-    }
-
-    [MenuItem("Generate/Create C# constants for theme colors")]
-    public static void CreateConstantsForColors()
-    {
-        string subClassName = "Color";
-        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
-        List<string> colors = ThemeManager.GetThemes()
-            .SelectMany(theme => theme.LoadedColors.Keys)
-            .Distinct()
-            .ToList();
-        if (colors.IsNullOrEmpty())
-        {
-            Debug.LogWarning("No theme colors found.");
-            return;
-        }
-
-        colors.Sort();
-        string classCode = CreateClassCode(subClassName, colors);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
-    }
-
-    [MenuItem("Generate/Create C# constants for theme files")]
-    public static void CreateConstantsForFiles()
-    {
-        CreateConstantsForImageFiles();
-        CreateConstantsForAudioFiles();
     }
 
     [MenuItem("Generate/Create C# constants for UXML names and classes")]
@@ -138,32 +106,6 @@ public static class CreateConstantsMenuItems
         return result;
     }
 
-    private static void CreateConstantsForAudioFiles()
-    {
-        string subClassName = "Audio";
-        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
-        List<string> files = GetFilesInStreamingAssetsFolder("*.wav", "*.ogg");
-        files.Sort();
-
-        string classCode = CreateClassCode(subClassName, files);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
-    }
-
-    private static void CreateConstantsForImageFiles()
-    {
-        string subClassName = "Image";
-        string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
-        List<string> files = GetFilesInStreamingAssetsFolder("*.png");
-        files.Sort();
-
-        string classCode = CreateClassCode(subClassName, files);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
-    }
-
     private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
         List<string> result = new List<string>();
@@ -173,25 +115,6 @@ public static class CreateConstantsMenuItems
             result.AddRange(files);
         }
         return result.Distinct().ToList();
-    }
-
-    private static List<string> GetFilesInStreamingAssetsFolder(params string[] fileExtensions)
-    {
-        List<string> result = GetFilesInFolder("Assets/StreamingAssets/", fileExtensions);
-        return result.Select(file => GetFilePathRelativeToThemeFolder(file)).ToList();
-    }
-
-    private static string GetFilePathRelativeToThemeFolder(string file)
-    {
-        string themesFolderPrefix = "Assets/StreamingAssets/" + ThemeManager.ThemesFolderName + "/";
-
-        string result = file.Replace("\\", "/");
-        int indexOfThemesFolder = result.IndexOf(themesFolderPrefix, StringComparison.CurrentCulture);
-        result = result.Substring(indexOfThemesFolder + themesFolderPrefix.Length);
-        int indexOfNextFolder = result.IndexOf("/", StringComparison.CurrentCulture);
-        result = result.Substring(indexOfNextFolder + 1);
-
-        return result;
     }
 
     private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)

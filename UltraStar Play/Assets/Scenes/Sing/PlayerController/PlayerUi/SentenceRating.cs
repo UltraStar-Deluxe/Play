@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class SentenceRating
 {
-    public static readonly SentenceRating Perfect = new SentenceRating(0.95, R.Messages.rating_sentence_perfect, R.Color.rating_sentence_perfect);
-    public static readonly SentenceRating Cool = new SentenceRating(0.8, R.Messages.rating_sentence_cool, R.Color.rating_sentence_cool);
-    public static readonly SentenceRating Great = new SentenceRating(0.7, R.Messages.rating_sentence_great, R.Color.rating_sentence_great);
-    public static readonly SentenceRating Good = new SentenceRating(0.6, R.Messages.rating_sentence_good, R.Color.rating_sentence_good);
-    public static readonly SentenceRating NotBad = new SentenceRating(0.5, R.Messages.rating_sentence_notBad, R.Color.rating_sentence_notBad);
-    public static readonly SentenceRating Bad = new SentenceRating(0.3, R.Messages.rating_sentence_bad, R.Color.rating_sentence_bad);
-    public static readonly SentenceRating Poor = new SentenceRating(0.2, R.Messages.rating_sentence_poor, R.Color.rating_sentence_poor);
-    public static readonly SentenceRating Awful = new SentenceRating(0, R.Messages.rating_sentence_awful, R.Color.rating_sentence_awful);
+    // TODO: Add style sheet classes and define in style sheet
+    private const string SentenceRatingColorPerfect = "#3AFF4E7F";
+    private const string SentenceRatingColorCool = "#7FE82A7F";
+    private const string SentenceRatingColorGreat = "#7FE82A7F";
+    private const string SentenceRatingColorGood = "#E4FF1F7F";
+    private const string SentenceRatingColorNotBad = "#E4FF1F7F";
+    private const string SentenceRatingColorBad = "#FF9C4F7F";
+    private const string SentenceRatingColorPoor = "#E848E67F";
+    private const string SentenceRatingColorAwful = "#764FFF7F";
+
+    public static readonly SentenceRating perfect = new SentenceRating(0.95, R.Messages.rating_sentence_perfect, SentenceRatingColorPerfect);
+    public static readonly SentenceRating cool = new SentenceRating(0.8, R.Messages.rating_sentence_cool, SentenceRatingColorCool);
+    public static readonly SentenceRating great = new SentenceRating(0.7, R.Messages.rating_sentence_great, SentenceRatingColorGreat);
+    public static readonly SentenceRating good = new SentenceRating(0.6, R.Messages.rating_sentence_good, SentenceRatingColorGood);
+    public static readonly SentenceRating notBad = new SentenceRating(0.5, R.Messages.rating_sentence_notBad, SentenceRatingColorNotBad);
+    public static readonly SentenceRating bad = new SentenceRating(0.3, R.Messages.rating_sentence_bad, SentenceRatingColorBad);
+    public static readonly SentenceRating poor = new SentenceRating(0.2, R.Messages.rating_sentence_poor, SentenceRatingColorPoor);
+    public static readonly SentenceRating awful = new SentenceRating(0, R.Messages.rating_sentence_awful, SentenceRatingColorAwful);
 
     private readonly string i18nCode;
     public double PercentageThreshold { get; private set; }
@@ -34,14 +44,14 @@ public class SentenceRating
             if (values == null)
             {
                 values = new List<SentenceRating>();
-                values.Add(Perfect);
-                values.Add(Cool);
-                values.Add(Great);
-                values.Add(Good);
-                values.Add(NotBad);
-                values.Add(Bad);
-                values.Add(Poor);
-                values.Add(Awful);
+                values.Add(perfect);
+                values.Add(cool);
+                values.Add(great);
+                values.Add(good);
+                values.Add(notBad);
+                values.Add(bad);
+                values.Add(poor);
+                values.Add(awful);
             }
             return values;
         }
@@ -51,6 +61,6 @@ public class SentenceRating
     {
         this.PercentageThreshold = percentThreshold;
         this.i18nCode = i18nCode;
-        BackgroundColor = ThemeManager.GetColor(hexBackgroundColor);
+        BackgroundColor = Colors.CreateColor(hexBackgroundColor);
     }
 }

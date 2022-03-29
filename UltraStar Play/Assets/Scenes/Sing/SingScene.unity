@@ -198,8 +198,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 2063730584}
-  backgroundImage: {fileID: 0}
-  videoImage: {fileID: 992840889}
   forceSyncOnForwardJumpInTheSong: 0
   videoPlayerErrorMessage: 
 --- !u!4 &227833047
