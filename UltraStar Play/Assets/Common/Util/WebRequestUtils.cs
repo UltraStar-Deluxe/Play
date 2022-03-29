@@ -20,7 +20,9 @@ public static class WebRequestUtils
                 yield return null;
             }
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result
+                is UnityWebRequest.Result.ConnectionError
+                or UnityWebRequest.Result.ProtocolError)
             {
                 if (onFailure != null)
                 {
