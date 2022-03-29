@@ -16,11 +16,9 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        AdditionalInputActionInfos.Clear();
         inputDeviceToLastChange.Clear();
     }
 
-    public static List<InputActionInfo> AdditionalInputActionInfos { get; private set; } = new List<InputActionInfo>();
     private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new Dictionary<InputDevice, InputDeviceChange>();
 
     [InjectedInInspector]
@@ -108,15 +106,6 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         if (Touch.activeTouches.Count > 0)
         {
             InputDeviceEnum = EInputDevice.Touch;
-        }
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (InputManager.instance == this)
-        {
-            AdditionalInputActionInfos.Clear();
         }
     }
 

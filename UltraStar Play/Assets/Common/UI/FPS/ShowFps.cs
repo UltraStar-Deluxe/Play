@@ -1,7 +1,6 @@
 ﻿using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
@@ -13,8 +12,6 @@ public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
     }
 
     private static Vector2 lastFpsLabelPositionInPx;
-
-    public Text fpsText;
 
     [ReadOnly]
     public int fps;
@@ -68,10 +65,6 @@ public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
             frameCount = 0;
             deltaTime -= 0.5f;
 
-            if (fpsText != null)
-            {
-                fpsText.text = "FPS: " + fps;
-            }
             if (fpsLabel != null)
             {
                 fpsLabel.text = "FPS: " + fps;

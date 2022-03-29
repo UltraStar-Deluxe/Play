@@ -1,37 +1,24 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
 public class AvatarPickerControl : PicturedItemPickerControl<EAvatar>
 {
-    private AvatarImageReference[] imageReferences;
+    private readonly UiManager uiManager;
 
-    public AvatarPickerControl(ItemPicker itemPicker)
+    public AvatarPickerControl(ItemPicker itemPicker, UiManager uiManager)
         : base(itemPicker, EnumUtils.GetValuesAsList<EAvatar>())
     {
         Items = EnumUtils.GetValuesAsList<EAvatar>();
+        this.uiManager = uiManager;
     }
 
     protected override StyleBackground GetBackgroundImageValue(EAvatar item)
     {
-        if (imageReferences == null)
-        {
-            imageReferences = GameObject.FindObjectsOfType<AvatarImageReference>();
-            if (imageReferences == null)
-            {
-                return new StyleBackground();
-            }
-        }
-
-        AvatarImageReference imageReference = imageReferences
-            .FirstOrDefault(it => it.avatar == item);
-        if (imageReference != null)
-        {
-            return new StyleBackground(imageReference.Sprite);
-        }
-        else
+        Sprite avatarSprite = uiManager.GetAvatarSprite(item);
+        if (avatarSprite == null)
         {
             return new StyleBackground();
         }
+        return new StyleBackground(avatarSprite);
     }
 }

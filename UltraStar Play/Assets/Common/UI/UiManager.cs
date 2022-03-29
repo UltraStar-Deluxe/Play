@@ -27,12 +27,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
-    public RectTransform debugPositionIndicatorPrefab;
-
-    [InjectedInInspector]
-    public ContextMenu contextMenuPrefab;
-
-    [InjectedInInspector]
     public VisualTreeAsset contextMenuUi;
 
     [InjectedInInspector]
@@ -43,6 +37,9 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public ShowFps showFpsPrefab;
+
+    [InjectedInInspector]
+    public List<AvatarImageReference> avatarImageReferences;
 
     private Canvas canvas;
     private RectTransform canvasRectTransform;
@@ -164,5 +161,12 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             visualElement.parent.Remove(visualElement);
         }
+    }
+
+    public Sprite GetAvatarSprite(EAvatar avatar)
+    {
+        AvatarImageReference avatarImageReference = avatarImageReferences
+            .FirstOrDefault(it => it.avatar == avatar);
+        return avatarImageReference?.sprite;
     }
 }

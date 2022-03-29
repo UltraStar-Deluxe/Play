@@ -44,7 +44,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 6adbf210ab0cbf143ba6e02835bb9c43, type: 3}
   - {fileID: 21300000, guid: f8442e207ea2a3f4bbeb74789d94cfbf, type: 3}
   - {fileID: 21300000, guid: 185207409f9e5f04bb50c7214f7e79e3, type: 3}
-  - {fileID: 21300000, guid: fce2a870cb35b95499d101db9001a784, type: 3}
   - {fileID: 21300000, guid: b2a0a970d3586cc469cacb577c1b2cb6, type: 3}
   - {fileID: 21300000, guid: c461ec905d3b8b643b4297ef57ee683d, type: 3}
   - {fileID: 21300000, guid: 94d2a3c0a1960db459ed830ef1bcecab, type: 3}
@@ -110,7 +109,6 @@ SpriteAtlas:
   - '[icon]main'
   - '[sing]p'
   - CircleFilled
-  - round_warning_white_48dp
   - '[button]p'
   - MicIconFilled
   - silhouette-02
