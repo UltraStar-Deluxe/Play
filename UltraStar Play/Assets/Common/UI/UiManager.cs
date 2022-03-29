@@ -41,9 +41,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public List<AvatarImageReference> avatarImageReferences;
 
-    private Canvas canvas;
-    private RectTransform canvasRectTransform;
-
     [Inject]
     private Injector injector;
 
