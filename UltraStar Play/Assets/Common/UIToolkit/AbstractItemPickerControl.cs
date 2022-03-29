@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UniRx;
 
 public abstract class AbstractItemPickerControl<T>

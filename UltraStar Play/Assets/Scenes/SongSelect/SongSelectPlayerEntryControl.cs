@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
-using UnityEngine;
 using UnityEngine.UIElements;
-using Toggle = UnityEngine.UIElements.Toggle;
 
 public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
 {

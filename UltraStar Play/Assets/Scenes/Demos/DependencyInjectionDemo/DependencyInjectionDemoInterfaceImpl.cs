@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class DependencyInjectionDemoInterfaceImpl : IDependencyInjectionDemoInterface
 {
     private static int instanceCount;

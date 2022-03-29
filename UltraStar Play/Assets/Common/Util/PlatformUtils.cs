@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public static class PlatformUtils
+﻿public static class PlatformUtils
 {
     public static bool IsStandalone
     {

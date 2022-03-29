@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using NLayer;
 using UnityEngine;
 using UnityEngine.Networking;
-using NLayer;
-using UniRx;
 
 public static class AudioUtils
 {

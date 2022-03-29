@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using CircularBuffer;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {

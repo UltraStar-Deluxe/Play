@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine.UI;
+using PrimeInputActions;
 using UniRx;
 using UnityEngine.InputSystem;
-using PrimeInputActions;
+using UnityEngine.UI;
 
 public class WarningDialog : Dialog
 {

@@ -1,14 +1,13 @@
 using System.IO;
 using PrimeInputActions;
 using ProTrans;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
+using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
 #endif
-using UnityEngine.UIElements;
-using Application = UnityEngine.Application;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

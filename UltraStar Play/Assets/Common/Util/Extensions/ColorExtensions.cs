@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class ColorExtensions
 {

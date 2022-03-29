@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UniRx;
 using UniInject;
-using UnityEngine;
+using UniRx;
 
 public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinishedListener
 {

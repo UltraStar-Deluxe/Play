@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Globalization;
 using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649

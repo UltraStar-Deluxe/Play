@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UniRx;
-using UnityEngine.InputSystem;
 using PrimeInputActions;
 using UniInject;
+using UniRx;
+using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListener

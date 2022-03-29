@@ -1,8 +1,6 @@
 using System;
 using UniInject;
-using UnityEngine;
 using UniRx;
-using UniRx.Triggers;
 using UnityEngine.UIElements;
 
 public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener

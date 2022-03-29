@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using UniRx;
-using System;
-using System.Collections;
+﻿using System;
 using ProTrans;
 using UniInject;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection

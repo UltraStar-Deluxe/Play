@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider

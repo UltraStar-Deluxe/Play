@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UniInject;
-using UnityEngine;
 
 public class SongEditorMidiSoundPlayAlongThread : INeedInjection
 {

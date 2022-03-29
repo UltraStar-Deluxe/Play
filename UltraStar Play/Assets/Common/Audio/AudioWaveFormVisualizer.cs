@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using UniInject;
+﻿using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AudioWaveFormVisualizer : MonoBehaviour
 {

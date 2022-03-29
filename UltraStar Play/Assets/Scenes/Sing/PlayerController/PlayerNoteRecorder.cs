@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UniRx;
 using UniInject;
-using System.Linq;
-using CSharpSynth.Wave;
+using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

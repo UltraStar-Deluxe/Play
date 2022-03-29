@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UniInject;
-using UniRx;
+﻿using CircularBuffer;
+using CSharpSynth.Midi;
 using CSharpSynth.Sequencer;
 using CSharpSynth.Synthesis;
-using CSharpSynth.Midi;
-using CircularBuffer;
+using UniInject;
+using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

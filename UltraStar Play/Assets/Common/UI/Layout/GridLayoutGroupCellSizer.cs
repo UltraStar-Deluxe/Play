@@ -1,5 +1,4 @@
-﻿using UniRx.Triggers;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(GridLayoutGroup))]

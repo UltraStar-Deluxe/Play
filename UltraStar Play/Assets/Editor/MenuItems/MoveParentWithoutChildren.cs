@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 [InitializeOnLoad]
 public static class MoveParentWithoutAffectingChildren

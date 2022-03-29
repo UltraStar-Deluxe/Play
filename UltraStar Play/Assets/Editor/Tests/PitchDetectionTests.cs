@@ -1,6 +1,6 @@
 ﻿using System;
-using NUnit.Framework;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class PitchDetectionTests

@@ -1,16 +1,12 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
-using UnityEngine.UI;
+using PrimeInputActions;
 using UniInject;
-using UniRx;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.UIElements;
-using PrimeInputActions;
+using UnityEngine.UI;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

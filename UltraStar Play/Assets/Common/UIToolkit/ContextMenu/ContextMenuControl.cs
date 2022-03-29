@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UniInject;
-using UnityEngine;
-using UniRx;
-using UnityEngine.InputSystem;
 using PrimeInputActions;
+using UniInject;
+using UniRx;
+using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 

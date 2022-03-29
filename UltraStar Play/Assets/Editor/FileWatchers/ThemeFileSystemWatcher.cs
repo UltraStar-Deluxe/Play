@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.IO;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 [InitializeOnLoad]
 public static class ThemeFileSystemWatcher

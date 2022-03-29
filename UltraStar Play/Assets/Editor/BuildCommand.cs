@@ -1,7 +1,7 @@
-using UnityEditor;
-using System.Linq;
 using System;
 using System.IO;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 static class BuildCommand

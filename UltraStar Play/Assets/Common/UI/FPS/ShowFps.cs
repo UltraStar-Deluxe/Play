@@ -1,10 +1,8 @@
-﻿using System;
-using UniInject;
+﻿using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using Label = UnityEngine.UIElements.Label;
-using UniRx;
 
 public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {

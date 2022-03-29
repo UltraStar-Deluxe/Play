@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
 public class GeneralDragEvent
 {
     public int InputButton { get; private set; }

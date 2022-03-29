@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using UnityEditor;
-using UnityEngine.UI;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
-using System;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class LayoutGroupMenuItems : MonoBehaviour
 {

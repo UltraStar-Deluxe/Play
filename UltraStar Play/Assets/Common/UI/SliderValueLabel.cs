@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using UniRx;
+using UnityEngine;
 using UnityEngine.UI;
-using UniRx;
 
 [RequireComponent(typeof(Text))]
 public class SliderValueLabel : MonoBehaviour
