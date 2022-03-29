@@ -311,7 +311,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
 
-        // Add itself as IDragListener to be notified when its RectTransform is dragged.
+        // Add itself as IDragListener to be notified when it is dragged.
         dragControl = injector
             .WithRootVisualElement(songEntryUiRoot)
             .CreateAndInject<GeneralDragControl>();
