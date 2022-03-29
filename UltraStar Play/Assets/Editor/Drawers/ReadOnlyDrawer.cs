@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 /// Draws fields that use the ReadOnlyAttribute but disables user editing beforehand.
 [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]

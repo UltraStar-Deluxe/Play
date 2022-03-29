@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.

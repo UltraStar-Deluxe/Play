@@ -4,11 +4,8 @@
 // On Android the StreamingAssets are packed in a JAR, together with all other resources.
 // This script extracts (via SharpZipLib) the StreamingAssets from the JAR to a normal file system location.
 // From there the StreamingAssets can be loaded synchronously like on other platforms (via System.IO classes).
+
 using UnityEngine;
-using System.IO;
-using System.Collections.Generic;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
 
 public static class AndroidStreamingAssets
 {

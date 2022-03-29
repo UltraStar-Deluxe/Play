@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using UniInject;
+﻿using UniInject;
 using UniRx;
- 
+using UnityEngine;
+
 public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
     [Inject]

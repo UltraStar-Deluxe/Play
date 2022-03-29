@@ -1,6 +1,4 @@
-﻿using UniInject;
-
-public class PerfectSinger : AbstractDummySinger
+﻿public class PerfectSinger : AbstractDummySinger
 {
     public int offset = 12;
 

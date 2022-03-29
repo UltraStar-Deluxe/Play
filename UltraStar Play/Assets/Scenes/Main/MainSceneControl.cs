@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿using System.Collections.Generic;
+using ProTrans;
 using UniInject;
 using UniRx;
-using PrimeInputActions;
-using ProTrans;
+using UnityEngine;
+using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.

@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
-using UniRx;
-using System.Xml;
-using TMPro;
 using UniInject.Extensions;
-using UnityEngine.InputSystem;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
-using Random = System.Random;
-using Range = UnityEngine.SocialPlatforms.Range;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

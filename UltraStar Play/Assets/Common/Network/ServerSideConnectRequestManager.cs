@@ -1,20 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using SimpleHttpServerForUnity;
-using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
-using UnityEditor;
-using AddressFamily = SimpleHttpServerForUnity.AddressFamily;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

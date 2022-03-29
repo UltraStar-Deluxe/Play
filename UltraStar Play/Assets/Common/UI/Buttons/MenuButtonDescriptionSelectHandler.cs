@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+﻿using ProTrans;
 using UniInject;
-using ProTrans;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

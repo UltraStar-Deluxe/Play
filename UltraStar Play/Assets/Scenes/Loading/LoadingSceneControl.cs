@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using UnityEngine;
-using UniRx;
 using PrimeInputActions;
-using ProTrans; 
+using ProTrans;
+using UniRx;
+using UnityEngine;
 
 public class LoadingSceneControl : MonoBehaviour
 {

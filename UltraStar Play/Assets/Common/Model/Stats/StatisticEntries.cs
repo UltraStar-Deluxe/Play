@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using ProTrans;
-using UnityEngine;
+using System.Linq;
 
 // Handles storage and operation over the song statistic entries themselves
 [Serializable]

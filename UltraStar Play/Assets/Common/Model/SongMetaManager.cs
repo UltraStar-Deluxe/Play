@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using UniInject;
 using UniRx;
-using UnityEditor;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).

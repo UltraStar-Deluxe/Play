@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UniInject;
-using static UniInject.UniInjectUtils;
+﻿using UniInject;
 using UnityEngine;
+using static UniInject.UniInjectUtils;
 
 // Ignore warnings about unassigned fields.
 // Their values are injected, but this is not visible to the compiler.

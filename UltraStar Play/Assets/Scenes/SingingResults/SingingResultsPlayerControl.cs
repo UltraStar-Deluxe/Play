@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UnityEngine;
-using UniRx;
 using UnityEngine.UIElements;
 
 public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjectionFinishedListener

@@ -1,6 +1,6 @@
 ﻿using System;
-using FullSerializer;
 using System.Linq;
+using FullSerializer;
 
 // Implements serialization / deserialization of JSON using
 // the serialization lib FullSerializer.

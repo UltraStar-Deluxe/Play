@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UniInject;
-using UniRx;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using ProTrans;
+using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 

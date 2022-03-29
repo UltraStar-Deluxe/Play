@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UniRx;
-using UnityEngine;
-using UnityEngine.InputSystem;
 using PrimeInputActions;
+using UniRx;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class QuestionDialog : Dialog
 {

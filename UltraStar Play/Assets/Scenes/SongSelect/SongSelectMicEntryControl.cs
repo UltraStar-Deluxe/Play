@@ -1,6 +1,5 @@
 ﻿using UniInject;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.

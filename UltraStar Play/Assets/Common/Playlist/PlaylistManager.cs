@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UniRx;
 using System.IO;
-using System.Text.RegularExpressions;
-using Application = UnityEngine.Application;
+using System.Linq;
+using UniRx;
+using UnityEngine;
 
 public class PlaylistManager : MonoBehaviour
 {

@@ -1,6 +1,5 @@
-﻿using UnityEngine;
+﻿using UniRx;
 using UnityEngine.UI;
-using UniRx;
 
 abstract public class TextItemSlider<T> : ItemSlider<T>
 {

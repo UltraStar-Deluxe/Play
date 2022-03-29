@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
-using UniRx;
 
 abstract public class ImageItemSlider<T> : ItemSlider<T>
 {

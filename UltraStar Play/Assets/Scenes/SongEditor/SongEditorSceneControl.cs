@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using ProTrans;
 using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using ProTrans;
+﻿using ProTrans;
 using UnityEngine;
 using UnityEngine.UI;
 

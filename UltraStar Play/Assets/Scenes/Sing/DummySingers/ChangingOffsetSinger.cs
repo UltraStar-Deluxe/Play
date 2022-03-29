@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-public class ChangingOffsetSinger : AbstractDummySinger
+﻿public class ChangingOffsetSinger : AbstractDummySinger
 {
     public int maxOffset = 5;
     private int noteOffset;
