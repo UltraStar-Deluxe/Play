@@ -53,6 +53,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [InjectedInInspector]
     public SongEditorCopyPasteManager songEditorCopyPasteManager;
 
+    [InjectedInInspector]
+    public SongEditorSceneInputControl songEditorSceneInputControl;
+
     [Inject]
     private Injector injector;
 
@@ -496,6 +499,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(overviewAreaControl);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(songEditorCopyPasteManager);
+        bb.BindExistingInstance(songEditorSceneInputControl);
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
         bb.BindExistingInstance(gameObject);
