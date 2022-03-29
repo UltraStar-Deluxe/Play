@@ -18,8 +18,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private readonly List<RectTransform> debugPoints = new List<RectTransform>();
-
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
 
@@ -88,15 +86,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             Destroy(showFpsInstance);
         }
-    }
-
-    public void DestroyAllDebugPoints()
-    {
-        foreach (RectTransform debugPoint in debugPoints)
-        {
-            GameObject.Destroy(debugPoint.gameObject);
-        }
-        debugPoints.Clear();
     }
 
     public Label CreateNotificationVisualElement(
