@@ -196,7 +196,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         yield return downloadRequest?.SendWebRequest();
 
-        if (downloadRequest != null && (downloadRequest.isNetworkError || downloadRequest.isHttpError))
+        if (downloadRequest is { result: UnityWebRequest.Result.ConnectionError
+                                      or UnityWebRequest.Result.ProtocolError })
         {
             Debug.LogError($"Error downloading {url}: {downloadRequest.error}");
             AddToUiLog("Error downloading the requested file");
@@ -268,7 +269,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         using UnityWebRequest request = UnityWebRequest.Head(url);
         yield return request.SendWebRequest();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result
+            is UnityWebRequest.Result.ConnectionError
+            or UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError($"Error fetching size: {request.error}");
             AddToUiLog($"Error fetching size: {request.error}");
