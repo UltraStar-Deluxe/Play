@@ -47,10 +47,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
 
-    private PlayerNameText playerNameText;
-
-    private AvatarImage avatarImage;
-
     [Inject]
     private Settings settings;
 

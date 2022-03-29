@@ -34,6 +34,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private UiManager uiManager;
+
     private void Start()
     {
         UpdatePlayerProfileList();
@@ -97,7 +100,7 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
         result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
-        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker))
+        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker), uiManager)
             .Bind(() => playerProfile.Avatar,
                 newValue => playerProfile.Avatar = newValue);
 

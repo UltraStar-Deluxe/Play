@@ -551,7 +551,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private bool AnyInputFieldHasFocus()
+    public bool AnyInputFieldHasFocus()
     {
         return uiDocument.rootVisualElement.focusController.focusedElement is TextField;
     }

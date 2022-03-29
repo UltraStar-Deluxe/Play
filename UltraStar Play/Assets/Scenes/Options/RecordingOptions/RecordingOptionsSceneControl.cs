@@ -296,7 +296,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noiseSuppressionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
         sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate, "value", "?");
+        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
     }
 
     private List<MicProfile> CreateMicProfiles()
