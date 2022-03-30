@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UniInject;
 using UnityEngine;
-using UniInject;
 using UnityEngine.UIElements;
 
 public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener

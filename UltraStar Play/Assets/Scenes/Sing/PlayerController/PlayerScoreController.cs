@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -209,7 +209,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
 
             // Score for a perfect sentence
-            if (correctNotesPercentage >= SentenceRating.Perfect.PercentageThreshold)
+            if (correctNotesPercentage >= SentenceRating.perfect.PercentageThreshold)
             {
                 ScoreData.PerfectSentenceCount++;
             }

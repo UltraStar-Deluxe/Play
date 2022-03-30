@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniInject;
-using UniRx;
-using UnityEngine.InputSystem;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -21,19 +18,11 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private readonly List<RectTransform> debugPoints = new List<RectTransform>();
-
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
 
     [InjectedInInspector]
     public VisualTreeAsset notificationVisualTreeAsset;
-
-    [InjectedInInspector]
-    public RectTransform debugPositionIndicatorPrefab;
-
-    [InjectedInInspector]
-    public ContextMenu contextMenuPrefab;
 
     [InjectedInInspector]
     public VisualTreeAsset contextMenuUi;
@@ -47,8 +36,8 @@ public class UiManager : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public ShowFps showFpsPrefab;
 
-    private Canvas canvas;
-    private RectTransform canvasRectTransform;
+    [InjectedInInspector]
+    public List<AvatarImageReference> avatarImageReferences;
 
     [Inject]
     private Injector injector;
@@ -97,15 +86,6 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             Destroy(showFpsInstance);
         }
-    }
-
-    public void DestroyAllDebugPoints()
-    {
-        foreach (RectTransform debugPoint in debugPoints)
-        {
-            GameObject.Destroy(debugPoint.gameObject);
-        }
-        debugPoints.Clear();
     }
 
     public Label CreateNotificationVisualElement(
@@ -167,5 +147,12 @@ public class UiManager : MonoBehaviour, INeedInjection
         {
             visualElement.parent.Remove(visualElement);
         }
+    }
+
+    public Sprite GetAvatarSprite(EAvatar avatar)
+    {
+        AvatarImageReference avatarImageReference = avatarImageReferences
+            .FirstOrDefault(it => it.avatar == avatar);
+        return avatarImageReference?.sprite;
     }
 }

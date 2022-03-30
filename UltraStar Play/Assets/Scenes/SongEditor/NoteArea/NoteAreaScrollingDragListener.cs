@@ -1,13 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
-using UniRx;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 // Disable warning about fields that are never assigned, their values are injected.

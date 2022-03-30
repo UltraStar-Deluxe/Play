@@ -1,6 +1,3 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
-
-public class InputDeviceChangeEvent
+﻿public class InputDeviceChangeEvent
 {
 }

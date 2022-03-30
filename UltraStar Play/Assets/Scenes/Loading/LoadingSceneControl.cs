@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using UnityEngine;
-using UniRx;
 using PrimeInputActions;
-using ProTrans; 
+using ProTrans;
+using UniRx;
+using UnityEngine;
 
 public class LoadingSceneControl : MonoBehaviour
 {
@@ -38,7 +38,6 @@ public class LoadingSceneControl : MonoBehaviour
 
         // Wait for Theme and I18N resources
         TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
-        ThemeManager.Instance.ReloadThemes();
 
         FinishScene();
     }

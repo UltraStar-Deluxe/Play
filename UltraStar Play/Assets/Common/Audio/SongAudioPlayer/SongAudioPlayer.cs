@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
 public class SongAudioPlayer : MonoBehaviour
 {

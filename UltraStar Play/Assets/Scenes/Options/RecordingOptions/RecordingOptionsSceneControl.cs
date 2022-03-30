@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using UnityEngine;
+using ProTrans;
 using UniInject;
 using UniRx;
-using ProTrans;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -298,7 +296,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noiseSuppressionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
         sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate, "value", "?");
+        calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
     }
 
     private List<MicProfile> CreateMicProfiles()
@@ -364,12 +362,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         return new List<Color32>
         {
-            ThemeManager.GetColor(R.Color.deviceColor_1),
-            ThemeManager.GetColor(R.Color.deviceColor_2),
-            ThemeManager.GetColor(R.Color.deviceColor_3),
-            ThemeManager.GetColor(R.Color.deviceColor_4),
-            ThemeManager.GetColor(R.Color.deviceColor_5),
-            ThemeManager.GetColor(R.Color.deviceColor_6)
+            Colors.CreateColor("#2ecc71"),
+            Colors.CreateColor("#f1c40f"),
+            Colors.CreateColor("#9b59b6"),
+            Colors.CreateColor("#d35400"),
+            Colors.CreateColor("#c0392b"),
+            Colors.CreateColor("#2c3e50"),
         };
     }
 }

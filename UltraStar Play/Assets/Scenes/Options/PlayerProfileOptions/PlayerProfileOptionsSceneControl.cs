@@ -1,9 +1,8 @@
 using PrimeInputActions;
 using ProTrans;
-using UnityEngine;
 using UniInject;
 using UniRx;
-using UnityEngine.TextCore.Text;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -34,6 +33,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private UiManager uiManager;
 
     private void Start()
     {
@@ -98,7 +100,7 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
         result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
-        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker))
+        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker), uiManager)
             .Bind(() => playerProfile.Avatar,
                 newValue => playerProfile.Avatar = newValue);
 

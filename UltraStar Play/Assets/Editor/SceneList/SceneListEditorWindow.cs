@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using System.IO;
-using UnityEditor.SceneManagement;
-using System.Linq;
-using System;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
 
 public class SceneListEditorWindow : EditorWindow
 {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -49,10 +46,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
-
-    private PlayerNameText playerNameText;
-
-    private AvatarImage avatarImage;
 
     [Inject]
     private Settings settings;
@@ -127,7 +120,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         // Therefor, consider the currently finished sentence and its predecessor.
         playerScoreController.SentenceScoreEventStream.Buffer(2, 1)
             // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.Perfect))
+            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.perfect))
             // Create an effect for these.
             .Subscribe(xs => CreatePerfectSentenceEffect());
 

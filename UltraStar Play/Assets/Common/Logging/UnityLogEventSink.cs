@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Serilog.Context;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;

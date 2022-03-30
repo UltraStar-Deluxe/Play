@@ -29,21 +29,4 @@ public class InputActionInfo
         InputText = inputText;
         InputSprite = inputSprite;
     }
-
-    public void AddInfoText(string infoText)
-    {
-        if (infoText.IsNullOrEmpty())
-        {
-            return;
-        }
-        
-        InputText = InputText.Length == 0
-            ? infoText
-            : InputText + InfoSeparator + infoText;
-    }
-
-    public static int CompareByActionName(InputActionInfo a, InputActionInfo b)
-    {
-        return string.Compare(a.ActionText, b.ActionText, StringComparison.InvariantCulture);
-    }
 }

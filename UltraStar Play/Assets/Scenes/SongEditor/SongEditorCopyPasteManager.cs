@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -40,6 +39,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private DeleteNotesAction deleteNotesAction;
 
+    [Inject]
+    private SongEditorSceneInputControl songEditorSceneInputControl;
+
     public List<Note> CopiedNotes
     {
         get
@@ -56,22 +58,22 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
         // Copy action
         InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Subscribe(_ => CopySelectedNotes());
 
         // Cut action
         InputManager.GetInputAction(R.InputActions.songEditor_cut).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Subscribe(_ => CutSelectedNotes());
         
         // Paste action
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Subscribe(_ => PasteCopiedNotes());
         
         // Cancel copy
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(SongEditorSceneInputControl.cancelCopyPriority)
-            .Where(_ => !GameObjectUtils.InputFieldHasFocus(eventSystem))
+            .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Where(_ => HasCopiedNotes())
             .Subscribe(_ =>
             {

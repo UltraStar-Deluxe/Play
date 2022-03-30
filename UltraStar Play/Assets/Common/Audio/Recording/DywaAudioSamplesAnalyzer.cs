@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using CircularBuffer;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {
     private const int MinSampleLength = 256;
     private readonly int maxSampleLength;
 
-    private DywaPitchTracker dywaPitchTracker;
-    private float[] halftoneFrequencies;
+    private readonly DywaPitchTracker dywaPitchTracker;
+    private readonly float[] halftoneFrequencies;
 
     public DywaAudioSamplesAnalyzer(int sampleRateHz, int maxSampleLength)
     {

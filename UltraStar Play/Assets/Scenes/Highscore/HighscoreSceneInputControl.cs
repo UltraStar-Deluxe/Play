@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using PrimeInputActions;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using Button = UnityEngine.UI.Button;
-using EventSystem = UnityEngine.EventSystems.EventSystem;
-using PrimeInputActions;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
 {
-    [InjectedInInspector]
-    public Button continueButton;
-    
-    [InjectedInInspector]
-    public Button nextDifficultyButton;
-    
     [Inject]
     private HighscoreSceneControl highscoreSceneControl;
     
@@ -58,17 +45,6 @@ public class HighscoreSceneInputControl : MonoBehaviour, INeedInjection
         if (direction.x < 0)
         {
             highscoreSceneControl.ShowNextDifficulty(-1);
-        }
-
-        if (direction.y != 0)
-        {
-            // Toggle between buttons
-            if (eventSystem.currentSelectedGameObject == nextDifficultyButton.gameObject)
-            {
-                continueButton.Select();
-                return;
-            }
-            nextDifficultyButton.Select();
         }
     }
 }

@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 public class SongDataStructureTests
 {

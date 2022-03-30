@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using JetBrains.Annotations;
 using PrimeInputActions;
 using ProTrans;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -46,8 +42,6 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        new ThemeSliderControl(themeContainer.Q<ItemPicker>());
-
         LabeledItemPickerControl<ENoteDisplayMode> noteDisplayModePickerControl = new LabeledItemPickerControl<ENoteDisplayMode>(noteDisplayModeContainer.Q<ItemPicker>(),
             EnumUtils.GetValuesAsList<ENoteDisplayMode>());
         noteDisplayModePickerControl.Bind(() => settings.GraphicSettings.noteDisplayMode,

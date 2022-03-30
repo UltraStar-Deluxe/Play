@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 /// Extension methods to simplify working with XAttributes.
 public static class XAttributeUtil

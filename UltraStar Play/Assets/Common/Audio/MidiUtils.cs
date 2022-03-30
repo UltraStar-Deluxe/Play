@@ -22,7 +22,7 @@ public static class MidiUtils
     private static readonly int[] blackKeyRelativeMidiNotes = { 1, 3, 6, 8, 10 };
 
     private static Dictionary<int, string> midiNoteToAbsoluteName = CreateMidiNoteToAbsoluteNameMap();
-    private static Dictionary<string, int> absoluteNameToMidiNote = CreateAbsoluteNameToMidiNoteMap();
+    private static readonly Dictionary<string, int> absoluteNameToMidiNote = CreateAbsoluteNameToMidiNoteMap();
 
     private static Dictionary<int, string> CreateMidiNoteToAbsoluteNameMap()
     {

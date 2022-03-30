@@ -1,7 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
 
 /**
  * Normally Unity executes coroutines in Edit Mode only when the scene changes.

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UniInject;
-using UniRx;
 using System.IO;
-using UnityEngine.Networking;
-using ICSharpCode.SharpZipLib.Tar;
-using ICSharpCode.SharpZipLib.Zip;
-using static ThreadPool;
 using System.Text;
 using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.Zip;
 using PrimeInputActions;
 using ProTrans;
+using UniInject;
+using UniRx;
+using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UIElements;
+using static ThreadPool;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -197,7 +196,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         yield return downloadRequest?.SendWebRequest();
 
-        if (downloadRequest != null && (downloadRequest.isNetworkError || downloadRequest.isHttpError))
+        if (downloadRequest is { result: UnityWebRequest.Result.ConnectionError
+                                      or UnityWebRequest.Result.ProtocolError })
         {
             Debug.LogError($"Error downloading {url}: {downloadRequest.error}");
             AddToUiLog("Error downloading the requested file");
@@ -269,7 +269,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         using UnityWebRequest request = UnityWebRequest.Head(url);
         yield return request.SendWebRequest();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result
+            is UnityWebRequest.Result.ConnectionError
+            or UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError($"Error fetching size: {request.error}");
             AddToUiLog($"Error fetching size: {request.error}");

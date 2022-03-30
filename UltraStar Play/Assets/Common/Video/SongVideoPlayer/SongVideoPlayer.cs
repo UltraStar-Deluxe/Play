@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UniInject;
-using UnityEngine.Video;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.Video;
 
 public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
