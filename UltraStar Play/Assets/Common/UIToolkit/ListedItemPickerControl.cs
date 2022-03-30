@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UniRx;
+﻿using System.Collections.Generic;
 
 public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 {

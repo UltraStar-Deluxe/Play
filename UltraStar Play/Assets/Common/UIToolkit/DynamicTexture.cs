@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
-using UniInject;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 /**
  * Holds a texture to draw pixels on a VisualElement (for UI Toolkit)

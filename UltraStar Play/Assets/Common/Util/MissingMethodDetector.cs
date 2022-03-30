@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
 
 /// <summary>
 /// Searches for missing references and missing methods of events in the game scene

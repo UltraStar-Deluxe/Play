@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Linq;
 using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
-using Background = UnityEngine.UIElements.Background;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -31,9 +27,8 @@ public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        AvatarImageReference imageRef = GameObject.FindObjectsOfType<AvatarImageReference>()
-                .FirstOrDefault(it => it.avatar == playerProfile.Avatar);
-        if (imageRef == null)
+        Sprite avatarSprite = uiManager.GetAvatarSprite(playerProfile.Avatar);
+        if (avatarSprite == null)
         {
             Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
             return;
@@ -42,7 +37,7 @@ public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null)
         {
             image.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
-            image.style.backgroundImage = new StyleBackground(imageRef.Sprite);
+            image.style.backgroundImage = new StyleBackground(avatarSprite);
         }
     }
 }

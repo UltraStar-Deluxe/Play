@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using UnityEngine;
-using UniInject;
-using UniRx;
 using UnityEngine.UIElements;
 
 public class DetectBpmControl

@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
+using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -18,11 +16,9 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        AdditionalInputActionInfos.Clear();
         inputDeviceToLastChange.Clear();
     }
 
-    public static List<InputActionInfo> AdditionalInputActionInfos { get; private set; } = new List<InputActionInfo>();
     private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new Dictionary<InputDevice, InputDeviceChange>();
 
     [InjectedInInspector]
@@ -110,15 +106,6 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         if (Touch.activeTouches.Count > 0)
         {
             InputDeviceEnum = EInputDevice.Touch;
-        }
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (InputManager.instance == this)
-        {
-            AdditionalInputActionInfos.Clear();
         }
     }
 

@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using NLayer;
 using UnityEngine;
 using UnityEngine.Networking;
-using NLayer;
-using UniRx;
 
 public static class AudioUtils
 {
@@ -44,7 +43,9 @@ public static class AudioUtils
             downloadHandler.streamAudio = streamAudio;
 
             webRequest.SendWebRequest();
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result
+                is UnityWebRequest.Result.ConnectionError
+                or UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error Loading Audio: " + uri);
                 Debug.LogError(webRequest.error);
@@ -63,7 +64,7 @@ public static class AudioUtils
     {
         string filename = Path.GetFileNameWithoutExtension(path);
         MpegFile mpegFile = new MpegFile(path);
-        if (mpegFile == null || mpegFile.Length < 1)
+        if (mpegFile.Length < 1)
         {
             Debug.LogWarning($"Failed to load mp3 audio file: {path}");
             return null;

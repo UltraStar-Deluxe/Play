@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class LogUtils
 {
-    private static Dictionary<string, LogData> messagePrefixToLogDataMap = new Dictionary<string, LogData>();
+    private static readonly Dictionary<string, LogData> messagePrefixToLogDataMap = new Dictionary<string, LogData>();
 
     // Logs a message every period.
     // The message is constructed from a messagePrefix and dataPoints that are accumulated over the period.

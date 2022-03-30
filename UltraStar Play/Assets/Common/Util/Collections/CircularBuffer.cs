@@ -9,9 +9,10 @@ this stuff is worth it, you can buy me a beer in return.
 Joao Portela
 ----------------------------------------------------------------------------
 */
+
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace CircularBuffer
 {

@@ -1,11 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
 using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
-using System.IO;
+using UnityEngine;
 
 /// Base class for custom inspectors.
 public class EditorBase : Editor

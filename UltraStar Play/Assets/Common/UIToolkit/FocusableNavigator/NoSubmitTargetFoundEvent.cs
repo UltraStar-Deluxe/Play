@@ -1,6 +1,3 @@
-﻿using UnityEngine;
-using UnityEngine.UIElements;
-
-public class NoSubmitTargetFoundEvent
+﻿public class NoSubmitTargetFoundEvent
 {
 }

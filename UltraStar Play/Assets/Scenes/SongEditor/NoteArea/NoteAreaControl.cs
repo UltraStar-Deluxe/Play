@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+using System.Linq;
 using UniInject;
 using UniRx;
-using System.Linq;
-using UnityEngine.InputSystem.Utilities;
+using UnityEngine;
 using UnityEngine.UIElements;
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 #pragma warning disable CS0649
 

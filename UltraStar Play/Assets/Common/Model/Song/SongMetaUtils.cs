@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using ProTrans;
 using UnityEngine;
 
 public static class SongMetaUtils

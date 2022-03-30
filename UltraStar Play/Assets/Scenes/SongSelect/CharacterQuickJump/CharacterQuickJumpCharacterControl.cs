@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using UniInject;
+﻿using UniInject;
 using UniRx;
-using System;
-using System.Collections.Generic;
-using PrimeInputActions;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.

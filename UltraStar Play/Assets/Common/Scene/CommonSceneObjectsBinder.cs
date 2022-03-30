@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using PrimeInputActions;
+using ProTrans;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using PrimeInputActions;
-using ProTrans;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -17,7 +17,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SceneNavigator.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(SongMetaManager.Instance);
-        bb.BindExistingInstance(ThemeManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);

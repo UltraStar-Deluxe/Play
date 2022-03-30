@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
 public class NoteAreaDragEvent
 {
     public GeneralDragEvent GeneralDragEvent { get; private set; }

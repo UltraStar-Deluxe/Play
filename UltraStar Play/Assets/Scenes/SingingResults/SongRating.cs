@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using ProTrans;
+using UnityEngine;
 
 public class SongRating
 {
@@ -18,7 +18,7 @@ public class SongRating
         ToneDeaf = 0, Amateur = 1, Wannabe = 2, Hopeful = 3, RisingStar = 4, LeadSinger = 5, Superstar = 6, Ultrastar = 7
     }
 
-    private string i18nCode;
+    private readonly string i18nCode;
     public ESongRating EnumValue { get; private set; }
     public double ScoreThreshold { get; private set; }
 

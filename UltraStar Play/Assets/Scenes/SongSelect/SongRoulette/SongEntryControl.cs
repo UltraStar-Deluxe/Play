@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UniRx;
-using UniRx.Triggers;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -314,7 +311,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
 
-        // Add itself as IDragListener to be notified when its RectTransform is dragged.
+        // Add itself as IDragListener to be notified when it is dragged.
         dragControl = injector
             .WithRootVisualElement(songEntryUiRoot)
             .CreateAndInject<GeneralDragControl>();

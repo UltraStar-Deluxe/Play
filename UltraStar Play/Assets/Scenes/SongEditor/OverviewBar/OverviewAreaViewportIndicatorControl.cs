@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UniInject;
-using UnityEngine;
+﻿using UniInject;
 using UniRx;
-using System;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649

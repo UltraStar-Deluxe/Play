@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UnityEngine;
-using UniRx;
 using UnityEngine.UIElements;
 
 public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjectionFinishedListener
@@ -66,11 +62,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .CreateAndInject<AvatarImageControl>();
 
         // Song rating
-        SongRatingImageHolder[] holders = GameObject.FindObjectsOfType<SongRatingImageHolder>();
-        SongRatingImageHolder holder = holders.FirstOrDefault(it => it.songRatingEnumValue == songRating.EnumValue);
-        if (holder != null)
+        Sprite songRatingSprite = singingResultsSceneControl.GetSongRatingSprite(songRating.EnumValue);
+        if (songRatingSprite != null)
         {
-            ratingImage.style.backgroundImage = new StyleBackground(holder.sprite);
+            ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
             // Bouncy size animation
             LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
                 .setEaseSpring()

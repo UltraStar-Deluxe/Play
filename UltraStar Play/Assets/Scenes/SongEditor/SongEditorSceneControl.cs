@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using ProTrans;
 using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -54,6 +52,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public SongEditorCopyPasteManager songEditorCopyPasteManager;
+
+    [InjectedInInspector]
+    public SongEditorSceneInputControl songEditorSceneInputControl;
 
     [Inject]
     private Injector injector;
@@ -498,6 +499,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(overviewAreaControl);
         bb.BindExistingInstance(songMetaChangeEventStream);
         bb.BindExistingInstance(songEditorCopyPasteManager);
+        bb.BindExistingInstance(songEditorSceneInputControl);
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
         bb.BindExistingInstance(gameObject);

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Text.RegularExpressions;
 using UniInject;
-using UniRx;
-using System.Text.RegularExpressions;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.

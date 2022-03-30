@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -17,6 +15,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset nPlayerUi;
+
+    [InjectedInInspector]
+    public List<SongRatingImageReference> songRatingImageReferences;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -244,5 +245,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
+    }
+
+    public Sprite GetSongRatingSprite(SongRating.ESongRating songRatingEnumValue)
+    {
+        SongRatingImageReference songRatingImageReference = songRatingImageReferences
+            .FirstOrDefault(it => it.songRating == songRatingEnumValue);
+        return songRatingImageReference?.sprite;
     }
 }

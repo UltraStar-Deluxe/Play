@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UniRx;
 using UniInject;
-using System.Linq;
-using CSharpSynth.Wave;
+using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -20,7 +17,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     private RecordedNote lastRecordedNote;
     private PlayerMicPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
 
-    private Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new Subject<RecordedNoteStartedEvent>();
+    private readonly Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new Subject<RecordedNoteStartedEvent>();
     public IObservable<RecordedNoteStartedEvent> RecordedNoteStartedEventStream
     {
         get
@@ -29,7 +26,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    private Subject<RecordedNoteContinuedEvent> recordedNoteContinuedEventStream = new Subject<RecordedNoteContinuedEvent>();
+    private readonly Subject<RecordedNoteContinuedEvent> recordedNoteContinuedEventStream = new Subject<RecordedNoteContinuedEvent>();
     public IObservable<RecordedNoteContinuedEvent> RecordedNoteContinuedEventStream
     {
         get

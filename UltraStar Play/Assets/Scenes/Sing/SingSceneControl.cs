@@ -2,15 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using UnityEngine;
-using UnityEngine.UI;
-using UniInject;
-using UniRx;
 using ProTrans;
+using UniInject;
 using UniInject.Extensions;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
-using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.

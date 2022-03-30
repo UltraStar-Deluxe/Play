@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UniRx;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
-using PrimeInputActions;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -552,7 +551,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private bool AnyInputFieldHasFocus()
+    public bool AnyInputFieldHasFocus()
     {
         return uiDocument.rootVisualElement.focusController.focusedElement is TextField;
     }

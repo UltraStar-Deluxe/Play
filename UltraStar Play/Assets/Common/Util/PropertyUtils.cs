@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using UnityEngine.UIElements;
 
 public static class PropertyUtils
 {

@@ -1,7 +1,7 @@
-﻿using UniInject;
-using UnityEngine;
+﻿using PrimeInputActions;
+using UniInject;
 using UniRx;
-using PrimeInputActions;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

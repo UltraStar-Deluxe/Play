@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -22,7 +20,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     // Static reference to last state to load it when opening the song editor scene
     // (e.g. after switching editor > sing > editor).
-    private static Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
+    private static readonly Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
 
     private int indexInHistory = -1;
     private readonly List<SongEditorMemento> history = new List<SongEditorMemento>();

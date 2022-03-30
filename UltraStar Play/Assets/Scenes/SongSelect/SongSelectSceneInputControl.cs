@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEngine;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using PrimeInputActions;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
