@@ -49,10 +49,10 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected float beatsPerSecond;
 
-    protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new Dictionary<Note, TargetNoteControl>();
-    protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new Dictionary<RecordedNote, List<RecordedNoteControl>>();
+    protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new();
+    protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new();
 
-    protected readonly List<StarParticleControl> starControls = new List<StarParticleControl>();
+    protected readonly List<StarParticleControl> starControls = new();
 
     protected int avgMidiNote;
 
@@ -196,7 +196,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         childInjector.AddBindingForInstance(note);
         childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
 
-        TargetNoteControl targetNoteControl = new TargetNoteControl(effectsContainer);
+        TargetNoteControl targetNoteControl = new(effectsContainer);
         childInjector.Inject(targetNoteControl);
 
         Label label = targetNoteControl.Label;
@@ -270,7 +270,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         childInjector.AddBindingForInstance(recordedNote);
         childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
 
-        RecordedNoteControl noteControl = new RecordedNoteControl();
+        RecordedNoteControl noteControl = new();
         childInjector.Inject(noteControl);
 
         noteControl.StartBeat = recordedNote.StartBeat;
@@ -318,7 +318,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         float xPercent = UnityEngine.Random.Range(0f, 100f);
         float yPercent = UnityEngine.Random.Range(0f, 100f);
-        Vector2 startPos = new Vector2(xPercent, yPercent);
+        Vector2 startPos = new(xPercent, yPercent);
         starControl.SetPosition(startPos);
         LeanTween.value(singSceneControl.gameObject, startPos, startPos + GetRandomVector2(-50, 50), 1f)
             .setOnUpdate((Vector2 p) => starControl.SetPosition(p));

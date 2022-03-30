@@ -17,7 +17,7 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public List<string> simulatedCommandLineArguments = new List<string>();
+    public List<string> simulatedCommandLineArguments = new();
 
     [Range(-1, 60)]
     public int targetFrameRate = 30;

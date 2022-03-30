@@ -38,7 +38,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     public MicSampleRecorder MicSampleRecorder { get; protected set; }
 
-    protected readonly Subject<PitchEvent> pitchEventStream = new Subject<PitchEvent>();
+    protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;
 
     protected IAudioSamplesAnalyzer audioSamplesAnalyzer;
@@ -79,10 +79,10 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         switch (pitchDetectionAlgorithm)
         {
             case EPitchDetectionAlgorithm.Camd:
-                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new CamdAudioSamplesAnalyzer(sampleRateHz, MaxSampleCountToUse);
+                CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer = new(sampleRateHz, MaxSampleCountToUse);
                 return camdAudioSamplesAnalyzer;
             case EPitchDetectionAlgorithm.Dywa:
-                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new DywaAudioSamplesAnalyzer(sampleRateHz, MaxSampleCountToUse);
+                DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer = new(sampleRateHz, MaxSampleCountToUse);
                 return dywaAudioSamplesAnalyzer;
             default:
                 throw new UnityException("Unknown pitch detection algorithm:" + pitchDetectionAlgorithm);

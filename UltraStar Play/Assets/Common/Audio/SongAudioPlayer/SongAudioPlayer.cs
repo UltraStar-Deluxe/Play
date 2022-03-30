@@ -15,16 +15,16 @@ public class SongAudioPlayer : MonoBehaviour
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
-    private readonly Subject<float> playbackStoppedEventStream = new Subject<float>();
+    private readonly Subject<float> playbackStoppedEventStream = new();
     public IObservable<float> PlaybackStoppedEventStream => playbackStoppedEventStream;
 
-    private readonly Subject<float> playbackStartedEventStream = new Subject<float>();
+    private readonly Subject<float> playbackStartedEventStream = new();
     public IObservable<float> PlaybackStartedEventStream => playbackStartedEventStream;
 
-    private readonly Subject<float> positionInSongEventStream = new Subject<float>();
+    private readonly Subject<float> positionInSongEventStream = new();
     public IObservable<float> PositionInSongEventStream => positionInSongEventStream;
 
-    private readonly Subject<AudioClip> audioClipLoadedEventStream = new Subject<AudioClip>();
+    private readonly Subject<AudioClip> audioClipLoadedEventStream = new();
     public IObservable<AudioClip> AudioClipLoadedEventStream => audioClipLoadedEventStream;
 
     public IObservable<Pair<float>> JumpBackInSongEventStream

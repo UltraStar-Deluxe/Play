@@ -24,7 +24,7 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         }
 
         // Check that the selected note is the last note in the sentence.
-        List<Note> notesInSentence = new List<Note>(selectedNote.Sentence.Notes);
+        List<Note> notesInSentence = new(selectedNote.Sentence.Notes);
         notesInSentence.Sort(Note.comparerByStartBeat);
         if (notesInSentence.Last() != selectedNote)
         {
@@ -50,7 +50,7 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         }
 
         // Check that the selected note is the first note in the sentence.
-        List<Note> notesInSentence = new List<Note>(selectedNote.Sentence.Notes);
+        List<Note> notesInSentence = new(selectedNote.Sentence.Notes);
         notesInSentence.Sort(Note.comparerByStartBeat);
         if (notesInSentence.First() != selectedNote)
         {

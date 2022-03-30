@@ -20,11 +20,11 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
     public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
     {
         Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
-        List<Sentence> changedSentences = new List<Sentence>();
-        List<Sentence> removedSentences = new List<Sentence>();
-        List<Sentence> createdSentences = new List<Sentence>();
+        List<Sentence> changedSentences = new();
+        List<Sentence> removedSentences = new();
+        List<Sentence> createdSentences = new();
 
-        List<SentenceWithRange> createdSentencesWithRange = new List<SentenceWithRange>();
+        List<SentenceWithRange> createdSentencesWithRange = new();
 
         List<Sentence> sortedTargetSentences = targetVoice.Sentences.ToList();
         sortedTargetSentences.Sort(Sentence.comparerByStartBeat);
@@ -63,7 +63,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                 int newSentenceUntilBeat = nextSentence != null
                     ? nextSentence.MinBeat
                     : int.MaxValue;
-                Sentence createdSentence = new Sentence(newSentenceFromBeat, newSentenceUntilBeat);
+                Sentence createdSentence = new(newSentenceFromBeat, newSentenceUntilBeat);
                 createdSentence.SetVoice(targetVoice);
 
                 createdSentences.Add(createdSentence);

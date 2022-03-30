@@ -30,10 +30,10 @@ public class ManipulateSentenceDragListener : INeedInjection, IInjectionFinished
     [Inject]
     private NoteAreaControl noteAreaControl;
 
-    private List<Note> selectedNotes = new List<Note>();
-    private List<Note> followingNotes = new List<Note>();
+    private List<Note> selectedNotes = new();
+    private List<Note> followingNotes = new();
 
-    private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
+    private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new();
     private int linebreakBeatSnapshot;
     private bool isCanceled;
 

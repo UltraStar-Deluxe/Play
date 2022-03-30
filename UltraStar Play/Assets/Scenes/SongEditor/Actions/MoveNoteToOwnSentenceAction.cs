@@ -26,7 +26,7 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
     {
         List<Sentence> affectedSentences = notes.Select(note => note.Sentence).ToList();
 
-        Sentence newSentence = new Sentence();
+        Sentence newSentence = new();
         Voice voice = notes
             .Select(note => note.Sentence?.Voice)
             .FirstOrDefault();

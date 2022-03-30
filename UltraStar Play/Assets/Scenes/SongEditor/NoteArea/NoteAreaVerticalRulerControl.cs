@@ -133,7 +133,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private Label CreateLabelForMidiNote(int midiNote)
     {
-        Label label = new Label();
+        Label label = new();
         label.AddToClassList("tinyFont");
         label.enableRichText = false;
         label.style.position = new StyleEnum<Position>(Position.Absolute);

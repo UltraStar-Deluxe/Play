@@ -32,7 +32,7 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private readonly List<SongSelectMicEntryControl> listEntryControls = new List<SongSelectMicEntryControl>();
+    private readonly List<SongSelectMicEntryControl> listEntryControls = new();
     public IReadOnlyList<SongSelectMicEntryControl> MicEntryControls => listEntryControls;
 
     private void Start()
@@ -110,7 +110,7 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
         micPitchTracker.MicProfile = micProfile;
         micPitchTracker.MicSampleRecorder.StartRecording();
 
-        SongSelectMicEntryControl entryControl = new SongSelectMicEntryControl(gameObject, visualElement, micPitchTracker);
+        SongSelectMicEntryControl entryControl = new(gameObject, visualElement, micPitchTracker);
         injector.WithRootVisualElement(visualElement).Inject(entryControl);
         entryControl.MicProfile = micProfile;
         listEntryControls.Add(entryControl);

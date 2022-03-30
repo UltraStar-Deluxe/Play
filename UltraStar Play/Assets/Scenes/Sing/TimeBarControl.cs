@@ -59,7 +59,7 @@ public class TimeBarControl : INeedInjection
         float startPosPercentage = 100f * startPosInMillis / durationOfSongInMillis;
         float endPosPercentage = 100f * endPosInMillis / durationOfSongInMillis;
 
-        VisualElement rectangle = new VisualElement();
+        VisualElement rectangle = new();
         rectangle.style.position = new StyleEnum<Position>(Position.Absolute);
         rectangle.style.left = new StyleLength(new Length(startPosPercentage, LengthUnit.Percent));
         rectangle.style.width = new StyleLength(new Length(endPosPercentage - startPosPercentage, LengthUnit.Percent));

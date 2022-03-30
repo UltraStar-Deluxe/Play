@@ -28,7 +28,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
 
-    private readonly ReactiveProperty<string> fuzzySearchText = new ReactiveProperty<string>("");
+    private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;

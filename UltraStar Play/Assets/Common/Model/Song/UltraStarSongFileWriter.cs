@@ -14,7 +14,7 @@ public static class UltraStarSongFileWriter
 
     private static string GetTxtFileContent(SongMeta songMeta)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         AppendHeader(sb, songMeta);
         List<Voice> nonEmptyVoices = songMeta.GetVoices().Where(voice => IsNotEmpty(voice)).ToList();
         if (nonEmptyVoices.Count == 0)
@@ -46,7 +46,7 @@ public static class UltraStarSongFileWriter
         {
             sb.AppendLine(voiceName);
         }
-        List<Sentence> sortedSentences = new List<Sentence>(voice.Sentences);
+        List<Sentence> sortedSentences = new(voice.Sentences);
         sortedSentences.Sort(Sentence.comparerByStartBeat);
         foreach (Sentence sentence in sortedSentences)
         {
@@ -62,7 +62,7 @@ public static class UltraStarSongFileWriter
             return;
         }
 
-        List<Note> sortedNotes = new List<Note>(sentence.Notes);
+        List<Note> sortedNotes = new(sentence.Notes);
         sortedNotes.Sort(Note.comparerByStartBeat);
         foreach (Note note in sortedNotes)
         {

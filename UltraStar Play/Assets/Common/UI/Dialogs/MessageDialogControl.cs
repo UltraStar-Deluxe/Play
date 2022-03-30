@@ -44,7 +44,7 @@ public class MessageDialogControl : AbstractDialogControl
 
     public Button AddButton(string text, Action callback)
     {
-        Button button = new Button();
+        Button button = new();
         dialogButtonContainer.Add(button);
 
         button.text = text;

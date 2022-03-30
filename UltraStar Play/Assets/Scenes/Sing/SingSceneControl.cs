@@ -94,7 +94,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UIDocument uiDocument;
 
-    public List<PlayerControl> PlayerControls { get; private set; } = new List<PlayerControl>();
+    public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
 
@@ -168,7 +168,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         PreparePlayerUiLayout();
 
         // Create PlayerControl (and PlayerUi) for each player
-        List<PlayerProfile> playerProfilesWithoutMic = new List<PlayerProfile>();
+        List<PlayerProfile> playerProfilesWithoutMic = new();
         for (int i = 0; i < SceneData.SelectedPlayerProfiles.Count; i++)
         {
             PlayerProfile playerProfile = SceneData.SelectedPlayerProfiles[i];
@@ -275,7 +275,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
-            VisualElement spacer = new VisualElement();
+            VisualElement spacer = new();
             spacer.style.flexGrow = 1;
             playerUiContainer.Add(spacer);
             return;
@@ -291,7 +291,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             playerUiColumns = new VisualElement[columnCount];
             for (int i = 0; i < columnCount; i++)
             {
-                VisualElement column = new VisualElement();
+                VisualElement column = new();
                 column.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
                 column.style.flexGrow = 1;
                 column.style.height = new StyleLength(new Length(100, LengthUnit.Percent));
@@ -475,7 +475,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
         }
 
-        SongEditorSceneData songEditorSceneData = new SongEditorSceneData
+        SongEditorSceneData songEditorSceneData = new()
         {
             PreviousSceneData = SceneData,
             PreviousScene = EScene.SingScene,
@@ -502,7 +502,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void FinishSceneToSongSelect()
     {
         // Open song select without recording scores
-        SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+        SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
@@ -510,7 +510,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void FinishSceneToSingingResults(bool isAfterEndOfSong)
     {
         // Open the singing results scene.
-        SingingResultsSceneData singingResultsSceneData = new SingingResultsSceneData();
+        SingingResultsSceneData singingResultsSceneData = new();
         singingResultsSceneData.SongMeta = SongMeta;
         singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
@@ -583,7 +583,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private string GetVoiceName(PlayerProfile playerProfile)
     {
-        List<string> voiceNames = new List<string>(SongMeta.VoiceNames.Keys);
+        List<string> voiceNames = new(SongMeta.VoiceNames.Keys);
         int voiceNameCount = voiceNames.Count;
         if (voiceNameCount <= 1)
         {
@@ -649,7 +649,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public List<IBinding> GetBindings()
     {
         // Binding happens before the injection finished. Thus, no fields can be used here that have been injected.
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);

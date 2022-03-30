@@ -79,24 +79,24 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private IDisposable autoSaveDisposable;
 
-    private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
+    private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
 
     private float positionInSongInMillisWhenPlaybackStarted;
 
-    private readonly Dictionary<string, Color> voiceNameToColorMap = new Dictionary<string, Color>();
+    private readonly Dictionary<string, Color> voiceNameToColorMap = new();
 
     private bool audioWaveFormInitialized;
 
     public float StopPlaybackAfterPositionInSongInMillis { get; set; }
 
-    private readonly OverviewAreaControl overviewAreaControl = new OverviewAreaControl();
-    private readonly VideoAreaControl videoAreaControl = new VideoAreaControl();
-    private readonly SongEditorVirtualPianoControl songEditorVirtualPianoControl = new SongEditorVirtualPianoControl();
-    private readonly LyricsAreaControl lyricsAreaControl = new LyricsAreaControl();
-    private readonly NoteAreaControl noteAreaControl = new NoteAreaControl();
-    private readonly SongEditorSideBarControl sideBarControl = new SongEditorSideBarControl();
-    private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new SongEditorIssueAnalyzerControl();
-    private readonly SongEditorStatusBarControl statusBarControl = new SongEditorStatusBarControl();
+    private readonly OverviewAreaControl overviewAreaControl = new();
+    private readonly VideoAreaControl videoAreaControl = new();
+    private readonly SongEditorVirtualPianoControl songEditorVirtualPianoControl = new();
+    private readonly LyricsAreaControl lyricsAreaControl = new();
+    private readonly NoteAreaControl noteAreaControl = new();
+    private readonly SongEditorSideBarControl sideBarControl = new();
+    private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
+    private readonly SongEditorStatusBarControl statusBarControl = new();
 
     public SongMeta SongMeta
     {
@@ -120,7 +120,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    private readonly List<IDialogControl> openDialogControls = new List<IDialogControl>();
+    private readonly List<IDialogControl> openDialogControls = new();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
 
     private void Awake()
@@ -277,7 +277,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public List<Note> GetAllVisibleNotes()
     {
-        List<Note> result = new List<Note>();
+        List<Note> result = new();
         List<Note> notesInVoices = SongMeta.GetVoices()
             // Second voice is drawn on top of first voice. Thus, start with second voice.
             .Reverse()
@@ -293,7 +293,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void CreateVoiceToColorMap()
     {
-        List<Color> colors = new List<Color> {
+        List<Color> colors = new()
+        {
             Colors.CreateColor("#2ecc71"),
             Colors.CreateColor("#9b59b6"),
         };
@@ -481,7 +482,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         // Note that the SceneData and SongMeta are loaded on access here if not done yet.
         bb.BindExistingInstance(SceneData);
         bb.BindExistingInstance(SongMeta);

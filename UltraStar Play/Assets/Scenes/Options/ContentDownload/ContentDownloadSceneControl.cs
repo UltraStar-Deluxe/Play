@@ -20,7 +20,7 @@ using static ThreadPool;
 
 public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    private static readonly List<string> defaultArchiveUrls = new List<string>
+    private static readonly List<string> defaultArchiveUrls = new()
     {
         "https://github.com/UltraStar-Deluxe/songs-stream/archive/refs/heads/main.zip",
         "https://42.usplay.net/ultrastar-songs-cc.tar",
@@ -136,7 +136,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private string GetDownloadTargetPath(string url)
     {
-        Uri uri = new Uri(url);
+        Uri uri = new(url);
         string filename = Path.GetFileName(uri.LocalPath);
         string targetPath = ApplicationManager.PersistentTempPath() + "/" + filename;
         return targetPath;
@@ -144,7 +144,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private DownloadHandler CreateDownloadHandler(string targetPath)
     {
-        DownloadHandlerFile downloadHandler = new DownloadHandlerFile(targetPath);
+        DownloadHandlerFile downloadHandler = new(targetPath);
         downloadHandler.removeFileOnAbort = true;
         return downloadHandler;
     }
@@ -332,7 +332,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void ExtractZipArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
     {
         using Stream archiveStream = File.OpenRead(archivePath);
-        using ZipFile zipFile = new ZipFile(archiveStream);
+        using ZipFile zipFile = new(archiveStream);
 
         try
         {

@@ -8,7 +8,7 @@ public abstract class AbstractDialogControl : IDialogControl, INeedInjection
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement dialogRootVisualElement;
 
-    private readonly Subject<bool> dialogClosedEventStream = new Subject<bool>();
+    private readonly Subject<bool> dialogClosedEventStream = new();
     public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
 
     public virtual void CloseDialog()

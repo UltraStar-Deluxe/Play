@@ -8,9 +8,9 @@ public class SlotListControl
     private float offsetPositionPercent;
     private ESlotListDirection offsetDirection = ESlotListDirection.None;
 
-    public List<ISlotListItem> ListItems { get; private set; } = new List<ISlotListItem>();
+    public List<ISlotListItem> ListItems { get; private set; } = new();
 
-    private readonly Subject<SlotChangeEvent> slotChangeEventStream = new Subject<SlotChangeEvent>();
+    private readonly Subject<SlotChangeEvent> slotChangeEventStream = new();
     public IObservable<SlotChangeEvent> SlotChangeEventStream => slotChangeEventStream;
     
     public void OnDrag(ISlotListItem listItem, Vector2 dragDelta)

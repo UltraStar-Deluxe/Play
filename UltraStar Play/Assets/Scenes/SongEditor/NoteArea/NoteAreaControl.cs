@@ -97,7 +97,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private PanelHelper panelHelper;
 
-    private readonly Subject<ViewportEvent> viewportEventStream = new Subject<ViewportEvent>();
+    private readonly Subject<ViewportEvent> viewportEventStream = new();
     public IObservable<ViewportEvent> ViewportEventStream => viewportEventStream;
 
     private float lastClickTime;
@@ -181,7 +181,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
         List<Note> notesInVoices = songMeta.GetVoices().SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes).ToList();
-        List<Note> notes = new List<Note>();
+        List<Note> notes = new();
         notes.AddRange(notesInLayers);
         notes.AddRange(notesInVoices);
         int minMidiNoteInSong = notes.Select(note => note.MidiNote).Min();
@@ -495,7 +495,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void FireViewportChangedEvent()
     {
-        ViewportEvent viewportEvent = new ViewportEvent(ViewportX, ViewportY, ViewportWidth, ViewportHeight);
+        ViewportEvent viewportEvent = new(ViewportX, ViewportY, ViewportWidth, ViewportHeight);
         viewportEventStream.OnNext(viewportEvent);
     }
 

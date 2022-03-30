@@ -13,7 +13,7 @@ public static class JsonConverter
 
     private static fsSerializer CreateSerializer()
     {
-        fsSerializer newSerializer = new fsSerializer();
+        fsSerializer newSerializer = new();
         return newSerializer;
     }
 
@@ -31,7 +31,7 @@ public static class JsonConverter
     public static T FromJson<T>(string json) where T : new()
     {
         fsData data = fsJsonParser.Parse(json);
-        T deserialized = new T();
+        T deserialized = new();
         serializer.TryDeserialize<T>(data, ref deserialized).AssertSuccessWithoutWarnings();
         return deserialized;
     }

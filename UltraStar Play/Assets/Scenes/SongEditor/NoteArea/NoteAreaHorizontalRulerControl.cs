@@ -38,7 +38,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private float lastSongMetaBpm;
 
-    private readonly VisualElementPool<Label> labelPool = new VisualElementPool<Label>();
+    private readonly VisualElementPool<Label> labelPool = new();
 
     public void OnInjectionFinished()
     {
@@ -180,7 +180,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private Label CreateLabel(VisualElement container)
     {
-        Label label = new Label();
+        Label label = new();
         label.AddToClassList("tinyFont");
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);

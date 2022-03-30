@@ -82,7 +82,7 @@ public class SongEditorVirtualPianoControl : INeedInjection, IInjectionFinishedL
 
     private VirtualPianoKeyControl CreatePianoKeyForMidiNote(int midiNote)
     {
-        VisualElement visualElement = new VisualElement();
+        VisualElement visualElement = new();
         visualElement.AddToClassList("virtualPianoKey");
         VirtualPianoKeyControl keyControl = injector
             .WithRootVisualElement(visualElement)

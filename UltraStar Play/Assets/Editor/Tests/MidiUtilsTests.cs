@@ -6,7 +6,7 @@ public class MidiUtilsTests
     [Test]
     public void GetRelativeNameTest()
     {
-        Dictionary<int, string> midiNoteToRelativeNameMap = new Dictionary<int, string>();
+        Dictionary<int, string> midiNoteToRelativeNameMap = new();
         midiNoteToRelativeNameMap.Add(36, "C");
         midiNoteToRelativeNameMap.Add(57, "A");
         midiNoteToRelativeNameMap.Add(60, "C");
@@ -23,7 +23,7 @@ public class MidiUtilsTests
     [Test]
     public void GetAbsoluteNameTest()
     {
-        Dictionary<int, string> midiNoteToAbsoluteNameMap = new Dictionary<int, string>();
+        Dictionary<int, string> midiNoteToAbsoluteNameMap = new();
         midiNoteToAbsoluteNameMap.Add(36, "C2");
         midiNoteToAbsoluteNameMap.Add(57, "A3");
         midiNoteToAbsoluteNameMap.Add(60, "C4");

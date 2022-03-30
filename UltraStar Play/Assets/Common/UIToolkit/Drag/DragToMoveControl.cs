@@ -8,7 +8,7 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
 
     private bool isCanceled;
 
-    private readonly Subject<Vector2> movedEventStream = new Subject<Vector2>();
+    private readonly Subject<Vector2> movedEventStream = new();
     public IObservable<Vector2> MovedEventStream => movedEventStream;
 
     public override void OnInjectionFinished()
@@ -28,7 +28,7 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
-        Vector2 newPosition = new Vector2(
+        Vector2 newPosition = new(
             dragEvent.ScreenCoordinateInPixels.CurrentPosition.x - targetVisualElement.resolvedStyle.width / 2,
             dragEvent.ScreenCoordinateInPixels.CurrentPosition.y - targetVisualElement.resolvedStyle.height / 2);
         MoveTo(newPosition);

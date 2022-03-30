@@ -4,11 +4,11 @@ using System.Collections.Generic;
 [Serializable]
 public class PlayerScoreControllerData
 {
-    public Dictionary<Sentence, SentenceScore> SentenceToSentenceScoreMap { get; set; } = new Dictionary<Sentence, SentenceScore>();
-    public Dictionary<Note, NoteScore> NoteToNoteScoreMap { get; set; } = new Dictionary<Note, NoteScore>();
+    public Dictionary<Sentence, SentenceScore> SentenceToSentenceScoreMap { get; set; } = new();
+    public Dictionary<Note, NoteScore> NoteToNoteScoreMap { get; set; } = new();
 
-    public PlayerScoreControllerBeatData NormalBeatData { get; private set; } = new PlayerScoreControllerBeatData(EPlayerScoreControllerBeatDataNoteType.Normal);
-    public PlayerScoreControllerBeatData GoldenBeatData { get; private set; } = new PlayerScoreControllerBeatData(EPlayerScoreControllerBeatDataNoteType.Golden);
+    public PlayerScoreControllerBeatData NormalBeatData { get; private set; } = new(EPlayerScoreControllerBeatDataNoteType.Normal);
+    public PlayerScoreControllerBeatData GoldenBeatData { get; private set; } = new(EPlayerScoreControllerBeatDataNoteType.Golden);
 
     public int NormalNoteLengthTotal { get; set; }
     public int GoldenNoteLengthTotal { get; set; }
@@ -40,8 +40,8 @@ public class SentenceScore
 {
     public Sentence Sentence { get; private set; }
 
-    public PlayerScoreControllerBeatData NormalBeatData { get; private set; } = new PlayerScoreControllerBeatData(EPlayerScoreControllerBeatDataNoteType.Normal);
-    public PlayerScoreControllerBeatData GoldenBeatData { get; private set; } = new PlayerScoreControllerBeatData(EPlayerScoreControllerBeatDataNoteType.Golden);
+    public PlayerScoreControllerBeatData NormalBeatData { get; private set; } = new(EPlayerScoreControllerBeatDataNoteType.Normal);
+    public PlayerScoreControllerBeatData GoldenBeatData { get; private set; } = new(EPlayerScoreControllerBeatDataNoteType.Golden);
 
     public int TotalScoreSoFar { get; set; }
 

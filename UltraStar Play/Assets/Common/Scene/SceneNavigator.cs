@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneNavigator : MonoBehaviour
 {
-    private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new Subject<BeforeSceneChangeEvent>();
+    private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -24,7 +24,7 @@ public class SceneNavigator : MonoBehaviour
     }
 
     /// Static map to store and load SceneData instances across scenes.
-    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new Dictionary<System.Type, SceneData>();
+    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
 
     public void LoadScene(SceneEnumHolder holder)
     {

@@ -42,7 +42,7 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        LabeledItemPickerControl<ENoteDisplayMode> noteDisplayModePickerControl = new LabeledItemPickerControl<ENoteDisplayMode>(noteDisplayModeContainer.Q<ItemPicker>(),
+        LabeledItemPickerControl<ENoteDisplayMode> noteDisplayModePickerControl = new(noteDisplayModeContainer.Q<ItemPicker>(),
             EnumUtils.GetValuesAsList<ENoteDisplayMode>());
         noteDisplayModePickerControl.Bind(() => settings.GraphicSettings.noteDisplayMode,
                   newValue => settings.GraphicSettings.noteDisplayMode = newValue);

@@ -125,9 +125,9 @@ public class SongMeta
     public float Start { get; set; }
     public float End { get; set; }
 
-    private List<Voice> voices = new List<Voice>();
+    private List<Voice> voices = new();
 
-    private readonly Dictionary<string, string> unknownHeaderEntries = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> unknownHeaderEntries = new();
     public IReadOnlyDictionary<string, string> UnknownHeaderEntries
     {
         get
@@ -181,7 +181,7 @@ public class SongMeta
             string path = Directory + Path.DirectorySeparatorChar + Filename;
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
-                VoicesBuilder voicesBuilder = new VoicesBuilder(path, Encoding, Relative);
+                VoicesBuilder voicesBuilder = new(path, Encoding, Relative);
                 voices = new List<Voice>(voicesBuilder.GetVoices());
             }
         }

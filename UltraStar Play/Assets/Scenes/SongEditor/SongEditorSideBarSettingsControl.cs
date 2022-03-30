@@ -115,7 +115,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject]
     private Injector injector;
 
-    private readonly SongEditorMidiFileImporter midiFileImporter = new SongEditorMidiFileImporter();
+    private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
     public void OnInjectionFinished()
     {

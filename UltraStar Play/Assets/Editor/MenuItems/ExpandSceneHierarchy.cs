@@ -15,7 +15,7 @@ public class ExpandSceneHierarchy : MonoBehaviour
 
     private static List<UnityEngine.Object> FindObjectsRecursively(GameObject[] rootObjects)
     {
-        List<UnityEngine.Object> resultList = new List<UnityEngine.Object>();
+        List<UnityEngine.Object> resultList = new();
         foreach (GameObject rootObject in rootObjects)
         {
             FindObjectsRecursively(rootObject, resultList);

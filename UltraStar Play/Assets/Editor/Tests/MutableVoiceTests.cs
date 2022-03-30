@@ -21,8 +21,8 @@ public class MutableVoiceTests
     [Test]
     public void TestOneSentence()
     {
-        Note testNote = new Note(ENoteType.Normal, 0, 2, 0, "");
-        Sentence ms = new Sentence();
+        Note testNote = new(ENoteType.Normal, 0, 2, 0, "");
+        Sentence ms = new();
         ms.AddNote(testNote);
         mv.AddSentence(ms);
 

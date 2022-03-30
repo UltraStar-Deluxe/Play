@@ -11,17 +11,17 @@ public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDa
 
     public SceneData GetDefaultSceneData()
     {
-        SongEditorSceneData defaultSceneData = new SongEditorSceneData();
+        SongEditorSceneData defaultSceneData = new();
         defaultSceneData.PositionInSongInMillis = 0;
         defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
 
         // Set up PreviousSceneData to directly start the SingScene.
         defaultSceneData.PreviousScene = EScene.SingScene;
 
-        SingSceneData singSceneData = new SingSceneData();
+        SingSceneData singSceneData = new();
         singSceneData.SelectedSongMeta = defaultSceneData.SelectedSongMeta;
         PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
-        List<PlayerProfile> playerProfiles = new List<PlayerProfile>();
+        List<PlayerProfile> playerProfiles = new();
         playerProfiles.Add(playerProfile);
         singSceneData.SelectedPlayerProfiles = playerProfiles;
 

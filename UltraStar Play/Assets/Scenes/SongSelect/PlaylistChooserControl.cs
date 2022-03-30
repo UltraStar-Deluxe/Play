@@ -28,9 +28,9 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Settings settings;
 
-    private List<UltraStarPlaylist> items = new List<UltraStarPlaylist>();
+    private List<UltraStarPlaylist> items = new();
 
-    public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new ReactiveProperty<UltraStarPlaylist>();
+    public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new();
 
     public bool IsPlaylistChooserDropdownOverlayVisible => playlistChooserDropdownOverlay.IsVisibleByDisplay();
 
@@ -137,7 +137,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     private Button CreatePlaylistButton(UltraStarPlaylist item)
     {
-        Button button = new Button();
+        Button button = new();
         button.text = GetDisplayString(item);
         button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
 

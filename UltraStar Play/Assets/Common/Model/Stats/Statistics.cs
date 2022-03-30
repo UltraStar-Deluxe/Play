@@ -9,9 +9,9 @@ using UnityEngine;
 public class Statistics
 {
     public float TotalPlayTimeSeconds { get; private set; }
-    public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new Dictionary<string, LocalStatistic>();
-    public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new Dictionary<string, WebStatistic>();
-    public List<TopEntry> TopTenList { get; private set; } = new List<TopEntry>();
+    public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new();
+    public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new();
+    public List<TopEntry> TopTenList { get; private set; } = new();
     public TopEntry TopScore { get; private set; }
 
     // Indicates whether the Statistics have non-persisted changes.
@@ -60,7 +60,7 @@ public class Statistics
     private void UpdateTopScores(SongMeta songMeta, SongStatistic songStatistic)
     {
         Debug.Log("Updating top scores");
-        TopEntry topEntry = new TopEntry(songMeta.Title, songMeta.Artist, songStatistic);
+        TopEntry topEntry = new(songMeta.Title, songMeta.Artist, songStatistic);
 
         //Update the top score
         if (TopScore == null || songStatistic.Score > TopScore.SongStatistic.Score)

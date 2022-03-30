@@ -26,9 +26,9 @@ public class PlaylistManager : MonoBehaviour
     public static readonly string favoritesPlaylistName = "Favorites";
 
     // static references to be persisted across scenes
-    private static Dictionary<UltraStarPlaylist, string> playlistToFilePathMap = new Dictionary<UltraStarPlaylist, string>();
-    private static List<UltraStarPlaylist> playlists = new List<UltraStarPlaylist>();
-    private static UltraStarPlaylist favoritesPlaylist = new UltraStarPlaylist();
+    private static Dictionary<UltraStarPlaylist, string> playlistToFilePathMap = new();
+    private static List<UltraStarPlaylist> playlists = new();
+    private static UltraStarPlaylist favoritesPlaylist = new();
 
     public IReadOnlyList<UltraStarPlaylist> Playlists
     {
@@ -56,7 +56,7 @@ public class PlaylistManager : MonoBehaviour
         }
     }
 
-    private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new Subject<PlaylistChangeEvent>();
+    private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
     private readonly string playlistFileExtension = ".playlist";
@@ -101,7 +101,7 @@ public class PlaylistManager : MonoBehaviour
         playlists = new List<UltraStarPlaylist>();
         playlistToFilePathMap = new Dictionary<UltraStarPlaylist, string>();
 
-        FolderScanner scanner = new FolderScanner("*" + playlistFileExtension);
+        FolderScanner scanner = new("*" + playlistFileExtension);
         List<string> playlistFilePaths = scanner.GetFiles(PlaylistFolder);
         foreach (string filePath in playlistFilePaths)
         {
@@ -296,7 +296,7 @@ public class PlaylistManager : MonoBehaviour
     {
         string newPlaylistName = GetNewUniquePlaylistName(initialName);
         string newPlaylistPath = $"{PlaylistFolder}/{newPlaylistName}{playlistFileExtension}";
-        UltraStarPlaylist newPlaylist = new UltraStarPlaylist();
+        UltraStarPlaylist newPlaylist = new();
         AddPlaylist(newPlaylist, newPlaylistPath);
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(newPlaylist, null));

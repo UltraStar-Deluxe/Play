@@ -17,7 +17,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     private RecordedNote lastRecordedNote;
     private PlayerMicPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
 
-    private readonly Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new Subject<RecordedNoteStartedEvent>();
+    private readonly Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new();
     public IObservable<RecordedNoteStartedEvent> RecordedNoteStartedEventStream
     {
         get
@@ -26,7 +26,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    private readonly Subject<RecordedNoteContinuedEvent> recordedNoteContinuedEventStream = new Subject<RecordedNoteContinuedEvent>();
+    private readonly Subject<RecordedNoteContinuedEvent> recordedNoteContinuedEventStream = new();
     public IObservable<RecordedNoteContinuedEvent> RecordedNoteContinuedEventStream
     {
         get
@@ -76,7 +76,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void StartNewRecordedNote(int analyzedBeat, Note noteAtBeat, Sentence sentenceAtBeat, int recordedMidiNote, int roundedMidiNote)
     {
-        RecordedNote newRecordedNote = new RecordedNote(recordedMidiNote, roundedMidiNote, analyzedBeat, analyzedBeat + 1, noteAtBeat, sentenceAtBeat);
+        RecordedNote newRecordedNote = new(recordedMidiNote, roundedMidiNote, analyzedBeat, analyzedBeat + 1, noteAtBeat, sentenceAtBeat);
         recordedNoteStartedEventStream.OnNext(new RecordedNoteStartedEvent(newRecordedNote));
         lastRecordedNote = newRecordedNote;
     }

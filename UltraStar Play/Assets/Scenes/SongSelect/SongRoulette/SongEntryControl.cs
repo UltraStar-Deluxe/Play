@@ -81,7 +81,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
 
-    public readonly Subject<bool> clickEventStream = new Subject<bool>();
+    public readonly Subject<bool> clickEventStream = new();
     public IObservable<bool> ClickEventStream => clickEventStream;
 
     private bool ignoreNextClickEvent;
@@ -411,7 +411,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             .ForEach(playlist =>
         {
             string playlistName = playlistManager.GetPlaylistName(playlist);
-            Button button = new Button();
+            Button button = new();
             button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             button.AddToClassList("smallFont");
             modifyPlaylistButtonContainer.Add(button);
