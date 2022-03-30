@@ -169,8 +169,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             {
                 if (CalibrationResult.IsSuccess)
                 {
-                    double medianValue = CalibrationResult.DelaysInMilliseconds[CalibrationResult.DelaysInMilliseconds.Count / 2];
-                    double roundedMedianValue = ((int)(medianValue / delayPickerControl.StepValue)) * delayPickerControl.StepValue;
+                    float medianValue = CalibrationResult.DelaysInMilliseconds[CalibrationResult.DelaysInMilliseconds.Count / 2];
+                    float roundedMedianValue = (int)(medianValue / delayPickerControl.StepValue) * delayPickerControl.StepValue;
                     delayPickerControl.SelectItem(roundedMedianValue);
                 }
                 else

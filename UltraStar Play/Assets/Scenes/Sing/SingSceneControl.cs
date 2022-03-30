@@ -121,7 +121,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
-    public double DurationOfSongInMillis
+    public float DurationOfSongInMillis
     {
         get
         {
@@ -129,7 +129,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
-    public double PositionInSongInMillis
+    public float PositionInSongInMillis
     {
         get
         {
@@ -137,7 +137,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
-    public double CurrentBeat
+    public float CurrentBeat
     {
         get
         {
@@ -436,15 +436,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         int nextStartBeat = nextSingableNotes.Min();
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
-        double offsetInMillis = Application.isEditor ? 500 : 1500;
-        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
+        float offsetInMillis = Application.isEditor ? 500 : 1500;
+        float targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             SkipToPositionInSong(targetPositionInMillis);
         }
     }
 
-    public void SkipToPositionInSong(double positionInSongInMillis)
+    public void SkipToPositionInSong(float positionInSongInMillis)
     {
         int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
         Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");

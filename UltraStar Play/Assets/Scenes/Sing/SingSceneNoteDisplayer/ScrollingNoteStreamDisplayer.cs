@@ -90,12 +90,12 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
-    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, float noteStartBeat, float noteEndBeat)
     {
         // The VerticalPitchIndicator's position is the position where recording happens.
         // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
-        double millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
-        double currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
+        float millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
+        float currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
 
         Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);
         float yStartPercent = yStartEndPercent.x;
@@ -147,7 +147,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         label.style.bottom = new StyleLength(StyleKeyword.Auto);
     }
 
-    private static double GetNoteStartBeatOfFollowingNote(Note note)
+    private static float GetNoteStartBeatOfFollowingNote(Note note)
     {
         Sentence sentence = note.Sentence;
         if (sentence == null)

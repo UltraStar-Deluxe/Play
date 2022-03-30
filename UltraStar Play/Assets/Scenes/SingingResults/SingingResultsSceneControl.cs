@@ -228,7 +228,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         return bb.GetBindings();
     }
 
-    private SongRating GetSongRating(double totalScore)
+    private SongRating GetSongRating(float totalScore)
     {
         foreach (SongRating songRating in SongRating.Values)
         {

@@ -105,7 +105,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
 
         // Analyze the next beat with fully recorded mic samples
-        double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, BeatToAnalyze + 1);
+        float nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, BeatToAnalyze + 1);
         if (nextBeatToAnalyzeEndPositionInMs < songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
         {
             // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
@@ -226,8 +226,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private int GetMicSampleBufferIndexForBeat(int beat)
     {
-        double beatInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        double beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
+        float beatInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        float beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
         int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * micSampleRecorder.SampleRateHz);
         // The newest sample has the highest index in the MicSampleBuffer
         int sampleBufferIndex = micSampleRecorder.MicSamples.Length - beatPassedBeforeSamplesInMicBuffer;
@@ -295,7 +295,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    public void SkipToBeat(double currentBeat)
+    public void SkipToBeat(float currentBeat)
     {
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences

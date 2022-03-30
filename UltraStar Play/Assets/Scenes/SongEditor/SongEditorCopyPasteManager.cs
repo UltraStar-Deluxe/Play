@@ -82,7 +82,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             });
     }
 
-    private void MoveCopiedNotesToMillisInSong(double newMillis)
+    private void MoveCopiedNotesToMillisInSong(float newMillis)
     {
         if (CopiedNotes.IsNullOrEmpty() || songAudioPlayer.IsPlaying)
         {

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 {
-    private static readonly double handleWidthInPercent = 0.25;
+    private static readonly float handleWidthInPercent = 0.25f;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -93,7 +93,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     {
         Vector2 localPoint = evt.localPosition;
         float width = VisualElement.worldBound.width;
-        double xPercent = localPoint.x / width;
+        float xPercent = localPoint.x / width;
         if (xPercent > (1 - handleWidthInPercent))
         {
             OnPointerOverRightHandle();
@@ -141,7 +141,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     {
         Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
         float width = VisualElement.worldBound.width;
-        double xPercent = localPoint.x / width;
+        float xPercent = localPoint.x / width;
         return xPercent > (1 - handleWidthInPercent);
     }
 

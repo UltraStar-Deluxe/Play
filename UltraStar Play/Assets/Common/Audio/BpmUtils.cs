@@ -1,47 +1,47 @@
 ﻿public static class BpmUtils
 {
 
-    public static double BeatToMillisecondsInSong(SongMeta songMeta, double beat)
+    public static float BeatToMillisecondsInSong(SongMeta songMeta, float beat)
     {
         return BeatToMillisecondsInSongWithoutGap(songMeta, beat) + songMeta.Gap;
     }
 
-    public static double BeatToMillisecondsInSongWithoutGap(SongMeta songMeta, double beat)
+    public static float BeatToMillisecondsInSongWithoutGap(SongMeta songMeta, float beat)
     {
-        double beatsPerMinute = GetBeatsPerMinute(songMeta);
-        double millisecondsPerBeat = 60000.0 / beatsPerMinute;
-        double millisecondsInSong = beat * millisecondsPerBeat;
+        float beatsPerMinute = GetBeatsPerMinute(songMeta);
+        float millisecondsPerBeat = 60000.0f / beatsPerMinute;
+        float millisecondsInSong = beat * millisecondsPerBeat;
         return millisecondsInSong;
     }
 
-    public static double GetBeatsPerMinute(SongMeta songMeta)
+    public static float GetBeatsPerMinute(SongMeta songMeta)
     {
-        // Ultrastar BPM is not "beats per minute" but "bars per minute" in four-four-time.
+        // UltraStar BPM is not "beats per minute" but "bars per minute" in four-four-time.
         // To get the common "beats per minute", one has to multiply with 4.
-        return songMeta.Bpm * 4.0;
+        return songMeta.Bpm * 4.0f;
     }
 
-    public static double GetBeatsPerSecond(SongMeta songMeta)
+    public static float GetBeatsPerSecond(SongMeta songMeta)
     {
-        return GetBeatsPerMinute(songMeta) / 60.0;
+        return GetBeatsPerMinute(songMeta) / 60.0f;
     }
 
-    public static double MillisecondInSongToBeat(SongMeta songMeta, double millisInSong)
+    public static float MillisecondInSongToBeat(SongMeta songMeta, float millisInSong)
     {
         return MillisecondInSongToBeatWithoutGap(songMeta, millisInSong - songMeta.Gap);
     }
 
-    public static double MillisecondInSongToBeatWithoutGap(SongMeta songMeta, double millisInSong)
+    public static float MillisecondInSongToBeatWithoutGap(SongMeta songMeta, float millisInSong)
     {
-        double beatsPerMinute = GetBeatsPerMinute(songMeta);
-        double result = beatsPerMinute * millisInSong / 1000.0 / 60.0;
+        float beatsPerMinute = GetBeatsPerMinute(songMeta);
+        float result = beatsPerMinute * millisInSong / 1000.0f / 60.0f;
         return result;
     }
 
-    public static double MillisecondsPerBeat(SongMeta songMeta)
+    public static float MillisecondsPerBeat(SongMeta songMeta)
     {
-        double millisOfBeat0 = BeatToMillisecondsInSong(songMeta, 0);
-        double millisOfBeat1 = BeatToMillisecondsInSong(songMeta, 1);
+        float millisOfBeat0 = BeatToMillisecondsInSong(songMeta, 0);
+        float millisOfBeat1 = BeatToMillisecondsInSong(songMeta, 1);
         return millisOfBeat1 - millisOfBeat0;
     }
 }

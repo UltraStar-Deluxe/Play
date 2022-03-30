@@ -14,17 +14,17 @@ public class SentenceRating
     private const string SentenceRatingColorPoor = "#E848E67F";
     private const string SentenceRatingColorAwful = "#764FFF7F";
 
-    public static readonly SentenceRating perfect = new SentenceRating(0.95, R.Messages.rating_sentence_perfect, SentenceRatingColorPerfect);
-    public static readonly SentenceRating cool = new SentenceRating(0.8, R.Messages.rating_sentence_cool, SentenceRatingColorCool);
-    public static readonly SentenceRating great = new SentenceRating(0.7, R.Messages.rating_sentence_great, SentenceRatingColorGreat);
-    public static readonly SentenceRating good = new SentenceRating(0.6, R.Messages.rating_sentence_good, SentenceRatingColorGood);
-    public static readonly SentenceRating notBad = new SentenceRating(0.5, R.Messages.rating_sentence_notBad, SentenceRatingColorNotBad);
-    public static readonly SentenceRating bad = new SentenceRating(0.3, R.Messages.rating_sentence_bad, SentenceRatingColorBad);
-    public static readonly SentenceRating poor = new SentenceRating(0.2, R.Messages.rating_sentence_poor, SentenceRatingColorPoor);
-    public static readonly SentenceRating awful = new SentenceRating(0, R.Messages.rating_sentence_awful, SentenceRatingColorAwful);
+    public static readonly SentenceRating perfect = new SentenceRating(0.95f, R.Messages.rating_sentence_perfect, SentenceRatingColorPerfect);
+    public static readonly SentenceRating cool = new SentenceRating(0.8f, R.Messages.rating_sentence_cool, SentenceRatingColorCool);
+    public static readonly SentenceRating great = new SentenceRating(0.7f, R.Messages.rating_sentence_great, SentenceRatingColorGreat);
+    public static readonly SentenceRating good = new SentenceRating(0.6f, R.Messages.rating_sentence_good, SentenceRatingColorGood);
+    public static readonly SentenceRating notBad = new SentenceRating(0.5f, R.Messages.rating_sentence_notBad, SentenceRatingColorNotBad);
+    public static readonly SentenceRating bad = new SentenceRating(0.3f, R.Messages.rating_sentence_bad, SentenceRatingColorBad);
+    public static readonly SentenceRating poor = new SentenceRating(0.2f, R.Messages.rating_sentence_poor, SentenceRatingColorPoor);
+    public static readonly SentenceRating awful = new SentenceRating(0f, R.Messages.rating_sentence_awful, SentenceRatingColorAwful);
 
     private readonly string i18nCode;
-    public double PercentageThreshold { get; private set; }
+    public float PercentageThreshold { get; private set; }
 
     public string Text
     {
@@ -57,7 +57,7 @@ public class SentenceRating
         }
     }
 
-    private SentenceRating(double percentThreshold, string i18nCode, string hexBackgroundColor)
+    private SentenceRating(float percentThreshold, string i18nCode, string hexBackgroundColor)
     {
         this.PercentageThreshold = percentThreshold;
         this.i18nCode = i18nCode;

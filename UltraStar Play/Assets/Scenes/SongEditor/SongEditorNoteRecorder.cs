@@ -83,7 +83,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
     }
 
-    private void OnPlaybackStopped(double positionInSongInMillis)
+    private void OnPlaybackStopped(float positionInSongInMillis)
     {
         if (hasRecordedNotes)
         {
@@ -91,7 +91,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnPlaybackStarted(double positionInSongInMillis)
+    private void OnPlaybackStarted(float positionInSongInMillis)
     {
         hasRecordedNotes = false;
         lastPitchDetectedBeat = GetBeat(positionInSongInMillis);
@@ -106,7 +106,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnJumpedBackInSong(Pair<double> previousAndNewPositionInMillis)
+    private void OnJumpedBackInSong(Pair<float> previousAndNewPositionInMillis)
     {
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, previousAndNewPositionInMillis.Current);
         lastPitchDetectedBeat = currentBeat;
@@ -283,7 +283,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private int GetBeat(double positionInSongInMillis)
+    private int GetBeat(float positionInSongInMillis)
     {
         int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
         return beat;

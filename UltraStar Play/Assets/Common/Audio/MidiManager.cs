@@ -85,7 +85,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
         audioFilterReadSecondsCounter += Time.deltaTime;
         if (audioFilterReadSecondsCounter > 1)
         {
-            audioFilterReadSampleRateHz = (int)((double)audioFilterReadSampleCounter / audioFilterReadSecondsCounter);
+            audioFilterReadSampleRateHz = (int)(audioFilterReadSampleCounter / audioFilterReadSecondsCounter);
             audioFilterReadSecondsCounter = 0;
             audioFilterReadSampleCounter = 0;
         }

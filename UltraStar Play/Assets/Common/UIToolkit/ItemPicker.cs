@@ -5,9 +5,9 @@ using UnityEngine.UIElements;
 public class ItemPicker : VisualElement
 {
     public bool wrapAround;
-    public double minValue;
-    public double maxValue;
-    public double stepValue;
+    public float minValue;
+    public float maxValue;
+    public float stepValue;
 
     private Button nextItemButton;
     public Button NextItemButton
@@ -66,8 +66,8 @@ public class ItemPicker : VisualElement
     {
         // Additional XML attributes
         private readonly UxmlBoolAttributeDescription wrapAround = new UxmlBoolAttributeDescription { name = "wrapAround", defaultValue = false};
-        private readonly UxmlDoubleAttributeDescription minValue = new UxmlDoubleAttributeDescription { name = "minValue", defaultValue = double.MinValue};
-        private readonly UxmlDoubleAttributeDescription maxValue = new UxmlDoubleAttributeDescription { name = "maxValue", defaultValue = double.MaxValue};
+        private readonly UxmlDoubleAttributeDescription minValue = new UxmlDoubleAttributeDescription { name = "minValue", defaultValue = float.MinValue};
+        private readonly UxmlDoubleAttributeDescription maxValue = new UxmlDoubleAttributeDescription { name = "maxValue", defaultValue = float.MaxValue};
         private readonly UxmlDoubleAttributeDescription stepValue = new UxmlDoubleAttributeDescription { name = "stepValue", defaultValue = 1};
         private readonly UxmlBoolAttributeDescription noPreviousButton = new UxmlBoolAttributeDescription { name = "noPreviousButton", defaultValue = false};
         private readonly UxmlBoolAttributeDescription noNextButton = new UxmlBoolAttributeDescription { name = "noNextButton", defaultValue = false};
@@ -79,9 +79,9 @@ public class ItemPicker : VisualElement
 
             // Read additional attributes from XML
             target.wrapAround = wrapAround.GetValueFromBag(bag, cc);
-            target.minValue = minValue.GetValueFromBag(bag, cc);
-            target.maxValue = maxValue.GetValueFromBag(bag, cc);
-            target.stepValue = stepValue.GetValueFromBag(bag, cc);
+            target.minValue = (float)minValue.GetValueFromBag(bag, cc);
+            target.maxValue = (float)maxValue.GetValueFromBag(bag, cc);
+            target.stepValue = (float)stepValue.GetValueFromBag(bag, cc);
 
             // Load UXML and add as child element
             string path = "UIDocuments/ItemPicker";

@@ -55,10 +55,10 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         get
         {
             int targetSentenceCount = (ScoreData.TotalSentenceCount > 20) ? 20 : ScoreData.TotalSentenceCount;
-            double score = (double)MaxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
+            float score = (float)MaxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
 
             // Round the score up
-            score = Math.Ceiling(score);
+            score = Mathf.Ceil(score);
             if (score > MaxPerfectSentenceBonusScore)
             {
                 score = MaxPerfectSentenceBonusScore;
@@ -93,8 +93,8 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private double maxScoreForNormalNotes;
-    private double maxScoreForGoldenNotes;
+    private float maxScoreForNormalNotes;
+    private float maxScoreForGoldenNotes;
 
     public PlayerScoreControllerData ScoreData { get; set; } = new PlayerScoreControllerData();
 
@@ -206,7 +206,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         if (ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
         {
             int correctlySungNoteLength = sentenceScore.NormalBeatData.PerfectAndGoodBeats + sentenceScore.GoldenBeatData.PerfectAndGoodBeats;
-            double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
+            float correctNotesPercentage = (float)correctlySungNoteLength / totalScorableNoteLength;
 
             // Score for a perfect sentence
             if (correctNotesPercentage >= SentenceRating.perfect.PercentageThreshold)
@@ -243,14 +243,14 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             ScoreData.GoldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        double scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / ((double)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
-        double scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
+        float scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / ((float)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
+        float scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
 
         maxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * ScoreData.NormalNoteLengthTotal;
         maxScoreForGoldenNotes = scoreForCorrectBeatOfGoldenNotes * ScoreData.GoldenNoteLengthTotal;
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
-        double pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
+        float pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
         bool isSound = Math.Abs(MaxScoreForNotes - pointsForAllNotes) <= 0.01;
         if (!isSound)
         {
@@ -259,8 +259,8 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
 
         // Round the values for the max score of normal / golden notes to avoid floating point inaccuracy.
-        maxScoreForNormalNotes = Math.Ceiling(maxScoreForNormalNotes);
-        maxScoreForGoldenNotes = Math.Ceiling(maxScoreForGoldenNotes);
+        maxScoreForNormalNotes = Mathf.Ceil(maxScoreForNormalNotes);
+        maxScoreForGoldenNotes = Mathf.Ceil(maxScoreForGoldenNotes);
         // The sum of the rounded points must not exceed the MaxScoreForNotes.
         // If the definition is sound then the overhang is at most 2 because of the above rounding.
         int overhang = (int)(maxScoreForNormalNotes + maxScoreForGoldenNotes) - MaxScoreForNotes;
@@ -280,7 +280,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         return sentence.Notes.Where(note => note.IsGolden).Select(note => (int)note.Length).Sum();
     }
 
-    private SentenceRating GetSentenceRating(double correctNotesPercentage)
+    private SentenceRating GetSentenceRating(float correctNotesPercentage)
     {
         if (correctNotesPercentage < 0)
         {

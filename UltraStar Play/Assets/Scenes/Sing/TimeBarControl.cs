@@ -18,9 +18,9 @@ public class TimeBarControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
 
-    public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
+    public void UpdateTimeValueLabel(float positionInSongInMillis, float durationOfSongInMillis)
     {
-        double remainingTimeInSeconds = (durationOfSongInMillis - positionInSongInMillis) / 1000;
+        float remainingTimeInSeconds = (durationOfSongInMillis - positionInSongInMillis) / 1000f;
         int mins = (int)Math.Floor(remainingTimeInSeconds / 60);
         string minsPadding = (mins < 10) ? "0" : "";
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
@@ -28,13 +28,13 @@ public class TimeBarControl : INeedInjection
         timeValueLabel.text = $"{minsPadding}{mins}:{secsPadding}{secs}";
     }
 
-    public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)
+    public void UpdatePositionIndicator(float positionInSongInMillis, float durationOfSongInMillis)
     {
-        float positionInPercent = (float)(100 * positionInSongInMillis / durationOfSongInMillis);
+        float positionInPercent = 100f * positionInSongInMillis / durationOfSongInMillis;
         timeBarPositionIndicator.style.left = new StyleLength(new Length(positionInPercent, LengthUnit.Percent));
     }
 
-    public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)
+    public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, float durationOfSongInMillis)
     {
         innerTimeBarSentenceEntryContainer.Clear();
         foreach (PlayerControl playerController in playerControls)
@@ -43,21 +43,21 @@ public class TimeBarControl : INeedInjection
         }
     }
 
-    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationOfSongInMillis)
+    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, float durationOfSongInMillis)
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
         {
-            double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
-            double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
+            float startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
+            float endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
             MicProfile micProfile = playerControl.MicProfile;
             CreateRectangle(micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis);
         }
     }
 
-    private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis)
+    private void CreateRectangle(MicProfile micProfile, float startPosInMillis, float endPosInMillis, float durationOfSongInMillis)
     {
-        float startPosPercentage = (float)(100 * startPosInMillis / durationOfSongInMillis);
-        float endPosPercentage = (float)(100 * endPosInMillis / durationOfSongInMillis);
+        float startPosPercentage = 100f * startPosInMillis / durationOfSongInMillis;
+        float endPosPercentage = 100f * endPosInMillis / durationOfSongInMillis;
 
         VisualElement rectangle = new VisualElement();
         rectangle.style.position = new StyleEnum<Position>(Position.Absolute);

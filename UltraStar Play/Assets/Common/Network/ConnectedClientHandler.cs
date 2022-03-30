@@ -142,7 +142,7 @@ public class ConnectedClientHandler : IDisposable
         lock (micSampleBufferReadWriteLock)
         {
             // Copy from byte array to float array. Note that in a float there are sizeof(float) bytes.
-            float[] receivedSamples = new float[(int)Math.Ceiling((double)receivedByteCount / sizeof(float))];
+            float[] receivedSamples = new float[(int)Math.Ceiling((float)receivedByteCount / sizeof(float))];
             Buffer.BlockCopy(
                 receivedBytes, 0,
                 receivedSamples, 0,

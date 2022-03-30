@@ -88,8 +88,8 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         int midiNoteRange = midiNoteMax - midiNoteMin;
         foreach (Note note in notes)
         {
-            double startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
-            double endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+            float startMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            float endMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
 
             int yStart = dynamicTexture.TextureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
             int yLength = dynamicTexture.TextureHeight / midiNoteRange * 2;

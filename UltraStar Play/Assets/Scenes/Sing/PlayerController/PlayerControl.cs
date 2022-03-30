@@ -97,7 +97,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         return newInjector;
     }
 
-    public void SetCurrentBeat(double currentBeat)
+    public void SetCurrentBeat(float currentBeat)
     {
         // Change the current display sentence, when the current beat is over its last note.
         if (displaySentenceIndex < SortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
@@ -127,7 +127,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         return sentence;
     }
 
-    public Note GetNextSingableNote(double currentBeat)
+    public Note GetNextSingableNote(float currentBeat)
     {
         Note nextSingableNote = SortedSentences
             .SelectMany(sentence => sentence.Notes)
@@ -140,7 +140,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         return nextSingableNote;
     }
 
-    private Sentence GetUpcomingSentenceForBeat(double currentBeat)
+    private Sentence GetUpcomingSentenceForBeat(float currentBeat)
     {
         Sentence result = Voice.Sentences
             .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);

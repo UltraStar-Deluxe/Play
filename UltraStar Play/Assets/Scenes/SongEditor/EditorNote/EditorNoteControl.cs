@@ -13,7 +13,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 {
     public static readonly IComparer<EditorNoteControl> comparerByStartBeat = new EditorUiNoteComparerByStartBeat();
 
-    private static readonly double handleWidthInPercent = 0.25;
+    private static readonly float handleWidthInPercent = 0.25f;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -133,7 +133,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     {
         Vector2 localPoint = evt.localPosition;
         float width = VisualElement.worldBound.width;
-        double xPercent = localPoint.x / width;
+        float xPercent = localPoint.x / width;
         if (xPercent < handleWidthInPercent)
         {
             OnPointerOverLeftHandle();
@@ -205,7 +205,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     {
         Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
         float width = VisualElement.worldBound.width;
-        double xPercent = localPoint.x / width;
+        float xPercent = localPoint.x / width;
         return xPercent < handleWidthInPercent;
     }
 
@@ -213,7 +213,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     {
         Vector2 localPoint = screenPosition - VisualElement.worldBound.position;
         float width = VisualElement.worldBound.width;
-        double xPercent = localPoint.x / width;
+        float xPercent = localPoint.x / width;
         return xPercent > (1 - handleWidthInPercent);
     }
 
@@ -234,7 +234,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        // Check double click to edit lyrics
+        // Check "double click" to edit lyrics
         bool isDoubleClick = Time.time - lastClickTime < InputUtils.DoubleClickThresholdInSeconds;
         lastClickTime = Time.time;
         if (isDoubleClick)
@@ -259,7 +259,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         else if (!InputUtils.IsKeyboardControlPressed())
         {
             // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+            float positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
             songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }

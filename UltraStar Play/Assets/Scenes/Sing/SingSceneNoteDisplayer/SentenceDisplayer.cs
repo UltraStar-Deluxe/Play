@@ -65,7 +65,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         base.DisplayRecordedNote(recordedNote);
     }
 
-    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, float noteStartBeat, float noteEndBeat)
     {
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;

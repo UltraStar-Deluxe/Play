@@ -27,11 +27,11 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 
     public int MidiNote { get; set; }
 
-    // The end beat is a double here, in contrast to the RecordedNote.
+    // The end beat is a floating-point value here, in contrast to the RecordedNote.
     // This is because the UiRecordedNote is drawn smoothly from start to end of the RecordedNote using multiple frames.
     // Therefor, the resolution of start and end for UiRecordedNotes must be more fine grained than whole beats.
     public int StartBeat { get; set; }
-    public double EndBeat { get; set; }
+    public float EndBeat { get; set; }
     public int TargetEndBeat { get; set; }
     public float LifeTimeInSeconds { get; set; }
 

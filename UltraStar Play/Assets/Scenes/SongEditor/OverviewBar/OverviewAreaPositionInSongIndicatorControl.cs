@@ -17,13 +17,13 @@ public class OverviewAreaPositionInSongIndicatorControl : INeedInjection, IInjec
         songAudioPlayer.PositionInSongEventStream.Subscribe(SetPositionInSongInMillis);
     }
 
-    private void SetPositionInSongInMillis(double positionInSongInMillis)
+    private void SetPositionInSongInMillis(float positionInSongInMillis)
     {
-        double positionInSongInPercent = positionInSongInMillis / songAudioPlayer.DurationOfSongInMillis;
+        float positionInSongInPercent = positionInSongInMillis / songAudioPlayer.DurationOfSongInMillis;
         UpdatePosition(positionInSongInPercent);
     }
 
-    private void UpdatePosition(double positionInSongInPercent)
+    private void UpdatePosition(float positionInSongInPercent)
     {
         float xPercent = (float)positionInSongInPercent;
         overviewAreaPositionInSongIndicator.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));

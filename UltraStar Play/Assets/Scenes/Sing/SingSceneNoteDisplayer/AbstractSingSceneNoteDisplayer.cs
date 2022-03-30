@@ -47,7 +47,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected LineDisplayer lineDisplayer;
 
-    protected double beatsPerSecond;
+    protected float beatsPerSecond;
 
     protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new Dictionary<Note, TargetNoteControl>();
     protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new Dictionary<RecordedNote, List<RecordedNoteControl>>();
@@ -68,7 +68,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     private bool displayRoundedAndActualRecordedNotes;
     private bool showPitchOfNotes;
 
-    protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+    protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, float noteStartBeat, float noteEndBeat);
 
     public virtual void OnInjectionFinished()
     {

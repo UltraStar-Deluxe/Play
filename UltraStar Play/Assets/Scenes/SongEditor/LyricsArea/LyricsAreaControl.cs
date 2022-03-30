@@ -213,7 +213,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         Note note = GetNoteForCaretPosition(textField.text, textField.cursorIndex);
         if (note != null)
         {
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            float positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
             songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }

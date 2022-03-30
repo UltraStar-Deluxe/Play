@@ -8,7 +8,7 @@ public class SongEditorSceneData : SceneData
     public SceneData PreviousSceneData { get; set; }
 
     public SongMeta SelectedSongMeta { get; set; }
-    public double PositionInSongInMillis { get; set; }
+    public float PositionInSongInMillis { get; set; }
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new List<PlayerProfile>();
     public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new PlayerProfileToMicProfileMap();
 }

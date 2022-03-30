@@ -436,7 +436,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private void UpdateSongDurationLabel(double durationInMillis)
+    private void UpdateSongDurationLabel(float durationInMillis)
     {
         int min = (int)Math.Floor(durationInMillis / 1000 / 60);
         int seconds = (int)Math.Floor((durationInMillis / 1000) % 60);

@@ -33,7 +33,7 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
             UpdateNextBeatToAnalyze(previousAndCurrentPositionInSongInMillis.Current));
     }
 
-    private void UpdateNextBeatToAnalyze(double positionInSongInMillis)
+    private void UpdateNextBeatToAnalyze(float positionInSongInMillis)
     {
         nextBeatToAnalyze = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
     }

@@ -74,7 +74,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
 
         // Use a minimum width of 0.5% such that the issue is not overlooked
         int lengthInMillis = endMillis - startMillis;
-        double lengthInPercent = (double)lengthInMillis / songDurationInMillis;
+        float lengthInPercent = (float)lengthInMillis / songDurationInMillis;
         if (lengthInPercent < 0.005)
         {
             endMillis = (int)(startMillis + songDurationInMillis * 0.005);

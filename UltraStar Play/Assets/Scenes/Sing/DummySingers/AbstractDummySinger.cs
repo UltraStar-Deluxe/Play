@@ -76,12 +76,12 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         playerControl.MicSampleRecorder.enabled = false;
     }
 
-    protected double GetBeatDelayedByMicDelay(int beat)
+    protected float GetBeatDelayedByMicDelay(int beat)
     {
-        double micDelayInBeats = (playerControl.MicProfile == null)
+        float micDelayInBeats = (playerControl.MicProfile == null)
             ? 0
             : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerControl.MicProfile.DelayInMillis);
-        double delayedBeat = beat - micDelayInBeats;
+        float delayedBeat = beat - micDelayInBeats;
         return delayedBeat;
     }
 

@@ -205,7 +205,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private void SyncVideoPlayPause(double positionInSongInMillis)
+    private void SyncVideoPlayPause(float positionInSongInMillis)
     {
         if (!HasLoadedVideo || !videoPlayer.gameObject.activeInHierarchy)
         {
@@ -226,7 +226,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync)
+    public void SyncVideoWithMusic(float positionInSongInMillis, bool forceImmediateSync)
     {
         if (!HasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis)
             || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time))
@@ -237,8 +237,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // Both, the smooth sync and immediate sync need some time.
         nextSyncTimeInSeconds = Time.time + 0.5f;
 
-        double targetPositionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000;
-        double timeDifferenceInSeconds = targetPositionInVideoInSeconds - videoPlayer.time;
+        float targetPositionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000f;
+        float timeDifferenceInSeconds = (float)(targetPositionInVideoInSeconds - videoPlayer.time);
 
         // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
         // A big mismatch is corrected immediately.
@@ -251,13 +251,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         else
         {
             // Smooth out the time difference over a duration of 2 seconds
-            float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
+            float playbackSpeed = 1 + (timeDifferenceInSeconds / 2.0f);
             videoPlayer.playbackSpeed = playbackSpeed;
         }
     }
 
     // Returns true if still waiting for the start of the video at the given position in the song.
-    private bool IsWaitingForVideoGap(double positionInSongInMillis)
+    private bool IsWaitingForVideoGap(float positionInSongInMillis)
     {
         // A negative video gap means this duration has to be waited before playing the video.
         return SongMeta.VideoGap < 0 && positionInSongInMillis < (-SongMeta.VideoGap * 1000);

@@ -15,19 +15,19 @@ public class SongAudioPlayer : MonoBehaviour
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
-    private readonly Subject<double> playbackStoppedEventStream = new Subject<double>();
-    public IObservable<double> PlaybackStoppedEventStream => playbackStoppedEventStream;
+    private readonly Subject<float> playbackStoppedEventStream = new Subject<float>();
+    public IObservable<float> PlaybackStoppedEventStream => playbackStoppedEventStream;
 
-    private readonly Subject<double> playbackStartedEventStream = new Subject<double>();
-    public IObservable<double> PlaybackStartedEventStream => playbackStartedEventStream;
+    private readonly Subject<float> playbackStartedEventStream = new Subject<float>();
+    public IObservable<float> PlaybackStartedEventStream => playbackStartedEventStream;
 
-    private readonly Subject<double> positionInSongEventStream = new Subject<double>();
-    public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
+    private readonly Subject<float> positionInSongEventStream = new Subject<float>();
+    public IObservable<float> PositionInSongEventStream => positionInSongEventStream;
 
     private readonly Subject<AudioClip> audioClipLoadedEventStream = new Subject<AudioClip>();
     public IObservable<AudioClip> AudioClipLoadedEventStream => audioClipLoadedEventStream;
 
-    public IObservable<Pair<double>> JumpBackInSongEventStream
+    public IObservable<Pair<float>> JumpBackInSongEventStream
     {
         get
         {
@@ -35,7 +35,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public IObservable<Pair<double>> JumpForwardInSongEventStream
+    public IObservable<Pair<float>> JumpForwardInSongEventStream
     {
         get
         {
@@ -50,8 +50,8 @@ public class SongAudioPlayer : MonoBehaviour
     }
 
     // The current position in the song in milliseconds.
-    private double positionInSongInMillis;
-    public double PositionInSongInMillis
+    private float positionInSongInMillis;
+    public float PositionInSongInMillis
     {
         get
         {
@@ -66,7 +66,7 @@ public class SongAudioPlayer : MonoBehaviour
             if (positionInSongInMillisFrame != Time.frameCount)
             {
                 positionInSongInMillisFrame = Time.frameCount;
-                positionInSongInMillis = 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
+                positionInSongInMillis = 1000.0f * (float)audioPlayer.timeSamples / (float)audioPlayer.clip.frequency;
             }
             return positionInSongInMillis;
         }
@@ -78,7 +78,7 @@ public class SongAudioPlayer : MonoBehaviour
                 return;
             }
 
-            double newPositionInSongInMillis = value;
+            float newPositionInSongInMillis = value;
             if (newPositionInSongInMillis < 0)
             {
                 newPositionInSongInMillis = 0;
@@ -96,9 +96,9 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public double DurationOfSongInMillis { get; private set; }
+    public float DurationOfSongInMillis { get; private set; }
 
-    public double PositionInSongInPercent
+    public float PositionInSongInPercent
     {
         get
         {
@@ -188,7 +188,7 @@ public class SongAudioPlayer : MonoBehaviour
         if (audioClip != null)
         {
             audioPlayer.clip = audioClip;
-            DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+            DurationOfSongInMillis = 1000.0f * audioClip.samples / audioClip.frequency;
             audioClipLoadedEventStream.OnNext(audioClip);
         }
         else
@@ -221,15 +221,15 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public double GetCurrentBeat(bool allowNegativeResult)
+    public float GetCurrentBeat(bool allowNegativeResult)
     {
         if (audioPlayer.clip == null)
         {
             return 0;
         }
 
-        double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+        float millisInSong = PositionInSongInMillis;
+        float result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {

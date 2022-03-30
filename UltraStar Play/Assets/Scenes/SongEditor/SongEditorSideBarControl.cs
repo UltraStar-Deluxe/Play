@@ -212,7 +212,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         VisualElement visualElement = issueSideBarEntryUi.CloneTree().Children().First();
         issuesSideBarContainer.Add(visualElement);
 
-        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        float issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(() => GoToIssue(issue));
         visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
@@ -222,7 +222,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void GoToIssue(SongIssue issue)
     {
-        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        float issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
         songAudioPlayer.PositionInSongInMillis = issueStartPositionInMillis;
     }
 

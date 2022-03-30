@@ -22,7 +22,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     private Injector injector;
 
     private SongEditorMidiSoundPlayAlongThread thread;
-    private double positionInSongInMillisOld;
+    private float positionInSongInMillisOld;
 
     void Update()
     {

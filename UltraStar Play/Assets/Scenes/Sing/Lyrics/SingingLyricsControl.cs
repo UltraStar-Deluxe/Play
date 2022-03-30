@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -49,13 +50,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetNextSentence(playerControl.GetSentence(1));
     }
 
-    public void Update(double positionInSongInMillis)
+    public void Update(float positionInSongInMillis)
     {
         UpdateNoteHighlighting(positionInSongInMillis);
         UpdatePositionBeforeLyricsIndicator(positionInSongInMillis);
     }
 
-    private void UpdatePositionBeforeLyricsIndicator(double positionInSongInMillis)
+    private void UpdatePositionBeforeLyricsIndicator(float positionInSongInMillis)
     {
         if (CurrentSentence == null
             || CurrentSentence.Notes.IsNullOrEmpty()
@@ -65,18 +66,18 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        double previousSentenceEndInMillis = previousSentence != null
+        float previousSentenceEndInMillis = previousSentence != null
             ? BpmUtils.BeatToMillisecondsInSong(songMeta, previousSentence.ExtendedMaxBeat)
             : 0;
-        double firstNoteStartBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, CurrentSentence.MinBeat);
+        float firstNoteStartBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, CurrentSentence.MinBeat);
 
-        if (Math.Abs(firstNoteStartBeatInMillis - previousSentenceEndInMillis) < 500)
+        if (Mathf.Abs(firstNoteStartBeatInMillis - previousSentenceEndInMillis) < 500)
         {
             positionBeforeLyricsIndicator.HideByDisplay();
             return;
         }
 
-        double positionBeforeLyricsPercent = (positionInSongInMillis - previousSentenceEndInMillis)
+        float positionBeforeLyricsPercent = (positionInSongInMillis - previousSentenceEndInMillis)
                                              / (firstNoteStartBeatInMillis - previousSentenceEndInMillis);
 
         // Find start position of label
@@ -96,7 +97,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         positionBeforeLyricsIndicator.style.left = positionBeforeLyricsPx;
     }
 
-    private void UpdateNoteHighlighting(double positionInSongInMillis)
+    private void UpdateNoteHighlighting(float positionInSongInMillis)
     {
         Note currentNote = SortedNotes
             .FirstOrDefault(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis

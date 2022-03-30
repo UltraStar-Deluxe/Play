@@ -290,11 +290,11 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
                 long kiloByte = size / 1024;
                 if (kiloByte > 1024)
                 {
-                    fileSize.text = Math.Round((double)kiloByte / 1024) + " MB";
+                    fileSize.text = Math.Round((float)kiloByte / 1024) + " MB";
                 }
                 else
                 {
-                    fileSize.text = Math.Round((double)kiloByte) + " KB";
+                    fileSize.text = Math.Round((float)kiloByte) + " KB";
                 }
             }
         }

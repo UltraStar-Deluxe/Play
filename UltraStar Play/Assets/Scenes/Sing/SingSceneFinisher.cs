@@ -15,7 +15,7 @@ public class SingSceneFinisher : MonoBehaviour
 
     private SingSceneControl singSceneControl;
 
-    private double positionInSongInMillisOld;
+    private float positionInSongInMillisOld;
 
     void Awake()
     {
@@ -24,7 +24,7 @@ public class SingSceneFinisher : MonoBehaviour
 
     void Update()
     {
-        double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
+        float durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
         if (durationOfSongInMillis <= 0)
         {
             return;
@@ -40,7 +40,7 @@ public class SingSceneFinisher : MonoBehaviour
         }
         else
         {
-            double positionInSongInMillis = singSceneControl.PositionInSongInMillis;
+            float positionInSongInMillis = singSceneControl.PositionInSongInMillis;
 
             // Normal detection of song finished.
             // This only works when the position is not reset to zero when the AudioClip finishes.
@@ -62,7 +62,7 @@ public class SingSceneFinisher : MonoBehaviour
             else
             {
                 // The position is near the end of the song.
-                double missingMillis = durationOfSongInMillis - positionInSongInMillis;
+                float missingMillis = durationOfSongInMillis - positionInSongInMillis;
                 if (missingMillis < 1000)
                 {
                     hasBeenNearEndOfSong = true;

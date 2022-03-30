@@ -118,7 +118,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            float beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -155,12 +155,12 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             drawStepRough = 4;
         }
 
-        double millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
-        double labelWidthInMillis = millisPerBeat * drawStepRough;
+        float millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
+        float labelWidthInMillis = millisPerBeat * drawStepRough;
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            float beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -189,7 +189,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         return label;
     }
 
-    private void UpdateLabelPosition(Label label, double beatPosInMillis, double labelWidthInMillis)
+    private void UpdateLabelPosition(Label label, float beatPosInMillis, float labelWidthInMillis)
     {
         float widthPercent = (float)(labelWidthInMillis / noteAreaControl.ViewportWidth);
         float xPercent = (float)((beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth) - widthPercent / 2;
@@ -197,7 +197,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         label.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
     }
 
-    private void DrawVerticalGridLine(double beatPosInMillis, Color color)
+    private void DrawVerticalGridLine(float beatPosInMillis, Color color)
     {
         int width = settings.SongEditorSettings.GridSizeInDevicePixels;
         if (width <= 0)
@@ -205,7 +205,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             return;
         }
 
-        double xPercent = (beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
+        float xPercent = (float)(beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
         int fromX = (int)(xPercent * dynamicTexture.TextureWidth);
         int toX = fromX + width;
         for (int x = fromX; x < toX && x < dynamicTexture.TextureWidth; x++)

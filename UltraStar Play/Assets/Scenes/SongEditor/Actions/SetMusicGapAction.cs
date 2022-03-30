@@ -17,8 +17,8 @@ public class SetMusicGapAction : INeedInjection
 
     public void Execute()
     {
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-        songMeta.Gap = (float)positionInSongInMillis;
+        float positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+        songMeta.Gap = positionInSongInMillis;
     }
 
     public void ExecuteAndNotify()

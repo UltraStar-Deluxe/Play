@@ -3,10 +3,10 @@ using System.Globalization;
 using UniRx;
 using UnityEngine.InputSystem;
 
-public class NumberPickerControl : ComputedItemPickerControl<double>
+public class NumberPickerControl : ComputedItemPickerControl<float>
 {
-    private Func<double, string> getLabelTextFunction = item => item.ToString(CultureInfo.InvariantCulture);
-    public Func<double, string> GetLabelTextFunction
+    private Func<float, string> getLabelTextFunction = item => item.ToString(CultureInfo.InvariantCulture);
+    public Func<float, string> GetLabelTextFunction
     {
         get
         {
@@ -20,11 +20,11 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
     }
 
     public bool WrapAround => ItemPicker.wrapAround;
-    public double MinValue => ItemPicker.minValue;
-    public double MaxValue => ItemPicker.maxValue;
-    public double StepValue => ItemPicker.stepValue;
+    public float MinValue => ItemPicker.minValue;
+    public float MaxValue => ItemPicker.maxValue;
+    public float StepValue => ItemPicker.stepValue;
 
-    public NumberPickerControl(ItemPicker itemPicker, double initialValue=0)
+    public NumberPickerControl(ItemPicker itemPicker, float initialValue=0)
         : base(itemPicker, initialValue)
     {
         Selection.Subscribe(newValue => UpdateLabelText(newValue));
@@ -32,7 +32,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
 
     public override void SelectNextItem()
     {
-        double currentValue = SelectedItem;
+        float currentValue = SelectedItem;
         if (currentValue >= MaxValue)
         {
             if (WrapAround)
@@ -42,7 +42,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
             return;
         }
 
-        double nextValue = currentValue + GetModifiedStepValue();
+        float nextValue = currentValue + GetModifiedStepValue();
         if (nextValue > MaxValue)
         {
             nextValue = MaxValue;
@@ -54,7 +54,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         }
     }
 
-    private double GetModifiedStepValue()
+    private float GetModifiedStepValue()
     {
         return Keyboard.current != null
                && Keyboard.current.shiftKey.isPressed
@@ -64,7 +64,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
 
     public override void SelectPreviousItem()
     {
-        double currentValue = SelectedItem;
+        float currentValue = SelectedItem;
         if (currentValue <= MinValue)
         {
             if (WrapAround)
@@ -74,7 +74,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
             return;
         }
 
-        double nextValue = currentValue - GetModifiedStepValue();
+        float nextValue = currentValue - GetModifiedStepValue();
         if (nextValue < MinValue)
         {
             nextValue = MinValue;
@@ -91,7 +91,7 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         UpdateLabelText(SelectedItem);
     }
 
-    private void UpdateLabelText(double newValue)
+    private void UpdateLabelText(float newValue)
     {
         ItemPicker.ItemLabel.text = GetLabelTextFunction(newValue);
     }

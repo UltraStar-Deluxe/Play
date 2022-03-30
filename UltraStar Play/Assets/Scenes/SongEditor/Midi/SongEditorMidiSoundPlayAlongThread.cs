@@ -138,7 +138,7 @@ public class SongEditorMidiSoundPlayAlongThread : INeedInjection
     }
 
     // Compute the upcoming notes, i.e., the visible notes that have not yet been finished at the playback position.
-    private List<Note> GetUpcomingSortedNotes(double positionInSongInMillis)
+    private List<Note> GetUpcomingSortedNotes(float positionInSongInMillis)
     {
         List<Note> notesInSongMeta = songMeta.GetVoices()
             .Where(voice => layerManager.IsVoiceVisible(voice))

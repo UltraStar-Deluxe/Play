@@ -81,13 +81,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new SongMetaChangeEventStream();
 
-    private double positionInSongInMillisWhenPlaybackStarted;
+    private float positionInSongInMillisWhenPlaybackStarted;
 
     private readonly Dictionary<string, Color> voiceNameToColorMap = new Dictionary<string, Color>();
 
     private bool audioWaveFormInitialized;
 
-    public double StopPlaybackAfterPositionInSongInMillis { get; set; }
+    public float StopPlaybackAfterPositionInSongInMillis { get; set; }
 
     private readonly OverviewAreaControl overviewAreaControl = new OverviewAreaControl();
     private readonly VideoAreaControl videoAreaControl = new VideoAreaControl();
@@ -248,7 +248,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
 
-    private void OnAudioPlaybackStarted(double positionInSongInMillis)
+    private void OnAudioPlaybackStarted(float positionInSongInMillis)
     {
         positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
     }

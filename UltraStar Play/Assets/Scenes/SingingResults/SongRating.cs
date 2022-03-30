@@ -20,7 +20,7 @@ public class SongRating
 
     private readonly string i18nCode;
     public ESongRating EnumValue { get; private set; }
-    public double ScoreThreshold { get; private set; }
+    public float ScoreThreshold { get; private set; }
 
     public string Text
     {
@@ -52,7 +52,7 @@ public class SongRating
         }
     }
 
-    private SongRating(ESongRating eSongRating, double scoreThreshold, string i18nCode)
+    private SongRating(ESongRating eSongRating, float scoreThreshold, string i18nCode)
     {
         this.EnumValue = eSongRating;
         this.ScoreThreshold = scoreThreshold;

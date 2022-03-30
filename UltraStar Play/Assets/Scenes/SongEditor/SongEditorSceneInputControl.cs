@@ -531,8 +531,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
         int minBeat = notes.Select(it => it.StartBeat).Min();
         int maxBeat = notes.Select(it => it.EndBeat).Max();
-        double maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
-        double minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
+        float maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
+        float minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
         songEditorSceneControl.StopPlaybackAfterPositionInSongInMillis = maxMillis;
         songAudioPlayer.PositionInSongInMillis = minMillis;
         songAudioPlayer.PlayAudio();

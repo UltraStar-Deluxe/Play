@@ -113,8 +113,8 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
     private void ScrollToPointer(IPointerEvent evt)
     {
-        double xPercent = evt.localPosition.x / overviewArea.contentRect.width;
-        double positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
+        float xPercent = evt.localPosition.x / overviewArea.contentRect.width;
+        float positionInSongInMillis = songAudioPlayer.DurationOfSongInMillis * xPercent;
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
     }
 }

@@ -22,18 +22,18 @@ public class OverviewAreaViewportIndicatorControl : INeedInjection, IInjectionFi
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
     {
-        double viewportStartInMillis = viewportEvent.X;
-        double viewportEndInMillis = viewportEvent.X + viewportEvent.Width;
-        double startPercent = viewportStartInMillis / songAudioPlayer.DurationOfSongInMillis;
-        double endPercent = viewportEndInMillis / songAudioPlayer.DurationOfSongInMillis;
+        float viewportStartInMillis = viewportEvent.X;
+        float viewportEndInMillis = viewportEvent.X + viewportEvent.Width;
+        float startPercent = viewportStartInMillis / songAudioPlayer.DurationOfSongInMillis;
+        float endPercent = viewportEndInMillis / songAudioPlayer.DurationOfSongInMillis;
 
         UpdatePositionAndWidth(startPercent, endPercent);
     }
 
-    private void UpdatePositionAndWidth(double startPercent, double endPercent)
+    private void UpdatePositionAndWidth(float startPercent, float endPercent)
     {
-        float xMinPercent = (float)startPercent;
-        float widthPercent = (float)(endPercent - startPercent);
+        float xMinPercent = startPercent;
+        float widthPercent = endPercent - startPercent;
 
         overviewAreaViewportIndicator.style.left = new StyleLength(new Length(xMinPercent * 100, LengthUnit.Percent));
         overviewAreaViewportIndicator.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));

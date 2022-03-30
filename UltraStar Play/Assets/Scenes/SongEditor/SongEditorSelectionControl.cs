@@ -247,7 +247,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
             if (updatePositionInSong)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
+                float noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
             }
 
@@ -305,7 +305,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
             if (updatePositionInSong)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
+                float noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
             }
 
