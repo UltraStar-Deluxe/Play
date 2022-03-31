@@ -14,7 +14,7 @@ public static class MapExtensions
         }
         else
         {
-            List<V> newList = new List<V>();
+            List<V> newList = new();
             newList.Add(newValue);
             map.Add(key, newList);
         }

@@ -26,7 +26,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.playerScrollView)]
     public VisualElement playerScrollView;
 
-    private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new List<SongSelectPlayerEntryControl>();
+    private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
     public List<SongSelectPlayerEntryControl> PlayerEntryControlControls => playerEntryControls;
 
     [Inject]
@@ -183,7 +183,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     public PlayerProfileToMicProfileMap GetSelectedPlayerProfileToMicProfileMap()
     {
-        PlayerProfileToMicProfileMap result = new PlayerProfileToMicProfileMap();
+        PlayerProfileToMicProfileMap result = new();
         playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected && entry.MicProfile != null)
@@ -196,7 +196,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceNameMap()
     {
-        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new Dictionary<PlayerProfile,string>();
+        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new();
         playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected)
@@ -212,7 +212,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     public void ToggleSelectedPlayers()
     {
-        List<SongSelectPlayerEntryControl> deselectedEntries = new List<SongSelectPlayerEntryControl>();
+        List<SongSelectPlayerEntryControl> deselectedEntries = new();
         // First deactivate the selected ones to make their mics available for others.
         playerEntryControls.ForEach(entry =>
         {

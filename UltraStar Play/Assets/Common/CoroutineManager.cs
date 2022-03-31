@@ -13,7 +13,7 @@ public class CoroutineManager : MonoBehaviour
         }
     }
 
-    public List<IEnumerator> CoroutinesInProgress { get; private set; } = new List<IEnumerator>();
+    public List<IEnumerator> CoroutinesInProgress { get; private set; } = new();
 
     /**
      * Starts a coroutine that will also be execute even when in Edit Mode.

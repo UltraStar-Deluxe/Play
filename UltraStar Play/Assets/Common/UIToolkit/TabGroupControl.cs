@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
  */
 public class TabGroupControl
 {
-    private readonly Dictionary<Button, VisualElement> buttonToContainerMap = new Dictionary<Button, VisualElement>();
+    private readonly Dictionary<Button, VisualElement> buttonToContainerMap = new();
 
     public bool IsAnyContainerVisible => buttonToContainerMap.Values.AnyMatch(it => it.IsVisibleByDisplay());
     public bool AllowNoContainerVisible { get; set; }

@@ -24,7 +24,7 @@ public static class SelectGameObjectsWithMissingScripts
 
     public static void SelectGameObjectsWithMissingScriptsRecursively(GameObject[] rootObjects)
     {
-        List<UnityEngine.Object> objectsWithDeadLinks = new List<UnityEngine.Object>();
+        List<UnityEngine.Object> objectsWithDeadLinks = new();
         foreach (GameObject rootObject in rootObjects)
         {
             FindGameObjectsWithMissingScriptsRecursively(rootObject, objectsWithDeadLinks);

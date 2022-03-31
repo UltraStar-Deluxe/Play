@@ -82,7 +82,7 @@ public class SongEditorMidiFileImporter : INeedInjection
 
     private List<Note> LoadNotesFromMidiFile(string midiFilePath)
     {
-        List<Note> loadedNotes = new List<Note>();
+        List<Note> loadedNotes = new();
 
         MidiFile midiFile = midiManager.LoadMidiFile(midiFilePath);
         if (midiFile == null)
@@ -90,7 +90,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             throw new UnityException("Loading midi file failed.");
         }
 
-        Dictionary<int, Note> midiPitchToNoteUnderConstruction = new Dictionary<int, Note>();
+        Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
         midiFile.Tracks.ForEach(track =>
         {
             midiPitchToNoteUnderConstruction.Clear();
@@ -139,7 +139,7 @@ public class SongEditorMidiFileImporter : INeedInjection
     {
         int midiPitch = midiEvent.parameter1;
         int deltaTimeInMillis = GetDeltaTimeInMillis(midiEvent);
-        Note newNote = new Note();
+        Note newNote = new();
         int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
         newNote.SetStartAndEndBeat(startBeat, startBeat);
         newNote.SetMidiNote(midiPitch);

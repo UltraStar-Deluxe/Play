@@ -17,7 +17,7 @@ public class Sentence : ISerializationCallbackReceiver
     // Must be greater than the MaxBeat and smaller or equal to the MinBeat of the following sentence.
     public int LinebreakBeat { get; private set; }
 
-    private readonly NoteHashSet notes = new NoteHashSet();
+    private readonly NoteHashSet notes = new();
     public IReadOnlyCollection<Note> Notes { get { return notes; } }
 
     // The following fields are computed from the list of notes.
@@ -200,14 +200,14 @@ public class Sentence : ISerializationCallbackReceiver
 
     public Sentence CloneDeep()
     {
-        List<Note> notesCopy = new List<Note>();
+        List<Note> notesCopy = new();
         foreach (Note note in notes)
         {
             Note noteCopy = note.Clone();
             notesCopy.Add(noteCopy);
         }
 
-        Sentence clone = new Sentence(notesCopy, LinebreakBeat);
+        Sentence clone = new(notesCopy, LinebreakBeat);
         return clone;
     }
 

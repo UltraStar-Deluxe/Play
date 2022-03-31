@@ -56,13 +56,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     [ReadOnly]
     public int usedJokerCount;
 
-    private readonly Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new Subject<BeatAnalyzedEvent>();
+    private readonly Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new();
     public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream => beatAnalyzedEventStream;
 
-    private readonly Subject<NoteAnalyzedEvent> noteAnalyzedEventStream = new Subject<NoteAnalyzedEvent>();
+    private readonly Subject<NoteAnalyzedEvent> noteAnalyzedEventStream = new();
     public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream => noteAnalyzedEventStream;
 
-    private readonly Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new Subject<SentenceAnalyzedEvent>();
+    private readonly Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new();
     public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
 
     void Start()

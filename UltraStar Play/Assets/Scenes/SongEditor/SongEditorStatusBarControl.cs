@@ -66,7 +66,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
         songAudioPlayer.PositionInSongEventStream
             .Subscribe(millis =>
             {
-                TimeSpan timeSpan = new TimeSpan(0, 0, 0, 0, (int)millis);
+                TimeSpan timeSpan = new(0, 0, 0, 0, (int)millis);
                 statusBarPositionInfoLabel.text = $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";
             });
 

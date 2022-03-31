@@ -9,7 +9,7 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
     {
     }
 
-    private List<T> items = new List<T>();
+    private List<T> items = new();
     public List<T> Items
     {
         get

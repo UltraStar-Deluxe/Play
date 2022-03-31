@@ -26,7 +26,7 @@ public static class MidiUtils
 
     private static Dictionary<int, string> CreateMidiNoteToAbsoluteNameMap()
     {
-        Dictionary<int, string> result = new Dictionary<int, string>();
+        Dictionary<int, string> result = new();
         for (int midiNote = 21; midiNote <= 127; midiNote++)
         {
             result.Add(midiNote, GetAbsoluteName(midiNote));

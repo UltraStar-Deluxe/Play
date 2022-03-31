@@ -12,7 +12,7 @@ public class VoicesBuilder
     private Sentence currentSentence;
     private bool endFound;
 
-    private readonly Dictionary<string, Voice> voiceNameToVoiceMap = new Dictionary<string, Voice>();
+    private readonly Dictionary<string, Voice> voiceNameToVoiceMap = new();
 
     private readonly bool isRelativeSongFile;
     // The last beat is only relevant for relative song files. Any beat will be relative to this.

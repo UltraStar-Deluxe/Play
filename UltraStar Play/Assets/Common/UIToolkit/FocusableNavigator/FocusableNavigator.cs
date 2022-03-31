@@ -28,10 +28,10 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
     public VisualElement FocusedVisualElement => uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
     protected VisualElement lastFocusedVisualElement;
 
-    protected readonly Subject<NoNavigationTargetFoundEvent> noNavigationTargetFoundEventStream = new Subject<NoNavigationTargetFoundEvent>();
+    protected readonly Subject<NoNavigationTargetFoundEvent> noNavigationTargetFoundEventStream = new();
     public IObservable<NoNavigationTargetFoundEvent> NoNavigationTargetFoundEventStream => noNavigationTargetFoundEventStream;
 
-    protected readonly Subject<NoSubmitTargetFoundEvent> noSubmitTargetFoundEventStream = new Subject<NoSubmitTargetFoundEvent>();
+    protected readonly Subject<NoSubmitTargetFoundEvent> noSubmitTargetFoundEventStream = new();
     public IObservable<NoSubmitTargetFoundEvent> NoSubmitTargetFoundEventStream => noSubmitTargetFoundEventStream;
 
     public virtual void Start()

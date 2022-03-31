@@ -6,7 +6,7 @@ public class CompareVersionStringTest
     [Test]
     public void CompareVersionStringTestMethod()
     {
-        Dictionary<string, string> smallVersionToBigVersion = new Dictionary<string, string>
+        Dictionary<string, string> smallVersionToBigVersion = new()
         {
             {"5", "20"},
             {"1.1.1", "1.1.2"},

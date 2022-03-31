@@ -15,14 +15,15 @@ public static class SongMetaBuilder
             string directory = new FileInfo(path).Directory.FullName;
             string filename = new FileInfo(path).Name;
 
-            Dictionary<string, string> requiredFields = new Dictionary<string, string>{
+            Dictionary<string, string> requiredFields = new()
+            {
                 {"artist", null},
                 {"bpm", null},
                 {"mp3", null},
                 {"title", null}
             };
-            Dictionary<string, string> voiceNames = new Dictionary<string, string>();
-            Dictionary<string, string> otherFields = new Dictionary<string, string>();
+            Dictionary<string, string> voiceNames = new();
+            Dictionary<string, string> otherFields = new();
 
             uint lineNumber = 0;
             while (!finishedHeaders && !reader.EndOfStream)
@@ -120,7 +121,7 @@ public static class SongMetaBuilder
             }
 
             //Read the song file body
-            StringBuilder songBody = new StringBuilder();
+            StringBuilder songBody = new();
             string bodyLine;
             while ((bodyLine = reader.ReadLine()) != null)
             {
@@ -132,7 +133,7 @@ public static class SongMetaBuilder
 
             try
             {
-                SongMeta res = new SongMeta(
+                SongMeta res = new(
                     directory,
                     filename,
                     songHash,

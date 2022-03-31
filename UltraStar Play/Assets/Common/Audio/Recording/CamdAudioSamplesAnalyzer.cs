@@ -16,7 +16,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     private readonly float[] correlation = new float[NumHalftones];
 
     private readonly CamdPitchCandidate[] currentCandidates = new CamdPitchCandidate[3];
-    private readonly CircularBuffer<CamdPitchCandidate> candidateHistory = new CircularBuffer<CamdPitchCandidate>(2);
+    private readonly CircularBuffer<CamdPitchCandidate> candidateHistory = new(2);
 
     // The best candidate from the currentCandidates and candidateHistory
     private CamdPitchCandidate bestCandidate;
