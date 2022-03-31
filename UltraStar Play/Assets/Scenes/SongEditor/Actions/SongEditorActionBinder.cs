@@ -9,7 +9,7 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
 {
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindTypeToNewInstances(typeof(DeleteNotesAction));
         bb.BindTypeToNewInstances(typeof(SplitNotesAction));
         bb.BindTypeToNewInstances(typeof(MergeNotesAction));

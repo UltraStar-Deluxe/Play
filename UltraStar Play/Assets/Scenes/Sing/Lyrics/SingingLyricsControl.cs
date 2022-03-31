@@ -13,7 +13,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private const float SpaceWidthInPx = 8;
 
     public Sentence CurrentSentence { get; private set; }
-    public List<Note> SortedNotes { get; private set; } = new List<Note>();
+    public List<Note> SortedNotes { get; private set; } = new();
 
     [Inject(UxmlName = R.UxmlNames.currentSentenceContainer)]
     private VisualElement currentSentenceContainer;
@@ -34,7 +34,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private SongMeta songMeta;
 
     private Sentence previousSentence;
-    private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new Dictionary<Note, Label>();
+    private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
 
     public void OnInjectionFinished()
     {
@@ -180,7 +180,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 ? $"<i>{note.Text.Trim()}</i>"
                 : note.Text.Trim();
 
-            Label label = new Label(richText);
+            Label label = new(richText);
             label.enableRichText = true;
 
             if (note.Text.StartsWith(" "))

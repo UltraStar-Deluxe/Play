@@ -3,8 +3,8 @@ using System.Linq;
 
 public class UltraStarPlaylist
 {
-    private readonly List<UltraStartPlaylistLineEntry> lineEntries = new List<UltraStartPlaylistLineEntry>();
-    private readonly HashSet<string> songHashes = new HashSet<string>();
+    private readonly List<UltraStartPlaylistLineEntry> lineEntries = new();
+    private readonly HashSet<string> songHashes = new();
 
     public string[] GetLines()
     {

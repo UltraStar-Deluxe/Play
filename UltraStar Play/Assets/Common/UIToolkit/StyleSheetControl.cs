@@ -59,7 +59,7 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        Dictionary<string, StyleSheet> themeNameToStyleSheet = new Dictionary<string, StyleSheet>();
+        Dictionary<string, StyleSheet> themeNameToStyleSheet = new();
         themeNameToStyleSheet.Add("RedTheme", redThemeStyleSheet);
 
         themeNameToStyleSheet.ForEach(entry =>

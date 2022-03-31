@@ -53,7 +53,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
 
     private DetectBpmControl detectBpmControl;
 
-    private readonly List<SongPropertyInputControl> songPropertyInputControls = new List<SongPropertyInputControl>();
+    private readonly List<SongPropertyInputControl> songPropertyInputControls = new();
 
     public void OnInjectionFinished()
     {

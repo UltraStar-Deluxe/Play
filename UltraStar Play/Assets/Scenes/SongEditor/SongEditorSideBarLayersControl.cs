@@ -33,7 +33,7 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
-    private readonly List<EditorLayerInputControl> editorLayerInputControls = new List<EditorLayerInputControl>();
+    private readonly List<EditorLayerInputControl> editorLayerInputControls = new();
 
     public void OnInjectionFinished()
     {

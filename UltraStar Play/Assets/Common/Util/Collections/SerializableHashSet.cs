@@ -9,9 +9,9 @@ using UnityEngine;
 public class SerializableHashSet<T> : ISerializationCallbackReceiver, ICollection<T>, IReadOnlyCollection<T>, ISet<T>
 {
     [SerializeField]
-    private List<T> valueList = new List<T>();
+    private List<T> valueList = new();
 
-    private HashSet<T> hashSet = new HashSet<T>();
+    private HashSet<T> hashSet = new();
 
     // Save values in HashSet to List
     public void OnBeforeSerialize()

@@ -172,7 +172,7 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     {
         VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree();
         dialogRootVisualElement.AddToClassList("overlay");
-        NewVersionDialog newVersionDialog = new NewVersionDialog(dialogRootVisualElement,
+        NewVersionDialog newVersionDialog = new(dialogRootVisualElement,
             uiDocument.rootVisualElement.Children().First(),
             remoteVersionProperties);
         injector.WithRootVisualElement(dialogRootVisualElement).Inject(newVersionDialog);

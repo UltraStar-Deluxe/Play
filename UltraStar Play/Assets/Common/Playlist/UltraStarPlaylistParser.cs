@@ -9,7 +9,7 @@ public static class UltraStarPlaylistParser
 
     public static UltraStarPlaylist ParseFile(string path)
     {
-        UltraStarPlaylist playlist = new UltraStarPlaylist();
+        UltraStarPlaylist playlist = new();
         string[] lines = File.ReadAllLines(path);
         for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
         {
@@ -45,8 +45,8 @@ public static class UltraStarPlaylistParser
             // Add this character either to the artist or title, depending on the targetToken.
             Token targetToken = Token.Artist;
             bool insideQuote = false;
-            StringBuilder artistBuilder = new StringBuilder(line.Length);
-            StringBuilder titleBuilder = new StringBuilder(line.Length);
+            StringBuilder artistBuilder = new(line.Length);
+            StringBuilder titleBuilder = new(line.Length);
             char lastChar = '0';
             foreach (char c in line)
             {

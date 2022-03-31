@@ -15,7 +15,7 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
 
     private readonly Action action;
 
-    private readonly Subject<bool> itemTriggeredEventStream = new Subject<bool>();
+    private readonly Subject<bool> itemTriggeredEventStream = new();
     public IObservable<bool> ItemTriggeredEventStream => itemTriggeredEventStream;
 
     public ContextMenuItemControl(string text, Action action)

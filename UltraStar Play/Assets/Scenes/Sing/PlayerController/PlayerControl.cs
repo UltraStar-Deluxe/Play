@@ -36,11 +36,11 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
 
-    private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new Subject<EnterSentenceEvent>();
+    private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
     // The sorted sentences of the Voice
-    public List<Sentence> SortedSentences { get; private set; } = new List<Sentence>();
+    public List<Sentence> SortedSentences { get; private set; } = new();
 
     [Inject]
     private Injector injector;

@@ -21,7 +21,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     [InjectedInInspector]
     public bool showRouletteItemPlaceholders;
 
-    public SlotListControl SlotListControl { get; private set; } = new SlotListControl();
+    public SlotListControl SlotListControl { get; private set; } = new();
 
     [Inject]
     private Injector injector;
@@ -38,17 +38,17 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.songEntryPlaceholder)]
     private List<VisualElement> songEntryPlaceholders;
 
-    private List<SongEntryPlaceholderControl> songEntryPlaceholderControls = new List<SongEntryPlaceholderControl>();
+    private List<SongEntryPlaceholderControl> songEntryPlaceholderControls = new();
 
-    private List<SongEntryPlaceholderControl> activeEntryPlaceholders = new List<SongEntryPlaceholderControl>();
+    private List<SongEntryPlaceholderControl> activeEntryPlaceholders = new();
     private SongEntryPlaceholderControl centerItem;
 
-    private List<SongMeta> songs = new List<SongMeta>();
+    private List<SongMeta> songs = new();
     public IReadOnlyList<SongMeta> Songs => songs;
 
     public IReactiveProperty<SongSelection> Selection { get; private set; } = new ReactiveProperty<SongSelection>();
 
-    private readonly Subject<SongSelection> selectionClickedEventStream = new Subject<SongSelection>();
+    private readonly Subject<SongSelection> selectionClickedEventStream = new();
     public IObservable<SongSelection> SelectionClickedEventStream => selectionClickedEventStream;
 
     public int SongEntryPlaceholderCount => songEntryPlaceholderControls.Count;
@@ -69,7 +69,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         }
     }
     
-    private readonly List<SongEntryControl> songEntryControls = new List<SongEntryControl>();
+    private readonly List<SongEntryControl> songEntryControls = new();
     public IReadOnlyList<SongEntryControl> SongEntryControls => songEntryControls;
     public SongEntryControl SelectedSongEntryControl => songEntryControls
         .FirstOrDefault(it => it.SongMeta == Selection.Value.SongMeta);
@@ -136,7 +136,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void OnSongRouletteItemChangedSlot(SlotChangeEvent slotChangeEvent)
     {
-        List<SongEntryPlaceholderControl> activePlaceholderControlsSortedByPosition = new List<SongEntryPlaceholderControl>(activeEntryPlaceholders);
+        List<SongEntryPlaceholderControl> activePlaceholderControlsSortedByPosition = new(activeEntryPlaceholders);
         activePlaceholderControlsSortedByPosition.Sort(SongEntryPlaceholderControl.comparerByPosition);
 
         int newSelectedSongIndex = SelectedSongIndex;
@@ -207,7 +207,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void SpawnAndRemoveSongRouletteItems()
     {
-        List<SongEntryControl> usedSongRouletteItems = new List<SongEntryControl>();
+        List<SongEntryControl> usedSongRouletteItems = new();
 
         // Spawn roulette items for songs to be displayed (i.e. selected song and its surrounding songs)
         foreach (SongEntryPlaceholderControl placeholderControl in activeEntryPlaceholders)
@@ -248,7 +248,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     {
         // Find initial position outside of screen
         SongEntryPlaceholderControl initialPositionPlaceholderControl = placeholderControl;
-        List<SongEntryPlaceholderControl> placeholderControlsSortedByPosition = new List<SongEntryPlaceholderControl>(songEntryPlaceholderControls);
+        List<SongEntryPlaceholderControl> placeholderControlsSortedByPosition = new(songEntryPlaceholderControls);
         placeholderControlsSortedByPosition.Sort(SongEntryPlaceholderControl.comparerByPosition);
         if (placeholderControl.GetPosition().x > centerItem.GetPosition().x)
         {
@@ -261,7 +261,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         Vector2 initialPosition = initialPositionPlaceholderControl.GetPosition();
         Vector2 initialSize = initialPositionPlaceholderControl.GetSize();
 
-        SongEntryControl item = new SongEntryControl(
+        SongEntryControl item = new(
             songEntryUi.CloneTree().Children().FirstOrDefault(),
             placeholderControl,
             initialPosition,

@@ -42,7 +42,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
 
     private bool needsRefresh;
 
-    private readonly List<CharacterQuickJumpCharacterControl> characterQuickJumpEntryControls = new List<CharacterQuickJumpCharacterControl>();
+    private readonly List<CharacterQuickJumpCharacterControl> characterQuickJumpEntryControls = new();
     private List<CharacterQuickJumpCharacterControl> EnabledCharacterQuickJumpEntryControls => characterQuickJumpEntryControls
         .Where(it => it.Enabled)
         .ToList();
@@ -145,7 +145,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
     private void CreateCharacter(char character)
     {
         VisualElement visualElement = characterUi.CloneTree().Children().FirstOrDefault();
-        CharacterQuickJumpCharacterControl characterQuickJumpCharacterControl = new CharacterQuickJumpCharacterControl(visualElement, character);
+        CharacterQuickJumpCharacterControl characterQuickJumpCharacterControl = new(visualElement, character);
         injector.WithRootVisualElement(visualElement)
             .Inject(characterQuickJumpCharacterControl);
 

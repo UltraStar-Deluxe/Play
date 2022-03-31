@@ -33,9 +33,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDocument;
     
-    private readonly NoteHashSet selectedNotes = new NoteHashSet();
+    private readonly NoteHashSet selectedNotes = new();
 
-    private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new Subject<NoteSelectionChangeEvent>();
+    private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
     public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
 
     public List<Note> GetSelectedNotes()
@@ -349,7 +349,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return new List<EditorNoteControl>();
         }
 
-        List<EditorNoteControl> sortedUiNote = new List<EditorNoteControl>(editorNoteDisplayer.EditorNoteControls);
+        List<EditorNoteControl> sortedUiNote = new(editorNoteDisplayer.EditorNoteControls);
         sortedUiNote.Sort(EditorNoteControl.comparerByStartBeat);
         return sortedUiNote;
     }

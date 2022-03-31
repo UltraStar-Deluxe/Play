@@ -41,7 +41,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     protected VisualElement effectsContainer;
 
-    private readonly List<StarParticleControl> starControls = new List<StarParticleControl>();
+    private readonly List<StarParticleControl> starControls = new();
 
     public TargetNoteControl(VisualElement effectsContainer)
     {
@@ -113,7 +113,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         float noteHeight = VisualElement.style.height.value.value;
         float xPercent = VisualElement.style.left.value.value + Random.Range(0, noteWidth);
         float yPercent = VisualElement.style.top.value.value + Random.Range(noteHeight * 0.9f, 0);
-        Vector2 pos = new Vector2(xPercent, yPercent);
+        Vector2 pos = new(xPercent, yPercent);
         starControl.SetPosition(pos);
         starControl.Rotation = Random.Range(0, 360);
 
@@ -151,7 +151,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         star.style.marginLeft = -25;
         float xPercent = VisualElement.style.left.value.value + VisualElement.style.width.value.value;
         float yPercent = VisualElement.style.top.value.value - VisualElement.style.height.value.value / 4f;
-        Vector2 pos = new Vector2(xPercent, yPercent);
+        Vector2 pos = new(xPercent, yPercent);
         starControl.SetPosition(pos);
         starControl.Rotation = Random.Range(0, 360);
 

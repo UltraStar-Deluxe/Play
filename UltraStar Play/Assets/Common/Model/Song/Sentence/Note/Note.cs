@@ -49,7 +49,7 @@ public class Note
 
     public Note Clone()
     {
-        Note clone = new Note();
+        Note clone = new();
         clone.CopyValues(this);
         return clone;
     }

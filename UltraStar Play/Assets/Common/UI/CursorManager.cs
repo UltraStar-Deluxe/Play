@@ -18,7 +18,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
     // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
     // Upper-left corner in the texture is coordinate (0,0).
     private static readonly Vector2 cursorTopLeftCorner = Vector2.zero;
-    private static readonly Vector2 cursorCenter = new Vector2(cursorWidth / 2f, cursorWidth / 2f);
+    private static readonly Vector2 cursorCenter = new(cursorWidth / 2f, cursorWidth / 2f);
 
     [Inject]
     private SettingsManager settingsManager;

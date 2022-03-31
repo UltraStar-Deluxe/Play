@@ -14,7 +14,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
     [Inject]
     private NoteAreaControl noteAreaControl;
 
-    private readonly Subject<IReadOnlyCollection<SongIssue>> issuesEventStream = new Subject<IReadOnlyCollection<SongIssue>>();
+    private readonly Subject<IReadOnlyCollection<SongIssue>> issuesEventStream = new();
     public IObservable<IReadOnlyCollection<SongIssue>> IssuesEventStream => issuesEventStream;
 
     private int lastIssueCount;

@@ -7,7 +7,7 @@ public static class TxtReader
     public static Encoding GuessFileEncoding(string srcFile)
     {
         byte[] buffer = new byte[5];
-        FileStream file = new FileStream(srcFile, FileMode.Open, FileAccess.Read);
+        FileStream file = new(srcFile, FileMode.Open, FileAccess.Read);
         file.Read(buffer, 0, 5);
         file.Close();
         if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
@@ -36,7 +36,7 @@ public static class TxtReader
             throw new UnityException($"Can not read file. No file exists in specified path: {path}");
         }
         Encoding guessedEncoding = (enc ?? GuessFileEncoding(path));
-        StreamReader reader = new StreamReader(path, guessedEncoding, true);
+        StreamReader reader = new(path, guessedEncoding, true);
         return reader;
     }
 }

@@ -539,7 +539,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private SingSceneData CreateSingSceneData(SongMeta songMeta)
     {
-        SingSceneData singSceneData = new SingSceneData();
+        SingSceneData singSceneData = new();
         singSceneData.SelectedSongMeta = songMeta;
 
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
@@ -566,7 +566,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSongEditorScene(SongMeta songMeta)
     {
-        SongEditorSceneData editorSceneData = new SongEditorSceneData();
+        SongEditorSceneData editorSceneData = new();
         editorSceneData.SelectedSongMeta = songMeta;
 
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
@@ -773,7 +773,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(songRouletteControl);
@@ -943,7 +943,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         Label CreateSongDetailLabel(string fieldName, object fieldValue)
         {
-            Label label = new Label();
+            Label label = new();
             label.enableRichText = true;
             label.AddToClassList("songDetailOverlayLabel");
             string fieldValueDisplayString = fieldValue?.ToString();
@@ -978,7 +978,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
             if (voiceNameKey != Voice.soloVoiceName)
             {
-                Label voiceNameLabel = new Label();
+                Label voiceNameLabel = new();
                 voiceNameLabel.enableRichText = true;
                 voiceNameLabel.AddToClassList("songDetailOverlayLabel");
                 string voiceName = songMeta.VoiceNames[voiceNameKey];
@@ -989,7 +989,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 songDetailOverlayScrollView.Add(voiceNameLabel);
             }
 
-            Label lyricsLabel = new Label();
+            Label lyricsLabel = new();
             lyricsLabel.AddToClassList("songDetailOverlayLabel");
             lyricsLabel.text = lyrics;
 

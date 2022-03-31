@@ -52,14 +52,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private DynamicTexture sentenceLinesDynamicTexture;
 
-    private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new Dictionary<Voice, List<Sentence>>();
+    private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new();
 
     private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
-    private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new Dictionary<Note, EditorNoteControl>();
+    private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new();
     public IReadOnlyCollection<EditorNoteControl> EditorNoteControls => noteToControlMap.Values;
 
-    private readonly Dictionary<Sentence, EditorSentenceControl> sentenceToControlMap = new Dictionary<Sentence, EditorSentenceControl>();
+    private readonly Dictionary<Sentence, EditorSentenceControl> sentenceToControlMap = new();
     public IReadOnlyCollection<EditorSentenceControl> EditorSentenceControls => sentenceToControlMap.Values;
 
     private int lastFullUpdateFrame;
@@ -194,7 +194,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         IEnumerable<Voice> voices = songMeta.GetVoices();
         foreach (Voice voice in voices)
         {
-            List<Sentence> sortedSentences = new List<Sentence>(voice.Sentences);
+            List<Sentence> sortedSentences = new(voice.Sentences);
             sortedSentences.Sort(Sentence.comparerByStartBeat);
             voiceToSortedSentencesMap.Add(voice, sortedSentences);
         }

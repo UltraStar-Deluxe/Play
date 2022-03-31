@@ -28,7 +28,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
 
     protected BackslashReplacingTextFieldControl backslashReplacingTextFieldControl;
 
-    private readonly Subject<string> submitValueEventStream = new Subject<string>();
+    private readonly Subject<string> submitValueEventStream = new();
     public IObservable<string> SubmitValueEventStream => submitValueEventStream;
 
     public Func<string, ValueInputDialogValidationResult> ValidateValueCallback { get; set; } = DefaultValidateValueCallback;

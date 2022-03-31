@@ -34,10 +34,10 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorLayerManager layerManager;
 
-    private List<Note> selectedNotes = new List<Note>();
-    private List<Note> followingNotes = new List<Note>();
+    private List<Note> selectedNotes = new();
+    private List<Note> followingNotes = new();
 
-    private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new Dictionary<Note, Note>();
+    private readonly Dictionary<Note, Note> noteToSnapshotOfNoteMap = new();
     private bool isCanceled;
 
     private DragAction dragAction;
