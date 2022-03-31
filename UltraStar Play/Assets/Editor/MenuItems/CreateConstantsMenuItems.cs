@@ -9,7 +9,8 @@ using UnityEngine;
 
 public static class CreateConstantsMenuItems
 {
-    private static readonly HashSet<string> cSharpKeywords = new HashSet<string> { "public", "protected", "private",
+    private static readonly HashSet<string> cSharpKeywords = new()
+    { "public", "protected", "private",
         "static", "void", "readonly", "const",
         "using", "class", "enum", "interface", "new", "this", "override", "virtual",
         "string", "int", "float", "double", "short", "long", "bool",
@@ -44,7 +45,7 @@ public static class CreateConstantsMenuItems
 
         List<string> files = GetFilesInFolder("Assets", "*.uxml");
 
-        HashSet<string> uxmlNames = new HashSet<string>();
+        HashSet<string> uxmlNames = new();
         files.ForEach(file => FindUxmlNames(file).ForEach(uxmlName => uxmlNames.Add(uxmlName)));
         List<string> uxmlNamesList = uxmlNames.ToList();
         uxmlNamesList.Sort();
@@ -61,7 +62,7 @@ public static class CreateConstantsMenuItems
 
         List<string> files = GetFilesInFolder("Assets", "*.uxml");
 
-        HashSet<string> uxmlClasses = new HashSet<string>();
+        HashSet<string> uxmlClasses = new();
         files.ForEach(file => FindUxmlClasses(file).ForEach(uxmlClass => uxmlClasses.Add(uxmlClass)));
         List<string> uxmlClassesList = uxmlClasses.ToList();
         uxmlClassesList.Sort();
@@ -73,7 +74,7 @@ public static class CreateConstantsMenuItems
 
     private static IEnumerable<string> FindUxmlNames(string uxmlFile)
     {
-        HashSet<string> result = new HashSet<string>();
+        HashSet<string> result = new();
         string content = File.ReadAllText(uxmlFile);
         XElement xroot = XElement.Parse(content);
         xroot.DescendantsAndSelf()
@@ -90,7 +91,7 @@ public static class CreateConstantsMenuItems
 
     private static IEnumerable<string> FindUxmlClasses(string uxmlFile)
     {
-        HashSet<string> result = new HashSet<string>();
+        HashSet<string> result = new();
         string content = File.ReadAllText(uxmlFile);
         XElement xroot = XElement.Parse(content);
         xroot.DescendantsAndSelf()
@@ -108,7 +109,7 @@ public static class CreateConstantsMenuItems
 
     private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
-        List<string> result = new List<string>();
+        List<string> result = new();
         foreach (string fileExtension in fileExtensions)
         {
             string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
@@ -121,7 +122,7 @@ public static class CreateConstantsMenuItems
     {
         string newline = System.Environment.NewLine;
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");
         sb.AppendLine("public static partial class " + className + newline + "{");
         sb.AppendLine(indentation + "public static class " + subClassName + newline + indentation + "{");

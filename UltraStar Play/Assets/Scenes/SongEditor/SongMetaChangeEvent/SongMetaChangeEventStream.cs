@@ -3,7 +3,7 @@ using UniRx;
 
 public class SongMetaChangeEventStream : IDisposable, IObservable<SongMetaChangeEvent>
 {
-    private readonly Subject<SongMetaChangeEvent> subject = new Subject<SongMetaChangeEvent>();
+    private readonly Subject<SongMetaChangeEvent> subject = new();
 
     public void Dispose()
     {

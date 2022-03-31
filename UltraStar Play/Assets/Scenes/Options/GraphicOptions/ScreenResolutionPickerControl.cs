@@ -35,7 +35,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
         }
 
         float bestMatchDistance = float.MaxValue;
-        ScreenResolution bestMatch = new ScreenResolution(0, 0, 0);
+        ScreenResolution bestMatch = new(0, 0, 0);
         Items.ForEach(screenResolution =>
         {
             if (bestMatch.Width == 0 || bestMatch.Height == 0 || bestMatch.RefreshRate == 0)
@@ -68,7 +68,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
 
     private static List<ScreenResolution> GetDummyResolutions()
     {
-        List<ScreenResolution> result = new List<ScreenResolution>();
+        List<ScreenResolution> result = new();
         result.Add(CreateResolution(800, 600, 60));
         result.Add(CreateResolution(1024, 768, 60));
         result.Add(CreateResolution(1920, 1080, 60));
@@ -77,7 +77,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
 
     private static ScreenResolution CreateResolution(int width, int height, int refreshRate)
     {
-        ScreenResolution res = new ScreenResolution(width, height, refreshRate);
+        ScreenResolution res = new(width, height, refreshRate);
         return res;
     }
 

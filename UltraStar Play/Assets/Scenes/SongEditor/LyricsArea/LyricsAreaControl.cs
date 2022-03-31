@@ -220,7 +220,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private string GetEditModeText()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         Note lastNote = null;
 
@@ -261,7 +261,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private string GetViewModeText()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
         foreach (Sentence sentence in sortedSentences)
         {
@@ -284,7 +284,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
             : new List<Note>();
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
 
         void ApplyNoteText()
         {

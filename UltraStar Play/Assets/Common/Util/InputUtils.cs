@@ -124,7 +124,7 @@ public static class InputUtils
 
     public static Vector2 GetPointerPositionInPanelCoordinates(PanelHelper panelHelper, bool invertY = false)
     {
-        Vector2 pointerScreenCoordinates = new Vector2(Pointer.current.position.x.ReadValue(), Pointer.current.position.y.ReadValue());
+        Vector2 pointerScreenCoordinates = new(Pointer.current.position.x.ReadValue(), Pointer.current.position.y.ReadValue());
         Vector2 pointerPanelCoordinates = panelHelper.ScreenToPanel(pointerScreenCoordinates);
         if (invertY)
         {

@@ -9,7 +9,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
 {
-    private static readonly Vector2 popupOffset = new Vector2(2, 2);
+    private static readonly Vector2 popupOffset = new(2, 2);
 
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
 
@@ -96,7 +96,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        ContextMenuPopupControl contextMenuPopup = new ContextMenuPopupControl(gameObject, position);
+        ContextMenuPopupControl contextMenuPopup = new(gameObject, position);
         injector.Inject(contextMenuPopup);
         FillContextMenuAction(contextMenuPopup);
     }

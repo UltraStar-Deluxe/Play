@@ -24,7 +24,7 @@ public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedLi
 
     private bool isActive;
 
-    private static readonly Regex whitespaceRegex = new Regex(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public void OnInjectionFinished()
     {

@@ -26,7 +26,7 @@ public class DeleteNotesAction : INeedInjection
             return new List<Sentence>();
         }
 
-        HashSet<Sentence> affectedSentences = new HashSet<Sentence>();
+        HashSet<Sentence> affectedSentences = new();
         foreach (Note note in selectedNotes)
         {
             if (note.Sentence != null)

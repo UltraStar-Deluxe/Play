@@ -63,7 +63,7 @@ public static class AudioUtils
     public static AudioClip LoadMp3(string path)
     {
         string filename = Path.GetFileNameWithoutExtension(path);
-        MpegFile mpegFile = new MpegFile(path);
+        MpegFile mpegFile = new(path);
         if (mpegFile.Length < 1)
         {
             Debug.LogWarning($"Failed to load mp3 audio file: {path}");

@@ -22,7 +22,7 @@ public class SongEditorMidiSoundPlayAlongThread : INeedInjection
 
     private bool isStopped;
 
-    private List<Note> upcomingSortedNotes = new List<Note>();
+    private List<Note> upcomingSortedNotes = new();
 
     private DateTime playbackStartDateTime = DateTime.Now;
 

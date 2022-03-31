@@ -22,7 +22,7 @@ using UnityEngine.UIElements;
  */
 public class DynamicTexture
 {
-    public Color backgroundColor = new Color(0, 0, 0, 0);
+    public Color backgroundColor = new(0, 0, 0, 0);
 
     // Blank color array (background color in every pixel)
     private Color[] blank;

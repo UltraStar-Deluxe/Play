@@ -26,7 +26,7 @@ public static class ApplicationUtils
     {
         // Screen.currentResolution in window mode returns the size of the desktop, not of the Unity application.
         // Thus, use Screen.width and Screen.height instead, which return the pixel size of the Unity application.
-        ScreenResolution res = new ScreenResolution(Screen.width, Screen.height, Screen.currentResolution.refreshRate);
+        ScreenResolution res = new(Screen.width, Screen.height, Screen.currentResolution.refreshRate);
         return res;
     }
 

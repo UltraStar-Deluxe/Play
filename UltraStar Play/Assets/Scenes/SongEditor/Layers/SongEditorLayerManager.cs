@@ -18,7 +18,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     [Inject]
     private Settings settings;
 
-    private readonly Subject<LayerChangedEvent> layerChangedEventStream = new Subject<LayerChangedEvent>();
+    private readonly Subject<LayerChangedEvent> layerChangedEventStream = new();
     public IObservable<LayerChangedEvent> LayerChangedEventStream => layerChangedEventStream;
 
     public void OnSceneInjectionFinished()
@@ -74,7 +74,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerEnumToLayerMap()
     {
-        Dictionary<ESongEditorLayer, SongEditorLayer> result = new Dictionary<ESongEditorLayer, SongEditorLayer>();
+        Dictionary<ESongEditorLayer, SongEditorLayer> result = new();
         List<ESongEditorLayer> layerEnums = EnumUtils.GetValuesAsList<ESongEditorLayer>();
         foreach (ESongEditorLayer layerEnum in layerEnums)
         {
@@ -89,7 +89,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     public List<Note> GetAllNotes()
     {
-        List<Note> notes = new List<Note>();
+        List<Note> notes = new();
         foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
         {
             List<Note> notesOfLayer = GetNotes(layerEnum);
@@ -100,7 +100,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
 
     public List<Note> GetAllVisibleNotes()
     {
-        List<Note> notes = new List<Note>();
+        List<Note> notes = new();
         foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
         {
             if (IsLayerEnabled(layerEnum))

@@ -79,7 +79,7 @@ public static class SongMetaUtils
             soloVoice.SetName(Voice.firstVoiceName);
         }
 
-        Voice newVoice = new Voice(voiceName);
+        Voice newVoice = new(voiceName);
         songMeta.AddVoice(newVoice);
 
         return newVoice;
@@ -115,7 +115,7 @@ public static class SongMetaUtils
 
     public static List<Sentence> GetAllSentences(SongMeta songMeta)
     {
-        List<Sentence> result = new List<Sentence>();
+        List<Sentence> result = new();
         List<Sentence> sentencesInVoices = songMeta.GetVoices().SelectMany(voice => voice.Sentences).ToList();
         result.AddRange(sentencesInVoices);
         return result;
@@ -128,7 +128,7 @@ public static class SongMetaUtils
             return null;
         }
 
-        List<Sentence> sortedSentencesOfVoice = new List<Sentence>(sentence.Voice.Sentences);
+        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
         sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
         foreach (Sentence s in sortedSentencesOfVoice)
@@ -149,7 +149,7 @@ public static class SongMetaUtils
             return null;
         }
 
-        List<Sentence> sortedSentencesOfVoice = new List<Sentence>(sentence.Voice.Sentences);
+        List<Sentence> sortedSentencesOfVoice = new(sentence.Voice.Sentences);
         sortedSentencesOfVoice.Sort(Sentence.comparerByStartBeat);
         Sentence lastSentence = null;
         foreach (Sentence s in sortedSentencesOfVoice)
@@ -165,7 +165,7 @@ public static class SongMetaUtils
 
     public static List<Note> GetSortedNotes(Sentence sentence)
     {
-        List<Note> result = new List<Note>(sentence.Notes);
+        List<Note> result = new(sentence.Notes);
         result.Sort(Note.comparerByStartBeat);
         return result;
     }
@@ -186,7 +186,7 @@ public static class SongMetaUtils
 
     public static List<Sentence> GetSortedSentences(Voice voice)
     {
-        List<Sentence> result = new List<Sentence>(voice.Sentences);
+        List<Sentence> result = new(voice.Sentences);
         result.Sort(Sentence.comparerByStartBeat);
         return result;
     }
@@ -214,7 +214,7 @@ public static class SongMetaUtils
 
     public static string GetLyrics(SongMeta songMeta, Voice voice)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         voice.Sentences.ForEach(sentence =>
         {
             sentence.Notes.ForEach(note =>

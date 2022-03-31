@@ -36,7 +36,7 @@ public class MutableSentenceTests
     [Test]
     public void TestNotes()
     {
-        Note testNote = new Note(ENoteType.Normal, 0, 2, 0, "");
+        Note testNote = new(ENoteType.Normal, 0, 2, 0, "");
         ms.AddNote(testNote);
         IReadOnlyCollection<Note> notes = ms.Notes;
         Assert.AreEqual(1, notes.Count);

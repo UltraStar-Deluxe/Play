@@ -26,7 +26,7 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
-        List<Sentence> selectedSentences = new List<Sentence> { sentenceControl.Sentence };
+        List<Sentence> selectedSentences = new() { sentenceControl.Sentence };
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));

@@ -39,12 +39,12 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
+    private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
     
-    private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new ConcurrentQueue<ClientConnectionEvent>();
+    private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new();
     
-    private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new Subject<ClientConnectionEvent>();
+    private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
 
     /**
@@ -120,7 +120,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         try
         {
             Debug.Log("Server listening for connect request on " + serverUdpClient.GetPort());
-            IPEndPoint clientIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            IPEndPoint clientIpEndPoint = new(IPAddress.Any, 0);
             // Receive is a blocking call.
             byte[] receivedBytes = serverUdpClient.Receive(ref clientIpEndPoint);
             string message = Encoding.UTF8.GetString(receivedBytes);
@@ -180,7 +180,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private void HandleClientMessageWithNoMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
-        ConnectResponseDto connectResponseDto = new ConnectResponseDto
+        ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
@@ -200,7 +200,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
             ? micProfileOfClient.SampleRate
             : -1;
 
-        ConnectResponseDto connectResponseDto = new ConnectResponseDto
+        ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
@@ -254,7 +254,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
             existingConnectedClientHandler.Dispose();
         }
         
-        ConnectedClientHandler connectedClientHandler = new ConnectedClientHandler(this, clientIpEndPoint, clientName, clientId, microphoneSampleRate);
+        ConnectedClientHandler connectedClientHandler = new(this, clientIpEndPoint, clientName, clientId, microphoneSampleRate);
         idToConnectedClientMap[clientId] = connectedClientHandler;
 
         Debug.Log("New number of connected clients: " + idToConnectedClientMap.Count);

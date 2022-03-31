@@ -6,7 +6,7 @@ public static class EnumUtils
     public static List<T> GetValuesAsList<T>()
     {
         System.Array enumValues = Enum.GetValues(typeof(T));
-        List<T> result = new List<T>();
+        List<T> result = new();
         foreach (object o in enumValues)
         {
             if (o is T)

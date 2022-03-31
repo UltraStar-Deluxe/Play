@@ -91,7 +91,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private float lastClickTime;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    private readonly List<IDisposable> disposables = new();
 
     private EditorNoteContextMenuControl contextMenuControl;
 

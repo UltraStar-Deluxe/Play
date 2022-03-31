@@ -9,7 +9,7 @@ public class DefaultHighscoreSceneDataProvider : MonoBehaviour, IDefaultSceneDat
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
 
-        HighscoreSceneData highscoreSceneData = new HighscoreSceneData();
+        HighscoreSceneData highscoreSceneData = new();
         highscoreSceneData.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
         highscoreSceneData.Difficulty = difficulty;
         return highscoreSceneData;

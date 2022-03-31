@@ -30,7 +30,7 @@ public class SongEditorSettings
 
     // Option to show / hide voices.
     // Contains the names of the voices that should be hidden.
-    public List<string> HideVoices { get; private set; } = new List<string>();
+    public List<string> HideVoices { get; private set; } = new();
 
     public bool ShowLyricsArea { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;

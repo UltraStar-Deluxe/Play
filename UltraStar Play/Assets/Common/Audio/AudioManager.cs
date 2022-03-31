@@ -15,7 +15,7 @@ public class AudioManager : MonoBehaviour
     }
 
     private static readonly int criticalCacheSize = 10;
-    private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new Dictionary<string, CachedAudioClip>();
+    private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
     private static float volumeBeforeMute = -1;
 
@@ -105,7 +105,7 @@ public class AudioManager : MonoBehaviour
         }
 
         // Cache the new AudioClip.
-        CachedAudioClip cachedAudioClip = new CachedAudioClip(path, audioClip, Time.frameCount, streamAudio);
+        CachedAudioClip cachedAudioClip = new(path, audioClip, Time.frameCount, streamAudio);
         audioClipCache[path] = cachedAudioClip;
     }
 
@@ -145,7 +145,7 @@ public class AudioManager : MonoBehaviour
     {
         public string Path { get; private set; }
         public DownloadHandlerAudioClip DownloadHandler { get; private set; }
-        public List<Action<AudioClip>> Callbacks { get; private set; } = new List<Action<AudioClip>>();
+        public List<Action<AudioClip>> Callbacks { get; private set; } = new();
         public long ElapsedMilliseconds
         {
             get

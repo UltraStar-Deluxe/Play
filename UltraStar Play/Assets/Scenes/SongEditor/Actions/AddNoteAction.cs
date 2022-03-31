@@ -16,16 +16,16 @@ public class AddNoteAction : INeedInjection
         if (sentencesAtBeat.Count == 0)
         {
             // Add sentence with note
-            Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
+            Note newNote = new(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
-            Sentence newSentence = new Sentence(new List<Note> { newNote }, newNote.EndBeat);
+            Sentence newSentence = new(new List<Note> { newNote }, newNote.EndBeat);
             IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
             newSentence.SetVoice(voices.FirstOrDefault());
         }
         else
         {
             // Add note to existing sentence
-            Note newNote = new Note(ENoteType.Normal, beat - 2, 4, 0, "~");
+            Note newNote = new(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
             newNote.SetSentence(sentencesAtBeat[0]);
         }

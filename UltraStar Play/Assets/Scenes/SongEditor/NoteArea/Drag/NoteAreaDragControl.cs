@@ -22,7 +22,7 @@ public class NoteAreaDragControl : AbstractDragControl<NoteAreaDragEvent>
         int positionInSongInBeatsDragStart = noteAreaControl.ScreenPixelPositionToBeat(generalDragEvent.ScreenCoordinateInPixels.StartPosition.x);
         int beatDistance = 0;
 
-        NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,
+        NoteAreaDragEvent result = new(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
             positionInSongInBeatsDragStart, beatDistance);
@@ -43,7 +43,7 @@ public class NoteAreaDragControl : AbstractDragControl<NoteAreaDragEvent>
         int positionInSongInBeatsDragStart = dragStartEvent.PositionInSongInBeatsDragStart;
         int beatDistance = (int)Mathf.Round(generalDragEvent.LocalCoordinateInPercent.Distance.x * noteAreaControl.ViewportWidthInBeats);
 
-        NoteAreaDragEvent result = new NoteAreaDragEvent(generalDragEvent,
+        NoteAreaDragEvent result = new(generalDragEvent,
             midiNoteDragStart, midiNoteDistance,
             positionInSongInMillisDragStart, millisDistance,
             positionInSongInBeatsDragStart, beatDistance);

@@ -20,10 +20,10 @@ public static class Hashing
     //Standard MD5 hashing
     public static string Md5(byte[] input)
     {
-        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+        MD5CryptoServiceProvider md5 = new();
         byte[] hashBytes = md5.ComputeHash(input);
 
-        StringBuilder sb = new StringBuilder(hashBytes.Length * 2);
+        StringBuilder sb = new(hashBytes.Length * 2);
         for (int i = 0; i < hashBytes.Length; ++i)
         {
             sb.Append(hashBytes[i].ToString("x2"));

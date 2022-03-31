@@ -20,10 +20,10 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     // Static reference to last state to load it when opening the song editor scene
     // (e.g. after switching editor > sing > editor).
-    private static readonly Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new Dictionary<SongMeta, SongEditorMemento>();
+    private static readonly Dictionary<SongMeta, SongEditorMemento> songMetaToSongEditorMementoMap = new();
 
     private int indexInHistory = -1;
-    private readonly List<SongEditorMemento> history = new List<SongEditorMemento>();
+    private readonly List<SongEditorMemento> history = new();
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -119,7 +119,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private SongEditorMemento CreateUndoState()
     {
-        SongEditorMemento memento = new SongEditorMemento();
+        SongEditorMemento memento = new();
         SaveVoices(memento);
         SaveLayers(memento);
         SaveSongMetaTags(memento);
@@ -188,7 +188,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
             else
             {
                 // Update existing voice
-                List<Sentence> sentencesCopy = new List<Sentence>();
+                List<Sentence> sentencesCopy = new();
                 foreach (Sentence sentence in voiceMemento.Sentences)
                 {
                     Sentence sentenceCopy = sentence.CloneDeep();

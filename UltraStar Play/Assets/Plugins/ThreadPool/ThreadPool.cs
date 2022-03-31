@@ -29,7 +29,7 @@ public static class ThreadPool
     {
         if (callBack == null)
             throw new ArgumentNullException("callBack");
-        PoolHandle handle = new PoolHandle();
+        PoolHandle handle = new();
         lock (queue)
             queue.Enqueue((callBack, handle));
         if (waiterCount > 0)

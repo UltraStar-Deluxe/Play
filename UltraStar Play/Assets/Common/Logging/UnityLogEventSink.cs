@@ -31,7 +31,7 @@ public sealed class UnityLogEventSink : ILogEventSink
             return;
         }
 
-        using (StringWriter stringBuffer = new StringWriter())
+        using (StringWriter stringBuffer = new())
         {
             formatter.Format(logEvent, stringBuffer);
             // Need to escape curly braces because Debug.LogFormat is used

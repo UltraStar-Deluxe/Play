@@ -21,11 +21,11 @@ public class MergeNotesAction : INeedInjection
 
     public void Execute(IReadOnlyCollection<Note> selectedNotes, Note targetNote)
     {
-        List<Note> sortedNotes = new List<Note>(selectedNotes);
+        List<Note> sortedNotes = new(selectedNotes);
         sortedNotes.Sort(Note.comparerByStartBeat);
         int minBeat = sortedNotes[0].StartBeat;
         int maxBeat = sortedNotes.Select(it => it.EndBeat).Max();
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
         foreach (Note note in sortedNotes)
         {
             if (stringBuilder.Length == 0 || note.Text != "~")
@@ -33,7 +33,7 @@ public class MergeNotesAction : INeedInjection
                 stringBuilder.Append(note.Text);
             }
         }
-        Note mergedNote = new Note(targetNote.Type, minBeat, maxBeat - minBeat, targetNote.TxtPitch, stringBuilder.ToString());
+        Note mergedNote = new(targetNote.Type, minBeat, maxBeat - minBeat, targetNote.TxtPitch, stringBuilder.ToString());
         mergedNote.SetSentence(targetNote.Sentence);
 
         // Remove old notes

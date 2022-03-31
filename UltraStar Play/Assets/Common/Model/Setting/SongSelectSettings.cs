@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class SongSelectSettings
 {
     public ESongOrder songOrder = ESongOrder.Artist;
-    public List<ESearchProperty> searchProperties = new List<ESearchProperty>
+    public List<ESearchProperty> searchProperties = new()
     {
         ESearchProperty.Artist,
         ESearchProperty.Title,

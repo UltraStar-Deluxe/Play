@@ -55,9 +55,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
 
-    private HashSet<ESearchProperty> searchProperties = new HashSet<ESearchProperty>();
+    private HashSet<ESearchProperty> searchProperties = new();
 
-    private readonly Subject<SearchChangedEvent> searchChangedEventStream = new Subject<SearchChangedEvent>();
+    private readonly Subject<SearchChangedEvent> searchChangedEventStream = new();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
     public void OnInjectionFinished()

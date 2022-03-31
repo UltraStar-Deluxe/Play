@@ -36,11 +36,11 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
     private string FolderPath => songMeta.Directory;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    private readonly List<IDisposable> disposables = new();
 
-    private readonly HashSet<string> changedVideoFiles = new HashSet<string>();
-    private readonly HashSet<string> changedAudioFiles = new HashSet<string>();
-    private readonly HashSet<string> changedImageFiles = new HashSet<string>();
+    private readonly HashSet<string> changedVideoFiles = new();
+    private readonly HashSet<string> changedAudioFiles = new();
+    private readonly HashSet<string> changedImageFiles = new();
 
     private void Start()
     {
@@ -52,11 +52,13 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
         // Media formats supported in Unity editor.
         // Note: Not all of these formats are supported by Unity at runtime.
-        List<string> videoFilters = new List<string> { "*.asf", "*.avi", "*.dv", "*.m4v", "*.mov",
+        List<string> videoFilters = new()
+        { "*.asf", "*.avi", "*.dv", "*.m4v", "*.mov",
             "*.mp4", "*.mpg", "*.mpeg", "*.ogv", "*.vp8", "*.webm", "*.wmv"};
-        List<string> audioFilters = new List<string> { "*.aiff", "*.aif", "*.it", "*.mp3", "*.mod", "*.ogg",
+        List<string> audioFilters = new()
+        { "*.aiff", "*.aif", "*.it", "*.mp3", "*.mod", "*.ogg",
             "*.s3m", "*.wav", "*.xm" };
-        List<string> imageFilters = new List<string> { "*.bmp", "*.jpg", "*.png", "*.psd", "*.tiff", "*.tga"};
+        List<string> imageFilters = new() { "*.bmp", "*.jpg", "*.png", "*.psd", "*.tiff", "*.tga"};
         videoFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnVideoFileChanged));
         imageFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnImageFileChanged));
         audioFilters.ForEach(filter => CreateFileSystemWatcher(filter, OnAudioFileChanged));
@@ -135,7 +137,7 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
     private void CreateFileSystemWatcher(string filter, FileSystemEventHandler fileSystemEventHandler)
     {
-        FileSystemWatcher fileSystemWatcher = new FileSystemWatcher(FolderPath, filter);
+        FileSystemWatcher fileSystemWatcher = new(FolderPath, filter);
         disposables.Add(fileSystemWatcher);
 
         fileSystemWatcher.Changed += fileSystemEventHandler;

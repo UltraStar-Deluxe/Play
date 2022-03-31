@@ -18,7 +18,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     
     private bool wasNoButtonOrTouchPressed;
 
-    public static List<ContextMenuPopupControl> OpenContextMenuPopups { get; private set; } = new List<ContextMenuPopupControl>();
+    public static List<ContextMenuPopupControl> OpenContextMenuPopups { get; private set; } = new();
     public static bool IsAnyContextMenuPopupOpen => OpenContextMenuPopups.Count > 0;
 
     [Inject]
@@ -68,8 +68,8 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
         visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
-            Vector2 currentSize = new Vector2(visualElement.resolvedStyle.width, visualElement.resolvedStyle.height);
-            Vector2 currentPosition = new Vector2(visualElement.resolvedStyle.left, visualElement.resolvedStyle.top);
+            Vector2 currentSize = new(visualElement.resolvedStyle.width, visualElement.resolvedStyle.height);
+            Vector2 currentPosition = new(visualElement.resolvedStyle.left, visualElement.resolvedStyle.top);
             if (currentSize != lastSize
                 || currentPosition != lastPosition)
             {
@@ -114,7 +114,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     public void AddItem(string text, Action action)
     {
         VisualElement contextMenuItemVisualElement = uiManager.contextMenuItemUi.CloneTree().Children().First();
-        ContextMenuItemControl contextMenuItem = new ContextMenuItemControl(text, action);
+        ContextMenuItemControl contextMenuItem = new(text, action);
         contextMenuItem.ItemTriggeredEventStream.Subscribe(evt => CloseContextMenu());
         injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItem);
         visualElement.Add(contextMenuItemVisualElement);

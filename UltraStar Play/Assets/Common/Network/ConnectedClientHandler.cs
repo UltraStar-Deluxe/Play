@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ConnectedClientHandler : IDisposable
 {
-    private static readonly object micSampleBufferReadWriteLock = new object();
+    private static readonly object micSampleBufferReadWriteLock = new();
 
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
