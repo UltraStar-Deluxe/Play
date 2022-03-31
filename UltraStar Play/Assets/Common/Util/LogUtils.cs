@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class LogUtils
 {
-    private static readonly Dictionary<string, LogData> messagePrefixToLogDataMap = new Dictionary<string, LogData>();
+    private static readonly Dictionary<string, LogData> messagePrefixToLogDataMap = new();
 
     // Logs a message every period.
     // The message is constructed from a messagePrefix and dataPoints that are accumulated over the period.
@@ -31,7 +31,7 @@ public class LogUtils
 
     private class LogData
     {
-        public List<string> DataPointQueue { get; private set; } = new List<string>();
+        public List<string> DataPointQueue { get; private set; } = new();
         public float LastLogTimeInSeconds { get; set; }
     }
 }

@@ -212,7 +212,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(createSongFromTemplateControl);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);

@@ -9,7 +9,7 @@ public static class GitUtils
     public static string RunGitCommand(string gitCommand)
     {
         // Set up our processInfo to run the git command and log to output and errorOutput.
-        ProcessStartInfo processInfo = new ProcessStartInfo("git", @gitCommand)
+        ProcessStartInfo processInfo = new("git", @gitCommand)
         {
             CreateNoWindow = true, // We want no visible pop-ups
             UseShellExecute = false, // Allows us to redirect input, output and error streams
@@ -18,7 +18,7 @@ public static class GitUtils
         };
 
         // Set up the Process
-        Process process = new Process {StartInfo = processInfo};
+        Process process = new() {StartInfo = processInfo};
 
         try
         {

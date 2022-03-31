@@ -22,17 +22,17 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
     private VisualElement lyricsContainer;
 
-    private List<Note> upcomingNotes = new List<Note>();
-    private List<Sentence> upcomingSentences = new List<Sentence>();
+    private List<Note> upcomingNotes = new();
+    private List<Sentence> upcomingSentences = new();
 
     private int micDelayInMillis;
     private int displayedBeats;
 
     private int frameCount;
 
-    private readonly Dictionary<Note, Label> noteToLyricsContainerLabel = new Dictionary<Note, Label>();
+    private readonly Dictionary<Note, Label> noteToLyricsContainerLabel = new();
 
-    private readonly Dictionary<Sentence, VisualElement> sentenceToSeparator = new Dictionary<Sentence, VisualElement>();
+    private readonly Dictionary<Sentence, VisualElement> sentenceToSeparator = new();
 
     public override void OnInjectionFinished()
     {
@@ -124,7 +124,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
 
         // Create label for dedicated lyrics bar
-        Label label = new Label(targetNoteControl.Note.Text.Trim());
+        Label label = new(targetNoteControl.Note.Text.Trim());
         targetNoteControl.Label.GetClasses().ForEach(className => label.AddToClassList(className));
         lyricsContainer.Add(label);
         noteToLyricsContainerLabel[targetNoteControl.Note] = label;
@@ -183,7 +183,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         int displayAreaMinBeat = CalculateDisplayAreaMinBeat();
         int displayAreaMaxBeat = CalculateDisplayAreaMaxBeat();
 
-        List<Note> newNotes = new List<Note>();
+        List<Note> newNotes = new();
         foreach (Note note in upcomingNotes)
         {
             if (displayAreaMinBeat <= note.StartBeat && note.StartBeat <= displayAreaMaxBeat)
@@ -206,7 +206,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
 
         // Create sentence separators
-        List<Sentence> newSentences = new List<Sentence>();
+        List<Sentence> newSentences = new();
         foreach (Sentence sentence in upcomingSentences)
         {
             if (sentenceToSeparator.ContainsKey(sentence))
@@ -241,7 +241,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     private VisualElement CreateSentenceSeparator(Sentence sentence)
     {
-        VisualElement separator = new VisualElement();
+        VisualElement separator = new();
         separator.AddToClassList("scrollingNoteStreamSentenceSeparator");
         sentenceToSeparator[sentence] = separator;
         return separator;
@@ -270,7 +270,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             }
         }
 
-        List<Sentence> sentencesToBeRemoved = new List<Sentence>();
+        List<Sentence> sentencesToBeRemoved = new();
         sentenceToSeparator.Keys.ForEach(sentence =>
         {
             if (sentence.ExtendedMaxBeat < displayAreaMinBeat)
@@ -312,7 +312,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     private VisualElement CreateRecordingPositionIndicator()
     {
-        VisualElement recordingPositionIndicator = new VisualElement();
+        VisualElement recordingPositionIndicator = new();
         recordingPositionIndicator.style.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
         recordingPositionIndicator.style.position = new StyleEnum<Position>(Position.Absolute);
         recordingPositionIndicator.style.width = new StyleLength(new Length(1, LengthUnit.Pixel));

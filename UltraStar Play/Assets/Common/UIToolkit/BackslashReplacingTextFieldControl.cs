@@ -15,7 +15,7 @@ public class BackslashReplacingTextFieldControl
 
     private TextField textField;
 
-    private readonly Subject<string> valueChangedEventStream = new Subject<string>();
+    private readonly Subject<string> valueChangedEventStream = new();
     public IObservable<string> ValueChangedEventStream => valueChangedEventStream;
 
     private readonly string backslashReplacement;

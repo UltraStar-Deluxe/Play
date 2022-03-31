@@ -8,7 +8,7 @@ using UnityEngine.Video;
 
 public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    private static readonly HashSet<string> ignoredVideoFiles = new HashSet<string>();
+    private static readonly HashSet<string> ignoredVideoFiles = new();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()

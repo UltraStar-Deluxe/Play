@@ -19,7 +19,7 @@ public static class VisualElementExtensions
 
     public static void AddToClassListIfNew(this VisualElement visualElement, params string[] newClasses)
     {
-        HashSet<string> currentClasses = new HashSet<string>();
+        HashSet<string> currentClasses = new();
         visualElement.GetClasses().ForEach(currentClass => currentClasses.Add(currentClass));
         newClasses.ForEach(newClass =>
         {
@@ -141,7 +141,7 @@ public static class VisualElementExtensions
             return;
         }
 
-        List<VisualElement> visualElementAndAncestors = new List<VisualElement>();
+        List<VisualElement> visualElementAndAncestors = new();
         visualElementAndAncestors.Add(visualElement);
         visualElementAndAncestors.AddRange(visualElement.GetAncestors());
         visualElementAndAncestors.ForEach(ancestor =>
@@ -161,7 +161,7 @@ public static class VisualElementExtensions
             return new List<VisualElement>();
         }
 
-        List<VisualElement> ancestors = new List<VisualElement>();
+        List<VisualElement> ancestors = new();
         VisualElement parent = visualElement.parent;
         while (parent != null)
         {

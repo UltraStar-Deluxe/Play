@@ -9,8 +9,8 @@ public class SongEditorLayer
     public bool IsEnabled { get; set; } = true;
     public Color Color { get; set; } = Colors.indigo;
 
-    private readonly List<Note> notes = new List<Note>();
-    private readonly HashSet<Note> notesHashSet = new HashSet<Note>();
+    private readonly List<Note> notes = new();
+    private readonly HashSet<Note> notesHashSet = new();
 
     public SongEditorLayer(ESongEditorLayer layerEnum)
     {
@@ -41,7 +41,7 @@ public class SongEditorLayer
 
     public SongEditorLayer CloneDeep()
     {
-        SongEditorLayer clone = new SongEditorLayer(LayerEnum);
+        SongEditorLayer clone = new(LayerEnum);
         clone.Color = Color;
         clone.IsEnabled = IsEnabled;
         notes.ForEach(note =>

@@ -16,7 +16,7 @@ public static class ImageManager
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
-    private static readonly Dictionary<string, CachedSprite> spriteCache = new Dictionary<string, CachedSprite>();
+    private static readonly Dictionary<string, CachedSprite> spriteCache = new();
 
     private static CoroutineManager coroutineManager;
 
@@ -84,7 +84,7 @@ public static class ImageManager
         }
 
         // Cache the new sprite.
-        CachedSprite cachedSprite = new CachedSprite(source, sprite);
+        CachedSprite cachedSprite = new(source, sprite);
         spriteCache[source] = cachedSprite;
     }
 
@@ -99,7 +99,7 @@ public static class ImageManager
 
     private static void RemoveUnusedSpritesFromCache()
     {
-        HashSet<Sprite> usedSprites = new HashSet<Sprite>();
+        HashSet<Sprite> usedSprites = new();
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
         UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
         if (uiDocument != null)

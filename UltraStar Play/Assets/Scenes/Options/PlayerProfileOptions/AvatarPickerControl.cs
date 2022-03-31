@@ -8,12 +8,17 @@ public class AvatarPickerControl : PicturedItemPickerControl<EAvatar>
     public AvatarPickerControl(ItemPicker itemPicker, UiManager uiManager)
         : base(itemPicker, EnumUtils.GetValuesAsList<EAvatar>())
     {
-        Items = EnumUtils.GetValuesAsList<EAvatar>();
         this.uiManager = uiManager;
+        Items = EnumUtils.GetValuesAsList<EAvatar>();
     }
 
     protected override StyleBackground GetBackgroundImageValue(EAvatar item)
     {
+        if (uiManager == null)
+        {
+            return new StyleBackground();
+        }
+
         Sprite avatarSprite = uiManager.GetAvatarSprite(item);
         if (avatarSprite == null)
         {

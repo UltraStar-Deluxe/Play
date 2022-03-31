@@ -33,7 +33,7 @@ public class SplitNotesAction : INeedInjection
                     newNoteText = "~";
                 }
                 int splitBeat = note.StartBeat + (note.Length / 2);
-                Note newNote = new Note(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, newNoteText);
+                Note newNote = new(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, newNoteText);
                 newNote.SetSentence(note.Sentence);
                 note.SetEndBeat(splitBeat);
             }

@@ -6,15 +6,15 @@ public class SongDataStructureTests
     [Test]
     public void SentenceMinAndMaxBeatIsSetWhenCreated()
     {
-        Note n2_4 = new Note(ENoteType.Normal, 2, 2, 0, "");
+        Note n2_4 = new(ENoteType.Normal, 2, 2, 0, "");
 
         // MinBeat and MaxBeat are set when the sentence is directly created with notes.
-        Sentence s1 = new Sentence(new List<Note> { n2_4 }, 0);
+        Sentence s1 = new(new List<Note> { n2_4 }, 0);
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
 
         // MinBeat and MaxBeat are set when the sentence is created empty and notes are added.
-        Sentence s2 = new Sentence();
+        Sentence s2 = new();
         s2.AddNote(n2_4);
         Assert.AreEqual(2, s2.MinBeat);
         Assert.AreEqual(4, s2.MaxBeat);
@@ -23,11 +23,11 @@ public class SongDataStructureTests
     [Test]
     public void SentenceMinAndMaxBeatChangeWithNotes()
     {
-        Note n0_2 = new Note(ENoteType.Normal, 0, 2, 0, "");
-        Note n2_4 = new Note(ENoteType.Normal, 2, 2, 0, "");
-        Note n4_6 = new Note(ENoteType.Normal, 4, 2, 0, "");
+        Note n0_2 = new(ENoteType.Normal, 0, 2, 0, "");
+        Note n2_4 = new(ENoteType.Normal, 2, 2, 0, "");
+        Note n4_6 = new(ENoteType.Normal, 4, 2, 0, "");
 
-        Sentence s1 = new Sentence(new List<Note> { n2_4 }, 0);
+        Sentence s1 = new(new List<Note> { n2_4 }, 0);
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
 
@@ -51,9 +51,9 @@ public class SongDataStructureTests
     [Test]
     public void SentenceMinAndMaxBeatChangeWithNotePositions()
     {
-        Note n2_4 = new Note(ENoteType.Normal, 2, 2, 0, "");
+        Note n2_4 = new(ENoteType.Normal, 2, 2, 0, "");
 
-        Sentence s1 = new Sentence(new List<Note> { n2_4 }, 0);
+        Sentence s1 = new(new List<Note> { n2_4 }, 0);
         Assert.AreEqual(2, s1.MinBeat);
         Assert.AreEqual(4, s1.MaxBeat);
 

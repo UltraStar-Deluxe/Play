@@ -5,7 +5,7 @@
 public class WebStatistic
 {
     public string WebSite { get; private set; }
-    public StatisticEntries StatsEntries { get; private set; } = new StatisticEntries();
+    public StatisticEntries StatsEntries { get; private set; } = new();
 
     public void SetWebSite(string webSite)
     {

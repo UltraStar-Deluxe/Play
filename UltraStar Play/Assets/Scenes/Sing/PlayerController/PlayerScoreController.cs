@@ -75,7 +75,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject]
     private Voice voice;
 
-    private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new Subject<SentenceScoreEvent>();
+    private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new();
     public IObservable<SentenceScoreEvent> SentenceScoreEventStream
     {
         get
@@ -84,7 +84,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    private readonly Subject<NoteScoreEvent> noteScoreEventStream = new Subject<NoteScoreEvent>();
+    private readonly Subject<NoteScoreEvent> noteScoreEventStream = new();
     public IObservable<NoteScoreEvent> NoteScoreEventStream
     {
         get
@@ -96,7 +96,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     private double maxScoreForNormalNotes;
     private double maxScoreForGoldenNotes;
 
-    public PlayerScoreControllerData ScoreData { get; set; } = new PlayerScoreControllerData();
+    public PlayerScoreControllerData ScoreData { get; set; } = new();
 
     public void OnInjectionFinished()
     {
@@ -299,7 +299,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
     private SentenceScore CreateSentenceScore(Sentence sentence)
     {
-        SentenceScore sentenceScore = new SentenceScore(sentence);
+        SentenceScore sentenceScore = new(sentence);
         sentenceScore.TotalScoreSoFar = TotalScore;
         return sentenceScore;
     }

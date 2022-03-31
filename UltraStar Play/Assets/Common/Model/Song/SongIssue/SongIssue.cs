@@ -22,13 +22,13 @@ public class SongIssue
 
     public static SongIssue CreateWarning(string message, int startBeat, int endBeat)
     {
-        SongIssue issue = new SongIssue(ESongIssueSeverity.Warning, message, startBeat, endBeat);
+        SongIssue issue = new(ESongIssueSeverity.Warning, message, startBeat, endBeat);
         return issue;
     }
 
     public static SongIssue CreateError(string message, int startBeat, int endBeat)
     {
-        SongIssue issue = new SongIssue(ESongIssueSeverity.Error, message, startBeat, endBeat);
+        SongIssue issue = new(ESongIssueSeverity.Error, message, startBeat, endBeat);
         return issue;
     }
 }

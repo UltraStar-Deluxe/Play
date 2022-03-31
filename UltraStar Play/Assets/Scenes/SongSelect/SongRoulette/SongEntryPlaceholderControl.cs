@@ -39,7 +39,7 @@ public class SongEntryPlaceholderControl : ISlotListSlot
 
     public Vector2 GetPosition()
     {
-        Vector2 result = new Vector2(VisualElement.resolvedStyle.left, VisualElement.resolvedStyle.top);
+        Vector2 result = new(VisualElement.resolvedStyle.left, VisualElement.resolvedStyle.top);
         if (float.IsNaN(result.x) || float.IsNaN(result.y))
         {
             result = new Vector2(VisualElement.style.left.value.value, VisualElement.style.top.value.value);

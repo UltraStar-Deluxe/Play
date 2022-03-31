@@ -52,12 +52,12 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
                   newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);
 
-        NumberPickerControl previewVolumePickerControl = new NumberPickerControl(previewVolumeChooser);
+        NumberPickerControl previewVolumePickerControl = new(previewVolumeChooser);
         previewVolumePickerControl.GetLabelTextFunction = item => item + " %";
         previewVolumePickerControl.Bind(() => settings.AudioSettings.PreviewVolumePercent,
                 newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
 
-        NumberPickerControl volumePickerControl = new NumberPickerControl(volumeChooser);
+        NumberPickerControl volumePickerControl = new(volumeChooser);
         volumePickerControl.GetLabelTextFunction = item => item + " %";
         volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
                 newValue => settings.AudioSettings.VolumePercent = (int)newValue);

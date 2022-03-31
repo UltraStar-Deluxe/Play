@@ -65,7 +65,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
 
     public void FinishScene()
     {
-        SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+        SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = sceneData.SongMeta;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
@@ -118,7 +118,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
 
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         return bb.GetBindings();
     }

@@ -19,7 +19,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         inputDeviceToLastChange.Clear();
     }
 
-    private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new Dictionary<InputDevice, InputDeviceChange>();
+    private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new();
 
     [InjectedInInspector]
     public VectorImage gamepadIcon;
@@ -30,7 +30,7 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
     [InjectedInInspector]
     public VectorImage touchIcon;
 
-    private readonly Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new Subject<InputDeviceChangeEvent>();
+    private readonly Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new();
     public IObservable<InputDeviceChangeEvent> InputDeviceChangeEventStream => inputDeviceChangeEventStream;
 
     private EInputDevice inputDeviceEnum = GetDefaultInputDeviceEnum();

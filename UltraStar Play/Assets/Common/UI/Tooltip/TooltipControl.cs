@@ -8,7 +8,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 {
     private static readonly float defaultShowDelayInSeconds = 1f;
     private static readonly float defaultCloseDelayInSeconds = 0.2f;
-    private static readonly Vector2 tooltipOffsetInPx = new Vector2(10, 10);
+    private static readonly Vector2 tooltipOffsetInPx = new(10, 10);
 
     public float ShowDelayInSeconds { get; set; } = defaultShowDelayInSeconds;
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;

@@ -104,10 +104,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private GameObject gameObject;
 
-    private readonly TabGroupControl sideBarTabGroupControl = new TabGroupControl();
-    private readonly SongEditorSideBarPropertiesControl propertiesControl = new SongEditorSideBarPropertiesControl();
-    private readonly SongEditorSideBarLayersControl sideBarLayersControl = new SongEditorSideBarLayersControl();
-    private readonly SongEditorSideBarSettingsControl sideBarSettingsControl = new SongEditorSideBarSettingsControl();
+    private readonly TabGroupControl sideBarTabGroupControl = new();
+    private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
+    private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
+    private readonly SongEditorSideBarSettingsControl sideBarSettingsControl = new();
 
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
@@ -250,7 +250,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             TranslationManager.GetTranslation(R.Messages.back),
             helpSideBarContainer);
 
-        List<InputActionInfo> inputActionInfos = new List<InputActionInfo>();
+        List<InputActionInfo> inputActionInfos = new();
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {
             inputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel"));

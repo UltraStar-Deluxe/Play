@@ -12,7 +12,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SceneNavigator.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);

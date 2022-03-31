@@ -8,13 +8,13 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
     public SceneData GetDefaultSceneData()
     {
-        SingingResultsSceneData data = new SingingResultsSceneData();
+        SingingResultsSceneData data = new();
 
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
         data.SongDurationInMillis = 120 * 1000;
 
-        PlayerScoreControllerData playerScoreData = new PlayerScoreControllerData();
+        PlayerScoreControllerData playerScoreData = new();
         playerScoreData.TotalScore = 6500;
         playerScoreData.NormalNotesTotalScore = 4000;
         playerScoreData.GoldenNotesTotalScore = 2000;
@@ -51,10 +51,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     {
         int noteCount = 3;
         int noteLength = 10;
-        Sentence sentence = new Sentence(startBeat, endBeat);
+        Sentence sentence = new(startBeat, endBeat);
         for (int i = 0; i < noteCount; i++)
         {
-            Note note = new Note(ENoteType.Normal, startBeat + (noteLength * i), noteLength, 0, "b");
+            Note note = new(ENoteType.Normal, startBeat + (noteLength * i), noteLength, 0, "b");
             sentence.AddNote(note);
         }
         return sentence;
@@ -62,7 +62,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
     private SentenceScore CreateSentenceScore(Sentence sentence, int totalScoreSoFar)
     {
-        SentenceScore sentenceScore = new SentenceScore(sentence);
+        SentenceScore sentenceScore = new(sentence);
         sentenceScore.TotalScoreSoFar = totalScoreSoFar;
         return sentenceScore;
     }

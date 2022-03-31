@@ -5,8 +5,8 @@ using System.Linq;
 public class ObjectPool<T>
     where T : class
 {
-    private readonly HashSet<T> usedObjects = new HashSet<T>();
-    private readonly HashSet<T> freeObjects = new HashSet<T>();
+    private readonly HashSet<T> usedObjects = new();
+    private readonly HashSet<T> freeObjects = new();
 
     private readonly Action<T> onFreeObject;
     private readonly Action<T> onUseObject;

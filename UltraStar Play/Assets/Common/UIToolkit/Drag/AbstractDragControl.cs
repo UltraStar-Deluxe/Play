@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 
 public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFinishedListener, IDisposable
 {
-    private readonly List<IDragListener<EVENT>> dragListeners = new List<IDragListener<EVENT>>();
+    private readonly List<IDragListener<EVENT>> dragListeners = new();
 
     public bool IsDragging => DragState.Value == EDragState.Dragging;
 
@@ -20,7 +20,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     private int pointerId;
 
     private DragControlPointerEvent dragControlPointerDownEvent;
-    public ReactiveProperty<EDragState> DragState { get; private set; } = new ReactiveProperty<EDragState>(EDragState.WaitingForPointerDown);
+    public ReactiveProperty<EDragState> DragState { get; private set; } = new(EDragState.WaitingForPointerDown);
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement targetVisualElement;
@@ -33,7 +33,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected PanelHelper panelHelper;
 
-    private readonly List<IDisposable> disposables = new List<IDisposable>();
+    private readonly List<IDisposable> disposables = new();
 
     public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
 
@@ -177,7 +177,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEvent(DragControlPointerEvent eventData, GeneralDragEvent localDragStartEvent)
     {
         // Screen coordinates in pixels
-        Vector2 screenPosInPixels = new Vector2(
+        Vector2 screenPosInPixels = new(
             eventData.Position.x,
             eventData.Position.y);
         Vector2 screenDistanceInPixels = screenPosInPixels - localDragStartEvent.ScreenCoordinateInPixels.StartPosition;
@@ -190,7 +190,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
         Vector2 localDistanceInPixels = localPosInPixels - localDragStartEvent.LocalCoordinateInPixels.StartPosition;
 
-        GeneralDragEvent result = new GeneralDragEvent(
+        GeneralDragEvent result = new(
             new DragCoordinate(
                 localDragStartEvent.ScreenCoordinateInPixels.StartPosition,
                 screenDistanceInPixels,
@@ -216,7 +216,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     protected GeneralDragEvent CreateGeneralDragEventStart(DragControlPointerEvent eventData)
     {
         // Screen coordinate in pixels
-        Vector2 screenPosInPixels = new Vector2(
+        Vector2 screenPosInPixels = new(
             eventData.Position.x,
             eventData.Position.y);
 
@@ -225,7 +225,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         float targetHeightInPixels = targetVisualElement.contentRect.height;
         Vector2 localPosInPixels = (Vector2)eventData.Position - targetVisualElement.worldBound.position;
 
-        GeneralDragEvent result = new GeneralDragEvent(
+        GeneralDragEvent result = new(
             new DragCoordinate(
                 screenPosInPixels,
                 Vector2.zero,

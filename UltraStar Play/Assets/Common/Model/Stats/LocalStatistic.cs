@@ -8,7 +8,7 @@ public class LocalStatistic
     public int TimesFinished { get; private set; }
     public int TimesCanceled => TimesStarted - TimesFinished;
     public DateTime LastPlayed { get; private set; } = DateTime.MinValue;
-    public StatisticEntries StatsEntries { get; private set; } = new StatisticEntries();
+    public StatisticEntries StatsEntries { get; private set; } = new();
 
     // Called once when a song is started
     public void IncrementSongStarted()

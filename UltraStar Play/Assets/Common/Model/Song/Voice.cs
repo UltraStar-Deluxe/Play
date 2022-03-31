@@ -14,7 +14,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public string Name { get; private set; } = soloVoiceName;
 
-    private readonly SentenceHashSet sentences = new SentenceHashSet();
+    private readonly SentenceHashSet sentences = new();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
     public Voice()
@@ -101,7 +101,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public Voice CloneDeep()
     {
-        Voice clone = new Voice(Name);
+        Voice clone = new(Name);
         foreach (Sentence sentence in Sentences)
         {
             Sentence sentenceCopy = sentence.CloneDeep();

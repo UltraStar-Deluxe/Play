@@ -6,7 +6,7 @@ public class UltraStarPlaylistTest
     [Test]
     public void PlaylistTest()
     {
-        UltraStarPlaylist playlist = new UltraStarPlaylist();
+        UltraStarPlaylist playlist = new();
         playlist.AddLineEntry(new UltraStartPlaylistLineEntry("# comment"));
         Assert.IsFalse(playlist.HasSongEntry("The artist", "The title"));
         Assert.AreEqual(1, playlist.GetLines().Length);

@@ -65,12 +65,12 @@ public class ItemPicker : VisualElement
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
         // Additional XML attributes
-        private readonly UxmlBoolAttributeDescription wrapAround = new UxmlBoolAttributeDescription { name = "wrapAround", defaultValue = false};
-        private readonly UxmlDoubleAttributeDescription minValue = new UxmlDoubleAttributeDescription { name = "minValue", defaultValue = double.MinValue};
-        private readonly UxmlDoubleAttributeDescription maxValue = new UxmlDoubleAttributeDescription { name = "maxValue", defaultValue = double.MaxValue};
-        private readonly UxmlDoubleAttributeDescription stepValue = new UxmlDoubleAttributeDescription { name = "stepValue", defaultValue = 1};
-        private readonly UxmlBoolAttributeDescription noPreviousButton = new UxmlBoolAttributeDescription { name = "noPreviousButton", defaultValue = false};
-        private readonly UxmlBoolAttributeDescription noNextButton = new UxmlBoolAttributeDescription { name = "noNextButton", defaultValue = false};
+        private readonly UxmlBoolAttributeDescription wrapAround = new() { name = "wrapAround", defaultValue = false};
+        private readonly UxmlDoubleAttributeDescription minValue = new() { name = "minValue", defaultValue = double.MinValue};
+        private readonly UxmlDoubleAttributeDescription maxValue = new() { name = "maxValue", defaultValue = double.MaxValue};
+        private readonly UxmlDoubleAttributeDescription stepValue = new() { name = "stepValue", defaultValue = 1};
+        private readonly UxmlBoolAttributeDescription noPreviousButton = new() { name = "noPreviousButton", defaultValue = false};
+        private readonly UxmlBoolAttributeDescription noNextButton = new() { name = "noNextButton", defaultValue = false};
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {

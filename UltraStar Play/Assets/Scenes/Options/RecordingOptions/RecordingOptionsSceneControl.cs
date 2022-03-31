@@ -12,8 +12,8 @@ using UnityEngine.UIElements;
 
 public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    private static readonly List<int> amplificationItems = new List<int> { 0, 3, 6, 9, 12, 15, 18 };
-    private static readonly List<int> noiseSuppressionItems= new List<int> { 0, 5, 10, 15, 20, 25, 30 };
+    private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
+    private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private RecordingOptionsMicVisualizer micVisualizer;
@@ -305,7 +305,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         // A loaded microphone might have been created with hardware that is not connected now.
         List<string> connectedMicNames = Microphone.devices.ToList();
         List<MicProfile> loadedMicProfiles = settings.MicProfiles;
-        List<MicProfile> micProfiles = new List<MicProfile>(loadedMicProfiles);
+        List<MicProfile> micProfiles = new(loadedMicProfiles);
         List<ConnectedClientHandler> connectedClientHandlers = ServerSideConnectRequestManager.GetConnectedClientHandlers();
 
         // Create mic profiles for connected microphones that are not yet in the list
@@ -314,7 +314,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName && !it.IsInputFromConnectedClient);
             if (!alreadyInList)
             {
-                MicProfile micProfile = new MicProfile(connectedMicName);
+                MicProfile micProfile = new(connectedMicName);
                 micProfiles.Add(micProfile);
             }
         }
@@ -325,7 +325,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
             if (!alreadyInList)
             {
-                MicProfile micProfile = new MicProfile(connectedClientHandler.ClientName, connectedClientHandler.ClientId);
+                MicProfile micProfile = new(connectedClientHandler.ClientName, connectedClientHandler.ClientId);
                 micProfiles.Add(micProfile);
             }
         }

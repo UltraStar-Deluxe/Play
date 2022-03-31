@@ -31,7 +31,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
-    private List<Note> upcomingSortedRecordedNotes = new List<Note>();
+    private List<Note> upcomingSortedRecordedNotes = new();
 
     private int lastPitchDetectedFrame;
     private int lastPitchDetectedBeat;
@@ -217,7 +217,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         // Move the start beat of existing notes behind the given beat.
         // If afterwards no length would be left (or negative), then remove the note completely.
-        List<Note> overlappingNotes = new List<Note>();
+        List<Note> overlappingNotes = new();
         int behindNoteCount = 0;
         foreach (Note upcomingNote in upcomingSortedRecordedNotes)
         {

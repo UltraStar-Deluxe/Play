@@ -51,7 +51,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private SingingResultsSceneData sceneData;
 
-    private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
+    private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
 
     public static SingingResultsSceneControl Instance
     {
@@ -114,7 +114,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
             if (i < playerUis.Count)
             {
                 VisualElement playerUi = playerUis[i];
-                SingingResultsPlayerControl singingResultsPlayerControl = new SingingResultsPlayerControl();
+                SingingResultsPlayerControl singingResultsPlayerControl = new();
                 childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUi, RebindingBehavior.Ignore);
                 childInjector.Inject(singingResultsPlayerControl);
                 singingResultsPlayerUiControls.Add(singingResultsPlayerControl);
@@ -138,7 +138,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         int playerIndex = 0;
         for (int column = 0; column < columns; column++)
         {
-            VisualElement columnElement = new VisualElement();
+            VisualElement columnElement = new();
             columnElement.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
             columnElement.style.height = new StyleLength(Length.Percent(100f));
             columnElement.style.width = new StyleLength(Length.Percent(100f / columns));
@@ -173,7 +173,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void ActivateLayout()
     {
-        List<VisualElement> layouts = new List<VisualElement>();
+        List<VisualElement> layouts = new();
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
         layouts.Add(nPlayerLayout);
@@ -204,7 +204,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (statistics.HasHighscore(sceneData.SongMeta))
         {
             // Go to highscore scene
-            HighscoreSceneData highscoreSceneData = new HighscoreSceneData();
+            HighscoreSceneData highscoreSceneData = new();
             highscoreSceneData.SongMeta = sceneData.SongMeta;
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
             SceneNavigator.Instance.LoadScene(EScene.HighscoreScene, highscoreSceneData);
@@ -212,7 +212,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         else
         {
             // No highscores to show, thus go to song select scene
-            SongSelectSceneData songSelectSceneData = new SongSelectSceneData();
+            SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.SongMeta = sceneData.SongMeta;
             SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
@@ -222,7 +222,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
 
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(sceneData);
         return bb.GetBindings();

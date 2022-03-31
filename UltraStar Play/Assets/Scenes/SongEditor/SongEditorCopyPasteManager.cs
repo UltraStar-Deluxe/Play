@@ -50,7 +50,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private readonly Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new Dictionary<Note, OriginalNoteCopyData>();
+    private readonly Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new();
 
     void Start()
     {

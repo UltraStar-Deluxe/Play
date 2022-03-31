@@ -50,7 +50,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
     public float[] MicSamples { get; private set; }
 
-    private readonly Subject<RecordingEvent> recordingEventStream = new Subject<RecordingEvent>();
+    private readonly Subject<RecordingEvent> recordingEventStream = new();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
@@ -98,7 +98,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             // Code for low-latency microphone input taken from
             // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
             micAudioClip = Microphone.Start(MicProfile.Name, true, 1, SampleRateHz);
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch stopwatch = new();
             stopwatch.Start();
             while (Microphone.GetPosition(MicProfile.Name) <= 0)
             {
@@ -210,7 +210,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         int newSamplesStartIndex = MicSamples.Length - newSamplesCount;
         int newSamplesEndIndex = MicSamples.Length - 1;
-        RecordingEvent recordingEvent = new RecordingEvent(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
+        RecordingEvent recordingEvent = new(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
         recordingEventStream.OnNext(recordingEvent);
     }
     
@@ -278,7 +278,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         else
         {
-            List<string> devices = new List<string>(Microphone.devices);
+            List<string> devices = new(Microphone.devices);
             if (!devices.Contains(localMicProfile.Name))
             {
                 Debug.LogWarning($"Did not find mic '{localMicProfile.Name}'. Available mic devices: {devices.ToCsv()}");

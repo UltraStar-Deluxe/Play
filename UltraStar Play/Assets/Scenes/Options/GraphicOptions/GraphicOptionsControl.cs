@@ -48,7 +48,7 @@ public class GraphicOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             fullscreenContainer.HideByDisplay();
         }
 
-        List<int> fpsOptions = new List<int> { 30, 60 };
+        List<int> fpsOptions = new() { 30, 60 };
         new LabeledItemPickerControl<int>(fpsContainer.Q<ItemPicker>(), fpsOptions)
             .Bind(() => settings.GraphicSettings.targetFps,
                 newValue => settings.GraphicSettings.targetFps = newValue);

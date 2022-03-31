@@ -33,7 +33,7 @@ public class LineDisplayer : INeedInjection, IInjectionFinishedListener
 
     private DynamicTexture dynamicTexture;
 
-    private readonly List<Action> pendingActionList = new List<Action>();
+    private readonly List<Action> pendingActionList = new();
 
     public void OnInjectionFinished()
     {

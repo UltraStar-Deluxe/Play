@@ -133,7 +133,7 @@ public static class CollectionExtensions
     // If the given element is not in the list, then an empty list is returned.
     public static List<T> GetElementsBefore<T>(this IEnumerable<T> enumerable, T element, bool inclusive)
     {
-        List<T> result = new List<T>();
+        List<T> result = new();
 
         int indexOfElement = enumerable.IndexOf(element);
         if (indexOfElement < 0)
@@ -213,7 +213,7 @@ public static class CollectionExtensions
 
     public static Dictionary<TValue, TKey> ToInvertedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> source)
     {
-        Dictionary<TValue, TKey> result = new Dictionary<TValue, TKey>();
+        Dictionary<TValue, TKey> result = new();
         foreach (KeyValuePair<TKey, TValue> entry in source)
         {
             result[entry.Value] = entry.Key;

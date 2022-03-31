@@ -30,7 +30,7 @@ public static class InputLegendControl
             return null;
         }
 
-        InputActionInfo inputActionInfo = new InputActionInfo(actionText, bindingDisplayString);
+        InputActionInfo inputActionInfo = new(actionText, bindingDisplayString);
         VisualElement inputActionInfoUi = CreateInputActionInfoUi(inputActionInfo);
         targetVisualElement.Add(inputActionInfoUi);
         return inputActionInfoUi;
@@ -74,7 +74,7 @@ public static class InputLegendControl
 
     public static VisualElement CreateInputActionInfoUi(InputActionInfo entry)
     {
-        Label label = new Label();
+        Label label = new();
         label.AddToClassList("inputLegendLabel");
         label.text = $"{entry.InputText}: {entry.ActionText}";
         return label;

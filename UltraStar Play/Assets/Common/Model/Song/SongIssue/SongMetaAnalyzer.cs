@@ -4,7 +4,7 @@ public static class SongMetaAnalyzer
 {
     public static IReadOnlyCollection<SongIssue> AnalyzeIssues(SongMeta songMeta)
     {
-        List<SongIssue> result = new List<SongIssue>();
+        List<SongIssue> result = new();
         foreach (Voice voice in songMeta.GetVoices())
         {
             AnalyzeSentencesInVoice(voice, result);

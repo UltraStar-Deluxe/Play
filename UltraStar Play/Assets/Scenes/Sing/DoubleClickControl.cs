@@ -9,16 +9,16 @@ using UnityEngine.UIElements;
 
 public class DoubleClickControl
 {
-    private readonly Subject<bool> doublePointerDownEventStream = new Subject<bool>();
+    private readonly Subject<bool> doublePointerDownEventStream = new();
     public IObservable<bool> DoublePointerDownEventStream => doublePointerDownEventStream;
 
-    private readonly Dictionary<int, float> buttonToLastPointerDownTime = new Dictionary<int, float>();
+    private readonly Dictionary<int, float> buttonToLastPointerDownTime = new();
 
     /**
      * List of buttons that should trigger a double click event.
      * 0 is the left button (and touch), 1 is the right button, 2 is the middle button.
      */
-    public List<int> ButtonFilter { get; set; } = new List<int> { 0 };
+    public List<int> ButtonFilter { get; set; } = new() { 0 };
 
     public DoubleClickControl(VisualElement visualElement)
     {

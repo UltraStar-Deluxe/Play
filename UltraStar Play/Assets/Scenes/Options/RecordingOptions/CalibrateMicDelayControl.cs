@@ -18,7 +18,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     public MicProfile MicProfile { get; set; }
 
-    private readonly Subject<CalibrationResult> calibrationResultEventStream = new Subject<CalibrationResult>();
+    private readonly Subject<CalibrationResult> calibrationResultEventStream = new();
     public IObservable<CalibrationResult> CalibrationResultEventStream => calibrationResultEventStream;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
@@ -33,7 +33,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     private readonly float timeoutInSeconds = 2;
     private float pauseTime = float.MinValue;
 
-    private List<int> delaysInMillis = new List<int>();
+    private List<int> delaysInMillis = new();
     private int currentIteration;
 
     void Awake()

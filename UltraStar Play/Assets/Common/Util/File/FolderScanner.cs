@@ -32,8 +32,8 @@ public class FolderScanner
             return new List<string>();
         }
 
-        List<string> result = new List<string>();
-        DirectoryInfo dirInfo = new DirectoryInfo(folder);
+        List<string> result = new();
+        DirectoryInfo dirInfo = new(folder);
         if (folder == null || !System.IO.Directory.Exists(folder))
         {
             Debug.LogError("Song folder '" + folder + "' does not exist or can not be read!");
