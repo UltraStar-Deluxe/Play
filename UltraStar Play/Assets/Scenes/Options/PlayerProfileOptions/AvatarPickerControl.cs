@@ -9,7 +9,10 @@ public class AvatarPickerControl : PicturedItemPickerControl<EAvatar>
         : base(itemPicker, EnumUtils.GetValuesAsList<EAvatar>())
     {
         this.uiManager = uiManager;
-        Items = EnumUtils.GetValuesAsList<EAvatar>();
+
+        // The initial value might have be set in the base constructor, where the uiManager was not defined yet.
+        // The the image must be updated now.
+        UpdateImageElement(SelectedItem);
     }
 
     protected override StyleBackground GetBackgroundImageValue(EAvatar item)
