@@ -7,7 +7,7 @@ public class SingingResultsSceneData : SceneData
     public SongMeta SongMeta { get; set; }
     public int SongDurationInMillis { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
-    public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new();
+    public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
     private readonly Dictionary<PlayerProfile, PlayerScoreControllerData> playerScoreMap = new();
 
     public void AddPlayerScores(PlayerProfile profile, PlayerScoreControllerData scoreData)
