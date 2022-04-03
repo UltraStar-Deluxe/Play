@@ -17,7 +17,7 @@ public class Sentence : ISerializationCallbackReceiver
     // Must be greater than the MaxBeat and smaller or equal to the MinBeat of the following sentence.
     public int LinebreakBeat { get; private set; }
 
-    private readonly NoteHashSet notes = new();
+    private readonly HashSet<Note> notes = new();
     public IReadOnlyCollection<Note> Notes { get { return notes; } }
 
     // The following fields are computed from the list of notes.
