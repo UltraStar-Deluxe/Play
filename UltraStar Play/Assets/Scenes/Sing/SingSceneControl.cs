@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -327,12 +329,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             return singingLyricsControl;
         }
 
-        bool needSecondLyricsDisplayer = SongMeta.GetVoices().Count > 1
-                                         && PlayerControls.Count > 1;
-        if (needSecondLyricsDisplayer)
+        Dictionary<Voice, List<PlayerControl>> voiceToPlayerControlsMap = new();
+        PlayerControls.ForEach(it => voiceToPlayerControlsMap.AddInsideList(it.Voice, it));
+        if (voiceToPlayerControlsMap.Keys.Count >= 2)
         {
-            topSingingLyricsControl = CreateSingingLyricsControl(topLyricsContainer, PlayerControls[0]);
-            bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls[1]);
+            // There are two different sets of lyrics that need to be displayed
+            List<PlayerControl> playerControlsUsingFirstVoice = voiceToPlayerControlsMap[voiceToPlayerControlsMap.Keys.FirstOrDefault()];
+            List<PlayerControl> playerControlsUsingSecondVoice = voiceToPlayerControlsMap[voiceToPlayerControlsMap.Keys.LastOrDefault()];
+            topSingingLyricsControl = CreateSingingLyricsControl(topLyricsContainer, playerControlsUsingFirstVoice.FirstOrDefault());
+            bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, playerControlsUsingSecondVoice.FirstOrDefault());
         }
         else
         {
