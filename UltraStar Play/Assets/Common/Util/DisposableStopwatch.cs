@@ -50,7 +50,7 @@ public class DisposableStopwatch : IDisposable
         else
         {
             // Log every now and then the measured durations
-            LogUtils.LogFreqeuently(textWithPlaceholders, millis, logPeriodInSeconds);
+            LogUtils.LogFrequently(textWithPlaceholders, millis, logPeriodInSeconds);
         }
     }
 }
