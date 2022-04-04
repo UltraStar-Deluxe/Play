@@ -10,7 +10,8 @@
         "com.achimmihca.primeinputactions",
         "com.achimmihca.Editor.primeinputactions",
         "Common",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "SharedRepoEditor"
     ],
     "includePlatforms": [
         "Editor"

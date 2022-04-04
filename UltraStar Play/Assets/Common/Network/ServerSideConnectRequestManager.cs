@@ -47,11 +47,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
 
-    /**
-     * This version number must to be increased when introducing breaking changes.
-     */
-    public const int ProtocolVersion = 3;
-    
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
     private const int ConnectPortOnClient = 34568;
@@ -145,10 +140,10 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         try
         {
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
-            if (connectRequestDto.ProtocolVersion != ProtocolVersion)
+            if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
             {
                 throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match"
-                    + $" (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
+                    + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
             if (connectRequestDto.ClientName.IsNullOrEmpty())
             {
