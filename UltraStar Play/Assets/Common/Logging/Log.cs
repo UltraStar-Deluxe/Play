@@ -5,8 +5,8 @@ using UnityEngine;
 
 public static class Log
 {
-    private static readonly string logFileFolder = Application.persistentDataPath + "/Logs";
-    private static readonly string logFilePath = logFileFolder + "/UltraStarPlay.log";
+    private static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
+    private static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
 
     public static Serilog.ILogger Logger { get; private set; }
 
