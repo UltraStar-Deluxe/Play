@@ -1,0 +1,3 @@
+[submodule "UltraStar Play/Assets/Common/SharedRepo"]
+	path = UltraStar Play/Assets/Common/SharedRepo
+	url = https://github.com/UltraStar-Deluxe/PlaySharedRepo.git
