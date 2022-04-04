@@ -9,7 +9,7 @@ public class LogUtils
     // The message is constructed from a messagePrefix and dataPoints that are accumulated over the period.
     // Logging a message every frame quickly gets confusing. This method overcomes this
     // by logging every now and then the combined data from multiple frames.
-    public static void LogFreqeuently(string messagePrefix, object dataPoint, float periodInSeconds = 1)
+    public static void LogFrequently(string messagePrefix, object dataPoint, float periodInSeconds = 1)
     {
         if (!messagePrefixToLogDataMap.TryGetValue(messagePrefix, out LogData logData))
         {
