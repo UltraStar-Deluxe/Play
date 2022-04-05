@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
-public class ConnectedClientHandler : IDisposable
+public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
 {
     private static readonly object micSampleBufferReadWriteLock = new();
 

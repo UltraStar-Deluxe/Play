@@ -74,7 +74,7 @@ public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITransl
             "count", ServerSideConnectRequestManager.ConnectedClientCount);
     }
 
-    private VisualElement CreateClientEntry(ConnectedClientHandler clientHandler)
+    private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)
     {
         VisualElement result = connectedClientListEntryAsset.CloneTree();
         result.Q<Label>(R.UxmlNames.nameLabel).text = clientHandler.ClientName;
