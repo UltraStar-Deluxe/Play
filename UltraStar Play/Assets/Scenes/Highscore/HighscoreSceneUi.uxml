@@ -26,7 +26,7 @@
             <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
                 <ui:Button name="nextItemButton" value="This is the about text on multiple lines." class="wideControl" style="flex-direction: row;">
                     <ui:Label text="Next" display-tooltip-when-elided="true" name="nextItemLabel" style="flex-grow: 1;" />
-                    <ui:VisualElement name="nextItemIcon" class="iconImageTextSized" style="position: relative; right: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/navigate_next_white_24dp.svg?fileID=7388822144124034973&amp;guid=a18bfb4f3168ff741bd72aa12e1e7a4d&amp;type=3#navigate_next_white_24dp&apos;); flex-grow: 0;" />
+                    <ui:VisualElement name="nextItemIcon" class="iconImageTextSized" style="position: relative; right: 0; background-image: url(&apos;project://database/Assets/Common/SharedRepo/Graphics/MaterialDesignIcons/navigate_next_white_24dp.svg?fileID=7388822144124034973&amp;guid=a18bfb4f3168ff741bd72aa12e1e7a4d&amp;type=3#navigate_next_white_24dp&apos;); flex-grow: 0;" />
                 </ui:Button>
                 <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" />
             </ui:VisualElement>
