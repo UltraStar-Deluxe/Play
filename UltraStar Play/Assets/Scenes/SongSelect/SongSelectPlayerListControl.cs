@@ -18,7 +18,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     // Static reference to be persisted across scenes.
     // Used to restore the player-microphone assignment.
-    private static PlayerProfileToMicProfileMap lastPlayerProfileToMicProfileMap;
+    private static Dictionary<PlayerProfile, MicProfile> lastPlayerProfileToMicProfileMap;
 
     [InjectedInInspector]
     public VisualTreeAsset playerEntryUi;
@@ -181,9 +181,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
-    public PlayerProfileToMicProfileMap GetSelectedPlayerProfileToMicProfileMap()
+    public Dictionary<PlayerProfile, MicProfile> GetSelectedPlayerProfileToMicProfileMap()
     {
-        PlayerProfileToMicProfileMap result = new();
+        Dictionary<PlayerProfile, MicProfile> result = new();
         playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected && entry.MicProfile != null)

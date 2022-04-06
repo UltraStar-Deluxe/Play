@@ -14,7 +14,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public string Name { get; private set; } = soloVoiceName;
 
-    private readonly SentenceHashSet sentences = new();
+    private readonly HashSet<Sentence> sentences = new();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
     public Voice()
