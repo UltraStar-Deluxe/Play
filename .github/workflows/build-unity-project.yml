@@ -57,5 +57,5 @@ jobs:
           allowDirtyBuild: true
       - uses: actions/upload-artifact@v2
         with:
-          name: Build
-          path: build
+          name: ${{ matrix.targetPlatform }}-build
+          path: build/${{ matrix.targetPlatform }}
