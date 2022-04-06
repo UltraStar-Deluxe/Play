@@ -10,5 +10,5 @@ public class SongEditorSceneData : SceneData
     public SongMeta SelectedSongMeta { get; set; }
     public double PositionInSongInMillis { get; set; }
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new();
-    public PlayerProfileToMicProfileMap PlayerProfileToMicProfileMap { get; set; } = new();
+    public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
 }

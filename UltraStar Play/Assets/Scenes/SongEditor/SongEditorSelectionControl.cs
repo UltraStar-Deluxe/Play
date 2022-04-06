@@ -33,7 +33,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDocument;
     
-    private readonly NoteHashSet selectedNotes = new();
+    private readonly HashSet<Note> selectedNotes = new();
 
     private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
     public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
