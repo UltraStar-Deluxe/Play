@@ -7,7 +7,6 @@ using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
