@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="ContextMenuItemUi" src="project://database/Assets/Common/SharedRepo/UI/ContextMenu/ContextMenuItemUi.uxml?fileID=9197481963319205126&amp;guid=ea29f0371daa45c4c984662fea365b88&amp;type=3#ContextMenuItemUi" />
+    <ui:Template name="ContextMenuSeparatorUi" src="project://database/Assets/Common/SharedRepo/UI/ContextMenu/ContextMenuSeparatorUi.uxml?fileID=9197481963319205126&amp;guid=95883c4a81ebaf142a628840e34b730f&amp;type=3#ContextMenuSeparatorUi" />
+    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
+    <ui:VisualElement name="contextMenu" class="contextMenu roundCorners" style="position: absolute; min-width: 120px; min-height: 24px; border-left-color: rgb(50, 50, 50); border-right-color: rgb(50, 50, 50); border-top-color: rgb(50, 50, 50); border-bottom-color: rgb(50, 50, 50); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;">
+        <ui:Instance template="ContextMenuItemUi" name="ContextMenuItemUi">
+            <AttributeOverrides element-name="contextMenuLabel" text="Some very very long text" />
+        </ui:Instance>
+        <ui:Instance template="ContextMenuSeparatorUi" name="ContextMenuSeparatorUi" />
+        <ui:Instance template="ContextMenuItemUi" name="ContextMenuItemUi" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,19 @@
+﻿public enum ESongProperty
+{
+    Artist,
+    Title,
+    Bpm,
+    Mp3,
+    Background,
+    Cover,
+    Video,
+    Edition,
+    Genre,
+    Language,
+    Year,
+    Gap,
+    VideoGap,
+    PreviewStart,
+    PreviewEnd,
+    Other,
+}
