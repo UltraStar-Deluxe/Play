@@ -1,0 +1,15 @@
+:root {
+    --font-size-xxs: 8px;
+    --font-size-xs: 10px;
+    --font-size-s: 12px;
+    --font-size: 14px;
+    --font-size-l: 18px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 22px;
+    --control-height: 30px;
+    --control-width: 100px;
+    --control-width-half: 50px;
+    --control-width-large: 120px;
+    --control-height-large: 74px;
+    --control-height-small: 20px;
+}
