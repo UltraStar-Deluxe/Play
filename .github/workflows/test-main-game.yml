@@ -1,7 +1,10 @@
-name: Build Unity Project
+name: Test Unity Project
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 
@@ -10,8 +13,8 @@ env:
   PROJECT_PATH: UltraStar Play
 
 jobs:
-  build-job:
-    name: Build for ${{ matrix.targetPlatform }}
+  test-job:
+    name: Test for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,12 +22,8 @@ jobs:
         unityVersion:
           - 2021.2.0f1
         targetPlatform:
-          - StandaloneWindows64
+          # At the moment, tests are target platform independent. Thus only build one.
           - StandaloneLinux64
-          - StandaloneOSX
-          - Android
-          - iOS
-          # - WebGL
     steps:
       # Clone repo and restore cache
       - uses: actions/checkout@v2
@@ -41,22 +40,24 @@ jobs:
             Library-${{ env.PROJECT_PATH }}-
             Library-
       
-      # Run "Download Dependencies"
-      - name: Download Dependencies
-        working-directory: tools/download-dependencies
-        run: sh download-dependencies.sh
+      # Run setup script
+      - name: Setup Script
+        working-directory: tools
+        run: sh setup.sh
       
-      # Build Executables.
-      - uses: game-ci/unity-builder@9358a3a8903d6527767eb4f7094f1d2a6e39edee
+      # Test Unity project
+      - uses: game-ci/unity-test-runner@b88af19d7fb34dadb854cd21a412a69c7fc448f6
+        id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ matrix.unityVersion }}
-          targetPlatform: ${{ matrix.targetPlatform }}
-          customParameters: '-myParameter myValue -myBoolean -ThirdParameter andItsValue'
-          allowDirtyBuild: true
+          testMode: all
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: "-nographics"
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
-          name: ${{ matrix.targetPlatform }}-build
-          path: build/${{ matrix.targetPlatform }}
+          name: Test results (all modes)
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
