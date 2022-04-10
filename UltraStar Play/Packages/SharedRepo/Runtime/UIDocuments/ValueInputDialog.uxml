@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="dialogContent" class="focusableNavigatorRoot dialogBackground" style="position: absolute; background-color: rgb(14, 28, 42); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 450px; height: auto; justify-content: flex-start; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 10px;">
+        <ui:VisualElement name="dialogTitleImageAndTextContainer" style="width: 100%; flex-direction: row; justify-content: flex-start; align-items: center; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; margin-bottom: 20px;">
+            <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage warning" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); display: none;" />
+            <ui:Label text="Dialog Title" name="dialogTitle" class="dialogTitle" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="dialogMessageContainer" style="max-width: 100%; align-items: center; justify-content: center; flex-grow: 1; margin-bottom: 5px;">
+            <ui:Label text="Lorem Ipsum" name="dialogMessage" class="dialogMessage" style="white-space: normal;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="validationWarningContainer" class="smallFont" style="flex-direction: row; width: 100%; align-items: center; padding-left: 10px; padding-right: 10px; padding-bottom: 2px; justify-content: center;">
+            <ui:VisualElement name="invalidValueIcon" class="iconImageTextSized" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); margin-right: 5px; visibility: hidden;" />
+            <ui:Label text="Warning about invalid value" display-tooltip-when-elided="true" name="invalidValueLabel" style="visibility: hidden;" />
+        </ui:VisualElement>
+        <ui:TextField picking-mode="Ignore" name="valueTextField" style="flex-grow: 1; flex-shrink: 1; margin-bottom: 20px;" />
+        <ui:VisualElement name="dialogButtonContainer" style="flex-direction: row; justify-content: space-around; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: center;">
+            <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelButton" style="width: 80px;" />
+            <ui:Button text="OK" display-tooltip-when-elided="true" name="okButton" style="width: 80px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

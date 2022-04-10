@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Common/SharedRepo/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" class="backgroundImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-load]blue.jpg?fileID=21300000&amp;guid=3a5bcfbf700543944b323d144d226503&amp;type=3#[bg-load]blue&apos;);">
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement style="width: 100%; flex-grow: 1; flex-direction: column-reverse;">
