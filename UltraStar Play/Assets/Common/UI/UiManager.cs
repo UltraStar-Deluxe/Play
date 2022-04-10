@@ -25,15 +25,6 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset contextMenuUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset contextMenuItemUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset contextMenuSeparatorUi;
-
-    [InjectedInInspector]
     public ShowFps showFpsPrefab;
 
     [InjectedInInspector]

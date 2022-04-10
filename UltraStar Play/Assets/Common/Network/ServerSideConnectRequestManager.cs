@@ -13,13 +13,13 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
+public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IServerSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
     {
         instance = null;
-        idToConnectedClientMap = new Dictionary<string, ConnectedClientHandler>();
+        idToConnectedClientMap = new Dictionary<string, IConnectedClientHandler>();
     }
 
     private static ServerSideConnectRequestManager instance;
@@ -39,7 +39,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static Dictionary<string, ConnectedClientHandler> idToConnectedClientMap = new();
+    private static Dictionary<string, IConnectedClientHandler> idToConnectedClientMap = new();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
     
     private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new();
@@ -47,11 +47,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
 
-    /**
-     * This version number must to be increased when introducing breaking changes.
-     */
-    public const int ProtocolVersion = 3;
-    
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
     private const int ConnectPortOnClient = 34568;
@@ -145,10 +140,10 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         try
         {
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
-            if (connectRequestDto.ProtocolVersion != ProtocolVersion)
+            if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
             {
                 throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match"
-                    + $" (server (main game): {ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
+                    + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
             if (connectRequestDto.ClientName.IsNullOrEmpty())
             {
@@ -232,7 +227,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         idToConnectedClientMap.Clear();
     }
 
-    public void RemoveConnectedClientHandler(ConnectedClientHandler connectedClientHandler)
+    public void RemoveConnectedClientHandler(IConnectedClientHandler connectedClientHandler)
     {
         if (idToConnectedClientMap.ContainsKey(connectedClientHandler.ClientId))
         {
@@ -249,7 +244,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         int microphoneSampleRate)
     {
         // Dispose any currently registered client with the same IP-Address.
-        if (idToConnectedClientMap.TryGetValue(clientId, out ConnectedClientHandler existingConnectedClientHandler))
+        if (idToConnectedClientMap.TryGetValue(clientId, out IConnectedClientHandler existingConnectedClientHandler))
         {
             existingConnectedClientHandler.Dispose();
         }
@@ -262,12 +257,12 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         return connectedClientHandler;
     }
 
-    public static List<ConnectedClientHandler> GetConnectedClientHandlers()
+    public static List<IConnectedClientHandler> GetConnectedClientHandlers()
     {
         return idToConnectedClientMap.Values.ToList();
     }
     
-    public static bool TryGetConnectedClientHandler(string clientIpEndPointId, out ConnectedClientHandler connectedClientHandler)
+    public bool TryGetConnectedClientHandler(string clientIpEndPointId, out IConnectedClientHandler connectedClientHandler)
     {
         return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
     }

@@ -1,0 +1,28 @@
+{
+    "name": "playshared.Editor",
+    "rootNamespace": "",
+    "references": [
+        "playshared",
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.Editor.protrans",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.Editor.primeinputactions",
+        "com.achimmihca.simplehttpserverforunity",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

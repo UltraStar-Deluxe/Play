@@ -11,7 +11,8 @@
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "playshared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

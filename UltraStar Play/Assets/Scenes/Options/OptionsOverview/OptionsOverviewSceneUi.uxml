@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" class="backgroundImage">
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
@@ -12,58 +11,58 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="languageContainer" style="flex-direction: row; align-items: center; justify-content: flex-end;">
-                    <ui:VisualElement name="languageImage" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/language_white_24dp.svg?fileID=7388822144124034973&amp;guid=1900ef20b8528d644b92809130c3c01a&amp;type=3#language_white_24dp&apos;); flex-direction: row; margin-right: 10px;" />
+                    <ui:VisualElement name="languageImage" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/language_white_24dp.svg?fileID=7388822144124034973&amp;guid=1900ef20b8528d644b92809130c3c01a&amp;type=3#language_white_24dp&apos;); flex-direction: row; margin-right: 10px;" />
                     <ItemPicker name="languageChooser" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement style="width: 100%; flex-grow: 1; justify-content: center;">
                 <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
                     <ui:Button name="gameOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/sports_esports_white_24dp.svg?fileID=7388822144124034973&amp;guid=4d46d47bdcb4baa4b819010bbc44f270&amp;type=3#sports_esports_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/sports_esports_white_24dp.svg?fileID=7388822144124034973&amp;guid=4d46d47bdcb4baa4b819010bbc44f270&amp;type=3#sports_esports_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Game" name="label" />
                     </ui:Button>
                     <ui:Button name="songsOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/music_note_white_24dp.svg?fileID=7388822144124034973&amp;guid=05da8c8efc8c90045b8c80afa7176e05&amp;type=3#music_note_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/music_note_white_24dp.svg?fileID=7388822144124034973&amp;guid=05da8c8efc8c90045b8c80afa7176e05&amp;type=3#music_note_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Songs" name="label" />
                     </ui:Button>
                     <ui:Button name="graphicsOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/desktop_windows_white_24dp.svg?fileID=7388822144124034973&amp;guid=5b22400e8a05fa641989014b3f8f6ce7&amp;type=3#desktop_windows_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/desktop_windows_white_24dp.svg?fileID=7388822144124034973&amp;guid=5b22400e8a05fa641989014b3f8f6ce7&amp;type=3#desktop_windows_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Graphics" name="label" />
                     </ui:Button>
                     <ui:Button name="soundOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/campaign_white_24dp.svg?fileID=7388822144124034973&amp;guid=3973c74a407563a4896a12e0202ae973&amp;type=3#campaign_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/campaign_white_24dp.svg?fileID=7388822144124034973&amp;guid=3973c74a407563a4896a12e0202ae973&amp;type=3#campaign_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Sound" name="label" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
                     <ui:Button name="recordingOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Recording" name="label" />
                     </ui:Button>
                     <ui:Button name="profileOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/people_white_24dp.svg?fileID=7388822144124034973&amp;guid=4be88bb4f0e87514cb4bd9e77845e72a&amp;type=3#people_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/people_white_24dp.svg?fileID=7388822144124034973&amp;guid=4be88bb4f0e87514cb4bd9e77845e72a&amp;type=3#people_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Players" name="label" />
                     </ui:Button>
                     <ui:Button name="designOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/filter_b_and_w_white_24dp.svg?fileID=7388822144124034973&amp;guid=d712c3117dbb89a4891d80a4fd244df8&amp;type=3#filter_b_and_w_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/filter_b_and_w_white_24dp.svg?fileID=7388822144124034973&amp;guid=d712c3117dbb89a4891d80a4fd244df8&amp;type=3#filter_b_and_w_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Design" name="label" />
                     </ui:Button>
                     <ui:Button name="internetOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/cloud_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fdfdc5d0d946a84da439e04160fb4f6&amp;type=3#cloud_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/cloud_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fdfdc5d0d946a84da439e04160fb4f6&amp;type=3#cloud_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Internet" name="label" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
                     <ui:Button name="appOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/phonelink_setup_white_24dp.svg?fileID=7388822144124034973&amp;guid=c5a188f95a686f642b74a04379d0a855&amp;type=3#phonelink_setup_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/phonelink_setup_white_24dp.svg?fileID=7388822144124034973&amp;guid=c5a188f95a686f642b74a04379d0a855&amp;type=3#phonelink_setup_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Apps" name="label" />
                     </ui:Button>
                     <ui:Button name="developerOptionsButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/bug_report_white_24dp.svg?fileID=7388822144124034973&amp;guid=9bef7197907abbe47932ade9224d0516&amp;type=3#bug_report_white_24dp&apos;);" />
+                        <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/bug_report_white_24dp.svg?fileID=7388822144124034973&amp;guid=9bef7197907abbe47932ade9224d0516&amp;type=3#bug_report_white_24dp&apos;);" />
                         <ui:Label text="Developer" name="label" />
                     </ui:Button>
                     <ui:Button name="backButton" class="optionsOverviewButton">
-                        <ui:VisualElement name="backImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MaterialDesignIcons/Svg/arrow_back_white_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_white_24dp&apos;);" />
+                        <ui:VisualElement name="backImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/arrow_back_white_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_white_24dp&apos;);" />
                         <ui:Label text="Back" name="backButtonLabel" />
                     </ui:Button>
                     <ui:Button name="dummyButton" class="optionsOverviewButton" style="visibility: hidden;" />

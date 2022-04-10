@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 
 // This class handles the creation of a sensible default for the SingSceneData
 // when starting the SingScene from within the Unity editor.
-public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
+public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider, INeedInjection
 {
     public string defaultSongName;
 
     [TextArea(3, 8)]
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
+
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     public SceneData GetDefaultSceneData()
     {
@@ -37,7 +41,8 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
 
     private MicProfile GetDefaultMicProfile()
     {
-        return SettingsManager.Instance.Settings.MicProfiles.Where(it => it.IsEnabled && it.IsConnected).FirstOrDefault();
+        return SettingsManager.Instance.Settings.MicProfiles
+            .FirstOrDefault(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager));
     }
 
     private SongMeta GetDefaultSongMeta()

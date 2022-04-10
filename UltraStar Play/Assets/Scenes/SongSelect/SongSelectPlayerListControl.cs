@@ -164,7 +164,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .Select(it => it.MicProfile)
             .ToList();
         List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles
-            .Where(it => it.IsEnabled && it.IsConnected)
+            .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
             .Where(it => !usedMicProfiles.Contains(it))
@@ -246,7 +246,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             PlayerProfile playerProfile = playerProfileAndMicProfileEntry.Key;
             MicProfile lastUsedMicProfile = playerProfileAndMicProfileEntry.Value;
 
-            if (!lastUsedMicProfile.IsConnected
+            if (!lastUsedMicProfile.IsConnected(serverSideConnectRequestManager)
                 || !lastUsedMicProfile.IsEnabled)
             {
                 // Do not use this mic.

@@ -1,0 +1,23 @@
+{
+    "name": "Scenes",
+    "rootNamespace": "",
+    "references": [
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "Common",
+        "com.achimmihca.protrans",
+        "com.achimmihca.uniinject",
+        "Unity.InputSystem",
+        "playshared"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
