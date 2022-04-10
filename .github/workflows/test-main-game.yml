@@ -1,4 +1,4 @@
-name: Test Unity Project
+name: Test Main Game
 
 on:
   push:
