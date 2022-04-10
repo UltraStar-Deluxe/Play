@@ -9,7 +9,8 @@
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "sharedrepo"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

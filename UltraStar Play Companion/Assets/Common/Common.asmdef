@@ -8,7 +8,8 @@
         "com.achimmihca.protrans",
         "com.achimmihca.uniinject",
         "com.achimmihca.primeinputactions",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "sharedrepo"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

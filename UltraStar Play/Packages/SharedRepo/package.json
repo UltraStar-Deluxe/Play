@@ -1,0 +1,18 @@
+{
+    "name": "sharedrepo",
+    "version": "1.0.0",
+    "displayName": "SharedRepo",
+    "description": "Unity package for common code in UltraStar Play main game and Companion App",
+    "dependencies": {
+    },
+   "keywords": [
+    ],
+    "author": {
+      "name": "UltraStar Play contributors",
+      "email": "ultrastar.play@outlook.com",
+      "url": "https://github.com/UltraStar-Deluxe/Play"
+    },
+	"samples": [
+    ]
+}
+  

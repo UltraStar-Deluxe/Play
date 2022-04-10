@@ -1,0 +1,15 @@
+{
+	"name": "com.achimmihca.protrans.sample1",
+	"references": [
+		"com.achimmihca.protrans"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
