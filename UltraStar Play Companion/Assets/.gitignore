@@ -14,6 +14,3 @@ Plugins/Serilog/Serilog/
 Plugins/Serilog/Serilog.meta
 Plugins/Serilog/Serilog.Sinks.File/
 Plugins/Serilog/Serilog.Sinks.File.meta
-
-# Do not commit the symlink to the SharedRepo
-Common/SharedRepo

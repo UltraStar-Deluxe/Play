@@ -12,7 +12,7 @@
         "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
         "Unity.InputSystem",
-        "sharedrepo"
+        "playshared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

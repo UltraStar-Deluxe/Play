@@ -10,7 +10,7 @@
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
         "Unity.InputSystem",
-        "sharedrepo"
+        "playshared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

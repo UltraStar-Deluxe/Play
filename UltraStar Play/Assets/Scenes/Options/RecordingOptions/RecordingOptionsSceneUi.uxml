@@ -48,7 +48,7 @@
             <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row-reverse;">
                 <ui:Button text="Back" name="backButton" />
                 <ui:VisualElement name="notConnectedContainer" style="width: 300px; flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="warningIcon" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 32px; height: 32px; -unity-background-image-tint-color: rgb(219, 214, 20); margin-right: 20px;" />
+                    <ui:VisualElement name="warningIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 32px; height: 32px; -unity-background-image-tint-color: rgb(219, 214, 20); margin-right: 20px;" />
                     <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" />
                 </ui:VisualElement>
                 <ui:Button text="Delete" name="deleteButton" style="visibility: visible; display: flex;" />

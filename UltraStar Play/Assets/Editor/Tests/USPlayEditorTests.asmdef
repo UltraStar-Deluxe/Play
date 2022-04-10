@@ -9,7 +9,7 @@
         "Scenes",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "sharedrepo"
+        "playshared"
     ],
     "includePlatforms": [
         "Editor"

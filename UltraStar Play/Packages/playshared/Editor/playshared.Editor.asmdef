@@ -1,8 +1,8 @@
 {
-    "name": "sharedrepo.Editor",
+    "name": "playshared.Editor",
     "rootNamespace": "",
     "references": [
-        "sharedrepo",
+        "playshared",
         "Serilog",
         "Plugins",
         "UniRx",

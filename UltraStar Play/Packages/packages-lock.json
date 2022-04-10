@@ -240,8 +240,8 @@
       },
       "url": "https://packages.unity.com"
     },
-    "sharedrepo": {
-      "version": "file:SharedRepo",
+    "playshared": {
+      "version": "file:playshared",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
