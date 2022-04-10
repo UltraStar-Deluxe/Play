@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="issueUiRoot" style="width: 18px; height: 18px; position: absolute;">
-        <ui:VisualElement name="issueImage" class="warning" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/warning_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=04777db2472d3ea479a358f54750ec99&amp;type=3#warning_outline_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 100%; height: 100%; position: absolute;" />
+        <ui:VisualElement name="issueImage" class="warning" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=04777db2472d3ea479a358f54750ec99&amp;type=3#warning_outline_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 100%; height: 100%; position: absolute;" />
     </ui:VisualElement>
 </ui:UXML>

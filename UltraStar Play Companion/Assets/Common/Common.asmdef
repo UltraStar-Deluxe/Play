@@ -9,7 +9,7 @@
         "com.achimmihca.uniinject",
         "com.achimmihca.primeinputactions",
         "Unity.InputSystem",
-        "sharedrepo"
+        "playshared"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

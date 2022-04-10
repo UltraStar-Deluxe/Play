@@ -7,7 +7,7 @@
             <ui:Button text="Delete" name="deleteButton" />
         </ui:VisualElement>
         <ui:VisualElement name="warningContainer" style="flex-direction: row; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; justify-content: center;">
-            <ui:VisualElement name="warningIcon" class="warning" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 24px; height: 24px;" />
+            <ui:VisualElement name="warningIcon" class="warning" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 24px; height: 24px;" />
             <ui:Label text="Path does not exist" display-tooltip-when-elided="true" name="warningLabel" class="warning" style="padding-left: 20px;" />
         </ui:VisualElement>
     </ui:VisualElement>

@@ -268,8 +268,8 @@
       },
       "url": "https://packages.unity.com"
     },
-    "sharedrepo": {
-      "version": "file:../../UltraStar Play/Packages/SharedRepo",
+    "playshared": {
+      "version": "file:../../UltraStar Play/Packages/playshared",
       "depth": 0,
       "source": "local",
       "dependencies": {}

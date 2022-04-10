@@ -1,5 +1,5 @@
 {
-    "name": "sharedrepo",
+    "name": "playshared",
     "rootNamespace": "",
     "references": [
         "Serilog",

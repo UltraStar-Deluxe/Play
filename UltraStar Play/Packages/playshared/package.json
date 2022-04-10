@@ -1,8 +1,8 @@
 {
-    "name": "sharedrepo",
+    "name": "playshared",
     "version": "1.0.0",
-    "displayName": "SharedRepo",
-    "description": "Unity package for common code in UltraStar Play main game and Companion App",
+    "displayName": "PlayShared",
+    "description": "Unity package for common assets in UltraStar Play main game and Companion App",
     "dependencies": {
     },
    "keywords": [
