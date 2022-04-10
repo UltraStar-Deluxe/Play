@@ -1,4 +1,4 @@
-name: Test Unity Project
+name: Test Companion App
 
 on:
   push:

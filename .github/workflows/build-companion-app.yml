@@ -1,4 +1,4 @@
-name: Build Unity Project
+name: Build Companion App
 
 on:
   push:
