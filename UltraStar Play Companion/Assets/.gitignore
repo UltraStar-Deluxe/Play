@@ -1,0 +1,16 @@
+Plugins/UniRx/
+Plugins/UniRx.meta
+
+Plugins/FullSerializer/
+Plugins/FullSerializer.meta
+
+Plugins/CompileTimeTracker/
+Plugins/CompileTimeTracker.meta
+
+Plugins/SharpZipLib/
+Plugins/SharpZipLib.meta
+
+Plugins/Serilog/Serilog/
+Plugins/Serilog/Serilog.meta
+Plugins/Serilog/Serilog.Sinks.File/
+Plugins/Serilog/Serilog.Sinks.File.meta

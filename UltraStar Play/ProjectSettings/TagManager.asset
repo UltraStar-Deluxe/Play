@@ -28,6 +28,7 @@ TagManager:
   - ServerSideConnectRequestManager
   - TranslationManager
   - StyleSheetControl
+  - ContextMenuPopupManager
   layers:
   - Default
   - TransparentFX

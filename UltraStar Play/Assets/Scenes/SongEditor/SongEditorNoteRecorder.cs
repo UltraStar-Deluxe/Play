@@ -31,6 +31,9 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
     private List<Note> upcomingSortedRecordedNotes = new();
 
     private int lastPitchDetectedFrame;
@@ -295,7 +298,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
                                 && songAudioPlayer.IsPlaying
                                 && settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone
                                 && settings.SongEditorSettings.MicProfile != null
-                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected;
+                                && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);
 
         if (!shouldBeRecoding && micPitchTracker.MicSampleRecorder.IsRecording)
         {

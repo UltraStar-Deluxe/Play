@@ -1,16 +1,29 @@
 {
     "name": "USPlayEditorTests",
+    "rootNamespace": "",
     "references": [
         "Plugins",
         "UniRx",
         "UniInject",
         "Common",
-        "Scenes"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Scenes",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "playshared"
     ],
     "includePlatforms": [
         "Editor"
-    ]
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

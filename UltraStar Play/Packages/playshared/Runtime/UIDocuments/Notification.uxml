@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="container" picking-mode="Ignore" style="background-color: rgba(14, 28, 42, 0.75); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: auto; height: auto; justify-content: center; align-items: flex-start; min-width: 200px; min-height: 40px; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px;">
+        <ui:Label text="Label" display-tooltip-when-elided="true" name="notificationLabel" picking-mode="Ignore" style="flex-wrap: wrap;" />
+    </ui:VisualElement>
+</ui:UXML>
