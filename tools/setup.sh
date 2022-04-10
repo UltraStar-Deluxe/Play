@@ -1,19 +1,5 @@
 old_dir=$(pwd)
 
-
-echo "Creating SharedRepo symlink"
-echo "==========================="
-echo ""
-sh create-shared-repo-symlink.sh
-cd "$old_dir"
-
-if [ ! -d "../UltraStar Play Companion/Assets/Common/SharedRepo" ] 
-then
-    echo "SharedRepo folder was not created successfully. Aborting setup script."
-    exit 1    
-fi
-
-
 echo "Downloading dependencies of main game"
 echo "==========================="
 echo ""
