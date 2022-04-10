@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 
 public class SongListRequestor : AbstractHttpRequestor
 {
-    private Subject<SongListEvent> songListEventStream = new Subject<SongListEvent>();
+    private readonly Subject<SongListEvent> songListEventStream = new Subject<SongListEvent>();
     public IObservable<SongListEvent> SongListEventStream => songListEventStream;
     
     public bool SuccessfullyLoadedAllSongs { get; private set; }
