@@ -37,7 +37,7 @@ public static class PropertiesFileParser
             return emptyKeyValuePair;
         }
 
-        int indexOfEquals = line.IndexOf("=");
+        int indexOfEquals = line.IndexOf("=", StringComparison.InvariantCulture);
         if (indexOfEquals < 0)
         {
             return emptyKeyValuePair;

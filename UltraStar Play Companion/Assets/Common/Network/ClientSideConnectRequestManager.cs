@@ -64,7 +64,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private int connectRequestCount;
 
-    private ConcurrentQueue<ConnectResponseDto> serverResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
+    private readonly ConcurrentQueue<ConnectResponseDto> serverResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
 
     private bool isApplicationPaused;
 
