@@ -1,0 +1,63 @@
+name: Test Unity Project
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  PROJECT_PATH: UltraStar Play Companion
+
+jobs:
+  test-job:
+    name: Test for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2021.2.0f1
+        targetPlatform:
+          - Android
+          - iOS
+    steps:
+      # Clone repo and restore cache
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true
+          submodules: recursive
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.PROJECT_PATH }}/Library
+          key: Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-${{ hashFiles(env.PROJECT_PATH) }}
+          restore-keys: |
+            Library-${{ env.PROJECT_PATH }}-${{ matrix.targetPlatform }}-
+            Library-${{ env.PROJECT_PATH }}-
+            Library-
+      
+      # Run setup script
+      - name: Setup Script
+        working-directory: tools
+        run: sh setup.sh
+      
+      # Test Unity project
+      - uses: game-ci/unity-test-runner@b88af19d7fb34dadb854cd21a412a69c7fc448f6
+        id: testRunner
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          projectPath: ${{ env.PROJECT_PATH }}
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: all
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          customParameters: "-nographics"
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Test results (all modes)
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
