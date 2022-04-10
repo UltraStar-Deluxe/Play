@@ -46,5 +46,7 @@ rmlink() {
 }
 
 # Create symlink from Companion App SharedRepo to main game SharedRepo
+old_dir=$(pwd)
 cd "../UltraStar Play Companion/Assets/Common"
 link "SharedRepo" "../../../UltraStar Play/Assets/Common/SharedRepo"
+cd "$old_dir"
