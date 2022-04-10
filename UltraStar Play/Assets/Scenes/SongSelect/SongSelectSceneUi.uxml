@@ -2,7 +2,6 @@
     <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSongEntryUi" />
     <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
     <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
-    <Style src="project://database/Assets/Common/SharedRepo/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
@@ -32,7 +31,7 @@
                         <ui:Label text="Search artist, title, language" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="smallerFont ellipsis" style="-unity-font-style: italic; width: 85%; position: absolute; left: 10px; color: rgb(0, 0, 0);" />
                     </ui:TextField>
                     <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="transparentBackgroundColor outlineOnFocus roundCorners" style="width: 30px; height: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-                        <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/SharedRepo/Graphics/MaterialDesignIcons/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
+                        <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%;">
@@ -83,7 +82,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="iconContainer" style="position: absolute; height: 100%; width: 30%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
                         <ui:VisualElement name="duetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 24px; height: 24px; display: flex;" />
-                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Assets/Common/SharedRepo/Graphics/MaterialDesignIcons/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit;">
+                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit;">
                             <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="videoIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/VideoIcon.png?fileID=2800000&amp;guid=7383f98aba0fc1f4c97010b513d5b884&amp;type=3#VideoIcon&apos;); width: 24px; height: 24px;" />
@@ -128,7 +127,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; flex-wrap: wrap;">
-            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Assets/Common/SharedRepo/Graphics/MaterialDesignIcons/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
+            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />

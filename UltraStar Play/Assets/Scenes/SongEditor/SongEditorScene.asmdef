@@ -9,7 +9,8 @@
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "sharedrepo"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

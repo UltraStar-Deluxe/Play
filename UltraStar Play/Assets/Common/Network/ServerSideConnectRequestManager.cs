@@ -13,7 +13,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
+public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IServerSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
@@ -262,7 +262,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection
         return idToConnectedClientMap.Values.ToList();
     }
     
-    public static bool TryGetConnectedClientHandler(string clientIpEndPointId, out IConnectedClientHandler connectedClientHandler)
+    public bool TryGetConnectedClientHandler(string clientIpEndPointId, out IConnectedClientHandler connectedClientHandler)
     {
         return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
     }

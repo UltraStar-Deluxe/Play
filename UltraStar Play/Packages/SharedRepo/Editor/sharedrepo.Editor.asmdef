@@ -1,10 +1,21 @@
 {
     "name": "sharedrepo.Editor",
+    "rootNamespace": "",
     "references": [
-		"sharedrepo"
+        "sharedrepo",
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.Editor.protrans",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.Editor.primeinputactions",
+        "com.achimmihca.simplehttpserverforunity",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
-		"Editor"
+        "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

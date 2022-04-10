@@ -1,9 +1,10 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
-public class Settings
+public class Settings : ISettings
 {
     public GameSettings GameSettings { get; set; } = new();
     public GraphicSettings GraphicSettings { get; set; } = new();
@@ -27,5 +28,18 @@ public class Settings
         result.Add(new PlayerProfile("Player01", EDifficulty.Medium, EAvatar.GenericPlayer01));
         result.Add(new PlayerProfile("Player02", EDifficulty.Easy, EAvatar.GenericPlayer02));
         return result;
+    }
+
+    // TODO: flatten settings?
+    public SystemLanguage Language
+    {
+        get { return GameSettings.language; }
+        set { GameSettings.language = value; }
+    }
+
+    public EPitchDetectionAlgorithm PitchDetectionAlgorithm
+    {
+        get { return AudioSettings.pitchDetectionAlgorithm; }
+        set { AudioSettings.pitchDetectionAlgorithm = value; }
     }
 }

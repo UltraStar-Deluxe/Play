@@ -1,6 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="NoteUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteUi.uxml?fileID=9197481963319205126&amp;guid=726e4c425e366bc4781f431b540ceb7f&amp;type=3#NoteUi" />
-    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="root" class="singScenePlayerUi" style="flex-grow: 1;">
         <ui:VisualElement name="column">
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
@@ -12,7 +11,7 @@
                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                 <ui:VisualElement name="micDisconnectedContainer" style="flex-direction: row; align-items: flex-end; width: auto; height: 100%;">
                     <ui:Label text="Mic Disconnected" display-tooltip-when-elided="true" name="micDisconnectedLabel" class="error" style="-unity-font-style: bold; -unity-text-align: lower-left; -unity-text-outline-color: rgb(255, 255, 255); text-shadow: 0 0 1px rgb(0, 0, 0);" />
-                    <ui:VisualElement name="micDisconnectedIcon" class="titleImage error" style="background-image: url(&apos;project://database/Assets/Common/SharedRepo/Graphics/MaterialDesignIcons/mic_off_white_24dp.svg?fileID=7388822144124034973&amp;guid=a42dbc48531aa5d49b08f8c2e7184ee6&amp;type=3#mic_off_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; margin-left: 5px; margin-right: 5px;" />
+                    <ui:VisualElement name="micDisconnectedIcon" class="titleImage error" style="background-image: url(&apos;project://database/Packages/sharedrepo/Runtime/Graphics/MaterialDesignIcons/mic_off_white_24dp.svg?fileID=7388822144124034973&amp;guid=a42dbc48531aa5d49b08f8c2e7184ee6&amp;type=3#mic_off_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; margin-left: 5px; margin-right: 5px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="scoreContainer" style="height: auto; width: 120px; justify-content: center; align-items: flex-end; border-top-left-radius: 5px; border-bottom-left-radius: 0; border-top-right-radius: 5px; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[sing]scoreBg.png?fileID=2800000&amp;guid=3c265bba4c7dfec43a0a3b5410a7c558&amp;type=3#[sing]scoreBg&apos;);">
                     <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5); -unity-text-align: middle-left;" />

@@ -135,7 +135,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 ignoreSampleRateChange = false;
             }
             else if (!SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
-                     && ServerSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                     && serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
             {
                 serverSideConnectRequestManager.RemoveConnectedClientHandler(connectedClientHandler);
             }
@@ -248,7 +248,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
         enabledToggle.value = micProfile.IsEnabled;
 
-        if (micProfile.IsConnected)
+        if (micProfile.IsConnected(serverSideConnectRequestManager))
         {
             notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
             deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
@@ -269,7 +269,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             return;
         }
 
-        if (!SelectedMicProfile.IsConnected)
+        if (!SelectedMicProfile.IsConnected(serverSideConnectRequestManager))
         {
             settings.MicProfiles.Remove(SelectedMicProfile);
             devicePickerControl.Items = CreateMicProfiles();

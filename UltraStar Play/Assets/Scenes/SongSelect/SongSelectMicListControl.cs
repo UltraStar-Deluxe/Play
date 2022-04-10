@@ -85,7 +85,9 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
 
         // Create new entries
         List<MicProfile> micProfiles = settings.MicProfiles;
-        List<MicProfile> enabledAndConnectedMicProfiles = micProfiles.Where(it => it.IsEnabled && it.IsConnected).ToList();
+        List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
+            .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
+            .ToList();
         if (enabledAndConnectedMicProfiles.IsNullOrEmpty())
         {
             noMicsFoundLabel.ShowByDisplay();

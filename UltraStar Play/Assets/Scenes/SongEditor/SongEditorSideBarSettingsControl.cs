@@ -113,6 +113,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    [Inject]
     private Injector injector;
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
@@ -159,11 +162,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         // Mic recording settings
         List<MicProfile> micProfiles = settings.MicProfiles;
-        List<MicProfile> enabledAndConnectedMicProfiles = micProfiles.Where(it => it.IsEnabledAndConnected).ToList();
+        List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
+            .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
+            .ToList();
         micDeviceItemPickerControl = new LabeledItemPickerControl<MicProfile>(micDeviceItemPicker, enabledAndConnectedMicProfiles);
         micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.Name : "";
         if (settings.SongEditorSettings.MicProfile == null
-            || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected)
+            || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
         {
             settings.SongEditorSettings.MicProfile = enabledAndConnectedMicProfiles.FirstOrDefault();
         }

@@ -1,4 +1,3 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="image" style="width: 24px; height: 24px; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/Notes/GoldenNoteStar.png?fileID=2800000&amp;guid=57e9a6fa481d26e45baabc650e4556ba&amp;type=3#GoldenNoteStar&apos;); -unity-background-image-tint-color: rgb(224, 233, 74); margin-left: -12px; margin-top: -12px;" />
 </ui:UXML>

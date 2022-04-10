@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="noteUiRoot" style="width: 100%; height: 100%;">
         <ui:VisualElement name="targetNote" style="position: absolute; width: 100%; height: 100%; overflow: hidden; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
             <ui:VisualElement name="targetNoteImage" style="background-image: none; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: rgb(126, 167, 179);">

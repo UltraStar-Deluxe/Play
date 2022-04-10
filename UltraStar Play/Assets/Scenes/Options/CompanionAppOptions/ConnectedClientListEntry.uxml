@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/UIToolkit/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="container" style="flex-direction: row; width: auto; justify-content: space-between; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; align-items: center;">
         <ui:Label text="My Connected App" name="nameLabel" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; width: 40%;" />
         <ui:VisualElement>

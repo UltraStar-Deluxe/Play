@@ -19,7 +19,10 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
 
     private int nextBeatToAnalyze;
 
-    private int MicDelayInMillis => settings.SongEditorSettings.MicDelayInMillis;
+    [Inject]
+    private Settings songEditorSettings;
+
+    private int MicDelayInMillis => songEditorSettings.SongEditorSettings.MicDelayInMillis;
 
     public override void OnInjectionFinished()
     {
@@ -82,7 +85,7 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
         }
         else
         {
-            int shiftedMidiNote = pitchEvent.MidiNote + (settings.SongEditorSettings.MicOctaveOffset * 12);
+            int shiftedMidiNote = pitchEvent.MidiNote + (songEditorSettings.SongEditorSettings.MicOctaveOffset * 12);
             pitchEventStream.OnNext(new BeatPitchEvent(shiftedMidiNote, beat));
         }
     }

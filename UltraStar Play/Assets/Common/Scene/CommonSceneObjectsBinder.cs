@@ -29,6 +29,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InputManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
+        bb.Bind(typeof(IServerSideConnectRequestManager)).ToExistingInstance(ServerSideConnectRequestManager.Instance);
         bb.BindExistingInstance(ServerSideConnectRequestManager.Instance);
 
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
@@ -38,6 +39,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => GetUiDocument());
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
+        bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
 
