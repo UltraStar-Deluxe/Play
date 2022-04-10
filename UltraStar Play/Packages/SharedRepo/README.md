@@ -1,0 +1,1 @@
+Unity package for common code in UltraStar Play main game and Companion App
