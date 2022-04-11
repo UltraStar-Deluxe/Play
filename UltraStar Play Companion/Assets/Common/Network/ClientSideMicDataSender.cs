@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -29,13 +30,15 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
     
-    private TcpClient clientMicDataSender;
-    private NetworkStream clientMicDataSenderNetworkStream;
-    public IPEndPoint serverMicDataReceiverEndPoint;
-
-    private byte[] receiveByteArray;
+    private TcpClient tcpClient;
+    private NetworkStream tcpClientStream;
+    private StreamReader tcpClientStreamReader;
+    private StreamWriter tcpClientStreamWriter;
+    private IPEndPoint serverSideTcpClientEndPoint;
 
     private Thread receiveDataThread;
+
+    private float lastSendMessageTimeInSeconds;
     
     private void Start()
     {
@@ -44,16 +47,15 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Receive data from server.
         // So far, the server only sends a still-alive check, which fails automatically when the connection is lost.
-        receiveByteArray = new byte[2048];
-        receiveDataThread = new Thread(() => 
+        receiveDataThread = new Thread(() =>
         {
             while (true)
             {
-                if (serverMicDataReceiverEndPoint != null
-                    && clientMicDataSender != null
-                    && clientMicDataSenderNetworkStream != null)
+                if (serverSideTcpClientEndPoint != null
+                    && tcpClient != null
+                    && tcpClientStream != null)
                 {
-                    ReceiveServerData();
+                    AcceptServerMessages();
                 }
                 Thread.Sleep(250);
             }
@@ -63,23 +65,59 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandleNewMicSamples(RecordingEvent recordingEvent)
     {
-        if (serverMicDataReceiverEndPoint != null
-            && clientMicDataSender != null
-            && clientMicDataSenderNetworkStream != null)
+        if (serverSideTcpClientEndPoint != null
+            && tcpClient != null
+            && tcpClientStream != null)
         {
-            SendMicData(recordingEvent);
+            // TODO: Perform pitch detection as needed and send result to server
+            if (Time.time > lastSendMessageTimeInSeconds + 1)
+            {
+                lastSendMessageTimeInSeconds = Time.time;
+
+                try
+                {
+                    // DateTime now = DateTime.Now;
+                    // Debug.Log($"Send data: {newByteData.Length} bytes ({recordingEvent.NewSampleCount} samples) at {now}:{now.Millisecond}");
+                    tcpClientStreamWriter.WriteLine("{\"name\": \"Bob\"}");
+                    tcpClientStreamWriter.Flush();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    Debug.LogError($"Failed to send message");
+                    clientSideConnectRequestManager.CloseConnectionAndReconnect();
+                }
+            }
         }
     }
 
-    private void ReceiveServerData()
+    private void AcceptServerMessages()
     {
-        int receivedByteCount;
-        while (clientMicDataSenderNetworkStream.DataAvailable
-               && (receivedByteCount = clientMicDataSenderNetworkStream.Read(receiveByteArray, 0, receiveByteArray.Length)) > 0)
+        if (!tcpClientStream.DataAvailable)
         {
-            // Do nothing.
-            // Debug.Log($"Received {receivedByteCount} bytes from main game (still-alive check).");
+            return;
         }
+
+        string receivedLine = tcpClientStreamReader.ReadLine();
+        if (receivedLine.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        receivedLine = receivedLine.Trim();
+        if (!receivedLine.StartsWith("{")
+            || !receivedLine.EndsWith("}"))
+        {
+            Debug.LogWarning($"Received invalid message from server: {receivedLine}");
+            return;
+        }
+
+        HandleServerJsonMessage(receivedLine);
+    }
+
+    private void HandleServerJsonMessage(string json)
+    {
+        Debug.Log($"Received JSON from server: {json}");
     }
 
     private void SendMicData(RecordingEvent recordingEvent)
@@ -100,7 +138,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         {
             // DateTime now = DateTime.Now;
             // Debug.Log($"Send data: {newByteData.Length} bytes ({recordingEvent.NewSampleCount} samples) at {now}:{now.Millisecond}");
-            clientMicDataSenderNetworkStream.Write(newByteData, 0, newByteData.Length);
+            tcpClientStream.Write(newByteData, 0, newByteData.Length);
         }
         catch (Exception e)
         {
@@ -116,7 +154,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             && connectEvent.MicrophonePort > 0
             && connectEvent.ServerIpEndPoint != null)
         {
-            serverMicDataReceiverEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MicrophonePort);
+            serverSideTcpClientEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MicrophonePort);
             if (connectEvent.MicrophoneSampleRate > 0
                 && connectEvent.MicrophoneSampleRate != settings.SampleRate)
             {
@@ -134,9 +172,11 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             CloseNetworkConnection();
             try
             {
-                clientMicDataSender = new TcpClient();
-                clientMicDataSender.Connect(serverMicDataReceiverEndPoint);
-                clientMicDataSenderNetworkStream = clientMicDataSender.GetStream();
+                tcpClient = new TcpClient();
+                tcpClient.Connect(serverSideTcpClientEndPoint);
+                tcpClientStream = tcpClient.GetStream();
+                tcpClientStreamReader = new StreamReader(tcpClientStream);
+                tcpClientStreamWriter = new StreamWriter(tcpClientStream);
             }
             catch (Exception e)
             {
@@ -147,7 +187,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         else
         {
             CloseNetworkConnection();
-            serverMicDataReceiverEndPoint = null;
+            serverSideTcpClientEndPoint = null;
             clientSideMicSampleRecorder.StopRecording();
         }
     }
@@ -159,9 +199,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void CloseNetworkConnection()
     {
-        clientMicDataSenderNetworkStream?.Close();
-        clientMicDataSenderNetworkStream = null;
-        clientMicDataSender?.Close();
-        clientMicDataSender = null;
+        tcpClientStream?.Close();
+        tcpClientStream = null;
+        tcpClient?.Close();
+        tcpClient = null;
     }
 }
