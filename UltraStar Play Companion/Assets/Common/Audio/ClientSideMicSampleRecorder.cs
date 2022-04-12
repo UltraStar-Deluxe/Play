@@ -35,6 +35,30 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
     private Settings settings;
     
     private AudioClip micAudioClip;
+
+    // TODO: Receive MicProfile from main game (except the device name).
+    public MicProfile MicProfile
+    {
+        get
+        {
+            MicProfile micProfile = new MicProfile(DeviceName.Value)
+                {
+                    SampleRate = SampleRate.Value,
+                    DelayInMillis = 0,
+                    Amplification = 0,
+                    NoiseSuppression = 0,
+                    IsEnabled = true,
+                    IsInputFromConnectedClient = false
+                };
+            return micProfile;
+        }
+
+        set
+        {
+            SampleRate.Value = value.SampleRate;
+            DeviceName.Value = value.Name;
+        }
+    }
     
     private int lastSamplePosition;
     
