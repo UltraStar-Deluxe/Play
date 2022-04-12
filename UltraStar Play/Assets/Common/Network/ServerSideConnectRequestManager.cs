@@ -43,9 +43,12 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
     
     private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new();
-    
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
+
+    private readonly ConcurrentQueue<ConnectedClientBeatPitchEvent> connectedClientBeatPitchEventQueue = new();
+    private readonly Subject<ConnectedClientBeatPitchEvent> connectedClientBeatPitchEventStream = new();
+    public IObservable<ConnectedClientBeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
@@ -85,6 +88,10 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         while (clientConnectedEventQueue.TryDequeue(out ClientConnectionEvent clientConnectedEvent))
         {
             clientConnectedEventStream.OnNext(clientConnectedEvent);
+        }
+        while (connectedClientBeatPitchEventQueue.TryDequeue(out ConnectedClientBeatPitchEvent pitchEvent))
+        {
+            connectedClientBeatPitchEventStream.OnNext(pitchEvent);
         }
     }
 
@@ -186,8 +193,14 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
 
     private void HandleClientMessageWithMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
-        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId, connectRequestDto.MicrophoneSampleRate);
+        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId);
         clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
+
+        newConnectedClientHandler.PitchEventStream
+            .Subscribe(pitchEvent => connectedClientBeatPitchEventQueue.Enqueue(new ConnectedClientBeatPitchEvent(
+                pitchEvent.MidiNote,
+                pitchEvent.Beat,
+                newConnectedClientHandler.ClientId)));
 
         MicProfile micProfileOfClient = settings.MicProfiles
             .FirstOrDefault(micProfile => micProfile.ConnectedClientId == newConnectedClientHandler.ClientId);
@@ -200,7 +213,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
-            MicrophonePort = newConnectedClientHandler.MicTcpListener.GetPort(),
+            MicrophonePort = newConnectedClientHandler.ClientTcpListener.GetPort(),
             MicrophoneSampleRate = micProfileSampleRate,
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
@@ -240,8 +253,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     private ConnectedClientHandler RegisterClient(
         IPEndPoint clientIpEndPoint,
         string clientName,
-        string clientId,
-        int microphoneSampleRate)
+        string clientId)
     {
         // Dispose any currently registered client with the same IP-Address.
         if (idToConnectedClientMap.TryGetValue(clientId, out IConnectedClientHandler existingConnectedClientHandler))
@@ -249,7 +261,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
             existingConnectedClientHandler.Dispose();
         }
         
-        ConnectedClientHandler connectedClientHandler = new(this, clientIpEndPoint, clientName, clientId, microphoneSampleRate);
+        ConnectedClientHandler connectedClientHandler = new(this, clientIpEndPoint, clientName, clientId);
         idToConnectedClientMap[clientId] = connectedClientHandler;
 
         Debug.Log("New number of connected clients: " + idToConnectedClientMap.Count);

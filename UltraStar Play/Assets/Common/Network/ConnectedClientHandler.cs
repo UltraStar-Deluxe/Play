@@ -3,14 +3,18 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using UniRx;
 using UnityEngine;
 
 public class ConnectedClientHandler : IConnectedClientHandler
 {
+    private Subject<BeatPitchEvent> pitchEventStream = new();
+    public IObservable<BeatPitchEvent> PitchEventStream => pitchEventStream;
+
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
     public string ClientId { get; private set; }
-    public TcpListener MicTcpListener { get; private set; }
+    public TcpListener ClientTcpListener { get; private set; }
     public int SampleRateHz => 44100;
 
     private bool isDisposed;
@@ -20,17 +24,16 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private StreamReader tcpClientStreamReader;
     private StreamWriter tcpClientStreamWriter;
 
-    private int newSamplesInMicBuffer;
-    private int writePositionInMicBuffer;
-
-    private readonly byte[] stillAliveRequestByteArray;
-
     private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     private readonly Thread receiveDataThread;
     private readonly Thread clientStillAliveCheckThread;
     
-    public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, string clientId, int microphoneSampleRate)
+    public ConnectedClientHandler(
+        ServerSideConnectRequestManager serverSideConnectRequestManager,
+        IPEndPoint clientIpEndPoint,
+        string clientName,
+        string clientId)
     {
         this.serverSideConnectRequestManager = serverSideConnectRequestManager;
         ClientIpEndPoint = clientIpEndPoint;
@@ -40,47 +43,54 @@ public class ConnectedClientHandler : IConnectedClientHandler
         {
             throw new ArgumentException("Attempt to create ConnectedClientHandler without ClientId");
         }
-        if (microphoneSampleRate <= 0)
-        {
-            throw new ArgumentException("Attempt to create ConnectedClientHandler without microphoneSampleRate");
-        }
 
-        stillAliveRequestByteArray = new byte[1];
+        ClientTcpListener = new TcpListener(IPAddress.Any, 0);
+        ClientTcpListener.Start();
         
-        MicTcpListener = new TcpListener(IPAddress.Any, 0);
-        MicTcpListener.Start();
-        
-        Debug.Log($"Started TcpListener on port {MicTcpListener.GetPort()} to receive mic samples at {microphoneSampleRate} Hz");
+        Debug.Log($"Started TcpListener on port {ClientTcpListener.GetPort()} to receive messages from Companion App");
         receiveDataThread = new Thread(() =>
         {
             while (!isDisposed)
             {
-                try
+                int sleepTimeInMillis = 250;
+                if (tcpClient == null)
                 {
-                    if (tcpClient == null)
+                    try
                     {
-                        tcpClient = MicTcpListener.AcceptTcpClient();
+                        tcpClient = ClientTcpListener.AcceptTcpClient();
                         tcpClientStream = tcpClient.GetStream();
                         tcpClientStreamReader = new StreamReader(tcpClientStream);
                         tcpClientStreamWriter = new StreamWriter(tcpClientStream);
                     }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    Debug.LogError("Error when accepting TcpClient for mic input. Closing TcpListener.");
-                    this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
-                    return;
-                }
-
-                if (tcpClientStream.DataAvailable)
-                {
-                    AcceptClientMessages();
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Error when accepting TcpClient for Companion App. Closing TcpListener.");
+                        Debug.LogException(e);
+                        this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+                        return;
+                    }
                 }
                 else
                 {
-                    Thread.Sleep(250);
+                    try
+                    {
+                        while (tcpClientStream.DataAvailable)
+                        {
+                            ReadClientMessage();
+                            // Check for next message soon (33 milliseconds is approx. 30 FPS).
+                            sleepTimeInMillis = 33;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Error when reading TcpClient message. Closing TcpListener.");
+                        Debug.LogException(e);
+                        this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+                        return;
+                    }
                 }
+
+                Thread.Sleep(sleepTimeInMillis);
             }
         });
         receiveDataThread.Start();
@@ -109,7 +119,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
             {
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
-                tcpClientStreamWriter.WriteLine("{\"message-type\": \"still-alive-check\"}");
+                tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
                 tcpClientStreamWriter.Flush();
             }
         }
@@ -121,42 +131,45 @@ public class ConnectedClientHandler : IConnectedClientHandler
         }
     }
 
-    private void AcceptClientMessages()
+    private void ReadClientMessage()
     {
-        if (!tcpClientStream.DataAvailable)
+        string line = tcpClientStreamReader.ReadLine();
+        if (line.IsNullOrEmpty())
         {
             return;
         }
 
-        try
+        line = line.Trim();
+        if (!line.StartsWith("{")
+            || !line.EndsWith("}"))
         {
-            string line = tcpClientStreamReader.ReadLine();
-            if (line.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            line = line.Trim();
-            if (!line.StartsWith("{")
-                || !line.EndsWith("}"))
-            {
-                Debug.LogWarning("Received invalid JSON from client.");
-                return;
-            }
-
-            HandleClientJsonMessage(line);
+            Debug.LogWarning("Received invalid JSON from client.");
+            return;
         }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            Debug.LogError("Failed receiving data from client. Removing ConnectedClientHandler.");
-            serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
-        }
+
+        HandleClientJsonMessage(line);
     }
 
     private void HandleClientJsonMessage(string json)
     {
-        Debug.Log($"Received JSON from client: {json}");
+        CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
+        switch (companionAppMessageDto.MessageType)
+        {
+            case CompanionAppMessageType.StillAliveCheck:
+                // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
+                return;
+            case CompanionAppMessageType.BeatPitchEvent:
+                FireBeatPitchEventFromCompanionApp(JsonConverter.FromJson<BeatPitchEventDto>(json));
+                return;
+            default:
+                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
+                return;
+        }
+    }
+
+    private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
+    {
+        pitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
     }
 
     public void Dispose()
@@ -164,7 +177,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
         isDisposed = true;
         tcpClientStream?.Close();
         tcpClient?.Close();
-        MicTcpListener?.Stop();
+        ClientTcpListener?.Stop();
     }
 
     public int GetNewMicSamples(float[] targetSampleBuffer)

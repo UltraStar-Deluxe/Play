@@ -36,31 +36,54 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private StreamWriter tcpClientStreamWriter;
     private IPEndPoint serverSideTcpClientEndPoint;
 
+    private MicProfile micProfile;
+    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
+
     private Thread receiveDataThread;
 
     private float lastSendMessageTimeInSeconds;
-    
+
     private void Start()
     {
+        UpdateMicProfile();
+        clientSideMicSampleRecorder.SampleRate.Subscribe(_ => UpdateMicProfile());
+
         clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
         clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
 
-        // Receive data from server.
-        // So far, the server only sends a still-alive check, which fails automatically when the connection is lost.
+        // Receive messages from server (i.e. from main game)
         receiveDataThread = new Thread(() =>
         {
             while (true)
             {
-                if (serverSideTcpClientEndPoint != null
-                    && tcpClient != null
-                    && tcpClientStream != null)
+                try
                 {
-                    AcceptServerMessages();
+                    if (serverSideTcpClientEndPoint != null
+                        && tcpClient != null
+                        && tcpClientStream != null)
+                    {
+                        while (tcpClientStream.DataAvailable)
+                        {
+                            ReadServerMessage();
+                        }
+                    }
                 }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    CloseNetworkConnection();
+                }
+
                 Thread.Sleep(250);
             }
         });
         receiveDataThread.Start();
+    }
+
+    private void UpdateMicProfile()
+    {
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, clientSideMicSampleRecorder.SampleRate.Value);
+        audioSamplesAnalyzer.Enable();
     }
 
     private void HandleNewMicSamples(RecordingEvent recordingEvent)
@@ -69,35 +92,46 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             && tcpClient != null
             && tcpClientStream != null)
         {
-            // TODO: Perform pitch detection as needed and send result to server
-            if (Time.time > lastSendMessageTimeInSeconds + 1)
+            try
             {
-                lastSendMessageTimeInSeconds = Time.time;
+                // TODO: Perform pitch detection on beats when song position is set
+                PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(
+                    recordingEvent.MicSamples,
+                    recordingEvent.NewSamplesStartIndex,
+                    recordingEvent.NewSamplesEndIndex,
+                    clientSideMicSampleRecorder.MicProfile);
 
-                try
+                if (pitchEvent == null)
                 {
-                    // DateTime now = DateTime.Now;
-                    // Debug.Log($"Send data: {newByteData.Length} bytes ({recordingEvent.NewSampleCount} samples) at {now}:{now.Millisecond}");
-                    tcpClientStreamWriter.WriteLine("{\"name\": \"Bob\"}");
-                    tcpClientStreamWriter.Flush();
+                    // Debug.Log($"Send empty pitchEvent");
+                    tcpClientStreamWriter.WriteLine(new BeatPitchEventDto
+                    {
+                        Beat = -1,
+                        MidiNote = -1,
+                    }.ToJson());
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogException(e);
-                    Debug.LogError($"Failed to send message");
-                    clientSideConnectRequestManager.CloseConnectionAndReconnect();
+                    // Debug.Log($"Send pitchEvent: {pitchEvent.MidiNote}");
+                    tcpClientStreamWriter.WriteLine(new BeatPitchEventDto
+                    {
+                        Beat = -1,
+                        MidiNote = pitchEvent.MidiNote,
+                    }.ToJson());
                 }
+                tcpClientStreamWriter.Flush();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                Debug.LogError($"Failed to send message");
+                clientSideConnectRequestManager.CloseConnectionAndReconnect();
             }
         }
     }
 
-    private void AcceptServerMessages()
+    private void ReadServerMessage()
     {
-        if (!tcpClientStream.DataAvailable)
-        {
-            return;
-        }
-
         string receivedLine = tcpClientStreamReader.ReadLine();
         if (receivedLine.IsNullOrEmpty())
         {
@@ -117,7 +151,24 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandleServerJsonMessage(string json)
     {
-        Debug.Log($"Received JSON from server: {json}");
+        CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
+        switch (companionAppMessageDto.MessageType)
+        {
+            case CompanionAppMessageType.StillAliveCheck:
+                // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
+                return;
+            case CompanionAppMessageType.PositionInSong:
+                UpdatePositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
+                return;
+            default:
+                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
+                return;
+        }
+    }
+
+    private void UpdatePositionInSong(PositionInSongDto positionInSongDto)
+    {
+        // TODO: Consider position in song, BPM, and GAP to do pitch detection on beats.
     }
 
     private void SendMicData(RecordingEvent recordingEvent)
