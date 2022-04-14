@@ -289,7 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: On the run
+  defaultSongName: Kryptonite
   defaultSongNamePasteBin: 'Summer Wine
 
     Me And My Broken Heart

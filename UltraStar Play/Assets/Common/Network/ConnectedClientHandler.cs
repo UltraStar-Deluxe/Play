@@ -76,7 +76,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                     {
                         while (tcpClientStream.DataAvailable)
                         {
-                            ReadClientMessage();
+                            ReadMessageFromClient();
                             // Check for next message soon (33 milliseconds is approx. 30 FPS).
                             sleepTimeInMillis = 33;
                         }
@@ -131,7 +131,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
         }
     }
 
-    private void ReadClientMessage()
+    private void ReadMessageFromClient()
     {
         string line = tcpClientStreamReader.ReadLine();
         if (line.IsNullOrEmpty())
@@ -147,10 +147,26 @@ public class ConnectedClientHandler : IConnectedClientHandler
             return;
         }
 
-        HandleClientJsonMessage(line);
+        HandleJsonMessageFromClient(line);
     }
 
-    private void HandleClientJsonMessage(string json)
+    public void SendMessageToClient(JsonSerializable jsonSerializable)
+    {
+        if (tcpClient != null
+            && tcpClientStream != null
+            && tcpClientStreamWriter != null
+            && tcpClientStream.CanWrite)
+        {
+            tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
+            tcpClientStreamWriter.Flush();
+        }
+        else
+        {
+            Debug.LogWarning("Cannot send message to client.");
+        }
+    }
+
+    private void HandleJsonMessageFromClient(string json)
     {
         CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
         switch (companionAppMessageDto.MessageType)
@@ -178,11 +194,5 @@ public class ConnectedClientHandler : IConnectedClientHandler
         tcpClientStream?.Close();
         tcpClient?.Close();
         ClientTcpListener?.Stop();
-    }
-
-    public int GetNewMicSamples(float[] targetSampleBuffer)
-    {
-        // TODO: Remove
-        return 0;
     }
 }

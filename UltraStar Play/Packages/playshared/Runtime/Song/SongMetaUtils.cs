@@ -52,6 +52,16 @@ public static class SongMetaUtils
             .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
     }
 
+    public static Sentence GetSentenceAtBeat(Voice voice, int beat)
+    {
+        return voice.Sentences.FirstOrDefault(sentence => sentence.MinBeat <= beat && beat <= sentence.MaxBeat);
+    }
+
+    public static Note GetNoteAtBeat(Sentence sentence, int beat)
+    {
+        return sentence.Notes.FirstOrDefault(note => note.StartBeat <= beat && beat <= note.EndBeat);
+    }
+
     public static bool IsBeatInSentence(Sentence sentence, int beat)
     {
         return sentence.MinBeat <= beat && beat <= sentence.ExtendedMaxBeat;

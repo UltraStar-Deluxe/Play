@@ -126,7 +126,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
             // Receive is a blocking call.
             byte[] receivedBytes = serverUdpClient.Receive(ref clientIpEndPoint);
             string message = Encoding.UTF8.GetString(receivedBytes);
-            HandleClientMessage(clientIpEndPoint, message);
+            HandleConnectRequest(clientIpEndPoint, message);
         }
         catch (Exception e)
         {
@@ -141,9 +141,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         }
     }
 
-    private void HandleClientMessage(IPEndPoint clientIpEndPoint, string message)
+    private void HandleConnectRequest(IPEndPoint clientIpEndPoint, string message)
     {
-        Debug.Log($"Received message from client {clientIpEndPoint} ({clientIpEndPoint.Address}): '{message}'");
+        Debug.Log($"Received connect request from client {clientIpEndPoint} ({clientIpEndPoint.Address}): '{message}'");
         try
         {
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
@@ -274,8 +274,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         return idToConnectedClientMap.Values.ToList();
     }
     
-    public bool TryGetConnectedClientHandler(string clientIpEndPointId, out IConnectedClientHandler connectedClientHandler)
+    public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler)
     {
-        return idToConnectedClientMap.TryGetValue(clientIpEndPointId, out connectedClientHandler);
+        return idToConnectedClientMap.TryGetValue(clientId, out connectedClientHandler);
     }
 }

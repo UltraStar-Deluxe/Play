@@ -62,7 +62,8 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             .Subscribe(OnPitchDetected);
         serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
             .Where(evt => evt.ClientId == MicProfile.ConnectedClientId)
-            .Subscribe(OnPitchDetected);
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
     }
 
     void Update()
