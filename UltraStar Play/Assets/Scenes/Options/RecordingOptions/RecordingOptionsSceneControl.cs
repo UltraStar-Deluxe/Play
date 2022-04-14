@@ -260,6 +260,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         }
 
         micVisualizer.SetMicProfile(micProfile);
+        calibrateMicDelayControl.MicProfile = micProfile;
     }
 
     private void DeleteSelectedRecordingDevice()
