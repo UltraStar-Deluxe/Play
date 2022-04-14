@@ -28,7 +28,8 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
         serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
             .Where(connectedClientBeatPitchEvent => connectedClientBeatPitchEvent.ClientId == micPitchTracker.MicProfile.ConnectedClientId)
-            .Subscribe(OnPitchDetected);
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);

@@ -84,6 +84,11 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             Debug.LogError("missing MicProfile");
             return;
         }
+        if (MicProfile.IsInputFromConnectedClient)
+        {
+            Debug.LogWarning("Cannot record mic samples using connected client");
+            return;
+        }
 
         IsRecording = true;
 
@@ -96,23 +101,20 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
         Debug.Log($"Starting recording with '{MicProfile.Name}' at {SampleRateHz} Hz");
 
-        if (!micProfile.IsInputFromConnectedClient)
+        // Code for low-latency microphone input taken from
+        // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
+        micAudioClip = Microphone.Start(MicProfile.Name, true, 1, SampleRateHz);
+        System.Diagnostics.Stopwatch stopwatch = new();
+        stopwatch.Start();
+        while (Microphone.GetPosition(MicProfile.Name) <= 0)
         {
-            // Code for low-latency microphone input taken from
-            // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
-            micAudioClip = Microphone.Start(MicProfile.Name, true, 1, SampleRateHz);
-            System.Diagnostics.Stopwatch stopwatch = new();
-            stopwatch.Start();
-            while (Microphone.GetPosition(MicProfile.Name) <= 0)
+            // <Busy waiting>
+            // Emergency exit
+            if (stopwatch.ElapsedMilliseconds > 1000)
             {
-                // <Busy waiting>
-                // Emergency exit
-                if (stopwatch.ElapsedMilliseconds > 1000)
-                {
-                    IsRecording = false;
-                    Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
-                    return;
-                }
+                IsRecording = false;
+                Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
+                return;
             }
         }
 
@@ -149,18 +151,6 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (MicProfile.IsInputFromConnectedClient)
-        {
-            UpdateRecordingWithInputFromConnectedClient();
-        }
-        else
-        {
-            UpdateRecordingWithInputFromMicrophoneOfThisDevice();
-        }
-    }
-
-    private void UpdateRecordingWithInputFromMicrophoneOfThisDevice()
-    {
         if (micAudioClip == null)
         {
             Debug.LogError("AudioClip for microphone is null");
@@ -181,20 +171,6 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         ApplyAmplificationAndNotifyListeners(newSamplesCount);
         
         lastSamplePosition = currentSamplePosition;
-    }
-
-    private void UpdateRecordingWithInputFromConnectedClient()
-    {
-        // Use the sample data that is sent by the connected client
-        if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(MicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
-        {
-            Debug.Log($"Client disconnected: {micProfile.Name}. Stopping recording.");
-            StopRecording();
-            return;
-        }
-        
-        int newSamplesCount = connectedClientHandler.GetNewMicSamples(MicSamples);
-        ApplyAmplificationAndNotifyListeners(newSamplesCount);
     }
 
     private void ApplyAmplificationAndNotifyListeners(int newSamplesCount)

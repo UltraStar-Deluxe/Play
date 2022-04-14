@@ -64,7 +64,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private int connectRequestCount;
 
-    private readonly ConcurrentQueue<ConnectResponseDto> serverResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
+    private readonly ConcurrentQueue<ConnectResponseDto> connectResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
 
     private bool isApplicationPaused;
 
@@ -93,7 +93,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private void Update()
     {
-        while (serverResponseQueue.TryDequeue(out ConnectResponseDto connectResponseDto))
+        while (connectResponseQueue.TryDequeue(out ConnectResponseDto connectResponseDto))
         {
             if (connectResponseDto.ErrorMessage.IsNullOrEmpty()
                 && connectResponseDto.MicrophonePort > 0)
@@ -162,7 +162,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             // Receive is a blocking call
             byte[] receivedBytes = clientUdpClient.Receive(ref serverIpEndPoint);
             string message = Encoding.UTF8.GetString(receivedBytes);
-            HandleServerMessage(serverIpEndPoint, message);
+            HandleConnectResponse(serverIpEndPoint, message);
         }
         catch (Exception e)
         {
@@ -170,9 +170,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void HandleServerMessage(IPEndPoint serverIpEndPoint, string message)
+    private void HandleConnectResponse(IPEndPoint serverIpEndPoint, string message)
     {
-        Debug.Log($"Received message from server {serverIpEndPoint} ({serverIpEndPoint.Address}): '{message}'");
+        Debug.Log($"Received connect response from server {serverIpEndPoint} ({serverIpEndPoint.Address}): '{message}'");
         try
         {
             ConnectResponseDto connectResponseDto = JsonConverter.FromJson<ConnectResponseDto>(message);
@@ -198,11 +198,11 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             }
 
             connectResponseDto.ServerIpEndPoint = serverIpEndPoint;
-            serverResponseQueue.Enqueue(connectResponseDto);
+            connectResponseQueue.Enqueue(connectResponseDto);
         }
         catch (Exception e)
         {
-            serverResponseQueue.Enqueue(new ConnectResponseDto
+            connectResponseQueue.Enqueue(new ConnectResponseDto
             {
                 ErrorMessage = e.Message
             });

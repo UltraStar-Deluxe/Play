@@ -65,6 +65,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     private readonly Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new();
     public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
 
+    private IConnectedClientHandler connectedClientHandler;
+    private int lastAnalyzedBeatFromConnectedClient;
+
+    private long lastSystemTimeWhenSentPositionInSongToClient;
+
     void Start()
     {
         // Restart recording if companion app for mic input has reconnected
@@ -79,24 +84,64 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
-        if (micProfile != null)
+        if (micProfile == null)
         {
-            roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
-            micSampleRecorder.MicProfile = micProfile;
+            Debug.LogWarning($"No mic for player {playerProfile.Name}. Not recording player notes.");
+            gameObject.SetActive(false);
+            return;
+        }
+
+        roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
+        micSampleRecorder.MicProfile = micProfile;
+        if (micProfile.IsInputFromConnectedClient)
+        {
+            if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId,
+                out connectedClientHandler))
+            {
+                Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
+                gameObject.SetActive(false);
+                return;
+            }
+
+            SendPositionInSongToClient();
+            serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
+                .Where(evt => evt.ClientId == micProfile.ConnectedClientId)
+                .Subscribe(HandlePitchEventFromCompanionApp)
+                .AddTo(gameObject);
+        }
+        else {
             micSampleRecorder.StartRecording();
 
             // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
             audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
             audioSamplesAnalyzer.Enable();
         }
-        else
-        {
-            Debug.LogWarning($"No mic for player {playerProfile.Name}. Not recording player notes.");
-            gameObject.SetActive(false);
-        }
     }
 
     void Update()
+    {
+        if (micProfile == null)
+        {
+            return;
+        }
+
+        if (micProfile.IsInputFromConnectedClient)
+        {
+            if (lastSystemTimeWhenSentPositionInSongToClient + 500 < TimeUtils.GetSystemTimeInMillis())
+            {
+                lastSystemTimeWhenSentPositionInSongToClient = TimeUtils.GetSystemTimeInMillis();
+
+                // Synchronize position in song with connected client.
+                SendPositionInSongToClient();
+            }
+        }
+        else
+        {
+            UpdatePitchDetectionFromMic();
+        }
+    }
+
+    private void UpdatePitchDetectionFromMic()
     {
         // No sentence to analyze left (all done).
         if (RecordingSentence == null)
@@ -106,21 +151,23 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         // Analyze the next beat with fully recorded mic samples
         double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, BeatToAnalyze + 1);
-        if (nextBeatToAnalyzeEndPositionInMs < songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
+        if (nextBeatToAnalyzeEndPositionInMs >= songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
         {
-            // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
-            PitchEvent pitchEvent = GetPitchEventOfBeat(BeatToAnalyze);
-            Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty()
-                ? null
-                : currentAndUpcomingNotesInRecordingSentence[0];
-            Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= BeatToAnalyze && BeatToAnalyze < currentOrUpcomingNote.EndBeat)
-                ? currentOrUpcomingNote
-                : null;
-
-            FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
-
-            GoToNextBeat();
+            return;
         }
+
+        // The beat has passed and should have recorded samples in the mic buffer. Analyze the samples now.
+        PitchEvent pitchEvent = GetPitchEventOfBeat(BeatToAnalyze);
+        Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence.IsNullOrEmpty()
+            ? null
+            : currentAndUpcomingNotesInRecordingSentence[0];
+        Note noteAtBeat = (currentOrUpcomingNote.StartBeat <= BeatToAnalyze && BeatToAnalyze < currentOrUpcomingNote.EndBeat)
+            ? currentOrUpcomingNote
+            : null;
+
+        FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
+
+        GoToNextBeat();
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -152,6 +199,69 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return noteAtBeat.MidiNote;
         }
         return roundedMidiNote;
+    }
+
+    private void HandlePitchEventFromCompanionApp(BeatPitchEvent pitchEvent)
+    {
+        Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote})");
+        if (pitchEvent.Beat < 0
+            || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
+        {
+            // Looks like the companion app does not know the current position in the song. Send it this info.
+            Debug.LogWarning("Received invalid beat from connected client.");
+            // SendPositionInSongToClient();
+            return;
+        }
+
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
+        if (pitchEvent.Beat > currentBeat)
+        {
+            Debug.LogWarning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
+            return;
+        }
+
+        lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
+        FirePitchEventFromConnectedClient(pitchEvent);
+    }
+
+    private void SendPositionInSongToClient()
+    {
+        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {(int)songAudioPlayer.PositionInSongInMillis})");
+        connectedClientHandler.SendMessageToClient(new PositionInSongDto
+        {
+            SongBpm = songMeta.Bpm,
+            SongGap = songMeta.Gap,
+            PositionInSongInMillis = (int)songAudioPlayer.PositionInSongInMillis,
+        });
+    }
+
+    private void FirePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
+    {
+        if (pitchEvent.Beat < 0)
+        {
+            return;
+        }
+
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
+        if (sentenceAtBeat == null)
+        {
+            return;
+        }
+
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat);
+        if (noteAtBeat == null)
+        {
+            return;
+        }
+
+        if (pitchEvent.MidiNote < 0)
+        {
+            FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
+        }
+        else
+        {
+            FirePitchEvent(pitchEvent, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
+        }
     }
 
     public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, Sentence sentenceAtBeat)

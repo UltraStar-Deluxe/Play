@@ -48,35 +48,20 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillisConsideringMicDelay);
         for (int beatToAnalyze = firstBeatToAnalyze; beatToAnalyze < currentBeatConsideringMicDelay; beatToAnalyze++)
         {
-            AnalyzeBeat(beatToAnalyze);
+            AnalyzeBeatAndNotify(beatToAnalyze);
             nextBeatToAnalyze = beatToAnalyze + 1;
         }
     }
 
-    private void AnalyzeBeat(int beat)
+    private void AnalyzeBeatAndNotify(int beat)
     {
-        float beatStartInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        float beatEndInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat + 1);
-        float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
-        int beatLengthInSamples = (int)(beatLengthInMillis * MicSampleRecorder.SampleRateHz / 1000f);
-
-        // The newest sample in the buffer corresponds to (positionInSong - micDelay)
-        float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicDelayInMillis;
-        float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
-        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * MicSampleRecorder.SampleRateHz / 1000f);
-        distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, MicSampleRecorder.MicSamples.Length - 1);
-
-        int endIndex = MicSampleRecorder.MicSamples.Length - distanceToNewestSamplesInSamples;
-        int startIndex = endIndex - beatLengthInSamples;
-        endIndex = NumberUtils.Limit(endIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
-        startIndex = NumberUtils.Limit(startIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
-        if (endIndex < startIndex)
-        {
-            Debug.LogWarning($"Cannot analyze from sample {startIndex} to {endIndex}. Start index must be smaller than end index.");
-            return;
-        }
-
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(MicSampleRecorder.MicSamples, startIndex, endIndex, MicProfile);
+        PitchEvent pitchEvent = AnalyzeBeat(
+            songMeta,
+            beat,
+            songAudioPlayer.PositionInSongInMillis,
+            MicSampleRecorder.MicProfile,
+            MicSampleRecorder.MicSamples,
+            audioSamplesAnalyzer);
 
         // Notify listeners
         if (pitchEvent == null)

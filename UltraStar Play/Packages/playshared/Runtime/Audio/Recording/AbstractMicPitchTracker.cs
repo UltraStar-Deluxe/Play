@@ -74,6 +74,39 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
     protected abstract void OnRecordingEvent(RecordingEvent recordingEvent);
 
+    public static PitchEvent AnalyzeBeat(
+        SongMeta songMeta,
+        int beat,
+        double positionInSongInMillis,
+        MicProfile micProfile,
+        float[] micSampleBuffer,
+        IAudioSamplesAnalyzer audioSamplesAnalyzer)
+    {
+        float beatStartInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        float beatEndInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat + 1);
+        float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
+        int beatLengthInSamples = (int)(beatLengthInMillis * micProfile.SampleRate / 1000f);
+
+        // The newest sample in the buffer corresponds to (positionInSong - micDelay)
+        float positionInSongInMillisConsideringMicDelay = (float)(positionInSongInMillis - micProfile.DelayInMillis);
+        float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
+        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * micProfile.DelayInMillis / 1000f);
+        distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, micSampleBuffer.Length - 1);
+
+        int endIndex = micSampleBuffer.Length - distanceToNewestSamplesInSamples;
+        int startIndex = endIndex - beatLengthInSamples;
+        endIndex = NumberUtils.Limit(endIndex, 0, micSampleBuffer.Length - 1);
+        startIndex = NumberUtils.Limit(startIndex, 0, micSampleBuffer.Length - 1);
+        if (endIndex < startIndex)
+        {
+            Debug.LogWarning($"Cannot analyze from sample {startIndex} to {endIndex}. Start index must be smaller than end index.");
+            return null;
+        }
+
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleBuffer, startIndex, endIndex, micProfile);
+        return pitchEvent;
+    }
+
     public static IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm pitchDetectionAlgorithm, int sampleRateHz)
     {
         switch (pitchDetectionAlgorithm)

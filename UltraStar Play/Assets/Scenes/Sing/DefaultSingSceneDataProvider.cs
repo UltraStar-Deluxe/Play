@@ -13,9 +13,6 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 
-    [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
-
     public SceneData GetDefaultSceneData()
     {
         SingSceneData defaultSceneData = new();
@@ -42,7 +39,7 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     private MicProfile GetDefaultMicProfile()
     {
         return SettingsManager.Instance.Settings.MicProfiles
-            .FirstOrDefault(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager));
+            .FirstOrDefault(it => it.IsEnabled && it.IsConnected(ServerSideConnectRequestManager.Instance));
     }
 
     private SongMeta GetDefaultSongMeta()
