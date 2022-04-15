@@ -65,22 +65,12 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     private readonly Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new();
     public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
 
-    private IConnectedClientHandler connectedClientHandler;
     private int lastAnalyzedBeatFromConnectedClient;
 
     private long lastSystemTimeWhenSentPositionInSongToClient;
 
-    void Start()
+    private void Start()
     {
-        // Restart recording if companion app for mic input has reconnected
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Where(clientConnectionEvent => clientConnectionEvent.IsConnected
-                                            && !micSampleRecorder.IsRecording
-                                            && micProfile != null
-                                            && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
-            .Subscribe(_ => micSampleRecorder.StartRecording())
-            .AddTo(gameObject);
-        
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
@@ -95,8 +85,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         micSampleRecorder.MicProfile = micProfile;
         if (micProfile.IsInputFromConnectedClient)
         {
-            if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId,
-                out connectedClientHandler))
+            if (GetConnectedClientHandler() == null)
             {
                 Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
                 gameObject.SetActive(false);
@@ -118,7 +107,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    void Update()
+    private IConnectedClientHandler GetConnectedClientHandler()
+    {
+        serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler);
+        return connectedClientHandler;
+    }
+
+    private void Update()
     {
         if (micProfile == null)
         {
@@ -203,7 +198,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void HandlePitchEventFromCompanionApp(BeatPitchEvent pitchEvent)
     {
-        Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote})");
         if (pitchEvent.Beat < 0
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
@@ -220,12 +214,32 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
+        Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
         lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
         FirePitchEventFromConnectedClient(pitchEvent);
     }
 
+    private void SendStopMessageToClient()
+    {
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        if (connectedClientHandler == null)
+        {
+            // Disconnected
+            return;
+        }
+
+        connectedClientHandler.SendMessageToClient(new StopRecordingMessageDto());
+    }
+
     private void SendPositionInSongToClient()
     {
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        if (connectedClientHandler == null)
+        {
+            // Disconnected
+            return;
+        }
+
         Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {(int)songAudioPlayer.PositionInSongInMillis})");
         connectedClientHandler.SendMessageToClient(new PositionInSongDto
         {

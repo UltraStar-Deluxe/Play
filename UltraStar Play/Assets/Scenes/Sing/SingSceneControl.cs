@@ -69,6 +69,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private SceneNavigator sceneNavigator;
 
     [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    [Inject]
     private Statistics statistics;
 
     [Inject]
@@ -463,7 +466,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void Restart()
     {
         SceneData.IsRestart = true;
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, SceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, SceneData);
     }
 
     public void OpenSongInEditor()
@@ -488,7 +491,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles,
         };
-        SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
+        SendStopRecordingMessageToConnectedClients();
+        sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
     public void FinishScene(bool isAfterEndOfSong)
@@ -508,6 +512,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Open song select without recording scores
         SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
+        SendStopRecordingMessageToConnectedClients();
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
@@ -538,7 +543,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             UpdateSongFinishedStats();
         }
 
+        SendStopRecordingMessageToConnectedClients();
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
+    }
+
+    private void SendStopRecordingMessageToConnectedClients()
+    {
+        serverSideConnectRequestManager
+            .GetConnectedClientHandlerss()
+            .ForEach(connectedClientHandler => connectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()) );
     }
 
     private void UpdateSongFinishedStats()
@@ -635,7 +648,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (!songAudioPlayer.HasAudioClip)
         {
             // Loading the audio failed.
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            SendStopRecordingMessageToConnectedClients();
+            sceneNavigator.LoadScene(EScene.SongSelectScene);
             yield break;
         }
 

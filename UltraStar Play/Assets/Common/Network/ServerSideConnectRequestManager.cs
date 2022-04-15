@@ -278,4 +278,9 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     {
         return idToConnectedClientMap.TryGetValue(clientId, out connectedClientHandler);
     }
+
+    public List<IConnectedClientHandler> GetConnectedClientHandlerss()
+    {
+        return new List<IConnectedClientHandler>(idToConnectedClientMap.Values);
+    }
 }

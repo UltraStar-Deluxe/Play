@@ -110,7 +110,10 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
         MicPitchTracker micPitchTracker = Instantiate(micPitchTrackerPrefab, gameObject.transform);
         injector.InjectAllComponentsInChildren(micPitchTracker);
         micPitchTracker.MicProfile = micProfile;
-        micPitchTracker.MicSampleRecorder.StartRecording();
+        if (!micProfile.IsInputFromConnectedClient)
+        {
+            micPitchTracker.MicSampleRecorder.StartRecording();
+        }
 
         SongSelectMicEntryControl entryControl = new(gameObject, visualElement, micPitchTracker);
         injector.WithRootVisualElement(visualElement).Inject(entryControl);

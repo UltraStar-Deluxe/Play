@@ -3,4 +3,5 @@
     StillAliveCheck,
     BeatPitchEvent,
     PositionInSong,
+    StopRecording,
 }

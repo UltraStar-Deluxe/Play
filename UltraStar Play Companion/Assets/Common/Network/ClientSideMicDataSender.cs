@@ -20,15 +20,15 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             return GameObjectUtils.FindComponentWithTag<ClientSideMicDataSender>("ClientSideMicrophoneDataSender");
         }
     }
-    
-    [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
     [Inject]
     private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private ClientSideConnectRequestManager clientSideConnectRequestManager;
     
     private TcpClient tcpClient;
     private NetworkStream tcpClientStream;
@@ -36,16 +36,25 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private StreamWriter tcpClientStreamWriter;
     private IPEndPoint serverSideTcpClientEndPoint;
 
+    public bool IsConnected => serverSideTcpClientEndPoint != null
+                                && tcpClient != null
+                                && tcpClientStream != null
+                                && tcpClientStreamReader != null
+                                && tcpClientStreamWriter != null;
+
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
     private Thread receiveDataThread;
-
-    private long lastSystemTimeWhenSetPositionInSong;
-    private long lastSystemTimeWhenCallingUpdate;
+    private Thread serverStillAliveCheckThread;
 
     private SongMeta songMeta;
-    private double positionInSongInMillis;
+    private double receivedPositionInSongInMillis;
+    private long systemTimeWhenReceivedPositionInSong;
     private int lastAnalyzedBeat;
+
+    private bool HasPositionInSong => songMeta != null && receivedPositionInSongInMillis >= 0;
+
+    private bool receivedStopRecordingMessage;
 
     private void Start()
     {
@@ -54,6 +63,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
         clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
+        clientSideMicSampleRecorder.IsRecording.Subscribe(HandleRecordingStatusChanged);
 
         // Receive messages from server (i.e. from main game)
         receiveDataThread = new Thread(() =>
@@ -62,9 +72,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             {
                 try
                 {
-                    if (serverSideTcpClientEndPoint != null
-                        && tcpClient != null
-                        && tcpClientStream != null)
+                    if (IsConnected)
                     {
                         while (tcpClientStream.DataAvailable)
                         {
@@ -82,19 +90,57 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             }
         });
         receiveDataThread.Start();
+
+        serverStillAliveCheckThread = new Thread(() =>
+        {
+            while (true)
+            {
+                if (IsConnected)
+                {
+                    CheckServerStillAlive();
+                }
+                Thread.Sleep(1500);
+            }
+        });
+        serverStillAliveCheckThread.Start();
+    }
+
+    private void CheckServerStillAlive()
+    {
+        try
+        {
+            // If there is new data available, then the client is still alive.
+            if (!tcpClientStream.DataAvailable)
+            {
+                // Try to send something to the client.
+                // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
+                tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
+                tcpClientStreamWriter.Flush();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            Debug.LogError("Failed sending data to server. Closing connection.");
+            CloseNetworkConnection();
+        }
     }
 
     private void Update()
     {
-        if (songMeta != null)
+        if (receivedStopRecordingMessage)
         {
-            long currentSystemTimeMillis = TimeUtils.GetSystemTimeInMillis();
-            long deltaSystemTimeMillis = currentSystemTimeMillis - lastSystemTimeWhenCallingUpdate;
-            positionInSongInMillis += deltaSystemTimeMillis;
-            lastSystemTimeWhenCallingUpdate = currentSystemTimeMillis;
+            receivedStopRecordingMessage = false;
+
+            ResetPositionInSong();
+
+            // Must be called from main thread.
+            Debug.Log("Stopping recording because of message from server");
+            clientSideMicSampleRecorder.StopRecording();
         }
 
-        if (lastSystemTimeWhenSetPositionInSong + 10000 < TimeUtils.GetSystemTimeInMillis())
+        if (HasPositionInSong
+            && systemTimeWhenReceivedPositionInSong + 10000 < TimeUtils.GetSystemTimeInMillis())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
@@ -107,60 +153,98 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         audioSamplesAnalyzer.Enable();
     }
 
+    private void HandleRecordingStatusChanged(bool isRecording)
+    {
+        if (!isRecording)
+        {
+            // Nothing to do.
+            return;
+        }
+
+        if (HasPositionInSong)
+        {
+            // Analyze the following beats, not past beats.
+            lastAnalyzedBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        }
+    }
+
     private void HandleNewMicSamples(RecordingEvent recordingEvent)
     {
-        if (serverSideTcpClientEndPoint == null
-            || tcpClient == null
-            || tcpClientStream == null)
+        if (!IsConnected)
         {
             return;
         }
 
         // Do pitch detection
-        if (songMeta == null
-            || positionInSongInMillis < 0)
+        if (HasPositionInSong)
         {
-            // Analyze the newest samples
-            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(
-                recordingEvent.MicSamples,
-                recordingEvent.NewSamplesStartIndex,
-                recordingEvent.NewSamplesEndIndex,
-                clientSideMicSampleRecorder.MicProfile);
-            int midiNote = pitchEvent != null
-                ? pitchEvent.MidiNote
-                : -1;
-            SendPitchEventToServer(new BeatPitchEvent(midiNote, -1));
+            AnalyzeMicSamplesCorrespondingToBeatsInSong(recordingEvent);
         }
         else
         {
-            // Check if can analyze now completed beat
-            int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
-            if (currentBeat <= lastAnalyzedBeat)
-            {
-                return;
-            }
-
-            Debug.Log($"Analyzing beats from {lastAnalyzedBeat + 1} to {currentBeat}");
-            int loopCount = 0;
-            int maxLoopCount = 100;
-            for (int beat = lastAnalyzedBeat + 1; beat <= currentBeat; beat++)
-            {
-                PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat);
-                int midiNote = pitchEvent != null
-                    ? pitchEvent.MidiNote
-                    : -1;
-                Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
-                SendPitchEventToServer(new BeatPitchEvent(midiNote, beat));
-
-                loopCount++;
-                if (loopCount > maxLoopCount)
-                {
-                    // Emergency exit
-                    Debug.LogWarning($"Took emergency exit out of loop. Analyzed {maxLoopCount} beats and still not finished?");
-                }
-            }
-            lastAnalyzedBeat = currentBeat;
+            AnalyzeNewestMicSamples(recordingEvent);
         }
+    }
+
+    private void AnalyzeMicSamplesCorrespondingToBeatsInSong(RecordingEvent recordingEvent)
+    {
+        // Check if can analyze new beat
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        if (currentBeat <= lastAnalyzedBeat)
+        {
+            return;
+        }
+
+        // Do not analyze more than 100 beats (might missed some beats while app was in background)
+        int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeat - 100);
+        Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats)");
+
+        int loopCount = 0;
+        int maxLoopCount = 100;
+        for (int beat = nextBeatToAnalyze; beat <= currentBeat; beat++)
+        {
+            PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat);
+            int midiNote = pitchEvent != null
+                ? pitchEvent.MidiNote
+                : -1;
+            Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
+            SendPitchEventToServer(new BeatPitchEvent(midiNote, beat));
+
+            loopCount++;
+            if (loopCount > maxLoopCount)
+            {
+                // Emergency exit
+                Debug.LogWarning($"Took emergency exit out of loop. Analyzed {maxLoopCount} beats and still not finished?");
+            }
+        }
+        lastAnalyzedBeat = currentBeat;
+    }
+
+    private void AnalyzeNewestMicSamples(RecordingEvent recordingEvent)
+    {
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(
+            recordingEvent.MicSamples,
+            recordingEvent.NewSamplesStartIndex,
+            recordingEvent.NewSamplesEndIndex,
+            clientSideMicSampleRecorder.MicProfile);
+        int midiNote = pitchEvent != null
+            ? pitchEvent.MidiNote
+            : -1;
+        SendPitchEventToServer(new BeatPitchEvent(midiNote, -1));
+    }
+
+
+    private double GetEstimatedPositionInSongInMillis()
+    {
+        if (!HasPositionInSong)
+        {
+            return -1;
+        }
+
+        long currentSystemTimeMillis = TimeUtils.GetSystemTimeInMillis();
+        long durationSinceReceivedPositionInSongInMillis = currentSystemTimeMillis - systemTimeWhenReceivedPositionInSong;
+        double estimatedPositionInSongInMillis = receivedPositionInSongInMillis + durationSinceReceivedPositionInSongInMillis;
+        return estimatedPositionInSongInMillis;
     }
 
     private PitchEvent AnalyzeMicSamplesOfBeat(RecordingEvent recordingEvent, int beat)
@@ -168,7 +252,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
             songMeta,
             beat,
-            positionInSongInMillis,
+            receivedPositionInSongInMillis,
             clientSideMicSampleRecorder.MicProfile,
             recordingEvent.MicSamples,
             audioSamplesAnalyzer);
@@ -189,8 +273,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            Debug.LogError($"Failed to send message");
-            clientSideConnectRequestManager.CloseConnectionAndReconnect();
+            Debug.LogError($"Failed to send pitch to server");
+            CloseNetworkConnection();
         }
     }
 
@@ -224,6 +308,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             case CompanionAppMessageType.PositionInSong:
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
                 return;
+            case CompanionAppMessageType.StopRecording:
+                // Must be called from main thread
+                receivedStopRecordingMessage = true;
+                return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
                 return;
@@ -232,9 +320,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
     {
-        Debug.Log($"Setting position in song to {positionInSongDto.PositionInSongInMillis} (offset: {positionInSongDto.PositionInSongInMillis - positionInSongInMillis})");
-        lastSystemTimeWhenSetPositionInSong = TimeUtils.GetSystemTimeInMillis();
-        positionInSongInMillis = positionInSongDto.PositionInSongInMillis;
+        Debug.Log($"Received position in song {positionInSongDto.PositionInSongInMillis} (offset: {positionInSongDto.PositionInSongInMillis - GetEstimatedPositionInSongInMillis()})");
+        systemTimeWhenReceivedPositionInSong = TimeUtils.GetSystemTimeInMillis();
+        receivedPositionInSongInMillis = positionInSongDto.PositionInSongInMillis;
         songMeta = new SongMeta
         {
             Bpm = positionInSongDto.SongBpm,
@@ -245,9 +333,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private void ResetPositionInSong()
     {
         Debug.Log("Resetting position in song");
-        lastSystemTimeWhenSetPositionInSong = TimeUtils.GetSystemTimeInMillis();
+        systemTimeWhenReceivedPositionInSong = -1;
         songMeta = null;
-        positionInSongInMillis = 0;
+        receivedPositionInSongInMillis = 0;
+        lastAnalyzedBeat = 0;
     }
 
     private void UpdateConnectionStatus(ConnectEvent connectEvent)
@@ -283,14 +372,17 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             catch (Exception e)
             {
                 Debug.LogException(e);
-                CloseNetworkConnection();                
+                CloseNetworkConnection();
             }
         }
         else
         {
-            CloseNetworkConnection();
             serverSideTcpClientEndPoint = null;
             clientSideMicSampleRecorder.StopRecording();
+
+            // Already disconnected.
+            // Do not try to call reconnect (i.e. disconnect then connect) because it would cause a stack overflow.
+            CloseNetworkConnection();
         }
     }
 
