@@ -50,7 +50,10 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             && lastBeatAnalyzedEvent.NoteAtBeat == analyzedNote
             && lastBeatAnalyzedEvent.RoundedRecordedMidiNote == beatAnalyzedEvent.RoundedRecordedMidiNote)
         {
-            ContinueLastRecordedNote(beatAnalyzedEvent.Beat);
+            int noteEndBeat = analyzedNote != null
+                ? analyzedNote.EndBeat
+                : -1;
+            ContinueLastRecordedNote(beatAnalyzedEvent.Beat, noteEndBeat);
         }
         else if (beatAnalyzedEvent.PitchEvent != null)
         {
@@ -68,9 +71,14 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         lastBeatAnalyzedEvent = beatAnalyzedEvent;
     }
 
-    private void ContinueLastRecordedNote(int analyzedBeat)
+    private void ContinueLastRecordedNote(int analyzedBeat, int targetNoteEndBeat)
     {
         lastRecordedNote.EndBeat = analyzedBeat + 1;
+        if (targetNoteEndBeat >= 0
+            && lastRecordedNote.EndBeat > targetNoteEndBeat)
+        {
+            lastRecordedNote.EndBeat = targetNoteEndBeat;
+        }
         recordedNoteContinuedEventStream.OnNext(new RecordedNoteContinuedEvent(lastRecordedNote));
     }
 
