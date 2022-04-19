@@ -124,7 +124,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            if (lastSystemTimeWhenSentPositionInSongToClient + 5000 < TimeUtils.GetSystemTimeInMillis())
+            if (lastSystemTimeWhenSentPositionInSongToClient + 1000 < TimeUtils.GetSystemTimeInMillis())
             {
                 lastSystemTimeWhenSentPositionInSongToClient = TimeUtils.GetSystemTimeInMillis();
 

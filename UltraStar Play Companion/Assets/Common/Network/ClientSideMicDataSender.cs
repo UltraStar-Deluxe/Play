@@ -265,8 +265,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         try
         {
             BeatPitchEventDto beatPitchEventDto = pitchEvent != null
-                ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat)
-                : new BeatPitchEventDto(-1, -1);
+                ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetSystemTimeInMillis())
+                : new BeatPitchEventDto(-1, -1, TimeUtils.GetSystemTimeInMillis());
             // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetSystemTimeInMillis()})");
             tcpClientStreamWriter.WriteLine(beatPitchEventDto.ToJson());
             // tcpClientStreamWriter.Flush();
