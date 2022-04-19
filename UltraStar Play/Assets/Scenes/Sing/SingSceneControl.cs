@@ -549,8 +549,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void SendStopRecordingMessageToConnectedClients()
     {
-        serverSideConnectRequestManager
-            .GetConnectedClientHandlerss()
+        ServerSideConnectRequestManager
+            .GetConnectedClientHandlers()
             .ForEach(connectedClientHandler => connectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()) );
     }
 

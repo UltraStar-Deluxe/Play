@@ -24,6 +24,8 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private StreamReader tcpClientStreamReader;
     private StreamWriter tcpClientStreamWriter;
 
+    private object streamReaderLock = new();
+
     private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     private readonly Thread receiveDataThread;
@@ -52,7 +54,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
         {
             while (!isDisposed)
             {
-                int sleepTimeInMillis = 250;
                 if (tcpClient == null)
                 {
                     try
@@ -63,7 +64,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
                         tcpClientStreamReader = new StreamReader(tcpClientStream);
                         tcpClientStreamWriter = new StreamWriter(tcpClientStream);
                         tcpClientStreamWriter.AutoFlush = true;
-
                     }
                     catch (Exception e)
                     {
@@ -77,12 +77,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 {
                     try
                     {
-                        while (tcpClientStream.DataAvailable)
-                        {
-                            ReadMessageFromClient();
-                            // Check for next message soon (33 milliseconds is approx. 30 FPS).
-                            sleepTimeInMillis = 33;
-                        }
+                        ReadMessagesFromClient();
                     }
                     catch (Exception e)
                     {
@@ -93,7 +88,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                     }
                 }
 
-                Thread.Sleep(sleepTimeInMillis);
+                Thread.Sleep(250);
             }
         });
         receiveDataThread.Start();
@@ -131,6 +126,17 @@ public class ConnectedClientHandler : IConnectedClientHandler
             Debug.LogException(e);
             Debug.LogError("Failed sending data to client. Removing ConnectedClientHandler.");
             serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+        }
+    }
+
+    public void ReadMessagesFromClient()
+    {
+        lock (streamReaderLock)
+        {
+            while (tcpClientStream.DataAvailable)
+            {
+                ReadMessageFromClient();
+            }
         }
     }
 
@@ -188,6 +194,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
     {
+        Debug.Log($"Received pitchEventDto at systime {beatPitchEventDto.SystemTimeMillis} (delay: {TimeUtils.GetSystemTimeInMillis() - beatPitchEventDto.SystemTimeMillis} ms)");
         pitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
     }
 
