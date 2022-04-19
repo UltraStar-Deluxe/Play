@@ -54,11 +54,19 @@ public static class SongMetaUtils
 
     public static Sentence GetSentenceAtBeat(Voice voice, int beat)
     {
+        if (voice == null)
+        {
+            return null;
+        }
         return voice.Sentences.FirstOrDefault(sentence => sentence.MinBeat <= beat && beat <= sentence.MaxBeat);
     }
 
     public static Note GetNoteAtBeat(Sentence sentence, int beat)
     {
+        if (sentence == null)
+        {
+            return null;
+        }
         return sentence.Notes.FirstOrDefault(note => note.StartBeat <= beat && beat <= note.EndBeat);
     }
 

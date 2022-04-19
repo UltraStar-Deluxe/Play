@@ -190,7 +190,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     {
         // Check if can analyze new beat
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
-        if (currentBeat <= lastAnalyzedBeat)
+        if (currentBeat <= lastAnalyzedBeat
+            || GetEstimatedPositionInSongInMillis() < songMeta.Gap)
         {
             return;
         }
@@ -321,6 +322,11 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
     {
         Debug.Log($"Received position in song {positionInSongDto.PositionInSongInMillis} (offset: {positionInSongDto.PositionInSongInMillis - GetEstimatedPositionInSongInMillis()})");
+        if (positionInSongDto.PositionInSongInMillis < receivedPositionInSongInMillis)
+        {
+            // Jump back in song (possibly restart)
+            lastAnalyzedBeat = 0;
+        }
         systemTimeWhenReceivedPositionInSong = TimeUtils.GetSystemTimeInMillis();
         receivedPositionInSongInMillis = positionInSongDto.PositionInSongInMillis;
         songMeta = new SongMeta

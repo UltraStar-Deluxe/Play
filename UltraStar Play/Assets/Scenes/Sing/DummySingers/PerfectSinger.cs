@@ -1,14 +1,16 @@
-﻿public class PerfectSinger : AbstractDummySinger
+﻿
+public class PerfectSinger : AbstractDummySinger
 {
     public int offset = 12;
 
-    protected override PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat)
+    protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
-        PitchEvent pitchEvent = null;
+        Note noteAtBeat = GetNoteAtBeat(beat);
         if (noteAtBeat != null)
         {
-            pitchEvent = new PitchEvent(noteAtBeat.MidiNote + offset);
+            return new BeatPitchEvent(noteAtBeat.MidiNote + offset, beat);
         }
-        return pitchEvent;
+
+        return null;
     }
 }
