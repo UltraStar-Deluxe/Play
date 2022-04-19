@@ -49,7 +49,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private SongMeta songMeta;
     private double receivedPositionInSongInMillis;
-    private long systemTimeWhenReceivedPositionInSong;
+    private long unixTimeMillisecondsWhenReceivedPositionInSong;
     private int lastAnalyzedBeat;
 
     private bool HasPositionInSong => songMeta != null && receivedPositionInSongInMillis >= 0;
@@ -140,7 +140,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
 
         if (HasPositionInSong
-            && systemTimeWhenReceivedPositionInSong + 30000 < TimeUtils.GetSystemTimeInMillis())
+            && unixTimeMillisecondsWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
@@ -198,7 +198,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
         int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeat - 100);
-        Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetSystemTimeInMillis()})");
+        // Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
 
         int loopCount = 0;
         int maxLoopCount = 100;
@@ -210,6 +210,11 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 : -1;
             // Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
             SendPitchEventToServer(new BeatPitchEvent(midiNote, beat));
+            if (!IsConnected)
+            {
+                // Connection was closed, probably when trying to send the data.
+                return;
+            }
 
             loopCount++;
             if (loopCount > maxLoopCount)
@@ -242,8 +247,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             return -1;
         }
 
-        long currentSystemTimeMillis = TimeUtils.GetSystemTimeInMillis();
-        long durationSinceReceivedPositionInSongInMillis = currentSystemTimeMillis - systemTimeWhenReceivedPositionInSong;
+        long currentUnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds();
+        long durationSinceReceivedPositionInSongInMillis = currentUnixTimeMilliseconds - unixTimeMillisecondsWhenReceivedPositionInSong;
         double estimatedPositionInSongInMillis = receivedPositionInSongInMillis + durationSinceReceivedPositionInSongInMillis;
         return estimatedPositionInSongInMillis;
     }
@@ -265,9 +270,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         try
         {
             BeatPitchEventDto beatPitchEventDto = pitchEvent != null
-                ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetSystemTimeInMillis())
-                : new BeatPitchEventDto(-1, -1, TimeUtils.GetSystemTimeInMillis());
-            // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetSystemTimeInMillis()})");
+                ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetUnixTimeMilliseconds())
+                : new BeatPitchEventDto(-1, -1, TimeUtils.GetUnixTimeMilliseconds());
+            // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetUnixTimeMilliseconds()})");
             tcpClientStreamWriter.WriteLine(beatPitchEventDto.ToJson());
             // tcpClientStreamWriter.Flush();
         }
@@ -307,7 +312,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
             case CompanionAppMessageType.PositionInSong:
-                Debug.Log(json);
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
                 return;
             case CompanionAppMessageType.StopRecording:
@@ -322,14 +326,16 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
     {
-        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, offset: {positionInSongDto.PositionInSongInMillis - GetEstimatedPositionInSongInMillis()})");
-        if (positionInSongDto.PositionInSongInMillis < receivedPositionInSongInMillis)
+        double messageDelayInMillis = TimeUtils.GetUnixTimeMilliseconds() - positionInSongDto.UnixTimeInMillis;
+        double positionInSongInMillisConsideringDelay = positionInSongDto.PositionInSongInMillis + messageDelayInMillis;
+        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, messageDelay: {messageDelayInMillis}, offset: {positionInSongInMillisConsideringDelay - GetEstimatedPositionInSongInMillis()})");
+        if (positionInSongInMillisConsideringDelay < receivedPositionInSongInMillis)
         {
             // Jump back in song (possibly restart)
             lastAnalyzedBeat = 0;
         }
-        systemTimeWhenReceivedPositionInSong = TimeUtils.GetSystemTimeInMillis();
-        receivedPositionInSongInMillis = positionInSongDto.PositionInSongInMillis;
+        unixTimeMillisecondsWhenReceivedPositionInSong = TimeUtils.GetUnixTimeMilliseconds();
+        receivedPositionInSongInMillis = positionInSongInMillisConsideringDelay;
         songMeta = new SongMeta
         {
             Bpm = positionInSongDto.SongBpm,
@@ -340,7 +346,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private void ResetPositionInSong()
     {
         Debug.Log("Resetting position in song");
-        systemTimeWhenReceivedPositionInSong = -1;
+        unixTimeMillisecondsWhenReceivedPositionInSong = -1;
         songMeta = null;
         receivedPositionInSongInMillis = 0;
         lastAnalyzedBeat = 0;

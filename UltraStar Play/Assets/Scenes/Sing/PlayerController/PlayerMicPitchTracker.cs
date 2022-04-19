@@ -67,7 +67,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private int lastAnalyzedBeatFromConnectedClient;
 
-    private long lastSystemTimeWhenSentPositionInSongToClient;
+    private long lastUnixTimeMillisecondsWhenSentPositionInSongToClient;
 
     private void Start()
     {
@@ -124,9 +124,9 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            if (lastSystemTimeWhenSentPositionInSongToClient + 1000 < TimeUtils.GetSystemTimeInMillis())
+            if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + 2000 < TimeUtils.GetUnixTimeMilliseconds())
             {
-                lastSystemTimeWhenSentPositionInSongToClient = TimeUtils.GetSystemTimeInMillis();
+                lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
 
                 // Synchronize position in song with connected client.
                 SendPositionInSongToClient();
@@ -203,7 +203,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             // Looks like the companion app does not know the current position in the song. Send it this info.
             Debug.LogWarning("Received invalid beat from connected client.");
-            // SendPositionInSongToClient();
+            SendPositionInSongToClient();
             return;
         }
 
@@ -245,8 +245,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             SongBpm = songMeta.Bpm,
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis,
+            UnixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds(),
         };
-        Debug.Log(jsonSerializable.ToJson());
         Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {songAudioPlayer.PositionInSongInMillis})");
         connectedClientHandler.SendMessageToClient(jsonSerializable);
     }
@@ -263,7 +263,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         int midiNote = noteAtBeat != null
             ? noteAtBeat.MidiNote
             : -1;
-        // Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (at frame: {Time.frameCount}, at systime {TimeUtils.GetSystemTimeInMillis()})");
+        // Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (at frame: {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
         if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
@@ -289,12 +289,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
-        if (beatAnalyzedEvent == null)
+        if (beatAnalyzedEvent == null
+            || RecordingSentence == null)
         {
             return;
         }
-
-        // Debug.Log("Beat analyzed: " + beatAnalyzedEvent.Beat);
 
         if (BeatToAnalyze <= beatAnalyzedEvent.Beat)
         {
@@ -427,10 +426,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     public void SkipToBeat(double currentBeat)
     {
+        SendPositionInSongToClient();
+
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences
-            .Where(sentence => currentBeat <= sentence.MaxBeat)
-            .FirstOrDefault();
+            .FirstOrDefault(sentence => currentBeat <= sentence.MaxBeat);
         if (RecordingSentence != null)
         {
             recordingSentenceIndex = playerControl.SortedSentences.IndexOf(RecordingSentence);

@@ -66,7 +66,7 @@ public class SongAudioPlayer : MonoBehaviour
             if (positionInSongInMillisFrame != Time.frameCount)
             {
                 positionInSongInMillisFrame = Time.frameCount;
-                positionInSongInMillis = 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
+                positionInSongInMillis = PositionInSongInMillisExact;
             }
             return positionInSongInMillis;
         }
@@ -95,6 +95,13 @@ public class SongAudioPlayer : MonoBehaviour
             positionInSongEventStream.OnNext(positionInSongInMillis);
         }
     }
+
+    /**
+     * Returns the exact position in the song based on current sample position.
+     * Note that this changes concurrently,
+     * such that it can return different values when called multiple times in the same frame.
+     */
+    public double PositionInSongInMillisExact => 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
 
     public double DurationOfSongInMillis { get; private set; }
 

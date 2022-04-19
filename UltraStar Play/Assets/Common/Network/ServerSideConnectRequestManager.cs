@@ -94,7 +94,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         GetConnectedClientHandlers().ForEach(connectedClientHandler => connectedClientHandler.ReadMessagesFromClient());
         if (connectedClientBeatPitchEventQueue.Count > 0)
         {
-            Debug.Log($"Received {connectedClientBeatPitchEventQueue.Count} beats (frame: {Time.frameCount})");
+            // Debug.Log($"Received {connectedClientBeatPitchEventQueue.Count} beats (frame: {Time.frameCount})");
         }
         while (connectedClientBeatPitchEventQueue.TryDequeue(out ConnectedClientBeatPitchEvent pitchEvent))
         {

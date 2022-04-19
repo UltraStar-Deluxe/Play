@@ -6,9 +6,9 @@ using System;
  */
 public static class TimeUtils
 {
-    public static long GetSystemTimeInMillis()
+    public static long GetUnixTimeMilliseconds()
     {
         // See https://stackoverflow.com/questions/4016483/get-time-in-milliseconds-using-c-sharp
-        return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        return DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 }
