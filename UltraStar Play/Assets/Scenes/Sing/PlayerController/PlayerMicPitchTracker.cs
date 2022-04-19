@@ -124,7 +124,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            if (lastSystemTimeWhenSentPositionInSongToClient + 500 < TimeUtils.GetSystemTimeInMillis())
+            if (lastSystemTimeWhenSentPositionInSongToClient + 5000 < TimeUtils.GetSystemTimeInMillis())
             {
                 lastSystemTimeWhenSentPositionInSongToClient = TimeUtils.GetSystemTimeInMillis();
 
@@ -240,13 +240,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {(int)songAudioPlayer.PositionInSongInMillis})");
-        connectedClientHandler.SendMessageToClient(new PositionInSongDto
+        JsonSerializable jsonSerializable = new PositionInSongDto
         {
             SongBpm = songMeta.Bpm,
             SongGap = songMeta.Gap,
-            PositionInSongInMillis = (int)songAudioPlayer.PositionInSongInMillis,
-        });
+            PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis,
+        };
+        Debug.Log(jsonSerializable.ToJson());
+        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {songAudioPlayer.PositionInSongInMillis})");
+        connectedClientHandler.SendMessageToClient(jsonSerializable);
     }
 
     private void FirePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
@@ -261,7 +263,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         int midiNote = noteAtBeat != null
             ? noteAtBeat.MidiNote
             : -1;
-        Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (frame: {Time.frameCount})");
+        // Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (at frame: {Time.frameCount}, at systime {TimeUtils.GetSystemTimeInMillis()})");
         if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);

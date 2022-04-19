@@ -58,9 +58,12 @@ public class ConnectedClientHandler : IConnectedClientHandler
                     try
                     {
                         tcpClient = ClientTcpListener.AcceptTcpClient();
+                        tcpClient.NoDelay = true;
                         tcpClientStream = tcpClient.GetStream();
                         tcpClientStreamReader = new StreamReader(tcpClientStream);
                         tcpClientStreamWriter = new StreamWriter(tcpClientStream);
+                        tcpClientStreamWriter.AutoFlush = true;
+
                     }
                     catch (Exception e)
                     {
@@ -120,7 +123,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
                 tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
-                tcpClientStreamWriter.Flush();
+                // tcpClientStreamWriter.Flush();
             }
         }
         catch (Exception e)
@@ -158,7 +161,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
             && tcpClientStream.CanWrite)
         {
             tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
-            tcpClientStreamWriter.Flush();
+            // tcpClientStreamWriter.Flush();
         }
         else
         {

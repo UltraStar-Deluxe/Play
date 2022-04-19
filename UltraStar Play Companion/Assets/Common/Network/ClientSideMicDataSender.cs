@@ -115,7 +115,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
                 tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
-                tcpClientStreamWriter.Flush();
+                // tcpClientStreamWriter.Flush();
             }
         }
         catch (Exception e)
@@ -140,7 +140,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
 
         if (HasPositionInSong
-            && systemTimeWhenReceivedPositionInSong + 10000 < TimeUtils.GetSystemTimeInMillis())
+            && systemTimeWhenReceivedPositionInSong + 30000 < TimeUtils.GetSystemTimeInMillis())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
@@ -198,7 +198,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
         int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeat - 100);
-        Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats)");
+        Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetSystemTimeInMillis()})");
 
         int loopCount = 0;
         int maxLoopCount = 100;
@@ -208,7 +208,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             int midiNote = pitchEvent != null
                 ? pitchEvent.MidiNote
                 : -1;
-            Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
+            // Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
             SendPitchEventToServer(new BeatPitchEvent(midiNote, beat));
 
             loopCount++;
@@ -267,9 +267,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             BeatPitchEventDto beatPitchEventDto = pitchEvent != null
                 ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat)
                 : new BeatPitchEventDto(-1, -1);
-            Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote})");
+            // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetSystemTimeInMillis()})");
             tcpClientStreamWriter.WriteLine(beatPitchEventDto.ToJson());
-            tcpClientStreamWriter.Flush();
+            // tcpClientStreamWriter.Flush();
         }
         catch (Exception e)
         {
@@ -307,6 +307,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
             case CompanionAppMessageType.PositionInSong:
+                Debug.Log(json);
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
                 return;
             case CompanionAppMessageType.StopRecording:
@@ -321,7 +322,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
     {
-        Debug.Log($"Received position in song {positionInSongDto.PositionInSongInMillis} (offset: {positionInSongDto.PositionInSongInMillis - GetEstimatedPositionInSongInMillis()})");
+        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, offset: {positionInSongDto.PositionInSongInMillis - GetEstimatedPositionInSongInMillis()})");
         if (positionInSongDto.PositionInSongInMillis < receivedPositionInSongInMillis)
         {
             // Jump back in song (possibly restart)
@@ -370,10 +371,12 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             try
             {
                 tcpClient = new TcpClient();
+                tcpClient.NoDelay = true;
                 tcpClient.Connect(serverSideTcpClientEndPoint);
                 tcpClientStream = tcpClient.GetStream();
                 tcpClientStreamReader = new StreamReader(tcpClientStream);
                 tcpClientStreamWriter = new StreamWriter(tcpClientStream);
+                tcpClientStreamWriter.AutoFlush = true;
             }
             catch (Exception e)
             {
