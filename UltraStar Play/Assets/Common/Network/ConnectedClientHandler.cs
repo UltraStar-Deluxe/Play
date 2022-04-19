@@ -133,7 +133,8 @@ public class ConnectedClientHandler : IConnectedClientHandler
     {
         lock (streamReaderLock)
         {
-            while (tcpClientStream.DataAvailable)
+            while (tcpClientStream != null
+                   && tcpClientStream.DataAvailable)
             {
                 ReadMessageFromClient();
             }
@@ -194,7 +195,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
     {
-        Debug.Log($"Received pitchEventDto at systime {beatPitchEventDto.SystemTimeMillis} (delay: {TimeUtils.GetSystemTimeInMillis() - beatPitchEventDto.SystemTimeMillis} ms)");
+        // Debug.Log($"Received pitchEventDto at systime {beatPitchEventDto.UnixTimeMilliseconds} (delay: {TimeUtils.GetUnixTimeMilliseconds() - beatPitchEventDto.UnixTimeMilliseconds} ms)");
         pitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
     }
 
