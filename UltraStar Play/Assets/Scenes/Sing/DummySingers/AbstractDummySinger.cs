@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 {
     public int playerIndexToSimulate;
 
-    private PlayerControl playerControl;
+    protected PlayerControl playerControl;
 
     [Inject]
     protected SingSceneControl singSceneControl;
@@ -25,9 +26,9 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
     }
 
-    protected abstract PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat);
+    protected abstract BeatPitchEvent GetDummyPitchEvent(int beat);
 
-    private void Update()
+    protected virtual void Update()
     {
         if (playerControl == null)
         {
@@ -46,18 +47,21 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
             return;
         }
 
-        Note noteAtBeat = GetNoteAtBeat(beatToAnalyze);
-        if (noteAtBeat == null)
-        {
-            return;
-        }
-
-        PitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze, noteAtBeat);
-        playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beatToAnalyze, noteAtBeat, noteAtBeat.Sentence);
-        playerControl.PlayerMicPitchTracker.GoToNextBeat();
+        BeatPitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze);
+        FirePitchEvent(pitchEvent, beatToAnalyze);
     }
 
-    private bool TryFindPlayerControl()
+    protected void FirePitchEvent(BeatPitchEvent pitchEvent, int fallbackBeat)
+    {
+        int beat = pitchEvent != null
+            ? pitchEvent.Beat
+            : fallbackBeat;
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
+        playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat);
+    }
+
+    protected bool TryFindPlayerControl()
     {
         if (singSceneControl.PlayerControls.IsNullOrEmpty()
             || playerIndexToSimulate >= singSceneControl.PlayerControls.Count)
@@ -76,25 +80,16 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         playerControl.MicSampleRecorder.enabled = false;
     }
 
-    protected double GetBeatDelayedByMicDelay(int beat)
+    protected Sentence GetSentenceAtBeat(int beat)
     {
-        double micDelayInBeats = (playerControl.MicProfile == null)
-            ? 0
-            : BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, playerControl.MicProfile.DelayInMillis);
-        double delayedBeat = beat - micDelayInBeats;
-        return delayedBeat;
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
+        return sentenceAtBeat;
     }
 
     protected Note GetNoteAtBeat(int beat)
     {
-        Sentence recordingSentence = playerControl?.PlayerMicPitchTracker?.RecordingSentence;
-        if (recordingSentence == null)
-        {
-            return null;
-        }
-
-        Note noteAtBeat = recordingSentence.Notes
-            .Where(note => note.StartBeat <= beat && beat < note.EndBeat).FirstOrDefault();
+        Sentence sentenceAtBeat = GetSentenceAtBeat(beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
         return noteAtBeat;
     }
 }

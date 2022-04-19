@@ -105,6 +105,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
             audioSamplesAnalyzer.Enable();
         }
+
+        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
 
     private IConnectedClientHandler GetConnectedClientHandler()
@@ -161,8 +163,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             : null;
 
         FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
-
-        GoToNextBeat();
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -214,7 +214,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
+        // Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
         lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
         FirePitchEventFromConnectedClient(pitchEvent);
     }
@@ -257,24 +257,18 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
 
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
-        if (sentenceAtBeat == null)
-        {
-            return;
-        }
-
         Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat);
-        if (noteAtBeat == null)
-        {
-            return;
-        }
-
-        if (pitchEvent.MidiNote < 0)
+        int midiNote = noteAtBeat != null
+            ? noteAtBeat.MidiNote
+            : -1;
+        Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (frame: {Time.frameCount})");
+        if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
         else
         {
-            FirePitchEvent(pitchEvent, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
+            FirePitchEvent(new PitchEvent(midiNote), pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
     }
 
@@ -291,9 +285,19 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
     }
 
-    public void GoToNextBeat()
+    private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
-        BeatToAnalyze++;
+        if (beatAnalyzedEvent == null)
+        {
+            return;
+        }
+
+        // Debug.Log("Beat analyzed: " + beatAnalyzedEvent.Beat);
+
+        if (BeatToAnalyze <= beatAnalyzedEvent.Beat)
+        {
+            BeatToAnalyze = beatAnalyzedEvent.Beat + 1;
+        }
         if (BeatToAnalyze > RecordingSentence.MaxBeat)
         {
             // All beats of the sentence analyzed. Go to next sentence.
