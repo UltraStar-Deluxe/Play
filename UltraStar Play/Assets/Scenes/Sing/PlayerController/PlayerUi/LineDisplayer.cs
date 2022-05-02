@@ -17,20 +17,6 @@ public class LineDisplayer : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
-    private int lineCount;
-    public int LineCount
-    {
-        get
-        {
-            return lineCount;
-        }
-        set
-        {
-            lineCount = value;
-            UpdateLines();
-        }
-    }
-
     private DynamicTexture dynamicTexture;
 
     private readonly List<Action> pendingActionList = new();
@@ -64,25 +50,21 @@ public class LineDisplayer : INeedInjection, IInjectionFinishedListener
         pendingActionList.Clear();
     }
 
-    private void UpdateLines()
+    public void DrawLines(IEnumerable<float> noteRowToYPercent)
     {
         if (dynamicTexture == null)
         {
-            pendingActionList.Add(() => UpdateLines());
+            pendingActionList.Add(() => DrawLines(noteRowToYPercent));
             return;
         }
 
         dynamicTexture.ClearTexture();
-        for (int i = 1; i <= lineCount; i++)
-        {
-            DrawLine(i);
-        }
+        noteRowToYPercent.ForEach(y => DrawLine(y));
         dynamicTexture.ApplyTexture();
     }
 
-    private void DrawLine(int index)
+    private void DrawLine(float yPercent)
     {
-        float yPercent = (float)index / (float)lineCount;
         int y = (int)(dynamicTexture.TextureHeight * yPercent);
         for (int x = 0; x < dynamicTexture.TextureWidth; x++)
         {
