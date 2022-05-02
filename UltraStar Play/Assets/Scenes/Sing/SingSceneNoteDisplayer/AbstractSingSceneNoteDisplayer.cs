@@ -136,15 +136,24 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         float lineHeightPercent = 1.0f / lineCount;
         noteHeightPercent = lineHeightPercent / 2.0f;
 
+        float marginTopPercent = noteHeightPercent;
+        float marginBottomPercent = noteHeightPercent;
+        float availableHeightPercent = 1 - marginTopPercent - marginBottomPercent;
         for (int i = 0; i < noteRowCount; i++)
         {
-            int lineIndex = (int)Math.Floor(i / 2f);
-            // The even noteRows are drawn between the lines. Thus they have an offset of half the line height.
-            float lineOffset = ((i % 2) == 0) ? 0 : (lineHeightPercent / 2);
-            noteRowToYPercent[i] = 1 - ((float)lineIndex / (float)lineCount) + lineOffset + (lineHeightPercent / 2);
+            noteRowToYPercent[i] = marginTopPercent + (availableHeightPercent * (float)i / noteRowCount);
         }
 
-        lineDisplayer.LineCount = lineCount;
+        // Draw every second line.
+        List<float> yPercentagesToDrawLinesFor = new();
+        for (int i = 0; i < noteRowToYPercent.Length; i++)
+        {
+            if (i % 2 == 0)
+            {
+                yPercentagesToDrawLinesFor.Add(noteRowToYPercent[i]);
+            }
+        }
+        lineDisplayer.DrawLines(yPercentagesToDrawLinesFor.ToArray());
     }
 
     public void RemoveAllDisplayedNotes()
