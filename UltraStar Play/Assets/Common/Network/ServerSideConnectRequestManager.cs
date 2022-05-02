@@ -19,7 +19,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     static void InitOnLoad()
     {
         instance = null;
-        idToConnectedClientMap = new Dictionary<string, IConnectedClientHandler>();
+        idToConnectedClientMap = new();
     }
 
     private static ServerSideConnectRequestManager instance;
@@ -283,6 +283,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     
     public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler)
     {
+        if (clientId == null)
+        {
+            connectedClientHandler = null;
+            return false;
+        }
         return idToConnectedClientMap.TryGetValue(clientId, out connectedClientHandler);
     }
 }
