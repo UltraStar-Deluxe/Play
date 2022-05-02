@@ -53,6 +53,11 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         targetNote.ShowByDisplay();
         recordedNote.HideByDisplay();
 
+        if (Note.IsGolden)
+        {
+            image.AddToClassList("goldenNote");
+        }
+
         SetStyleByMicProfile();
     }
 
