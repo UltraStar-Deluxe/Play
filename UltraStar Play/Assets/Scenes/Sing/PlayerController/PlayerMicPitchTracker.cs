@@ -233,6 +233,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void SendPositionInSongToClient()
     {
+        if (micProfile == null)
+        {
+            return;
+        }
+
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
         if (connectedClientHandler == null)
         {
