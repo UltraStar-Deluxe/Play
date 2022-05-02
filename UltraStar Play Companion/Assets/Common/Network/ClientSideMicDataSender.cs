@@ -115,7 +115,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
                 tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
-                // tcpClientStreamWriter.Flush();
             }
         }
         catch (Exception e)
@@ -209,10 +208,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 ? pitchEvent.MidiNote
                 : -1;
             // Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
-            SendPitchEventToServer(new BeatPitchEvent(midiNote, beat));
-            if (!IsConnected)
+            if (!TrySendPitchEventToServer(new BeatPitchEvent(midiNote, beat)))
             {
-                // Connection was closed, probably when trying to send the data.
+                // Something went wrong when sending the data. Thus, skip sending the other beats.
                 return;
             }
 
@@ -236,7 +234,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int midiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;
-        SendPitchEventToServer(new BeatPitchEvent(midiNote, -1));
+        TrySendPitchEventToServer(new BeatPitchEvent(midiNote, -1));
     }
 
 
@@ -265,16 +263,19 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         return pitchEvent;
     }
 
-    private void SendPitchEventToServer(BeatPitchEvent pitchEvent)
+    private bool TrySendPitchEventToServer(BeatPitchEvent pitchEvent)
     {
+        BeatPitchEventDto beatPitchEventDto;
+        string json;
         try
         {
-            BeatPitchEventDto beatPitchEventDto = pitchEvent != null
+            beatPitchEventDto = pitchEvent != null
                 ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetUnixTimeMilliseconds())
                 : new BeatPitchEventDto(-1, -1, TimeUtils.GetUnixTimeMilliseconds());
             // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetUnixTimeMilliseconds()})");
-            tcpClientStreamWriter.WriteLine(beatPitchEventDto.ToJson());
-            // tcpClientStreamWriter.Flush();
+            json = beatPitchEventDto.ToJson();
+            tcpClientStreamWriter.WriteLine(json);
+            return true;
         }
         catch (Exception e)
         {
@@ -282,6 +283,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             Debug.LogError($"Failed to send pitch to server");
             CloseNetworkConnection();
         }
+
+        return false;
     }
 
     private void ReadMessageFromServer()
@@ -305,7 +308,17 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandleJsonMessageFromServer(string json)
     {
-        CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
+        CompanionAppMessageDto companionAppMessageDto = null;
+        try
+        {
+            companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Exception while parsing message from server: {json}");
+            Debug.LogException(e);
+        }
+
         switch (companionAppMessageDto.MessageType)
         {
             case CompanionAppMessageType.StillAliveCheck:
