@@ -11,6 +11,9 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private Subject<BeatPitchEvent> pitchEventStream = new();
     public IObservable<BeatPitchEvent> PitchEventStream => pitchEventStream;
 
+    private Subject<PositionInSongResponseDto> positionInSongResponseEventStream = new();
+    public IObservable<PositionInSongResponseDto> PositionInSongResponseEventStream => positionInSongResponseEventStream;
+
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
     public string ClientId { get; private set; }
@@ -23,13 +26,13 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private StreamReader tcpClientStreamReader;
     private StreamWriter tcpClientStreamWriter;
 
-    private object streamReaderLock = new();
+    private readonly object streamReaderLock = new();
 
     private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     private readonly Thread receiveDataThread;
     private readonly Thread clientStillAliveCheckThread;
-    
+
     public ConnectedClientHandler(
         ServerSideConnectRequestManager serverSideConnectRequestManager,
         IPEndPoint clientIpEndPoint,
@@ -117,6 +120,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
                 tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
+                tcpClientStreamWriter.Flush();
             }
         }
         catch (Exception e)
@@ -166,6 +170,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
             && tcpClientStream.CanWrite)
         {
             tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
+            tcpClientStreamWriter.Flush();
         }
         else
         {
@@ -184,6 +189,9 @@ public class ConnectedClientHandler : IConnectedClientHandler
             case CompanionAppMessageType.BeatPitchEvent:
                 FireBeatPitchEventFromCompanionApp(JsonConverter.FromJson<BeatPitchEventDto>(json));
                 return;
+            case CompanionAppMessageType.PositionInSongResponse:
+                positionInSongResponseEventStream.OnNext(JsonConverter.FromJson<PositionInSongResponseDto>(json));
+                return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
                 return;
@@ -192,7 +200,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
     {
-        // Debug.Log($"Received pitchEventDto at systime {beatPitchEventDto.UnixTimeMilliseconds} (delay: {TimeUtils.GetUnixTimeMilliseconds() - beatPitchEventDto.UnixTimeMilliseconds} ms)");
+        // Debug.Log($"Received pitchEventDto for beat {beatPitchEventDto.Beat} at systime {beatPitchEventDto.UnixTimeMilliseconds} (delay: {TimeUtils.GetUnixTimeMilliseconds() - beatPitchEventDto.UnixTimeMilliseconds} ms)");
         pitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
     }
 

@@ -116,7 +116,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             {
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
-                tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
+                TrySendMessageToServer(new StillAliveCheckDto());
             }
         }
         catch (Exception e)
@@ -204,11 +204,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Check if can analyze new beat
         double positionInSongConsideringMicDelay = GetEstimatedPositionInSongInMillis() - settings.MicProfile.DelayInMillis;
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat)
         {
             return;
         }
+        // Debug.Log($"currentBeat: {currentBeat}, withDelay: {currentBeatConsideringMicDelay} (diff: {currentBeat - currentBeatConsideringMicDelay})");
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
         int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
@@ -290,16 +292,19 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private bool TrySendPitchEventToServer(BeatPitchEvent pitchEvent)
     {
-        BeatPitchEventDto beatPitchEventDto;
-        string json;
+        BeatPitchEventDto beatPitchEventDto = pitchEvent != null
+            ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetUnixTimeMilliseconds())
+            : new BeatPitchEventDto(-1, -1, TimeUtils.GetUnixTimeMilliseconds());
+        // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetUnixTimeMilliseconds()})");
+        return TrySendMessageToServer(beatPitchEventDto);
+    }
+
+    private bool TrySendMessageToServer(JsonSerializable jsonSerializable)
+    {
         try
         {
-            beatPitchEventDto = pitchEvent != null
-                ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetUnixTimeMilliseconds())
-                : new BeatPitchEventDto(-1, -1, TimeUtils.GetUnixTimeMilliseconds());
-            // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetUnixTimeMilliseconds()})");
-            json = beatPitchEventDto.ToJson();
-            tcpClientStreamWriter.WriteLine(json);
+            tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
+            tcpClientStreamWriter.Flush();
             return true;
         }
         catch (Exception e)
@@ -351,6 +356,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 return;
             case CompanionAppMessageType.PositionInSong:
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
+                TrySendMessageToServer(new PositionInSongResponseDto());
                 return;
             case CompanionAppMessageType.MicProfile:
                 SetMicProfile(JsonConverter.FromJson<MicProfileMessageDto>(json));
@@ -384,7 +390,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
     {
-        double messageDelayInMillis = TimeUtils.GetUnixTimeMilliseconds() - positionInSongDto.UnixTimeInMillis;
+        double messageDelayInMillis = positionInSongDto.MessageDelayInMillis;
         double positionInSongInMillisConsideringDelay = positionInSongDto.PositionInSongInMillis + messageDelayInMillis;
         Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, messageDelay: {messageDelayInMillis}, offset: {positionInSongInMillisConsideringDelay - GetEstimatedPositionInSongInMillis()})");
         if (positionInSongInMillisConsideringDelay < receivedPositionInSongInMillis)

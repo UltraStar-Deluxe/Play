@@ -1,4 +1,9 @@
-﻿public static class NumberUtils
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+public static class NumberUtils
 {
     public static int Limit(int value, int min, int max)
     {
@@ -36,5 +41,17 @@
             result += n;
         }
         return result;
+    }
+
+    public static double Median(IEnumerable<double> enumerable)
+    {
+        List<double> list = enumerable.ToList();
+        if (list.IsNullOrEmpty())
+        {
+            return 0;
+        }
+
+        list.Sort();
+        return list[list.Count / 2];
     }
 }
