@@ -1,13 +1,9 @@
-public class BeatPitchEventDto : CompanionAppMessageDto
+public class BeatPitchEventDto
 {
     public int Beat { get; set; }
     public int MidiNote { get; set; }
 
-    public BeatPitchEventDto() : base(CompanionAppMessageType.BeatPitchEvent)
-    {
-    }
-
-    public BeatPitchEventDto(int midiNote, int beat, long unixTimeMilliseconds) : this()
+    public BeatPitchEventDto(int midiNote, int beat)
     {
         Beat = beat;
         MidiNote = midiNote;

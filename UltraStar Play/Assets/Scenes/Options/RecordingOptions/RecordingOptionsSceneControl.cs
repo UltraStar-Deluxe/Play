@@ -276,6 +276,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
         micVisualizer.SetMicProfile(micProfile);
         calibrateMicDelayControl.MicProfile = micProfile;
+        noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
 
         UpdateSampleRateLabel();
     }

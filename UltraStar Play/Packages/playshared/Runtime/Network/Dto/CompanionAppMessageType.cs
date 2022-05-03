@@ -1,7 +1,7 @@
 ﻿public enum CompanionAppMessageType
 {
     StillAliveCheck,
-    BeatPitchEvent,
+    BeatPitchEvents,
     PositionInSong,
     PositionInSongResponse,
     StopRecording,

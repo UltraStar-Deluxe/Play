@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -116,7 +117,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             {
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
-                TrySendMessageToServer(new StillAliveCheckDto());
+                SendMessageToServer(new StillAliveCheckDto());
             }
         }
         catch (Exception e)
@@ -216,6 +217,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
         // Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
 
+        List<BeatPitchEvent> beatPitchEvents = new();
         int loopCount = 0;
         int maxLoopCount = 100;
         for (int beat = nextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
@@ -224,12 +226,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             int midiNote = pitchEvent != null
                 ? pitchEvent.MidiNote
                 : -1;
+            beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat));
             // Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
-            if (!TrySendPitchEventToServer(new BeatPitchEvent(midiNote, beat)))
-            {
-                // Something went wrong when sending the data. Thus, skip sending the other beats.
-                return;
-            }
 
             loopCount++;
             if (loopCount > maxLoopCount)
@@ -238,6 +236,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 Debug.LogWarning($"Took emergency exit out of loop. Analyzed {maxLoopCount} beats and still not finished?");
             }
         }
+
+        // Send all events int one message
+        List<BeatPitchEventDto> beatPitchEventDtos = beatPitchEvents
+            .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat))
+            .ToList();
+        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDtos));
+
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
     }
 
@@ -252,9 +257,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int midiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;
-        TrySendPitchEventToServer(new BeatPitchEvent(midiNote, -1));
+        BeatPitchEventDto beatPitchEventDto = new BeatPitchEventDto(midiNote, -1);
+        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto));
     }
-
 
     private double GetEstimatedPositionInSongInMillis()
     {
@@ -290,22 +295,12 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         return micProfile;
     }
 
-    private bool TrySendPitchEventToServer(BeatPitchEvent pitchEvent)
-    {
-        BeatPitchEventDto beatPitchEventDto = pitchEvent != null
-            ? new BeatPitchEventDto(pitchEvent.MidiNote, pitchEvent.Beat, TimeUtils.GetUnixTimeMilliseconds())
-            : new BeatPitchEventDto(-1, -1, TimeUtils.GetUnixTimeMilliseconds());
-        // Debug.Log($"Sending pitch to server (beat: {beatPitchEventDto.Beat}, midiNote: {beatPitchEventDto.MidiNote}, systime: {TimeUtils.GetUnixTimeMilliseconds()})");
-        return TrySendMessageToServer(beatPitchEventDto);
-    }
-
-    private bool TrySendMessageToServer(JsonSerializable jsonSerializable)
+    private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
         try
         {
             tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
             tcpClientStreamWriter.Flush();
-            return true;
         }
         catch (Exception e)
         {
@@ -313,8 +308,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             Debug.LogError($"Failed to send pitch to server");
             CloseNetworkConnection();
         }
-
-        return false;
     }
 
     private void ReadMessageFromServer()
@@ -356,7 +349,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 return;
             case CompanionAppMessageType.PositionInSong:
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
-                TrySendMessageToServer(new PositionInSongResponseDto());
+                SendMessageToServer(new PositionInSongResponseDto());
                 return;
             case CompanionAppMessageType.MicProfile:
                 SetMicProfile(JsonConverter.FromJson<MicProfileMessageDto>(json));
