@@ -255,11 +255,16 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         {
             toggleRecordingButton.text = TranslationManager.GetTranslation(R.Messages.stopRecording);
             toggleRecordingButton.AddToClassList("stopRecordingButton");
+
+            // Prevent stand-by when recording
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
         else
         {
             toggleRecordingButton.text = TranslationManager.GetTranslation(R.Messages.startRecording);
             toggleRecordingButton.RemoveFromClassList("stopRecordingButton");
+
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;
         }
     }
 
