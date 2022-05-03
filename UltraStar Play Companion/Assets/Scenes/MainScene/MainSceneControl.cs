@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
@@ -33,67 +34,73 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
     
-    [Inject(Key = "#semanticVersionText")]
+    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
 
-    [Inject(Key = "#buildTimeStampText")]
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    [Inject(Key = "#commitHashText")]
+    [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
     
-    [Inject(Key = "#fpsText")]
+    [Inject(UxmlName = R.UxmlNames.fpsText)]
     private Label fpsText;
     
-    [Inject(Key = "#toggleRecordingButton")]
+    [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
     
-    [Inject(Key = "#recordingDeviceButtonContainer")]
-    private VisualElement recordingDeviceButtonContainer;
-    
-    [Inject(Key = "#connectionStatusText")]
+    [Inject(UxmlName = R.UxmlNames.recordingDevicePicker)]
+    private ItemPicker recordingDevicePicker;
+
+    [Inject(UxmlName = R.UxmlNames.nextRecordingDeviceButton)]
+    private Button nextRecordingDeviceButton;
+
+    [Inject(UxmlName = R.UxmlNames.connectionStatusText)]
     private Label connectionStatusText;
 
-    [Inject(Key = "#selectedRecordingDeviceText")]
+    [Inject(UxmlName = R.UxmlNames.selectedRecordingDeviceText)]
     private Label selectedRecordingDeviceText;
     
-    [Inject(Key = "#clientNameTextField")]
+    [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
     
-    [Inject(Key = "#visualizeAudioToggle")]
+    [Inject(UxmlName = R.UxmlNames.visualizeAudioToggle)]
     private Toggle visualizeAudioToggle;
     
-    [Inject(Key = "#audioWaveForm")]
+    [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
-    [Inject(Key = "#connectionThroubleshootingText")]
+    [Inject(UxmlName = R.UxmlNames.connectionThroubleshootingText)]
     private Label connectionThroubleshootingText;
     
-    [Inject(Key = "#serverErrorResponseText")]
+    [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
 
-    [Inject(Key = "#songListContainer")]
+    [Inject(UxmlName = R.UxmlNames.songListContainer)]
     private VisualElement songListContainer;
     
-    [Inject(Key = "#songListView")]
+    [Inject(UxmlName = R.UxmlNames.songListView)]
     private ScrollView songListView;
     
-    [Inject(Key = "#showSongListButton")]
+    [Inject(UxmlName = R.UxmlNames.showSongListButton)]
     private Button showSongListButton;
     
-    [Inject(Key = "#closeSongListButton")]
+    [Inject(UxmlName = R.UxmlNames.closeSongListButton)]
     private Button closeSongListButton;
     
-    [Inject(Key = "#sceneTitle")]
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
+
+    private LabeledItemPickerControl<string> recordingDevicePickerControl;
 
     private float frameCountTime;
     private int frameCount;
     
     private void Start()
     {
+        InitRecordingDeviceNameControls();
         settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(_ => UpdateSelectedRecordingDeviceText());
         clientSideMicSampleRecorder.IsRecording
@@ -132,6 +139,28 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
         });
+    }
+
+    private void InitRecordingDeviceNameControls()
+    {
+        string initialRecordingDeviceName = Microphone.devices.Contains(settings.MicProfile.Name)
+            ? settings.MicProfile.Name
+            : Microphone.devices.FirstOrDefault();
+        SetMicProfileName(initialRecordingDeviceName);
+
+        if (Microphone.devices.IsNullOrEmpty()
+            || Microphone.devices.Length <= 1)
+        {
+            recordingDevicePicker.HideByDisplay();
+            nextRecordingDeviceButton.HideByDisplay();
+        }
+        else
+        {
+            recordingDevicePickerControl = new LabeledItemPickerControl<string>(recordingDevicePicker, Microphone.devices.ToList());
+            recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
+            recordingDevicePickerControl.Selection.Subscribe(newValue => SetMicProfileName(newValue));
+            nextRecordingDeviceButton.RegisterCallbackButtonTriggered(() => recordingDevicePickerControl.SelectNextItem());
+        }
     }
 
     public void UpdateTranslation()
@@ -244,7 +273,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
             connectionThroubleshootingText.HideByDisplay();
             serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
-            UpdateRecordingDeviceButtons();
         }
         else
         {
@@ -265,25 +293,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
                 serverErrorResponseText.text = connectEvent.ErrorMessage;
             }
         }
-    }
-
-    private void UpdateRecordingDeviceButtons()
-    {
-        recordingDeviceButtonContainer.Clear();
-        if (Microphone.devices.Length <= 1)
-        {
-            // No real choice
-            return;
-        }
-        
-        Microphone.devices.ForEach(deviceName =>
-        {
-            Button deviceButton = new Button();
-            deviceButton.RegisterCallbackButtonTriggered(
-                () => SetMicProfileName(deviceName));
-            deviceButton.text = $"{deviceName}";
-            recordingDeviceButtonContainer.Add(deviceButton);
-        });
     }
 
     private void SetMicProfileName(string deviceName)
