@@ -198,8 +198,10 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         if (item <= 0)
         {
             // When "auto" is selected, then also show the automatically used sample rate.
-            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) +
-                   $"\n({micPitchTracker.MicSampleRecorder.SampleRateHz} Hz)";
+            string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
+                ? ""
+                : $"\n({micPitchTracker.MicSampleRecorder.SampleRateHz} Hz)";
+            return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
         }
         return $"{item} Hz";
     }
@@ -274,6 +276,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
         micVisualizer.SetMicProfile(micProfile);
         calibrateMicDelayControl.MicProfile = micProfile;
+
+        UpdateSampleRateLabel();
     }
 
     private void DeleteSelectedRecordingDevice()

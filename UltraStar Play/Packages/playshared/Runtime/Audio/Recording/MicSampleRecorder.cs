@@ -30,8 +30,8 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             }
             micProfile = value;
             if (micProfile != null
-                && ((!micProfile.IsInputFromConnectedClient && !micProfile.Name.IsNullOrEmpty())
-                     || (micProfile.IsInputFromConnectedClient && !micProfile.ConnectedClientId.IsNullOrEmpty())))
+                && !micProfile.IsInputFromConnectedClient
+                && !micProfile.Name.IsNullOrEmpty())
             {
                 SampleRateHz = GetSampleRateHz(micProfile);
                 MicSamples = new float[SampleRateHz];
@@ -48,7 +48,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     // SampleRateHz is available after the MicProfile has been set.
     public int SampleRateHz { get; private set; }
     // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
-    public float[] MicSamples { get; private set; }
+    public float[] MicSamples { get; private set; } = new float[DefaultSampleRateHz];
 
     private readonly Subject<RecordingEvent> recordingEventStream = new();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
@@ -230,9 +230,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     {
         if (localMicProfile.IsInputFromConnectedClient)
         {
-            return serverSideConnectRequestManager.TryGetConnectedClientHandler(localMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler)
-                ? connectedClientHandler.SampleRateHz
-                : DefaultSampleRateHz;
+            return 0;
         }
         else
         {
