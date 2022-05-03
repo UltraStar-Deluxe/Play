@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public class Settings
@@ -9,7 +11,8 @@ public class Settings
      */
     public string ClientId { get; private set; }
 
-    public MicProfile MicProfile { get; set; } = new MicProfile();
+    public MicProfile MicProfile { get; set; } = new MicProfile(Microphone.devices.FirstOrDefault());
+
     public int TargetFps { get; set; } = 30;
     public bool ShowFps { get; set; }
     public bool ShowAudioWaveForm { get; set; } = true;

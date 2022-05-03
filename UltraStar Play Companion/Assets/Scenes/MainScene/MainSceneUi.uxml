@@ -19,9 +19,9 @@
                 <ui:VisualElement name="audioWaveForm" class="onlyVisibleWhenConnected" style="width: 100%; height: 100px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;" />
                 <ui:TextField picking-mode="Ignore" value="MyCompanionApp" text="MyCompanionApp" name="clientNameTextField" style="width: 100%; flex-grow: 1;" />
                 <ui:Label text="Mic1234" display-tooltip-when-elided="true" name="selectedRecordingDeviceText" style="width: 100%; flex-grow: 1; -unity-text-align: lower-left; white-space: normal;" />
-                <ui:Button text="Start Recording" display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" />
-                <ui:VisualElement name="recordingDeviceButtonContainer" style="height: auto; align-items: center; justify-content: center; width: 100%; padding-left: 24px; padding-right: 24px; padding-top: 24px; padding-bottom: 24px; flex-grow: 1;" />
-                <ui:VisualElement name="sampleRateButtonContainer" style="height: auto; align-items: center; justify-content: center; width: 100%; padding-left: 24px; padding-right: 24px; padding-top: 24px; padding-bottom: 24px; flex-grow: 1;" />
+                <ui:Button text="Start Recording" display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" style="margin-bottom: 20px;" />
+                <ItemPicker name="recordingDevicePicker" noPreviousButton="true" noNextButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0; display: none;" />
+                <ui:Button text="Change Device" display-tooltip-when-elided="true" name="nextRecordingDeviceButton" style="margin-bottom: 20px;" />
                 <ui:Button text="Show song list" display-tooltip-when-elided="true" name="showSongListButton" class="startButtonClass" />
             </ui:VisualElement>
         </ui:VisualElement>
