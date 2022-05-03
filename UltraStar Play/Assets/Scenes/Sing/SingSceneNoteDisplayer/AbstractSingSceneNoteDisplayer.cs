@@ -141,7 +141,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         float availableHeightPercent = 1 - marginTopPercent - marginBottomPercent;
         for (int i = 0; i < noteRowCount; i++)
         {
-            noteRowToYPercent[i] = marginTopPercent + (availableHeightPercent * (float)i / noteRowCount);
+            noteRowToYPercent[i] = 1 - (marginTopPercent + (availableHeightPercent * (float)i / noteRowCount));
         }
 
         // Draw every second line.
