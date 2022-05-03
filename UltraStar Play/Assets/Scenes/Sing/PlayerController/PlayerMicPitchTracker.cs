@@ -202,8 +202,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
             // Looks like the companion app does not know the current position in the song. Send it this info.
-            Debug.LogWarning("Received invalid beat from connected client.");
-            SendPositionInSongToClient();
+            Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
+            // SendPositionInSongToClient();
             return;
         }
 
@@ -265,10 +265,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
         Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat);
-        int midiNote = noteAtBeat != null
-            ? noteAtBeat.MidiNote
-            : -1;
-        // Debug.Log($"Fire target midiNote {midiNote} instead of {pitchEvent.MidiNote} for beat {pitchEvent.Beat} (at frame: {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
+        int midiNote = pitchEvent.MidiNote;
         if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);

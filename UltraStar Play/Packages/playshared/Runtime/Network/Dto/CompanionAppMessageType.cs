@@ -4,4 +4,6 @@
     BeatPitchEvent,
     PositionInSong,
     StopRecording,
+    StartRecording,
+    MicProfile,
 }

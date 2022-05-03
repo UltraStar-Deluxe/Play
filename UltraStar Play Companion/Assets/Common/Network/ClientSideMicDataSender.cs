@@ -55,11 +55,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private bool HasPositionInSong => songMeta != null && receivedPositionInSongInMillis >= 0;
 
     private bool receivedStopRecordingMessage;
+    private bool receivedStartRecordingMessage;
 
     private void Start()
     {
         UpdateAudioSamplesAnalyzer();
-        clientSideMicSampleRecorder.SampleRate.Subscribe(_ => UpdateAudioSamplesAnalyzer());
+        settings.ObserveEveryValueChanged(it => it.MicProfile)
+            .Subscribe(newValue => UpdateAudioSamplesAnalyzer());
 
         clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
         clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
@@ -137,6 +139,14 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             Debug.Log("Stopping recording because of message from server");
             clientSideMicSampleRecorder.StopRecording();
         }
+        if (receivedStartRecordingMessage)
+        {
+            receivedStartRecordingMessage = false;
+
+            // Must be called from main thread.
+            Debug.Log("Starting recording because of message from server");
+            clientSideMicSampleRecorder.StartRecording();
+        }
 
         if (HasPositionInSong
             && unixTimeMillisecondsWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
@@ -148,7 +158,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void UpdateAudioSamplesAnalyzer()
     {
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, clientSideMicSampleRecorder.SampleRate.Value);
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, GetMicProfileWithFinalSampleRate().SampleRate);
         audioSamplesAnalyzer.Enable();
     }
 
@@ -187,21 +197,26 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void AnalyzeMicSamplesCorrespondingToBeatsInSong(RecordingEvent recordingEvent)
     {
+        if (GetEstimatedPositionInSongInMillis() < songMeta.Gap)
+        {
+            return;
+        }
+
         // Check if can analyze new beat
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
-        if (currentBeat <= lastAnalyzedBeat
-            || GetEstimatedPositionInSongInMillis() < songMeta.Gap)
+        double positionInSongConsideringMicDelay = GetEstimatedPositionInSongInMillis() - settings.MicProfile.DelayInMillis;
+        int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
+        if (currentBeatConsideringMicDelay <= lastAnalyzedBeat)
         {
             return;
         }
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
-        int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeat - 100);
+        int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
         // Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
 
         int loopCount = 0;
         int maxLoopCount = 100;
-        for (int beat = nextBeatToAnalyze; beat <= currentBeat; beat++)
+        for (int beat = nextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
         {
             PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat);
             int midiNote = pitchEvent != null
@@ -221,7 +236,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 Debug.LogWarning($"Took emergency exit out of loop. Analyzed {maxLoopCount} beats and still not finished?");
             }
         }
-        lastAnalyzedBeat = currentBeat;
+        lastAnalyzedBeat = currentBeatConsideringMicDelay;
     }
 
     private void AnalyzeNewestMicSamples(RecordingEvent recordingEvent)
@@ -230,7 +245,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             recordingEvent.MicSamples,
             recordingEvent.NewSamplesStartIndex,
             recordingEvent.NewSamplesEndIndex,
-            clientSideMicSampleRecorder.MicProfile);
+            GetMicProfileWithFinalSampleRate());
+
         int midiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;
@@ -256,11 +272,20 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
             songMeta,
             beat,
-            receivedPositionInSongInMillis,
-            clientSideMicSampleRecorder.MicProfile,
+            GetEstimatedPositionInSongInMillis(),
+            GetMicProfileWithFinalSampleRate(),
             recordingEvent.MicSamples,
             audioSamplesAnalyzer);
         return pitchEvent;
+    }
+
+    private MicProfile GetMicProfileWithFinalSampleRate()
+    {
+        // The MicProfile in the settings may use a SampleRate of 0 for "best available".
+        // The pitch detection algorithm needs the proper value.
+        MicProfile micProfile = new MicProfile(settings.MicProfile);
+        micProfile.SampleRate = ClientSideMicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
+        return micProfile;
     }
 
     private bool TrySendPitchEventToServer(BeatPitchEvent pitchEvent)
@@ -327,14 +352,34 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             case CompanionAppMessageType.PositionInSong:
                 SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
                 return;
+            case CompanionAppMessageType.MicProfile:
+                SetMicProfile(JsonConverter.FromJson<MicProfileMessageDto>(json));
+                return;
             case CompanionAppMessageType.StopRecording:
                 // Must be called from main thread
                 receivedStopRecordingMessage = true;
+                return;
+            case CompanionAppMessageType.StartRecording:
+                // Must be called from main thread
+                receivedStartRecordingMessage = true;
                 return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
                 return;
         }
+    }
+
+    private void SetMicProfile(MicProfileMessageDto micProfileMessageDto)
+    {
+        Debug.Log($"Received new mic profile: {micProfileMessageDto.ToJson()}");
+
+        MicProfile micProfile = new MicProfile(settings.MicProfile.Name);
+        micProfile.Amplification = micProfileMessageDto.Amplification;
+        micProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
+        micProfile.SampleRate = micProfileMessageDto.SampleRate;
+        micProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
+
+        settings.MicProfile = micProfile;
     }
 
     private void SetPositionInSong(PositionInSongDto positionInSongDto)
@@ -372,19 +417,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             && connectEvent.ServerIpEndPoint != null)
         {
             serverSideTcpClientEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MicrophonePort);
-            if (connectEvent.MicrophoneSampleRate > 0
-                && connectEvent.MicrophoneSampleRate != settings.SampleRate)
-            {
-                Debug.Log($"Received new sample rate: {settings.SampleRate}");
-                settings.SampleRate = connectEvent.MicrophoneSampleRate;
-                if (clientSideMicSampleRecorder.SampleRate.Value != settings.SampleRate)
-                {
-                    clientSideMicSampleRecorder.SetSampleRate(settings.SampleRate);
-                    // Try again with new SampleRate received from main game.
-                    CloseNetworkConnection();
-                    return;
-                }
-            }
 
             CloseNetworkConnection();
             try

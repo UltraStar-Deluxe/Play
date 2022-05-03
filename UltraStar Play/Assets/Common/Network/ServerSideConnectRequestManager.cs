@@ -168,14 +168,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
                 throw new ConnectRequestException("Malformed ConnectRequest: missing ClientId.");
             }
 
-            if (connectRequestDto.MicrophoneSampleRate > 0)
-            {
-                HandleClientMessageWithMicrophone(clientIpEndPoint, connectRequestDto);
-            }
-            else
-            {
-                HandleClientMessageWithNoMicrophone(clientIpEndPoint, connectRequestDto);
-            }
+            HandleClientMessage(clientIpEndPoint, connectRequestDto);
         }
         catch (Exception e)
         {
@@ -198,7 +191,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
 
-    private void HandleClientMessageWithMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
+    private void HandleClientMessage(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
         ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId);
         clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
@@ -209,22 +202,26 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
                 pitchEvent.Beat,
                 newConnectedClientHandler.ClientId)));
 
-        MicProfile micProfileOfClient = settings.MicProfiles
-            .FirstOrDefault(micProfile => micProfile.ConnectedClientId == newConnectedClientHandler.ClientId);
-        int micProfileSampleRate = micProfileOfClient != null
-            ? micProfileOfClient.SampleRate
-            : -1;
-
         ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
             MicrophonePort = newConnectedClientHandler.ClientTcpListener.GetPort(),
-            MicrophoneSampleRate = micProfileSampleRate,
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
+
+        // Send MicProfile
+        MicProfile micProfileOfClient = settings.MicProfiles
+            .FirstOrDefault(micProfile => micProfile.ConnectedClientId == newConnectedClientHandler.ClientId);
+        if (micProfileOfClient == null)
+        {
+            micProfileOfClient = new MicProfile();
+        }
+
+        Debug.Log("Sending MicProfile to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
+        newConnectedClientHandler.SendMessageToClient(new MicProfileMessageDto(micProfileOfClient));
     }
 
     private void OnDestroy()
