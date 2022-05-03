@@ -186,8 +186,10 @@ public class ConnectedClientHandler : IConnectedClientHandler
             case CompanionAppMessageType.StillAliveCheck:
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
-            case CompanionAppMessageType.BeatPitchEvent:
-                FireBeatPitchEventFromCompanionApp(JsonConverter.FromJson<BeatPitchEventDto>(json));
+            case CompanionAppMessageType.BeatPitchEvents:
+                BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
+                beatPitchEventsDto.BeatPitchEvents
+                    .ForEach(beatPitchEventDto => FireBeatPitchEventFromCompanionApp(beatPitchEventDto));
                 return;
             case CompanionAppMessageType.PositionInSongResponse:
                 positionInSongResponseEventStream.OnNext(JsonConverter.FromJson<PositionInSongResponseDto>(json));

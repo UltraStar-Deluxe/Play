@@ -92,10 +92,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
 
         // Read messages from client that arrived since the last time the reader thread was active.
         GetConnectedClientHandlers().ForEach(connectedClientHandler => connectedClientHandler.ReadMessagesFromClient());
-        if (connectedClientBeatPitchEventQueue.Count > 0)
-        {
-            // Debug.Log($"Received {connectedClientBeatPitchEventQueue.Count} beats (frame: {Time.frameCount})");
-        }
         while (connectedClientBeatPitchEventQueue.TryDequeue(out ConnectedClientBeatPitchEvent pitchEvent))
         {
             connectedClientBeatPitchEventStream.OnNext(pitchEvent);
