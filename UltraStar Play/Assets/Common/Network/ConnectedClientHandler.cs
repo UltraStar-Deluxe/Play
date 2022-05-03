@@ -15,7 +15,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
     public string ClientName { get; private set; }
     public string ClientId { get; private set; }
     public TcpListener ClientTcpListener { get; private set; }
-    public int SampleRateHz => 44100;
 
     private bool isDisposed;
 
