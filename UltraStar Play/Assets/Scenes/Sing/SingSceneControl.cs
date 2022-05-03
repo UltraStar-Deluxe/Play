@@ -251,6 +251,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             .WithRootVisualElement(doubleClickToTogglePauseElement)
             .CreateAndInject<ContextMenuControl>();
         contextMenuControl.FillContextMenuAction = FillContextMenu;
+
+        // Automatically start recording on companion apps
+        InitRecordingWithConnectedClients();
     }
 
     private void InitDummySingers()
@@ -545,6 +548,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         SendStopRecordingMessageToConnectedClients();
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
+    }
+
+    private void InitRecordingWithConnectedClients()
+    {
+        PlayerControls
+            .Select(playerControl => playerControl.MicProfile)
+            .Where(micProfile => micProfile != null && micProfile.IsInputFromConnectedClient)
+            .ForEach(micProfile =>
+            {
+                if (serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                {
+                    connectedClientHandler.SendMessageToClient(new MicProfileMessageDto(micProfile));
+                    connectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
+                }
+            });
     }
 
     private void SendStopRecordingMessageToConnectedClients()

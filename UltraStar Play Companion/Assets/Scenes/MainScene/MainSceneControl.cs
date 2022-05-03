@@ -94,9 +94,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
-        clientSideMicSampleRecorder.DeviceName
-            .Subscribe(_ => UpdateSelectedRecordingDeviceText());
-        clientSideMicSampleRecorder.SampleRate
+        settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(_ => UpdateSelectedRecordingDeviceText());
         clientSideMicSampleRecorder.IsRecording
             .Subscribe(OnRecordingStateChanged);
@@ -214,7 +212,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
 
     private void UpdateSelectedRecordingDeviceText()
     {
-        selectedRecordingDeviceText.text = $"{clientSideMicSampleRecorder.DeviceName.Value}\n({clientSideMicSampleRecorder.SampleRate.Value} Hz)";
+        int sampleRate = ClientSideMicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
+        selectedRecordingDeviceText.text = $"{settings.MicProfile.Name}\n" +
+                                           $"(sampleRate:{sampleRate} Hz," +
+                                           $"delay: {settings.MicProfile.DelayInMillis} ms," +
+                                           $"amp: {settings.MicProfile.Amplification}," +
+                                           $"supp: {settings.MicProfile.NoiseSuppression})";
     }
 
     private void OnRecordingStateChanged(bool isRecording)
@@ -273,14 +276,21 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
             return;
         }
         
-        Microphone.devices.ForEach(device =>
+        Microphone.devices.ForEach(deviceName =>
         {
             Button deviceButton = new Button();
             deviceButton.RegisterCallbackButtonTriggered(
-                () => clientSideMicSampleRecorder.SetRecordingDevice(device));
-            deviceButton.text = $"{device}";
+                () => SetMicProfileName(deviceName));
+            deviceButton.text = $"{deviceName}";
             recordingDeviceButtonContainer.Add(deviceButton);
         });
+    }
+
+    private void SetMicProfileName(string deviceName)
+    {
+        MicProfile micProfile = new MicProfile(settings.MicProfile);
+        micProfile.Name = deviceName;
+        settings.MicProfile = micProfile;
     }
 
     private void ToggleRecording()

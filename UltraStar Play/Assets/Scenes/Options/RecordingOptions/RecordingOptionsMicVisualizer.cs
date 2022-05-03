@@ -72,7 +72,8 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     public void SetMicProfile(MicProfile micProfile)
     {
         micPitchTracker.MicProfile = micProfile;
-        if (!string.IsNullOrEmpty(micProfile.Name))
+        if (!micProfile.Name.IsNullOrEmpty()
+            && !micProfile.IsInputFromConnectedClient)
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }

@@ -33,11 +33,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             return instance;
         }
     }
-    
-    /**
-     * This version number must to be increased when introducing breaking changes.
-     */
-    public const int ProtocolVersion = 3;
 
     [Inject]
     private Settings settings;
@@ -107,7 +102,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
                     IsSuccess = true,
                     ConnectRequestCount = connectRequestCount,
                     MicrophonePort = serverMicrophonePort,
-                    MicrophoneSampleRate = connectResponseDto.MicrophoneSampleRate,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
                 });
@@ -125,7 +119,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         
         if (!IsConnected
             && Time.time > nextConnectRequestTime
-            && clientSideMicSampleRecorder.SampleRate.Value > 0
             && !isApplicationPaused)
         {
             nextConnectRequestTime = Time.time + ConnectRequestPauseInSeconds;
@@ -236,10 +229,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         {
             ConnectRequestDto connectRequestDto = new ConnectRequestDto
             {
-                ProtocolVersion = ProtocolVersion,
+                ProtocolVersion = ProtocolVersions.ProtocolVersion,
                 ClientName = settings.ClientName,
                 ClientId = settings.ClientId,
-                MicrophoneSampleRate = clientSideMicSampleRecorder.SampleRate.Value,
             };
             byte[] requestBytes = Encoding.UTF8.GetBytes(connectRequestDto.ToJson());
             // UDP Broadcast (255.255.255.255)
