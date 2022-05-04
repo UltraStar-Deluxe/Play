@@ -279,7 +279,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
 
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat, true, false);
         int midiNote = pitchEvent.MidiNote;
         if (midiNote < 0)
         {
