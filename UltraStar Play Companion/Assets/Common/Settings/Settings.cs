@@ -11,7 +11,7 @@ public class Settings
      */
     public string ClientId { get; private set; }
 
-    public MicProfile MicProfile { get; set; } = new MicProfile(Microphone.devices.FirstOrDefault());
+    public MicProfile MicProfile { get; set; } = new MicProfile();
 
     public int TargetFps { get; set; } = 30;
     public bool ShowFps { get; set; }
