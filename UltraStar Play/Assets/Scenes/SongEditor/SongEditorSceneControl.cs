@@ -367,8 +367,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         else
         {
             songSelectSceneData = new SongSelectSceneData();
-            songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
         }
+        songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
