@@ -13,9 +13,24 @@ public class Note
     public Sentence Sentence { get { return sentence; } }
 
     public ENoteType Type { get; private set; }
+
+    /**
+     * The first beat (inclusive) where this note is positioned.
+     */
     public int StartBeat { get; private set; }
+
+    /**
+     * The last beat (exclusive) where this note is positioned.
+     * Note that the EndBeat is exclusive, i.e. the note is NOT drawn there.
+     * Example: a note only on beat 1 has StartBeat==1, Length==1, EndBeat==2.
+     */
     public int EndBeat { get; private set; }
+
+    /**
+     * The number of beats that this note occupies.
+     */
     public int Length { get; private set; }
+
     // A Pitch of 0 in song txt file is middle C, which is 60 (C4) as MIDI note.
     public int TxtPitch { get; private set; }
     public int MidiNote { get; private set; }
