@@ -377,6 +377,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         micProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
         micProfile.SampleRate = micProfileMessageDto.SampleRate;
         micProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
+        micProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
 
         settings.MicProfile = micProfile;
     }

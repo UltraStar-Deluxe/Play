@@ -26,10 +26,12 @@ public static partial class R
         public const string menuOverlayScrollView = "menuOverlayScrollView";
         public const string micIcon = "micIcon";
         public const string micViewContainer = "micViewContainer";
+        public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceContainer = "recordingDeviceContainer";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
         public const string recordingDeviceLabel = "recordingDeviceLabel";
         public const string recordingDevicePicker = "recordingDevicePicker";
+        public const string row = "row";
         public const string sceneTitle = "sceneTitle";
         public const string semanticVersionText = "semanticVersionText";
         public const string serverErrorResponseText = "serverErrorResponseText";
