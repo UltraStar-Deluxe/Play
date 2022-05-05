@@ -16,8 +16,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
 
-    private const string MenuOverlayVisibleStyleClass = "shown";
-
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -269,12 +267,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void ShowMenu()
     {
-        menuOverlay.AddToClassList(MenuOverlayVisibleStyleClass);
+        menuOverlay.style.left = new StyleLength(new Length(0, LengthUnit.Percent));
     }
 
     private void HideMenu()
     {
-        menuOverlay.RemoveFromClassList(MenuOverlayVisibleStyleClass);
+        menuOverlay.style.left = new StyleLength(new Length(100, LengthUnit.Percent));
     }
 
     public void UpdateTranslation()
