@@ -4,7 +4,10 @@ public static partial class R
     public static class UxmlClasses
     {
         public const string onlyVisibleWhenConnected = "onlyVisibleWhenConnected";
+        public const string onlyVisibleWhenNotConnected = "onlyVisibleWhenNotConnected";
+        public const string smallerFont = "smallerFont";
         public const string startButtonClass = "startButtonClass";
         public const string titleText = "titleText";
+        public const string transparentBackgroundColor = "transparentBackgroundColor";
     }
 }

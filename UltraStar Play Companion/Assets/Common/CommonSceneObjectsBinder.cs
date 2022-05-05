@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using PrimeInputActions;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,6 +18,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ClientSideMicSampleRecorder.Instance);
         bb.BindExistingInstance(ClientSideMicDataSender.Instance);
         bb.BindExistingInstance(InputManager.Instance);
+        bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(GetUiDocument());
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
