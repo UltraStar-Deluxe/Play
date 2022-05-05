@@ -143,22 +143,23 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.songSearchHint)]
     private Label songSearchHint;
 
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
+    private VisualElement recordingDeviceColorIndicator;
+
     private float frameCountTime;
     private int frameCount;
 
-    private void Awake()
+    private void Start()
     {
+        // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
         {
             settings.SetMicProfileName(Microphone.devices.FirstOrDefault());
         }
-    }
 
-    private void Start()
-    {
         settings.ObserveEveryValueChanged(it => it.MicProfile)
-            .Subscribe(_ => UpdateSelectedRecordingDeviceText());
+            .Subscribe(_ => OnMicProfileChanged());
         clientSideMicSampleRecorder.IsRecording
             .Subscribe(OnRecordingStateChanged);
 
@@ -394,13 +395,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         clientSideConnectRequestManager.CloseConnectionAndReconnect();
     }
 
-    private void UpdateSelectedRecordingDeviceText()
+    private void OnMicProfileChanged()
     {
         int sampleRate = ClientSideMicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
         recordingDeviceInfo.text = $"Sample Rate:{sampleRate}Hz, " +
                                    $"Delay: {settings.MicProfile.DelayInMillis}ms, " +
                                    $"Amp: {settings.MicProfile.Amplification}, " +
                                    $"Supp: {settings.MicProfile.NoiseSuppression}";
+        recordingDeviceColorIndicator.style.backgroundColor = new StyleColor(settings.MicProfile.Color);
     }
 
     private void OnRecordingStateChanged(bool isRecording)
