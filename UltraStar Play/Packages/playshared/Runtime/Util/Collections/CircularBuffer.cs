@@ -45,7 +45,7 @@ namespace CircularBuffer
         /// <summary>
         /// The _size. Buffer size.
         /// </summary>
-        private int _size;
+        private int count;
 
         public CircularBuffer(int capacity)
             : this(capacity, new T[] { })
@@ -84,10 +84,10 @@ namespace CircularBuffer
             _buffer = new T[capacity];
 
             Array.Copy(items, _buffer, items.Length);
-            _size = items.Length;
+            count = items.Length;
 
             _start = 0;
-            _end = _size == capacity ? 0 : _size;
+            _end = count == capacity ? 0 : count;
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace CircularBuffer
         {
             get
             {
-                return Size == Capacity;
+                return Count == Capacity;
             }
         }
 
@@ -108,21 +108,21 @@ namespace CircularBuffer
         {
             get
             {
-                return Size == 0;
+                return Count == 0;
             }
         }
 
         public void Clear()
         {
-            _size = 0;
+            count = 0;
             _start = 0;
-            _end = _size == Capacity ? 0 : _size;
+            _end = count == Capacity ? 0 : count;
         }
 
         /// <summary>
         /// Current buffer size (the number of elements that the buffer has).
         /// </summary>
-        public int Size { get { return _size; } }
+        public int Count { get { return count; } }
 
         /// <summary>
         /// Element at the front of the buffer - this[0].
@@ -152,9 +152,9 @@ namespace CircularBuffer
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer is empty", index));
                 }
-                if (index >= _size)
+                if (index >= count)
                 {
-                    throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, _size));
+                    throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, count));
                 }
                 int actualIndex = InternalIndex(index);
                 return _buffer[actualIndex];
@@ -165,9 +165,9 @@ namespace CircularBuffer
                 {
                     throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer is empty", index));
                 }
-                if (index >= _size)
+                if (index >= count)
                 {
-                    throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, _size));
+                    throw new IndexOutOfRangeException(string.Format("Cannot access index {0}. Buffer size is {1}", index, count));
                 }
                 int actualIndex = InternalIndex(index);
                 _buffer[actualIndex] = value;
@@ -194,7 +194,7 @@ namespace CircularBuffer
             {
                 _buffer[_end] = item;
                 Increment(ref _end);
-                ++_size;
+                ++count;
             }
         }
 
@@ -218,7 +218,7 @@ namespace CircularBuffer
             {
                 Decrement(ref _start);
                 _buffer[_start] = item;
-                ++_size;
+                ++count;
             }
         }
 
@@ -231,7 +231,7 @@ namespace CircularBuffer
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
             Decrement(ref _end);
             _buffer[_end] = default(T);
-            --_size;
+            --count;
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace CircularBuffer
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
             _buffer[_start] = default(T);
             Increment(ref _start);
-            --_size;
+            --count;
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace CircularBuffer
         /// <returns>A new array with a copy of the buffer contents.</returns>
         public T[] ToArray()
         {
-            T[] newArray = new T[Size];
+            T[] newArray = new T[Count];
             int newArrayOffset = 0;
             var segments = new ArraySegment<T>[2] { ArrayOne(), ArrayTwo() };
             foreach (ArraySegment<T> segment in segments)

@@ -26,6 +26,9 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
     // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
     public float[] MicSampleBuffer { get; private set; }
 
+    private string currentDeviceName;
+    private int CurrentSampleRate => MicSampleBuffer.Length;
+
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
     
@@ -44,7 +47,10 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
         settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(newValue =>
             {
-                if (IsRecording.Value)
+                int newSampleRate = GetFinalSampleRate(newValue.Name, newValue.SampleRate);
+                if (IsRecording.Value
+                    && (newSampleRate != CurrentSampleRate
+                        || newValue.Name != currentDeviceName))
                 {
                     // Restart recording with changed settings
                     StopRecording();
@@ -65,12 +71,13 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
     {
         if (IsRecording.Value)
         {
-            throw new UnityException("Already recording");
+            Debug.LogWarning("Already recording");
+            return;
         }
 
-        string deviceName = settings.MicProfile.Name;
-        int sampleRate = GetFinalSampleRate(deviceName, settings.MicProfile.SampleRate);
-        Debug.Log($"Starting recording with '{deviceName}' at {sampleRate} Hz (targetSampleRate: {settings.MicProfile.SampleRate})");
+        currentDeviceName = settings.MicProfile.Name;
+        int sampleRate = GetFinalSampleRate(currentDeviceName, settings.MicProfile.SampleRate);
+        Debug.Log($"Starting recording with '{currentDeviceName}' at {sampleRate}Hz (targetSampleRate: {settings.MicProfile.SampleRate})");
 
         if (MicSampleBuffer == null
             || MicSampleBuffer.Length != sampleRate)
@@ -80,10 +87,10 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
 
         // Code for low-latency microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
-        micAudioClip = Microphone.Start(deviceName, true, 1, sampleRate);
+        micAudioClip = Microphone.Start(currentDeviceName, true, 1, sampleRate);
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
-        while (Microphone.GetPosition(deviceName) <= 0)
+        while (Microphone.GetPosition(currentDeviceName) <= 0)
         {
             // <Busy waiting>
             // Emergency exit
@@ -118,7 +125,7 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
         }
 
         // Fill buffer with raw sample data from microphone
-        int currentSamplePosition = Microphone.GetPosition(settings.MicProfile.Name);
+        int currentSamplePosition = Microphone.GetPosition(currentDeviceName);
         micAudioClip.GetData(MicSampleBuffer, currentSamplePosition);
         if (currentSamplePosition == lastSamplePosition)
         {
@@ -161,9 +168,9 @@ public class ClientSideMicSampleRecorder: MonoBehaviour, INeedInjection
             return;
         }
         
-        Debug.Log($"Stopping recording with '{settings.MicProfile.Name}'");
+        Debug.Log($"Stopping recording with '{currentDeviceName}'");
         IsRecording.Value = false;
-        Microphone.End(settings.MicProfile.Name);
+        Microphone.End(currentDeviceName);
     }
 
     public static int GetFinalSampleRate(string deviceName, int targetSampleRate)

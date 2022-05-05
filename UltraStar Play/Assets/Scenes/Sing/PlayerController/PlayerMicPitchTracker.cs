@@ -68,11 +68,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private int lastAnalyzedBeatFromConnectedClient;
 
-    private long lastUnixTimeMillisecondsWhenSentPositionInSongToClient;
+    private long lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
 
     // Take the median of multiple measurements.
     private readonly CircularBuffer<double> messageDelaysInMillis = new(5);
-    private double MessageDelayInMillis => NumberUtils.Median(messageDelaysInMillis);
+
+    private double MessageDelayInMillis => messageDelaysInMillis.Count > 2
+        ? messageDelaysInMillis.Min()
+        : 0;
 
     private void Start()
     {
@@ -97,14 +100,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
                 return;
             }
 
-            SendPositionInSongToClient();
             serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
                 .Where(evt => evt.ClientId == micProfile.ConnectedClientId)
                 .Subscribe(HandlePitchEventFromCompanionApp)
                 .AddTo(gameObject);
 
             (GetConnectedClientHandler() as ConnectedClientHandler).PositionInSongResponseEventStream
-                .Subscribe(_ => OnPositionInSongResponse());
+                .Subscribe(_ => OnPositionInSongResponse())
+                .AddTo(gameObject);
+
+            SendPositionInSongToClient();
         }
         else {
             micSampleRecorder.StartRecording();
@@ -260,15 +265,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        JsonSerializable jsonSerializable = new PositionInSongDto
+        PositionInSongDto positionInSongDto = new PositionInSongDto
         {
             SongBpm = songMeta.Bpm,
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis,
             MessageDelayInMillis = MessageDelayInMillis,
         };
-        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId} (millis: {songAudioPlayer.PositionInSongInMillis})");
-        connectedClientHandler.SendMessageToClient(jsonSerializable);
+        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
+        connectedClientHandler.SendMessageToClient(positionInSongDto);
     }
 
     private void FirePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
@@ -443,8 +448,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     public void SkipToBeat(double currentBeat)
     {
-        SendPositionInSongToClient();
-
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences
             .FirstOrDefault(sentence => currentBeat <= sentence.MaxBeat);
@@ -474,6 +477,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
                 BeatToAnalyze = RecordingSentence.MaxBeat;
             }
         }
+
+        SendPositionInSongToClient();
     }
 
     public PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
