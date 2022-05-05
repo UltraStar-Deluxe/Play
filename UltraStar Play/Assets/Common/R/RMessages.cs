@@ -24,8 +24,24 @@ public static partial class R
         public static readonly string active = "active";
         public static readonly string add = "add";
         public static readonly string back = "back";
+        public static readonly string buildTimeStamp = "buildTimeStamp";
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
+        public static readonly string commit = "commit";
+        public static readonly string companionApp_button_showMicrophone = "companionApp_button_showMicrophone";
+        public static readonly string companionApp_button_showSongs = "companionApp_button_showSongs";
+        public static readonly string companionApp_connectedTo = "companionApp_connectedTo";
+        public static readonly string companionApp_connecting = "companionApp_connecting";
+        public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
+        public static readonly string companionApp_songList_error_general = "companionApp_songList_error_general";
+        public static readonly string companionApp_songList_error_noSongsFound = "companionApp_songList_error_noSongsFound";
+        public static readonly string companionApp_songList_error_notConnected = "companionApp_songList_error_notConnected";
+        public static readonly string companionApp_songList_hide = "companionApp_songList_hide";
+        public static readonly string companionApp_songList_loading = "companionApp_songList_loading";
+        public static readonly string companionApp_songList_show = "companionApp_songList_show";
+        public static readonly string companionApp_title = "companionApp_title";
+        public static readonly string companionApp_troubleShootingHints = "companionApp_troubleShootingHints";
+        public static readonly string companionApp_visualizeMicInput = "companionApp_visualizeMicInput";
         public static readonly string contentDownloadScene_archiveUrlLabel = "contentDownloadScene_archiveUrlLabel";
         public static readonly string contentDownloadScene_cancelDownloadButton = "contentDownloadScene_cancelDownloadButton";
         public static readonly string contentDownloadScene_startDownloadButton = "contentDownloadScene_startDownloadButton";
@@ -35,6 +51,7 @@ public static partial class R
         public static readonly string contentDownloadScene_title = "contentDownloadScene_title";
         public static readonly string continue_ = "continue";
         public static readonly string delete = "delete";
+        public static readonly string devMode = "devMode";
         public static readonly string difficulty = "difficulty";
         public static readonly string difficulty_easy = "difficulty_easy";
         public static readonly string difficulty_hard = "difficulty_hard";
@@ -49,6 +66,7 @@ public static partial class R
         public static readonly string i18nDemoScene_hello = "i18nDemoScene_hello";
         public static readonly string i18nDemoScene_love = "i18nDemoScene_love";
         public static readonly string i18nDemoScene_multiline = "i18nDemoScene_multiline";
+        public static readonly string language = "language";
         public static readonly string load = "load";
         public static readonly string loading = "loading";
         public static readonly string mainScene_button_about_description = "mainScene_button_about_description";
@@ -201,6 +219,7 @@ public static partial class R
         public static readonly string start = "start";
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";
+        public static readonly string version = "version";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
     }
