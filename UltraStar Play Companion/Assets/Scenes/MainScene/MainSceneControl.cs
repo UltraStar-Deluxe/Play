@@ -12,7 +12,7 @@ using Toggle = UnityEngine.UIElements.Toggle;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
 
@@ -107,9 +107,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.recordingDevicePicker)]
     private ItemPicker recordingDevicePicker;
 
-    [Inject(UxmlName = R.UxmlNames.recordingDeviceContainer)]
-    private VisualElement recordingDeviceContainer;
-
     [Inject(UxmlName = R.UxmlNames.languageLabel)]
     private Label languageLabel;
 
@@ -146,10 +143,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
+    private LabeledItemPickerControl<string> recordingDevicePickerControl;
+    private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
+    private BoolPickerControl devModePickerControl;
+
     private float frameCountTime;
     private int frameCount;
 
-    private void Start()
+    public void OnInjectionFinished()
     {
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
@@ -228,33 +229,25 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
     private void InitMenu()
     {
         // Recording device
-        if (Microphone.devices.IsNullOrEmpty()
-            || Microphone.devices.Length <= 1)
-        {
-            recordingDeviceContainer.HideByDisplay();
-        }
-        else
-        {
-            LabeledItemPickerControl<string> recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
-            recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
-            recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
-        }
+        recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
+        recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
+        recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
         // Language
         translationManager.currentLanguage = settings.GameSettings.language;
         translationManager.UpdateTranslatorsInScene();
-        LabeledItemPickerControl<SystemLanguage> languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
+        languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
         languagePickerControl.SelectItem(settings.GameSettings.language);
         languagePickerControl.Selection.Subscribe(newValue => settings.GameSettings.language = newValue);
         settings.ObserveEveryValueChanged(it => it.GameSettings.language)
             .Subscribe(newValue =>
             {
                 translationManager.currentLanguage = newValue;
-                translationManager.UpdateTranslatorsInScene();
+                translationManager.ReloadTranslationsAndUpdateScene();
             });
 
         // Dev Mode
-        BoolPickerControl devModePickerControl = new BoolPickerControl(devModePicker);
+        devModePickerControl = new BoolPickerControl(devModePicker);
         devModePickerControl.SelectItem(settings.IsDevModeEnabled);
         devModePickerControl.Selection.Subscribe(newValue => settings.IsDevModeEnabled = newValue);
         settings
@@ -286,7 +279,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && connectionStatusText == null)
+        if (!Application.isPlaying && sceneTitle == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }
@@ -299,6 +292,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator
         showMicViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showMicrophone);
         showSongViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showSongs);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
+
+        recordingDevicePickerControl.UpdateLabelText();
+        languagePickerControl.UpdateLabelText();
+        TranslationManager.GetTranslation("yes");
+        devModePickerControl.UpdateLabelText();
 
         // Search text field hint
         string searchPropertiesText = new List<string>
