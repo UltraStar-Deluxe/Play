@@ -49,7 +49,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private Thread serverStillAliveCheckThread;
 
     private SongMeta songMeta;
-    private double receivedPositionInSongInMillis;
+    private double receivedPositionInSongInMillis = -1;
     private long unixTimeMillisecondsWhenReceivedPositionInSong;
     private int lastAnalyzedBeat;
 
@@ -63,6 +63,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         UpdateAudioSamplesAnalyzer();
         settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(newValue => UpdateAudioSamplesAnalyzer());
+
+        ResetPositionInSong();
 
         clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
         clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
@@ -165,16 +167,11 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandleRecordingStatusChanged(bool isRecording)
     {
-        if (!isRecording)
-        {
-            // Nothing to do.
-            return;
-        }
-
-        if (HasPositionInSong)
+        if (isRecording && HasPositionInSong)
         {
             // Analyze the following beats, not past beats.
             lastAnalyzedBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+            Debug.Log($"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
         }
     }
 
@@ -192,35 +189,32 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
         else
         {
+            Debug.Log("No position in song, analyzing newest samples");
             AnalyzeNewestMicSamples(recordingEvent);
         }
     }
 
     private void AnalyzeMicSamplesCorrespondingToBeatsInSong(RecordingEvent recordingEvent)
     {
-        if (GetEstimatedPositionInSongInMillis() < songMeta.Gap)
-        {
-            return;
-        }
-
         // Check if can analyze new beat
-        double positionInSongConsideringMicDelay = GetEstimatedPositionInSongInMillis() - settings.MicProfile.DelayInMillis;
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
+        double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - settings.MicProfile.DelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
+        // int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, estimatedPositionInSongInMillis);
+        // Debug.Log($"currentBeat: {currentBeat}, withDelay: {currentBeatConsideringMicDelay} (diff: {currentBeat - currentBeatConsideringMicDelay})");
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat)
         {
             return;
         }
-        // Debug.Log($"currentBeat: {currentBeat}, withDelay: {currentBeatConsideringMicDelay} (diff: {currentBeat - currentBeatConsideringMicDelay})");
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
-        int nextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
+        int firstNextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
         // Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
 
         List<BeatPitchEvent> beatPitchEvents = new();
         int loopCount = 0;
         int maxLoopCount = 100;
-        for (int beat = nextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
+        for (int beat = firstNextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
         {
             PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat);
             int midiNote = pitchEvent != null
@@ -241,6 +235,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         List<BeatPitchEventDto> beatPitchEventDtos = beatPitchEvents
             .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat))
             .ToList();
+        if (beatPitchEventDtos.Count > 3)
+        {
+            Debug.LogWarning($"Sending {beatPitchEventDtos.Count} beats to server: {beatPitchEventDtos.Select(it => it.Beat).ToCsv(", ")}");
+        }
         SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDtos));
 
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
@@ -265,7 +263,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     {
         if (!HasPositionInSong)
         {
-            return -1;
+            return 0;
         }
 
         long currentUnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds();
@@ -348,8 +346,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
             case CompanionAppMessageType.PositionInSong:
-                SetPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
+                // Immediately send the response. It is used to measure the message delay.
                 SendMessageToServer(new PositionInSongResponseDto());
+                // Handle the message.
+                ReceivedPositionInSong(JsonConverter.FromJson<PositionInSongDto>(json));
                 return;
             case CompanionAppMessageType.MicProfile:
                 SetMicProfile(JsonConverter.FromJson<MicProfileMessageDto>(json));
@@ -382,23 +382,27 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         settings.MicProfile = micProfile;
     }
 
-    private void SetPositionInSong(PositionInSongDto positionInSongDto)
+    private void ReceivedPositionInSong(PositionInSongDto positionInSongDto)
     {
-        double messageDelayInMillis = positionInSongDto.MessageDelayInMillis;
-        double positionInSongInMillisConsideringDelay = positionInSongDto.PositionInSongInMillis + messageDelayInMillis;
-        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, messageDelay: {messageDelayInMillis}, offset: {positionInSongInMillisConsideringDelay - GetEstimatedPositionInSongInMillis()})");
-        if (positionInSongInMillisConsideringDelay < receivedPositionInSongInMillis)
-        {
-            // Jump back in song (possibly restart)
-            lastAnalyzedBeat = 0;
-        }
+        double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
+        double newReceivedPositionInSongInMillis = positionInSongDto.PositionInSongInMillis + positionInSongDto.MessageDelayInMillis;
+
+        receivedPositionInSongInMillis = newReceivedPositionInSongInMillis;
         unixTimeMillisecondsWhenReceivedPositionInSong = TimeUtils.GetUnixTimeMilliseconds();
-        receivedPositionInSongInMillis = positionInSongInMillisConsideringDelay;
         songMeta = new SongMeta
         {
             Bpm = positionInSongDto.SongBpm,
             Gap = positionInSongDto.SongGap,
         };
+
+        // If beats have been analyzed prematurely, then redo analysis.
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, receivedPositionInSongInMillis);
+        if (lastAnalyzedBeat > currentBeat)
+        {
+            lastAnalyzedBeat = currentBeat;
+        }
+
+        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, messageDelay: {positionInSongDto.MessageDelayInMillis}, offset: {newReceivedPositionInSongInMillis - estimatedPositionInSongInMillis}, lastAnalyzedBeat: {lastAnalyzedBeat})");
     }
 
     private void ResetPositionInSong()
@@ -406,8 +410,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         Debug.Log("Resetting position in song");
         unixTimeMillisecondsWhenReceivedPositionInSong = -1;
         songMeta = null;
-        receivedPositionInSongInMillis = 0;
-        lastAnalyzedBeat = 0;
+        receivedPositionInSongInMillis = -1;
+        lastAnalyzedBeat = -1;
     }
 
     private void UpdateConnectionStatus(ConnectEvent connectEvent)

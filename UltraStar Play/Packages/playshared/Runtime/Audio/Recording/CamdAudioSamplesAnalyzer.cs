@@ -112,12 +112,12 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError;
             if (HalftoneContinuationBias >= 0 && HalftoneContinuationBias <= 1)
             {
-                for (int historyIndex = 0; historyIndex < bestCandidateHistory.Size; historyIndex++)
+                for (int historyIndex = 0; historyIndex < bestCandidateHistory.Count; historyIndex++)
                 {
                     if (bestCandidateHistory[historyIndex].halftone == currentCandidate.halftone)
                     {
                         // The further away in the history the halftone was before, the less the bias will impact the current candidate.
-                        float biasConsideringHistoryDistance = HalftoneContinuationBias - (HalftoneContinuationBias * (historyIndex / bestCandidateHistory.Size));
+                        float biasConsideringHistoryDistance = HalftoneContinuationBias - (HalftoneContinuationBias * (historyIndex / bestCandidateHistory.Count));
                         currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError * (1 - biasConsideringHistoryDistance);
                         // Do not apply bias multiple times.
                         break;
@@ -135,7 +135,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         });
 
         CamdPitchCandidate bestHistoryCandidate = null;
-        for (int i = 0; i < bestCandidateHistory.Size; i++)
+        for (int i = 0; i < bestCandidateHistory.Count; i++)
         {
             // Do not consider the biased error when comparing best candidate from history.
             CamdPitchCandidate historyCandidate = bestCandidateHistory[i];
