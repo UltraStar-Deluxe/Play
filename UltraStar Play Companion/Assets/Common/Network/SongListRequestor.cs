@@ -32,17 +32,23 @@ public class SongListRequestor : AbstractHttpRequestor
         Debug.Log("GET song list from URI: " + uri);
 
         UnityWebRequest getSongListWebRequest = UnityWebRequest.Get(uri);
-        getSongListWebRequest.SendWebRequest()
-            .AsAsyncOperationObservable()
-            .Subscribe(_ => HandleSongListResponse(getSongListWebRequest),
+        UnityWebRequestAsyncOperation unityWebRequestAsyncOperation = getSongListWebRequest.SendWebRequest();
+        unityWebRequestAsyncOperation.AsObservable()
+            .Subscribe(_ => HandleSongListResponse(getSongListWebRequest, false),
                 exception => FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.songList_error_general)),
-                () => HandleSongListResponse(getSongListWebRequest));
+                () => HandleSongListResponse(getSongListWebRequest, true));
+        // BUG: When using only the observable, then completed is sometimes called before isDone is true.
+        unityWebRequestAsyncOperation.completed += (AsyncOperation op) => HandleSongListResponse(getSongListWebRequest, true);
     }
 
-    private void HandleSongListResponse(UnityWebRequest webRequest)
+    private void HandleSongListResponse(UnityWebRequest webRequest, bool isCompleted)
     {
         if (!webRequest.isDone)
         {
+            if (isCompleted)
+            {
+                Debug.LogWarning("WebRequest not done but already completed?!");
+            }
             return;
         }
 
