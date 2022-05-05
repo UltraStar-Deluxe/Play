@@ -24,7 +24,7 @@ public class SongListRequestor : AbstractHttpRequestor
         if (serverIPEndPoint == null
             || httpServerPort == 0)
         {
-            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.songList_error_notConnected));
+            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_notConnected));
             return;
         }
         
@@ -35,7 +35,7 @@ public class SongListRequestor : AbstractHttpRequestor
         UnityWebRequestAsyncOperation unityWebRequestAsyncOperation = getSongListWebRequest.SendWebRequest();
         unityWebRequestAsyncOperation.AsObservable()
             .Subscribe(_ => HandleSongListResponse(getSongListWebRequest, false),
-                exception => FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.songList_error_general)),
+                exception => FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general)),
                 () => HandleSongListResponse(getSongListWebRequest, true));
         // BUG: When using only the observable, then completed is sometimes called before isDone is true.
         unityWebRequestAsyncOperation.completed += (AsyncOperation op) => HandleSongListResponse(getSongListWebRequest, true);
@@ -60,7 +60,7 @@ public class SongListRequestor : AbstractHttpRequestor
                 && LoadedSongsDto.SongCount == 0)
             {
                 SuccessfullyLoadedAllSongs = false;
-                FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.songList_error_noSongsFound));
+                FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_noSongsFound));
                 return;
             }
 
@@ -78,7 +78,7 @@ public class SongListRequestor : AbstractHttpRequestor
         {
             Debug.LogException(e);
             SuccessfullyLoadedAllSongs = false;
-            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.songList_error_general));
+            FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
         }
     }
     
