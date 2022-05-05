@@ -20,8 +20,17 @@ public class Settings
     public GameSettings GameSettings { get; set; } = new GameSettings();
     public AudioSettings AudioSettings { get; set; } = new AudioSettings();
 
+    public bool IsDevModeEnabled { get; set; }
+
     public void CreateAndSetClientId()
     {
         ClientId = Guid.NewGuid().ToString();
+    }
+
+    public void SetMicProfileName(string deviceName)
+    {
+        MicProfile newMicProfile = new MicProfile(MicProfile);
+        newMicProfile.Name = deviceName;
+        MicProfile = newMicProfile;
     }
 }

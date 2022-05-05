@@ -1,0 +1,21 @@
+#menuOverlay {
+    position: absolute;
+    left: 100%;
+    transition: left 0.5s;
+}
+
+#menuOverlay.shown {
+    left: 0;
+}
+
+.stopRecordingButton {
+    background-color: rgb(224, 0, 0);
+}
+
+.stopRecordingButton:hover {
+    background-color: rgb(255, 0, 0);
+}
+
+.stopRecordingButton:focus {
+    background-color: rgb(255, 0, 0);
+}
