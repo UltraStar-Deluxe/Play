@@ -72,13 +72,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private long lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
 
-    // Take the median of multiple measurements.
-    private readonly CircularBuffer<double> messageDelaysInMillis = new(5);
-
-    private double MessageDelayInMillis => messageDelaysInMillis.Count > 2
-        ? messageDelaysInMillis.Min()
-        : 0;
-
     private void Start()
     {
         // Find first sentence to analyze
@@ -123,7 +116,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Beat events must be handled on the main thread
         GetConnectedClientHandler().ReceivedMessageStream
             .ObserveOnMainThread()
             .Subscribe(dto =>
@@ -135,25 +127,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        // PositionInSongResponse should be handled as soon as possible. Thus, it is not handled on the main thread.
-        GetConnectedClientHandler().ReceivedMessageStream
-            .Subscribe(dto =>
-            {
-                if (dto is PositionInSongDto)
-                {
-                    HandlePositionInSongResponseFromConnectedClient();
-                }
-            })
-            .AddTo(gameObject);
-
         SendPositionInSongToClient();
-    }
-
-    private void HandlePositionInSongResponseFromConnectedClient()
-    {
-        double roundTripTime = TimeUtils.GetUnixTimeMilliseconds() - lastUnixTimeMillisecondsWhenSentPositionInSongToClient;
-        double currentMessageDelayInMillis = roundTripTime / 2;
-        messageDelaysInMillis.PushBack(currentMessageDelayInMillis);
     }
 
     private IConnectedClientHandler GetConnectedClientHandler()
@@ -297,7 +271,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             SongBpm = songMeta.Bpm,
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
-            MessageDelayInMillis = MessageDelayInMillis,
         };
         Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
