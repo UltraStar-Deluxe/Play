@@ -16,6 +16,8 @@ using UnityEngine;
 [RequireComponent(typeof(MicSampleRecorder))]
 public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 {
+    private const int SendPositionInSongIntervalInMillis = 2000;
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
@@ -210,7 +212,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
         connectedClientHandler?.ReadMessagesFromClient();
 
-        if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + 2000 < TimeUtils.GetUnixTimeMilliseconds())
+        if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Synchronize position in song with connected client.
             SendPositionInSongToClient();
@@ -253,9 +255,12 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         if (pitchEvent.Beat < 0
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
-            // Looks like the companion app does not know the current position in the song. Send it this info.
+            // Looks like the companion app does not know the current position in the song. Send it this info again.
             Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
-            // SendPositionInSongToClient();
+            if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + (SendPositionInSongIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
+            {
+                SendPositionInSongToClient();
+            }
             return;
         }
 
