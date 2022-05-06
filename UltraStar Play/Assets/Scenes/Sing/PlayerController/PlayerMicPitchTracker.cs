@@ -141,6 +141,12 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private IConnectedClientHandler GetConnectedClientHandler()
     {
+        if (micProfile == null
+            || !micProfile.IsInputFromConnectedClient)
+        {
+            return null;
+        }
+
         serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler);
         return connectedClientHandler;
     }
