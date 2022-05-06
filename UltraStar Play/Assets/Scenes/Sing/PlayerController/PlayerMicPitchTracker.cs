@@ -127,7 +127,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        SendPositionInSongToClient();
+        SendPositionInSongToClientRapidly();
     }
 
     private IConnectedClientHandler GetConnectedClientHandler()
@@ -248,6 +248,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         // Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
         lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
         FirePitchEventFromConnectedClient(pitchEvent);
+    }
+
+    private void SendPositionInSongToClientRapidly()
+    {
+        // The position in the song changed dramatically.
+        // But the client implements methods to ignore single messages with big position differences (resilient behavior).
+        // Thus, send the new position in song more aggressively.
+        List<float> delaysInSeconds = new(){ 0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+        delaysInSeconds.ForEach(delayInSeconds =>
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds, () => SendPositionInSongToClient())));
     }
 
     private void SendPositionInSongToClient()
@@ -481,7 +491,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            SendPositionInSongToClient();
+            // Position changed heavily. Send the new position more aggressively to connected clients.
+            SendPositionInSongToClientRapidly();
         }
     }
 
