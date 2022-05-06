@@ -77,12 +77,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         });
     }
 
-    private void Update()
-    {
-        // Read messages from client that arrived since the last time the reader thread was active.
-        GetConnectedClientHandlers().ForEach(connectedClientHandler => connectedClientHandler.ReadMessagesFromClient());
-    }
-
     private void InitSingleInstance()
     {
         if (!Application.isPlaying)
@@ -248,11 +242,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         return connectedClientHandler;
     }
 
-    public static List<IConnectedClientHandler> GetConnectedClientHandlers()
+    public List<IConnectedClientHandler> GetAllConnectedClientHandlers()
     {
         return idToConnectedClientMap.Values.ToList();
     }
-    
+
     public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler)
     {
         if (clientId == null)
@@ -261,5 +255,20 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
             return false;
         }
         return idToConnectedClientMap.TryGetValue(clientId, out connectedClientHandler);
+    }
+
+    public List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers(IEnumerable<MicProfile> micProfiles)
+    {
+        List<ConnectedClientHandlerAndMicProfile> result = new();
+        micProfiles
+            .Where(micProfile => micProfile != null && micProfile.IsInputFromConnectedClient)
+            .ForEach(micProfile =>
+            {
+                if (TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                {
+                    result.Add(new ConnectedClientHandlerAndMicProfile(connectedClientHandler, micProfile));
+                }
+            });
+        return result;
     }
 }

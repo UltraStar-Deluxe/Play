@@ -100,8 +100,27 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
                 return;
             }
 
+            // Beat events must be handled on the main thread
             GetConnectedClientHandler().ReceivedMessageStream
-                .Subscribe(dto => HandleMessageFromConnectedClient(dto))
+                .ObserveOnMainThread()
+                .Subscribe(dto =>
+                {
+                    if (dto is BeatPitchEventDto beatPitchEventDto)
+                    {
+                        HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                    }
+                })
+                .AddTo(gameObject);
+
+            // PositionInSongResponse should be handled as soon as possible. Thus, it is not handled on the main thread.
+            GetConnectedClientHandler().ReceivedMessageStream
+                .Subscribe(dto =>
+                {
+                    if (dto is PositionInSongDto)
+                    {
+                        HandlePositionInSongResponseFromConnectedClient();
+                    }
+                })
                 .AddTo(gameObject);
 
             SendPositionInSongToClient();
@@ -115,18 +134,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
 
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
-    }
-
-    private void HandleMessageFromConnectedClient(JsonSerializable dto)
-    {
-        if (dto is BeatPitchEventDto beatPitchEventDto)
-        {
-            HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
-        }
-        else if (dto is PositionInSongDto)
-        {
-            HandlePositionInSongResponseFromConnectedClient();
-        }
     }
 
     private void HandlePositionInSongResponseFromConnectedClient()
@@ -151,6 +158,10 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile.IsInputFromConnectedClient)
         {
+            // Read messages from client since last time the reader thread was active.
+            IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+            connectedClientHandler?.ReadMessagesFromClient();
+
             if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + 2000 < TimeUtils.GetUnixTimeMilliseconds())
             {
                 // Synchronize position in song with connected client.
@@ -276,7 +287,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             SongBpm = songMeta.Bpm,
             SongGap = songMeta.Gap,
-            PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis,
+            PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
             MessageDelayInMillis = MessageDelayInMillis,
         };
         Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
