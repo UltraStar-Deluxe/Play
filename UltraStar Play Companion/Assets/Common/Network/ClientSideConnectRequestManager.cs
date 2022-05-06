@@ -57,8 +57,8 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private bool hasBeenDestroyed;
 
-    private bool IsConnected => serverMicrophonePort > 0;
-    private int serverMicrophonePort;
+    private bool IsConnected => serverMessagingPort > 0;
+    private int serverMessagingPort;
 
     private int connectRequestCount;
 
@@ -94,14 +94,14 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         while (connectResponseQueue.TryDequeue(out ConnectResponseDto connectResponseDto))
         {
             if (connectResponseDto.ErrorMessage.IsNullOrEmpty()
-                && connectResponseDto.MicrophonePort > 0)
+                && connectResponseDto.MessagingPort > 0)
             {
-                serverMicrophonePort = connectResponseDto.MicrophonePort;
+                serverMessagingPort = connectResponseDto.MessagingPort;
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     IsSuccess = true,
                     ConnectRequestCount = connectRequestCount,
-                    MicrophonePort = serverMicrophonePort,
+                    MessagingPort = serverMessagingPort,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
                 });
@@ -195,9 +195,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             {
                 throw new ConnectRequestException($"Malformed ConnectResponse: wrong ClientId. Is {connectResponseDto.ClientId}, expected {settings.ClientId}");
             }
-            if (connectResponseDto.MicrophonePort <= 0)
+            if (connectResponseDto.MessagingPort <= 0)
             {
-                throw new ConnectRequestException("Malformed ConnectResponse: invalid MicrophonePort.");
+                throw new ConnectRequestException("Malformed ConnectResponse: invalid MessagingPort.");
             }
 
             connectResponseDto.ServerIpEndPoint = serverIpEndPoint;
@@ -252,7 +252,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     public void CloseConnectionAndReconnect()
     {
-        serverMicrophonePort = 0;
+        serverMessagingPort = 0;
         connectEventStream.OnNext(new ConnectEvent
         {
             IsSuccess = false,

@@ -417,10 +417,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private void UpdateConnectionStatus(ConnectEvent connectEvent)
     {
         if (connectEvent.IsSuccess
-            && connectEvent.MicrophonePort > 0
+            && connectEvent.MessagingPort > 0
             && connectEvent.ServerIpEndPoint != null)
         {
-            serverSideTcpClientEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MicrophonePort);
+            serverSideTcpClientEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MessagingPort);
 
             CloseNetworkConnection();
             try
