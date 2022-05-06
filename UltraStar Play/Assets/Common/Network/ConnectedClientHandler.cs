@@ -16,18 +16,18 @@ public class ConnectedClientHandler : IConnectedClientHandler
     public string ClientId { get; private set; }
     public TcpListener ClientTcpListener { get; private set; }
 
-    private bool isDisposed;
+    private readonly IServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    private readonly object streamReaderLock = new();
+    private readonly Thread receiveDataThread;
+    private readonly Thread clientStillAliveCheckThread;
 
     private TcpClient tcpClient;
     private NetworkStream tcpClientStream;
     private StreamReader tcpClientStreamReader;
     private StreamWriter tcpClientStreamWriter;
 
-    private readonly IServerSideConnectRequestManager serverSideConnectRequestManager;
-
-    private readonly object streamReaderLock = new();
-    private readonly Thread receiveDataThread;
-    private readonly Thread clientStillAliveCheckThread;
+    private bool isDisposed;
 
     public ConnectedClientHandler(
         IServerSideConnectRequestManager serverSideConnectRequestManager,
@@ -185,18 +185,12 @@ public class ConnectedClientHandler : IConnectedClientHandler
             case CompanionAppMessageType.BeatPitchEvents:
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
                 beatPitchEventsDto.BeatPitchEvents
-                    .ForEach(beatPitchEventDto => FireBeatPitchEventFromCompanionApp(beatPitchEventDto));
+                    .ForEach(beatPitchEventDto => receivedMessageStream.OnNext(beatPitchEventDto));
                 return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
                 return;
         }
-    }
-
-    private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
-    {
-        // Debug.Log($"Received pitchEventDto for beat {beatPitchEventDto.Beat} at systime {beatPitchEventDto.UnixTimeMilliseconds} (delay: {TimeUtils.GetUnixTimeMilliseconds() - beatPitchEventDto.UnixTimeMilliseconds} ms)");
-        receivedMessageStream.OnNext(beatPitchEventDto);
     }
 
     public void Dispose()
