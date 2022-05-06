@@ -403,12 +403,16 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         return new List<Color32>
         {
-            Colors.CreateColor("#2ecc71"),
-            Colors.CreateColor("#f1c40f"),
-            Colors.CreateColor("#9b59b6"),
-            Colors.CreateColor("#d35400"),
-            Colors.CreateColor("#c0392b"),
-            Colors.CreateColor("#2c3e50"),
+            Colors.CreateColor("#0AFF99"),
+            Colors.CreateColor("#FFD300"),
+            Colors.CreateColor("#FF8700"),
+            Colors.CreateColor("#FF0000"),
+            Colors.CreateColor("#FDFCDC"),
+            Colors.CreateColor("#B392AC"),
+            Colors.CreateColor("#BE0AFF"),
+            Colors.CreateColor("#580AFF"),
+            Colors.CreateColor("#147DF5"),
+            Colors.CreateColor("#0AEFFF"),
         };
     }
 
