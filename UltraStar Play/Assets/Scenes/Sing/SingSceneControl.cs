@@ -552,24 +552,23 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void InitRecordingWithConnectedClients()
     {
-        PlayerControls
-            .Select(playerControl => playerControl.MicProfile)
-            .Where(micProfile => micProfile != null && micProfile.IsInputFromConnectedClient)
-            .ForEach(micProfile =>
-            {
-                if (serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
-                {
-                    connectedClientHandler.SendMessageToClient(new MicProfileMessageDto(micProfile));
-                    connectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
-                }
-            });
+        GetConnectedClientHandlers().ForEach(connectedClientHandlerAndMicProfile =>
+        {
+            connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new MicProfileMessageDto(connectedClientHandlerAndMicProfile.MicProfile));
+            connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
+        });
     }
 
     private void SendStopRecordingMessageToConnectedClients()
     {
-        ServerSideConnectRequestManager
-            .GetConnectedClientHandlers()
-            .ForEach(connectedClientHandler => connectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()) );
+        GetConnectedClientHandlers()
+            .ForEach(connectedClientHandlerAndMicProfile => connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()) );
+    }
+
+    private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
+    {
+        IEnumerable<MicProfile> micProfiles = PlayerControls.Select(playerProfile => playerProfile.MicProfile);
+        return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
     private void UpdateSongFinishedStats()

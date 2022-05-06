@@ -194,6 +194,13 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             });
     }
 
+    private void Update()
+    {
+        // Read messages from client since last time the reader thread was active.
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        connectedClientHandler?.ReadMessagesFromClient();
+    }
+
     private void UpdateSampleRateLabel()
     {
         sampleRatePickerControl.UpdateLabelText();
@@ -244,15 +251,22 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         }
     }
 
-    private void SendSelectedMicProfileToConnectedClient()
+    private IConnectedClientHandler GetConnectedClientHandler()
     {
         if (SelectedMicProfile == null
             || SelectedMicProfile.ConnectedClientId.IsNullOrEmpty()
             || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
         {
-            return;
+            return null;
         }
-        connectedClientHandler.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
+
+        return connectedClientHandler;
+    }
+
+    private void SendSelectedMicProfileToConnectedClient()
+    {
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        connectedClientHandler?.SendMessageToClient(new MicProfileMessageDto(SelectedMicProfile));
     }
 
     private void OnRecordingDeviceSelected(MicProfile micProfile)
@@ -333,7 +347,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         List<string> connectedMicNames = Microphone.devices.ToList();
         List<MicProfile> loadedMicProfiles = settings.MicProfiles;
         List<MicProfile> micProfiles = new(loadedMicProfiles);
-        List<IConnectedClientHandler> connectedClientHandlers = ServerSideConnectRequestManager.GetConnectedClientHandlers();
+        List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
 
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
@@ -347,7 +361,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         }
 
         // Create mic profiles for connected companion apps that are not yet in the list
-        foreach (ConnectedClientHandler connectedClientHandler in connectedClientHandlers)
+        foreach (IConnectedClientHandler connectedClientHandler in connectedClientHandlers)
         {
             bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
             if (!alreadyInList)

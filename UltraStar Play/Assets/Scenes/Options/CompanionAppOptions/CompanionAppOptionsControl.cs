@@ -64,7 +64,7 @@ public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITransl
     private void UpdateConnectedClients()
     {
         connectedClientList.Clear();
-        ServerSideConnectRequestManager.GetConnectedClientHandlers()
+        serverSideConnectRequestManager.GetAllConnectedClientHandlers()
             .ForEach(clientHandler =>
             {
                 connectedClientList.Add(CreateClientEntry(clientHandler));
