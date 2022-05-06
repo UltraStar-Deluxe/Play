@@ -100,7 +100,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     private IDisposable connectedClientReceivedMessageStreamDisposable;
 
-    private Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
+    private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
     public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
     private void Start()

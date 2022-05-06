@@ -61,7 +61,7 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
             songAudioPlayer.PositionInSongInMillis,
             MicSampleRecorder.MicProfile,
             MicSampleRecorder.MicSamples,
-            audioSamplesAnalyzer);
+            AudioSamplesAnalyzer);
 
         // Notify listeners
         if (pitchEvent == null)

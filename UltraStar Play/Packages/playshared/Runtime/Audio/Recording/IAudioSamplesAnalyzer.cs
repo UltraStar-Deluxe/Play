@@ -4,5 +4,7 @@
 
     void Disable();
 
-    PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile mic);
+    PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile mic);
+
+    bool ModifySamplesInPlace { get; set; }
 }

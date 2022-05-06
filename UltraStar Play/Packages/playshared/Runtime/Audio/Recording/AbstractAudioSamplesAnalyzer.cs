@@ -1,7 +1,9 @@
 ﻿using System;
 
-abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
+public abstract class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
+    public bool ModifySamplesInPlace { get; set; } = true;
+
     protected bool isEnabled;
 
     public void Enable()
@@ -14,12 +16,32 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         isEnabled = false;
     }
 
-    protected static bool IsAboveNoiseSuppressionThreshold(float[] samplesBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
+    public abstract PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile mic);
+
+    public static void ApplyAmplification(float[] sampleBuffer, int fromIndexInclusive, int toIndexExclusive, float amplificationFactor)
     {
-        float minThreshold = micProfile.NoiseSuppression / 100f;
-        for (int index = sampleStartIndex; index < sampleEndIndex; index++)
+        if (amplificationFactor == 1)
         {
-            if (Math.Abs(samplesBuffer[index]) >= minThreshold)
+            return;
+        }
+
+        for (int i = fromIndexInclusive; i < sampleBuffer.Length && i < toIndexExclusive; i++)
+        {
+            sampleBuffer[i] *= amplificationFactor;
+        }
+    }
+
+    public static bool IsAboveNoiseSuppressionThreshold(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, float noiseSuppression)
+    {
+        if (noiseSuppression == 0)
+        {
+            return true;
+        }
+
+        float minThreshold = noiseSuppression / 100f;
+        for (int index = startIndexInclusive; index < endIndexExclusive; index++)
+        {
+            if (Math.Abs(sampleBuffer[index]) >= minThreshold)
             {
                 return true;
             }
@@ -36,7 +58,4 @@ abstract public class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         x |= (x >> 16);
         return x - (x >> 1);
     }
-
-    abstract public PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile mic);
-
 }
