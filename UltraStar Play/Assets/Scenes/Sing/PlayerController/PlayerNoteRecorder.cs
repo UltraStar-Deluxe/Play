@@ -15,7 +15,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     private RecordedNote lastRecordedNote;
-    private PlayerMicPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
+    private BeatAnalyzedEvent lastBeatAnalyzedEvent;
 
     private readonly Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new();
     public IObservable<RecordedNoteStartedEvent> RecordedNoteStartedEventStream
@@ -42,7 +42,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             .Subscribe(OnBeatAnalyzed);
     }
 
-    private void OnBeatAnalyzed(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
         if (lastRecordedNote != null
