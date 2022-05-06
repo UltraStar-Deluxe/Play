@@ -107,8 +107,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
         double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - settings.MicProfile.DelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
-        // int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, estimatedPositionInSongInMillis);
-        // Debug.Log($"currentBeat: {currentBeat}, withDelay: {currentBeatConsideringMicDelay} (diff: {currentBeat - currentBeatConsideringMicDelay})");
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
             || currentBeatConsideringMicDelay < -20)
         {
@@ -117,7 +115,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Do not analyze more than 100 beats (might missed some beats while app was in background)
         int firstNextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
-        // Debug.Log($"Analyzing beats from {nextBeatToAnalyze} to {currentBeat} ({currentBeat - lastAnalyzedBeat} beats, at frame {Time.frameCount}, at systime {TimeUtils.GetUnixTimeMilliseconds()})");
 
         List<BeatPitchEvent> beatPitchEvents = new();
         int loopCount = 0;
@@ -129,7 +126,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
                 ? pitchEvent.MidiNote
                 : -1;
             beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat));
-            // Debug.Log($"Analyzed beat {beat}: midiNote: {midiNote}");
 
             loopCount++;
             if (loopCount > maxLoopCount)

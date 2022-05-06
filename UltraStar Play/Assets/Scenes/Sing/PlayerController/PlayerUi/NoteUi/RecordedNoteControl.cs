@@ -60,10 +60,6 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
             : color;
         image.style.unityBackgroundImageTintColor = finalColor;
         image.style.backgroundColor = finalColor;
-        // image.style.borderTopColor = finalColor;
-        // image.style.borderBottomColor = finalColor;
-        // image.style.borderLeftColor = finalColor;
-        // image.style.borderRightColor = finalColor;
     }
 
     public void Dispose()
