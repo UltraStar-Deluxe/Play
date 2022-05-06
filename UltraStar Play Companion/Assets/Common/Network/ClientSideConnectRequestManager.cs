@@ -37,12 +37,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    [Inject]
-    private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
-
-    [Inject]
-    private ClientSideMicDataSender clientSideMicDataSender;
-
     private const float ConnectRequestPauseInSeconds = 1f;
     private float nextConnectRequestTime;
 
@@ -57,7 +51,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private bool hasBeenDestroyed;
 
-    private bool IsConnected => serverMessagingPort > 0;
+    public bool IsConnected => serverMessagingPort > 0;
     private int serverMessagingPort;
 
     private int connectRequestCount;
@@ -123,13 +117,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         {
             nextConnectRequestTime = Time.time + ConnectRequestPauseInSeconds;
             ClientSendConnectRequest();
-        }
-
-        if (IsConnected
-            && !clientSideMicDataSender.IsConnected)
-        {
-            // The connection for the mic data was closed. Try reconnect.
-            CloseConnectionAndReconnect();
         }
     }
 

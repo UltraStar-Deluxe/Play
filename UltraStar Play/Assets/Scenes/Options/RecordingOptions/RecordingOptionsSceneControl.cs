@@ -152,12 +152,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             SelectedMicProfile.SampleRate = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        micPitchTracker.MicSampleRecorder
-            .ObserveEveryValueChanged(it => it.SampleRateHz)
-            .Subscribe(_ => UpdateSampleRateLabel());
-        micPitchTracker.MicSampleRecorder
-            .ObserveEveryValueChanged(it => it.IsRecording)
-            .Subscribe(_ => UpdateSampleRateLabel());
+        micPitchTracker.MicSampleRecorder.FinalSampleRate
+            .Subscribe(_ => UpdateSampleRateLabel())
+            .AddTo(gameObject);
+        micPitchTracker.MicSampleRecorder.IsRecording
+            .Subscribe(_ => UpdateSampleRateLabel())
+            .AddTo(gameObject);
 
         // Reselect recording device of connected client, when the client has now connected
         serverSideConnectRequestManager.ClientConnectedEventStream
@@ -214,7 +214,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             // When "auto" is selected, then also show the automatically used sample rate.
             string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
-                : $"\n({micPitchTracker.MicSampleRecorder.SampleRateHz} Hz)";
+                : $"\n({micPitchTracker.MicSampleRecorder.FinalSampleRate.Value} Hz)";
             return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
         }
         return $"{item} Hz";

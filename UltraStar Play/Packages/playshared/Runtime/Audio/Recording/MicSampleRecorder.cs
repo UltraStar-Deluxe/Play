@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,7 +11,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class MicSampleRecorder : MonoBehaviour, INeedInjection
 {
-    private const int DefaultSampleRateHz = 44100;
+    private const int DefaultSampleRate = 44100;
 
     public bool playRecordedAudio;
 
@@ -23,8 +24,8 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         set
         {
-            bool restartPitchDetection = IsRecording;
-            if (IsRecording)
+            bool restartPitchDetection = IsRecording.Value;
+            if (IsRecording.Value)
             {
                 StopRecording();
             }
@@ -33,8 +34,8 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
                 && !micProfile.IsInputFromConnectedClient
                 && !micProfile.Name.IsNullOrEmpty())
             {
-                SampleRateHz = GetSampleRateHz(micProfile);
-                MicSamples = new float[SampleRateHz];
+                FinalSampleRate.Value = GetFinalSampleRate(micProfile.Name, micProfile.SampleRate);
+                MicSamples = new float[FinalSampleRate.Value];
                 if (restartPitchDetection)
                 {
                     StartRecording();
@@ -42,19 +43,16 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             }
         }
     }
+
+    public ReactiveProperty<bool> IsRecording { get; private set; } = new(false);
     
-    public bool IsRecording { get; private set; }
-    
-    // SampleRateHz is available after the MicProfile has been set.
-    public int SampleRateHz { get; private set; }
-    // The MicSamples array has the length of the SampleRateHz (one float value per sample.)
-    public float[] MicSamples { get; private set; } = new float[DefaultSampleRateHz];
+    // The sample rate is available after a MicProfile has been set.
+    public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(0);
+    // The MicSamples array has one float value per sample.
+    public float[] MicSamples { get; private set; } = new float[DefaultSampleRate];
 
     private readonly Subject<RecordingEvent> recordingEventStream = new();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
-
-    [Inject]
-    public IServerSideConnectRequestManager serverSideConnectRequestManager;
 
     [Inject(SearchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
@@ -75,7 +73,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
     public void StartRecording()
     {
-        if (IsRecording)
+        if (IsRecording.Value)
         {
             return;
         }
@@ -90,20 +88,22 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        IsRecording = true;
+        IsRecording.Value = true;
 
         // Check for microphone existence.
-        if (CheckMicProfileIsDisconnected(micProfile))
+        string[] micDevices = Microphone.devices;
+        if (!micDevices.Contains(micProfile.Name))
         {
-            IsRecording = false;
+            IsRecording.Value = false;
+            Debug.LogWarning($"Did not find mic '{micProfile.Name}'. Available mic devices: {micDevices.ToCsv()}");
             return;
         }
 
-        Debug.Log($"Starting recording with '{MicProfile.Name}' at {SampleRateHz} Hz");
+        Debug.Log($"Starting recording with '{MicProfile.Name}' at {FinalSampleRate} Hz");
 
         // Code for low-latency microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
-        micAudioClip = Microphone.Start(MicProfile.Name, true, 1, SampleRateHz);
+        micAudioClip = Microphone.Start(MicProfile.Name, true, 1, FinalSampleRate.Value);
         System.Diagnostics.Stopwatch stopwatch = new();
         stopwatch.Start();
         while (Microphone.GetPosition(MicProfile.Name) <= 0)
@@ -112,7 +112,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             // Emergency exit
             if (stopwatch.ElapsedMilliseconds > 1000)
             {
-                IsRecording = false;
+                IsRecording.Value = false;
                 Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
                 return;
             }
@@ -125,7 +125,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
     public void StopRecording()
     {
-        if (!IsRecording)
+        if (!IsRecording.Value)
         {
             return;
         }
@@ -141,12 +141,12 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             MicSamples[i] = 0;
         }
         
-        IsRecording = false;
+        IsRecording.Value = false;
     }
 
     private void UpdateRecording()
     {
-        if (!IsRecording)
+        if (!IsRecording.Value)
         {
             return;
         }
@@ -168,20 +168,13 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
-        ApplyAmplificationAndNotifyListeners(newSamplesCount);
+        NotifyListeners(newSamplesCount);
         
         lastSamplePosition = currentSamplePosition;
     }
 
-    private void ApplyAmplificationAndNotifyListeners(int newSamplesCount)
+    private void NotifyListeners(int newSamplesCount)
     {
-        // The buffer is always overwritten completely by Unity. Thus, amplification has to be applied to the whole buffer again.
-        // The buffer is filled "from the right", i.e., highest index holds the newest sample.
-        if (micProfile.Amplification > 0)
-        {
-            ApplyAmplification(MicSamples, 0, MicSamples.Length - 1, micProfile.AmplificationMultiplier);
-        }
-        
         // Notify listeners
         if (newSamplesCount <= 0)
         {
@@ -191,14 +184,6 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         int newSamplesEndIndex = MicSamples.Length - 1;
         RecordingEvent recordingEvent = new(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
         recordingEventStream.OnNext(recordingEvent);
-    }
-    
-    private static void ApplyAmplification(float[] buffer, int startIndex, int endIndex, float amplificationMultiplier)
-    {
-        for (int index = startIndex; index < endIndex; index++)
-        {
-            buffer[index] *= amplificationMultiplier;
-        }
     }
 
     private void UpdateMicrophoneAudioPlayback()
@@ -225,43 +210,43 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return currentSamplePosition - lastSamplePosition;
         }
     }
-    
-    private int GetSampleRateHz(MicProfile localMicProfile)
+
+    public static int GetFinalSampleRate(string deviceName, int targetSampleRate)
     {
-        if (localMicProfile.IsInputFromConnectedClient)
+        Microphone.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate);
+        int finalSampleRate;
+        if (targetSampleRate <= 0)
         {
-            return 0;
+            // Select best sample rate
+            finalSampleRate = GetMaxSampleRate(maxSampleRate);
         }
         else
         {
-            Microphone.GetDeviceCaps(localMicProfile.Name, out int minFrequency, out int maxFrequency);
-            return maxFrequency == 0
-                // a value of zero indicates, that the device supports any frequency
-                // https://docs.unity3d.com/ScriptReference/Microphone.GetDeviceCaps.html
-                ? DefaultSampleRateHz
-                : maxFrequency;
+            // Select the target sample rate.
+            finalSampleRate = targetSampleRate;
         }
+
+        return finalSampleRate;
     }
-    
-    private bool CheckMicProfileIsDisconnected(MicProfile localMicProfile)
+
+    private static int GetMaxSampleRate(int maxSampleRate)
     {
-        if (localMicProfile.IsInputFromConnectedClient)
+        // Select best available sample rate.
+        if (maxSampleRate == 0)
         {
-            if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(localMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
-            {
-                Debug.LogWarning($"Client for mic-input not connected: '{localMicProfile.ConnectedClientId}'.");
-                return true;
-            }
+            // A max value of 0 indicates that any sample rate can be used
+            return DefaultSampleRate;
+        }
+        else if (maxSampleRate == 16000)
+        {
+            // Unity returns a value of 16000 on some devices, although more is possible.
+            // Every half-decent smartphone should be able to record with a better sample rate than this.
+            // See https://issuetracker.unity3d.com/issues/mobile-incorrect-values-returned-from-microphone-dot-getdevicecaps
+            return DefaultSampleRate;
         }
         else
         {
-            List<string> devices = new(Microphone.devices);
-            if (!devices.Contains(localMicProfile.Name))
-            {
-                Debug.LogWarning($"Did not find mic '{localMicProfile.Name}'. Available mic devices: {devices.ToCsv()}");
-                return true;
-            }
+            return maxSampleRate;
         }
-        return false;
     }
 }
