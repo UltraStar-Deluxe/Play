@@ -203,7 +203,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
-            MicrophonePort = newConnectedClientHandler.ClientTcpListener.GetPort(),
+            MessagingPort = newConnectedClientHandler.ClientTcpListener.GetPort(),
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
