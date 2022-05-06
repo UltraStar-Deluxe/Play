@@ -8,11 +8,8 @@ using UnityEngine;
 
 public class ConnectedClientHandler : IConnectedClientHandler
 {
-    private Subject<BeatPitchEvent> pitchEventStream = new();
-    public IObservable<BeatPitchEvent> PitchEventStream => pitchEventStream;
-
-    private Subject<PositionInSongResponseDto> positionInSongResponseEventStream = new();
-    public IObservable<PositionInSongResponseDto> PositionInSongResponseEventStream => positionInSongResponseEventStream;
+    private readonly Subject<JsonSerializable> receivedMessageStream = new();
+    public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
 
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
@@ -192,7 +189,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                     .ForEach(beatPitchEventDto => FireBeatPitchEventFromCompanionApp(beatPitchEventDto));
                 return;
             case CompanionAppMessageType.PositionInSongResponse:
-                positionInSongResponseEventStream.OnNext(JsonConverter.FromJson<PositionInSongResponseDto>(json));
+                receivedMessageStream.OnNext(JsonConverter.FromJson<PositionInSongResponseDto>(json));
                 return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
@@ -203,7 +200,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private void FireBeatPitchEventFromCompanionApp(BeatPitchEventDto beatPitchEventDto)
     {
         // Debug.Log($"Received pitchEventDto for beat {beatPitchEventDto.Beat} at systime {beatPitchEventDto.UnixTimeMilliseconds} (delay: {TimeUtils.GetUnixTimeMilliseconds() - beatPitchEventDto.UnixTimeMilliseconds} ms)");
-        pitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+        receivedMessageStream.OnNext(beatPitchEventDto);
     }
 
     public void Dispose()

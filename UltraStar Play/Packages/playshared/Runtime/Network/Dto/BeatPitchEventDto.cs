@@ -1,4 +1,4 @@
-public class BeatPitchEventDto
+public class BeatPitchEventDto : JsonSerializable
 {
     public int Beat { get; set; }
     public int MidiNote { get; set; }

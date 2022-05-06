@@ -100,13 +100,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
                 return;
             }
 
-            serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
-                .Where(evt => evt.ClientId == micProfile.ConnectedClientId)
-                .Subscribe(HandlePitchEventFromCompanionApp)
-                .AddTo(gameObject);
-
-            (GetConnectedClientHandler() as ConnectedClientHandler).PositionInSongResponseEventStream
-                .Subscribe(_ => OnPositionInSongResponse())
+            GetConnectedClientHandler().ReceivedMessageStream
+                .Subscribe(dto => HandleMessageFromConnectedClient(dto))
                 .AddTo(gameObject);
 
             SendPositionInSongToClient();
@@ -122,7 +117,19 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
 
-    private void OnPositionInSongResponse()
+    private void HandleMessageFromConnectedClient(JsonSerializable dto)
+    {
+        if (dto is BeatPitchEventDto beatPitchEventDto)
+        {
+            HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+        }
+        else if (dto is PositionInSongDto)
+        {
+            HandlePositionInSongResponseFromConnectedClient();
+        }
+    }
+
+    private void HandlePositionInSongResponseFromConnectedClient()
     {
         double roundTripTime = TimeUtils.GetUnixTimeMilliseconds() - lastUnixTimeMillisecondsWhenSentPositionInSongToClient;
         double currentMessageDelayInMillis = roundTripTime / 2;
@@ -214,7 +221,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         return roundedMidiNote;
     }
 
-    private void HandlePitchEventFromCompanionApp(BeatPitchEvent pitchEvent)
+    private void HandlePitchEventFromConnectedClient(BeatPitchEvent pitchEvent)
     {
         if (pitchEvent.Beat < 0
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
