@@ -23,15 +23,14 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private StreamReader tcpClientStreamReader;
     private StreamWriter tcpClientStreamWriter;
 
+    private readonly IServerSideConnectRequestManager serverSideConnectRequestManager;
+
     private readonly object streamReaderLock = new();
-
-    private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
-
     private readonly Thread receiveDataThread;
     private readonly Thread clientStillAliveCheckThread;
 
     public ConnectedClientHandler(
-        ServerSideConnectRequestManager serverSideConnectRequestManager,
+        IServerSideConnectRequestManager serverSideConnectRequestManager,
         IPEndPoint clientIpEndPoint,
         string clientName,
         string clientId)

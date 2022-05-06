@@ -205,11 +205,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         serverUdpClient?.Close();
         if (instance == this)
         {
-            RemoveAllConnectedClients();
+            RemoveAllConnectedClientHandlers();
         }
     }
     
-    private void RemoveAllConnectedClients()
+    private void RemoveAllConnectedClientHandlers()
     {
         idToConnectedClientMap.Values.ForEach(connectedClientHandler =>
         {
