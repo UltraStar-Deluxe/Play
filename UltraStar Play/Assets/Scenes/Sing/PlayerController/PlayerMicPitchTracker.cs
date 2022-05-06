@@ -259,7 +259,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
         lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
         FirePitchEventFromConnectedClient(pitchEvent);
     }
