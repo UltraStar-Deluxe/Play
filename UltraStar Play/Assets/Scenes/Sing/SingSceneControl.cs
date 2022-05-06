@@ -253,7 +253,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         contextMenuControl.FillContextMenuAction = FillContextMenu;
 
         // Automatically start recording on companion apps
-        InitRecordingWithConnectedClients();
+        SendMicProfileToConnectedClients();
+        SendStartRecordingMessageToConnectedClients();
     }
 
     private void InitDummySingers()
@@ -550,19 +551,25 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
-    private void InitRecordingWithConnectedClients()
+    private void SendMicProfileToConnectedClients()
     {
-        GetConnectedClientHandlers().ForEach(connectedClientHandlerAndMicProfile =>
-        {
-            connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new MicProfileMessageDto(connectedClientHandlerAndMicProfile.MicProfile));
-            connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
-        });
+        GetConnectedClientHandlers()
+            .ForEach(connectedClientHandlerAndMicProfile => connectedClientHandlerAndMicProfile.ConnectedClientHandler
+                .SendMessageToClient(new MicProfileMessageDto(connectedClientHandlerAndMicProfile.MicProfile)));
+    }
+
+    private void SendStartRecordingMessageToConnectedClients()
+    {
+        GetConnectedClientHandlers()
+            .ForEach(connectedClientHandlerAndMicProfile => connectedClientHandlerAndMicProfile.ConnectedClientHandler
+                .SendMessageToClient(new StartRecordingMessageDto()) );
     }
 
     private void SendStopRecordingMessageToConnectedClients()
     {
         GetConnectedClientHandlers()
-            .ForEach(connectedClientHandlerAndMicProfile => connectedClientHandlerAndMicProfile.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()) );
+            .ForEach(connectedClientHandlerAndMicProfile => connectedClientHandlerAndMicProfile.ConnectedClientHandler
+                .SendMessageToClient(new StopRecordingMessageDto()) );
     }
 
     private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
@@ -644,11 +651,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             pauseOverlay.ShowByDisplay();
             songAudioPlayer.PauseAudio();
+            SendStopRecordingMessageToConnectedClients();
         }
         else
         {
             pauseOverlay.HideByDisplay();
             songAudioPlayer.PlayAudio();
+            SendStartRecordingMessageToConnectedClients();
         }
     }
 
