@@ -93,47 +93,58 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         micSampleRecorder.MicProfile = micProfile;
         if (micProfile.IsInputFromConnectedClient)
         {
-            if (GetConnectedClientHandler() == null)
-            {
-                Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
-                gameObject.SetActive(false);
-                return;
-            }
-
-            // Beat events must be handled on the main thread
-            GetConnectedClientHandler().ReceivedMessageStream
-                .ObserveOnMainThread()
-                .Subscribe(dto =>
-                {
-                    if (dto is BeatPitchEventDto beatPitchEventDto)
-                    {
-                        HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
-                    }
-                })
-                .AddTo(gameObject);
-
-            // PositionInSongResponse should be handled as soon as possible. Thus, it is not handled on the main thread.
-            GetConnectedClientHandler().ReceivedMessageStream
-                .Subscribe(dto =>
-                {
-                    if (dto is PositionInSongDto)
-                    {
-                        HandlePositionInSongResponseFromConnectedClient();
-                    }
-                })
-                .AddTo(gameObject);
-
-            SendPositionInSongToClient();
+            InitPitchDetectionFromConnectedClient();
         }
-        else {
-            micSampleRecorder.StartRecording();
-
-            // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-            audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
-            audioSamplesAnalyzer.Enable();
+        else
+        {
+            InitPitchDetectionFromLocalMicrophone();
         }
 
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
+    }
+
+    private void InitPitchDetectionFromLocalMicrophone()
+    {
+        micSampleRecorder.StartRecording();
+
+        // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
+        audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.SampleRateHz);
+        audioSamplesAnalyzer.Enable();
+    }
+
+    private void InitPitchDetectionFromConnectedClient()
+    {
+        if (GetConnectedClientHandler() == null)
+        {
+            Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
+            gameObject.SetActive(false);
+            return;
+        }
+
+        // Beat events must be handled on the main thread
+        GetConnectedClientHandler().ReceivedMessageStream
+            .ObserveOnMainThread()
+            .Subscribe(dto =>
+            {
+                if (dto is BeatPitchEventDto beatPitchEventDto)
+                {
+                    HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                }
+            })
+            .AddTo(gameObject);
+
+        // PositionInSongResponse should be handled as soon as possible. Thus, it is not handled on the main thread.
+        GetConnectedClientHandler().ReceivedMessageStream
+            .Subscribe(dto =>
+            {
+                if (dto is PositionInSongDto)
+                {
+                    HandlePositionInSongResponseFromConnectedClient();
+                }
+            })
+            .AddTo(gameObject);
+
+        SendPositionInSongToClient();
     }
 
     private void HandlePositionInSongResponseFromConnectedClient()
@@ -158,23 +169,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile.IsInputFromConnectedClient)
         {
-            // Read messages from client since last time the reader thread was active.
-            IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-            connectedClientHandler?.ReadMessagesFromClient();
-
-            if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + 2000 < TimeUtils.GetUnixTimeMilliseconds())
-            {
-                // Synchronize position in song with connected client.
-                SendPositionInSongToClient();
-            }
+            UpdatePitchDetectionFromConnectedClient();
         }
         else
         {
-            UpdatePitchDetectionFromMic();
+            UpdatePitchDetectionFromLocalMicrophone();
         }
     }
 
-    private void UpdatePitchDetectionFromMic()
+    private void UpdatePitchDetectionFromLocalMicrophone()
     {
         // No sentence to analyze left (all done).
         if (RecordingSentence == null)
@@ -199,6 +202,19 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             : null;
 
         FirePitchEvent(pitchEvent, BeatToAnalyze, noteAtBeat, RecordingSentence);
+    }
+
+    private void UpdatePitchDetectionFromConnectedClient()
+    {
+        // Read messages from client since last time the reader thread was active.
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        connectedClientHandler?.ReadMessagesFromClient();
+
+        if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + 2000 < TimeUtils.GetUnixTimeMilliseconds())
+        {
+            // Synchronize position in song with connected client.
+            SendPositionInSongToClient();
+        }
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -253,18 +269,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         // Debug.Log($"Received pitch from client (beat: {pitchEvent.Beat}, midiNote: {pitchEvent.MidiNote}, currentBeat: {currentBeat})");
         lastAnalyzedBeatFromConnectedClient = pitchEvent.Beat;
         FirePitchEventFromConnectedClient(pitchEvent);
-    }
-
-    private void SendStopMessageToClient()
-    {
-        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        if (connectedClientHandler == null)
-        {
-            // Disconnected
-            return;
-        }
-
-        connectedClientHandler.SendMessageToClient(new StopRecordingMessageDto());
     }
 
     private void SendPositionInSongToClient()
@@ -496,7 +500,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             }
         }
 
-        SendPositionInSongToClient();
+        if (micProfile != null
+            && micProfile.IsInputFromConnectedClient)
+        {
+            SendPositionInSongToClient();
+        }
     }
 
     public PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
@@ -517,52 +525,5 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat + 1);
         PitchEvent pitchEvent = GetPitchEventOfSamples(startSampleBufferIndex, endSampleBufferIndex);
         return pitchEvent;
-    }
-
-    public class BeatAnalyzedEvent
-    {
-        public PitchEvent PitchEvent { get; private set; }
-        public int Beat { get; private set; }
-        public Note NoteAtBeat { get; private set; }
-        public Sentence SentenceAtBeat { get; private set; }
-        public int RoundedRecordedMidiNote { get; private set; }
-        public int RecordedMidiNote { get; private set; }
-
-        public BeatAnalyzedEvent(PitchEvent pitchEvent,
-            int beat,
-            Note noteAtBeat,
-            Sentence sentenceAtBeat,
-            int recordedMidiNote,
-            int roundedRecordedMidiNote)
-        {
-            PitchEvent = pitchEvent;
-            Beat = beat;
-            NoteAtBeat = noteAtBeat;
-            SentenceAtBeat = sentenceAtBeat;
-            RecordedMidiNote = recordedMidiNote;
-            RoundedRecordedMidiNote = roundedRecordedMidiNote;
-        }
-    }
-
-    public class NoteAnalyzedEvent
-    {
-        public Note Note { get; private set; }
-
-        public NoteAnalyzedEvent(Note note)
-        {
-            Note = note;
-        }
-    }
-
-    public class SentenceAnalyzedEvent
-    {
-        public Sentence Sentence { get; private set; }
-        public bool IsLastSentence { get; private set; }
-
-        public SentenceAnalyzedEvent(Sentence sentence, bool isLastSentence)
-        {
-            Sentence = sentence;
-            IsLastSentence = isLastSentence;
-        }
     }
 }
