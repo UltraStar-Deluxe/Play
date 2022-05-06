@@ -4,18 +4,6 @@ public abstract class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
     public bool ModifySamplesInPlace { get; set; } = true;
 
-    protected bool isEnabled;
-
-    public void Enable()
-    {
-        isEnabled = true;
-    }
-
-    public void Disable()
-    {
-        isEnabled = false;
-    }
-
     public abstract PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile mic);
 
     public static void ApplyAmplification(float[] sampleBuffer, int fromIndexInclusive, int toIndexExclusive, float amplificationFactor)

@@ -21,12 +21,6 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 
     public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile micProfile)
     {
-        if (!isEnabled)
-        {
-            Debug.LogWarning("AudioSamplesAnalyzer is disabled");
-            return null;
-        }
-
         int sampleLength = endIndexExclusive - startIndexInclusive;
         if (sampleLength < MinSampleLength)
         {

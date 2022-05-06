@@ -76,7 +76,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private void UpdateAudioSamplesAnalyzer()
     {
         audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, micSampleRecorder.FinalSampleRate.Value);
-        audioSamplesAnalyzer.Enable();
     }
 
     private void HandleRecordingStatusChanged(bool isRecording)

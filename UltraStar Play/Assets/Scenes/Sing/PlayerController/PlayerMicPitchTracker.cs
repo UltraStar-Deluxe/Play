@@ -112,8 +112,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         micSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-        audioSamplesAnalyzer = MicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.FinalSampleRate.Value);
-        audioSamplesAnalyzer.Enable();
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(settings.AudioSettings.pitchDetectionAlgorithm, micSampleRecorder.FinalSampleRate.Value);
     }
 
     private void InitPitchDetectionFromConnectedClient()
