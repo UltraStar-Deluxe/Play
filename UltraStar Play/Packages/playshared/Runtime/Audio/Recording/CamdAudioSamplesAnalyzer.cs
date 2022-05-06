@@ -1,4 +1,5 @@
-﻿using CircularBuffer;
+﻿using System;
+using CircularBuffer;
 using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
@@ -40,7 +41,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile micProfile)
     {
         if (!isEnabled)
         {
@@ -48,7 +49,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             return null;
         }
 
-        int sampleLength = sampleEndIndex - sampleStartIndex;
+        int sampleLength = endIndexExclusive - startIndexInclusive;
         if (sampleLength < MinSampleLength)
         {
             return null;
@@ -62,15 +63,27 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             sampleCountToUse = PreviousPowerOfTwo(maxSampleLength);
         }
 
-        // Check if samples is louder than threshhold
-        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, sampleStartIndex, sampleStartIndex + sampleCountToUse, micProfile))
+        // Copy samples if needed
+        if (!ModifySamplesInPlace)
+        {
+            // Copy original sample buffer
+            float[] sampleBufferCopy = new float[sampleBuffer.Length];
+            Array.Copy(sampleBuffer, sampleBufferCopy, sampleBuffer.Length);
+            sampleBuffer = sampleBufferCopy;
+        }
+
+        // Apply amplification
+        ApplyAmplification(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.AmplificationMultiplier);
+
+        // Check if samples is louder than threshold
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.NoiseSuppression))
         {
             OnNoPitchDetected();
             return null;
         }
 
         // Get best fitting tone
-        CircularAverageMagnitudeDifference(sampleBuffer, sampleStartIndex, sampleCountToUse, correlation);
+        CircularAverageMagnitudeDifference(sampleBuffer, startIndexInclusive, sampleCountToUse, correlation);
 
         FindCurrentCandidates(correlation, currentCandidates);
         CalculateNormalizedError(currentCandidates, candidateHistory);

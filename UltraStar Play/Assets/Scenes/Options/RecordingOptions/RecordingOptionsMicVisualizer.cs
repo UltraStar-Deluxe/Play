@@ -8,6 +8,9 @@ using UnityEngine.UIElements;
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicSampleRecorder micSampleRecorder;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private MicPitchTracker micPitchTracker;
 
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
@@ -21,11 +24,9 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
-    private IDisposable pitchEventStreamDisposable;
-
     private void Start()
     {
-        pitchEventStreamDisposable = micPitchTracker.PitchEventStream
+        micPitchTracker.PitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
         recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
@@ -40,11 +41,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private void Update()
     {
         UpdateWaveForm();
-    }
-
-    private void OnDestroy()
-    {
-        pitchEventStreamDisposable?.Dispose();
+        micPitchTracker.AudioSamplesAnalyzer.ModifySamplesInPlace = false;
     }
 
     private void UpdateWaveForm()
@@ -60,13 +57,17 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Consider noise suppression when displaying the the buffer
         float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
-        float noiseThreshold = micProfile.NoiseSuppression / 100f;
-        bool micSampleBufferIsAboveThreshold = micData.AnyMatch(sample => sample >= noiseThreshold);
-        float[] displayData = micSampleBufferIsAboveThreshold
+
+        // Consider amplification
+        AbstractAudioSamplesAnalyzer.ApplyAmplification(micData, 0, micData.Length, micProfile.AmplificationMultiplier);
+
+        // Consider noise suppression when displaying the the buffer
+        bool isAboveThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(micData, 0, micData.Length, micProfile.NoiseSuppression);
+        float[] displayData = isAboveThreshold
             ? micData
             : new float[micData.Length];
+
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(displayData);
     }
 
