@@ -24,7 +24,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     }
 
     [Inject]
-    private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
+    private MicSampleRecorder micSampleRecorder;
 
     [Inject]
     private Settings settings;
@@ -61,15 +61,14 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        UpdateAudioSamplesAnalyzer();
-        settings.ObserveEveryValueChanged(it => it.MicProfile)
-            .Subscribe(newValue => UpdateAudioSamplesAnalyzer());
-
         ResetPositionInSong();
 
+        UpdateAudioSamplesAnalyzer();
+        micSampleRecorder.FinalSampleRate.Subscribe(_ => UpdateAudioSamplesAnalyzer());
+
         clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
-        clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
-        clientSideMicSampleRecorder.IsRecording.Subscribe(HandleRecordingStatusChanged);
+        micSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
+        micSampleRecorder.IsRecording.Subscribe(HandleRecordingStatusChanged);
 
         // Receive messages from server (i.e. from main game)
         receiveDataThread = new Thread(() =>
@@ -141,7 +140,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
             // Must be called from main thread.
             Debug.Log("Stopping recording because of message from server");
-            clientSideMicSampleRecorder.StopRecording();
+            micSampleRecorder.StopRecording();
         }
         if (receivedStartRecordingMessage)
         {
@@ -149,7 +148,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
             // Must be called from main thread.
             Debug.Log("Starting recording because of message from server");
-            clientSideMicSampleRecorder.StartRecording();
+            micSampleRecorder.StartRecording();
         }
 
         if (HasPositionInSong
@@ -158,11 +157,18 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
         }
+
+        if (clientSideConnectRequestManager.IsConnected
+            && !IsConnected)
+        {
+            // The connection for messaging was closed. Try reconnect.
+            clientSideConnectRequestManager.CloseConnectionAndReconnect();
+        }
     }
 
     private void UpdateAudioSamplesAnalyzer()
     {
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, GetMicProfileWithFinalSampleRate().SampleRate);
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, micSampleRecorder.FinalSampleRate.Value);
         audioSamplesAnalyzer.Enable();
     }
 
@@ -287,7 +293,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         // The MicProfile in the settings may use a SampleRate of 0 for "best available".
         // The pitch detection algorithm needs the proper value.
         MicProfile micProfile = new MicProfile(settings.MicProfile);
-        micProfile.SampleRate = ClientSideMicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
+        micProfile.SampleRate = micSampleRecorder.FinalSampleRate.Value;
         return micProfile;
     }
 
@@ -453,7 +459,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         else
         {
             serverSideTcpClientEndPoint = null;
-            clientSideMicSampleRecorder.StopRecording();
+            micSampleRecorder.StopRecording();
 
             // Already disconnected.
             // Do not try to call reconnect (i.e. disconnect then connect) because it would cause a stack overflow.
