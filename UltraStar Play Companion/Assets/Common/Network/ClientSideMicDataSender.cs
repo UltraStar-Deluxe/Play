@@ -31,138 +31,45 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     [Inject]
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
-    
-    private TcpClient tcpClient;
-    private NetworkStream tcpClientStream;
-    private StreamReader tcpClientStreamReader;
-    private StreamWriter tcpClientStreamWriter;
-    private IPEndPoint serverSideTcpClientEndPoint;
-
-    public bool IsConnected => serverSideTcpClientEndPoint != null
-                                && tcpClient != null
-                                && tcpClientStream != null
-                                && tcpClientStreamReader != null
-                                && tcpClientStreamWriter != null;
 
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
-    private Thread receiveDataThread;
-    private Thread serverStillAliveCheckThread;
-
-    private SongMeta songMeta;
     private readonly CircularBuffer<PositionInSongData> receivedPositionInSongTimes = new(3);
     private PositionInSongData bestPositionInSongData;
+    private SongMeta songMeta;
     private int lastAnalyzedBeat;
 
     private bool HasPositionInSong => songMeta != null && bestPositionInSongData != null;
 
-    private bool receivedStopRecordingMessage;
-    private bool receivedStartRecordingMessage;
+    private IDisposable receivedMessageStreamDisposable;
 
     private void Start()
     {
         ResetPositionInSong();
 
         UpdateAudioSamplesAnalyzer();
-        micSampleRecorder.FinalSampleRate.Subscribe(_ => UpdateAudioSamplesAnalyzer());
+        micSampleRecorder.FinalSampleRate
+            .Subscribe(_ => UpdateAudioSamplesAnalyzer())
+            .AddTo(gameObject);
 
-        clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
-        micSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
-        micSampleRecorder.IsRecording.Subscribe(HandleRecordingStatusChanged);
-
-        // Receive messages from server (i.e. from main game)
-        receiveDataThread = new Thread(() =>
-        {
-            while (true)
-            {
-                try
-                {
-                    if (IsConnected)
-                    {
-                        while (tcpClientStream.DataAvailable)
-                        {
-                            ReadMessageFromServer();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    CloseNetworkConnection();
-                }
-
-                Thread.Sleep(250);
-            }
-        });
-        receiveDataThread.Start();
-
-        serverStillAliveCheckThread = new Thread(() =>
-        {
-            while (true)
-            {
-                if (IsConnected)
-                {
-                    CheckServerStillAlive();
-                }
-                Thread.Sleep(1500);
-            }
-        });
-        serverStillAliveCheckThread.Start();
-    }
-
-    private void CheckServerStillAlive()
-    {
-        try
-        {
-            // If there is new data available, then the client is still alive.
-            if (!tcpClientStream.DataAvailable)
-            {
-                // Try to send something to the client.
-                // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
-                SendMessageToServer(new StillAliveCheckDto());
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            Debug.LogError("Failed sending data to server. Closing connection.");
-            CloseNetworkConnection();
-        }
+        clientSideConnectRequestManager.ConnectEventStream
+            .Subscribe(UpdateConnectionStatus)
+            .AddTo(gameObject);
+        micSampleRecorder.RecordingEventStream
+            .Subscribe(HandleNewMicSamples)
+            .AddTo(gameObject);
+        micSampleRecorder.IsRecording
+            .Subscribe(HandleRecordingStatusChanged)
+            .AddTo(gameObject);
     }
 
     private void Update()
     {
-        if (receivedStopRecordingMessage)
-        {
-            receivedStopRecordingMessage = false;
-
-            ResetPositionInSong();
-
-            // Must be called from main thread.
-            Debug.Log("Stopping recording because of message from server");
-            micSampleRecorder.StopRecording();
-        }
-        if (receivedStartRecordingMessage)
-        {
-            receivedStartRecordingMessage = false;
-
-            // Must be called from main thread.
-            Debug.Log("Starting recording because of message from server");
-            micSampleRecorder.StartRecording();
-        }
-
         if (HasPositionInSong
             && bestPositionInSongData.UnixTimeInMillisWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
-        }
-
-        if (clientSideConnectRequestManager.IsConnected
-            && !IsConnected)
-        {
-            // The connection for messaging was closed. Try reconnect.
-            clientSideConnectRequestManager.CloseConnectionAndReconnect();
         }
     }
 
@@ -184,11 +91,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandleNewMicSamples(RecordingEvent recordingEvent)
     {
-        if (!IsConnected)
-        {
-            return;
-        }
-
         // Do pitch detection
         if (HasPositionInSong)
         {
@@ -208,7 +110,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
         // int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, estimatedPositionInSongInMillis);
         // Debug.Log($"currentBeat: {currentBeat}, withDelay: {currentBeatConsideringMicDelay} (diff: {currentBeat - currentBeatConsideringMicDelay})");
-        if (currentBeatConsideringMicDelay <= lastAnalyzedBeat)
+        if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
+            || currentBeatConsideringMicDelay < -20)
         {
             return;
         }
@@ -261,8 +164,16 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int midiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;
-        BeatPitchEventDto beatPitchEventDto = new BeatPitchEventDto(midiNote, -1);
+        BeatPitchEventDto beatPitchEventDto = new(midiNote, -1);
         SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto));
+    }
+
+    private void SendMessageToServer(JsonSerializable jsonSerializable)
+    {
+        if (clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
+        {
+            connectedServerHandler.SendMessageToServer(jsonSerializable);
+        }
     }
 
     private double GetEstimatedPositionInSongInMillis()
@@ -292,88 +203,16 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     {
         // The MicProfile in the settings may use a SampleRate of 0 for "best available".
         // The pitch detection algorithm needs the proper value.
-        MicProfile micProfile = new MicProfile(settings.MicProfile);
+        MicProfile micProfile = new(settings.MicProfile);
         micProfile.SampleRate = micSampleRecorder.FinalSampleRate.Value;
         return micProfile;
-    }
-
-    private void SendMessageToServer(JsonSerializable jsonSerializable)
-    {
-        try
-        {
-            tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
-            tcpClientStreamWriter.Flush();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            Debug.LogError($"Failed to send pitch to server");
-            CloseNetworkConnection();
-        }
-    }
-
-    private void ReadMessageFromServer()
-    {
-        string receivedLine = tcpClientStreamReader.ReadLine();
-        if (receivedLine.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        receivedLine = receivedLine.Trim();
-        if (!receivedLine.StartsWith("{")
-            || !receivedLine.EndsWith("}"))
-        {
-            Debug.LogWarning($"Received invalid message from server: {receivedLine}");
-            return;
-        }
-
-        HandleJsonMessageFromServer(receivedLine);
-    }
-
-    private void HandleJsonMessageFromServer(string json)
-    {
-        CompanionAppMessageDto companionAppMessageDto = null;
-        try
-        {
-            companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
-        }
-        catch (Exception e)
-        {
-            Debug.Log($"Exception while parsing message from server: {json}");
-            Debug.LogException(e);
-        }
-
-        switch (companionAppMessageDto.MessageType)
-        {
-            case CompanionAppMessageType.StillAliveCheck:
-                // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
-                return;
-            case CompanionAppMessageType.PositionInSong:
-                HandlePositionInSongMessage(JsonConverter.FromJson<PositionInSongDto>(json));
-                return;
-            case CompanionAppMessageType.MicProfile:
-                HandleMicProfileMessage(JsonConverter.FromJson<MicProfileMessageDto>(json));
-                return;
-            case CompanionAppMessageType.StopRecording:
-                // Must be called from main thread
-                receivedStopRecordingMessage = true;
-                return;
-            case CompanionAppMessageType.StartRecording:
-                // Must be called from main thread
-                receivedStartRecordingMessage = true;
-                return;
-            default:
-                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
-                return;
-        }
     }
 
     private void HandleMicProfileMessage(MicProfileMessageDto micProfileMessageDto)
     {
         Debug.Log($"Received new mic profile: {micProfileMessageDto.ToJson()}");
 
-        MicProfile micProfile = new MicProfile(settings.MicProfile.Name);
+        MicProfile micProfile = new(settings.MicProfile.Name);
         micProfile.Amplification = micProfileMessageDto.Amplification;
         micProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
         micProfile.SampleRate = micProfileMessageDto.SampleRate;
@@ -385,8 +224,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void HandlePositionInSongMessage(PositionInSongDto positionInSongDto)
     {
-        double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
-
         PositionInSongData positionInSongData = new(positionInSongDto.PositionInSongInMillis, TimeUtils.GetUnixTimeMilliseconds());
         receivedPositionInSongTimes.PushBack(positionInSongData);
         songMeta = new SongMeta
@@ -433,51 +270,41 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void UpdateConnectionStatus(ConnectEvent connectEvent)
     {
+        if (receivedMessageStreamDisposable != null)
+        {
+            receivedMessageStreamDisposable.Dispose();
+            receivedMessageStreamDisposable = null;
+        }
+
         if (connectEvent.IsSuccess
-            && connectEvent.MessagingPort > 0
-            && connectEvent.ServerIpEndPoint != null)
+            && clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
         {
-            serverSideTcpClientEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MessagingPort);
-
-            CloseNetworkConnection();
-            try
-            {
-                tcpClient = new TcpClient();
-                tcpClient.NoDelay = true;
-                tcpClient.Connect(serverSideTcpClientEndPoint);
-                tcpClientStream = tcpClient.GetStream();
-                tcpClientStreamReader = new StreamReader(tcpClientStream);
-                tcpClientStreamWriter = new StreamWriter(tcpClientStream);
-                tcpClientStreamWriter.AutoFlush = true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                CloseNetworkConnection();
-            }
+            receivedMessageStreamDisposable = connectedServerHandler.ReceivedMessageStream
+                .ObserveOnMainThread()
+                .Subscribe(dto =>
+                {
+                    if (dto is StopRecordingMessageDto)
+                    {
+                        Debug.Log("Stopping recording because of message from server");
+                        micSampleRecorder.StopRecording();
+                        ResetPositionInSong();
+                    }
+                    else if (dto is StartRecordingMessageDto)
+                    {
+                        Debug.Log("Starting recording because of message from server");
+                        micSampleRecorder.StartRecording();
+                    }
+                    else if (dto is PositionInSongDto positionInSongDto)
+                    {
+                        HandlePositionInSongMessage(positionInSongDto);
+                    }
+                    else if (dto is MicProfileMessageDto micProfileMessageDto)
+                    {
+                        HandleMicProfileMessage(micProfileMessageDto);
+                    }
+                })
+                .AddTo(gameObject);
         }
-        else
-        {
-            serverSideTcpClientEndPoint = null;
-            micSampleRecorder.StopRecording();
-
-            // Already disconnected.
-            // Do not try to call reconnect (i.e. disconnect then connect) because it would cause a stack overflow.
-            CloseNetworkConnection();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        CloseNetworkConnection();
-    }
-
-    private void CloseNetworkConnection()
-    {
-        tcpClientStream?.Close();
-        tcpClientStream = null;
-        tcpClient?.Close();
-        tcpClient = null;
     }
 
     private class PositionInSongData : JsonSerializable

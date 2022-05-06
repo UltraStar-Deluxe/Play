@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -12,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
+public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IClientSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
@@ -51,17 +50,17 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private bool hasBeenDestroyed;
 
-    public bool IsConnected => serverMessagingPort > 0;
-    private int serverMessagingPort;
-
     private int connectRequestCount;
 
-    private readonly ConcurrentQueue<ConnectResponseDto> connectResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
+    private readonly ConcurrentQueue<ConnectResponseDto> connectResponseQueue = new();
 
     private bool isApplicationPaused;
 
     private Thread acceptMessageFromServerThread;
-    
+
+    private ConnectedServerHandler connectedServerHandler;
+    public bool IsConnected => connectedServerHandler != null;
+
     private void Start()
     {
         InitSingleInstance();
@@ -90,19 +89,23 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             if (connectResponseDto.ErrorMessage.IsNullOrEmpty()
                 && connectResponseDto.MessagingPort > 0)
             {
-                serverMessagingPort = connectResponseDto.MessagingPort;
+                DisposeConnectedServerHandler();
+                IPEndPoint messagingIpEndPoint = new(connectResponseDto.ServerIpEndPoint.Address, connectResponseDto.MessagingPort);
+                connectedServerHandler = new(this, messagingIpEndPoint);
+
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     IsSuccess = true,
                     ConnectRequestCount = connectRequestCount,
-                    MessagingPort = serverMessagingPort,
+                    MessagingPort = connectResponseDto.MessagingPort,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
                 });
-                connectRequestCount = 0;            
+                connectRequestCount = 0;
             }
             else if (!connectResponseDto.ErrorMessage.IsNullOrEmpty())
             {
+                DisposeConnectedServerHandler();
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     ConnectRequestCount = connectRequestCount,
@@ -111,12 +114,21 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             }
         }
         
-        if (!IsConnected
+        if (connectedServerHandler == null
             && Time.time > nextConnectRequestTime
             && !isApplicationPaused)
         {
             nextConnectRequestTime = Time.time + ConnectRequestPauseInSeconds;
             ClientSendConnectRequest();
+        }
+    }
+
+    private void DisposeConnectedServerHandler()
+    {
+        if (connectedServerHandler != null)
+        {
+            connectedServerHandler.Dispose();
+            connectedServerHandler = null;
         }
     }
 
@@ -234,15 +246,31 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
     private void OnDestroy()
     {
         hasBeenDestroyed = true;
+        DisposeConnectedServerHandler();
         clientUdpClient?.Close();
     }
 
     public void CloseConnectionAndReconnect()
     {
-        serverMessagingPort = 0;
+        DisposeConnectedServerHandler();
         connectEventStream.OnNext(new ConnectEvent
         {
             IsSuccess = false,
         });
+    }
+
+    public bool TryGetConnectedServerHandler(out IConnectedServerHandler localConnectedServerHandler)
+    {
+        localConnectedServerHandler = this.connectedServerHandler;
+        return localConnectedServerHandler != null;
+    }
+
+    public void RemoveConnectedServerHandler(IConnectedServerHandler localConnectedServerHandler)
+    {
+        if (this.connectedServerHandler != null
+            && this.connectedServerHandler == localConnectedServerHandler)
+        {
+            DisposeConnectedServerHandler();
+        }
     }
 }
