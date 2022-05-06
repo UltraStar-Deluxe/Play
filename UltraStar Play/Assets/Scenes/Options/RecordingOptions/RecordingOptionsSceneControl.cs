@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
 using ProTrans;
@@ -6,17 +7,24 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private RecordingOptionsMicVisualizer micVisualizer;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private CalibrateMicDelayControl calibrateMicDelayControl;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicPitchTracker micPitchTracker;
 
     [Inject]
     private UiManager uiManager;
@@ -32,9 +40,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     [Inject]
     private TranslationManager translationManager;
-
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private CalibrateMicDelayControl calibrateMicDelayControl;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -84,9 +89,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
-
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
@@ -95,6 +97,11 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private ColorPickerControl colorPickerControl;
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
+
+    private IDisposable connectedClientReceivedMessageStreamDisposable;
+
+    private Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
+    public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
     private void Start()
     {
@@ -279,6 +286,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
 
         UpdateSampleRateLabel();
+        InitPitchDetectionFromConnectionClient();
     }
 
     private void DeleteSelectedRecordingDevice()
@@ -388,5 +396,42 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             Colors.CreateColor("#c0392b"),
             Colors.CreateColor("#2c3e50"),
         };
+    }
+
+    private void InitPitchDetectionFromConnectionClient()
+    {
+        if (connectedClientReceivedMessageStreamDisposable != null)
+        {
+            connectedClientReceivedMessageStreamDisposable.Dispose();
+            connectedClientReceivedMessageStreamDisposable = null;
+        }
+
+        if (SelectedMicProfile == null
+            || !SelectedMicProfile.IsInputFromConnectedClient
+            || !serverSideConnectRequestManager.TryGetConnectedClientHandler(SelectedMicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+        {
+            return;
+        }
+
+        connectedClientReceivedMessageStreamDisposable = connectedClientHandler.ReceivedMessageStream
+            .ObserveOnMainThread()
+            .Subscribe(dto =>
+            {
+                if (dto is BeatPitchEventDto beatPitchEventDto)
+                {
+                    connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                }
+            })
+            .AddTo(gameObject);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(micVisualizer);
+        bb.BindExistingInstance(calibrateMicDelayControl);
+        return bb.GetBindings();
     }
 }

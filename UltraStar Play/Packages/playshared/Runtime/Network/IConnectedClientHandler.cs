@@ -6,4 +6,5 @@ public interface IConnectedClientHandler : IDisposable
     string ClientName { get; }
     void SendMessageToClient(JsonSerializable jsonSerializable);
     void ReadMessagesFromClient();
+    IObservable<JsonSerializable> ReceivedMessageStream { get; }
 }

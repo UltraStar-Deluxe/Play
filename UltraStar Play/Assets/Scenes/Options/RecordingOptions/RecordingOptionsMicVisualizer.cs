@@ -17,7 +17,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private VisualElement audioWaveForm;
 
     [Inject]
-    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    private RecordingOptionsSceneControl recordingOptionsSceneControl;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
@@ -25,9 +25,10 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
-        serverSideConnectRequestManager.ConnectedClientBeatPitchEventStream
-            .Where(connectedClientBeatPitchEvent => connectedClientBeatPitchEvent.ClientId == micPitchTracker.MicProfile.ConnectedClientId)
+        pitchEventStreamDisposable = micPitchTracker.PitchEventStream
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
+        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>

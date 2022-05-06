@@ -42,13 +42,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     private static Dictionary<string, IConnectedClientHandler> idToConnectedClientMap = new();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
     
-    private readonly ConcurrentQueue<ClientConnectionEvent> clientConnectedEventQueue = new();
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
-    public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream;
-
-    private readonly ConcurrentQueue<ConnectedClientBeatPitchEvent> connectedClientBeatPitchEventQueue = new();
-    private readonly Subject<ConnectedClientBeatPitchEvent> connectedClientBeatPitchEventStream = new();
-    public IObservable<ConnectedClientBeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
+    public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream.ObserveOnMainThread();
 
     private UdpClient serverUdpClient;
     private const int ConnectPortOnServer = 34567;
@@ -84,18 +79,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
 
     private void Update()
     {
-        // Fire events on the main thread.
-        while (clientConnectedEventQueue.TryDequeue(out ClientConnectionEvent clientConnectedEvent))
-        {
-            clientConnectedEventStream.OnNext(clientConnectedEvent);
-        }
-
         // Read messages from client that arrived since the last time the reader thread was active.
         GetConnectedClientHandlers().ForEach(connectedClientHandler => connectedClientHandler.ReadMessagesFromClient());
-        while (connectedClientBeatPitchEventQueue.TryDequeue(out ConnectedClientBeatPitchEvent pitchEvent))
-        {
-            connectedClientBeatPitchEventStream.OnNext(pitchEvent);
-        }
     }
 
     private void InitSingleInstance()
@@ -190,13 +175,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     private void HandleClientMessage(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
         ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId);
-        clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(newConnectedClientHandler, true));
-
-        newConnectedClientHandler.PitchEventStream
-            .Subscribe(pitchEvent => connectedClientBeatPitchEventQueue.Enqueue(new ConnectedClientBeatPitchEvent(
-                pitchEvent.MidiNote,
-                pitchEvent.Beat,
-                newConnectedClientHandler.ClientId)));
+        clientConnectedEventStream.OnNext(new ClientConnectionEvent(newConnectedClientHandler, true));
 
         ConnectResponseDto connectResponseDto = new()
         {
@@ -234,7 +213,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     {
         idToConnectedClientMap.Values.ForEach(connectedClientHandler =>
         {
-            clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(connectedClientHandler, false));
+            clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
             connectedClientHandler.Dispose();
         });
         idToConnectedClientMap.Clear();
@@ -246,7 +225,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         {
             idToConnectedClientMap.Remove(connectedClientHandler.ClientId);
         }
-        clientConnectedEventQueue.Enqueue(new ClientConnectionEvent(connectedClientHandler, false));
+        clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
         connectedClientHandler.Dispose();
     }
     
