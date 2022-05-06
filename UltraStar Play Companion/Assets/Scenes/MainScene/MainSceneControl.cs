@@ -197,19 +197,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
         });
 
-        InitTabGroup();
-        InitMenu();
-        InitSongSearch();
-    }
-
-    private void InitSongSearch()
-    {
-        songSearchTextField.value = "";
         songSearchTextField.RegisterValueChangedCallback(evt =>
         {
-            songSearchHint.SetVisibleByDisplay(evt.newValue.IsNullOrEmpty());
+            songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
             UpdateSongList();
         });
+
+        InitTabGroup();
+        InitMenu();
     }
 
     private void InitTabGroup()
@@ -223,6 +218,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
         {
             clientSideMicSampleRecorder.StopRecording();
+            songSearchTextField.value = "";
             ShowSongList();
         });
     }
