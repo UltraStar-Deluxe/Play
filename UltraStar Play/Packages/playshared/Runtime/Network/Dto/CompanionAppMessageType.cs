@@ -3,7 +3,6 @@
     StillAliveCheck,
     BeatPitchEvents,
     PositionInSong,
-    PositionInSongResponse,
     StopRecording,
     StartRecording,
     MicProfile,

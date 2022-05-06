@@ -187,9 +187,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 beatPitchEventsDto.BeatPitchEvents
                     .ForEach(beatPitchEventDto => FireBeatPitchEventFromCompanionApp(beatPitchEventDto));
                 return;
-            case CompanionAppMessageType.PositionInSongResponse:
-                receivedMessageStream.OnNext(JsonConverter.FromJson<PositionInSongResponseDto>(json));
-                return;
             default:
                 Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
                 return;
