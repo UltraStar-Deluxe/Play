@@ -232,8 +232,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
         // Language
-        translationManager.currentLanguage = settings.GameSettings.language;
-        translationManager.UpdateTranslatorsInScene();
         languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
         languagePickerControl.SelectItem(settings.GameSettings.language);
         languagePickerControl.Selection.Subscribe(newValue => settings.GameSettings.language = newValue);
