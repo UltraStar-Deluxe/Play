@@ -8,6 +8,7 @@ using System.Threading;
 using UniInject;
 using UnityEngine;
 using UniRx;
+using CircularBuffer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -49,11 +50,11 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     private Thread serverStillAliveCheckThread;
 
     private SongMeta songMeta;
-    private double receivedPositionInSongInMillis = -1;
-    private long unixTimeMillisecondsWhenReceivedPositionInSong;
+    private readonly CircularBuffer<PositionInSongData> receivedPositionInSongTimes = new(3);
+    private PositionInSongData bestPositionInSongData;
     private int lastAnalyzedBeat;
 
-    private bool HasPositionInSong => songMeta != null && receivedPositionInSongInMillis >= 0;
+    private bool HasPositionInSong => songMeta != null && bestPositionInSongData != null;
 
     private bool receivedStopRecordingMessage;
     private bool receivedStartRecordingMessage;
@@ -152,7 +153,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
 
         if (HasPositionInSong
-            && unixTimeMillisecondsWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
+            && bestPositionInSongData.UnixTimeInMillisWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
@@ -189,7 +190,6 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
         else
         {
-            Debug.Log("No position in song, analyzing newest samples");
             AnalyzeNewestMicSamples(recordingEvent);
         }
     }
@@ -267,10 +267,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             return 0;
         }
 
-        long currentUnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds();
-        long durationSinceReceivedPositionInSongInMillis = currentUnixTimeMilliseconds - unixTimeMillisecondsWhenReceivedPositionInSong;
-        double estimatedPositionInSongInMillis = receivedPositionInSongInMillis + durationSinceReceivedPositionInSongInMillis;
-        return estimatedPositionInSongInMillis;
+        return bestPositionInSongData.EstimatedPositionInSongInMillis;
     }
 
     private PitchEvent AnalyzeMicSamplesOfBeat(RecordingEvent recordingEvent, int beat, double positionInSongInMillis)
@@ -384,8 +381,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
     {
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
 
-        receivedPositionInSongInMillis = positionInSongDto.PositionInSongInMillis;
-        unixTimeMillisecondsWhenReceivedPositionInSong = TimeUtils.GetUnixTimeMilliseconds();
+        PositionInSongData positionInSongData = new(positionInSongDto.PositionInSongInMillis, TimeUtils.GetUnixTimeMilliseconds());
+        receivedPositionInSongTimes.PushBack(positionInSongData);
         songMeta = new SongMeta
         {
             Bpm = positionInSongDto.SongBpm,
@@ -393,21 +390,38 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         };
 
         // If beats have been analyzed prematurely, then redo analysis.
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, receivedPositionInSongInMillis);
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
         if (lastAnalyzedBeat > currentBeat)
         {
             lastAnalyzedBeat = currentBeat;
         }
 
-        Debug.Log($"Received position in song (millis: {positionInSongDto.PositionInSongInMillis}, offset: {positionInSongDto.PositionInSongInMillis - estimatedPositionInSongInMillis}, lastAnalyzedBeat: {lastAnalyzedBeat})");
+        // Use the "received position in the song" which has the least discrepancy
+        // with respect to the "estimated position in song" of previously received times.
+        // This makes the time more resilient against outliers (e.g. when a message was delivered with big delay).
+        float GetTimeError(PositionInSongData time)
+        {
+            double resultError = 0;
+            receivedPositionInSongTimes
+                .Where(otherTime => otherTime.UnixTimeInMillisWhenReceivedPositionInSong != time.UnixTimeInMillisWhenReceivedPositionInSong)
+                .ForEach(otherTime =>
+                {
+                    double offset = Math.Abs(time.EstimatedPositionInSongInMillis - otherTime.EstimatedPositionInSongInMillis);
+                    resultError += offset;
+                });
+            return (float)resultError;
+        }
+        bestPositionInSongData = receivedPositionInSongTimes.FindMinElement(time => GetTimeError(time));
+
+        Debug.Log($"Received position in song: {positionInSongDto.ToJson()}, new best position in song {bestPositionInSongData.ToJson()}");
     }
 
     private void ResetPositionInSong()
     {
         Debug.Log("Resetting position in song");
-        unixTimeMillisecondsWhenReceivedPositionInSong = -1;
         songMeta = null;
-        receivedPositionInSongInMillis = -1;
+        bestPositionInSongData = null;
+        receivedPositionInSongTimes.Clear();
         lastAnalyzedBeat = -1;
     }
 
@@ -458,5 +472,18 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         tcpClientStream = null;
         tcpClient?.Close();
         tcpClient = null;
+    }
+
+    private class PositionInSongData : JsonSerializable
+    {
+        public double ReceivedPositionInSongInMillis { get; private set; }
+        public long UnixTimeInMillisWhenReceivedPositionInSong { get; private set; }
+        public double EstimatedPositionInSongInMillis => ReceivedPositionInSongInMillis + (TimeUtils.GetUnixTimeMilliseconds() - UnixTimeInMillisWhenReceivedPositionInSong);
+
+        public PositionInSongData(double receivedPositionInSongInMillis, long unixTimeInMillisWhenReceivedPositionInSong)
+        {
+            ReceivedPositionInSongInMillis = receivedPositionInSongInMillis;
+            UnixTimeInMillisWhenReceivedPositionInSong = unixTimeInMillisWhenReceivedPositionInSong;
+        }
     }
 }
