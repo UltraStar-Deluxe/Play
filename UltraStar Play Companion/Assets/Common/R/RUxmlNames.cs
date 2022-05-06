@@ -9,6 +9,7 @@ public static partial class R
         public const string clientNameTextField = "clientNameTextField";
         public const string closeMenuButton = "closeMenuButton";
         public const string commitHashText = "commitHashText";
+        public const string connectionInfoText = "connectionInfoText";
         public const string connectionStatusText = "connectionStatusText";
         public const string connectionThroubleshootingText = "connectionThroubleshootingText";
         public const string connectionViewContainer = "connectionViewContainer";
@@ -17,6 +18,7 @@ public static partial class R
         public const string devModePicker = "devModePicker";
         public const string fpsText = "fpsText";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
+        public const string infoContainer = "infoContainer";
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
@@ -49,7 +51,6 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
-        public const string versionInfoContainer = "versionInfoContainer";
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";

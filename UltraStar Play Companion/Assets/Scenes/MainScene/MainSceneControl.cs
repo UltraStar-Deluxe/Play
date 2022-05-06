@@ -54,7 +54,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.recordingDeviceInfo)]
     private Label recordingDeviceInfo;
-    
+
+    [Inject(UxmlName = R.UxmlNames.connectionInfoText)]
+    private Label connectionInfoText;
+
     [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
 
@@ -261,6 +264,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         fpsText.SetVisibleByDisplay(isEnabled);
         recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
+        connectionInfoText.SetVisibleByDisplay(isEnabled);
     }
 
     private void ShowMenu()
@@ -427,9 +431,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             connectionThroubleshootingText.HideByDisplay();
             serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
+            connectionInfoText.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
         }
         else
         {
+            connectionInfoText.text = "Not connected";
             connectionStatusText.text = connectEvent.ConnectRequestCount > 0
                 ? TranslationManager.GetTranslation(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
                 : TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
