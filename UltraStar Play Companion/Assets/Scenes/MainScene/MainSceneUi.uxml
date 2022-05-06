@@ -66,7 +66,8 @@
                     </ui:VisualElement>
                 </ui:ScrollView>
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
-                <ui:VisualElement name="versionInfoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
+                <ui:VisualElement name="infoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
+                    <ui:Label text="Connected to aaa.bbb.ccc.ddd" display-tooltip-when-elided="true" name="connectionInfoText" />
                     <ui:Label text="Version: yyyy-MM-dd" display-tooltip-when-elided="true" name="semanticVersionText" />
                     <ui:Label text="Commit: xxxxxxx" display-tooltip-when-elided="true" name="commitHashText" />
                     <ui:Label text="Build time: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
