@@ -89,6 +89,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
+            serverSideConnectRequestManager.ClientConnectedEventStream
+                .Subscribe(evt =>
+                {
+                    if (evt.IsConnected)
+                    {
+                        InitPitchDetectionFromConnectedClient();
+                    }
+                })
+                .AddTo(gameObject);
         }
         else
         {
@@ -250,7 +259,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         FirePitchEventFromConnectedClient(pitchEvent);
     }
 
-    private void SendPositionInSongToClientRapidly()
+    public void SendPositionInSongToClientRapidly()
     {
         // The position in the song changed dramatically.
         // But the client implements methods to ignore single messages with big position differences (resilient behavior).
@@ -264,7 +273,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     {
         lastUnixTimeMillisecondsWhenSentPositionInSongToClient = TimeUtils.GetUnixTimeMilliseconds();
 
-        if (micProfile == null)
+        if (micProfile == null
+            || !micProfile.IsInputFromConnectedClient)
         {
             return;
         }
@@ -514,5 +524,22 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat + 1);
         PitchEvent pitchEvent = GetPitchEventOfSamples(startSampleBufferIndex, endSampleBufferIndex);
         return pitchEvent;
+    }
+
+    public void SendMicProfileToConnectedClient()
+    {
+        GetConnectedClientHandler()?.SendMessageToClient(new MicProfileMessageDto(micProfile));
+    }
+
+    public void SendStopRecordingMessageToConnectedClient()
+    {
+        GetConnectedClientHandler()?.SendMessageToClient(new StopRecordingMessageDto());
+    }
+
+    public void SendStartRecordingMessageToConnectedClient()
+    {
+        GetConnectedClientHandler()?.SendMessageToClient(new StartRecordingMessageDto());
+        SendPositionInSongToClientRapidly();
+
     }
 }
