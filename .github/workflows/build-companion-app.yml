@@ -45,7 +45,11 @@ jobs:
       - name: Setup Script
         working-directory: tools
         run: sh setup.sh
-      
+
+      - name: Configure workspace as safe directory in git
+        working-directory: ./
+        run: git config --global --add safe.directory /github/workspace
+
       # Build Executables.
       - uses: game-ci/unity-builder@v2
         env:
