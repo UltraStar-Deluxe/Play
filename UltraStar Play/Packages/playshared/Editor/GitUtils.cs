@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using UnityEditor.Build;
 using Debug = UnityEngine.Debug;
 
@@ -9,7 +10,7 @@ public static class GitUtils
     public static string RunGitCommand(string gitCommand)
     {
         // Set up our processInfo to run the git command and log to output and errorOutput.
-        ProcessStartInfo processInfo = new("git", @gitCommand)
+        ProcessStartInfo processInfo = new("git", gitCommand)
         {
             CreateNoWindow = true, // We want no visible pop-ups
             UseShellExecute = false, // Allows us to redirect input, output and error streams
@@ -18,7 +19,7 @@ public static class GitUtils
         };
 
         // Set up the Process
-        Process process = new() {StartInfo = processInfo};
+        Process process = new() { StartInfo = processInfo };
 
         try
         {
@@ -57,6 +58,13 @@ public static class GitUtils
 
     public static string GetCurrentCommitShortHash()
     {
+        // Workaround for "fatal: unsafe repository" because of a security fix in Git.
+        // See https://stackoverflow.com/questions/71901632/fatal-unsafe-repository-home-repon-is-owned-by-someone-else
+        if (Directory.Exists("/github/workspace"))
+        {
+            RunGitCommand("config --global --add safe.directory /github/workspace");
+        }
+
         string result = RunGitCommand("rev-parse --short --verify HEAD");
         // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
         result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
