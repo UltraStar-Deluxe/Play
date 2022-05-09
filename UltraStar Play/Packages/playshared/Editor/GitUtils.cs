@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 public static class GitUtils
 {
     // Original implementation from https://www.stewmcc.com/post/git-commands-from-unity/
-    public static string RunGitCommand(string gitCommand)
+    public static string RunGitCommand(string gitCommand, bool throwOnFailure = true)
     {
         // Set up our processInfo to run the git command and log to output and errorOutput.
         ProcessStartInfo processInfo = new("git", gitCommand)
@@ -41,14 +41,21 @@ public static class GitUtils
         process.WaitForExit(); // Make sure we wait till the process has fully finished.
         process.Close(); // Close the process ensuring it frees it resources.
 
-        // Check for failure due to no git setup in the project itself or other fatal errors from git.
+        // Check for fatal errors.
         if (output.IsNullOrEmpty() || output.Contains("fatal"))
         {
-            throw new BuildFailedException("Command: git " + @gitCommand + " Failed\n" + output + errorOutput);
+            string errorMessage = $"Command failed: git {gitCommand}\n{output}\n{errorOutput}\n";
+            if (throwOnFailure)
+            {
+                throw new BuildFailedException(errorMessage);
+            }
+
+            Debug.LogError(errorMessage);
+            return "";
         }
 
         // Log any errors.
-        if (errorOutput != "")
+        if (!errorOutput.IsNullOrEmpty())
         {
             Debug.LogError("Git Error: " + errorOutput);
         }
@@ -58,14 +65,13 @@ public static class GitUtils
 
     public static string GetCurrentCommitShortHash()
     {
-        // Workaround for "fatal: unsafe repository" because of a security fix in Git.
-        // See https://stackoverflow.com/questions/71901632/fatal-unsafe-repository-home-repon-is-owned-by-someone-else
-        if (Directory.Exists("/github/workspace"))
+        string result = RunGitCommand("rev-parse --short --verify HEAD", false);
+        if (result.IsNullOrEmpty())
         {
-            RunGitCommand("config --global --add safe.directory /github/workspace");
+            // Failed to get commit hash from Git.
+            return "???";
         }
 
-        string result = RunGitCommand("rev-parse --short --verify HEAD");
         // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
         result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
         Debug.Log("Current commit short hash: " + result);
