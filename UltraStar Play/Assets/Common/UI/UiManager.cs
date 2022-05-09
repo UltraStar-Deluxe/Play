@@ -88,7 +88,7 @@ public class UiManager : MonoBehaviour, INeedInjection
             return null;
         }
 
-        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>(R.UxmlNames.notificationOverlay);
+        VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
             notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
@@ -99,7 +99,7 @@ public class UiManager : MonoBehaviour, INeedInjection
 
         TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
         VisualElement notification = templateContainer.Children().First();
-        Label notificationLabel = notification.Q<Label>(R.UxmlNames.notificationLabel);
+        Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
         if (additionalTextClasses != null)
         {

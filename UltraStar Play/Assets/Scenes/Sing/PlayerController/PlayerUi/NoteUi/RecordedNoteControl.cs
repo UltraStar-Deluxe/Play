@@ -59,6 +59,7 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
             ? color.RgbToHsv().WithGreen(0).HsvToRgb().WithAlpha(0.25f)
             : color;
         image.style.unityBackgroundImageTintColor = finalColor;
+        image.style.backgroundColor = finalColor;
     }
 
     public void Dispose()

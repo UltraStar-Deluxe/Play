@@ -47,7 +47,7 @@ public class MicPitchTracker : AbstractMicPitchTracker
         // Analyze the newest portion of the not-yet-analyzed MicSamples
         int startIndex = recordingEvent.MicSamples.Length - bufferedNotAnalyzedSampleCount;
         int endIndex = recordingEvent.MicSamples.Length;
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(recordingEvent.MicSamples, startIndex, endIndex, MicProfile);
+        PitchEvent pitchEvent = AudioSamplesAnalyzer.ProcessAudioSamples(recordingEvent.MicSamples, startIndex, endIndex, MicProfile);
         bufferedNotAnalyzedSampleCount = 0;
 
         // Notify listeners

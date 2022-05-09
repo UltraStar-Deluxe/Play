@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {
@@ -18,15 +19,9 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         dywaPitchTracker.SampleRateHz = sampleRateHz;
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile micProfile)
     {
-        if (!isEnabled)
-        {
-            Debug.LogWarning("AudioSamplesAnalyzer is disabled");
-            return null;
-        }
-
-        int sampleLength = sampleEndIndex - sampleStartIndex;
+        int sampleLength = endIndexExclusive - startIndexInclusive;
         if (sampleLength < MinSampleLength)
         {
             return null;
@@ -40,15 +35,27 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             sampleCountToUse = PreviousPowerOfTwo(maxSampleLength);
         }
 
-        // Check if samples is louder than threshhold
-        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, sampleStartIndex, sampleEndIndex, micProfile))
+        // Copy samples if needed
+        if (!ModifySamplesInPlace)
+        {
+            // Copy original sample buffer
+            float[] sampleBufferCopy = new float[sampleBuffer.Length];
+            Array.Copy(sampleBuffer, sampleBufferCopy, sampleBuffer.Length);
+            sampleBuffer = sampleBufferCopy;
+        }
+
+        // Apply amplification
+        ApplyAmplification(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.AmplificationMultiplier);
+
+        // Check if samples is louder than threshold
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.NoiseSuppression))
         {
             dywaPitchTracker.ClearPitchHistory();
             return null;
         }
 
         // Find frequency
-        float frequency = dywaPitchTracker.ComputePitch(sampleBuffer, sampleStartIndex, sampleCountToUse);
+        float frequency = dywaPitchTracker.ComputePitch(sampleBuffer, startIndexInclusive, sampleCountToUse);
         if (frequency <= 0)
         {
             dywaPitchTracker.ClearPitchHistory();

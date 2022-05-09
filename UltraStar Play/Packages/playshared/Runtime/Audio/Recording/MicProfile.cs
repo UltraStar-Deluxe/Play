@@ -19,7 +19,7 @@ public class MicProfile
 
     // A connected companion app can be used as a mic. This string identifies the client.
     public string ConnectedClientId { get; set; }
-    public bool IsInputFromConnectedClient { get; set; }
+    public bool IsInputFromConnectedClient => !ConnectedClientId.IsNullOrEmpty();
 
     public int AmplificationMultiplier => Convert.ToInt32(Math.Pow(10d, Amplification / 20d));
 
@@ -31,6 +31,17 @@ public class MicProfile
     {
         this.Name = name;
         this.ConnectedClientId = connectedClientId;
-        this.IsInputFromConnectedClient = !connectedClientId.IsNullOrEmpty();
+    }
+
+    public MicProfile(MicProfile other)
+    {
+        Name = other.Name;
+        Color = other.Color;
+        Amplification = other.Amplification;
+        NoiseSuppression = other.NoiseSuppression;
+        IsEnabled = other.IsEnabled;
+        DelayInMillis = other.DelayInMillis;
+        SampleRate = other.SampleRate;
+        ConnectedClientId = other.ConnectedClientId;
     }
 }

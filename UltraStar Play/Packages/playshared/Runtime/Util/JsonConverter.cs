@@ -7,9 +7,7 @@ using FullSerializer;
 public static class JsonConverter
 {
     // Indentation for pretty printing JSON.
-    private const string INDENT_STRING = "    ";
-
-    private static readonly fsSerializer serializer = CreateSerializer();
+    private const string IndentString = "    ";
 
     private static fsSerializer CreateSerializer()
     {
@@ -19,7 +17,7 @@ public static class JsonConverter
 
     public static string ToJson<T>(T obj, bool prettyPrint = false)
     {
-        serializer.TrySerialize(typeof(T), obj, out fsData data).AssertSuccessWithoutWarnings();
+        CreateSerializer().TrySerialize(typeof(T), obj, out fsData data).AssertSuccessWithoutWarnings();
         string json = fsJsonPrinter.CompressedJson(data);
         if (prettyPrint)
         {
@@ -32,14 +30,14 @@ public static class JsonConverter
     {
         fsData data = fsJsonParser.Parse(json);
         T deserialized = new();
-        serializer.TryDeserialize<T>(data, ref deserialized).AssertSuccessWithoutWarnings();
+        CreateSerializer().TryDeserialize<T>(data, ref deserialized).AssertSuccessWithoutWarnings();
         return deserialized;
     }
 
     public static void FillFromJson<T>(string json, T existingInstance)
     {
         fsData data = fsJsonParser.Parse(json);
-        serializer.TryDeserialize<T>(data, ref existingInstance).AssertSuccessWithoutWarnings();
+        CreateSerializer().TryDeserialize<T>(data, ref existingInstance).AssertSuccessWithoutWarnings();
     }
 
     // https://stackoverflow.com/questions/4580397/json-formatter-in-c
@@ -50,9 +48,9 @@ public static class JsonConverter
         var result =
             from ch in json
             let quotes = ch == '"' ? quoteCount++ : quoteCount
-            let lineBreak = ch == ',' && quotes % 2 == 0 ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(INDENT_STRING, indentation)) : null
-            let openChar = ch == '{' || ch == '[' ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(INDENT_STRING, ++indentation)) : ch.ToString()
-            let closeChar = ch == '}' || ch == ']' ? Environment.NewLine + String.Concat(Enumerable.Repeat(INDENT_STRING, --indentation)) + ch : ch.ToString()
+            let lineBreak = ch == ',' && quotes % 2 == 0 ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, indentation)) : null
+            let openChar = ch == '{' || ch == '[' ? ch + Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, ++indentation)) : ch.ToString()
+            let closeChar = ch == '}' || ch == ']' ? Environment.NewLine + String.Concat(Enumerable.Repeat(IndentString, --indentation)) + ch : ch.ToString()
             select lineBreak == null
                         ? openChar.Length > 1
                             ? openChar

@@ -124,6 +124,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        List<Note> pastedNotes = new();
+
         // Paste to original layer
         layerManager.GetLayers().ForEach(layer =>
         {
@@ -135,6 +137,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             {
                 layerManager.RemoveNoteFromAllLayers(copiedNote);
                 layerManager.AddNoteToLayer(layer.LayerEnum, copiedNote);
+                pastedNotes.Add(copiedNote);
             });
         });
 
@@ -147,10 +150,14 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 .ToList();
             copiedNotesFromVoice.ForEach(copiedNote => layerManager.RemoveNoteFromAllLayers(copiedNote));
             moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, copiedNotesFromVoice, voice.Name);
+            pastedNotes.AddRange(copiedNotesFromVoice);
         });
 
-        // Add the notes to the voice
+        // All done, nothing to copy anymore.
         ClearCopiedNotes();
+
+        // Select copied notes.
+        selectionControl.SetSelection(pastedNotes);
 
         songMetaChangeEventStream.OnNext(new NotesPastedEvent());
     }

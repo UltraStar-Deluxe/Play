@@ -1,37 +1,39 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using UniRx;
 using UnityEngine;
 
-public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
+public class ConnectedClientHandler : IConnectedClientHandler
 {
-    private static readonly object micSampleBufferReadWriteLock = new();
+    private readonly Subject<JsonSerializable> receivedMessageStream = new();
+    public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
 
     public IPEndPoint ClientIpEndPoint { get; private set; }
     public string ClientName { get; private set; }
     public string ClientId { get; private set; }
-    public TcpListener MicTcpListener { get; private set; }
-    public int SampleRateHz => micSampleBuffer.Length;
-    
-    private bool isDisposed;
+    public TcpListener ClientTcpListener { get; private set; }
 
-    private TcpClient micTcpClient;
-    private NetworkStream micTcpClientStream;
-    
-    private int newSamplesInMicBuffer;
-    private int writePositionInMicBuffer;
-    public readonly float[] micSampleBuffer;
+    private readonly IServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private readonly byte[] receivedByteBuffer;
-    private readonly byte[] stillAliveRequestByteArray;
-
-    private readonly ServerSideConnectRequestManager serverSideConnectRequestManager;
-
+    private readonly object streamReaderLock = new();
     private readonly Thread receiveDataThread;
     private readonly Thread clientStillAliveCheckThread;
-    
-    public ConnectedClientHandler(ServerSideConnectRequestManager serverSideConnectRequestManager, IPEndPoint clientIpEndPoint, string clientName, string clientId, int microphoneSampleRate)
+
+    private TcpClient tcpClient;
+    private NetworkStream tcpClientStream;
+    private StreamReader tcpClientStreamReader;
+    private StreamWriter tcpClientStreamWriter;
+
+    private bool isDisposed;
+
+    public ConnectedClientHandler(
+        IServerSideConnectRequestManager serverSideConnectRequestManager,
+        IPEndPoint clientIpEndPoint,
+        string clientName,
+        string clientId)
     {
         this.serverSideConnectRequestManager = serverSideConnectRequestManager;
         ClientIpEndPoint = clientIpEndPoint;
@@ -41,42 +43,50 @@ public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
         {
             throw new ArgumentException("Attempt to create ConnectedClientHandler without ClientId");
         }
-        if (microphoneSampleRate <= 0)
-        {
-            throw new ArgumentException("Attempt to create ConnectedClientHandler without microphoneSampleRate");
-        }
 
-        micSampleBuffer = new float[microphoneSampleRate];
-
-        receivedByteBuffer = new byte[2048];
-        stillAliveRequestByteArray = new byte[1];
+        ClientTcpListener = new TcpListener(IPAddress.Any, 0);
+        ClientTcpListener.Start();
         
-        MicTcpListener = new TcpListener(IPAddress.Any, 0);
-        MicTcpListener.Start();
-        
-        Debug.Log($"Started TcpListener on port {MicTcpListener.GetPort()} to receive mic samples at {microphoneSampleRate} Hz");
+        Debug.Log($"Started TcpListener on port {ClientTcpListener.GetPort()} to receive messages from Companion App");
         receiveDataThread = new Thread(() =>
         {
             while (!isDisposed)
             {
-                try
+                if (tcpClient == null)
                 {
-                    if (micTcpClient == null)
+                    try
                     {
-                        micTcpClient = MicTcpListener.AcceptTcpClient();
-                        micTcpClientStream = micTcpClient.GetStream();
+                        tcpClient = ClientTcpListener.AcceptTcpClient();
+                        tcpClient.NoDelay = true;
+                        tcpClientStream = tcpClient.GetStream();
+                        tcpClientStreamReader = new StreamReader(tcpClientStream);
+                        tcpClientStreamWriter = new StreamWriter(tcpClientStream);
+                        tcpClientStreamWriter.AutoFlush = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Error when accepting TcpClient for Companion App. Closing TcpListener.");
+                        Debug.LogException(e);
+                        this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+                        return;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogException(e);
-                    Debug.LogError("Error when accepting TcpClient for mic input. Closing TcpListener.");
-                    this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
-                    return;
+                    try
+                    {
+                        ReadMessagesFromClient();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Error when reading TcpClient message. Closing TcpListener.");
+                        Debug.LogException(e);
+                        this.serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
+                        return;
+                    }
                 }
-                
-                AcceptMicrophoneData();
-                Thread.Sleep(10);
+
+                Thread.Sleep(250);
             }
         });
         receiveDataThread.Start();
@@ -85,12 +95,12 @@ public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
         {
             while (!isDisposed)
             {
-                if (micTcpClient != null
-                    && micTcpClientStream != null)
+                if (tcpClient != null
+                    && tcpClientStream != null)
                 {
                     CheckClientStillAlive();
                 }
-                Thread.Sleep(250);
+                Thread.Sleep(1500);
             }
         });
         clientStillAliveCheckThread.Start();
@@ -101,11 +111,12 @@ public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
         try
         {
             // If there is new data available, then the client is still alive.
-            if (!micTcpClientStream.DataAvailable)
+            if (!tcpClientStream.DataAvailable)
             {
                 // Try to send something to the client.
                 // If this fails with an Exception, then the connection has been lost and the client has to reconnect.
-                micTcpClientStream.Write(stillAliveRequestByteArray, 0, stillAliveRequestByteArray.Length);
+                tcpClientStreamWriter.WriteLine(new StillAliveCheckDto().ToJson());
+                tcpClientStreamWriter.Flush();
             }
         }
         catch (Exception e)
@@ -116,90 +127,77 @@ public class ConnectedClientHandler : IDisposable, IConnectedClientHandler
         }
     }
 
-    private void AcceptMicrophoneData()
+    public void ReadMessagesFromClient()
     {
-        try
+        lock (streamReaderLock)
         {
-            // Loop to receive all the data sent by the client.
-            int receivedByteCount;
-            while (micTcpClientStream.DataAvailable
-                   && (receivedByteCount = micTcpClientStream.Read(receivedByteBuffer, 0, receivedByteBuffer.Length)) > 0)
+            while (tcpClientStream != null
+                   && tcpClientStream.DataAvailable)
             {
-                FillMicBuffer(receivedByteBuffer, receivedByteCount);
+                ReadMessageFromClient();
             }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            Debug.LogError("Failed receiving data from client. Removing ConnectedClientHandler.");
-            serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
         }
     }
 
-    private void FillMicBuffer(byte[] receivedBytes, int receivedByteCount)
+    private void ReadMessageFromClient()
     {
-        // Write into circular buffer
-        lock (micSampleBufferReadWriteLock)
+        string line = tcpClientStreamReader.ReadLine();
+        if (line.IsNullOrEmpty())
         {
-            // Copy from byte array to float array. Note that in a float there are sizeof(float) bytes.
-            float[] receivedSamples = new float[(int)Math.Ceiling((double)receivedByteCount / sizeof(float))];
-            Buffer.BlockCopy(
-                receivedBytes, 0,
-                receivedSamples, 0,
-                receivedByteCount);
+            return;
+        }
 
-            if (receivedSamples.Length > micSampleBuffer.Length)
-            {
-                Debug.LogError("Received mic data does not fit into mic buffer.");
+        line = line.Trim();
+        if (!line.StartsWith("{")
+            || !line.EndsWith("}"))
+        {
+            Debug.LogWarning("Received invalid JSON from client.");
+            return;
+        }
+
+        HandleJsonMessageFromClient(line);
+    }
+
+    public void SendMessageToClient(JsonSerializable jsonSerializable)
+    {
+        if (tcpClient != null
+            && tcpClientStream != null
+            && tcpClientStreamWriter != null
+            && tcpClientStream.CanWrite)
+        {
+            tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
+            tcpClientStreamWriter.Flush();
+        }
+        else
+        {
+            Debug.LogWarning("Cannot send message to client.");
+        }
+    }
+
+    private void HandleJsonMessageFromClient(string json)
+    {
+        CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
+        switch (companionAppMessageDto.MessageType)
+        {
+            case CompanionAppMessageType.StillAliveCheck:
+                // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
-            }
-
-            foreach (float sample in receivedSamples)
-            {
-                micSampleBuffer[writePositionInMicBuffer] = sample;
-                writePositionInMicBuffer = (writePositionInMicBuffer + 1) % micSampleBuffer.Length;
-            }
-        
-            newSamplesInMicBuffer += receivedSamples.Length;
-            if (newSamplesInMicBuffer > micSampleBuffer.Length)
-            {
-                newSamplesInMicBuffer = micSampleBuffer.Length;
-            }
+            case CompanionAppMessageType.BeatPitchEvents:
+                BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
+                beatPitchEventsDto.BeatPitchEvents
+                    .ForEach(beatPitchEventDto => receivedMessageStream.OnNext(beatPitchEventDto));
+                return;
+            default:
+                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
+                return;
         }
     }
 
     public void Dispose()
     {
         isDisposed = true;
-        micTcpClientStream?.Close();
-        micTcpClient?.Close();
-        MicTcpListener?.Stop();
-    }
-
-    /**
-     * Fills the target buffer with the newest samples.
-     * Thereby, the newest samples are written to the highest index.
-     * This corresponds to the behaviour of Unity's Microphone.GetData.
-     *
-     * Returns the number of new samples since this method has been called the last time.
-     */
-    public int GetNewMicSamples(float[] targetSampleBuffer)
-    {
-        lock (micSampleBufferReadWriteLock)
-        {
-            if (targetSampleBuffer.Length < newSamplesInMicBuffer)
-            {
-                throw new UnityException("Unread samples do not fit into target array");
-            }
-
-            for (int i = 0; i < targetSampleBuffer.Length; i++)
-            {
-                targetSampleBuffer[i] = micSampleBuffer[NumberUtils.Mod(i + writePositionInMicBuffer - targetSampleBuffer.Length, micSampleBuffer.Length)];
-            }
-
-            int newSamplesCount = newSamplesInMicBuffer;
-            newSamplesInMicBuffer = 0;
-            return newSamplesCount;
-        }
+        tcpClientStream?.Close();
+        tcpClient?.Close();
+        ClientTcpListener?.Stop();
     }
 }

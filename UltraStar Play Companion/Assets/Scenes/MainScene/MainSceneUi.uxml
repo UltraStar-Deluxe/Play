@@ -1,43 +1,78 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="/Assets/Scenes/MainStyles.uss" />
-    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg&apos;); padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px;">
-        <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: column;">
-            <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
+    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;); padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px;">
+        <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+            <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
                 <ui:VisualElement name="titleAndDescription">
-                    <ui:Label text="UltraStar Play Companion" name="sceneTitle" class="titleText" style="-unity-font-style: normal;" />
+                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold;" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                <ui:VisualElement name="menuIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/menu_white_24dp.svg?fileID=7388822144124034973&amp;guid=3a1f291f5afd8ce47a65ce133facea36&amp;type=3#menu_white_24dp&apos;); width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit;" />
+            </ui:Button>
+            <ui:Label text="FPS: 30" display-tooltip-when-elided="true" name="fpsText" style="font-size: 15px; margin-left: 0; position: absolute; margin-right: 0; margin-top: 0; margin-bottom: 0; top: 0; right: 50%;" />
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; height: 100%;">
-            <ui:Label text="Connecting..." display-tooltip-when-elided="true" name="connectionStatusText" style="flex-grow: 1; -unity-text-align: middle-center;" />
-            <ui:Label text="Received error" display-tooltip-when-elided="true" name="serverErrorResponseText" style="flex-grow: 1; -unity-text-align: middle-center; color: rgb(255, 0, 0); white-space: normal; width: 100%;" />
-            <ui:Label text="There are connection issues." display-tooltip-when-elided="true" name="connectionThroubleshootingText" style="flex-grow: 1; -unity-text-align: middle-center; color: rgb(255, 152, 0); white-space: normal; width: 100%;" />
-            <ui:VisualElement name="controlsContainer" class="onlyVisibleWhenConnected" style="align-items: center; justify-content: space-around; width: 100%; height: 100%;">
-                <ui:VisualElement name="visualizeAudioToggleContainer" style="align-items: center; justify-content: center; width: 100%; flex-grow: 1;">
-                    <ui:Toggle label="Visualize audio" name="visualizeAudioToggle" value="true" class="onlyVisibleWhenConnected" style="width: 100%; justify-content: center; align-items: center; -unity-text-align: middle-left;" />
+        <ui:VisualElement name="tabGroup" class="onlyVisibleWhenConnected" style="flex-direction: row; width: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+            <ui:Button text="Microphone" display-tooltip-when-elided="true" name="showMicViewButton" style="width: 10%; margin-left: 0; margin-right: 1px; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;" />
+            <ui:Button text="Songs" display-tooltip-when-elided="true" name="showSongViewButton" style="width: 10%; margin-left: 1px; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tabContentContainer" class="onlyVisibleWhenConnected" style="flex-grow: 4;">
+            <ui:VisualElement name="micViewContainer" style="flex-grow: 1; align-items: center; justify-content: center; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+                <ui:VisualElement name="row" style="flex-direction: row; width: 100%;">
+                    <ui:TextField picking-mode="Ignore" value="MyCompanionApp" text="MyCompanionApp" name="clientNameTextField" style="flex-grow: 1;" />
+                    <ui:VisualElement name="recordingDeviceColorIndicator" style="width: 32px; height: auto; background-color: rgb(220, 20, 60); margin-left: 2px; margin-right: 0; margin-top: 1px; margin-bottom: 1px;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="audioWaveForm" class="onlyVisibleWhenConnected" style="width: 100%; height: 100px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;" />
-                <ui:TextField picking-mode="Ignore" value="MyCompanionApp" text="MyCompanionApp" name="clientNameTextField" style="width: 100%; flex-grow: 1;" />
-                <ui:Label text="Mic1234" display-tooltip-when-elided="true" name="selectedRecordingDeviceText" style="width: 100%; flex-grow: 1; -unity-text-align: lower-left;" />
-                <ui:Button text="Start Recording" display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" />
-                <ui:VisualElement name="recordingDeviceButtonContainer" style="height: auto; align-items: center; justify-content: center; width: 100%; padding-left: 24px; padding-right: 24px; padding-top: 24px; padding-bottom: 24px; flex-grow: 1;" />
-                <ui:VisualElement name="sampleRateButtonContainer" style="height: auto; align-items: center; justify-content: center; width: 100%; padding-left: 24px; padding-right: 24px; padding-top: 24px; padding-bottom: 24px; flex-grow: 1;" />
-                <ui:Button text="Show song list" display-tooltip-when-elided="true" name="showSongListButton" class="startButtonClass" />
+                <ui:VisualElement name="toggleRecordingButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
+                    <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" style="margin-bottom: 0; width: 256px; height: 256px; border-top-left-radius: 128px; border-bottom-left-radius: 128px; border-top-right-radius: 128px; border-bottom-right-radius: 128px; margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                        <ui:VisualElement name="micIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); width: 128px; height: 128px; -unity-background-scale-mode: scale-to-fit;" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="visualizeAudioToggleContainer" style="align-items: center; justify-content: center; width: 100%; flex-direction: row;">
+                    <ui:Label text="Visualize audio" display-tooltip-when-elided="true" name="visualizeAudioLabel" style="margin-right: 5px;" />
+                    <ui:Toggle name="visualizeAudioToggle" value="true" class="onlyVisibleWhenConnected" />
+                </ui:VisualElement>
+                <ui:VisualElement name="audioWaveForm" class="onlyVisibleWhenConnected" style="width: 100%; height: 100px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; display: none;" />
+                <ui:Label text="Delay: 333ms, Amp: 0" display-tooltip-when-elided="true" name="recordingDeviceInfo" class="smallerFont" style="width: 100%; -unity-text-align: lower-center; white-space: normal;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="songViewContainer" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; top: -1px; left: 0; display: none;">
+                <ui:TextField picking-mode="Ignore" name="songSearchTextField">
+                    <ui:Label text="Search artist, title" display-tooltip-when-elided="true" name="songSearchHint" style="position: absolute; height: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: italic; font-size: 14px; color: rgb(127, 127, 127);" />
+                </ui:TextField>
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songListView" style="width: 100%; height: auto; flex-grow: 1;">
+                    <ui:Label text="Loading song list..." display-tooltip-when-elided="true" />
+                </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
-            <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
-                <ui:Label text="Version: yyyy-MM-dd" display-tooltip-when-elided="true" name="semanticVersionText" style="font-size: 15px;" />
-                <ui:Label text="Build time: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" style="font-size: 15px;" />
-            </ui:VisualElement>
-            <ui:VisualElement style="flex-direction: row;">
-                <ui:Label text="Commit: xxxxxxx" display-tooltip-when-elided="true" name="commitHashText" style="font-size: 15px;" />
-                <ui:Label text="FPS: 30" display-tooltip-when-elided="true" name="fpsText" style="font-size: 15px; margin-left: auto;" />
-            </ui:VisualElement>
+        <ui:VisualElement name="connectionViewContainer" class="onlyVisibleWhenNotConnected" style="justify-content: center; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; flex-grow: 1; display: none;">
+            <ui:Label text="Connecting..." display-tooltip-when-elided="true" name="connectionStatusText" style="-unity-text-align: middle-center; margin-bottom: 20px;" />
+            <ui:Label text="Received error" display-tooltip-when-elided="true" name="serverErrorResponseText" style="-unity-text-align: middle-left; color: rgb(255, 0, 0); white-space: normal; width: 100%; margin-bottom: 20px;" />
+            <ui:Label text="There are connection issues." display-tooltip-when-elided="true" name="connectionThroubleshootingText" style="-unity-text-align: middle-left; color: rgb(255, 152, 0); white-space: normal; width: 100%; margin-bottom: 20px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="songListContainer" style="position: absolute; width: 100%; height: 100%; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px; display: none; background-color: rgba(0, 0, 0, 0.75);">
-            <ui:Button text="Hide song list" display-tooltip-when-elided="true" name="closeSongListButton" class="startButtonClass" style="flex-grow: 0; margin-bottom: 10px;" />
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songListView" style="width: 100%; height: auto;" />
+        <ui:VisualElement name="menuOverlay" style="width: 100%; height: 100%; flex-direction: row;">
+            <ui:Button display-tooltip-when-elided="true" name="hiddenCloseMenuButton" class="transparentBackgroundColor" style="flex-grow: 1; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
+            <ui:VisualElement name="menuOverlayContent" style="background-color: rgba(0, 0, 0, 0.75); width: 80%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="menuOverlayScrollView" style="flex-grow: 1; width: 100%;">
+                    <ui:VisualElement name="languageContainer" style="margin-bottom: 20px;">
+                        <ui:Label text="Language" display-tooltip-when-elided="true" name="languageLabel" />
+                        <ItemPicker name="languagePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="recordingDeviceContainer" style="margin-bottom: 20px;">
+                        <ui:Label text="Recording device" display-tooltip-when-elided="true" name="recordingDeviceLabel" />
+                        <ItemPicker name="recordingDevicePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="devModeContainer" style="margin-bottom: 20px;">
+                        <ui:Label text="Developer Mode" display-tooltip-when-elided="true" name="devModeLabel" />
+                        <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+                    </ui:VisualElement>
+                </ui:ScrollView>
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
+                <ui:VisualElement name="infoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
+                    <ui:Label text="Connected to aaa.bbb.ccc.ddd" display-tooltip-when-elided="true" name="connectionInfoText" />
+                    <ui:Label text="Version: yyyy-MM-dd" display-tooltip-when-elided="true" name="semanticVersionText" />
+                    <ui:Label text="Commit: xxxxxxx" display-tooltip-when-elided="true" name="commitHashText" />
+                    <ui:Label text="Build time: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

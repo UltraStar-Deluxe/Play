@@ -167,7 +167,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
 
         // Synthesize new samples from the Midi instrument until there is enough to fill the data array.
         int neededSingleChannelSamples = data.Length / channels;
-        if (availableSamplesOutputSampleRate.Size < neededSingleChannelSamples)
+        if (availableSamplesOutputSampleRate.Count < neededSingleChannelSamples)
         {
             FillAvailableSampleBuffers();
         }
@@ -200,7 +200,7 @@ public class MidiManager : MonoBehaviour, INeedInjection
 
     private void SynthesizeMidiSamples()
     {
-        while (availableSamplesSynthesizerSampleRate.Size < availableSamplesSynthesizerSampleRate.Capacity / 2)
+        while (availableSamplesSynthesizerSampleRate.Count < availableSamplesSynthesizerSampleRate.Capacity / 2)
         {
             midiStreamSynthesizer.GetNext(newSampleBuffer);
             for (int i = 0; i < newSampleBuffer.Length; i++)

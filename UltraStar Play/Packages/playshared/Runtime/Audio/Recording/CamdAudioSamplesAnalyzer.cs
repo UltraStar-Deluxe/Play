@@ -1,4 +1,5 @@
-﻿using CircularBuffer;
+﻿using System;
+using CircularBuffer;
 using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
@@ -40,15 +41,9 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int sampleStartIndex, int sampleEndIndex, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile micProfile)
     {
-        if (!isEnabled)
-        {
-            Debug.LogWarning("AudioSamplesAnalyzer is disabled");
-            return null;
-        }
-
-        int sampleLength = sampleEndIndex - sampleStartIndex;
+        int sampleLength = endIndexExclusive - startIndexInclusive;
         if (sampleLength < MinSampleLength)
         {
             return null;
@@ -62,15 +57,27 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             sampleCountToUse = PreviousPowerOfTwo(maxSampleLength);
         }
 
-        // Check if samples is louder than threshhold
-        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, sampleStartIndex, sampleStartIndex + sampleCountToUse, micProfile))
+        // Copy samples if needed
+        if (!ModifySamplesInPlace)
+        {
+            // Copy original sample buffer
+            float[] sampleBufferCopy = new float[sampleBuffer.Length];
+            Array.Copy(sampleBuffer, sampleBufferCopy, sampleBuffer.Length);
+            sampleBuffer = sampleBufferCopy;
+        }
+
+        // Apply amplification
+        ApplyAmplification(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.AmplificationMultiplier);
+
+        // Check if samples is louder than threshold
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.NoiseSuppression))
         {
             OnNoPitchDetected();
             return null;
         }
 
         // Get best fitting tone
-        CircularAverageMagnitudeDifference(sampleBuffer, sampleStartIndex, sampleCountToUse, correlation);
+        CircularAverageMagnitudeDifference(sampleBuffer, startIndexInclusive, sampleCountToUse, correlation);
 
         FindCurrentCandidates(correlation, currentCandidates);
         CalculateNormalizedError(currentCandidates, candidateHistory);
@@ -112,12 +119,12 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError;
             if (HalftoneContinuationBias >= 0 && HalftoneContinuationBias <= 1)
             {
-                for (int historyIndex = 0; historyIndex < bestCandidateHistory.Size; historyIndex++)
+                for (int historyIndex = 0; historyIndex < bestCandidateHistory.Count; historyIndex++)
                 {
                     if (bestCandidateHistory[historyIndex].halftone == currentCandidate.halftone)
                     {
                         // The further away in the history the halftone was before, the less the bias will impact the current candidate.
-                        float biasConsideringHistoryDistance = HalftoneContinuationBias - (HalftoneContinuationBias * (historyIndex / bestCandidateHistory.Size));
+                        float biasConsideringHistoryDistance = HalftoneContinuationBias - (HalftoneContinuationBias * (historyIndex / bestCandidateHistory.Count));
                         currentCandidate.normalizedErrorWithBias = currentCandidate.normalizedError * (1 - biasConsideringHistoryDistance);
                         // Do not apply bias multiple times.
                         break;
@@ -135,7 +142,7 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         });
 
         CamdPitchCandidate bestHistoryCandidate = null;
-        for (int i = 0; i < bestCandidateHistory.Size; i++)
+        for (int i = 0; i < bestCandidateHistory.Count; i++)
         {
             // Do not consider the biased error when comparing best candidate from history.
             CamdPitchCandidate historyCandidate = bestCandidateHistory[i];

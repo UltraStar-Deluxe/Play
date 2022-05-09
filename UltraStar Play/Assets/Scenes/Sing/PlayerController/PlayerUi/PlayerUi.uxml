@@ -19,7 +19,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="noteContainer" style="flex-grow: 1; width: 100%;">
-            <ui:VisualElement name="noteLines" style="width: 100%; height: 100%; position: absolute; overflow: hidden;" />
+            <ui:VisualElement name="noteLines" style="width: 100%; height: 100%; position: absolute; overflow: hidden; display: none;" />
             <ui:VisualElement name="targetNoteEntryContainer" style="width: 100%; position: absolute; height: 100%; overflow: hidden;">
                 <ui:Instance template="NoteUi" name="noteEntry" style="position: absolute; top: 20px; width: 200px; height: 20px;" />
                 <ui:Instance template="NoteUi" name="noteEntry" style="position: absolute; top: 60px; width: 400px; height: 40px;" />

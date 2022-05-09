@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -12,7 +11,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
+public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IClientSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
@@ -33,17 +32,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             return instance;
         }
     }
-    
-    /**
-     * This version number must to be increased when introducing breaking changes.
-     */
-    public const int ProtocolVersion = 3;
 
     [Inject]
     private Settings settings;
-
-    [Inject]
-    private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
 
     private const float ConnectRequestPauseInSeconds = 1f;
     private float nextConnectRequestTime;
@@ -59,17 +50,17 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private bool hasBeenDestroyed;
 
-    private bool IsConnected => serverMicrophonePort > 0;
-    private int serverMicrophonePort;
-
     private int connectRequestCount;
 
-    private readonly ConcurrentQueue<ConnectResponseDto> serverResponseQueue = new ConcurrentQueue<ConnectResponseDto>();
+    private readonly ConcurrentQueue<ConnectResponseDto> connectResponseQueue = new();
 
     private bool isApplicationPaused;
 
     private Thread acceptMessageFromServerThread;
-    
+
+    private ConnectedServerHandler connectedServerHandler;
+    public bool IsConnected => connectedServerHandler != null;
+
     private void Start()
     {
         InitSingleInstance();
@@ -93,25 +84,28 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
 
     private void Update()
     {
-        while (serverResponseQueue.TryDequeue(out ConnectResponseDto connectResponseDto))
+        while (connectResponseQueue.TryDequeue(out ConnectResponseDto connectResponseDto))
         {
             if (connectResponseDto.ErrorMessage.IsNullOrEmpty()
-                && connectResponseDto.MicrophonePort > 0)
+                && connectResponseDto.MessagingPort > 0)
             {
-                serverMicrophonePort = connectResponseDto.MicrophonePort;
+                DisposeConnectedServerHandler();
+                IPEndPoint messagingIpEndPoint = new(connectResponseDto.ServerIpEndPoint.Address, connectResponseDto.MessagingPort);
+                connectedServerHandler = new(this, messagingIpEndPoint);
+
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     IsSuccess = true,
                     ConnectRequestCount = connectRequestCount,
-                    MicrophonePort = serverMicrophonePort,
-                    MicrophoneSampleRate = connectResponseDto.MicrophoneSampleRate,
+                    MessagingPort = connectResponseDto.MessagingPort,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
                 });
-                connectRequestCount = 0;            
+                connectRequestCount = 0;
             }
             else if (!connectResponseDto.ErrorMessage.IsNullOrEmpty())
             {
+                DisposeConnectedServerHandler();
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     ConnectRequestCount = connectRequestCount,
@@ -120,13 +114,21 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             }
         }
         
-        if (!IsConnected
+        if (connectedServerHandler == null
             && Time.time > nextConnectRequestTime
-            && clientSideMicSampleRecorder.SampleRate.Value > 0
             && !isApplicationPaused)
         {
             nextConnectRequestTime = Time.time + ConnectRequestPauseInSeconds;
             ClientSendConnectRequest();
+        }
+    }
+
+    private void DisposeConnectedServerHandler()
+    {
+        if (connectedServerHandler != null)
+        {
+            connectedServerHandler.Dispose();
+            connectedServerHandler = null;
         }
     }
 
@@ -162,7 +164,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             // Receive is a blocking call
             byte[] receivedBytes = clientUdpClient.Receive(ref serverIpEndPoint);
             string message = Encoding.UTF8.GetString(receivedBytes);
-            HandleServerMessage(serverIpEndPoint, message);
+            HandleConnectResponse(serverIpEndPoint, message);
         }
         catch (Exception e)
         {
@@ -170,9 +172,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void HandleServerMessage(IPEndPoint serverIpEndPoint, string message)
+    private void HandleConnectResponse(IPEndPoint serverIpEndPoint, string message)
     {
-        Debug.Log($"Received message from server {serverIpEndPoint} ({serverIpEndPoint.Address}): '{message}'");
+        Debug.Log($"Received connect response from server {serverIpEndPoint} ({serverIpEndPoint.Address}): '{message}'");
         try
         {
             ConnectResponseDto connectResponseDto = JsonConverter.FromJson<ConnectResponseDto>(message);
@@ -192,17 +194,17 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
             {
                 throw new ConnectRequestException($"Malformed ConnectResponse: wrong ClientId. Is {connectResponseDto.ClientId}, expected {settings.ClientId}");
             }
-            if (connectResponseDto.MicrophonePort <= 0)
+            if (connectResponseDto.MessagingPort <= 0)
             {
-                throw new ConnectRequestException("Malformed ConnectResponse: invalid MicrophonePort.");
+                throw new ConnectRequestException("Malformed ConnectResponse: invalid MessagingPort.");
             }
 
             connectResponseDto.ServerIpEndPoint = serverIpEndPoint;
-            serverResponseQueue.Enqueue(connectResponseDto);
+            connectResponseQueue.Enqueue(connectResponseDto);
         }
         catch (Exception e)
         {
-            serverResponseQueue.Enqueue(new ConnectResponseDto
+            connectResponseQueue.Enqueue(new ConnectResponseDto
             {
                 ErrorMessage = e.Message
             });
@@ -226,10 +228,9 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
         {
             ConnectRequestDto connectRequestDto = new ConnectRequestDto
             {
-                ProtocolVersion = ProtocolVersion,
+                ProtocolVersion = ProtocolVersions.ProtocolVersion,
                 ClientName = settings.ClientName,
                 ClientId = settings.ClientId,
-                MicrophoneSampleRate = clientSideMicSampleRecorder.SampleRate.Value,
             };
             byte[] requestBytes = Encoding.UTF8.GetBytes(connectRequestDto.ToJson());
             // UDP Broadcast (255.255.255.255)
@@ -245,15 +246,31 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection
     private void OnDestroy()
     {
         hasBeenDestroyed = true;
+        DisposeConnectedServerHandler();
         clientUdpClient?.Close();
     }
 
     public void CloseConnectionAndReconnect()
     {
-        serverMicrophonePort = 0;
+        DisposeConnectedServerHandler();
         connectEventStream.OnNext(new ConnectEvent
         {
             IsSuccess = false,
         });
+    }
+
+    public bool TryGetConnectedServerHandler(out IConnectedServerHandler localConnectedServerHandler)
+    {
+        localConnectedServerHandler = this.connectedServerHandler;
+        return localConnectedServerHandler != null;
+    }
+
+    public void RemoveConnectedServerHandler(IConnectedServerHandler localConnectedServerHandler)
+    {
+        if (this.connectedServerHandler != null
+            && this.connectedServerHandler == localConnectedServerHandler)
+        {
+            DisposeConnectedServerHandler();
+        }
     }
 }

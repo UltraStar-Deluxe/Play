@@ -8,6 +8,9 @@ using UnityEngine.UIElements;
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private MicSampleRecorder micSampleRecorder;
+
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private MicPitchTracker micPitchTracker;
 
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
@@ -16,13 +19,19 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
-    private AudioWaveFormVisualization audioWaveFormVisualization;
+    [Inject]
+    private RecordingOptionsSceneControl recordingOptionsSceneControl;
 
-    private IDisposable pitchEventStreamDisposable;
+    private AudioWaveFormVisualization audioWaveFormVisualization;
 
     private void Start()
     {
-        pitchEventStreamDisposable = micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+        micPitchTracker.PitchEventStream
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
+        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);
@@ -32,11 +41,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private void Update()
     {
         UpdateWaveForm();
-    }
-
-    private void OnDestroy()
-    {
-        pitchEventStreamDisposable?.Dispose();
+        micPitchTracker.AudioSamplesAnalyzer.ModifySamplesInPlace = false;
     }
 
     private void UpdateWaveForm()
@@ -52,20 +57,25 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Consider noise suppression when displaying the the buffer
         float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
-        float noiseThreshold = micProfile.NoiseSuppression / 100f;
-        bool micSampleBufferIsAboveThreshold = micData.AnyMatch(sample => sample >= noiseThreshold);
-        float[] displayData = micSampleBufferIsAboveThreshold
+
+        // Consider amplification
+        AbstractAudioSamplesAnalyzer.ApplyAmplification(micData, 0, micData.Length, micProfile.AmplificationMultiplier);
+
+        // Consider noise suppression when displaying the the buffer
+        bool isAboveThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(micData, 0, micData.Length, micProfile.NoiseSuppression);
+        float[] displayData = isAboveThreshold
             ? micData
             : new float[micData.Length];
+
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(displayData);
     }
 
     public void SetMicProfile(MicProfile micProfile)
     {
         micPitchTracker.MicProfile = micProfile;
-        if (!string.IsNullOrEmpty(micProfile.Name))
+        if (!micProfile.Name.IsNullOrEmpty()
+            && !micProfile.IsInputFromConnectedClient)
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }

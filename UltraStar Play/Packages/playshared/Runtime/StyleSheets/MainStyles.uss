@@ -809,3 +809,11 @@ Label.tinyFont {
 .dialogBackground {
     background-color: rgb(14, 28, 42);
 }
+
+#targetNoteImage {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#targetNoteImage.goldenNote {
+    background-color: rgba(255, 215, 0, 0.4);
+}

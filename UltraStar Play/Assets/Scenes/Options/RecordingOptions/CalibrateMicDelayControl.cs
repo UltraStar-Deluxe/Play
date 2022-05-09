@@ -27,6 +27,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private MicPitchTracker micPitchTracker;
 
+    [Inject]
+    private RecordingOptionsSceneControl recordingOptionsSceneControl;
+
     private bool isCalibrationInProgress;
 
     private float startTimeInSeconds;
@@ -55,7 +58,12 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     void Start()
     {
-        micPitchTracker.PitchEventStream.Subscribe(OnPitchDetected);
+        micPitchTracker.PitchEventStream
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
+        recordingOptionsSceneControl.ConnectedClientBeatPitchEventStream
+            .Subscribe(OnPitchDetected)
+            .AddTo(gameObject);
     }
 
     void Update()
