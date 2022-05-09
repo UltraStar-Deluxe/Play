@@ -15,7 +15,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
     public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     private RecordedNote lastRecordedNote;
-    private PlayerMicPitchTracker.BeatAnalyzedEvent lastBeatAnalyzedEvent;
+    private BeatAnalyzedEvent lastBeatAnalyzedEvent;
 
     private readonly Subject<RecordedNoteStartedEvent> recordedNoteStartedEventStream = new();
     public IObservable<RecordedNoteStartedEvent> RecordedNoteStartedEventStream
@@ -42,7 +42,7 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             .Subscribe(OnBeatAnalyzed);
     }
 
-    private void OnBeatAnalyzed(PlayerMicPitchTracker.BeatAnalyzedEvent beatAnalyzedEvent)
+    private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
         if (lastRecordedNote != null
@@ -50,7 +50,10 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
             && lastBeatAnalyzedEvent.NoteAtBeat == analyzedNote
             && lastBeatAnalyzedEvent.RoundedRecordedMidiNote == beatAnalyzedEvent.RoundedRecordedMidiNote)
         {
-            ContinueLastRecordedNote(beatAnalyzedEvent.Beat);
+            int noteEndBeat = analyzedNote != null
+                ? analyzedNote.EndBeat
+                : -1;
+            ContinueLastRecordedNote(beatAnalyzedEvent.Beat, noteEndBeat);
         }
         else if (beatAnalyzedEvent.PitchEvent != null)
         {
@@ -68,9 +71,14 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
         lastBeatAnalyzedEvent = beatAnalyzedEvent;
     }
 
-    private void ContinueLastRecordedNote(int analyzedBeat)
+    private void ContinueLastRecordedNote(int analyzedBeat, int targetNoteEndBeat)
     {
         lastRecordedNote.EndBeat = analyzedBeat + 1;
+        if (targetNoteEndBeat >= 0
+            && lastRecordedNote.EndBeat > targetNoteEndBeat)
+        {
+            lastRecordedNote.EndBeat = targetNoteEndBeat;
+        }
         recordedNoteContinuedEventStream.OnNext(new RecordedNoteContinuedEvent(lastRecordedNote));
     }
 

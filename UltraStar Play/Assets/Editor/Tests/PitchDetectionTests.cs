@@ -41,7 +41,6 @@ public class PitchDetectionTests
 
             // Analyze the samples
             IAudioSamplesAnalyzer audioSamplesAnalyzer = audioSamplesAnalyzerProvider(audioClip.frequency);
-            audioSamplesAnalyzer.Enable();
             PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, 0, samples.Length - 1, micProfile);
 
             // Check result

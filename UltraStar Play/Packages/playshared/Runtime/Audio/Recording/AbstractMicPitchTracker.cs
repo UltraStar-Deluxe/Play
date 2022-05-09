@@ -30,8 +30,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         {
             MicSampleRecorder.MicProfile = value;
             // The sample rate could have changed, which means a new analyzer is needed.
-            audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
-            audioSamplesAnalyzer.Enable();
+            AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         }
     }
 
@@ -41,13 +40,13 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;
 
-    protected IAudioSamplesAnalyzer audioSamplesAnalyzer;
+    public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; private set; }
 
     public virtual void OnInjectionFinished()
     {
         MicSampleRecorder.RecordingEventStream.Subscribe(recordingEvent => OnRecordingEvent(recordingEvent));
 
-        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.SampleRateHz);
+        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         settings.ObserveEveryValueChanged(it => it.PitchDetectionAlgorithm)
             .Subscribe(OnPitchDetectionAlgorithmChanged)
             .AddTo(gameObject);
@@ -55,9 +54,9 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
     protected virtual void Update()
     {
-        if (audioSamplesAnalyzer is CamdAudioSamplesAnalyzer)
+        if (AudioSamplesAnalyzer is CamdAudioSamplesAnalyzer)
         {
-            (audioSamplesAnalyzer as CamdAudioSamplesAnalyzer).HalftoneContinuationBias = halftoneContinuationBias;
+            (AudioSamplesAnalyzer as CamdAudioSamplesAnalyzer).HalftoneContinuationBias = halftoneContinuationBias;
         }
     }
 
@@ -68,11 +67,43 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             return;
         }
 
-        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.SampleRateHz);
-        audioSamplesAnalyzer.Enable();
+        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     protected abstract void OnRecordingEvent(RecordingEvent recordingEvent);
+
+    public static PitchEvent AnalyzeBeat(
+        SongMeta songMeta,
+        int beat,
+        double positionInSongInMillis,
+        MicProfile micProfile,
+        float[] micSampleBuffer,
+        IAudioSamplesAnalyzer audioSamplesAnalyzer)
+    {
+        float beatStartInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        float beatEndInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat + 1);
+        float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
+        int beatLengthInSamples = (int)(beatLengthInMillis * micProfile.SampleRate / 1000f);
+
+        // The newest sample in the buffer corresponds to (positionInSong - micDelay)
+        float positionInSongInMillisConsideringMicDelay = (float)(positionInSongInMillis - micProfile.DelayInMillis);
+        float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
+        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * micProfile.DelayInMillis / 1000f);
+        distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, micSampleBuffer.Length - 1);
+
+        int endIndex = micSampleBuffer.Length - distanceToNewestSamplesInSamples;
+        int startIndex = endIndex - beatLengthInSamples;
+        endIndex = NumberUtils.Limit(endIndex, 0, micSampleBuffer.Length - 1);
+        startIndex = NumberUtils.Limit(startIndex, 0, micSampleBuffer.Length - 1);
+        if (endIndex < startIndex)
+        {
+            Debug.LogWarning($"Cannot analyze from sample {startIndex} to {endIndex}. Start index must be smaller than end index.");
+            return null;
+        }
+
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleBuffer, startIndex, endIndex, micProfile);
+        return pitchEvent;
+    }
 
     public static IAudioSamplesAnalyzer CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm pitchDetectionAlgorithm, int sampleRateHz)
     {

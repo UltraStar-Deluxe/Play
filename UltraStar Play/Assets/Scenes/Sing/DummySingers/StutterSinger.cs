@@ -2,13 +2,14 @@
 
 public class StutterSinger : AbstractDummySinger
 {
-    protected override PitchEvent GetDummyPitchEvent(int beat, Note noteAtBeat)
+    protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
-        PitchEvent pitchEvent = null;
+        Note noteAtBeat = GetNoteAtBeat(beat);
         if (noteAtBeat != null && Random.Range(0, 5) != 0)
         {
-            pitchEvent = new PitchEvent(noteAtBeat.MidiNote + Random.Range(-3, 3));
+            return new BeatPitchEvent(noteAtBeat.MidiNote + Random.Range(-3, 3), beat);
         }
-        return pitchEvent;
+
+        return null;
     }
 }

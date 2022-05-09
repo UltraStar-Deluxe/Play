@@ -69,13 +69,6 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
-        public const string contextMenu = "contextMenu";
-        public const string contextMenuButton = "contextMenuButton";
-        public const string contextMenuItem = "contextMenuItem";
-        public const string ContextMenuItemUi = "ContextMenuItemUi";
-        public const string contextMenuLabel = "contextMenuLabel";
-        public const string contextMenuSeparator = "contextMenuSeparator";
-        public const string ContextMenuSeparatorUi = "ContextMenuSeparatorUi";
         public const string continueButton = "continueButton";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
         public const string createBackgroundLabel = "createBackgroundLabel";
@@ -179,8 +172,6 @@ public static partial class R
         public const string inputLegend = "inputLegend";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string internetOptionsButton = "internetOptionsButton";
-        public const string invalidValueIcon = "invalidValueIcon";
-        public const string invalidValueLabel = "invalidValueLabel";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
@@ -191,7 +182,6 @@ public static partial class R
         public const string issuesTitle = "issuesTitle";
         public const string issueUiRoot = "issueUiRoot";
         public const string itemIndexLabel = "itemIndexLabel";
-        public const string itemLabel = "itemLabel";
         public const string ItemPicker = "ItemPicker";
         public const string label = "label";
         public const string Label = "Label";
@@ -303,8 +293,6 @@ public static partial class R
         public const string noteLines = "noteLines";
         public const string NoteUi = "NoteUi";
         public const string noteUiRoot = "noteUiRoot";
-        public const string notificationLabel = "notificationLabel";
-        public const string notificationOverlay = "notificationOverlay";
         public const string noVideoImage = "noVideoImage";
         public const string nPlayerLayout = "nPlayerLayout";
         public const string okButton = "okButton";
@@ -542,8 +530,6 @@ public static partial class R
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldContainer = "urlTextFieldContainer";
-        public const string validationWarningContainer = "validationWarningContainer";
-        public const string valueTextField = "valueTextField";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

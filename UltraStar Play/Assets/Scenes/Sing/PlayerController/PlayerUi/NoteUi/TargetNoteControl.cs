@@ -53,6 +53,11 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         targetNote.ShowByDisplay();
         recordedNote.HideByDisplay();
 
+        if (Note.IsGolden)
+        {
+            image.AddToClassList("goldenNote");
+        }
+
         SetStyleByMicProfile();
     }
 
@@ -82,10 +87,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
 
         image.style.unityBackgroundImageTintColor = finalColor;
-        image.style.backgroundColor = new Color(130f / 255f, 168 / 255f, 179 / 255f).RgbToHsv()
-            // Red is hue
-            .WithRed(finalColor.RgbToHsv().r)
-            .HsvToRgb();
+        image.style.borderTopColor = finalColor;
+        image.style.borderBottomColor = finalColor;
+        image.style.borderLeftColor = finalColor;
+        image.style.borderRightColor = finalColor;
     }
 
     private void CreateGoldenNoteEffect()

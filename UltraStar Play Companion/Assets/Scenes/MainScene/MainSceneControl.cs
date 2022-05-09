@@ -1,25 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using ProTrans;
 using Button = UnityEngine.UIElements.Button;
+using IBinding = UniInject.IBinding;
 using Toggle = UnityEngine.UIElements.Toggle;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection
+public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener, IBinder
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
-    
+
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
     public SongListRequestor songListRequestor;
+
+    [InjectedInInspector]
+    public ClientSideMicDataSender clientSideMicDataSender;
+
+    [InjectedInInspector]
+    public MicSampleRecorder micSampleRecorder;
 
     [Inject]
     private UIDocument uiDocument;
@@ -28,81 +36,142 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
     [Inject]
-    private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
-
-    [Inject]
     private Settings settings;
     
-    [Inject(Key = "#semanticVersionText")]
+    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
 
-    [Inject(Key = "#buildTimeStampText")]
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
-    [Inject(Key = "#commitHashText")]
+    [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
     
-    [Inject(Key = "#fpsText")]
+    [Inject(UxmlName = R.UxmlNames.fpsText)]
     private Label fpsText;
     
-    [Inject(Key = "#toggleRecordingButton")]
+    [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
-    
-    [Inject(Key = "#recordingDeviceButtonContainer")]
-    private VisualElement recordingDeviceButtonContainer;
-    
-    [Inject(Key = "#connectionStatusText")]
+
+    [Inject(UxmlName = R.UxmlNames.connectionStatusText)]
     private Label connectionStatusText;
 
-    [Inject(Key = "#selectedRecordingDeviceText")]
-    private Label selectedRecordingDeviceText;
-    
-    [Inject(Key = "#clientNameTextField")]
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceInfo)]
+    private Label recordingDeviceInfo;
+
+    [Inject(UxmlName = R.UxmlNames.connectionInfoText)]
+    private Label connectionInfoText;
+
+    [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
-    
-    [Inject(Key = "#visualizeAudioToggle")]
+
+    [Inject(UxmlName = R.UxmlNames.visualizeAudioLabel)]
+    private Label visualizeAudioLabel;
+
+    [Inject(UxmlName = R.UxmlNames.visualizeAudioToggle)]
     private Toggle visualizeAudioToggle;
     
-    [Inject(Key = "#audioWaveForm")]
+    [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
-    [Inject(Key = "#connectionThroubleshootingText")]
+    [Inject(UxmlName = R.UxmlNames.connectionThroubleshootingText)]
     private Label connectionThroubleshootingText;
     
-    [Inject(Key = "#serverErrorResponseText")]
+    [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
 
-    [Inject(Key = "#songListContainer")]
-    private VisualElement songListContainer;
-    
-    [Inject(Key = "#songListView")]
+    [Inject(UxmlName = R.UxmlNames.songListView)]
     private ScrollView songListView;
-    
-    [Inject(Key = "#showSongListButton")]
-    private Button showSongListButton;
-    
-    [Inject(Key = "#closeSongListButton")]
-    private Button closeSongListButton;
-    
-    [Inject(Key = "#sceneTitle")]
+
+    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
+
+    [Inject(UxmlName = R.UxmlNames.showMenuButton)]
+    private Button showMenuButton;
+
+    [Inject(UxmlName = R.UxmlNames.hiddenCloseMenuButton)]
+    private Button hiddenCloseMenuButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeMenuButton)]
+    private Button closeMenuButton;
+
+    [Inject(UxmlName = R.UxmlNames.menuOverlay)]
+    private VisualElement menuOverlay;
+
+    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenConnected)]
+    private List<VisualElement> onlyVisibleWhenConnected;
+
+    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenNotConnected)]
+    private List<VisualElement> onlyVisibleWhenNotConnected;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceLabel)]
+    private Label recordingDeviceLabel;
+
+    [Inject(UxmlName = R.UxmlNames.recordingDevicePicker)]
+    private ItemPicker recordingDevicePicker;
+
+    [Inject(UxmlName = R.UxmlNames.languageLabel)]
+    private Label languageLabel;
+
+    [Inject(UxmlName = R.UxmlNames.languagePicker)]
+    private ItemPicker languagePicker;
+
+    [Inject(UxmlName = R.UxmlNames.devModeLabel)]
+    private Label devModeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.devModePicker)]
+    private ItemPicker devModePicker;
+
+    [Inject]
+    private TranslationManager translationManager;
+
+    [Inject(UxmlName = R.UxmlNames.showMicViewButton)]
+    private Button showMicViewButton;
+
+    [Inject(UxmlName = R.UxmlNames.micViewContainer)]
+    private VisualElement micViewContainer;
+
+    [Inject(UxmlName = R.UxmlNames.showSongViewButton)]
+    private Button showSongViewButton;
+
+    [Inject(UxmlName = R.UxmlNames.songViewContainer)]
+    private VisualElement songViewContainer;
+
+    [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
+    private TextField songSearchTextField;
+
+    [Inject(UxmlName = R.UxmlNames.songSearchHint)]
+    private Label songSearchHint;
+
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
+    private VisualElement recordingDeviceColorIndicator;
+
+    private LabeledItemPickerControl<string> recordingDevicePickerControl;
+    private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
+    private BoolPickerControl devModePickerControl;
+
     private float frameCountTime;
     private int frameCount;
-    
-    private void Start()
+
+    public void OnInjectionFinished()
     {
-        clientSideMicSampleRecorder.DeviceName
-            .Subscribe(_ => UpdateSelectedRecordingDeviceText());
-        clientSideMicSampleRecorder.SampleRate
-            .Subscribe(_ => UpdateSelectedRecordingDeviceText());
-        clientSideMicSampleRecorder.IsRecording
-            .Subscribe(OnRecordingStateChanged);
+        // Select recording device if none.
+        if (settings.MicProfile.Name.IsNullOrEmpty()
+            || !Microphone.devices.Contains(settings.MicProfile.Name))
+        {
+            settings.SetMicProfileName(Microphone.devices.FirstOrDefault());
+        }
+
+        settings.ObserveEveryValueChanged(it => it.MicProfile)
+            .Subscribe(_ => OnMicProfileChanged());
+        micSampleRecorder.IsRecording.Subscribe(OnRecordingStateChanged);
+        micSampleRecorder.FinalSampleRate.Subscribe(_ => UpdateRecordingDeviceInfo());
 
         // All controls are hidden until a connection has been established.
-        uiDocument.rootVisualElement.Query(null, "onlyVisibleWhenConnected").ForEach(it => it.HideByDisplay());
+        onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
+        onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
         connectionThroubleshootingText.HideByDisplay();
         serverErrorResponseText.HideByDisplay();
         
@@ -125,59 +194,171 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
 
         songListRequestor.SongListEventStream.Subscribe(evt => HandleSongListEvent(evt));
         
-        showSongListButton.RegisterCallbackButtonTriggered(() => ShowSongList());
-        closeSongListButton.RegisterCallbackButtonTriggered(() => songListContainer.HideByDisplay());
-        
         UpdateVersionInfoText();
 
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
         });
+
+        songSearchTextField.RegisterValueChangedCallback(evt =>
+        {
+            songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
+            UpdateSongList();
+        });
+
+        InitTabGroup();
+        InitMenu();
+    }
+
+    private void InitTabGroup()
+    {
+        TabGroupControl tabGroupControl = new TabGroupControl();
+        tabGroupControl.AllowNoContainerVisible = false;
+        tabGroupControl.AddTabGroupButton(showMicViewButton, micViewContainer);
+        tabGroupControl.AddTabGroupButton(showSongViewButton, songViewContainer);
+        tabGroupControl.ShowContainer(micViewContainer);
+
+        showSongViewButton.RegisterCallbackButtonTriggered(() =>
+        {
+            micSampleRecorder.StopRecording();
+            songSearchTextField.value = "";
+            ShowSongList();
+        });
+    }
+
+    private void InitMenu()
+    {
+        // Recording device
+        recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
+        recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
+        recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
+
+        // Language
+        languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
+        languagePickerControl.SelectItem(settings.GameSettings.language);
+        languagePickerControl.Selection.Subscribe(newValue => settings.GameSettings.language = newValue);
+        settings.ObserveEveryValueChanged(it => it.GameSettings.language)
+            .Subscribe(newValue =>
+            {
+                translationManager.currentLanguage = newValue;
+                translationManager.ReloadTranslationsAndUpdateScene();
+            });
+
+        // Dev Mode
+        devModePickerControl = new BoolPickerControl(devModePicker);
+        devModePickerControl.SelectItem(settings.IsDevModeEnabled);
+        devModePickerControl.Selection.Subscribe(newValue => settings.IsDevModeEnabled = newValue);
+        settings
+            .ObserveEveryValueChanged(it => it.IsDevModeEnabled)
+            .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
+
+        // Show/hide menu overlay
+        HideMenu();
+        showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
+        hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+    }
+
+    private void OnDevModeEnabledChanged(bool isEnabled)
+    {
+        fpsText.SetVisibleByDisplay(isEnabled);
+        recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
+        connectionInfoText.SetVisibleByDisplay(isEnabled);
+    }
+
+    private void ShowMenu()
+    {
+        menuOverlay.style.left = new StyleLength(new Length(0, LengthUnit.Percent));
+    }
+
+    private void HideMenu()
+    {
+        menuOverlay.style.left = new StyleLength(new Length(100, LengthUnit.Percent));
     }
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && connectionStatusText == null)
+        if (!Application.isPlaying && sceneTitle == null)
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.connecting);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.title);
-        visualizeAudioToggle.label = TranslationManager.GetTranslation(R.Messages.visualizeMicInput);
-        showSongListButton.text = TranslationManager.GetTranslation(R.Messages.songList_show);
-        closeSongListButton.text = TranslationManager.GetTranslation(R.Messages.songList_hide);
+        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
+        connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
+        recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
+        languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
+        devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
+        visualizeAudioLabel.text = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
+        showMicViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showMicrophone);
+        showSongViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showSongs);
+        closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
+
+        recordingDevicePickerControl.UpdateLabelText();
+        languagePickerControl.UpdateLabelText();
+        TranslationManager.GetTranslation("yes");
+        devModePickerControl.UpdateLabelText();
+
+        // Search text field hint
+        string searchPropertiesText = new List<string>
+        {
+            TranslationManager.GetTranslation(R.Messages.songProperty_artist),
+            TranslationManager.GetTranslation(R.Messages.songProperty_title),
+        }.ToCsv(", ", "", "");
+        songSearchHint.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
     }
-    
-    private void HandleSongListEvent(SongListEvent evt)
+
+    private void UpdateSongList()
     {
         songListView.Clear();
-        if (!evt.ErrorMessage.IsNullOrEmpty())
+        if (songListRequestor.LoadedSongsDto == null
+            || songListRequestor.LoadedSongsDto.SongList.IsNullOrEmpty())
         {
-            AddSongListLabel(evt.ErrorMessage);
+            AddSongListLabel("No songs found");
             return;
         }
 
-        evt.LoadedSongsDto.SongList.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
-        foreach (SongDto songDto in evt.LoadedSongsDto.SongList)
+        List<SongDto> songDtos = new List<SongDto>(songListRequestor.LoadedSongsDto.SongList)
+            .Where(songDto => SongSearchMatches(songDto))
+            .ToList();
+        songDtos.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
+
+        foreach (SongDto songDto in songDtos)
         {
             AddSongListLabel(songDto.Artist + " - " + songDto.Title);
         }
 
-        if (!evt.LoadedSongsDto.IsSongScanFinished)
+        if (!songListRequestor.LoadedSongsDto.IsSongScanFinished)
         {
             AddSongListLabel("...");
         }
     }
 
+    private bool SongSearchMatches(SongDto songDto)
+    {
+        string searchText = songSearchTextField.value.ToLowerInvariant();
+        return searchText.IsNullOrEmpty()
+               || songDto.Title.ToLowerInvariant().Contains(searchText)
+               || songDto.Artist.ToLowerInvariant().Contains(searchText);
+    }
+
+    private void HandleSongListEvent(SongListEvent evt)
+    {
+        if (!evt.ErrorMessage.IsNullOrEmpty())
+        {
+            songListView.Clear();
+            AddSongListLabel(evt.ErrorMessage);
+            return;
+        }
+
+        UpdateSongList();
+    }
+
     private void ShowSongList()
     {
-        songListContainer.ShowByDisplay();
-        
         if (!songListRequestor.SuccessfullyLoadedAllSongs)
         {
             songListView.Clear();
-            AddSongListLabel("Loading songs list...");
+            AddSongListLabel("Loading song list...");
             songListRequestor.RequestSongList();
         }
     }
@@ -187,7 +368,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         if (audioWaveForm.style.display != DisplayStyle.None
             && audioWaveFormVisualization != null)
         {
-            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(clientSideMicSampleRecorder.MicSampleBuffer);
+            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(micSampleRecorder.MicSamples);
         }
         UpdateFps();
     }
@@ -199,7 +380,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         if (frameCountTime > 1)
         {
             int fps = (int)(frameCount / frameCountTime);
-            fpsText.text = TranslationManager.GetTranslation(R.Messages.fps, "value", fps);
+            fpsText.text = $"FPS: {fps}";
             frameCount = 0;
             frameCountTime = 0;
         }
@@ -212,22 +393,46 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         clientSideConnectRequestManager.CloseConnectionAndReconnect();
     }
 
-    private void UpdateSelectedRecordingDeviceText()
+    private void OnMicProfileChanged()
     {
-        selectedRecordingDeviceText.text = $"{clientSideMicSampleRecorder.DeviceName.Value}\n({clientSideMicSampleRecorder.SampleRate.Value} Hz)";
+        // Update MicProfile of sample recorder.
+        int newFinalSampleRate = MicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
+        if (micSampleRecorder.MicProfile == null
+            || settings.MicProfile.Name != micSampleRecorder.MicProfile.Name
+            || newFinalSampleRate != micSampleRecorder.FinalSampleRate.Value)
+        {
+            micSampleRecorder.MicProfile = settings.MicProfile;
+        }
+
+        UpdateRecordingDeviceInfo();
+    }
+
+    private void UpdateRecordingDeviceInfo()
+    {
+        recordingDeviceInfo.text = $"Sample Rate:{micSampleRecorder.FinalSampleRate}Hz, " +
+                                   $"Delay: {settings.MicProfile.DelayInMillis}ms, " +
+                                   $"Amp: {settings.MicProfile.Amplification}, " +
+                                   $"Supp: {settings.MicProfile.NoiseSuppression}";
+        recordingDeviceColorIndicator.style.backgroundColor = new StyleColor(settings.MicProfile.Color);
     }
 
     private void OnRecordingStateChanged(bool isRecording)
     {
         if (isRecording)
         {
-            toggleRecordingButton.text = TranslationManager.GetTranslation(R.Messages.stopRecording);
             toggleRecordingButton.AddToClassList("stopRecordingButton");
+
+            // Prevent stand-by when recording
+            Debug.Log("Setting Screen.sleepTimeout to SleepTimeout.NeverSleep");
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
         else
         {
-            toggleRecordingButton.text = TranslationManager.GetTranslation(R.Messages.startRecording);
             toggleRecordingButton.RemoveFromClassList("stopRecordingButton");
+
+            // Reset stand-by behavior
+            Debug.Log("Setting Screen.sleepTimeout to SleepTimeout.SystemSetting");
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;
         }
     }
 
@@ -235,25 +440,28 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
     {
         if (connectEvent.IsSuccess)
         {
-            connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
-            uiDocument.rootVisualElement.Query(null, "onlyVisibleWhenConnected").ForEach(it => it.ShowByDisplay());
+            connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
+            onlyVisibleWhenConnected.ForEach(it => it.ShowByDisplay());
+            onlyVisibleWhenNotConnected.ForEach(it => it.HideByDisplay());
             audioWaveForm.SetVisibleByDisplay(settings.ShowAudioWaveForm);
             connectionThroubleshootingText.HideByDisplay();
             serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
-            UpdateRecordingDeviceButtons();
+            connectionInfoText.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
         }
         else
         {
+            connectionInfoText.text = "Not connected";
             connectionStatusText.text = connectEvent.ConnectRequestCount > 0
-                ? TranslationManager.GetTranslation(R.Messages.connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
-                : TranslationManager.GetTranslation(R.Messages.connecting);
+                ? TranslationManager.GetTranslation(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
+                : TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
             
-            uiDocument.rootVisualElement.Query(null, "onlyVisibleWhenConnected").ForEach(it => it.HideByDisplay());
+            onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
+            onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
             if (connectEvent.ConnectRequestCount > ConnectRequestCountShowTroubleshootingHintThreshold)
             {
                 connectionThroubleshootingText.ShowByDisplay();
-                connectionThroubleshootingText.text = TranslationManager.GetTranslation(R.Messages.troubleShootingHints);
+                connectionThroubleshootingText.text = TranslationManager.GetTranslation(R.Messages.companionApp_troubleShootingHints);
             }
 
             if (!connectEvent.ErrorMessage.IsNullOrEmpty())
@@ -264,34 +472,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateRecordingDeviceButtons()
-    {
-        recordingDeviceButtonContainer.Clear();
-        if (Microphone.devices.Length <= 1)
-        {
-            // No real choice
-            return;
-        }
-        
-        Microphone.devices.ForEach(device =>
-        {
-            Button deviceButton = new Button();
-            deviceButton.RegisterCallbackButtonTriggered(
-                () => clientSideMicSampleRecorder.SetRecordingDevice(device));
-            deviceButton.text = $"{device}";
-            recordingDeviceButtonContainer.Add(deviceButton);
-        });
-    }
-
     private void ToggleRecording()
     {
-        if (clientSideMicSampleRecorder.IsRecording.Value)
+        if (micSampleRecorder.IsRecording.Value)
         {
-            clientSideMicSampleRecorder.StopRecording();
+            micSampleRecorder.StopRecording();
         }
         else
         {
-            clientSideMicSampleRecorder.StartRecording();
+            micSampleRecorder.StartRecording();
         }
     }
 
@@ -324,6 +513,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection
         Label label = new Label(text);
         label.AddToClassList("songListElement");
         label.style.whiteSpace = WhiteSpace.Normal;
+        label.style.marginBottom = 20;
         songListView.Add(label);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(micSampleRecorder);
+        bb.BindExistingInstance(clientSideMicDataSender);
+        return bb.GetBindings();
     }
 }

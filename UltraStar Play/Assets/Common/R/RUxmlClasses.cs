@@ -6,12 +6,9 @@ public static partial class R
         public const string backgroundImage = "backgroundImage";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
-        public const string contextMenu = "contextMenu";
-        public const string contextMenuSeparator = "contextMenuSeparator";
         public const string controlLabel = "controlLabel";
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
-        public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";
         public const string dialogTextButton = "dialogTextButton";
@@ -27,8 +24,6 @@ public static partial class R
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
-        public const string itemPickerButton = "itemPickerButton";
-        public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";

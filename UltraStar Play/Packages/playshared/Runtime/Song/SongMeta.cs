@@ -136,6 +136,10 @@ public class SongMeta
         }
     }
 
+    public SongMeta()
+    {
+    }
+
     public SongMeta(
         // required helper fields
         string directory,

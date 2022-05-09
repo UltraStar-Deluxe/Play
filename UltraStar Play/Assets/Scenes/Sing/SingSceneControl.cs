@@ -69,6 +69,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private SceneNavigator sceneNavigator;
 
     [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    [Inject]
     private Statistics statistics;
 
     [Inject]
@@ -248,6 +251,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             .WithRootVisualElement(doubleClickToTogglePauseElement)
             .CreateAndInject<ContextMenuControl>();
         contextMenuControl.FillContextMenuAction = FillContextMenu;
+
+        // Automatically start recording on companion apps
+        PlayerControls.ForEach(playerControl =>
+        {
+            playerControl.PlayerMicPitchTracker.SendMicProfileToConnectedClient();
+            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
+        });
     }
 
     private void InitDummySingers()
@@ -463,7 +473,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void Restart()
     {
         SceneData.IsRestart = true;
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, SceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, SceneData);
     }
 
     public void OpenSongInEditor()
@@ -488,7 +498,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles,
         };
-        SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, songEditorSceneData);
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
     public void FinishScene(bool isAfterEndOfSong)
@@ -508,6 +519,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Open song select without recording scores
         SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
@@ -538,7 +550,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             UpdateSongFinishedStats();
         }
 
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
+    }
+
+    private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
+    {
+        IEnumerable<MicProfile> micProfiles = PlayerControls.Select(playerProfile => playerProfile.MicProfile);
+        return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
     private void UpdateSongFinishedStats()
@@ -614,11 +633,17 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             pauseOverlay.ShowByDisplay();
             songAudioPlayer.PauseAudio();
+            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         }
         else
         {
             pauseOverlay.HideByDisplay();
             songAudioPlayer.PlayAudio();
+            PlayerControls.ForEach(playerControl =>
+            {
+                playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
+                playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
+            });
         }
     }
 
@@ -635,7 +660,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (!songAudioPlayer.HasAudioClip)
         {
             // Loading the audio failed.
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene);
+            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+            sceneNavigator.LoadScene(EScene.SongSelectScene);
             yield break;
         }
 

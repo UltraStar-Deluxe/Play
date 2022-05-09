@@ -15,7 +15,7 @@ public static class CollectionExtensions
 
     public static void ForEach<T>(this CircularBuffer<T> circularBuffer, Action<T> action)
     {
-        for (int i = 0; i < circularBuffer.Size; i++)
+        for (int i = 0; i < circularBuffer.Count; i++)
         {
             action(circularBuffer[i]);
         }

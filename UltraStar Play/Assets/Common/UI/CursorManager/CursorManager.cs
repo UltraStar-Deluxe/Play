@@ -76,11 +76,11 @@ public class CursorManager : MonoBehaviour, INeedInjection
         CurrentCursor = ECursor.Default;
         if (UseImageAsCursor())
         {
-            Cursor.SetCursor(cursorTexture, cursorTopLeftCorner, CursorMode.Auto);
+            SetCursor(cursorTexture, cursorTopLeftCorner, CursorMode.Auto);
         }
         else
         {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            SetCursor(null, Vector2.zero, CursorMode.Auto);
         }
     }
 
@@ -92,7 +92,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
         }
 
         CurrentCursor = ECursor.ArrowsLeftRight;
-        Cursor.SetCursor(horizontalCursorTexture, cursorCenter, CursorMode.Auto);
+        SetCursor(horizontalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorMusicNote()
@@ -103,7 +103,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
         }
 
         CurrentCursor = ECursor.MusicNote;
-        Cursor.SetCursor(musicNoteCursorTexture, cursorCenter, CursorMode.Auto);
+        SetCursor(musicNoteCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorVertical()
@@ -114,7 +114,7 @@ public class CursorManager : MonoBehaviour, INeedInjection
         }
 
         CurrentCursor = ECursor.ArrowsUpDown;
-        Cursor.SetCursor(verticalCursorTexture, cursorCenter, CursorMode.Auto);
+        SetCursor(verticalCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     public void SetCursorGrab()
@@ -125,11 +125,19 @@ public class CursorManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        Cursor.SetCursor(grabCursorTexture, cursorCenter, CursorMode.Auto);
+        SetCursor(grabCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
     private bool UseImageAsCursor()
     {
         return settingsManager.Settings.GraphicSettings.useImageAsCursor;
+    }
+
+    private static void SetCursor(Texture2D texture, Vector2 hotspot, CursorMode cursorMode)
+    {
+        if (PlatformUtils.IsStandalone)
+        {
+            Cursor.SetCursor(texture, hotspot, cursorMode);
+        }
     }
 }

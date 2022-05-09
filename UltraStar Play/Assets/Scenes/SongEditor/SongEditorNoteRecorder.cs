@@ -300,11 +300,11 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
                                 && settings.SongEditorSettings.MicProfile != null
                                 && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);
 
-        if (!shouldBeRecoding && micPitchTracker.MicSampleRecorder.IsRecording)
+        if (!shouldBeRecoding && micPitchTracker.MicSampleRecorder.IsRecording.Value)
         {
             micPitchTracker.MicSampleRecorder.StopRecording();
         }
-        else if (shouldBeRecoding && !micPitchTracker.MicSampleRecorder.IsRecording)
+        else if (shouldBeRecoding && !micPitchTracker.MicSampleRecorder.IsRecording.Value)
         {
             micPitchTracker.MicSampleRecorder.StartRecording();
         }

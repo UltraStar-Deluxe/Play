@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -6,6 +8,7 @@ using System.Threading;
 using UniInject;
 using UnityEngine;
 using UniRx;
+using CircularBuffer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -19,149 +22,296 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             return GameObjectUtils.FindComponentWithTag<ClientSideMicDataSender>("ClientSideMicrophoneDataSender");
         }
     }
-    
-    [Inject]
-    private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
     [Inject]
-    private ClientSideMicSampleRecorder clientSideMicSampleRecorder;
+    private MicSampleRecorder micSampleRecorder;
 
     [Inject]
     private Settings settings;
-    
-    private TcpClient clientMicDataSender;
-    private NetworkStream clientMicDataSenderNetworkStream;
-    public IPEndPoint serverMicDataReceiverEndPoint;
 
-    private byte[] receiveByteArray;
+    [Inject]
+    private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
-    private Thread receiveDataThread;
-    
+    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
+
+    private readonly CircularBuffer<PositionInSongData> receivedPositionInSongTimes = new(3);
+    private PositionInSongData bestPositionInSongData;
+    private SongMeta songMeta;
+    private int lastAnalyzedBeat;
+
+    private bool HasPositionInSong => songMeta != null && bestPositionInSongData != null;
+
+    private IDisposable receivedMessageStreamDisposable;
+
     private void Start()
     {
-        clientSideConnectRequestManager.ConnectEventStream.Subscribe(UpdateConnectionStatus);
-        clientSideMicSampleRecorder.RecordingEventStream.Subscribe(HandleNewMicSamples);
+        ResetPositionInSong();
 
-        // Receive data from server.
-        // So far, the server only sends a still-alive check, which fails automatically when the connection is lost.
-        receiveByteArray = new byte[2048];
-        receiveDataThread = new Thread(() => 
+        UpdateAudioSamplesAnalyzer();
+        micSampleRecorder.FinalSampleRate
+            .Subscribe(_ => UpdateAudioSamplesAnalyzer())
+            .AddTo(gameObject);
+
+        clientSideConnectRequestManager.ConnectEventStream
+            .Subscribe(UpdateConnectionStatus)
+            .AddTo(gameObject);
+        micSampleRecorder.RecordingEventStream
+            .Subscribe(HandleNewMicSamples)
+            .AddTo(gameObject);
+        micSampleRecorder.IsRecording
+            .Subscribe(HandleRecordingStatusChanged)
+            .AddTo(gameObject);
+    }
+
+    private void Update()
+    {
+        if (HasPositionInSong
+            && bestPositionInSongData.UnixTimeInMillisWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
         {
-            while (true)
-            {
-                if (serverMicDataReceiverEndPoint != null
-                    && clientMicDataSender != null
-                    && clientMicDataSenderNetworkStream != null)
-                {
-                    ReceiveServerData();
-                }
-                Thread.Sleep(250);
-            }
-        });
-        receiveDataThread.Start();
+            // Did not receive new position in song for some time. Probably not in sing scene anymore.
+            ResetPositionInSong();
+        }
+    }
+
+    private void UpdateAudioSamplesAnalyzer()
+    {
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, micSampleRecorder.FinalSampleRate.Value);
+    }
+
+    private void HandleRecordingStatusChanged(bool isRecording)
+    {
+        if (isRecording && HasPositionInSong)
+        {
+            // Analyze the following beats, not past beats.
+            lastAnalyzedBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+            Debug.Log($"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
+        }
     }
 
     private void HandleNewMicSamples(RecordingEvent recordingEvent)
     {
-        if (serverMicDataReceiverEndPoint != null
-            && clientMicDataSender != null
-            && clientMicDataSenderNetworkStream != null)
+        // Do pitch detection
+        if (HasPositionInSong)
         {
-            SendMicData(recordingEvent);
+            AnalyzeMicSamplesCorrespondingToBeatsInSong(recordingEvent);
+        }
+        else
+        {
+            AnalyzeNewestMicSamples(recordingEvent);
         }
     }
 
-    private void ReceiveServerData()
+    private void AnalyzeMicSamplesCorrespondingToBeatsInSong(RecordingEvent recordingEvent)
     {
-        int receivedByteCount;
-        while (clientMicDataSenderNetworkStream.DataAvailable
-               && (receivedByteCount = clientMicDataSenderNetworkStream.Read(receiveByteArray, 0, receiveByteArray.Length)) > 0)
+        // Check if can analyze new beat
+        double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
+        double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - settings.MicProfile.DelayInMillis;
+        int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
+        if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
+            || currentBeatConsideringMicDelay < -20)
         {
-            // Do nothing.
-            // Debug.Log($"Received {receivedByteCount} bytes from main game (still-alive check).");
-        }
-    }
-
-    private void SendMicData(RecordingEvent recordingEvent)
-    {
-        if (recordingEvent.NewSampleCount >= clientSideMicSampleRecorder.SampleRate.Value - 1)
-        {
-            Debug.LogError("Attempt to send complete mic buffer at once");
             return;
         }
-        // Copy from float array to byte array. Note that in a float there are sizeof(float) bytes.
-        byte[] newByteData = new byte[recordingEvent.NewSampleCount * sizeof(float)];
-        Buffer.BlockCopy(
-            recordingEvent.MicSamples, recordingEvent.NewSamplesStartIndex * sizeof(float),
-            newByteData, 0,
-            recordingEvent.NewSampleCount * sizeof(float));
 
-        try
+        // Do not analyze more than 100 beats (might missed some beats while app was in background)
+        int firstNextBeatToAnalyze = Math.Max(lastAnalyzedBeat + 1, currentBeatConsideringMicDelay - 100);
+
+        List<BeatPitchEvent> beatPitchEvents = new();
+        int loopCount = 0;
+        int maxLoopCount = 100;
+        for (int beat = firstNextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
         {
-            // DateTime now = DateTime.Now;
-            // Debug.Log($"Send data: {newByteData.Length} bytes ({recordingEvent.NewSampleCount} samples) at {now}:{now.Millisecond}");
-            clientMicDataSenderNetworkStream.Write(newByteData, 0, newByteData.Length);
+            PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat, estimatedPositionInSongInMillis);
+            int midiNote = pitchEvent != null
+                ? pitchEvent.MidiNote
+                : -1;
+            beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat));
+
+            loopCount++;
+            if (loopCount > maxLoopCount)
+            {
+                // Emergency exit
+                Debug.LogWarning($"Took emergency exit out of loop. Analyzed {maxLoopCount} beats and still not finished?");
+            }
         }
-        catch (Exception e)
+
+        // Send all events int one message
+        List<BeatPitchEventDto> beatPitchEventDtos = beatPitchEvents
+            .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat))
+            .ToList();
+        if (beatPitchEventDtos.Count > 3)
         {
-            Debug.LogException(e);
-            Debug.LogError($"Failed sending mic data: {newByteData.Length} bytes ({recordingEvent.NewSampleCount} samples)");
-            clientSideConnectRequestManager.CloseConnectionAndReconnect();
+            Debug.LogWarning($"Sending {beatPitchEventDtos.Count} beats to server: {beatPitchEventDtos.Select(it => it.Beat).ToCsv(", ")}");
         }
+        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDtos));
+
+        lastAnalyzedBeat = currentBeatConsideringMicDelay;
+    }
+
+    private void AnalyzeNewestMicSamples(RecordingEvent recordingEvent)
+    {
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(
+            recordingEvent.MicSamples,
+            recordingEvent.NewSamplesStartIndex,
+            recordingEvent.NewSamplesEndIndex,
+            GetMicProfileWithFinalSampleRate());
+
+        int midiNote = pitchEvent != null
+            ? pitchEvent.MidiNote
+            : -1;
+        BeatPitchEventDto beatPitchEventDto = new(midiNote, -1);
+        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto));
+    }
+
+    private void SendMessageToServer(JsonSerializable jsonSerializable)
+    {
+        if (clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
+        {
+            connectedServerHandler.SendMessageToServer(jsonSerializable);
+        }
+    }
+
+    private double GetEstimatedPositionInSongInMillis()
+    {
+        if (!HasPositionInSong)
+        {
+            Debug.LogWarning("GetEstimatedPositionInSongInMillis called without position in song");
+            return 0;
+        }
+
+        return bestPositionInSongData.EstimatedPositionInSongInMillis;
+    }
+
+    private PitchEvent AnalyzeMicSamplesOfBeat(RecordingEvent recordingEvent, int beat, double positionInSongInMillis)
+    {
+        PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
+            songMeta,
+            beat,
+            positionInSongInMillis,
+            GetMicProfileWithFinalSampleRate(),
+            recordingEvent.MicSamples,
+            audioSamplesAnalyzer);
+        return pitchEvent;
+    }
+
+    private MicProfile GetMicProfileWithFinalSampleRate()
+    {
+        // The MicProfile in the settings may use a SampleRate of 0 for "best available".
+        // The pitch detection algorithm needs the proper value.
+        MicProfile micProfile = new(settings.MicProfile);
+        micProfile.SampleRate = micSampleRecorder.FinalSampleRate.Value;
+        return micProfile;
+    }
+
+    private void HandleMicProfileMessage(MicProfileMessageDto micProfileMessageDto)
+    {
+        Debug.Log($"Received new mic profile: {micProfileMessageDto.ToJson()}");
+
+        MicProfile micProfile = new(settings.MicProfile.Name);
+        micProfile.Amplification = micProfileMessageDto.Amplification;
+        micProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
+        micProfile.SampleRate = micProfileMessageDto.SampleRate;
+        micProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
+        micProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
+
+        settings.MicProfile = micProfile;
+    }
+
+    private void HandlePositionInSongMessage(PositionInSongDto positionInSongDto)
+    {
+        PositionInSongData positionInSongData = new(positionInSongDto.PositionInSongInMillis, TimeUtils.GetUnixTimeMilliseconds());
+        receivedPositionInSongTimes.PushBack(positionInSongData);
+        songMeta = new SongMeta
+        {
+            Bpm = positionInSongDto.SongBpm,
+            Gap = positionInSongDto.SongGap,
+        };
+
+        // If beats have been analyzed prematurely, then redo analysis.
+        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        if (lastAnalyzedBeat > currentBeat)
+        {
+            lastAnalyzedBeat = currentBeat;
+        }
+
+        // Use the "received position in the song" which has the least discrepancy
+        // with respect to the "estimated position in song" of previously received times.
+        // This makes the time more resilient against outliers (e.g. when a message was delivered with big delay).
+        float GetTimeError(PositionInSongData time)
+        {
+            double resultError = 0;
+            receivedPositionInSongTimes
+                .Where(otherTime => otherTime.UnixTimeInMillisWhenReceivedPositionInSong != time.UnixTimeInMillisWhenReceivedPositionInSong)
+                .ForEach(otherTime =>
+                {
+                    double offset = Math.Abs(time.EstimatedPositionInSongInMillis - otherTime.EstimatedPositionInSongInMillis);
+                    resultError += offset;
+                });
+            return (float)resultError;
+        }
+        bestPositionInSongData = receivedPositionInSongTimes.FindMinElement(time => GetTimeError(time));
+
+        Debug.Log($"Received position in song: {positionInSongDto.ToJson()}, new best position in song {bestPositionInSongData.ToJson()}");
+    }
+
+    private void ResetPositionInSong()
+    {
+        Debug.Log("Resetting position in song");
+        songMeta = null;
+        bestPositionInSongData = null;
+        receivedPositionInSongTimes.Clear();
+        lastAnalyzedBeat = -1;
     }
 
     private void UpdateConnectionStatus(ConnectEvent connectEvent)
     {
+        if (receivedMessageStreamDisposable != null)
+        {
+            receivedMessageStreamDisposable.Dispose();
+            receivedMessageStreamDisposable = null;
+        }
+
         if (connectEvent.IsSuccess
-            && connectEvent.MicrophonePort > 0
-            && connectEvent.ServerIpEndPoint != null)
+            && clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
         {
-            serverMicDataReceiverEndPoint = new IPEndPoint(connectEvent.ServerIpEndPoint.Address, connectEvent.MicrophonePort);
-            if (connectEvent.MicrophoneSampleRate > 0
-                && connectEvent.MicrophoneSampleRate != settings.SampleRate)
-            {
-                Debug.Log($"Received new sample rate: {settings.SampleRate}");
-                settings.SampleRate = connectEvent.MicrophoneSampleRate;
-                if (clientSideMicSampleRecorder.SampleRate.Value != settings.SampleRate)
+            receivedMessageStreamDisposable = connectedServerHandler.ReceivedMessageStream
+                .ObserveOnMainThread()
+                .Subscribe(dto =>
                 {
-                    clientSideMicSampleRecorder.SetSampleRate(settings.SampleRate);
-                    // Try again with new SampleRate received from main game.
-                    CloseNetworkConnection();
-                    return;
-                }
-            }
-
-            CloseNetworkConnection();
-            try
-            {
-                clientMicDataSender = new TcpClient();
-                clientMicDataSender.Connect(serverMicDataReceiverEndPoint);
-                clientMicDataSenderNetworkStream = clientMicDataSender.GetStream();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                CloseNetworkConnection();                
-            }
+                    if (dto is StopRecordingMessageDto)
+                    {
+                        Debug.Log("Stopping recording because of message from server");
+                        micSampleRecorder.StopRecording();
+                        ResetPositionInSong();
+                    }
+                    else if (dto is StartRecordingMessageDto)
+                    {
+                        Debug.Log("Starting recording because of message from server");
+                        micSampleRecorder.StartRecording();
+                    }
+                    else if (dto is PositionInSongDto positionInSongDto)
+                    {
+                        HandlePositionInSongMessage(positionInSongDto);
+                    }
+                    else if (dto is MicProfileMessageDto micProfileMessageDto)
+                    {
+                        HandleMicProfileMessage(micProfileMessageDto);
+                    }
+                })
+                .AddTo(gameObject);
         }
-        else
+    }
+
+    private class PositionInSongData : JsonSerializable
+    {
+        public double ReceivedPositionInSongInMillis { get; private set; }
+        public long UnixTimeInMillisWhenReceivedPositionInSong { get; private set; }
+        public double EstimatedPositionInSongInMillis => ReceivedPositionInSongInMillis + (TimeUtils.GetUnixTimeMilliseconds() - UnixTimeInMillisWhenReceivedPositionInSong);
+
+        public PositionInSongData(double receivedPositionInSongInMillis, long unixTimeInMillisWhenReceivedPositionInSong)
         {
-            CloseNetworkConnection();
-            serverMicDataReceiverEndPoint = null;
-            clientSideMicSampleRecorder.StopRecording();
+            ReceivedPositionInSongInMillis = receivedPositionInSongInMillis;
+            UnixTimeInMillisWhenReceivedPositionInSong = unixTimeInMillisWhenReceivedPositionInSong;
         }
-    }
-
-    private void OnDestroy()
-    {
-        CloseNetworkConnection();
-    }
-
-    private void CloseNetworkConnection()
-    {
-        clientMicDataSenderNetworkStream?.Close();
-        clientMicDataSenderNetworkStream = null;
-        clientMicDataSender?.Close();
-        clientMicDataSender = null;
     }
 }

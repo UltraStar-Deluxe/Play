@@ -1,4 +1,5 @@
 ﻿public interface IServerSideConnectRequestManager
 {
-    public bool TryGetConnectedClientHandler(string clientIpEndPointId, out IConnectedClientHandler connectedClientHandler);
+    public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler);
+    public void RemoveConnectedClientHandler(IConnectedClientHandler connectedClientHandler);
 }
