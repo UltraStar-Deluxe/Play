@@ -31,7 +31,6 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-          submodules: recursive
       - uses: actions/cache@v2
         with:
           path: ${{ env.PROJECT_PATH }}/Library

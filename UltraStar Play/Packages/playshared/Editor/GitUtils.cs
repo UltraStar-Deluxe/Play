@@ -65,16 +65,40 @@ public static class GitUtils
 
     public static string GetCurrentCommitShortHash()
     {
-        string result = RunGitCommand("rev-parse --short --verify HEAD", false);
-        if (result.IsNullOrEmpty())
+        string currentDirectory = Directory.GetCurrentDirectory();
+        string firstGitFolderPath = null;
+        do
         {
-            // Failed to get commit hash from Git.
-            return "???";
-        }
+            ListDirectoryContent(currentDirectory);
+            DirectoryInfo parentDirectory = Directory.GetParent(currentDirectory);
+            currentDirectory = parentDirectory?.FullName;
+            if (firstGitFolderPath.IsNullOrEmpty()
+                && Directory.Exists(currentDirectory + "/.git"))
+            {
+                firstGitFolderPath = currentDirectory + "/.git";
+            }
+        } while (!currentDirectory.IsNullOrEmpty() && Directory.Exists(currentDirectory));
+
+        // Get commit hash from .git/refs/heads/master
+        string commitHashFile = firstGitFolderPath + "/refs/heads/master";
+        Debug.Log($"commitHashFile: {commitHashFile}");
+        string commitHash = File.ReadAllText(commitHashFile);
+        Debug.Log($"commitHash: {commitHash}");
+        string commitShortHash = commitHash[..8];
+        Debug.Log($"commitShortHash: {commitShortHash}");
+
+        // Alternative: run git command
+        // string result = RunGitCommand("rev-parse --short --verify HEAD");
 
         // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
-        result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
-        Debug.Log("Current commit short hash: " + result);
-        return result;
+        // result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+        // Debug.Log("Current commit short hash: " + result);
+        return commitShortHash;
+    }
+
+    private static void ListDirectoryContent(string path)
+    {
+        string[] allFolders = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly);
+        allFolders.ForEach(folder => Debug.Log(folder));
     }
 }
