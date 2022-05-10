@@ -65,40 +65,57 @@ public static class GitUtils
 
     public static string GetCurrentCommitShortHash()
     {
-        string currentDirectory = Directory.GetCurrentDirectory();
-        string firstGitFolderPath = null;
-        do
+        return GetMasterBranchCommitShortHash();
+
+        // TODO: running Git command to get the commit hash of the current branch fails with "fatal: unsafe repository ('/github/workspace' is owned by someone else)"
+        // string result = RunGitCommand("rev-parse --short --verify HEAD");
+
+        // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
+        // commitShortHash = string.Join("", commitShortHash.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+        // Debug.Log("Current commit short hash: " + commitShortHash);
+        // return commitShortHash;
+    }
+
+    private static string GetMasterBranchCommitShortHash()
+    {
+        string gitFolderPath = GetGitFolder();
+        if (gitFolderPath.IsNullOrEmpty())
         {
-            ListDirectoryContent(currentDirectory);
-            DirectoryInfo parentDirectory = Directory.GetParent(currentDirectory);
-            currentDirectory = parentDirectory?.FullName;
-            if (firstGitFolderPath.IsNullOrEmpty()
-                && Directory.Exists(currentDirectory + "/.git"))
-            {
-                firstGitFolderPath = currentDirectory + "/.git";
-            }
-        } while (!currentDirectory.IsNullOrEmpty() && Directory.Exists(currentDirectory));
+            throw new BuildFailedException("No .git folder found");
+        }
 
         // Get commit hash from .git/refs/heads/master
-        string commitHashFile = firstGitFolderPath + "/refs/heads/master";
+        string commitHashFile = gitFolderPath + "/refs/heads/master";
+        if (!File.Exists(commitHashFile))
+        {
+            throw new BuildFailedException($"No file with commit hash found inside .git folder (tried file path: {commitHashFile})");
+        }
+
         Debug.Log($"commitHashFile: {commitHashFile}");
         string commitHash = File.ReadAllText(commitHashFile);
         Debug.Log($"commitHash: {commitHash}");
         string commitShortHash = commitHash[..8];
         Debug.Log($"commitShortHash: {commitShortHash}");
-
-        // Alternative: run git command
-        // string result = RunGitCommand("rev-parse --short --verify HEAD");
-
-        // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
-        // result = string.Join("", result.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
-        // Debug.Log("Current commit short hash: " + result);
         return commitShortHash;
     }
 
-    private static void ListDirectoryContent(string path)
+    private static string GetGitFolder()
     {
-        string[] allFolders = Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly);
-        allFolders.ForEach(folder => Debug.Log(folder));
+        Debug.Log("Searching .git folder");
+        string currentDirectory = Directory.GetCurrentDirectory();
+        do
+        {
+            Debug.Log($"currentDirectory: {currentDirectory}");
+            if (Directory.Exists(currentDirectory + "/.git"))
+            {
+                string gitFolder = currentDirectory + "/.git";
+                Debug.Log($"Found .git folder: {gitFolder}");
+                return gitFolder;
+            }
+            DirectoryInfo parentDirectory = Directory.GetParent(currentDirectory);
+            currentDirectory = parentDirectory?.FullName;
+        } while (!currentDirectory.IsNullOrEmpty() && Directory.Exists(currentDirectory));
+
+        return null;
     }
 }
