@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -30,11 +31,12 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
 
     private static void UpdateVersionFile()
     {
+        string bundleVersion = GetPlayerSettingsFileBundleVersion();
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
         string commitShortHash = GitUtils.GetCurrentCommitShortHash();
 
         Dictionary<string, string> propertyNameToValueMap = new();
-        propertyNameToValueMap.Add(versionPropertyName, PlayerSettings.bundleVersion);
+        propertyNameToValueMap.Add(versionPropertyName, bundleVersion);
         propertyNameToValueMap.Add(timeStampPropertyName, timeStamp);
         propertyNameToValueMap.Add(commitShortHashPropertyName, commitShortHash);
 
@@ -56,9 +58,22 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
         }
         File.WriteAllLines(versionFile, versionFileLines);
 
-        Debug.Log($"New contents of {versionFile}:\n{versionFileLines}");
+        Debug.Log($"New contents of {versionFile}:\n{versionFileLines.ToCsv(", ")}");
 
         // Unity needs a hint that this asset has changed.
         AssetDatabase.ImportAsset(versionFile);
+    }
+
+    private static string GetPlayerSettingsFileBundleVersion()
+    {
+        // Return the value from the file because the C# API (PlayerSettings.bundleVersion) returns an older value
+        // during the GitHub Actions build for whatever reason.
+        string[] projectSettingsAssetLines = File.ReadAllLines("ProjectSettings/ProjectSettings.asset");
+        Debug.Log($"ProjectSettings.asset content:\n{projectSettingsAssetLines.JoinWith("\n")}");
+        string bundleVersionLine = projectSettingsAssetLines.FirstOrDefault(line => line.Contains("bundleVersion:"));
+        Debug.Log($"bundleVersionLine: {bundleVersionLine}");
+        string bundleVersion = bundleVersionLine.Replace("bundleVersion:", "").Trim();
+        Debug.Log($"bundleVersion: {bundleVersion}");
+        return bundleVersion;
     }
 }
