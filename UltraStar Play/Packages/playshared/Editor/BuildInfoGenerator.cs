@@ -69,11 +69,9 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
         // Return the value from the file because the C# API (PlayerSettings.bundleVersion) returns an older value
         // during the GitHub Actions build for whatever reason.
         string[] projectSettingsAssetLines = File.ReadAllLines("ProjectSettings/ProjectSettings.asset");
-        Debug.Log($"ProjectSettings.asset content:\n{projectSettingsAssetLines.JoinWith("\n")}");
         string bundleVersionLine = projectSettingsAssetLines.FirstOrDefault(line => line.Contains("bundleVersion:"));
-        Debug.Log($"bundleVersionLine: {bundleVersionLine}");
         string bundleVersion = bundleVersionLine.Replace("bundleVersion:", "").Trim();
-        Debug.Log($"bundleVersion: {bundleVersion}");
+        Debug.Log($"bundleVersion from ProjectSettings/ProjectSettings.asset: {bundleVersion}");
         return bundleVersion;
     }
 }
