@@ -1,6 +1,6 @@
 # UltraStar Play Development README
 
-[![Build Status](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-unity-project.yml/badge.svg)](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-unity-project.yml)
+[![Build Status](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-main-game.yml/badge.svg)](https://github.com/UltraStar-Deluxe/Play/actions/workflows/build-main-game.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7cb9f368e7cb49a580a2ab3ed4345a07)](https://www.codacy.com/gh/UltraStar-Deluxe/Play/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=UltraStar-Deluxe/Play&amp;utm_campaign=Badge_Grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/UltraStar-Deluxe/Play/blob/master/LICENSE) 
 [![Join the chat at https://gitter.im/UltraStar-Deluxe/Play](https://badges.gitter.im/UltraStar-Deluxe/Play.svg)](https://gitter.im/UltraStar-Deluxe/Play?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
