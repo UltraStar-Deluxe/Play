@@ -5,7 +5,11 @@ about: Discuss a development problem or question with other developers
 ---
 
 Issue type: Development discussion
-<!--PLEASE DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS.-->
+<!--
+PLEASE DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS.
+The issue tracker is for reporting bugs, feature requests and development discussions only.
+For support questions, please use our Discord: https://discord.gg/PAUJFKCGbb
+-->
 
 ### Problem or question to be solved
 Describe the issue to be discussed.
