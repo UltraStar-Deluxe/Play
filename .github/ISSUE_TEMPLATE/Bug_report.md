@@ -8,7 +8,7 @@ Issue type: Bug report
 <!--
 PLEASE DO NOT FILE ISSUES FOR GENERAL SUPPORT QUESTIONS.
 The issue tracker is for reporting bugs, feature requests and development discussions only.
-For support questions, please use our chat at https://gitter.im/UltraStar-Deluxe/Play
+For support questions, please use our Discord: https://discord.gg/PAUJFKCGbb
 -->
 
 ### Actual behaviour
