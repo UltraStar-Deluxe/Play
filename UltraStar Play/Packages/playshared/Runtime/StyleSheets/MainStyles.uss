@@ -316,6 +316,10 @@ TextInput {
     color: rgb(0, 102, 156);
 }
 
+.dialogTextButton:focus {
+    color: rgb(125, 198, 233);
+}
+
 .optionsOverviewButtonRow {
     width: 100%;
     height: 25%;
