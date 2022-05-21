@@ -25,6 +25,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     public bool focusLastElementIfNothingFocused;
 
+    public bool logFocusedVisualElements;
+
     public VisualElement FocusedVisualElement => uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
     protected VisualElement lastFocusedVisualElement;
 
@@ -80,7 +82,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         if (lastFocusedVisualElement != null
             && IsFocusableNow(lastFocusedVisualElement))
         {
-            lastFocusedVisualElement.Focus();
+            if (logFocusedVisualElements)
+            {
+                Debug.Log("Moving focus to last focused VisualElement: " + lastFocusedVisualElement);
+                lastFocusedVisualElement.Focus();
+            }
         }
     }
 
@@ -136,6 +142,10 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         VisualElement nearestVisualElement = visualElementsInDirection.FindMinElement(visualElement => Vector2.Distance(visualElement.worldBound.center, targetPosition));
         if (nearestVisualElement != null)
         {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log($"Moving focus to VisualElement: {nearestVisualElement}");
+            }
             nearestVisualElement.Focus();
             nearestVisualElement.ScrollToSelf();
         }
