@@ -212,6 +212,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
     {
+        if (IsSongMenuOverlayVisible)
+        {
+            CancelDrag();
+            return;
+        }
+
         songRouletteControl.OnBeginDrag(this);
     }
 
@@ -227,12 +233,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     public void CancelDrag()
     {
-        // Nothing to do. This method is part of IDragListener.
+        dragControl.CancelDrag();
     }
 
     public bool IsCanceled()
     {
-        return false;
+        return dragControl.IsCanceled;
     }
 
     public ISlotListSlot GetCurrentSlot()
@@ -328,8 +334,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         });
         
-        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
-        songEntryUiRoot.RegisterCallback<PointerUpEvent>(_ => OnPointerUp(), TrickleDown.TrickleDown);
+        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDownOnThisVisualElement(evt), TrickleDown.TrickleDown);
+        // Listen to any PointerUp event, not only above this VisualElement.
+        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(_ => OnPointerUpOnAnyVisualElement(), TrickleDown.TrickleDown);
 
         // Stop coroutine when dragging
         dragControl.DragState.Subscribe(dragState =>
@@ -343,7 +350,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         UpdateTranslation();
     }
 
-    private void OnPointerDown(IPointerEvent pointerEvent)
+    private void OnPointerDownOnThisVisualElement(IPointerEvent pointerEvent)
     {
         if (pointerEvent.button == 1)
         {
@@ -353,11 +360,17 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             return;
         }
 
+        if (IsSongMenuOverlayVisible)
+        {
+            CancelDrag();
+            return;
+        }
+
         isPointerDown = true;
         StartShowSongMenuOverlayCoroutine();
     }
 
-    private void OnPointerUp()
+    private void OnPointerUpOnAnyVisualElement()
     {
         if (isPointerDown
             && !dragControl.IsDragging

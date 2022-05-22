@@ -15,6 +15,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     private readonly List<IDragListener<EVENT>> dragListeners = new();
 
     public bool IsDragging => DragState.Value == EDragState.Dragging;
+    public bool IsCanceled => DragState.Value == EDragState.Canceled;
 
     private EVENT dragStartEvent;
     private int pointerId;
