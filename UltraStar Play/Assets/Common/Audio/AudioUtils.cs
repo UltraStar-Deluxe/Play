@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using NLayer;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -17,22 +16,7 @@ public static class AudioUtils
             return null;
         }
 
-        string fileExtension = Path.GetExtension(uri);
-        if (fileExtension.ToLowerInvariant().Equals(".mp3"))
-        {
-            if (WebRequestUtils.IsHttpOrHttpsUri(uri))
-            {
-                throw new ArgumentException("Streaming of MP3 audio is not supported. Please use OGG audio instead.");
-            }
-
-            string filePath = uri.Replace("file://", "");
-            AudioClip audioClip = LoadMp3(filePath);
-            return audioClip;
-        }
-        else
-        {
-            return LoadAudio(uri, streamAudio);
-        }
+        return LoadAudio(uri, streamAudio);
     }
 
     private static AudioClip LoadAudio(string uri, bool streamAudio)
@@ -58,33 +42,5 @@ public static class AudioUtils
             }
             return downloadHandler.audioClip;
         }
-    }
-
-    public static AudioClip LoadMp3(string path)
-    {
-        string filename = Path.GetFileNameWithoutExtension(path);
-        MpegFile mpegFile = new(path);
-        if (mpegFile.Length < 1)
-        {
-            Debug.LogWarning($"Failed to load mp3 audio file: {path}");
-            return null;
-        }
-        return AudioClip.Create(filename,
-                                (int)(mpegFile.Length / sizeof(float) / mpegFile.Channels),
-                                mpegFile.Channels,
-                                mpegFile.SampleRate,
-                                true,
-                                data => OnReadMp3(data, mpegFile),
-                                position => OnClipPositionSet(position, mpegFile));
-    }
-
-    private static void OnReadMp3(float[] data, MpegFile mpegFile)
-    {
-        mpegFile.ReadSamples(data, 0, data.Length);
-    }
-
-    private static void OnClipPositionSet(int position, MpegFile mpegFile)
-    {
-        mpegFile.Position = position * sizeof(float) * mpegFile.Channels;
     }
 }
