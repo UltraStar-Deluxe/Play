@@ -6,30 +6,34 @@
 [![Chat on Discord](https://img.shields.io/discord/957290213246390352)](https://discord.com/invite/PAUJFKCGbb)
 [![Sponsor this project](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/achimmihca)
 
-### 1. About
+### About
 [UltraStar Play](https://usplay.net/) is a free and open source singing game.
 The game plays an audio file, displays lyrics, notes, and optionally a background video or image, while the players sing along to earn points.
 
 UltraStar Play is built with the [Unity](https://unity.com/) game engine and mostly C# as programming language.
 Builds are available for [desktop and mobile](https://github.com/UltraStar-Deluxe/Play/releases).
-Even more platforms (e.g. PlayStation, XBox) might be added in the future.
+Even more platforms (e.g. tvOS, PlayStation, XBox) might be added in the future.
 
 See [the project wiki](https://github.com/UltraStar-Deluxe/Play/wiki/First-Steps) to get started.
 
-### 2. Minimal System Requirements
-- Windows 7 SP1+, macOS 10.13+, Ubuntu 18.04+, Android 4.4 (API 19)+, iOS 11+ (to be released)
-    - For more details, see the [Unity documentation](https://docs.unity3d.com/Manual/system-requirements.html#player)
-- Speakers and microphones (e.g. headset, USB mic, UltraStar Play Companion App, [WO Mic](https://wolicheng.com/womic), etc.)
+### How to Contribute
+This is a free and open source project and we love to receive contributions from our community — you!
 
-### 3. How to Contribute
+Join us on [Discord](https://discord.gg/PAUJFKCGbb) to meet other maintainers. We'll help you get your first contribution in no time!
+
 You can support this project by
 
-- becoming a [GitHub Sponsor](https://github.com/sponsors/achimmihca) or
-- getting involved with the development
-    - See the [contribution guide](https://github.com/UltraStar-Deluxe/Play/blob/master/CONTRIBUTING.md) and [how to compile the game](https://github.com/UltraStar-Deluxe/Play/wiki/Compiling-the-game).
+- becoming a [GitHub Sponsor](https://github.com/sponsors/achimmihca)
+- writing tutorials or blog posts
+- improving the [documentation](https://github.com/UltraStar-Deluxe/Play/wiki)
+- adding [translations](https://github.com/UltraStar-Deluxe/Play/wiki/Translations,-Internationalization-(I18N))
+- submitting [bug reports or feature requests](https://github.com/UltraStar-Deluxe/Play/issues)
+- creating assets (images, sounds, music, styles, etc.)
+- writing code
+    - Checkout the [contribution guide](https://github.com/UltraStar-Deluxe/Play/blob/master/CONTRIBUTING.md) for help getting started.
 
-### 4. Support
+### Support
 If you need help or found a bug, then visit the [chat](https://discord.com/invite/PAUJFKCGbb) or [issue tracker](https://github.com/UltraStar-Deluxe/Play/issues)
 
-### 5. Follow us on Social Media
+### Follow us on Social Media
 UltraStar Play is on [Discord](https://discord.gg/PAUJFKCGbb), [Twitter](https://twitter.com/UltraStar_Play), [YouTube](https://www.youtube.com/channel/UCr481bd1jFp5d9wixQecwVw), [Facebook](https://www.facebook.com/UltraStar-Play-101984782475359)
