@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         unityVersion:
-          - 2021.2.0f1
+          - 2021.3.4f1
         targetPlatform:
           # At the moment, tests are target platform independent. Thus only build one.
           - StandaloneLinux64
@@ -46,7 +46,7 @@ jobs:
         run: sh setup.sh
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@b88af19d7fb34dadb854cd21a412a69c7fc448f6
+      - uses: game-ci/unity-test-runner@v2.0.2
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}

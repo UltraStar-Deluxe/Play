@@ -217,6 +217,11 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
+#searchTextField #unity-text-input {
+    height: 100%;
+    border-radius: 5px;
+}
+
 .transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);
 }
@@ -314,6 +319,10 @@ TextInput {
 
 .dialogTextButton:hover {
     color: rgb(0, 102, 156);
+}
+
+.dialogTextButton:focus {
+    color: rgb(125, 198, 233);
 }
 
 .optionsOverviewButtonRow {

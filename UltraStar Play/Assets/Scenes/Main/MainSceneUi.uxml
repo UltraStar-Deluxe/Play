@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="NewVersionAvailableDialog" src="project://database/Assets/Scenes/Main/NewVersionAvailableDialog.uxml?fileID=9197481963319205126&amp;guid=c0e2e6b52c0d55b40b80105b9b989bd2&amp;type=3#NewVersionAvailableDialog" />
     <ui:VisualElement name="background" class="backgroundImage">
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
             <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
@@ -24,7 +23,6 @@
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton" style="display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Instance template="NewVersionAvailableDialog" name="newVersionDialogRoot" class="overlay" style="display: none;" />
         <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
             <ui:Label text="Version: xx.yy.zz" name="semanticVersionText" style="font-size: 12px;" />
             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
