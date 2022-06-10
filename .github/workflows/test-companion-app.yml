@@ -46,7 +46,7 @@ jobs:
         run: sh setup.sh
       
       # Test Unity project
-      - uses: game-ci/unity-test-runner@2
+      - uses: game-ci/unity-test-runner@v2.0.2
         id: testRunner
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
