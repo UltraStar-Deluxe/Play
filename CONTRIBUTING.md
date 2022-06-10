@@ -25,10 +25,15 @@ Documentation
 - Update the [wiki](https://github.com/UltraStar-Deluxe/Play/wiki) when things change for users.
 - Document your code with comments for other developers.
 
-## How to suggest a feature or enhancement
+## How to suggest a feature or enhancement?
 Visit the [chat](https://discord.com/invite/PAUJFKCGbb) or [issue tracker](https://github.com/UltraStar-Deluxe/Play/issues) 
 
 Discuss things transparently and get community feedback. Create issues for any major change and enhancement that you wish to make.
+
+## How to download and run UltraStar Play from source?
+See the [wiki page on download and install](https://github.com/UltraStar-Deluxe/Play/wiki/Download-and-Install#download-and-build-from-source-code).
+
+Building for iOS requires additional steps that are explained [here](https://github.com/UltraStar-Deluxe/Play/wiki/iOS-Executable-Compilation).
 
 ## Repository Folder Structure
 See the [wiki page on foler structure](https://github.com/UltraStar-Deluxe/Play/wiki/Folder-Structure).
