@@ -191,8 +191,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             // Update leading player icon
             if (SceneData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreController.NoteScoreEventStream
-                    .Subscribe(_ => UpdateLeadingPlayerIcon());
                 playerControl.PlayerScoreController.SentenceScoreEventStream
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
