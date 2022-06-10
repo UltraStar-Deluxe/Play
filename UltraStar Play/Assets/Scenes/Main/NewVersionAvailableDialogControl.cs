@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITranslator
+public class NewVersionAvailableDialogControl : INeedInjection, IInjectionFinishedListener, ITranslator
 {
+    private const int CloseNewVersionAvailableDialogInputActionPriority = 10;
+
     [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
 
@@ -33,7 +38,9 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
     private readonly VisualElement dialogRootVisualElement;
     private readonly VisualElement parentVisualElement;
 
-    public NewVersionDialog(VisualElement dialogRootVisualElement,
+    private readonly List<IDisposable> disposables = new();
+
+    public NewVersionAvailableDialogControl(VisualElement dialogRootVisualElement,
         VisualElement parentVisualElement,
         Dictionary<string, string> remoteVersionProperties)
     {
@@ -68,11 +75,22 @@ public class NewVersionDialog : INeedInjection, IInjectionFinishedListener, ITra
         UpdateTranslation();
 
         parentVisualElement.Add(dialogRootVisualElement);
+
+        closeButton.Focus();
+
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back)
+            .PerformedAsObservable(CloseNewVersionAvailableDialogInputActionPriority)
+            .Subscribe(_ =>
+            {
+                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+                CloseDialog();
+            }));
     }
 
     public void CloseDialog()
     {
         parentVisualElement.Remove(dialogRootVisualElement);
+        disposables.ForEach(it => it.Dispose());
     }
 
     public void UpdateTranslation()
