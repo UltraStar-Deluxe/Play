@@ -56,6 +56,7 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
+        public const string closeLogOverlayButton = "closeLogOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
@@ -208,6 +209,11 @@ public static partial class R
         public const string legendInnerContainer = "legendInnerContainer";
         public const string lo = "lo";
         public const string localHighScoreContainer = "localHighScoreContainer";
+        public const string logContainer = "logContainer";
+        public const string logLevelItemPicker = "logLevelItemPicker";
+        public const string logOverlay = "logOverlay";
+        public const string logOverlayButtonRow = "logOverlayButtonRow";
+        public const string logTextField = "logTextField";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaTextField = "lyricsAreaTextField";
@@ -263,8 +269,6 @@ public static partial class R
         public const string musicVolumeSlider = "musicVolumeSlider";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
-        public const string NewVersionAvailableDialog = "NewVersionAvailableDialog";
-        public const string newVersionDialogRoot = "newVersionDialogRoot";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -415,6 +419,7 @@ public static partial class R
         public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showCoverButton = "showCoverButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string showLogOverlayButton = "showLogOverlayButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
         public const string showStatusBarContainer = "showStatusBarContainer";

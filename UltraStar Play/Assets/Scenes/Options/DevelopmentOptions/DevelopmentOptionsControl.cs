@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
+using Serilog.Events;
+using Serilog.Formatting.Display;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
@@ -38,11 +43,28 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
+    [Inject(UxmlName = R.UxmlNames.logLevelItemPicker)]
+    private ItemPicker logLevelItemPicker;
+
+    [Inject(UxmlName = R.UxmlNames.logTextField)]
+    private TextField logTextField;
+
+    [Inject(UxmlName = R.UxmlNames.showLogOverlayButton)]
+    private Button showLogOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeLogOverlayButton)]
+    private Button closeLogOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.logOverlay)]
+    private VisualElement logOverlay;
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private UiManager uiManager;
+
+    private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
 
     private void Start()
     {
@@ -83,11 +105,69 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
         }
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+            .Subscribe(_ => OnBack());
+
+        // View Log
+        HideLogOverlay();
+        showLogOverlayButton.RegisterCallbackButtonTriggered(() => ShowLogOverlay());
+        closeLogOverlayButton.RegisterCallbackButtonTriggered(() => HideLogOverlay());
+        logLevelItemPickerControl = new LabeledItemPickerControl<LogEventLevel>(
+            logLevelItemPicker,
+            EnumUtils.GetValuesAsList<LogEventLevel>());
+        LogEvent eventWithHighestLogLevel = Log.GetLogHistory()
+            .FindMaxElement(logEvent =>  (int)logEvent.Level);
+        LogEventLevel highestLogLevel = eventWithHighestLogLevel != null
+            ? eventWithHighestLogLevel.Level
+            : LogEventLevel.Error;
+        logLevelItemPickerControl.SelectItem(highestLogLevel);
+        logLevelItemPickerControl.Selection.Subscribe(_ => UpdateLogTextField());
+        UpdateLogTextField();
+    }
+
+    private void HideLogOverlay()
+    {
+        logOverlay.HideByDisplay();
+    }
+
+    private void ShowLogOverlay()
+    {
+        logOverlay.ShowByDisplay();
+        closeLogOverlayButton.Focus();
+    }
+
+    private void OnBack()
+    {
+        if (logOverlay.IsVisibleByDisplay())
+        {
+            HideLogOverlay();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
+    }
+
+    private void UpdateLogTextField()
+    {
+        MessageTemplateTextFormatter textFormatter = new(Log.OutputTemplate);
+        List<string> logLines = Log.GetLogHistory()
+            .Where(logEvent => (int)logEvent.Level >= (int)logLevelItemPickerControl.SelectedItem)
+            .Select(logEvent =>
+            {
+                StringWriter stringWriter = new();
+                textFormatter.Format(logEvent, stringWriter);
+                string logLine = stringWriter.ToString();
+                // Workaround for Unity TextField interpreting backslash for special characters.
+                return logLine.Replace("\\", "/");
+            })
+            .ToList();
+        logTextField.value = logLines.IsNullOrEmpty()
+            ? "(no messages for this log level)"
+            : logLines.JoinWith("");
     }
 
     public void UpdateTranslation()

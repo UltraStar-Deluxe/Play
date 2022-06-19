@@ -38,7 +38,6 @@ public static class GameObjectUtils
                 return obj;
             }
         }
-        Debug.LogWarning("No object of Type " + typeof(T) + " has been found in the scene.");
         return null;
     }
 

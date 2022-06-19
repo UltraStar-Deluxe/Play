@@ -1,19 +1,28 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Serilog;
 using Serilog.Events;
 using UnityEngine;
 
 public static class Log
 {
+    public const string OutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
     private static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     private static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
 
     public static Serilog.ILogger Logger { get; private set; }
 
+    private static readonly LogHistorySink logHistorySink = new();
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
         Logger = CreateLogger();
+    }
+
+    public static List<LogEvent> GetLogHistory()
+    {
+        return logHistorySink.LogHistory;
     }
 
     private static Serilog.ILogger CreateLogger()
@@ -28,10 +37,11 @@ public static class Log
             .Enrich.FromLogContext()
             .Enrich.With<UnityStackTraceEnricher>()
             .WriteTo.Sink(new UnityLogEventSink())
+            .WriteTo.Sink(logHistorySink)
             .WriteTo.File(
                 logFilePath, // path
                 LogEventLevel.Verbose, // restrictedToMinimumLevel
-                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}", // outputTemplate
+                OutputTemplate, // outputTemplate
                 null, // formatProvider
                 fileSizeLimitBytes, // fileSizeLimitBytes
                 null, // levelSwitch

@@ -826,3 +826,7 @@ Label.tinyFont {
 #targetNoteImage.goldenNote {
     background-color: rgba(255, 215, 0, 0.4);
 }
+
+.fullMinHeightUnityContentContainer #unity-content-container {
+    min-height: 100%;
+}
