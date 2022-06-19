@@ -222,7 +222,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">
                 <ui:VisualElement name="lyricsArea" class="panel" style="width: 180px; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" style="width: 100%; height: auto; flex-grow: 1;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: auto; flex-grow: 1;">
                         <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
                     </ui:ScrollView>
                     <ui:VisualElement name="voiceButtonRow" class="smallFont" style="flex-direction: row; flex-shrink: 0;">
