@@ -6,7 +6,7 @@
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Sound Options" name="sceneTitle" class="titleText"/>
+                            <ui:Label text="Sound Options" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
@@ -19,9 +19,9 @@
                 <ui:Label text="Preview Volume" name="previewVolumeLabel" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="previewVolumeChooser" />
             </ui:VisualElement>
-            <ui:VisualElement name="backgroundMusicEnabledContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Background Music" name="backgroundMusicEnabledLabel" class="controlLabel" />
-                <ItemPicker wrapAround="true" name="backgroundMusicEnabledChooser" />
+            <ui:VisualElement name="backgroundMusicVolumeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Background Music" name="backgroundMusicVolumeLabel" class="controlLabel" />
+                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="backgroundMusicVolumeChooser" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
                 <ui:Button text="Back" name="backButton" />

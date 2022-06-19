@@ -12,21 +12,15 @@ public class VolumeControl : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        UpdateVolumeInScene();
+        UpdateGeneralVolume();
         settings.AudioSettings
             .ObserveEveryValueChanged(audioSettings => audioSettings.VolumePercent)
-            .Subscribe(newValue => UpdateVolumeInScene())
+            .Subscribe(newValue => UpdateGeneralVolume())
             .AddTo(gameObject);
     }
 
-    private void UpdateVolumeInScene()
+    private void UpdateGeneralVolume()
     {
-        AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
-        if (!audioSources.IsNullOrEmpty())
-        {
-            audioSources.ForEach(audioSource => audioSource.volume = settings.AudioSettings.VolumePercent / 100.0f);
-        }
-
         AudioListener.volume = settings.AudioSettings.VolumePercent / 100.0f;
     }
 }

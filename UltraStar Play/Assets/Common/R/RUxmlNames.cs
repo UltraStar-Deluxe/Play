@@ -27,9 +27,9 @@ public static partial class R
         public const string backButtonContainer = "backButtonContainer";
         public const string backButtonLabel = "backButtonLabel";
         public const string background = "background";
-        public const string backgroundMusicEnabledChooser = "backgroundMusicEnabledChooser";
-        public const string backgroundMusicEnabledContainer = "backgroundMusicEnabledContainer";
-        public const string backgroundMusicEnabledLabel = "backgroundMusicEnabledLabel";
+        public const string backgroundMusicVolumeChooser = "backgroundMusicVolumeChooser";
+        public const string backgroundMusicVolumeContainer = "backgroundMusicVolumeContainer";
+        public const string backgroundMusicVolumeLabel = "backgroundMusicVolumeLabel";
         public const string backImage = "backImage";
         public const string backToMainMenuButton = "backToMainMenuButton";
         public const string bottomButtonRow = "bottomButtonRow";
