@@ -209,10 +209,11 @@ public static partial class R
         public const string legendInnerContainer = "legendInnerContainer";
         public const string lo = "lo";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logContainer = "logContainer";
+        public const string logLevelContainer = "logLevelContainer";
         public const string logLevelItemPicker = "logLevelItemPicker";
         public const string logOverlay = "logOverlay";
         public const string logOverlayButtonRow = "logOverlayButtonRow";
+        public const string logPathLabel = "logPathLabel";
         public const string logTextField = "logTextField";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";

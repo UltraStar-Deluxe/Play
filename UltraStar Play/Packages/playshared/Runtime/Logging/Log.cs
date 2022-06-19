@@ -6,9 +6,9 @@ using UnityEngine;
 
 public static class Log
 {
-    public const string OutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
+    public static readonly string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
     private static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
-    private static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
+    public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
 
     public static Serilog.ILogger Logger { get; private set; }
 
@@ -41,7 +41,7 @@ public static class Log
             .WriteTo.File(
                 logFilePath, // path
                 LogEventLevel.Verbose, // restrictedToMinimumLevel
-                OutputTemplate, // outputTemplate
+                outputTemplate, // outputTemplate
                 null, // formatProvider
                 fileSizeLimitBytes, // fileSizeLimitBytes
                 null, // levelSwitch

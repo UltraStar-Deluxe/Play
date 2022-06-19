@@ -58,6 +58,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.logOverlay)]
     private VisualElement logOverlay;
 
+    [Inject(UxmlName = R.UxmlNames.logPathLabel)]
+    private Label logPathLabel;
+
     [Inject]
     private Settings settings;
 
@@ -124,6 +127,8 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         logLevelItemPickerControl.Selection.Subscribe(_ => UpdateLogTextField());
         UpdateLogTextField();
 
+        logPathLabel.text = Log.logFilePath;
+
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
@@ -155,7 +160,7 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     private void UpdateLogTextField()
     {
-        MessageTemplateTextFormatter textFormatter = new(Log.OutputTemplate);
+        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
         List<string> logLines = Log.GetLogHistory()
             .Where(logEvent => (int)logEvent.Level >= (int)logLevelItemPickerControl.SelectedItem)
             .Select(logEvent =>
