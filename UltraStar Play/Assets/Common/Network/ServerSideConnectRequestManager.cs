@@ -32,7 +32,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
                 ServerSideConnectRequestManager instanceInScene = GameObjectUtils.FindComponentWithTag<ServerSideConnectRequestManager>("ServerSideConnectRequestManager");
                 if (instanceInScene != null)
                 {
-                    instanceInScene.InitSingleInstance();
+                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
                 }
             }
             return instance;
@@ -59,7 +59,8 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     
     private void Start()
     {
-        InitSingleInstance();
+        ServerSideConnectRequestManager self = this;
+        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
         if (!Application.isPlaying || instance != this)
         {
             return;
@@ -75,28 +76,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
                 ServerAcceptMessageFromClient();
             }
         });
-    }
-
-    private void InitSingleInstance()
-    {
-        if (!Application.isPlaying)
-        {
-            return;
-        }
-
-        if (instance != null
-            && instance != this)
-        {
-            // This instance is not needed.
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
-            
-        // Move object to top level in scene hierarchy.
-        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used.
-        transform.SetParent(null);
-        DontDestroyOnLoad(gameObject);
     }
 
     private void ServerAcceptMessageFromClient()

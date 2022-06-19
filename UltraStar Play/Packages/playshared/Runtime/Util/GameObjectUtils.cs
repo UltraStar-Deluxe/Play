@@ -82,4 +82,28 @@ public static class GameObjectUtils
         gameObject.transform.SetParent(null);
         GameObject.DontDestroyOnLoad(gameObject);
     }
+
+    public static void TryInitSingleInstanceWithDontDestroyOnLoad<T>(ref T staticInstance, ref T selfInstance, bool onlyInPlayMode = true)
+        where T : MonoBehaviour
+    {
+        if (!Application.isPlaying && onlyInPlayMode)
+        {
+            return;
+        }
+
+        if (staticInstance != null
+            && staticInstance != selfInstance)
+        {
+            // This instance is not needed.
+            GameObject.Destroy(selfInstance.gameObject);
+            return;
+        }
+
+        staticInstance = selfInstance;
+
+        // Move object to top level in scene hierarchy.
+        // Otherwise this object will be destroyed with its parent, even when DontDestroyOnLoad is used.
+        selfInstance.transform.SetParent(null);
+        GameObject.DontDestroyOnLoad(selfInstance.gameObject);
+    }
 }
