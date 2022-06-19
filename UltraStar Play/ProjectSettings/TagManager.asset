@@ -29,6 +29,7 @@ TagManager:
   - TranslationManager
   - StyleSheetControl
   - ContextMenuPopupManager
+  - BackgroundMusicManager
   layers:
   - Default
   - TransparentFX
