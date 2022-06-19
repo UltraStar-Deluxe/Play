@@ -18,6 +18,7 @@ public static partial class R
         public const string error = "error";
         public const string focusableNavigatorIgnore = "focusableNavigatorIgnore";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
+        public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
