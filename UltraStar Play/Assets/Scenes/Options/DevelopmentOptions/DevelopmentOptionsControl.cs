@@ -105,9 +105,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
         }
 
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => OnBack());
 
@@ -126,11 +123,16 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         logLevelItemPickerControl.SelectItem(highestLogLevel);
         logLevelItemPickerControl.Selection.Subscribe(_ => UpdateLogTextField());
         UpdateLogTextField();
+
+        // Back button
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
+        backButton.Focus();
     }
 
     private void HideLogOverlay()
     {
         logOverlay.HideByDisplay();
+        showLogOverlayButton.Focus();
     }
 
     private void ShowLogOverlay()
