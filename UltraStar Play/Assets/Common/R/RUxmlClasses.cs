@@ -41,7 +41,6 @@ public static partial class R
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
-        public const string overlay = "overlay";
         public const string panel = "panel";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
