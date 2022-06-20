@@ -100,7 +100,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            PlayerScoreControllerData playerScoreData = sceneData.GetPlayerScores(playerProfile);
+            PlayerScoreControlData playerScoreData = sceneData.GetPlayerScores(playerProfile);
             SongRating songRating = GetSongRating(playerScoreData.TotalScore);
 
             Injector childInjector = UniInjectUtils.CreateInjector(injector);

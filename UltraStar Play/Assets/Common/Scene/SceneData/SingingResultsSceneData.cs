@@ -8,9 +8,9 @@ public class SingingResultsSceneData : SceneData
     public int SongDurationInMillis { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
-    private readonly Dictionary<PlayerProfile, PlayerScoreControllerData> playerScoreMap = new();
+    private readonly Dictionary<PlayerProfile, PlayerScoreControlData> playerScoreMap = new();
 
-    public void AddPlayerScores(PlayerProfile profile, PlayerScoreControllerData scoreData)
+    public void AddPlayerScores(PlayerProfile profile, PlayerScoreControlData scoreData)
     {
         if (!PlayerProfiles.Contains(profile))
         {
@@ -19,7 +19,7 @@ public class SingingResultsSceneData : SceneData
         playerScoreMap[profile] = scoreData;
     }
 
-    public PlayerScoreControllerData GetPlayerScores(PlayerProfile playerProfile)
+    public PlayerScoreControlData GetPlayerScores(PlayerProfile playerProfile)
     {
         return playerScoreMap[playerProfile];
     }

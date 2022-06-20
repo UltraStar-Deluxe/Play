@@ -64,8 +64,11 @@ public static partial class R
         public const string closeSongOverlayButton = "closeSongOverlayButton";
         public const string colorContainer = "colorContainer";
         public const string column = "column";
-        public const string combineDuetScoresContainer = "combineDuetScoresContainer";
         public const string commitHashText = "commitHashText";
+        public const string commonScoreContainer = "commonScoreContainer";
+        public const string commonScoreContainerBackground = "commonScoreContainerBackground";
+        public const string commonScoreIcon = "commonScoreIcon";
+        public const string commonScoreLabel = "commonScoreLabel";
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
@@ -327,6 +330,8 @@ public static partial class R
         public const string playerImage = "playerImage";
         public const string playerInfoContainer = "playerInfoContainer";
         public const string playerNameLabel = "playerNameLabel";
+        public const string playerScoreContainer = "playerScoreContainer";
+        public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
         public const string playerSelectOverlay = "playerSelectOverlay";
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
@@ -382,7 +387,6 @@ public static partial class R
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string scoreBar = "scoreBar";
-        public const string scoreContainer = "scoreContainer";
         public const string scoreIcon = "scoreIcon";
         public const string scoreLabel = "scoreLabel";
         public const string scoreName = "scoreName";
