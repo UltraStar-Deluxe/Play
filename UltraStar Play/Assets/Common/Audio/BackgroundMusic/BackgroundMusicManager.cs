@@ -63,7 +63,6 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
     private float lastPauseTimeInSeconds;
 
 	private void Start() {
-        Debug.Log("Start");
         BackgroundMusicManager self = this;
         GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
 

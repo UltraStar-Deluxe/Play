@@ -9,14 +9,14 @@ using UnityEngine;
 #pragma warning disable CS0649
 
 // Takes the analyzed beats of the PlayerPitchTracker and calculates the player's score.
-public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     // A total of 10000 points can be achieved.
     // Golden notes give double points.
     // Singing perfect lines gives a bonus of up to 1000 points.
-    public static readonly int MaxScore = 10000;
-    public static readonly int MaxPerfectSentenceBonusScore = 1000;
-    public static readonly int MaxScoreForNotes = MaxScore - MaxPerfectSentenceBonusScore;
+    public static readonly int maxScore = 10000;
+    public static readonly int maxPerfectSentenceBonusScore = 1000;
+    public static readonly int maxScoreForNotes = maxScore - maxPerfectSentenceBonusScore;
 
     public int TotalScore
     {
@@ -55,13 +55,13 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         get
         {
             int targetSentenceCount = (ScoreData.TotalSentenceCount > 20) ? 20 : ScoreData.TotalSentenceCount;
-            double score = (double)MaxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
+            double score = (double)maxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
 
             // Round the score up
             score = Math.Ceiling(score);
-            if (score > MaxPerfectSentenceBonusScore)
+            if (score > maxPerfectSentenceBonusScore)
             {
-                score = MaxPerfectSentenceBonusScore;
+                score = maxPerfectSentenceBonusScore;
             }
             return (int)score;
         }
@@ -96,7 +96,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     private double maxScoreForNormalNotes;
     private double maxScoreForGoldenNotes;
 
-    public PlayerScoreControllerData ScoreData { get; set; } = new();
+    public PlayerScoreControlData ScoreData { get; set; } = new();
 
     public void OnInjectionFinished()
     {
@@ -214,12 +214,12 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
                 ScoreData.PerfectSentenceCount++;
             }
 
-            sentenceRating = GetSentenceRating(correctNotesPercentage);
+            sentenceRating = SentenceRating.GetSentenceRating(correctNotesPercentage);
         }
         else
         {
             sentenceScore = CreateSentenceScore(analyzedSentence);
-            sentenceRating = GetSentenceRating(0);
+            sentenceRating = SentenceRating.GetSentenceRating(0);
         }
         sentenceScore.TotalScoreSoFar = TotalScore;
 
@@ -243,7 +243,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
             ScoreData.GoldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        double scoreForCorrectBeatOfNormalNotes = MaxScoreForNotes / ((double)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
+        double scoreForCorrectBeatOfNormalNotes = maxScoreForNotes / ((double)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
         double scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
 
         maxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * ScoreData.NormalNoteLengthTotal;
@@ -251,7 +251,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
         double pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
-        bool isSound = Math.Abs(MaxScoreForNotes - pointsForAllNotes) <= 0.01;
+        bool isSound = Math.Abs(maxScoreForNotes - pointsForAllNotes) <= 0.01;
         if (!isSound)
         {
             Debug.LogWarning("The definition of scores for normal or golden notes is not sound: "
@@ -263,7 +263,7 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
         maxScoreForGoldenNotes = Math.Ceiling(maxScoreForGoldenNotes);
         // The sum of the rounded points must not exceed the MaxScoreForNotes.
         // If the definition is sound then the overhang is at most 2 because of the above rounding.
-        int overhang = (int)(maxScoreForNormalNotes + maxScoreForGoldenNotes) - MaxScoreForNotes;
+        int overhang = (int)(maxScoreForNormalNotes + maxScoreForGoldenNotes) - maxScoreForNotes;
         maxScoreForNormalNotes -= overhang;
 
         // Remember the sentence count to calculate the points for a perfect sentence.
@@ -278,23 +278,6 @@ public class PlayerScoreController : MonoBehaviour, INeedInjection, IInjectionFi
     private int GetGoldenNoteLength(Sentence sentence)
     {
         return sentence.Notes.Where(note => note.IsGolden).Select(note => (int)note.Length).Sum();
-    }
-
-    private SentenceRating GetSentenceRating(double correctNotesPercentage)
-    {
-        if (correctNotesPercentage < 0)
-        {
-            return null;
-        }
-
-        foreach (SentenceRating sentenceRating in SentenceRating.Values)
-        {
-            if (correctNotesPercentage >= sentenceRating.PercentageThreshold)
-            {
-                return sentenceRating;
-            }
-        }
-        return null;
     }
 
     private SentenceScore CreateSentenceScore(Sentence sentence)
