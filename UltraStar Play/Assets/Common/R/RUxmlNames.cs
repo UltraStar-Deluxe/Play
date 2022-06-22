@@ -335,6 +335,7 @@ public static partial class R
         public const string playerScrollView = "playerScrollView";
         public const string playerSelectOverlay = "playerSelectOverlay";
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
+        public const string playersIcon = "playersIcon";
         public const string playerUi = "playerUi";
         public const string PlayerUi = "PlayerUi";
         public const string playerUiContainer = "playerUiContainer";
@@ -389,6 +390,8 @@ public static partial class R
         public const string scoreBar = "scoreBar";
         public const string scoreIcon = "scoreIcon";
         public const string scoreLabel = "scoreLabel";
+        public const string scoreModeLabel = "scoreModeLabel";
+        public const string scoreModePicker = "scoreModePicker";
         public const string scoreName = "scoreName";
         public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
@@ -417,6 +420,7 @@ public static partial class R
         public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
+        public const string settingsIcon = "settingsIcon";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
         public const string showBackgroundButton = "showBackgroundButton";
@@ -435,6 +439,7 @@ public static partial class R
         public const string showVirtualPianoContainer = "showVirtualPianoContainer";
         public const string showVirtualPianoToggle = "showVirtualPianoToggle";
         public const string SingingLyricsUi = "SingingLyricsUi";
+        public const string singingOptionsScrollView = "singingOptionsScrollView";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
         public const string SingingResultsPlayerUi = "SingingResultsPlayerUi";
         public const string SingingResultsPlayerUiAlternative = "SingingResultsPlayerUiAlternative";
@@ -526,6 +531,7 @@ public static partial class R
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleSettingsButton = "toggleSettingsButton";
         public const string toggleSideBarSizeButton = "toggleSideBarSizeButton";
+        public const string toggleSingingOptionsButton = "toggleSingingOptionsButton";
         public const string toggleSongDetailOverlayButton = "toggleSongDetailOverlayButton";
         public const string toggleSongPropertiesButton = "toggleSongPropertiesButton";
         public const string topContent = "topContent";
