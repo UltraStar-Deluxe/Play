@@ -69,6 +69,7 @@ public static partial class R
         public const string commonScoreContainerBackground = "commonScoreContainerBackground";
         public const string commonScoreIcon = "commonScoreIcon";
         public const string commonScoreLabel = "commonScoreLabel";
+        public const string commonScoreSentenceRatingContainer = "commonScoreSentenceRatingContainer";
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";

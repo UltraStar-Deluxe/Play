@@ -20,8 +20,8 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.commonScoreLabel)]
     private Label commonScoreLabel;
 
-    [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
-    private VisualElement playerUiContainer;
+    [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
+    private VisualElement commonScoreSentenceRatingContainer;
 
     private IEnumerable<PlayerScoreControl> ScoreControls => singSceneControl.PlayerControls
         .Select(playerControl => playerControl.PlayerScoreControl);
@@ -32,6 +32,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
+        commonScoreSentenceRatingContainer.Clear();
         if (singSceneControl.IsCommonScore)
         {
             InitCommonScore();
@@ -73,7 +74,11 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     private void ShowSentenceRating(SentenceRating sentenceRating)
     {
         PlayerControl playerControl = singSceneControl.PlayerControls.FirstOrDefault();
-        playerControl.PlayerUiControl.ShowSentenceRating(sentenceRating, playerUiContainer);
+        VisualElement sentenceRatingVisualElement = playerControl.PlayerUiControl.ShowSentenceRating(sentenceRating, commonScoreSentenceRatingContainer);
+        if (sentenceRatingVisualElement != null)
+        {
+            sentenceRatingVisualElement.style.position = new StyleEnum<Position>(Position.Relative);
+        }
     }
 
     private void UpdateCommonScoreLabel()
