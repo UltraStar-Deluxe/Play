@@ -28,7 +28,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     private int totalScoreAnimationId;
 
-    private HashSet<Sentence> ratedSentences = new();
+    private readonly HashSet<Sentence> ratedSentences = new();
 
     public void OnInjectionFinished()
     {
