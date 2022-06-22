@@ -19,8 +19,8 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.ratePlayersContainer)]
-    private VisualElement ratePlayersContainer;
+    [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
+    private VisualElement scoreModeContainer;
 
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
@@ -30,7 +30,7 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        new LabeledItemPickerControl<EScoreMode>(ratePlayersContainer.Q<ItemPicker>(), EnumUtils.GetValuesAsList<EScoreMode>())
+        new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
 
@@ -47,7 +47,7 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        ratePlayersContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_ratePlayers);
+        scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
     }
