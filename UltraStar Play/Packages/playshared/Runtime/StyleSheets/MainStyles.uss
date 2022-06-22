@@ -830,3 +830,7 @@ Label.tinyFont {
 .fullMinHeightUnityContentContainer #unity-content-container {
     min-height: 100%;
 }
+
+.searchPropertyContainer {
+    margin-bottom: 10px;
+}

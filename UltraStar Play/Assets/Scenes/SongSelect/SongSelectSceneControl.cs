@@ -171,6 +171,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
     private ItemPicker songOrderItemPicker;
 
+    [Inject(UxmlName = R.UxmlNames.scoreModeLabel)]
+    private Label scoreModeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
+    private ItemPicker scoreModePicker;
+
+    [Inject(UxmlName = R.UxmlNames.singingOptionsScrollView)]
+    private VisualElement singingOptionsScrollView;
+
+    [Inject(UxmlName = R.UxmlNames.toggleSingingOptionsButton)]
+    private Button toggleSingingOptionsButton;
+
+    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
+    private VisualElement playerScrollView;
+
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     private SongSelectSceneData sceneData;
@@ -318,6 +333,36 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
+
+        // Toggle player select and singing options
+        playerScrollView.ShowByDisplay();
+        singingOptionsScrollView.HideByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).ShowByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).HideByDisplay();
+        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() => TogglePlayerSelectAndSingingOptions());
+
+        // Init singing options
+        new LabeledItemPickerControl<EScoreMode>(scoreModePicker, EnumUtils.GetValuesAsList<EScoreMode>())
+            .Bind(() => settings.GameSettings.ScoreMode,
+                newValue => settings.GameSettings.ScoreMode = newValue);
+    }
+
+    private void TogglePlayerSelectAndSingingOptions()
+    {
+        if (playerScrollView.IsVisibleByDisplay())
+        {
+            playerScrollView.HideByDisplay();
+            singingOptionsScrollView.ShowByDisplay();
+            toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).HideByDisplay();
+            toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).ShowByDisplay();
+        }
+        else
+        {
+            playerScrollView.ShowByDisplay();
+            singingOptionsScrollView.HideByDisplay();
+            toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).ShowByDisplay();
+            toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).HideByDisplay();
+        }
     }
 
     private void UpdateNextAndPreviousSongButtonLabels()
