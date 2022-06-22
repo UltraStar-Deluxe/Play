@@ -360,7 +360,6 @@ public static partial class R
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
-        public const string ratePlayersContainer = "ratePlayersContainer";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
         public const string recordedNote = "recordedNote";
@@ -390,6 +389,7 @@ public static partial class R
         public const string scoreBar = "scoreBar";
         public const string scoreIcon = "scoreIcon";
         public const string scoreLabel = "scoreLabel";
+        public const string scoreModeContainer = "scoreModeContainer";
         public const string scoreModeLabel = "scoreModeLabel";
         public const string scoreModePicker = "scoreModePicker";
         public const string scoreName = "scoreName";

@@ -109,7 +109,7 @@
                     <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                 </ui:ScrollView>
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 90%; flex-grow: 1;">
-                    <ui:Label text="Rate Players" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
+                    <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
                     <ItemPicker noPreviousButton="true" name="scoreModePicker" wrapAround="true" class="smallControl" style="width: auto;" />
                 </ui:ScrollView>
             </ui:VisualElement>
