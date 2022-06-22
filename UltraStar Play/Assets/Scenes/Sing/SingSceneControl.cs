@@ -290,7 +290,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void PreparePlayerUiLayout()
     {
         int playerCount = SceneData.SelectedPlayerProfiles.Count;
-        playerUiContainer.Clear();
+        playerUiContainer.Children()
+            .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
+            .ToList()
+            .ForEach(it => it.RemoveFromHierarchy());
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.

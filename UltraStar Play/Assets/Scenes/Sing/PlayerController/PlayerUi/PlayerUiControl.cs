@@ -182,11 +182,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .id;
     }
 
-    public void ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
+    public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
         if (settings.GameSettings.ScoreMode == EScoreMode.None)
         {
-            return;
+            return null;
         }
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
@@ -202,6 +202,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .setEaseInSine()
             .setOnUpdate(interpolatedTop => visualElement.style.top = interpolatedTop)
             .setOnComplete(visualElement.RemoveFromHierarchy);
+        return visualElement;
     }
 
     private void ShowTotalScore(int score)
