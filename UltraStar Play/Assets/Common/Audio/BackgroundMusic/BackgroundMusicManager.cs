@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 
 public class BackgroundMusicManager : MonoBehaviour, INeedInjection
 {
-    public static BackgroundMusicManager instance;
+    private static BackgroundMusicManager instance;
     public static BackgroundMusicManager Instance
     {
         get
