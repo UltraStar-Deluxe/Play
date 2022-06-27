@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 [Serializable]
-public class PlayerScoreControllerData
+public class PlayerScoreControlData
 {
     public Dictionary<Sentence, SentenceScore> SentenceToSentenceScoreMap { get; set; } = new();
     public Dictionary<Note, NoteScore> NoteToNoteScoreMap { get; set; } = new();

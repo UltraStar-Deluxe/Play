@@ -19,11 +19,8 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.ratePlayersContainer)]
-    private VisualElement ratePlayersContainer;
-
-    [Inject(UxmlName = R.UxmlNames.combineDuetScoresContainer)]
-    private VisualElement combineDuetScoresContainer;
+    [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
+    private VisualElement scoreModeContainer;
 
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
@@ -33,13 +30,9 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        new BoolPickerControl(ratePlayersContainer.Q<ItemPicker>())
-            .Bind(() => settings.GameSettings.RatePlayers,
-                  newValue => settings.GameSettings.RatePlayers = newValue);
-
-        new BoolPickerControl(combineDuetScoresContainer.Q<ItemPicker>())
-            .Bind(() => settings.GameSettings.CombineDuetScores,
-                newValue => settings.GameSettings.CombineDuetScores = newValue);
+        new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
+            .Bind(() => settings.GameSettings.ScoreMode,
+                  newValue => settings.GameSettings.ScoreMode = newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();
@@ -54,8 +47,7 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        ratePlayersContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_ratePlayers);
-        combineDuetScoresContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_combineDuetScores);
+        scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
     }

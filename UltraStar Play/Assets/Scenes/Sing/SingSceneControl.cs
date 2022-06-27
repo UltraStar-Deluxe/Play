@@ -158,6 +158,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public bool IsDialogOpen => dialogControl != null;
 
     private ContextMenuControl contextMenuControl;
+    private CommonScoreControl commonScoreControl;
+
+    public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
+                                 && SceneData.SelectedPlayerProfiles.Count >= 2;
+
+    public bool IsIndividualScore => settings.GameSettings.ScoreMode == EScoreMode.Individual
+                                     || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
+                                         && SceneData.SelectedPlayerProfiles.Count <= 1);
 
     private void Start()
     {
@@ -183,15 +191,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             }
             PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
 
-            if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControllerData scoreData))
+            if (SceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out PlayerScoreControlData scoreData))
             {
-                playerControl.PlayerScoreController.ScoreData = scoreData;
+                playerControl.PlayerScoreControl.ScoreData = scoreData;
             }
 
             // Update leading player icon
             if (SceneData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreController.SentenceScoreEventStream
+                playerControl.PlayerScoreControl.SentenceScoreEventStream
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
@@ -256,6 +264,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             playerControl.PlayerMicPitchTracker.SendMicProfileToConnectedClient();
             playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
         });
+
+        commonScoreControl = injector.CreateAndInject<CommonScoreControl>();
     }
 
     private void InitDummySingers()
@@ -280,7 +290,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void PreparePlayerUiLayout()
     {
         int playerCount = SceneData.SelectedPlayerProfiles.Count;
-        playerUiContainer.Clear();
+        playerUiContainer.Children()
+            .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
+            .ToList()
+            .ForEach(it => it.RemoveFromHierarchy());
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
@@ -359,8 +372,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         PlayerControl leadingPlayerControl = null;
         foreach (PlayerControl playerController in PlayerControls)
         {
-            if ((leadingPlayerControl == null && playerController.PlayerScoreController.TotalScore > 0)
-               || (leadingPlayerControl != null && playerController.PlayerScoreController.TotalScore > leadingPlayerControl.PlayerScoreController.TotalScore))
+            if ((leadingPlayerControl == null && playerController.PlayerScoreControl.TotalScore > 0)
+               || (leadingPlayerControl != null && playerController.PlayerScoreControl.TotalScore > leadingPlayerControl.PlayerScoreControl.TotalScore))
             {
                 leadingPlayerControl = playerController;
             }
@@ -463,7 +476,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         foreach (PlayerControl playerController in PlayerControls)
         {
-            playerController.PlayerScoreController.NextBeatToScore = nextBeatToScore;
+            playerController.PlayerScoreControl.NextBeatToScore = nextBeatToScore;
             playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
         }
     }
@@ -477,14 +490,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void OpenSongInEditor()
     {
         int maxBeatToScore = PlayerControls
-            .Select(playerController => playerController.PlayerScoreController.NextBeatToScore)
+            .Select(playerController => playerController.PlayerScoreControl.NextBeatToScore)
             .Max();
         SceneData.NextBeatToScore = Math.Max((int)CurrentBeat, maxBeatToScore);
 
-        SceneData.PlayerProfileToScoreDataMap = new Dictionary<PlayerProfile, PlayerScoreControllerData>();
+        SceneData.PlayerProfileToScoreDataMap = new Dictionary<PlayerProfile, PlayerScoreControlData>();
         foreach (PlayerControl playerController in PlayerControls)
         {
-            SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
+            SceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, playerController.PlayerScoreControl.ScoreData);
         }
 
         SongEditorSceneData songEditorSceneData = new()
@@ -502,13 +515,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void FinishScene(bool isAfterEndOfSong)
     {
-        if (settings.GameSettings.RatePlayers)
+        if (settings.GameSettings.ScoreMode == EScoreMode.None)
         {
-            FinishSceneToSingingResults(isAfterEndOfSong);
+            FinishSceneToSongSelect();
         }
         else
         {
-            FinishSceneToSongSelect();
+            FinishSceneToSingingResults(isAfterEndOfSong);
         }
     }
 
@@ -526,26 +539,76 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new();
         singingResultsSceneData.SongMeta = SongMeta;
-        singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
+
+        // Add scores, either for individual players, or as one common score.
+        List<SongStatistic> songStatistics = new();
+        if (IsIndividualScore)
+        {
+            // Add and record score for each player individually.
+            singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+            PlayerControls.ForEach(playerControl =>
+            {
+                singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerControl.PlayerScoreControl.ScoreData);
+            });
+
+            songStatistics = PlayerControls
+                .Select(playerControl => new SongStatistic(playerControl.PlayerProfile.Name,
+                    playerControl.PlayerProfile.Difficulty,
+                    playerControl.PlayerScoreControl.TotalScore,
+                    EScoreMode.Individual))
+                .ToList();
+        }
+        else if (IsCommonScore)
+        {
+            // Add and record score as average of all players.
+            List<PlayerScoreControl> scoreControls = PlayerControls
+                .Select(playerControl => playerControl.PlayerScoreControl)
+                .ToList();
+            string commonPlayerProfileName = PlayerControls
+                .Select(playerControl => playerControl.PlayerProfile.Name)
+                .JoinWith(settings.GameSettings.CommonScoreNameSeparator);
+            EDifficulty easiestPlayerProfileDifficulty = PlayerControls
+                .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
+                .PlayerProfile.Difficulty;
+            EAvatar commonPlayerProfileAvatar = PlayerControls.FirstOrDefault().PlayerProfile.Avatar;
+            PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonPlayerProfileAvatar);
+            PlayerScoreControlData commonScoreData = new()
+            {
+                TotalScore = (int)scoreControls.Select(scoreControl => scoreControl.TotalScore).Average(),
+                GoldenNotesTotalScore = (int)scoreControls.Select(scoreControl => scoreControl.GoldenNotesTotalScore).Average(),
+                NormalNotesTotalScore = (int)scoreControls.Select(scoreControl => scoreControl.NormalNotesTotalScore).Average(),
+                PerfectSentenceBonusTotalScore = (int)scoreControls.Select(scoreControl => scoreControl.PerfectSentenceBonusTotalScore).Average(),
+                PerfectSentenceCount = (int)scoreControls.Select(scoreControl => scoreControl.ScoreData.PerfectSentenceCount).Average(),
+                TotalSentenceCount = (int)scoreControls.Select(scoreControl => scoreControl.ScoreData.TotalSentenceCount).Average(),
+                NormalNoteLengthTotal = (int)scoreControls.Select(scoreControl => scoreControl.ScoreData.NormalNoteLengthTotal).Average(),
+                GoldenNoteLengthTotal = (int)scoreControls.Select(scoreControl => scoreControl.ScoreData.GoldenNoteLengthTotal).Average()
+            };
+            singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
+
+            SongStatistic commonSongStatistic = new SongStatistic(
+                commonPlayerProfileName,
+                easiestPlayerProfileDifficulty,
+                commonScoreData.TotalScore,
+                EScoreMode.CommonAverage);
+            songStatistics = new() { commonSongStatistic };
+        }
 
         // Check if the full song has been sung, i.e., the playback position is after the last note.
         // This determines whether the statistics should be updated and the score should be recorded.
         bool isAfterLastNote = true;
-        foreach (PlayerControl playerController in PlayerControls)
+        PlayerControls.ForEach(playerControl =>
         {
-            singingResultsSceneData.AddPlayerScores(playerController.PlayerProfile, playerController.PlayerScoreController.ScoreData);
-
-            Note lastNoteInSong = playerController.GetLastNoteInSong();
+            Note lastNoteInSong = playerControl.GetLastNoteInSong();
             if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }
-        }
-
-        if (isAfterLastNote)
+        });
+        if (isAfterLastNote
+            && !songStatistics.IsNullOrEmpty())
         {
-            UpdateSongFinishedStats();
+            UpdateSongFinishedStats(songStatistics);
         }
 
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
@@ -558,13 +621,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
-    private void UpdateSongFinishedStats()
+    private void UpdateSongFinishedStats(List<SongStatistic> songStatistics)
     {
-        List<SongStatistic> songStatistics = PlayerControls
-            .Select(playerController => new SongStatistic(playerController.PlayerProfile.Name,
-                                                          playerController.PlayerProfile.Difficulty,
-                                                          playerController.PlayerScoreController.TotalScore))
-            .ToList();
         statistics.RecordSongFinished(SongMeta, songStatistics);
     }
 

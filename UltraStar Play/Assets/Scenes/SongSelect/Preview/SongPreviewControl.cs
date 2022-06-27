@@ -226,6 +226,6 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     private float GetFinalPreviewVolume()
     {
-        return (settings.AudioSettings.PreviewVolumePercent / 100.0f) * (settings.AudioSettings.VolumePercent / 100.0f);
+        return settings.AudioSettings.PreviewVolumePercent / 100.0f;
     }
 }

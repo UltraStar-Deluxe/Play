@@ -22,7 +22,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public MicSampleRecorder MicSampleRecorder { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public PlayerScoreController PlayerScoreController { get; private set; }
+    public PlayerScoreControl PlayerScoreControl { get; private set; }
 
     [Inject]
     public PlayerProfile PlayerProfile { get; private set; }
@@ -90,7 +90,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         newInjector.AddBindingForInstance(MicSampleRecorder);
         newInjector.AddBindingForInstance(PlayerMicPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
-        newInjector.AddBindingForInstance(PlayerScoreController);
+        newInjector.AddBindingForInstance(PlayerScoreControl);
         newInjector.AddBindingForInstance(PlayerUiControl);
         newInjector.AddBindingForInstance(newInjector);
         newInjector.AddBindingForInstance(this);

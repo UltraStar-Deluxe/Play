@@ -3,7 +3,8 @@
         <ui:VisualElement name="icon" picking-mode="Ignore" style="width: 30px; height: 30px; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[sing]p.png?fileID=2800000&amp;guid=f8442e207ea2a3f4bbeb74789d94cfbf&amp;type=3#[sing]p&apos;); align-items: center; justify-content: center; margin-right: 20px;">
             <ui:Label text="1" display-tooltip-when-elided="true" name="posLabel" picking-mode="Ignore" class="titleText" style="width: 100%; height: 100%; -unity-text-align: middle-center; -unity-font-style: bold;" />
         </ui:VisualElement>
-        <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" />
+        <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" style="margin-right: 5px;" />
+        <ui:VisualElement name="commonScoreIcon" class="iconImageTextSized" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/diversity_2_white_24dp.svg?fileID=7388822144124034973&amp;guid=022cc3e3522427243869dc8f71719858&amp;type=3#diversity_2_white_24dp&apos;);" />
         <ui:VisualElement name="rightSide" picking-mode="Ignore" style="flex-direction: row; justify-content: flex-end; flex-grow: 1; height: 100%; align-items: center;">
             <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" picking-mode="Ignore" class="titleText" style="margin-right: 20px;" />
             <ui:Label text="01.01.2020" display-tooltip-when-elided="true" name="dateLabel" picking-mode="Ignore" class="titleText" />
