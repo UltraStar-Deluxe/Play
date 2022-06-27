@@ -27,7 +27,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
             if (instance == null)
             {
                 ClientSideConnectRequestManager instanceInScene = FindObjectOfType<ClientSideConnectRequestManager>();
-                instanceInScene.InitSingleInstance();
+                GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
             }
             return instance;
         }
@@ -63,7 +63,8 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
 
     private void Start()
     {
-        InitSingleInstance();
+        ClientSideConnectRequestManager self = this;
+        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
         if (!Application.isPlaying || instance != this)
         {
             return;
@@ -130,17 +131,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
             connectedServerHandler.Dispose();
             connectedServerHandler = null;
         }
-    }
-
-    private void InitSingleInstance()
-    {
-        if (instance != null
-            && instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
     }
 
     private void OnApplicationPause(bool pauseStatus)

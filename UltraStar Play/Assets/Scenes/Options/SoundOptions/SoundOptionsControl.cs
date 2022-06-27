@@ -22,11 +22,11 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.backgroundMusicEnabledLabel)]
-    private Label backgroundMusicEnabledLabel;
+    [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeLabel)]
+    private Label backgroundMusicVolumeLabel;
 
-    [Inject(UxmlName = R.UxmlNames.backgroundMusicEnabledChooser)]
-    private ItemPicker backgroundMusicEnabledChooser;
+    [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeChooser)]
+    private ItemPicker backgroundMusicVolumeChooser;
 
     [Inject(UxmlName = R.UxmlNames.previewVolumeLabel)]
     private Label previewVolumeLabel;
@@ -48,19 +48,17 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        new BoolPickerControl(backgroundMusicEnabledChooser)
-            .Bind(() => settings.AudioSettings.BackgroundMusicEnabled,
-                  newValue => settings.AudioSettings.BackgroundMusicEnabled = newValue);
+        PercentNumberPickerControl backgroundMusicVolumePickerControl = new(backgroundMusicVolumeChooser);
+        backgroundMusicVolumePickerControl.Bind(() => settings.AudioSettings.BackgroundMusicVolumePercent,
+            newValue => settings.AudioSettings.BackgroundMusicVolumePercent = (int)newValue);
 
-        NumberPickerControl previewVolumePickerControl = new(previewVolumeChooser);
-        previewVolumePickerControl.GetLabelTextFunction = item => item + " %";
+        PercentNumberPickerControl previewVolumePickerControl = new(previewVolumeChooser);
         previewVolumePickerControl.Bind(() => settings.AudioSettings.PreviewVolumePercent,
-                newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
+            newValue => settings.AudioSettings.PreviewVolumePercent = (int)newValue);
 
-        NumberPickerControl volumePickerControl = new(volumeChooser);
-        volumePickerControl.GetLabelTextFunction = item => item + " %";
+        PercentNumberPickerControl volumePickerControl = new(volumeChooser);
         volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
-                newValue => settings.AudioSettings.VolumePercent = (int)newValue);
+            newValue => settings.AudioSettings.VolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();
@@ -75,7 +73,7 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
-        backgroundMusicEnabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
+        backgroundMusicVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
         volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);

@@ -17,7 +17,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private MicProfile micProfile;
 
     [Inject]
-    private PlayerScoreControllerData playerScoreData;
+    private PlayerScoreControlData playerScoreData;
 
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
@@ -84,7 +84,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => SetScoreLabelText(totalScoreContainer, interpolatedValue));
 
         // Score bar (animated)
-        float playerScorePercent = (float)playerScoreData.TotalScore / PlayerScoreController.MaxScore;
+        float playerScorePercent = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
         float minScoreBarHeightInPercent = 5f;
         float maxScoreBarHeightInPercent = minScoreBarHeightInPercent + ((100f - minScoreBarHeightInPercent) * playerScorePercent);
         LeanTween.value(singingResultsSceneControl.gameObject, minScoreBarHeightInPercent, maxScoreBarHeightInPercent, animationTimeInSeconds)

@@ -57,6 +57,9 @@ public static partial class R
         public static readonly string difficulty_hard = "difficulty_hard";
         public static readonly string difficulty_medium = "difficulty_medium";
         public static readonly string enabled = "enabled";
+        public static readonly string enum_scoreMode_commonAverage = "enum_scoreMode_commonAverage";
+        public static readonly string enum_scoreMode_individual = "enum_scoreMode_individual";
+        public static readonly string enum_scoreMode_none = "enum_scoreMode_none";
         public static readonly string exit = "exit";
         public static readonly string graph_button_label = "graph_button_label";
         public static readonly string graph_legend_good = "graph_legend_good";
@@ -99,7 +102,6 @@ public static partial class R
         public static readonly string options_analyzeBeatsWithoutTargetNote = "options_analyzeBeatsWithoutTargetNote";
         public static readonly string options_backgroundMusicEnabled = "options_backgroundMusicEnabled";
         public static readonly string options_color = "options_color";
-        public static readonly string options_combineDuetScores = "options_combineDuetScores";
         public static readonly string options_companionApp_button = "options_companionApp_button";
         public static readonly string options_companionApp_title = "options_companionApp_title";
         public static readonly string options_connectedClientCount = "options_connectedClientCount";
@@ -131,12 +133,12 @@ public static partial class R
         public static readonly string options_playerProfiles_button = "options_playerProfiles_button";
         public static readonly string options_playerProfiles_title = "options_playerProfiles_title";
         public static readonly string options_previewVolume = "options_previewVolume";
-        public static readonly string options_ratePlayers = "options_ratePlayers";
         public static readonly string options_recording_button = "options_recording_button";
         public static readonly string options_recording_title = "options_recording_title";
         public static readonly string options_resolution = "options_resolution";
         public static readonly string options_sampleRate = "options_sampleRate";
         public static readonly string options_sampleRate_auto = "options_sampleRate_auto";
+        public static readonly string options_scoreMode = "options_scoreMode";
         public static readonly string options_showFps = "options_showFps";
         public static readonly string options_showLyricsOnNotes = "options_showLyricsOnNotes";
         public static readonly string options_showPitchIndicator = "options_showPitchIndicator";

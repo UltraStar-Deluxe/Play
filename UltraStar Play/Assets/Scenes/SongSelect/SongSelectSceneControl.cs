@@ -171,6 +171,24 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
     private ItemPicker songOrderItemPicker;
 
+    [Inject(UxmlName = R.UxmlNames.scoreModeLabel)]
+    private Label scoreModeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
+    private ItemPicker scoreModePicker;
+
+    [Inject(UxmlName = R.UxmlNames.micListOverlay)]
+    private VisualElement micListOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.singingOptionsScrollView)]
+    private VisualElement singingOptionsScrollView;
+
+    [Inject(UxmlName = R.UxmlNames.toggleSingingOptionsButton)]
+    private Button toggleSingingOptionsButton;
+
+    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
+    private VisualElement playerScrollView;
+
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     private SongSelectSceneData sceneData;
@@ -318,6 +336,46 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
+
+        // Toggle player select and singing options container
+        ShowPlayerSelectContainer();
+        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() => TogglePlayerSelectAndSingingOptions());
+
+        // Init singing options
+        new ScoreModeItemPickerControl(scoreModePicker)
+            .Bind(() => settings.GameSettings.ScoreMode,
+                newValue => settings.GameSettings.ScoreMode = newValue);
+    }
+
+    private void ShowPlayerSelectContainer()
+    {
+        playerScrollView.ShowByDisplay();
+        micListOverlay.ShowByDisplay();
+        singingOptionsScrollView.HideByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).ShowByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).HideByDisplay();
+    }
+
+    private void ShowSingingOptionsContainer()
+    {
+        playerScrollView.HideByDisplay();
+        micListOverlay.HideByDisplay();
+        singingOptionsScrollView.ShowByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).HideByDisplay();
+        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).ShowByDisplay();
+
+    }
+
+    private void TogglePlayerSelectAndSingingOptions()
+    {
+        if (playerScrollView.IsVisibleByDisplay())
+        {
+            ShowSingingOptionsContainer();
+        }
+        else
+        {
+            ShowPlayerSelectContainer();
+        }
     }
 
     private void UpdateNextAndPreviousSongButtonLabels()
@@ -859,6 +917,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
         closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+        scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
 
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);

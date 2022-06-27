@@ -6,27 +6,43 @@
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Development Options" name="sceneTitle" class="titleText"/>
+                            <ui:Label text="Development Options" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="showFpsContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Show FPS" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; flex-grow: 1;">
+                <ui:VisualElement name="showFpsContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Show FPS" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="pitchDetectionAlgorithmContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Pitch Detection Algorithm" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" class="multiline" />
+                </ui:VisualElement>
+                <ui:VisualElement name="analyzeBeatsWithoutTargetNoteContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Analyze Beats Without Target Note" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
+                <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
+            </ui:ScrollView>
+            <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-between; width: 100%;">
+                <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogOverlayButton" />
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
             </ui:VisualElement>
-            <ui:VisualElement name="pitchDetectionAlgorithmContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Pitch Detection Algorithm" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" class="multiline" />
+        </ui:VisualElement>
+        <ui:VisualElement name="logOverlay" class="optionsSceneMainContainer focusableNavigatorRoot" style="position: absolute; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: flex; top: 0; left: 0;">
+            <ui:VisualElement name="logLevelContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="View Log" name="Label" class="controlLabel" />
+                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="logLevelItemPicker" />
             </ui:VisualElement>
-            <ui:VisualElement name="analyzeBeatsWithoutTargetNoteContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Analyze Beats Without Target Note" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
-            <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" />
-            <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" name="backButton" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" class="fullMinHeightUnityContentContainer" style="width: 100%; flex-grow: 1; flex-shrink: 1;">
+                <ui:TextField picking-mode="Ignore" name="logTextField" multiline="true" style="flex-grow: 1; flex-shrink: 1; height: auto;" />
+            </ui:ScrollView>
+            <ui:Label tabindex="-1" text="/path/to/log/file.log" display-tooltip-when-elided="false" name="logPathLabel" enable-rich-text="false" class="tinyFont" style="width: 100%;" />
+            <ui:VisualElement name="logOverlayButtonRow" style="flex-direction: row; width: 100%; justify-content: flex-end; flex-shrink: 0;">
+                <ui:Button text="Close" display-tooltip-when-elided="true" name="closeLogOverlayButton" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

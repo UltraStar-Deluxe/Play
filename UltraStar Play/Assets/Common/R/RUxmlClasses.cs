@@ -18,6 +18,7 @@ public static partial class R
         public const string error = "error";
         public const string focusableNavigatorIgnore = "focusableNavigatorIgnore";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
+        public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
@@ -41,12 +42,12 @@ public static partial class R
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
-        public const string overlay = "overlay";
         public const string panel = "panel";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
         public const string scoreRow = "scoreRow";
+        public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondarySideBarPanel = "secondarySideBarPanel";
         public const string secondarySideBarTitle = "secondarySideBarTitle";
         public const string singingLyrics = "singingLyrics";

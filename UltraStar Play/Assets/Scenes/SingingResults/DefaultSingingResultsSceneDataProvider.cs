@@ -14,7 +14,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
         data.SongDurationInMillis = 120 * 1000;
 
-        PlayerScoreControllerData playerScoreData = new();
+        PlayerScoreControlData playerScoreData = new();
         playerScoreData.TotalScore = 6500;
         playerScoreData.NormalNotesTotalScore = 4000;
         playerScoreData.GoldenNotesTotalScore = 2000;

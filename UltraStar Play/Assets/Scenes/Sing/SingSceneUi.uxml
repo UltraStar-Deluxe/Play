@@ -1,13 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsUi" />
     <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
+    <ui:Template name="SentenceRatingUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/SentenceRatingUi.uxml?fileID=9197481963319205126&amp;guid=fc5ccc90fb3478b49bea1f39b1e6bcce&amp;type=3#SentenceRatingUi" />
     <ui:VisualElement name="background" class="backgroundImage">
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
         <ui:Instance template="SingingLyricsUi" name="topLyricsContainer" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; overflow: hidden;" />
+        <ui:VisualElement name="commonScoreContainer" style="flex-direction: row; justify-content: flex-end; align-items: center;">
+            <ui:VisualElement name="commonScoreContainerBackground" style="justify-content: center; align-items: flex-end; border-top-left-radius: 5px; border-bottom-left-radius: 0; border-top-right-radius: 5px; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[sing]scoreBg.png?fileID=21300000&amp;guid=3c265bba4c7dfec43a0a3b5410a7c558&amp;type=3#[sing]scoreBg&apos;); -unity-background-image-tint-color: rgb(125, 198, 233); width: 120px;">
+                <ui:Label text="99999" display-tooltip-when-elided="true" name="commonScoreLabel" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5); -unity-text-align: middle-left; align-items: center; justify-content: center;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="playerUiContainer" style="width: 100%; flex-grow: 1;">
             <ui:VisualElement name="spacer" style="flex-grow: 1;" />
             <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
+            <ui:VisualElement name="commonScoreSentenceRatingContainer" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; justify-content: flex-start;">
+                <ui:Instance template="SentenceRatingUi" name="SentenceRatingUi" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" style="overflow: hidden; border-top-left-radius: 10px; border-top-right-radius: 10px;" />
         <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex;">

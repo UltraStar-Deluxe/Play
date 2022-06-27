@@ -54,4 +54,21 @@ public class SentenceRating
         this.i18nCode = i18nCode;
         BackgroundColor = Colors.CreateColor(hexBackgroundColor);
     }
+
+    public static SentenceRating GetSentenceRating(double correctNotesPercentage)
+    {
+        if (correctNotesPercentage < 0)
+        {
+            return null;
+        }
+
+        foreach (SentenceRating sentenceRating in Values)
+        {
+            if (correctNotesPercentage >= sentenceRating.PercentageThreshold)
+            {
+                return sentenceRating;
+            }
+        }
+        return null;
+    }
 }
