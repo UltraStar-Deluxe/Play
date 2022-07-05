@@ -39,6 +39,15 @@ public class LoadingSceneControl : MonoBehaviour
         // Wait for Theme and I18N resources
         TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
 
+        // Ask for microphone permissions on Android
+#if  UNITY_ANDROID
+        AndroidRuntimePermissions.Permission checkPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
+        if (checkPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+        {
+            AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
+        }
+#endif
+
         FinishScene();
     }
 

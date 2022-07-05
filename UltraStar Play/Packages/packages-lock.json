@@ -240,6 +240,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.yasirkula.androidruntimepermissions": {
+      "version": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6778d20ec4133dbac43cd526113426a608558249"
+    },
     "playshared": {
       "version": "file:playshared",
       "depth": 0,
