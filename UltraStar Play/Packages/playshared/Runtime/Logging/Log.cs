@@ -12,11 +12,12 @@ public static class Log
 
     public static Serilog.ILogger Logger { get; private set; }
 
-    private static readonly LogHistorySink logHistorySink = new();
+    private static LogHistorySink logHistorySink;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
+        logHistorySink = new();
         Logger = CreateLogger();
     }
 
