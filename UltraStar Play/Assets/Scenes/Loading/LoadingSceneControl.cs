@@ -1,13 +1,27 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class LoadingSceneControl : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
+    [Inject]
+    private Settings settings;
+
     void Start()
     {
+        // Init song folders if none yet
+        if (settings.GameSettings.songDirs.IsNullOrEmpty())
+        {
+            settings.GameSettings.songDirs = CreateInitialSongFolders();
+        }
+
         // The next scene should show up automatically.
         // However, in case of an Exception (e.g. song folder not found)
         // it might be useful to continue via button.
@@ -62,5 +76,20 @@ public class LoadingSceneControl : MonoBehaviour
         // Wait delay in case loading just didn't finish yet.
         yield return new WaitForSeconds(2);
         FinishScene();
+    }
+
+    private List<string> CreateInitialSongFolders()
+    {
+        // Must be called from main thread because of Application.persistentDataPath
+        List<string> result = new();
+#if UNITY_ANDROID
+        string internalStoragePath = AndroidUtils.GetAppSpecificStorageAbsolutePath(false);
+        result.Add(internalStoragePath + "/Songs");
+        string sdCardStoragePath = AndroidUtils.GetAppSpecificStorageAbsolutePath(true);
+        result.Add(sdCardStoragePath + "/Songs");
+#else
+        result.Add(Application.persistentDataPath + "/Songs");
+#endif
+        return result;
     }
 }

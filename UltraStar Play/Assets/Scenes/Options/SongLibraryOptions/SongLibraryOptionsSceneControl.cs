@@ -38,6 +38,18 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
+    [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
+    private VisualElement androidSongFolderHintContainer;
+
+    [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
+    private Label androidSongFolderHintLabel;
+
+    [Inject(UxmlName = R.UxmlNames.addAndroidSdCardSongFolderButton)]
+    private Button addAndroidSdCardSongFolderButton;
+
+    [Inject(UxmlName = R.UxmlNames.addAndroidInternalSongFolderButton)]
+    private Button addAndroidInternalSongFolderButton;
+
     [Inject]
     private Settings settings;
 
@@ -62,6 +74,44 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+
+#if UNITY_ANDROID
+        if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
+            && AndroidUtils.GetAppSpecificStorageAbsolutePath(true).IsNullOrEmpty())
+        {
+            // No storage folders found. Do not show any hint.
+            androidSongFolderHintContainer.HideByDisplay();
+        }
+        else
+        {
+            androidSongFolderHintContainer.ShowByDisplay();
+            addAndroidInternalSongFolderButton.RegisterCallbackButtonTriggered(() =>
+                AddSongFolderIfNotContains(AndroidUtils.GetAppSpecificStorageAbsolutePath(false)));
+            addAndroidSdCardSongFolderButton.RegisterCallbackButtonTriggered(() =>
+                AddSongFolderIfNotContains(AndroidUtils.GetAppSpecificStorageAbsolutePath(true)));
+        }
+        UpdateAddAndroidSongFoldersButtons();
+#else
+        androidSongFolderHintContainer.HideByDisplay();
+#endif
+    }
+
+    private void AddSongFolderIfNotContains(string basePath)
+    {
+        settings.GameSettings.songDirs.AddIfNotContains(basePath + "/Songs");
+        UpdateSongFolderList();
+    }
+
+    private void UpdateAddAndroidSongFoldersButtons()
+    {
+        string sdCardSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(true);
+        string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false);
+        bool anySongDirInSdCardSongFolder = settings.GameSettings.songDirs
+            .AnyMatch(songDir => songDir.StartsWith(sdCardSongFolder));
+        bool anySongDirInInternalSongFolder = settings.GameSettings.songDirs
+            .AnyMatch(songDir => songDir.StartsWith(internalSongFolder));
+        addAndroidSdCardSongFolderButton.SetVisibleByDisplay(!sdCardSongFolder.IsNullOrEmpty() && !anySongDirInSdCardSongFolder);
+        addAndroidInternalSongFolderButton.SetVisibleByDisplay(!internalSongFolder.IsNullOrEmpty() && !anySongDirInInternalSongFolder);
     }
 
     private static void RequestExternalStoragePermissionIfNeeded()
@@ -85,6 +135,11 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_downloadSongs_button);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_title);
+        androidSongFolderHintLabel.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidFolderHint,
+            // AppSpecificStorageRelativePath is the same for internal memory and sd card.
+            "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false));
+        addAndroidSdCardSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_addSdCardSongFolder);
+        addAndroidInternalSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_addInternalSongFolder);
     }
 
     private void UpdateSongFolderList()
@@ -96,6 +151,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             songList.Add(CreateSongFolderEntry(songDir, index));
             index++;
         });
+        UpdateAddAndroidSongFoldersButtons();
     }
 
     private VisualElement CreateSongFolderEntry(string songDir, int indexInList)
@@ -130,6 +186,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             {
                 settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
                 CheckFolderExists(newValueUnescaped);
+                UpdateAddAndroidSongFoldersButtons();
             });
 
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);

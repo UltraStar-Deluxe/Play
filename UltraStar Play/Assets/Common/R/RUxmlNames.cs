@@ -6,6 +6,8 @@ public static partial class R
         public const string a = "a";
         public const string aboutButton = "aboutButton";
         public const string aboutText = "aboutText";
+        public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
+        public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
         public const string addButton = "addButton";
         public const string adjustFollowingNotesContainer = "adjustFollowingNotesContainer";
         public const string adjustFollowingNotesLabel = "adjustFollowingNotesLabel";
@@ -13,6 +15,8 @@ public static partial class R
         public const string adminRightsContainer = "adminRightsContainer";
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
+        public const string androidSongFolderHintContainer = "androidSongFolderHintContainer";
+        public const string androidSongFolderHintLabel = "androidSongFolderHintLabel";
         public const string appOptionsButton = "appOptionsButton";
         public const string artistInputContainer = "artistInputContainer";
         public const string artistLabel = "artistLabel";
@@ -417,6 +421,7 @@ public static partial class R
         public const string sentenceLineSizeContainer = "sentenceLineSizeContainer";
         public const string sentenceLineSizeTextField = "sentenceLineSizeTextField";
         public const string sentenceRatingContainer = "sentenceRatingContainer";
+        public const string SentenceRatingUi = "SentenceRatingUi";
         public const string sentenceUiRoot = "sentenceUiRoot";
         public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
