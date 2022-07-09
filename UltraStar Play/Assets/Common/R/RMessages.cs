@@ -142,6 +142,9 @@ public static partial class R
         public static readonly string options_showFps = "options_showFps";
         public static readonly string options_showLyricsOnNotes = "options_showLyricsOnNotes";
         public static readonly string options_showPitchIndicator = "options_showPitchIndicator";
+        public static readonly string options_songLibrary_addInternalSongFolder = "options_songLibrary_addInternalSongFolder";
+        public static readonly string options_songLibrary_addSdCardSongFolder = "options_songLibrary_addSdCardSongFolder";
+        public static readonly string options_songLibrary_androidFolderHint = "options_songLibrary_androidFolderHint";
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
         public static readonly string options_songLibrary_title = "options_songLibrary_title";
         public static readonly string options_sound_button = "options_sound_button";
