@@ -76,9 +76,6 @@ public class SettingsManager : MonoBehaviour
             {
                 UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
                 settings = new Settings();
-                // Can only access Application.persistentDataPath from main thread. Thus, set the default songDirs in a coroutine.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
-                    () => settings.GameSettings.songDirs.Add(Application.persistentDataPath + "/Songs")));
                 Save();
                 return;
             }
