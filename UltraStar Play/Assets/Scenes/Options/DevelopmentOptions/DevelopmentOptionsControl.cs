@@ -172,9 +172,16 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                 return logLine.Replace("\\", "/");
             })
             .ToList();
-        logTextField.value = logLines.IsNullOrEmpty()
+
+        string logText = logLines.IsNullOrEmpty()
             ? "(no messages for this log level)"
             : logLines.JoinWith("");
+        if (logText.Length > VisualElementUtils.TextFieldCharacterLimit)
+        {
+            string prefix = "...\n";
+            logText = prefix + logText.Substring(logText.Length - (VisualElementUtils.TextFieldCharacterLimit - prefix.Length));
+        }
+        logTextField.value = logText;
     }
 
     public void UpdateTranslation()

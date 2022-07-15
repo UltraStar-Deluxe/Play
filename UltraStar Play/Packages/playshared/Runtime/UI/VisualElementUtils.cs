@@ -3,6 +3,11 @@ using UnityEngine.UIElements;
 
 public static class VisualElementUtils
 {
+    // UIToolkit TextFields have a character limit imposed by the limit of vertices Unity provides for a VisualElement.
+    // This limitation is planned to be removed in future versions of UIToolkit.
+    // See https://forum.unity.com/threads/textfield-character-limit-text-will-be-truncated-because-it-exceeds-49152-vertices.1309179/#post-8281530
+    public const int TextFieldCharacterLimit = 12000;
+
     public static void MoveVisualElementFullyInsideScreen(VisualElement visualElement, PanelHelper panelHelper)
     {
         Vector2 screenSizeInPanelCoordinates = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
