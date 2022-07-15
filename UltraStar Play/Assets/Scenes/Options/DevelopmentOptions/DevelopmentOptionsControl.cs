@@ -67,6 +67,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+
     private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
 
     private void Start()
@@ -148,7 +151,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     private void OnBack()
     {
-        if (logOverlay.IsVisibleByDisplay())
+        if (uiDocument.rootVisualElement.focusController.focusedElement == logTextField)
+        {
+            closeLogOverlayButton.Focus();
+        }
+        else if (logOverlay.IsVisibleByDisplay())
         {
             HideLogOverlay();
         }
