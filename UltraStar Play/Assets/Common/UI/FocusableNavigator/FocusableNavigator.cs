@@ -117,6 +117,16 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
+        // Keep focus on TextField if not navigating away from it
+        if (focusedVisualElement is TextField focusedTextField)
+        {
+            if (!IsNavigatingAwayFromTextField(navigationDirection, focusedTextField))
+            {
+                return;
+            }
+        }
+
+        // Find elements to include in navigation
         VisualElement focusableNavigatorRootVisualElement = GetFocusableNavigatorRootVisualElement(focusedVisualElement);
         if (focusableNavigatorRootVisualElement == null)
         {
@@ -158,6 +168,23 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                 FocusedVisualElement = focusedVisualElement,
             });
         }
+    }
+
+    private bool IsNavigatingAwayFromTextField(Vector2 navigationDirection, TextField focusedTextField)
+    {
+        // Navigate away from TextField
+        // when cursor was already at first or last position in text field
+        // and still navigating towards same direction.
+        bool isContinuedNavigationFromTextStart = focusedTextField.cursorIndex == 0
+                                                  // Navigate left or up is continued navigation
+                                                  && (navigationDirection.x < 0 || navigationDirection.y > 0);
+        bool isContinuedNavigationFromTextEnd = focusedTextField.cursorIndex == focusedTextField.value.Length
+                                                // Navigate right or down is continued navigation
+                                                && (navigationDirection.x > 0 || navigationDirection.y < 0);
+        bool isContinuedNavigation = isContinuedNavigationFromTextStart || isContinuedNavigationFromTextEnd;
+        return isContinuedNavigation
+               // There must not be any selection
+               && focusedTextField.selectIndex == focusedTextField.cursorIndex;
     }
 
     protected virtual List<VisualElement> GetFocusableVisualElementsInDescendants(VisualElement rootVisualElement)
