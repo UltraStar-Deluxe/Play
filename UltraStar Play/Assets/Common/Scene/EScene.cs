@@ -4,6 +4,7 @@
     MainScene = 1,
     LoadingScene = 0,
     AboutScene = 3,
+    CreditsScene = 21,
 
     // result
     HighscoreScene = 8,

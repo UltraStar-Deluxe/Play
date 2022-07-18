@@ -90,6 +90,7 @@ public static partial class R
         public const string createVideoInputContainer = "createVideoInputContainer";
         public const string createVideoLabel = "createVideoLabel";
         public const string createVideoToggle = "createVideoToggle";
+        public const string creditsButton = "creditsButton";
         public const string currentSentenceContainer = "currentSentenceContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
