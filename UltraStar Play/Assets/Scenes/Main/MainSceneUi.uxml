@@ -17,8 +17,8 @@
                 <ui:Button text="Settings" name="settingsButton" class="mainSceneButton" />
             </ui:VisualElement>
             <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
-                <ui:Button display-tooltip-when-elided="true" name="dummyButton" class="mainSceneButton" />
-                <ui:Button display-tooltip-when-elided="true" name="dummyButton" class="mainSceneButton" />
+                <ui:Button display-tooltip-when-elided="true" name="dummyButton" class="mainSceneButton focusableNavigatorIgnore" />
+                <ui:Button text="Credits" name="creditsButton" class="mainSceneButton" />
                 <ui:Button text="Info" name="aboutButton" class="mainSceneButton" />
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton" style="display: flex;" />
             </ui:VisualElement>
