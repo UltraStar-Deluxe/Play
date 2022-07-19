@@ -29,6 +29,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public Sprite silverBanner;
 
+    [InjectedInInspector]
+    public bool forceFadeOut;
+
     [Inject(UxmlName = R.UxmlNames.player)]
     private VisualElement player;
 
@@ -47,13 +50,26 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.secondBackground)]
     private VisualElement secondBackground;
 
+    [Inject(UxmlName = R.UxmlNames.categoryNameLabel)]
+    private Label categoryNameLabel;
+
+    [Inject(UxmlName = R.UxmlNames.categoryNameContainer)]
+    private VisualElement categoryNameContainer;
+
+    [Inject(UxmlName = R.UxmlNames.creditsSummaryLabel)]
+    private Label creditsSummaryLabel;
+
+    [Inject(UxmlName = R.UxmlNames.skipButton)]
+    private Button skipButton;
+
     [Inject]
     private PanelHelper panelHelper;
 
     [Inject]
     private Injector injector;
 
-    private List<CreditsEntry> creditsEntries;
+    private int categoryIndex;
+    private List<CreditsCategoryEntry> creditsCategoryEntries;
     private List<CreditsEntry> remainingCreditsEntries;
     private readonly List<CreditsEntryControl> entryControls = new();
 
@@ -67,18 +83,39 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private float spawnPauseInSeconds;
 
     private bool isFadeOut;
-    public bool forceFadeOut;
+    private bool isFirstEntryControl = true;
 
     public void Start()
     {
         // Init UI
+        creditsSummaryLabel.text = "";
         scoreLabel.text = "0";
         bonusLabel.style.opacity = 0;
         entriesContainer.Clear();
 
         // Parse credit entries
-        creditsEntries = JsonConverter.FromJson<List<CreditsEntry>>(creditsEntriesTextAsset.text);
-        remainingCreditsEntries = creditsEntries.ToList();
+        creditsCategoryEntries = JsonConverter.FromJson<List<CreditsCategoryEntry>>(creditsEntriesTextAsset.text);
+        SelectNextCategoryEntry();
+
+        skipButton.RegisterCallbackButtonTriggered(() => forceFadeOut = true);
+    }
+
+    private void SelectNextCategoryEntry()
+    {
+        if (categoryIndex >= creditsCategoryEntries.Count
+            || isFadeOut)
+        {
+            return;
+        }
+        CreditsCategoryEntry categoryEntry = creditsCategoryEntries[categoryIndex];
+        remainingCreditsEntries = categoryEntry.Entries.ToList();
+        categoryIndex++;
+
+        categoryNameLabel.text = categoryEntry.Name;
+        categoryNameLabel.SetVisibleByVisibility(!categoryNameLabel.text.IsNullOrEmpty());
+        categoryNameLabel.style.top = new StyleLength(new Length(40, LengthUnit.Percent));
+        LeanTween.value(gameObject, 40, 0, 2)
+            .setOnUpdate(value => categoryNameLabel.style.top = new StyleLength(new Length(value, LengthUnit.Percent)));
     }
 
     public void Update()
@@ -100,19 +137,49 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
             }
         });
 
-        if (!isFadeOut && (entryControls.Count == 0 && remainingCreditsEntries.Count == 0
-                           || forceFadeOut))
+        if (!isFadeOut && forceFadeOut)
         {
-            isFadeOut = true;
-            float fadeOutTimeInSeconds = 4f;
-            LeanTween.value(gameObject, 1, 0, fadeOutTimeInSeconds)
-                .setOnUpdate(value =>
-                {
-                    player.style.opacity = value;
-                    background.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, value));
-                    secondBackground.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, 1 - value));
-                });
+            StartFadeOut();
         }
+
+        if (!isFadeOut && entryControls.Count == 0 && remainingCreditsEntries.Count == 0)
+        {
+            if (categoryIndex < creditsCategoryEntries.Count)
+            {
+                SelectNextCategoryEntry();
+            }
+            else
+            {
+                StartFadeOut();
+            }
+        }
+    }
+
+    private void StartFadeOut()
+    {
+        isFadeOut = true;
+        float fadeOutTimeInSeconds = 4f;
+        LeanTween.value(gameObject, 1, 0, fadeOutTimeInSeconds)
+            .setOnUpdate(value =>
+            {
+                player.style.opacity = value;
+                categoryNameContainer.style.opacity = value;
+                background.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, value));
+                secondBackground.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f, 1 - value));
+            });
+
+        string creditsSummaryText = creditsCategoryEntries
+            .Select(category =>
+            {
+                string categoryContent = category.Entries
+                    .Select(entry => entry.MainNameAndNickname)
+                    .JoinWith("\n");
+                return !category.Name.IsNullOrEmpty()
+                    ? ($"<i>{category.Name}</i>" + "\n" + categoryContent)
+                    : categoryContent;
+            }).JoinWith("\n\n");
+        // Extra line breaks for continued scroll range
+        creditsSummaryLabel.text = creditsSummaryText + "\n\n\n\n\n\n\n\n";
     }
 
     private void SpawnCreditEntries()
@@ -237,8 +304,6 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     private void CreateEntryControl(CreditsEntry creditsEntry)
     {
-        bool isFirst = remainingCreditsEntries.Count == creditsEntries.Count;
-
         VisualElement visualElement = creditsEntryUi.CloneTree().Children().FirstOrDefault();
         CreditsEntryControl entryControl = injector
             .WithRootVisualElement(visualElement)
@@ -266,8 +331,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         entriesContainer.Add(visualElement);
         visualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            if (isFirst)
+            if (isFirstEntryControl)
             {
+                isFirstEntryControl = false;
                 visualElement.style.top = 50;
                 visualElement.style.left = 250;
             }
