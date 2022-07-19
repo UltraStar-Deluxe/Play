@@ -58,8 +58,6 @@ public static partial class R
         public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
         public const string cancelDeletePlaylistButton = "cancelDeletePlaylistButton";
-        public const string categoryNameContainer = "categoryNameContainer";
-        public const string categoryNameLabel = "categoryNameLabel";
         public const string centerContent = "centerContent";
         public const string characterContainer = "characterContainer";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
@@ -98,7 +96,6 @@ public static partial class R
         public const string createVideoToggle = "createVideoToggle";
         public const string creditsButton = "creditsButton";
         public const string CreditsEntryUi = "CreditsEntryUi";
-        public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentSentenceContainer = "currentSentenceContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
@@ -290,7 +287,6 @@ public static partial class R
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
-        public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -336,9 +332,6 @@ public static partial class R
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string overviewAreaWaveform = "overviewAreaWaveform";
-        public const string ownHostContainer = "ownHostContainer";
-        public const string ownHostLabel = "ownHostLabel";
-        public const string ownHostTextField = "ownHostTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
@@ -420,7 +413,6 @@ public static partial class R
         public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
-        public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
@@ -473,7 +465,6 @@ public static partial class R
         public const string singingResultsScoresContainer = "singingResultsScoresContainer";
         public const string singThisSongButton = "singThisSongButton";
         public const string sizeLabel = "sizeLabel";
-        public const string skipButton = "skipButton";
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
@@ -568,12 +559,6 @@ public static partial class R
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";
-        public const string udpPortOnClientContainer = "udpPortOnClientContainer";
-        public const string udpPortOnClientLabel = "udpPortOnClientLabel";
-        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
-        public const string udpPortOnServerContainer = "udpPortOnServerContainer";
-        public const string udpPortOnServerLabel = "udpPortOnServerLabel";
-        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
         public const string urlChooser = "urlChooser";
         public const string urlContainer = "urlContainer";
