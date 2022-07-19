@@ -5,11 +5,12 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -38,5 +39,13 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        return bb.GetBindings();
     }
 }

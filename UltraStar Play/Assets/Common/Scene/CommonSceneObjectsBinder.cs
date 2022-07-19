@@ -38,6 +38,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
         // Lazy binding of UIDocument, because it does not exist in every scene (yet)
         bb.BindExistingInstanceLazy(() => GetUiDocument());
+        bb.BindExistingInstanceLazy(() => new PanelHelper(GetUiDocument()));
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);

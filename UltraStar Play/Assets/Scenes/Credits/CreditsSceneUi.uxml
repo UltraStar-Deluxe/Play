@@ -1,7 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
-        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 20px; width: 100%;">
-            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
+    <ui:Template name="CreditsEntryUi" src="project://database/Assets/Scenes/Credits/CreditsEntryUi.uxml?fileID=9197481963319205126&amp;guid=a2add421bc81d5149acdf8c9c252ea51&amp;type=3#CreditsEntryUi" />
+    <ui:VisualElement name="secondBackground" style="position: absolute; width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/thank-you-publicdomainvectors.org.svg?fileID=7388822144124034973&amp;guid=f99e8bfaffb8a3245aef58acff1c9979&amp;type=3#thank-you-publicdomainvectors.org&apos;); -unity-background-scale-mode: scale-and-crop;" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/Credits/Images/brown-g145e3ab49_1920.jpg?fileID=21300000&amp;guid=e304a20c525dcbd4bae9249350c5f566&amp;type=3#brown-g145e3ab49_1920&apos;); position: absolute; -unity-background-scale-mode: scale-and-crop;">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; width: 100%;">
+            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px; display: none;">
                 <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
                         <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
@@ -12,7 +14,19 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; background-color: rgba(0, 0, 0, 0.25);" />
+            <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; align-items: flex-start;">
+                <ui:VisualElement name="entriesContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
+                    <ui:Instance template="CreditsEntryUi" name="CreditsEntryUi" />
+                </ui:VisualElement>
+                <ui:VisualElement name="allCharactersContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
+                <ui:VisualElement name="player" style="position: absolute; top: 90%; left: 50%;">
+                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Icons/ultrastardx-icon.svg?fileID=7388822144124034973&amp;guid=15d395ee39b856f4c84be1537a1d4137&amp;type=3#ultrastardx-icon&apos;); width: 80px; height: 80px; -unity-background-scale-mode: scale-to-fit; position: relative; left: -45px; top: -45px;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="scoreContainer" style="position: absolute; align-items: center; justify-content: center; width: 100%; top: 100%;">
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" class="largeFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(241, 241, 241); -unity-text-align: upper-center;" />
+                    <ui:Label text="Chain +1" display-tooltip-when-elided="true" name="bonusLabel" class="smallFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(15, 255, 0); -unity-text-align: upper-center; position: absolute; top: -100%;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="bottomContent" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
                 <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" />
             </ui:VisualElement>
