@@ -15,7 +15,7 @@ using Random = UnityEngine.Random;
 
 public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFinishedListener
 {
-    private static readonly Vector2 gravityInPx = new Vector2(0, 9.81f);
+    private static readonly Vector2 gravityInPxPerSecond = new Vector2(0, 300f);
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public Label Label { get; private set; }
@@ -29,7 +29,7 @@ public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFi
 
     private float lifeTime;
 
-    private Vector2 velocityInPx;
+    private Vector2 velocityInPxPerSecond;
     private float angleVelocityInDegrees;
 
     public bool IsMoving { get; private set; }
@@ -65,17 +65,17 @@ public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFi
             if (!IsMoving)
             {
                 IsMoving = true;
-                velocityInPx = new Vector2(
-                    Random.Range(-8, 8),
-                    Random.Range(-12, -5));
+                velocityInPxPerSecond = new Vector2(
+                    Random.Range(-200, 200),
+                    Random.Range(-360, -200));
                 // max angle velocity: 2 turns per second
                 angleVelocityInDegrees = Random.Range(0, 720 / Application.targetFrameRate);
             }
 
-            velocityInPx += gravityInPx * Time.deltaTime;
+            velocityInPxPerSecond += gravityInPxPerSecond * Time.deltaTime;
 
-            Label.style.left = Label.style.left.value.value + velocityInPx.x;
-            Label.style.top = Label.style.top.value.value + velocityInPx.y;
+            Label.style.left = Label.style.left.value.value + velocityInPxPerSecond.x * Time.deltaTime;
+            Label.style.top = Label.style.top.value.value + velocityInPxPerSecond.y * Time.deltaTime;
             Label.style.rotate = new StyleRotate(new Rotate(new Angle(
                 Label.style.rotate.value.angle.value + angleVelocityInDegrees, AngleUnit.Degree)));
         }

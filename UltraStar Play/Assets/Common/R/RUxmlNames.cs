@@ -58,6 +58,8 @@ public static partial class R
         public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
         public const string cancelDeletePlaylistButton = "cancelDeletePlaylistButton";
+        public const string categoryNameContainer = "categoryNameContainer";
+        public const string categoryNameLabel = "categoryNameLabel";
         public const string centerContent = "centerContent";
         public const string characterContainer = "characterContainer";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
@@ -96,6 +98,7 @@ public static partial class R
         public const string createVideoToggle = "createVideoToggle";
         public const string creditsButton = "creditsButton";
         public const string CreditsEntryUi = "CreditsEntryUi";
+        public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentSentenceContainer = "currentSentenceContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
@@ -417,6 +420,7 @@ public static partial class R
         public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
+        public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
@@ -469,6 +473,7 @@ public static partial class R
         public const string singingResultsScoresContainer = "singingResultsScoresContainer";
         public const string singThisSongButton = "singThisSongButton";
         public const string sizeLabel = "sizeLabel";
+        public const string skipButton = "skipButton";
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
