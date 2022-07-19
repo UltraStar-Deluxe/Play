@@ -1,0 +1,101 @@
+/* Non-exhaustive list of contributors and supporters.
+   Contributors have been searched via "git shortlog -ns" */
+[
+  /* Main contributor (over 1000 commits) */
+  {
+    "Name": "Andreas Achim Stange",
+    "Nickname": "achimmica",
+    "Comment": "Main contributor, promoter, and driving force",
+    "Banner": "gold"
+  },
+
+  /* Sponsors and contributors */
+  {
+    "Nickname": "basisbit",
+    "Comment": "Initiator, regular contributor, reviewer, sponsor since 05-2021",
+    "Banner": "silver"
+  },
+  {
+    "Nickname": "bohning",
+    "Comment": "Long-term follower, one-time contributor, sponsor 06-2021, thanks for iOS builds"
+  },
+  {
+    "Nickname": "Frank Bowens",
+    "Comment": "Former contributor, sponsor 05-2021 until 01-2022",
+  },
+
+  /* GitHub Sponsors */
+  {
+    "Name": "rubinhos",
+    "Comment": "sponsor 07-2022"
+  },
+  {
+    "Name": "Goltergaul",
+    "Comment": "sponsor 01-2022"
+  },
+  {
+    "Name": "Seoul2004",
+    "Comment": "sponsor 12-2021"
+  },
+
+  /* Community moderators */
+  {
+    "Name": "Hitonabi",
+    "Comment": "Discord moderator"
+  },
+
+  /* Contributors */
+  {
+    "Nickname": "barbeque-squared"
+  },
+  {
+    "Nickname": "Dex@Twi"
+  },
+  {
+    "Nickname": "Michiel Bos"
+  },
+  {
+    "Nickname": "paradigm"
+  },
+  {
+    "Nickname": "Arjan Spieard"
+  },
+  {
+    "Nickname": "Dex"
+  },
+  {
+    "Nickname": "Nikolaos Ginos",
+  },
+  {
+    "Nickname": "Nico C",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Nickname": "Sven Kubisch",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Nickname": "The Gitter Badger",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Nickname": "TheMatiaz0",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Nickname": "Thorsten Neumann",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Name": "Tom-Julux",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Name": "matfrem",
+    "Comment": "one-time contributor"
+  },
+  {
+    "Name": "ruben",
+    "Comment": "one-time contributor"
+  }
+]

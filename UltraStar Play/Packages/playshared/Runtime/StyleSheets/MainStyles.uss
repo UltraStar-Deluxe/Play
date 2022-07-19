@@ -397,6 +397,22 @@ ItemPicker.smallFont Label {
     font-size: var(--font-size-s);
 }
 
+.xxlFont Label {
+    font-size: var(--font-size-xxl);
+}
+
+Label.xxlFont {
+    font-size: var(--font-size-xxl);
+}
+
+.largerFont Label {
+    font-size: var(--font-size-xl);
+}
+
+Label.largerFont {
+    font-size: var(--font-size-xl);
+}
+
 .largeFont Label {
     font-size: var(--font-size-l);
 }
@@ -833,4 +849,24 @@ Label.tinyFont {
 
 .searchPropertyContainer {
     margin-bottom: 10px;
+}
+
+.creditsEntryCharacter {
+    -unity-font-style: bold;
+    font-size: var(--font-size-xxl);
+    text-shadow: 1px 1px 0 rgb(0, 0, 0);
+}
+
+.creditsGoldBanner {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.creditsRegularBanner {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 40px;
 }
