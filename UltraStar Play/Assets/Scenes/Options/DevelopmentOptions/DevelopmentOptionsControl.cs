@@ -10,11 +10,12 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -70,7 +71,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private Injector injector;
+
     private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
+    private NetworkConfigControl networkConfigControl;
 
     private void Start()
     {
@@ -135,6 +140,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
+
+        // Network config
+        networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
     }
 
     private void HideLogOverlay()
@@ -202,5 +210,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_development_title);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }
