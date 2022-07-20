@@ -46,8 +46,6 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream.ObserveOnMainThread();
 
     private UdpClient serverUdpClient;
-    private const int ConnectPortOnServer = 34567;
-    private const int ConnectPortOnClient = 34568;
 
     private bool hasBeenDestroyed;
 
@@ -67,8 +65,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
         }
         
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
-        
-        serverUdpClient = new UdpClient(ConnectPortOnServer);
+
+        serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
+            ? new UdpClient(settings.OwnHost, settings.UdpPortOnServer)
+            : new UdpClient(settings.UdpPortOnServer);
+
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
             while (!hasBeenDestroyed)

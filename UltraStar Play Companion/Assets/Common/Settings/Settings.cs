@@ -22,6 +22,10 @@ public class Settings : ISettings
 
     public bool IsDevModeEnabled { get; set; }
 
+    public int UdpPortOnServer { get; set; } = 34567;
+    public int UdpPortOnClient { get; set; } = 34568;
+    public string OwnHost { get; set; }
+
     public void CreateAndSetClientId()
     {
         ClientId = Guid.NewGuid().ToString();
