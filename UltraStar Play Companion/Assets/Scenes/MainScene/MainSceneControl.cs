@@ -148,9 +148,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
+    [Inject]
+    private Injector injector;
+
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
+    private NetworkConfigControl networkConfigControl;
 
     private float frameCountTime;
     private int frameCount;
@@ -252,6 +256,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         settings
             .ObserveEveryValueChanged(it => it.IsDevModeEnabled)
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
+
+        // Network config
+        networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
 
         // Show/hide menu overlay
         HideMenu();

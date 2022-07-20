@@ -64,6 +64,20 @@
                         <ui:Label text="Developer Mode" display-tooltip-when-elided="true" name="devModeLabel" />
                         <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
                     </ui:VisualElement>
+                    <ui:VisualElement name="networkConfigContainer">
+                        <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px;">
+                            <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" />
+                            <ui:TextField picking-mode="Ignore" name="udpPortOnClientTextField" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="udpPortOnServerContainer" style="margin-bottom: 20px;">
+                            <ui:Label text="UDP Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="udpPortOnServerLabel" />
+                            <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="ownHostContainer" style="margin-bottom: 20px;">
+                            <ui:Label text="IP Address of Companion App&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" />
+                            <ui:TextField picking-mode="Ignore" name="ownHostTextField" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                 </ui:ScrollView>
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
                 <ui:VisualElement name="infoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
