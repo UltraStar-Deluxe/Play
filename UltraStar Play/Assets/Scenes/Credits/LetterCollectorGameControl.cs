@@ -85,6 +85,8 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private bool isFadeOut;
     private bool isFirstEntryControl = true;
 
+    private Vector2 lastCreatedEntryControlPosition;
+
     public void Start()
     {
         // Init UI
@@ -186,7 +188,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     {
         if (nextSpawnTimeInSeconds <= Time.time)
         {
-            spawnPauseInSeconds = Random.Range(1f, 6f);
+            spawnPauseInSeconds = Random.Range(1f, 3f);
             nextSpawnTimeInSeconds = Time.time + spawnPauseInSeconds;
 
             CreateNextEntryControl();
@@ -336,11 +338,23 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
                 isFirstEntryControl = false;
                 visualElement.style.top = 50;
                 visualElement.style.left = 250;
+                lastCreatedEntryControlPosition = new Vector2(visualElement.style.left.value.value, visualElement.style.top.value.value);
             }
             else
             {
-                visualElement.style.top = Random.Range(0, 200);
-                visualElement.style.left = Random.Range(0, 800 - visualElement.worldBound.size.x);
+                // Random position with some distance to last created object
+                float distance = 0;
+                Vector2 entryControlPosition;
+                int i = 0;
+                do
+                {
+                    visualElement.style.top = Random.Range(0, 200);
+                    visualElement.style.left = Random.Range(0, 800 - visualElement.worldBound.size.x);
+                    entryControlPosition = new Vector2(visualElement.style.left.value.value, visualElement.style.top.value.value);
+                    distance = Vector2.Distance(lastCreatedEntryControlPosition, entryControlPosition);
+                    i++;
+                } while (distance < 200 && i < 100);
+                lastCreatedEntryControlPosition = entryControlPosition;
             }
 
             // Keep fix size in pixels even if child content changes (i.e. even when the child letters are re-parented)

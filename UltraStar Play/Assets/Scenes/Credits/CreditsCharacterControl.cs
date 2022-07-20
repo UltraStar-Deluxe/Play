@@ -66,7 +66,7 @@ public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFi
             {
                 IsMoving = true;
                 velocityInPxPerSecond = new Vector2(
-                    Random.Range(-200, 200),
+                    Random.Range(-150, 150),
                     Random.Range(-360, -200));
                 // max angle velocity: 2 turns per second
                 angleVelocityInDegrees = Random.Range(0, 720 / Application.targetFrameRate);
