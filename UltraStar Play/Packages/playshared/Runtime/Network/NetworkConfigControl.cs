@@ -13,32 +13,26 @@ using UnityEngine.UIElements;
 
 public class NetworkConfigControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = R.UxmlNames.networkConfigContainer)]
-    private VisualElement networkConfigContainer;
+    [Inject(UxmlName = "networkConfigContainer")]
+    protected VisualElement networkConfigContainer;
 
-    [Inject(UxmlName = R.UxmlNames.udpPortOnClientTextField)]
-    private TextField udpPortOnClientTextField;
+    [Inject(UxmlName = "udpPortOnClientTextField")]
+    protected TextField udpPortOnClientTextField;
 
-    [Inject(UxmlName = R.UxmlNames.udpPortOnServerTextField)]
-    private TextField udpPortOnServerTextField;
+    [Inject(UxmlName = "udpPortOnServerTextField")]
+    protected TextField udpPortOnServerTextField;
 
-    [Inject(UxmlName = R.UxmlNames.ownHostTextField)]
-    private TextField ownHostTextField;
-
-    [Inject]
-    private Settings settings;
+    [Inject(UxmlName = "ownHostTextField")]
+    protected TextField ownHostTextField;
 
     [Inject]
-    private GameObject gameObject;
+    protected ISettings settings;
 
-    public void OnInjectionFinished()
+    [Inject]
+    protected GameObject gameObject;
+
+    public virtual void OnInjectionFinished()
     {
-        // Only show controls when dev mode is enabled.
-        UpdateNetworkConfigVisibility();
-        settings.ObserveEveryValueChanged(it => it.IsDevModeEnabled)
-            .Subscribe(_ => UpdateNetworkConfigVisibility())
-            .AddTo(gameObject);
-
         // Update value when TextField changes
         BindTextField(udpPortOnServerTextField,
             () => settings.UdpPortOnServer,
@@ -61,10 +55,5 @@ public class NetworkConfigControl : INeedInjection, IInjectionFinishedListener
             : "";
 
         textField.RegisterValueChangedCallback(evt => valueSetter(evt.newValue));
-    }
-
-    private void UpdateNetworkConfigVisibility()
-    {
-        networkConfigContainer.SetVisibleByDisplay(settings.IsDevModeEnabled);
     }
 }
