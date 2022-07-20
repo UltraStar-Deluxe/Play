@@ -43,8 +43,6 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
     public IObservable<ConnectEvent> ConnectEventStream => connectEventStream;
     
     private UdpClient clientUdpClient;
-    private const int ConnectPortOnServer = 34567;
-    private const int ConnectPortOnClient = 34568;
 
     private bool isListeningForConnectResponse;
 
@@ -71,8 +69,11 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
         }
 
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
-        
-        clientUdpClient = new UdpClient(ConnectPortOnClient);
+
+        clientUdpClient = !settings.OwnHost.IsNullOrEmpty()
+            ? new UdpClient(settings.OwnHost, settings.UdpPortOnClient)
+            : new UdpClient(settings.UdpPortOnClient);
+
         acceptMessageFromServerThread = new Thread(poolHandle =>
         {
             while (!hasBeenDestroyed)
@@ -224,7 +225,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
             };
             byte[] requestBytes = Encoding.UTF8.GetBytes(connectRequestDto.ToJson());
             // UDP Broadcast (255.255.255.255)
-            clientUdpClient.Send(requestBytes, requestBytes.Length, "255.255.255.255", ConnectPortOnServer);
+            clientUdpClient.Send(requestBytes, requestBytes.Length, "255.255.255.255", settings.UdpPortOnServer);
             Debug.Log($"Client has sent ConnectRequest as broadcast. Request: {connectRequestDto.ToJson()}");
         }
         catch (Exception e)

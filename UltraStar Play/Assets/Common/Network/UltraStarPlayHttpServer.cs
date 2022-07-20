@@ -1,12 +1,17 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
+using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer
+public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
+    [Inject]
+    private Settings settings;
+
     protected override void Awake()
     {
         if (!Application.isPlaying)
@@ -19,21 +24,33 @@ public class UltraStarPlayHttpServer : HttpServer
         {
             return;
         }
-        
-        host = IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
+    }
+
+    private void Start()
+    {
+        if (!Application.isPlaying
+            || Instance != this)
+        {
+            return;
+        }
+
+        host = !settings.OwnHost.IsNullOrEmpty()
+            ? settings.OwnHost
+            : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
+
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
-        
+
         this.On(HttpMethod.Get, "api/rest/endpoints")
             .WithDescription("Get currently registered endpoints")
             .UntilDestroy(gameObject)
             .Do(SendRegisteredEndpoints);
-        
+
         this.On(HttpMethod.Get, "api/rest/songs")
             .WithDescription("Get loaded songs")
             .UntilDestroy(gameObject)
             .Do(SendLoadedSongs);
-        
+
         this.On(HttpMethod.Get, "/api/rest/hello/{name}")
             .WithDescription("Say hello (path-parameter example)")
             .UntilDestroy(gameObject)
