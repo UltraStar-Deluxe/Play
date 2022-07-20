@@ -71,7 +71,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
 
         clientUdpClient = !settings.OwnHost.IsNullOrEmpty()
-            ? new UdpClient(settings.OwnHost, settings.UdpPortOnClient)
+            ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost), settings.UdpPortOnClient))
             : new UdpClient(settings.UdpPortOnClient);
 
         acceptMessageFromServerThread = new Thread(poolHandle =>
@@ -150,7 +150,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
     {
         try
         {
-            Debug.Log("Client listening for connect response on port " + clientUdpClient.GetPort());
+            Debug.Log("Client listening for connect response on " + clientUdpClient.Client.LocalEndPoint);
             IPEndPoint serverIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             // Receive is a blocking call
             byte[] receivedBytes = clientUdpClient.Receive(ref serverIpEndPoint);
