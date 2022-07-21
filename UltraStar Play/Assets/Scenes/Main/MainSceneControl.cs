@@ -116,7 +116,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
         createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
-        aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
     }
 
