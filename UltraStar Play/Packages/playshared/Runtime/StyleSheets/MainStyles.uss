@@ -133,7 +133,7 @@
     font-size: var(--font-size);
     border-width: 0;
     border-color: rgba(0, 0, 0, 0);
-    border-radius: 0;
+    border-radius: 5px;
     align-items: center;
     justify-content: center;
     padding: 6px 6px 5px 5px;
@@ -694,6 +694,16 @@ Label.tinyFont {
 
 .previousNoteLyrics {
     color: var(--control-color);
+}
+
+#previousItemButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#nextItemButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .lyricsContainer {
