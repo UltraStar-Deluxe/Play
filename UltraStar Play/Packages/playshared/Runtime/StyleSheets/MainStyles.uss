@@ -825,6 +825,10 @@ Label.tinyFont {
     width: 12px;
 }
 
+.unity-scroller--horizontal {
+    height: 12px;
+}
+
 .unity-scroller__low-button {
     width: 100%;
     display: none;
@@ -835,9 +839,18 @@ Label.tinyFont {
     display: none;
 }
 
-.unity-base-slider {
-    width: 100%;
+.unity-scroller--vertical > .unity-scroller__slider  {
+    width: 12px;
     min-width: auto;
+    border-radius: 5px;
+    margin: 0;
+    padding: 0;
+}
+
+.unity-scroller--horizontal > .unity-scroller__slider  {
+    height: 12px;
+    min-height: auto;
+    border-radius: 5px;
     margin: 0;
     padding: 0;
 }
@@ -847,9 +860,16 @@ Label.tinyFont {
     margin-bottom: 0;
 }
 
-.unity-base-slider__dragger {
+.unity-base-slider--vertical .unity-base-slider__dragger {
     width: 10px;
     left: 1px;
+    border-radius: 5px;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger {
+    height: 10px;
+    top: 1px;
+    border-radius: 5px;
 }
 
 .textColorTint {
