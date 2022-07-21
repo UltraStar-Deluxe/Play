@@ -74,9 +74,6 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private readonly List<CreditsEntryControl> entryControls = new();
 
     private int score;
-    private int bonusLabelAnimationId;
-    private readonly List<string> collectedCharacters = new();
-    private readonly List<string> normalizedCollectedCharacters = new();
 
     private float startTimeInSeconds;
     private float nextSpawnTimeInSeconds;
@@ -166,6 +163,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
             {
                 player.style.opacity = value;
                 categoryNameContainer.style.opacity = value;
+                skipButton.style.opacity = value;
                 background.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, value));
                 secondBackground.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f, 1 - value));
             });
@@ -211,77 +209,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
                     // One regular point for the character
                     score += 1;
-                    ApplyBonusPoints(characterControl.Character, out List<string> bonusTexts);
-                    if (!bonusTexts.IsNullOrEmpty())
-                    {
-                        // Show bonus label
-                        bonusLabel.style.opacity = 1;
-                        bonusLabel.text = bonusTexts.JoinWith(", ");
-                        // Fade out bonus label
-                        if (bonusLabelAnimationId > 0)
-                        {
-                            LeanTween.cancel(gameObject, bonusLabelAnimationId);
-                        }
-                        bonusLabelAnimationId = LeanTween.value(gameObject, 1, 0, 1f)
-                            .setDelay(1f)
-                            .setOnUpdate(value => bonusLabel.style.opacity = value)
-                            .id;
-                    }
                     scoreLabel.text = score.ToString();
-
-                    collectedCharacters.Add(characterControl.Character);
-                    normalizedCollectedCharacters.Add(characterControl.Character.ToLowerInvariant());
                 }
             });
-    }
-
-    private void ApplyBonusPoints(string newCharacter, out List<string> bonusTexts)
-    {
-        bonusTexts = new();
-
-        // New characters give bonus
-        if (!normalizedCollectedCharacters.Contains(newCharacter))
-        {
-            int bonus = 5;
-            score += bonus;
-            bonusTexts.Add($"new Character {newCharacter}: +{bonus}");
-        }
-
-        // Same character in a row gives bonus
-        int sameCharacterChain = GetSameCharacterChainLength(newCharacter);
-        if (sameCharacterChain > 0)
-        {
-            int bonus = sameCharacterChain * 20;
-            score += bonus;
-            bonusTexts.Add($"{sameCharacterChain + 1}-Chain: +{bonus}");
-        }
-
-        // Number character has its value as bonus
-        if (int.TryParse(newCharacter, out int parsedInt)
-            && parsedInt > 0)
-        {
-            int bonus = parsedInt;
-            score += bonus;
-            bonusTexts.Add($"{parsedInt}: +{bonus}");
-        }
-    }
-
-    private int GetSameCharacterChainLength(string newCharacter)
-    {
-        int result = 0;
-        for (int i = normalizedCollectedCharacters.Count - 1; i >= 0; i--)
-        {
-            string oldCharacter = normalizedCollectedCharacters[i];
-            if (oldCharacter != newCharacter)
-            {
-                // Chain ended
-                break;
-            }
-
-            result++;
-        }
-
-        return result;
     }
 
     private void UpdatePlayerPosition()
@@ -289,8 +219,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         Vector2 screenSize = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
         Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper);
         float pointerPositionXPercent = pointerPosition.x / screenSize.x;
-        int relativeMidiNote = (int)Math.Round(pointerPositionXPercent * 12f);
-        player.style.left = new StyleLength(new Length(relativeMidiNote / 12f * 100f, LengthUnit.Percent));
+        player.style.left = new StyleLength(new Length(pointerPositionXPercent * 100f, LengthUnit.Percent));
     }
 
     private void CreateNextEntryControl()
