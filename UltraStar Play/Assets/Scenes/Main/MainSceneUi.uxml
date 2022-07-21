@@ -10,18 +10,29 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 12px;">
-                <ui:Button text="Sing" name="startButton" class="startButtonClass mainSceneButton" />
+            <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
+            <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center;">
+                <ui:Button text="Sing" name="startButton" class="startButtonClass mainSceneButton" style="text-shadow: 1px 1px 0 rgb(0, 0, 0); -unity-font-style: bold;" />
+                <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Party" name="partyButton" class="mainSceneButton" />
+            </ui:VisualElement>
+            <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
+            <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center; align-items: center;">
                 <ui:Button text="Create Song" name="createSongButton" class="mainSceneButton" />
+                <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Settings" name="settingsButton" class="mainSceneButton" />
+                <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
+                <ui:Button text="Quit" name="quitButton" class="mainSceneButton mainSceneExitButton" style="display: flex;" />
             </ui:VisualElement>
-            <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around; margin-top: 48px;">
-                <ui:Button display-tooltip-when-elided="true" name="dummyButton" class="mainSceneButton focusableNavigatorIgnore" />
-                <ui:Button text="Credits" name="creditsButton" class="mainSceneButton" />
-                <ui:Button text="Info" name="aboutButton" class="mainSceneButton" />
-                <ui:Button text="Quit" name="quitButton" class="mainSceneButton" style="display: flex;" />
+            <ui:VisualElement name="bottomButtonRow" style="width: 100%;">
+                <ui:Button name="creditsButton" class="roundButton" style="position: absolute; left: 0;">
+                    <ui:VisualElement name="creditsIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/groups_white_24dp.svg?fileID=7388822144124034973&amp;guid=997a4abfa63f0ca4aacbd7053d7c8606&amp;type=3#groups_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 90%; height: 90%;" />
+                </ui:Button>
+                <ui:Button name="aboutButton" class="roundButton" style="position: absolute; right: 0;">
+                    <ui:VisualElement name="aboutIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/info_white_24dp.svg?fileID=7388822144124034973&amp;guid=65f497815bf9b0441b2c67b69b56213b&amp;type=3#info_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 70%; height: 70%;" />
+                </ui:Button>
             </ui:VisualElement>
+            <ui:VisualElement name="buttonContainer" style="align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-around;" />
         </ui:VisualElement>
         <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
             <ui:Label text="Version: xx.yy.zz" name="semanticVersionText" style="font-size: 12px;" />

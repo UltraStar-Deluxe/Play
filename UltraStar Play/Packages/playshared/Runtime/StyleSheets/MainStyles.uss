@@ -1,5 +1,5 @@
 :root {
-    --text-color: white;
+    --text-color: rgb(240, 240, 240);
     --text-color-inverted: rgb(64, 64, 64);
     --text-color-accent1: lightgrey;
     --text-color-error: rgb(200, 48, 48);
@@ -20,6 +20,8 @@
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
+    --main-scene-button-width: 150px;
+    --main-scene-sing-button-width: 310px;
 }
 
 .unity-label {
@@ -138,6 +140,7 @@
     justify-content: center;
     padding: 6px 6px 5px 5px;
     margin: 2px 2px 2px 2px;
+    -unity-font-style: bold;
 }
 
 .unity-button:hover {
@@ -302,8 +305,20 @@ TextInput {
 }
 
 .mainSceneButton {
-    width: var(--control-width-large);
+    -unity-font-style: bold;
+    width: var(--main-scene-button-width);
     height: var(--control-height-large);
+    margin: 0px;
+}
+
+#startButton.mainSceneButton {
+    width: var(--main-scene-sing-button-width);
+    height: var(--control-height-large);
+}
+
+.mainSceneButtonSpacer {
+    width: 10px;
+    height: 10px;
 }
 
 .dialogButton {
@@ -862,8 +877,8 @@ Label.tinyFont {
 }
 
 .creditsEntryCharacter {
-    -unity-font-style: bold;
     font-size: var(--font-size-xxl);
+    -unity-font-style: bold;
     text-shadow: 1px 1px 0 rgb(0, 0, 0);
 }
 
