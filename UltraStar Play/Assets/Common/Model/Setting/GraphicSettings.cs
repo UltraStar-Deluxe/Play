@@ -15,4 +15,5 @@ public class GraphicSettings
     public bool showLyricsOnNotes = true;
     public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = "BaseTheme";
+    public bool AnimateSceneChange { get; set; } = true;
 }

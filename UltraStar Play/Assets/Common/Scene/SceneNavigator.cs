@@ -25,6 +25,9 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
     [Inject]
     private UltraStarPlaySceneChangeAnimationControl sceneChangeAnimationControl;
 
+    [Inject]
+    private Settings settings;
+
     public static SceneNavigator Instance
     {
         get
@@ -45,9 +48,18 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
     {
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
-        sceneChangeAnimationControl.AnimateChangeToScene(
-            () => SceneManager.LoadScene((int)scene),
-            sceneChangeAnimationControl.StartSceneChangeAnimation);
+        Action doChangeScene = () => SceneManager.LoadScene((int)scene);
+
+        if (settings.GraphicSettings.AnimateSceneChange)
+        {
+            sceneChangeAnimationControl.AnimateChangeToScene(
+                doChangeScene,
+                sceneChangeAnimationControl.StartSceneChangeAnimation);
+        }
+        else
+        {
+            doChangeScene();
+        }
     }
 
     private void AddSceneData(SceneData sceneData)
