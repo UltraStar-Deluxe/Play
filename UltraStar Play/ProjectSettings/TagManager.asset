@@ -30,6 +30,7 @@ TagManager:
   - StyleSheetControl
   - ContextMenuPopupManager
   - BackgroundMusicManager
+  - SceneChangeAnimationControl
   layers:
   - Default
   - TransparentFX
