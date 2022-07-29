@@ -15,11 +15,11 @@
       "hash": "9d50e260346432ca05b6508b09e21f530ba3bae0"
     },
     "com.achimmihca.scenechangeanimations": {
-      "version": "https://github.com/achimmihca/SceneChangeAnimations.git?path=SceneChangeAnimations/Packages/com.achimmihca.scenechangeanimations#v0.0.1",
+      "version": "https://github.com/achimmihca/SceneChangeAnimations.git?path=SceneChangeAnimations/Packages/com.achimmihca.scenechangeanimations#v1.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "ea8c718377ad8554613aae8226d2cc287855e543"
+      "hash": "be3273a1c3eb3682599f39b10a92313ee7443db5"
     },
     "com.achimmihca.simplehttpserverforunity": {
       "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",

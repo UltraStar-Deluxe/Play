@@ -30,10 +30,15 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
         }
     }
 
-    private void Awake()
+    public override void Start()
     {
         UltraStarPlaySceneChangeAnimationControl self = this;
         GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
+
+        if (instance == this)
+        {
+            base.Start();
+        }
     }
 
     public void StartSceneChangeAnimation(VisualElement visualElement)
@@ -41,9 +46,9 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
         LeanTween.value(gameObject, 0, 1, 0.3f)
             .setOnUpdate((float animTimePercent) =>
             {
-                visualElement.style.opacity = 1 - animTimePercent;
+                visualElement.style.opacity = 1 - (animTimePercent * 2);
 
-                float scale = 1 + animTimePercent * 2f;
+                float scale = 1 + animTimePercent * 1.5f;
                 visualElement.style.scale = new StyleScale(new Scale(new Vector3(scale, scale, 1)));
             })
             .setOnComplete(() => visualElement.RemoveFromHierarchy())
