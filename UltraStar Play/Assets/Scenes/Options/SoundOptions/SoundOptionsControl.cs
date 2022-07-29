@@ -40,6 +40,9 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.volumeChooser)]
     private ItemPicker volumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
+    private ItemPicker animateSceneChangeVolumePicker;
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
@@ -59,6 +62,10 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         PercentNumberPickerControl volumePickerControl = new(volumeChooser);
         volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
             newValue => settings.AudioSettings.VolumePercent = (int)newValue);
+
+        PercentNumberPickerControl animateSceneChangeVolumePickerControl = new(animateSceneChangeVolumePicker);
+        animateSceneChangeVolumePickerControl.Bind(() => settings.AudioSettings.SceneChangeSoundVolumePercent,
+            newValue => settings.AudioSettings.SceneChangeSoundVolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

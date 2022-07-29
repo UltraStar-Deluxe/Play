@@ -31,6 +31,8 @@ public static partial class R
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
+        public const string mainSceneButtonSpacer = "mainSceneButtonSpacer";
+        public const string mainSceneExitButton = "mainSceneExitButton";
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string middleCenterText = "middleCenterText";
         public const string multiline = "multiline";

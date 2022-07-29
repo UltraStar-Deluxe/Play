@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine.SceneManagement;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -29,6 +30,12 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
             return instance;
         }
     }
+
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    private AudioSource audioSource;
+
+    [Inject]
+    private Settings settings;
 
     public override void Start()
     {
@@ -53,5 +60,18 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
             })
             .setOnComplete(() => visualElement.RemoveFromHierarchy())
             .setEaseInSine();
+
+        audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent;
+        audioSource.Play();
+    }
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if (!settings.GraphicSettings.AnimateSceneChange)
+        {
+            return;
+        }
+        
+        base.OnSceneLoaded(scene, loadSceneMode);
     }
 }
