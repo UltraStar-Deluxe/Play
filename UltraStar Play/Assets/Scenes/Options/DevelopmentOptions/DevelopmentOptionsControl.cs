@@ -10,11 +10,12 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -67,7 +68,14 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
+    private Injector injector;
+
     private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
+    private NetworkConfigControl networkConfigControl;
 
     private void Start()
     {
@@ -132,6 +140,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
+
+        // Network config
+        networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
     }
 
     private void HideLogOverlay()
@@ -148,7 +159,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     private void OnBack()
     {
-        if (logOverlay.IsVisibleByDisplay())
+        if (uiDocument.rootVisualElement.focusController.focusedElement == logTextField)
+        {
+            closeLogOverlayButton.Focus();
+        }
+        else if (logOverlay.IsVisibleByDisplay())
         {
             HideLogOverlay();
         }
@@ -172,9 +187,16 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                 return logLine.Replace("\\", "/");
             })
             .ToList();
-        logTextField.value = logLines.IsNullOrEmpty()
+
+        string logText = logLines.IsNullOrEmpty()
             ? "(no messages for this log level)"
             : logLines.JoinWith("");
+        if (logText.Length > VisualElementUtils.TextFieldCharacterLimit)
+        {
+            string prefix = "...\n";
+            logText = prefix + logText.Substring(logText.Length - (VisualElementUtils.TextFieldCharacterLimit - prefix.Length));
+        }
+        logTextField.value = logText;
     }
 
     public void UpdateTranslation()
@@ -188,5 +210,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_development_title);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new BindingBuilder();
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(this);
+        return bb.GetBindings();
     }
 }
