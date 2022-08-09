@@ -22,6 +22,10 @@ public class Settings : ISettings
     // When containing the string "all", then all releases will be ignored.
     public List<string> IgnoredReleases { get; set; } = new();
 
+    public int UdpPortOnServer { get; set; } = 34567;
+    public int UdpPortOnClient { get; set; } = 34568;
+    public string OwnHost { get; set; }
+
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
         List<PlayerProfile> result = new();

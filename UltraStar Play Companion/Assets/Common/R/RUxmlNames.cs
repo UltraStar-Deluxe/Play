@@ -28,6 +28,10 @@ public static partial class R
         public const string menuOverlayScrollView = "menuOverlayScrollView";
         public const string micIcon = "micIcon";
         public const string micViewContainer = "micViewContainer";
+        public const string networkConfigContainer = "networkConfigContainer";
+        public const string ownHostContainer = "ownHostContainer";
+        public const string ownHostLabel = "ownHostLabel";
+        public const string ownHostTextField = "ownHostTextField";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceContainer = "recordingDeviceContainer";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
@@ -51,6 +55,12 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
+        public const string udpPortOnClientContainer = "udpPortOnClientContainer";
+        public const string udpPortOnClientLabel = "udpPortOnClientLabel";
+        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
+        public const string udpPortOnServerContainer = "udpPortOnServerContainer";
+        public const string udpPortOnServerLabel = "udpPortOnServerLabel";
+        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";

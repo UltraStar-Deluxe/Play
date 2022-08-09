@@ -278,6 +278,7 @@ public static partial class R
         public const string musicVolumeSlider = "musicVolumeSlider";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
+        public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -322,6 +323,9 @@ public static partial class R
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string overviewAreaWaveform = "overviewAreaWaveform";
+        public const string ownHostContainer = "ownHostContainer";
+        public const string ownHostLabel = "ownHostLabel";
+        public const string ownHostTextField = "ownHostTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
@@ -546,6 +550,12 @@ public static partial class R
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";
+        public const string udpPortOnClientContainer = "udpPortOnClientContainer";
+        public const string udpPortOnClientLabel = "udpPortOnClientLabel";
+        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
+        public const string udpPortOnServerContainer = "udpPortOnServerContainer";
+        public const string udpPortOnServerLabel = "udpPortOnServerLabel";
+        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
         public const string urlChooser = "urlChooser";
         public const string urlContainer = "urlContainer";
