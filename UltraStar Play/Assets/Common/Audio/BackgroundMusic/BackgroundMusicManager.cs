@@ -38,6 +38,7 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
         EScene.SingingResultsScene,
         EScene.HighscoreScene,
         EScene.SongEditorScene,
+        EScene.RecordingOptionsScene,
     };
 
     private bool ShouldPlayBackgroundMusic
@@ -62,7 +63,8 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
 
     private float lastPauseTimeInSeconds;
 
-	private void Start() {
+	private void Start()
+    {
         BackgroundMusicManager self = this;
         GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
 
