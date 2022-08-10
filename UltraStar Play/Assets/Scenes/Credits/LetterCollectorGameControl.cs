@@ -77,7 +77,6 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     private float startTimeInSeconds;
     private float nextSpawnTimeInSeconds;
-    private float spawnPauseInSeconds;
 
     private bool isFadeOut;
     private bool isFirstEntryControl = true;
@@ -186,7 +185,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     {
         if (nextSpawnTimeInSeconds <= Time.time)
         {
-            spawnPauseInSeconds = Random.Range(1f, 3f);
+            float spawnPauseInSeconds = Random.Range(1f, 3f);
             nextSpawnTimeInSeconds = Time.time + spawnPauseInSeconds;
 
             CreateNextEntryControl();
