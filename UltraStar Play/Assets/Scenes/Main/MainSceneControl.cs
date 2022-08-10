@@ -142,6 +142,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         else
         {
             buildTimeStampText.text = "";
+            buildTimeStampText.HideByDisplay();
         }
     }
 
