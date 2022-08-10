@@ -10,14 +10,11 @@ public class AudioManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        volumeBeforeMute = -1;
         ClearCache();
     }
 
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
-
-    private static float volumeBeforeMute = -1;
 
     public static AudioManager Instance
     {
@@ -28,22 +25,6 @@ public class AudioManager : MonoBehaviour
     }
 
     private CoroutineManager coroutineManager;
-
-    public static void ToggleMuteAudio()
-    {
-        if (volumeBeforeMute >= 0)
-        {
-            AudioListener.volume = volumeBeforeMute;
-            volumeBeforeMute = -1;
-            UiManager.Instance.CreateNotificationVisualElement("Unmute");
-        }
-        else
-        {
-            volumeBeforeMute = AudioListener.volume;
-            AudioListener.volume = 0;
-            UiManager.Instance.CreateNotificationVisualElement("Mute");
-        }
-    }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
     {
