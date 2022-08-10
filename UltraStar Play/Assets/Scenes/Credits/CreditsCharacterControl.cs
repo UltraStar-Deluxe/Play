@@ -13,7 +13,7 @@ using Random = UnityEngine.Random;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFinishedListener
+public class CreditsCharacterControl : INeedInjection, IDisposable
 {
     private static readonly Vector2 gravityInPxPerSecond = new Vector2(0, 300f);
 
@@ -47,10 +47,6 @@ public class CreditsCharacterControl : INeedInjection, IDisposable, IInjectionFi
         {
             Label.text = value;
         }
-    }
-
-    public void OnInjectionFinished()
-    {
     }
 
     public void InitMovement()
