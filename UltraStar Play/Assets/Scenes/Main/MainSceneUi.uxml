@@ -27,11 +27,11 @@
             </ui:VisualElement>
             <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
             <ui:VisualElement name="bottomButtonRow" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 5px;">
-                <ui:Button name="creditsButton" class="roundButton" style="right: 5px;">
+                <ui:Button name="creditsButton" class="roundButton mainSceneButton" style="right: 5px;">
                     <ui:VisualElement name="creditsIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/groups_white_24dp.svg?fileID=7388822144124034973&amp;guid=997a4abfa63f0ca4aacbd7053d7c8606&amp;type=3#groups_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 90%; height: 90%;" />
                 </ui:Button>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
-                <ui:Button name="aboutButton" class="roundButton" style="right: 5px;">
+                <ui:Button name="aboutButton" class="roundButton mainSceneButton" style="right: 5px;">
                     <ui:VisualElement name="aboutIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/info_white_24dp.svg?fileID=7388822144124034973&amp;guid=65f497815bf9b0441b2c67b69b56213b&amp;type=3#info_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 70%; height: 70%;" />
                 </ui:Button>
             </ui:VisualElement>

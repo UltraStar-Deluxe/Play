@@ -311,6 +311,12 @@ TextInput {
     margin: 0px;
 }
 
+.mainSceneButton.roundButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+}
+
 #startButton.mainSceneButton {
     width: var(--main-scene-sing-button-width);
     height: var(--control-height-large);
