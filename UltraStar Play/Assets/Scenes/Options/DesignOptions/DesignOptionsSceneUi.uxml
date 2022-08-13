@@ -32,6 +32,10 @@
                     <ui:Label text="Use Image as Cursor" name="Label" class="controlLabel" />
                     <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
                 </ui:VisualElement>
+                <ui:VisualElement name="animateSceneChangeContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Scene Transition" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
                 <ui:Button text="Back" name="backButton" />

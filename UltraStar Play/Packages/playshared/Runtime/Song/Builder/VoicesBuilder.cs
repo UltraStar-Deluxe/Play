@@ -129,7 +129,7 @@ public class VoicesBuilder
         // Format of line breaks: - STARTBEAT ENDBEAT
         // Thereby, ENDBEAT is optional.
         char[] splitChars = { ' ' };
-        string[] data = line.Split(splitChars);
+        string[] data = line.Trim().Split(splitChars);
 
         startBeat = 0;
         endBeat = 0;

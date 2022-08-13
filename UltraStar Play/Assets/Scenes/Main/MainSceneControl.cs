@@ -47,6 +47,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.aboutButton)]
     private Button aboutButton;
 
+    [Inject(UxmlName = R.UxmlNames.creditsButton)]
+    private Button creditsButton;
+
     [Inject(UxmlName = R.UxmlNames.quitButton)]
     private Button quitButton;
 
@@ -77,12 +80,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
+        creditsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.CreditsScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
         InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
         InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
         InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
+        InitButtonDescription(creditsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_credits_description));
         InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
         InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
         InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
@@ -111,7 +116,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
         createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_label);
         settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
-        aboutButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_about_label);
         quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
     }
 
@@ -138,6 +142,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         else
         {
             buildTimeStampText.text = "";
+            buildTimeStampText.HideByDisplay();
         }
     }
 

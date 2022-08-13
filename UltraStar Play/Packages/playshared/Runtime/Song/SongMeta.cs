@@ -127,6 +127,8 @@ public class SongMeta
 
     private List<Voice> voices = new();
 
+    public bool FailedToLoadVoices { get; private set; }
+
     private readonly Dictionary<string, string> unknownHeaderEntries = new();
     public IReadOnlyDictionary<string, string> UnknownHeaderEntries
     {
@@ -180,14 +182,20 @@ public class SongMeta
 
     public IReadOnlyList<Voice> GetVoices()
     {
-        if (voices.IsNullOrEmpty())
+        if (voices.IsNullOrEmpty()
+            && !FailedToLoadVoices)
         {
+            // When there is an Exception, then this field is not reset.
+            FailedToLoadVoices = true;
+
             string path = Directory + Path.DirectorySeparatorChar + Filename;
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
                 VoicesBuilder voicesBuilder = new(path, Encoding, Relative);
                 voices = new List<Voice>(voicesBuilder.GetVoices());
             }
+
+            FailedToLoadVoices = false;
         }
         return voices;
     }

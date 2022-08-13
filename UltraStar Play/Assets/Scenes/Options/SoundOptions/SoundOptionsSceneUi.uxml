@@ -20,8 +20,12 @@
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="previewVolumeChooser" />
             </ui:VisualElement>
             <ui:VisualElement name="backgroundMusicVolumeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Background Music" name="backgroundMusicVolumeLabel" class="controlLabel" />
+                <ui:Label text="Background Music Volume" name="backgroundMusicVolumeLabel" class="controlLabel" />
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="backgroundMusicVolumeChooser" />
+            </ui:VisualElement>
+            <ui:VisualElement name="animateSceneChangeVolumeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Scene Transition Volume" name="animateSceneChangeVolumeLabel" class="controlLabel" />
+                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="animateSceneChangeVolumePicker" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
                 <ui:Button text="Back" name="backButton" />

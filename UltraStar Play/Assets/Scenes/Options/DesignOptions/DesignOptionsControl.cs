@@ -37,6 +37,9 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.imageAsCursorContainer)]
     private VisualElement imageAsCursorContainer;
 
+    [Inject(UxmlName = R.UxmlNames.animateSceneChangeContainer)]
+    private VisualElement animateSceneChangeContainer;
+
     [Inject]
     private Settings settings;
 
@@ -61,6 +64,10 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         new BoolPickerControl(imageAsCursorContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.useImageAsCursor,
                 newValue => settings.GraphicSettings.useImageAsCursor = newValue);
+
+        new BoolPickerControl(animateSceneChangeContainer.Q<ItemPicker>())
+            .Bind(() => settings.GraphicSettings.AnimateSceneChange,
+                newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        volumeBeforeMute = -1;
+    }
+
+    private static int volumeBeforeMute = -1;
+
     [Inject]
     private Settings settings;
     
@@ -15,7 +23,7 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
 
         // Mute / unmute audio via F12
         UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
-            .Subscribe(_ => AudioManager.ToggleMuteAudio());
+            .Subscribe(_ => ToggleMuteAudio());
     }
 
     private void ToggleFullscreen()
@@ -29,5 +37,22 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
                 settings.GraphicSettings.fullScreenMode = Screen.fullScreenMode;
                 Debug.Log("New full-screen mode " + settings.GraphicSettings.fullScreenMode);
             }));
+    }
+
+
+    public void ToggleMuteAudio()
+    {
+        if (volumeBeforeMute >= 0)
+        {
+            settings.AudioSettings.VolumePercent = volumeBeforeMute;
+            volumeBeforeMute = -1;
+            UiManager.Instance.CreateNotificationVisualElement("Unmute");
+        }
+        else
+        {
+            volumeBeforeMute = settings.AudioSettings.VolumePercent;
+            settings.AudioSettings.VolumePercent = 0;
+            UiManager.Instance.CreateNotificationVisualElement("Mute");
+        }
     }
 }
