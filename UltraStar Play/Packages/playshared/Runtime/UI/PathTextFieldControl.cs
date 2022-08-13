@@ -5,7 +5,7 @@
 
 public class PathTextFieldControl : BackslashReplacingTextFieldControl
 {
-    private const string BackslashReplacement = "＼"; // FULLWIDTH REVERSE SOLIDUS
+    private const string BackslashReplacement = "|";
 
     public PathTextFieldControl(TextField textField)
         : base(textField, BackslashReplacement)

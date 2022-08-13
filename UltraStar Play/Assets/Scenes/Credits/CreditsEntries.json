@@ -1,0 +1,157 @@
+/* Non-exhaustive list of contributors and supporters. */
+
+/* Categories of Credits */
+[
+  {
+    "Name": "",
+    "Entries": [
+      /* Main contributor (over 1000 commits) */
+      {
+        "Name": "Andreas Achim Stange",
+        "Nickname": "achimmica",
+        "Comment": "main contributor, promoter, and driving force",
+        "Banner": "gold"
+      },
+
+      /* Initiator */
+      {
+        "Nickname": "basisbit",
+        "Comment": "initiator, regular contributor and reviewer",
+        "Banner": "silver"
+      }
+    ]
+  },
+
+  /* Sponsors and contributors */
+  {
+    "Name": "GitHub Sponsors",
+    "Entries": [
+      {
+        "Nickname": "basisbit",
+        "Comment": "sponsor since 05-2021"
+      },
+      {
+        "Nickname": "imOrenj",
+        "Comment": "sponsor 07-2022"
+      },
+      {
+        "Name": "rubinhos",
+        "Comment": "sponsor 07-2022"
+      },
+      {
+        "Name": "Goltergaul",
+        "Comment": "sponsor 01-2022"
+      },
+      {
+        "Nickname": "Frank Bowens",
+        "Comment": "sponsor 05-2021 until 01-2022"
+      },
+      {
+        "Name": "Seoul2004",
+        "Comment": "sponsor 12-2021"
+      },
+      {
+        "Nickname": "bohning",
+        "Comment": "sponsor 06-2021"
+      }
+    ]
+  },
+
+  /* Contributors (searched via "git shortlog -ns") */
+  {
+    "Name": "Contributors",
+    "Entries": [
+      {
+        "Nickname": "achimmihca",
+        "Comment": "thanks for over 1000 commits"
+      },
+      {
+        "Nickname": "basisbit",
+        "Comment": "thanks for over 250 commits"
+      },
+      {
+        "Nickname": "barbeque-squared",
+        "Comment": "thanks for 20 commits"
+      },
+      {
+        "Nickname": "Dex@Twi",
+        "Comment": "thanks for 8 commits"
+      },
+      {
+        "Nickname": "Michiel Bos",
+        "Comment": "thanks for 7 commits"
+      },
+      {
+        "Nickname": "paradigm",
+        "Comment": "thanks for 5 commits"
+      },
+      {
+        "Nickname": "Arjan Spieard",
+        "Comment": "thanks for 3 commits"
+      },
+      {
+        "Nickname": "Dex",
+        "Comment": "thanks for 2 commits"
+      },
+      {
+        "Nickname": "Frank Bouwens",
+        "Comment": "thanks for 2 commits"
+      },
+      {
+        "Nickname": "Nikolaos Ginos",
+        "Comment": "thanks for 2 commits"
+      },
+      {
+        "Nickname": "Markus Böhning",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Nickname": "Nico C",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Nickname": "Sven Kubisch",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Nickname": "The Gitter Badger",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Nickname": "TheMatiaz0",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Nickname": "Thorsten Neumann",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Name": "Tom-Julux",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Name": "matfrem",
+        "Comment": "thanks for 1 commit"
+      },
+      {
+        "Name": "ruben",
+        "Comment": "thanks for 1 commit"
+      }
+    ]
+  },
+
+  /* Special thanks */
+  {
+    "Name": "Special Thanks",
+    "Entries": [
+      {
+        "Name": "Hitonabi",
+        "Comment": "Discord moderator"
+      },
+      {
+        "Name": "bohning",
+        "Comment": "iOS build"
+      }
+    ]
+  }
+]

@@ -74,6 +74,7 @@ public static partial class R
         public static readonly string loading = "loading";
         public static readonly string mainScene_button_about_description = "mainScene_button_about_description";
         public static readonly string mainScene_button_about_label = "mainScene_button_about_label";
+        public static readonly string mainScene_button_credits_description = "mainScene_button_credits_description";
         public static readonly string mainScene_button_description_noImplementation = "mainScene_button_description_noImplementation";
         public static readonly string mainScene_button_jukebox_label = "mainScene_button_jukebox_label";
         public static readonly string mainScene_button_newSong_description = "mainScene_button_newSong_description";

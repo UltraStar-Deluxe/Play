@@ -615,6 +615,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene(SongMeta songMeta)
     {
+        if (songMeta.FailedToLoadVoices)
+        {
+            uiManager.CreateNotificationVisualElement("Failed to load song. Check log for details.");
+            return;
+        }
+
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
         if (singSceneData != null)
         {
@@ -624,6 +630,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSongEditorScene(SongMeta songMeta)
     {
+        if (songMeta.FailedToLoadVoices)
+        {
+            uiManager.CreateNotificationVisualElement("Failed to load song. Check log for details.");
+            return;
+        }
+
         SongEditorSceneData editorSceneData = new();
         editorSceneData.SelectedSongMeta = songMeta;
 

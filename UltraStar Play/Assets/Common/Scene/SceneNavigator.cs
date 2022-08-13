@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using SceneChangeAnimations;
+using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
-public class SceneNavigator : MonoBehaviour
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class SceneNavigator : MonoBehaviour, INeedInjection
 {
     private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
@@ -14,6 +21,12 @@ public class SceneNavigator : MonoBehaviour
     {
         staticSceneDatas.Clear();
     }
+
+    [Inject]
+    private UltraStarPlaySceneChangeAnimationControl sceneChangeAnimationControl;
+
+    [Inject]
+    private Settings settings;
 
     public static SceneNavigator Instance
     {
@@ -34,7 +47,19 @@ public class SceneNavigator : MonoBehaviour
     public void LoadScene(EScene scene)
     {
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
-        SceneManager.LoadScene((int)scene);
+
+        Action doChangeScene = () => SceneManager.LoadScene((int)scene);
+
+        if (settings.GraphicSettings.AnimateSceneChange)
+        {
+            sceneChangeAnimationControl.AnimateChangeToScene(
+                doChangeScene,
+                sceneChangeAnimationControl.StartSceneChangeAnimation);
+        }
+        else
+        {
+            doChangeScene();
+        }
     }
 
     private void AddSceneData(SceneData sceneData)

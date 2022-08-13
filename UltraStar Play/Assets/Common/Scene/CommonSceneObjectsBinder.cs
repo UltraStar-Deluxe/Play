@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
+using SceneChangeAnimations;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
@@ -28,6 +29,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
+        bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
+        bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.Bind(typeof(IServerSideConnectRequestManager)).ToExistingInstance(ServerSideConnectRequestManager.Instance);
@@ -38,6 +41,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
         // Lazy binding of UIDocument, because it does not exist in every scene (yet)
         bb.BindExistingInstanceLazy(() => GetUiDocument());
+        bb.BindExistingInstanceLazy(() => new PanelHelper(GetUiDocument()));
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);

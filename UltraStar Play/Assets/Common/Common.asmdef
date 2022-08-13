@@ -10,7 +10,8 @@
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
         "Unity.InputSystem",
-        "playshared"
+        "playshared",
+        "com.achimmihca.scenechangeanimations"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

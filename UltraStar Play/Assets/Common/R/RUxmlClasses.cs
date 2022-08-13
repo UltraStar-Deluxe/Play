@@ -7,6 +7,8 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string controlLabel = "controlLabel";
+        public const string creditsEntryCharacter = "creditsEntryCharacter";
+        public const string creditsRegularBanner = "creditsRegularBanner";
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dialogButton = "dialogButton";
@@ -25,9 +27,12 @@ public static partial class R
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
+        public const string largeFont = "largeFont";
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
+        public const string mainSceneButtonSpacer = "mainSceneButtonSpacer";
+        public const string mainSceneExitButton = "mainSceneExitButton";
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string middleCenterText = "middleCenterText";
         public const string multiline = "multiline";
@@ -68,5 +73,6 @@ public static partial class R
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string warning = "warning";
         public const string wideControl = "wideControl";
+        public const string xxlFont = "xxlFont";
     }
 }
