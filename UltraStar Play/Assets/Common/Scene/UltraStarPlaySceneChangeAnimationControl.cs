@@ -48,8 +48,15 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
         }
     }
 
-    public void StartSceneChangeAnimation(VisualElement visualElement)
+    public void StartSceneChangeAnimation(VisualElement visualElement, EScene currentScene, EScene nextScene)
     {
+        bool skipSceneChangeAnimationSound = nextScene == EScene.SingScene
+                                             || currentScene == EScene.SingingResultsScene;
+        if (!skipSceneChangeAnimationSound)
+        {
+            PlaySceneChangeAnimationSound();
+        }
+
         LeanTween.value(gameObject, 0, 1, 0.3f)
             .setOnUpdate((float animTimePercent) =>
             {
@@ -60,8 +67,11 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
             })
             .setOnComplete(() => visualElement.RemoveFromHierarchy())
             .setEaseInSine();
+    }
 
-        audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent;
+    private void PlaySceneChangeAnimationSound()
+    {
+        audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent / 100f;
         audioSource.Play();
     }
 
