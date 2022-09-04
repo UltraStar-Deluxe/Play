@@ -107,10 +107,10 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
-        AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString());
+        AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString(CultureInfo.InvariantCulture));
         if (songMeta.Gap != 0)
         {
-            AppendHeaderField(sb, "gap", songMeta.Gap.ToString());
+            AppendHeaderField(sb, "gap", songMeta.Gap.ToString(CultureInfo.InvariantCulture));
         }
 
         AppendHeaderField(sb, "cover", songMeta.Cover);
@@ -119,7 +119,7 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "video", songMeta.Video);
         if (songMeta.VideoGap != 0)
         {
-            AppendHeaderField(sb, "videogap", songMeta.VideoGap.ToString());
+            AppendHeaderField(sb, "videogap", songMeta.VideoGap.ToString(CultureInfo.InvariantCulture));
         }
 
         AppendHeaderField(sb, "genre", songMeta.Genre);
@@ -133,11 +133,19 @@ public static class UltraStarSongFileWriter
 
         if (songMeta.Start != 0)
         {
-            AppendHeaderField(sb, "start", songMeta.Start.ToString());
+            AppendHeaderField(sb, "start", songMeta.Start.ToString(CultureInfo.InvariantCulture));
         }
         if (songMeta.End != 0)
         {
-            AppendHeaderField(sb, "end", songMeta.End.ToString());
+            AppendHeaderField(sb, "end", songMeta.End.ToString(CultureInfo.InvariantCulture));
+        }
+        if (songMeta.PreviewStart != 0)
+        {
+            AppendHeaderField(sb, "previewstart", songMeta.PreviewStart.ToString(CultureInfo.InvariantCulture));
+        }
+        if (songMeta.PreviewEnd != 0)
+        {
+            AppendHeaderField(sb, "previewend", songMeta.PreviewEnd.ToString(CultureInfo.InvariantCulture));
         }
 
         songMeta.UnknownHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
