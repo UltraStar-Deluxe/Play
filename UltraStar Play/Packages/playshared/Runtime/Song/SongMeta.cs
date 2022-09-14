@@ -122,7 +122,14 @@ public class SongMeta
      */
     public uint Year { get; set; }
 
+    /**
+     * Start in SECONDS to skip the beginning of the audio file.
+     */
     public float Start { get; set; }
+
+    /**
+     * End in MILLISECONDS to skip the ending of the audio file.
+     */
     public float End { get; set; }
 
     private List<Voice> voices = new();
