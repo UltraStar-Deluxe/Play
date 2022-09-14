@@ -242,12 +242,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         StartCoroutine(StartMusicAndVideo());
 
-        // Update TimeBar every second
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
-        {
-            timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
-        }));
-
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
@@ -266,6 +260,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         });
 
         commonScoreControl = injector.CreateAndInject<CommonScoreControl>();
+
+        // Skip beginning of song via #START tag of txt file
+        if (SceneData.PositionInSongInMillis <= 0
+            && SongMeta.Start > 0)
+        {
+            // #START tag in txt file is in seconds (but #END is in milliseconds).
+            SkipToPositionInSong(SongMeta.Start * 1000);
+        }
+
+        // Update TimeBar every second
+        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
+        {
+            timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+        }));
     }
 
     private void InitDummySingers()
