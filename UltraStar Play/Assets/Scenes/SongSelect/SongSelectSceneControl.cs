@@ -213,7 +213,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
-    private VisualElement noSongsFoundLabel;
+    private Label noSongsFoundLabel;
 
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
@@ -930,6 +930,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
+        noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
 
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
