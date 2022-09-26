@@ -149,12 +149,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             navigationDirection,
             focusableVisualElements);
 
-        VisualElement nearestVisualElement = visualElementsInDirection.FindMinElement(visualElement => Vector2.Distance(visualElement.worldBound.center, targetPosition));
+        VisualElement nearestVisualElement = visualElementsInDirection.FindMinElement(visualElement => GetVisualElementDistance(visualElement, focusedVisualElement));
         if (nearestVisualElement != null)
         {
             if (logFocusedVisualElements)
             {
-                Debug.Log($"Moving focus to VisualElement: {nearestVisualElement}");
+                Debug.Log($"Moving focus to VisualElement with distance {GetVisualElementDistance(nearestVisualElement, focusedVisualElement)}: {nearestVisualElement}");
             }
             nearestVisualElement.Focus();
             nearestVisualElement.ScrollToSelf();
@@ -168,6 +168,27 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                 FocusedVisualElement = focusedVisualElement,
             });
         }
+    }
+
+    private static float GetVisualElementDistance(VisualElement visualElementA, VisualElement visualElementB)
+    {
+        float RectangleDistance(Rect rectA, Rect rectB)
+        {
+            // https://gamedev.stackexchange.com/questions/154036/efficient-minimum-distance-between-two-axis-aligned-squares
+            Rect rectOuter = new Rect(
+                Mathf.Min(rectA.xMin, rectB.xMin),
+                Mathf.Min(rectA.yMin, rectB.yMin),
+                Mathf.Max(rectA.xMax, rectB.xMax) - Mathf.Min(rectA.xMin, rectB.xMin),
+                Mathf.Max(rectA.yMax, rectB.yMax) - Mathf.Min(rectA.yMin, rectB.yMin));
+            float innerWidth = Mathf.Max(0, rectOuter.width - rectA.width - rectB.width);
+            float innerHeight = Mathf.Max(0, rectOuter.height - rectA.height - rectB.height);
+            float minDistance = Mathf.Sqrt(innerWidth * innerWidth + innerHeight * innerHeight);
+            return minDistance;
+        }
+
+        float distance = RectangleDistance(visualElementA.worldBound, visualElementB.worldBound);
+
+        return distance;
     }
 
     private bool IsNavigatingAwayFromTextField(Vector2 navigationDirection, TextField focusedTextField)
