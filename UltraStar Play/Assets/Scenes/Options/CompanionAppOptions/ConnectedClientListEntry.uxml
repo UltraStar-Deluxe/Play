@@ -1,13 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="container" style="flex-direction: row; width: auto; justify-content: space-between; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; align-items: center;">
-        <ui:Label text="My Connected App" name="nameLabel" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; width: 40%;" />
-        <ui:VisualElement>
-            <ui:VisualElement name="adminRightsContainer" style="width: auto; flex-direction: row; align-items: center;">
-                <ui:Label text="Is Admin" name="label" style="margin-right: 10px;" />
-                <ui:Toggle name="toggle" />
-            </ui:VisualElement>
+        <ui:VisualElement name="icon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/phone_iphone_white_24dp.svg?fileID=7388822144124034973&amp;guid=fd2d313e0d881824692de83215aa3c5a&amp;type=3#phone_iphone_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; margin-right: 10px;" />
+        <ui:Label text="My Connected App" name="nameLabel" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; flex-grow: 1;" />
+        <ui:VisualElement name="adminRightsContainer" style="width: auto; flex-direction: row; align-items: center; display: none;">
+            <ui:Label text="Is Admin" name="label" style="margin-right: 10px;" />
+            <ui:Toggle name="toggle" />
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueRights" style="flex-direction: row; align-items: center;">
+        <ui:VisualElement name="songQueueRights" style="flex-direction: row; align-items: center; margin-left: 10px; display: none;">
             <ui:Label text="Enqueue Songs" name="label" style="margin-right: 10px;" />
             <ui:Toggle name="toggle" />
         </ui:VisualElement>
