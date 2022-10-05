@@ -264,6 +264,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                && visualElement.GetAncestors().AllMatch(ancestor => ancestor.IsVisibleByDisplay())
                && !float.IsNaN(visualElement.worldBound.center.x)
                && !float.IsNaN(visualElement.worldBound.center.y)
+               && visualElement is not Focusable { focusable: false }
+               && visualElement.enabledInHierarchy
                && !visualElement.ClassListContains(R.UxmlClasses.focusableNavigatorIgnore);
     }
 }
