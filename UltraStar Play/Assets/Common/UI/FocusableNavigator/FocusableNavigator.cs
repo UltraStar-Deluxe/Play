@@ -193,6 +193,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     private bool IsNavigatingAwayFromTextField(Vector2 navigationDirection, TextField focusedTextField)
     {
+        if (focusedTextField.isReadOnly)
+        {
+            return true;
+        }
+
         // Navigate away from TextField
         // when cursor was already at first or last position in text field
         // and still navigating towards same direction.
