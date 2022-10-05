@@ -36,6 +36,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
     protected readonly Subject<NoSubmitTargetFoundEvent> noSubmitTargetFoundEventStream = new();
     public IObservable<NoSubmitTargetFoundEvent> NoSubmitTargetFoundEventStream => noSubmitTargetFoundEventStream;
 
+    private readonly List<CustomNavigationTarget> customNavigationTargets = new();
+
     public virtual void Start()
     {
         if (!gameObject.activeInHierarchy)
@@ -126,7 +128,18 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             }
         }
 
-        // Find elements to include in navigation
+        // Use custom navigation target if any
+        if (TryNavigateToCustomNavigationTarget(focusedVisualElement, navigationDirection))
+        {
+            return;
+        }
+
+        NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
+    }
+
+    private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
+    {
+        // Find eligible elements for navigation, i.e., all descendants of the current focusableNavigatorRootVisualElement.
         VisualElement focusableNavigatorRootVisualElement = GetFocusableNavigatorRootVisualElement(focusedVisualElement);
         if (focusableNavigatorRootVisualElement == null)
         {
@@ -144,11 +157,14 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         focusableVisualElements = focusableVisualElements
             .Where(it => it != focusedVisualElement)
             .ToList();
+
+        // Only consider the VisualElements that are in the navigation direction
         List<VisualElement> visualElementsInDirection = GetVisualElementsInDirection(
             startRect,
             navigationDirection,
             focusableVisualElements);
 
+        // Choose the nearest VisualElement
         VisualElement nearestVisualElement = visualElementsInDirection.FindMinElement(visualElement => GetVisualElementDistance(visualElement, focusedVisualElement));
         if (nearestVisualElement != null)
         {
@@ -167,6 +183,39 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                 FocusableNavigatorRootVisualElement = focusableNavigatorRootVisualElement,
                 FocusedVisualElement = focusedVisualElement,
             });
+        }
+    }
+
+    private bool TryNavigateToCustomNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
+    {
+        CustomNavigationTarget customNavigationTarget = customNavigationTargets.FirstOrDefault(customNavigationTarget =>
+            customNavigationTarget.Matches(focusedVisualElement, navigationDirection));
+        if (customNavigationTarget != null)
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log($"Moving focus to VisualElement from custom navigation target (start: {customNavigationTarget.StartVisualElement.name}, direction: {navigationDirection}, target: {customNavigationTarget.TargetVisualElement.name}");
+            }
+            customNavigationTarget.TargetVisualElement.Focus();
+            customNavigationTarget.TargetVisualElement.ScrollToSelf();
+            return true;
+        }
+
+        return false;
+    }
+
+    public void AddCustomNavigationTarget(
+        VisualElement startVisualElement,
+        Vector2 navigationDirection,
+        VisualElement targetVisualElement,
+        bool alsoAddOppositeDirection = false)
+    {
+        CustomNavigationTarget customNavigationTarget = new(startVisualElement, navigationDirection, targetVisualElement);
+        customNavigationTargets.Add(customNavigationTarget);
+
+        if (alsoAddOppositeDirection)
+        {
+            AddCustomNavigationTarget(targetVisualElement, -navigationDirection, startVisualElement, false);
         }
     }
 
@@ -257,22 +306,22 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             if (direction.x < 0)
             {
                 // Go left => RIGHT SIDE of target must be left of LEFT SIDE of start
-                return rect.xMax < startRect.xMin;
+                return rect.xMax <= startRect.xMin;
             }
             else if (direction.x > 0)
             {
                 // Go right => LEFT SIDE of target must be right of RIGHT SIDE of start
-                return rect.xMin > startRect.xMax;
+                return rect.xMin >= startRect.xMax;
             }
-            else if (direction.y < 0)
+            else if (direction.y <= 0)
             {
                 // Go down => TOP SIDE of target must be below BOTTOM SIDE of start
-                return rect.yMin > startRect.yMax;
+                return rect.yMin >= startRect.yMax;
             }
             else if (direction.y > 0)
             {
                 // Go up => BOTTOM SIDE of target must be above TOP SIDE of start
-                return rect.yMax < startRect.yMin;
+                return rect.yMax <= startRect.yMin;
             }
 
             return false;
@@ -300,6 +349,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                && !float.IsNaN(visualElement.worldBound.center.y)
                && visualElement is not Focusable { focusable: false }
                && visualElement.enabledInHierarchy
+               && visualElement.canGrabFocus
                && !visualElement.ClassListContains(R.UxmlClasses.focusableNavigatorIgnore);
     }
 }
