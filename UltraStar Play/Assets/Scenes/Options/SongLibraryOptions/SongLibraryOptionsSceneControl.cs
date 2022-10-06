@@ -50,6 +50,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.addAndroidInternalSongFolderButton)]
     private Button addAndroidInternalSongFolderButton;
 
+    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
+    private FocusableNavigator focusableNavigator;
+
     [Inject]
     private Settings settings;
 
@@ -74,6 +77,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+
+        // Custom navigation targets
+        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, downloadSceneButton, true);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
