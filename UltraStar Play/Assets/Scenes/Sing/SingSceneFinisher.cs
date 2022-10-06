@@ -49,7 +49,7 @@ public class SingSceneFinisher : MonoBehaviour
                 isSongFinished = true;
             }
 
-            // Detection of the end of the song by looking for a falling flank in the position in the song.
+            // Detect end of the song by looking for a falling flank in the playback position.
             if (hasBeenNearEndOfSong)
             {
                 // The position is back to the start.
@@ -67,6 +67,15 @@ public class SingSceneFinisher : MonoBehaviour
                 {
                     hasBeenNearEndOfSong = true;
                 }
+            }
+
+            // Detect end of the song by #END tag of txt file.
+            // This can be used to skip the ending of the audio file.
+            if (singSceneControl.SongMeta.End > 0
+                // #END tag is in milliseconds (but #START is in seconds)
+                && positionInSongInMillis > singSceneControl.SongMeta.End)
+            {
+                isSongFinished = true;
             }
         }
     }

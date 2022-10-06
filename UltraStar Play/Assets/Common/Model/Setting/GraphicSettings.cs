@@ -12,7 +12,7 @@ public class GraphicSettings
     public ENoteDisplayMode noteDisplayMode = ENoteDisplayMode.SentenceBySentence;
     public bool showPitchIndicator;
     public bool useImageAsCursor = true;
-    public bool showLyricsOnNotes = true;
+    public bool showLyricsOnNotes;
     public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = "BaseTheme";
     public bool AnimateSceneChange { get; set; } = true;
