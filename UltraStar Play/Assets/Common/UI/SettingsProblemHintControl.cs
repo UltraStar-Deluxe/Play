@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ProTrans;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
@@ -35,11 +36,11 @@ public class SettingsProblemHintControl
         List<string> result = new();
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
-            result.Add("Add a song folder");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noSongFolders));
         }
         else if (settings.GameSettings.songDirs.AnyMatch(songDir => !Directory.Exists(songDir)))
         {
-            result.Add("At least one song folder does not exist");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
         return result;
     }
@@ -51,12 +52,12 @@ public class SettingsProblemHintControl
             || !settings.MicProfiles
                 .AnyMatch(micProfile => micProfile.IsEnabled))
         {
-            result.Add("Select a microphone for singing");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noMicProfiles));
         }
         else if (settings.MicProfiles
                  .AllMatch(micProfile => !micProfile.IsEnabled || !micProfile.IsConnected(ServerSideConnectRequestManager.Instance)))
         {
-            result.Add("Connect a microphone\nor select another one for singing");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noConnectedAndEnabledMicProfile));
         }
         return result;
     }
@@ -66,11 +67,11 @@ public class SettingsProblemHintControl
         List<string> result = new();
         if (settings.PlayerProfiles.IsNullOrEmpty())
         {
-            result.Add("Add a player profile for singing");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noPlayerProfile));
         }
         else if (!settings.PlayerProfiles.AnyMatch(playerProfile => playerProfile.IsEnabled))
         {
-            result.Add("Select a player profile for singing");
+            result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noEnabledPlayerProfile));
         }
         return result;
     }
