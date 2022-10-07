@@ -44,6 +44,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.settingsButton)]
     private Button settingsButton;
 
+    [Inject(UxmlName = R.UxmlNames.settingsProblemHintIcon)]
+    private VisualElement settingsProblemHintIcon;
+
     [Inject(UxmlName = R.UxmlNames.aboutButton)]
     private Button aboutButton;
 
@@ -67,6 +70,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
+
+    [Inject]
+    private Settings settings;
 
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
@@ -97,6 +103,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
         songMetaManager.ScanFilesIfNotDoneYet();
+
+        new SettingsProblemHintControl(
+            settingsProblemHintIcon,
+            SettingsProblemHintControl.GetAllSettingsProblems(settings),
+            injector);
     }
 
     private void InitButtonDescription(Button button, string description)
