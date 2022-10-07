@@ -208,6 +208,9 @@ public static partial class R
         public static readonly string songSelectScene_noSongsFound = "songSelectScene_noSongsFound";
         public static readonly string songSelectScene_onlineTopScoresTitle = "songSelectScene_onlineTopScoresTitle";
         public static readonly string songSelectScene_playlistDropdownTitle = "songSelectScene_playlistDropdownTitle";
+        public static readonly string songSelectScene_searchExpressionError = "songSelectScene_searchExpressionError";
+        public static readonly string songSelectScene_searchExpressionInfo = "songSelectScene_searchExpressionInfo";
+        public static readonly string songSelectScene_searchExpressionInfo_syntaxTips = "songSelectScene_searchExpressionInfo_syntaxTips";
         public static readonly string songSelectScene_searchPropertyDropdownTitle = "songSelectScene_searchPropertyDropdownTitle";
         public static readonly string songSelectScene_searchTextFieldHint = "songSelectScene_searchTextFieldHint";
         public static readonly string songSelectScene_songMenu_openSongEditor = "songSelectScene_songMenu_openSongEditor";

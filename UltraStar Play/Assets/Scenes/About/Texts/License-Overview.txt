@@ -9,16 +9,19 @@ MIT License
 -----------
 - CSharpSynthForUnity
     - https://github.com/UltraStar-Deluxe/CSharpSynthForUnity
-    
+
+- DynamicQueryable
+    - https://github.com/umutozel/DynamicQueryable
+
 - FullSerializer
     - https://github.com/jacobdufault/fullserializer
-    
+
+- Jokenizer.Net
+    - https://github.com/umutozel/Jokenizer.Net
+
 - LeanTween
     - https://github.com/UltraStar-Deluxe/LeanTween
-    
-- NLayer
-    - https://github.com/naudio/NLayer
-    
+
 - SharpZipLib
     - https://github.com/icsharpcode/SharpZipLib
     
@@ -38,5 +41,3 @@ Apache License 2.0
 
 - Serilog
     - https://github.com/serilog/serilog
-
-

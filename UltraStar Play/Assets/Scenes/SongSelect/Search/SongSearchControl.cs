@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic;
 using ProTrans;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -53,6 +55,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.lyricsPropertyContainer)]
     private VisualElement lyricsPropertyContainer;
 
+    [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
+    private VisualElement searchErrorIcon;
+
+    [Inject]
+    private Injector injector;
+
+    private TooltipControl searchErrorIconTooltipControl;
+
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
 
     private HashSet<ESearchProperty> searchProperties = new();
@@ -68,6 +78,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             searchTextFieldHint.SetVisibleByDisplay(GetRawSearchText().IsNullOrEmpty());
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
+
+        searchErrorIcon.HideByDisplay();
+        searchErrorIconTooltipControl = injector
+            .WithRootVisualElement(searchErrorIcon)
+            .CreateAndInject<TooltipControl>();
 
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(() =>
@@ -145,6 +160,27 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
     {
+        string searchExp = searchTextField.value;
+        searchErrorIcon.HideByDisplay();
+        if (IsSearchExpression(searchExp))
+        {
+            try
+            {
+                List<SongMeta> searchExpSongMetas = songMetas.AsQueryable()
+                    .Where(searchExp)
+                    .ToList();
+                return searchExpSongMetas;
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
+                searchErrorIcon.ShowByDisplay();
+                searchErrorIconTooltipControl.TooltipText = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionError,
+                    "errorDetails", e.Message);
+                return new List<SongMeta>();
+            }
+        }
+
         // Ignore prefix for special search syntax
         string searchText = GetRawSearchText() != "#"
             ? GetSearchText()
@@ -154,6 +190,25 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                                || SongMetaMatchesSearchedProperties(songMeta, searchText))
             .ToList();
         return filteredSongs;
+    }
+
+    private bool IsSearchExpression(string searchExp)
+    {
+        bool IsSongPropertyRelation(ESongProperty songProperty)
+        {
+            List<string> relations = new() { "=", "!=", "<", ">", ">=", "<=" };
+            List<string> methods = new() { ".Contains(", ".StartsWith(", ".EndsWith(",
+                ".ToLower(", ".ToUpper(", ".ToLowerInvariant(", ".ToUpperInvariant(" };
+            string searchExpNoWhitespace = searchExp.Replace(" ", "");
+            return relations.AnyMatch(relation =>
+                       searchExpNoWhitespace.StartsWith($"{songProperty}{relation}")
+                       || searchExpNoWhitespace.Contains($"{relation}{songProperty}"))
+                   || methods.AnyMatch(boolMethod =>
+                       searchExpNoWhitespace.StartsWith($"{songProperty}{boolMethod}"));
+        }
+
+        return !searchExp.IsNullOrEmpty()
+               && EnumUtils.GetValuesAsList<ESongProperty>().AnyMatch(songProperty => IsSongPropertyRelation(songProperty));
     }
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)

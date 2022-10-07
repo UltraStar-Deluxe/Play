@@ -74,6 +74,7 @@ public static partial class R
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
+        public const string closeSearchExpressionInfoButton = "closeSearchExpressionInfoButton";
         public const string closeSearchPropertyDropdownButton = "closeSearchPropertyDropdownButton";
         public const string closeSongOverlayButton = "closeSongOverlayButton";
         public const string colorContainer = "colorContainer";
@@ -173,6 +174,7 @@ public static partial class R
         public const string gridSizeContainer = "gridSizeContainer";
         public const string gridSizeTextField = "gridSizeTextField";
         public const string gridTitle = "gridTitle";
+        public const string helpIcon = "helpIcon";
         public const string helpSideBarContainer = "helpSideBarContainer";
         public const string helpTitle = "helpTitle";
         public const string hiddenContinueButton = "hiddenContinueButton";
@@ -191,6 +193,7 @@ public static partial class R
         public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string importMidiFileButton = "importMidiFileButton";
         public const string innerMenuOverlay = "innerMenuOverlay";
+        public const string innerSearchExpressionInfoOverlay = "innerSearchExpressionInfoOverlay";
         public const string innerSongDetailOverlay = "innerSongDetailOverlay";
         public const string innerTimeBar = "innerTimeBar";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
@@ -296,6 +299,7 @@ public static partial class R
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
+        public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -341,6 +345,9 @@ public static partial class R
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string overviewAreaWaveform = "overviewAreaWaveform";
+        public const string ownHostContainer = "ownHostContainer";
+        public const string ownHostLabel = "ownHostLabel";
+        public const string ownHostTextField = "ownHostTextField";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
@@ -424,6 +431,10 @@ public static partial class R
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
+        public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchExpressionInfoLabel = "searchExpressionInfoLabel";
+        public const string searchExpressionInfoOverlay = "searchExpressionInfoOverlay";
+        public const string searchExpressionInfoSyntaxTipsLabel = "searchExpressionInfoSyntaxTipsLabel";
         public const string searchIcon = "searchIcon";
         public const string searchPropertyButton = "searchPropertyButton";
         public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
@@ -460,6 +471,9 @@ public static partial class R
         public const string showLogOverlayButton = "showLogOverlayButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
+        public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
+        public const string showSearchExpressionInfoContainer = "showSearchExpressionInfoContainer";
+        public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
         public const string showStatusBarContainer = "showStatusBarContainer";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showVideoAreaContainer = "showVideoAreaContainer";
@@ -570,6 +584,12 @@ public static partial class R
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";
+        public const string udpPortOnClientContainer = "udpPortOnClientContainer";
+        public const string udpPortOnClientLabel = "udpPortOnClientLabel";
+        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
+        public const string udpPortOnServerContainer = "udpPortOnServerContainer";
+        public const string udpPortOnServerLabel = "udpPortOnServerLabel";
+        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
         public const string urlChooser = "urlChooser";
         public const string urlContainer = "urlContainer";
