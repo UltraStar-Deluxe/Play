@@ -921,3 +921,12 @@ Label.tinyFont {
     padding-top: 20px;
     padding-bottom: 40px;
 }
+
+.tooltip {
+    font-size: var(--font-size-s);
+    -unity-font-style: bold;
+    padding: 5px;
+    background-color: rgb(60, 63, 65);
+    border-color: rgb(50, 50, 50);
+    border-width: 1px;
+}
