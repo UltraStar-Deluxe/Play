@@ -24,6 +24,7 @@
                     <ui:Button name="songsOptionsButton" class="optionsOverviewButton">
                         <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/music_note_white_24dp.svg?fileID=7388822144124034973&amp;guid=05da8c8efc8c90045b8c80afa7176e05&amp;type=3#music_note_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Songs" name="label" />
+                        <ui:VisualElement name="songSettingsProblemHintIcon" class="iconImage warning" style="position: absolute; bottom: 5px; right: 5px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
                     </ui:Button>
                     <ui:Button name="graphicsOptionsButton" class="optionsOverviewButton">
                         <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/desktop_windows_white_24dp.svg?fileID=7388822144124034973&amp;guid=5b22400e8a05fa641989014b3f8f6ce7&amp;type=3#desktop_windows_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
@@ -38,10 +39,12 @@
                     <ui:Button name="recordingOptionsButton" class="optionsOverviewButton">
                         <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Recording" name="label" />
+                        <ui:VisualElement name="recordingSettingsProblemHintIcon" class="iconImage warning" style="position: absolute; bottom: 5px; right: 5px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
                     </ui:Button>
                     <ui:Button name="profileOptionsButton" class="optionsOverviewButton">
                         <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/people_white_24dp.svg?fileID=7388822144124034973&amp;guid=4be88bb4f0e87514cb4bd9e77845e72a&amp;type=3#people_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
                         <ui:Label text="Players" name="label" />
+                        <ui:VisualElement name="playerProfileSettingsProblemHintIcon" class="iconImage warning" style="position: absolute; bottom: 5px; right: 5px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
                     </ui:Button>
                     <ui:Button name="designOptionsButton" class="optionsOverviewButton">
                         <ui:VisualElement name="image" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/filter_b_and_w_white_24dp.svg?fileID=7388822144124034973&amp;guid=d712c3117dbb89a4891d80a4fd244df8&amp;type=3#filter_b_and_w_white_24dp&apos;); -unity-background-image-tint-color: rgb(255, 255, 255);" />

@@ -20,7 +20,9 @@
             <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center; align-items: center;">
                 <ui:Button text="Create Song" name="createSongButton" class="mainSceneButton" />
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
-                <ui:Button text="Settings" name="settingsButton" class="mainSceneButton" />
+                <ui:Button text="Settings" name="settingsButton" class="mainSceneButton">
+                    <ui:VisualElement name="settingsProblemHintIcon" class="iconImage warning" style="position: absolute; bottom: 5px; right: 5px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                </ui:Button>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton mainSceneExitButton" style="display: flex;" />
                 <ui:VisualElement style="position: absolute; right: 5px;" />
