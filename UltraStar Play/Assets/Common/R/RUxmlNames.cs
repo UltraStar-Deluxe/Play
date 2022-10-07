@@ -362,6 +362,7 @@ public static partial class R
         public const string playerImage = "playerImage";
         public const string playerInfoContainer = "playerInfoContainer";
         public const string playerNameLabel = "playerNameLabel";
+        public const string playerProfileSettingsProblemHintIcon = "playerProfileSettingsProblemHintIcon";
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
@@ -400,6 +401,7 @@ public static partial class R
         public const string recordedNoteLabel = "recordedNoteLabel";
         public const string recordingGroup = "recordingGroup";
         public const string recordingOptionsButton = "recordingOptionsButton";
+        public const string recordingSettingsProblemHintIcon = "recordingSettingsProblemHintIcon";
         public const string recordingSourceContainer = "recordingSourceContainer";
         public const string recordingSourceItemPicker = "recordingSourceItemPicker";
         public const string recordingTitle = "recordingTitle";
@@ -461,6 +463,7 @@ public static partial class R
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
         public const string settingsIcon = "settingsIcon";
+        public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
         public const string showBackgroundButton = "showBackgroundButton";
@@ -527,6 +530,7 @@ public static partial class R
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
+        public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
         public const string songsOptionsButton = "songsOptionsButton";
         public const string songTitle = "songTitle";
         public const string songVideoImage = "songVideoImage";
