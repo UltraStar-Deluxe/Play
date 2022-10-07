@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic;
 using ProTrans;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -145,6 +147,23 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
     {
+        string searchExp = searchTextField.value;
+        if (IsSearchExpression(searchExp))
+        {
+            try
+            {
+                List<SongMeta> searchExpSongMetas = songMetas.AsQueryable()
+                    .Where(searchExp)
+                    .ToList();
+                return searchExpSongMetas;
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
+                return new List<SongMeta>();
+            }
+        }
+
         // Ignore prefix for special search syntax
         string searchText = GetRawSearchText() != "#"
             ? GetSearchText()
@@ -154,6 +173,25 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                                || SongMetaMatchesSearchedProperties(songMeta, searchText))
             .ToList();
         return filteredSongs;
+    }
+
+    private bool IsSearchExpression(string searchExp)
+    {
+        bool IsSongPropertyRelation(ESongProperty songProperty)
+        {
+            List<string> relations = new() { "=", "!=", "<", ">", ">=", "<=" };
+            List<string> methods = new() { ".Contains(", ".StartsWith(", ".EndsWith(",
+                ".ToLower(", ".ToUpper(", ".ToLowerInvariant(", ".ToUpperInvariant(" };
+            string searchExpNoWhitespace = searchExp.Replace(" ", "");
+            return relations.AnyMatch(relation =>
+                       searchExpNoWhitespace.StartsWith($"{songProperty}{relation}")
+                       || searchExpNoWhitespace.Contains($"{relation}{songProperty}"))
+                   || methods.AnyMatch(boolMethod =>
+                       searchExpNoWhitespace.StartsWith($"{songProperty}{boolMethod}"));
+        }
+
+        return !searchExp.IsNullOrEmpty()
+               && EnumUtils.GetValuesAsList<ESongProperty>().AnyMatch(songProperty => IsSongPropertyRelation(songProperty));
     }
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)

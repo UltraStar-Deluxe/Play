@@ -38,3 +38,9 @@ Plugins/Serilog/Serilog.Sinks.File.meta
 
 StreamingAssets/Input/UltraStarPlayInputActions.inputactions
 StreamingAssets/Input/UltraStarPlayInputActions.inputactions.meta
+
+Plugins/Jokenizer.Net/
+Plugins/Jokenizer.Net.meta
+
+Plugins/DynamicQueryable/
+Plugins/DynamicQueryable.meta
