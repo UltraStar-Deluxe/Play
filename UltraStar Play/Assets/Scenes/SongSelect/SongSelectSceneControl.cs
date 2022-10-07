@@ -304,7 +304,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 
-        SongSearchControl.SearchChangedEventStream.Subscribe(_ => OnSearchTextChanged());
+        SongSearchControl.SearchChangedEventStream
+            .Throttle(new TimeSpan(0, 0, 0, 0, 500))
+            .Subscribe(_ => OnSearchTextChanged());
 
         PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
