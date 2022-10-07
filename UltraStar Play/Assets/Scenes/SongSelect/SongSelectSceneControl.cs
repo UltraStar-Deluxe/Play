@@ -215,11 +215,27 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
     private Label noSongsFoundLabel;
 
+    [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
+    private Button showSearchExpressionInfoButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeSearchExpressionInfoButton)]
+    private Button closeSearchExpressionInfoButton;
+
+    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoOverlay)]
+    private VisualElement searchExpressionInfoOverlay;
+
+    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoLabel)]
+    private Label searchExpressionInfoLabel;
+
+    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoSyntaxTipsLabel)]
+    private Label searchExpressionInfoSyntaxTipsLabel;
+
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
     public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
+    public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -267,6 +283,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         HidePlayerSelectOverlay();
         HideMenuOverlay();
         HideSongDetailOverlay();
+        HideSearchExpressionInfoOverlay();
 
         SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
 
@@ -297,6 +314,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             }
         });
 
+        InitSearchExpressionInfo();
+
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
         UpdateNextAndPreviousSongButtonLabels();
@@ -304,7 +323,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 
-        SongSearchControl.SearchChangedEventStream.Subscribe(_ => OnSearchTextChanged());
+        SongSearchControl.SearchChangedEventStream
+            .Throttle(new TimeSpan(0, 0, 0, 0, 500))
+            .Subscribe(_ => OnSearchTextChanged());
 
         PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
@@ -345,6 +366,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                 newValue => settings.GameSettings.ScoreMode = newValue);
+    }
+
+    public void HideSearchExpressionInfoOverlay()
+    {
+        searchExpressionInfoOverlay.HideByDisplay();
+    }
+
+    private void InitSearchExpressionInfo()
+    {
+        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => searchExpressionInfoOverlay.ShowByDisplay());
+        closeSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => HideSearchExpressionInfoOverlay());
     }
 
     private void ShowPlayerSelectContainer()
@@ -931,6 +963,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
+        searchExpressionInfoLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo);
+        searchExpressionInfoSyntaxTipsLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips);
 
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
