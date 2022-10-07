@@ -55,6 +55,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.lyricsPropertyContainer)]
     private VisualElement lyricsPropertyContainer;
 
+    [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
+    private VisualElement searchErrorIcon;
+
+    [Inject]
+    private Injector injector;
+
+    private TooltipControl searchErrorIconTooltipControl;
+
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
 
     private HashSet<ESearchProperty> searchProperties = new();
@@ -70,6 +78,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             searchTextFieldHint.SetVisibleByDisplay(GetRawSearchText().IsNullOrEmpty());
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
+
+        searchErrorIcon.HideByDisplay();
+        searchErrorIconTooltipControl = injector
+            .WithRootVisualElement(searchErrorIcon)
+            .CreateAndInject<TooltipControl>();
 
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(() =>
@@ -148,6 +161,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
     {
         string searchExp = searchTextField.value;
+        searchErrorIcon.HideByDisplay();
         if (IsSearchExpression(searchExp))
         {
             try
@@ -160,6 +174,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             catch (Exception e)
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
+                searchErrorIcon.ShowByDisplay();
+                searchErrorIconTooltipControl.TooltipText = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionError,
+                    "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
         }
