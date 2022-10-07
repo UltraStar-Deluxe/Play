@@ -362,6 +362,12 @@ TextInput {
     align-items: center;
 }
 
+.optionsOverviewButton .warning
+{
+    color: var(--text-color-warning);
+    -unity-background-image-tint-color: var(--text-color-warning);
+}
+
 .optionsOverviewButton VisualElement {
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;

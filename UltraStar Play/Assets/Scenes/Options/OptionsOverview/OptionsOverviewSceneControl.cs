@@ -49,6 +49,15 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.languageChooser)]
     private ItemPicker languageChooser;
 
+    [Inject(UxmlName = R.UxmlNames.songSettingsProblemHintIcon)]
+    private VisualElement songSettingsProblemHintIcon;
+
+    [Inject(UxmlName = R.UxmlNames.recordingSettingsProblemHintIcon)]
+    private VisualElement recordingSettingsProblemHintIcon;
+
+    [Inject(UxmlName = R.UxmlNames.playerProfileSettingsProblemHintIcon)]
+    private VisualElement playerProfileSettingsProblemHintIcon;
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -60,6 +69,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject]
     private UIDocument uiDoc;
+
+    [Inject]
+    private Injector injector;
 
 	private void Start()
     {
@@ -77,10 +89,29 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         appOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CompanionAppOptionsScene));
         developerOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene));
 
+        InitSettingsProblemHints();
         InitLanguageChooser();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
+    }
+
+    private void InitSettingsProblemHints()
+    {
+        new SettingsProblemHintControl(
+            songSettingsProblemHintIcon,
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings),
+            injector);
+
+        new SettingsProblemHintControl(
+            recordingSettingsProblemHintIcon,
+            SettingsProblemHintControl.GetRecordingSettingsProblems(settings),
+            injector);
+
+        new SettingsProblemHintControl(
+            playerProfileSettingsProblemHintIcon,
+            SettingsProblemHintControl.GetPlayerSettingsProblems(settings),
+            injector);
     }
 
     private void InitLanguageChooser()
