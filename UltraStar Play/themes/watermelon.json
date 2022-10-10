@@ -1,0 +1,17 @@
+{
+    "fontColorButtons": "#af4e56",
+    "fontColorLabels": "#32513c",
+    "buttonMainColor": "#e88383",
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/green watermelon.png",
+        "gradientType": "Repeated",
+        "gradientScale": 5,
+        "gradientSmoothness": 0.4,
+        "gradientAngle": 200,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.0,
+        "gradientAnimAmplitude": 0.2,
+        "particleFile": "",
+        "particleOpacity": 0.3
+    }
+}

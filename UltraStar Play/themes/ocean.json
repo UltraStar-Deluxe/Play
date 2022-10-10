@@ -1,0 +1,32 @@
+{
+    "fontColorButtons": {
+        "r": 0.2,
+        "g": 0.2,
+        "b": 0.5,
+        "a": 1.0
+    },
+    "fontColor": {
+        "r": 0.2,
+        "g": 0.2,
+        "b": 0.5,
+        "a": 1.0
+    },
+    "buttonMainColor": {
+        "r": 0.3,
+        "g": 0.6,
+        "b": 1.0,
+        "a": 1.0
+    },
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/ocean.png",
+        "gradientType": "Linear",
+        "gradientScale": 2.0,
+        "gradientSmoothness": 0.8,
+        "gradientAngle": 100,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.0,
+        "gradientAnimAmplitude": 0.5,
+        "particleFile": "particles/bubble.png",
+        "particleOpacity": 0.3
+    }
+}
