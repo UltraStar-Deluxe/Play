@@ -235,6 +235,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
                 RemoveSongRouletteItem(songRouletteItem);
             }
         }
+
+        // Update style sheet
+        StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
     }
 
     public void RemoveSongRouletteItem(SongEntryControl songRouletteItem)

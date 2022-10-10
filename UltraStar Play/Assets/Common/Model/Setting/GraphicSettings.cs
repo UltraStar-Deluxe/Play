@@ -16,4 +16,15 @@ public class GraphicSettings
     public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = "BaseTheme";
     public bool AnimateSceneChange { get; set; } = true;
+
+    string currentThemeName = ThemeManager.DEFAULT_THEME;
+    public string CurrentThemeName
+    {
+        get => currentThemeName;
+        set
+        {
+            currentThemeName = value;
+            ThemeManager.Instance.LoadTheme(currentThemeName);
+        }
+    }
 }

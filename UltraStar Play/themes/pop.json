@@ -1,0 +1,32 @@
+{
+    "fontColorLabels": {
+        "r": 0.3,
+        "g": 0.1,
+        "b": 0.2,
+        "a": 1.0
+    },
+    "fontColorButtons": {
+        "r": 0.95,
+        "g": 0.85,
+        "b": 0.8,
+        "a": 1.0
+    },
+    "buttonMainColor": {
+        "r": 0.859,
+        "g": 0.365,
+        "b": 0.467,
+        "a": 1.0
+    },
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/yellow pink.png",
+        "gradientType": "Linear",
+        "gradientScale": 2.5,
+        "gradientSmoothness": 0.0,
+        "gradientAngle": 70.0,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.5,
+        "gradientAnimAmplitude": 0.3,
+        "particleFile": "particles/heart.png",
+        "particleOpacity": 1.0
+	}
+}

@@ -1,0 +1,26 @@
+{
+    "fontColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+    },
+    "buttonMainColor": {
+        "r": 0.2,
+        "g": 0.6,
+        "b": 0.85,
+        "a": 1.0
+    },
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/blue.png",
+        "gradientType": "Radial",
+        "gradientScale": 1.7,
+        "gradientSmoothness": 2.0,
+        "gradientAngle": 0.0,
+        "gradientAnimation": false,
+        "gradientAnimSpeed": 1.0,
+        "gradientAnimAmplitude": 0.1,
+        "particleFile": "particles/star.png",
+        "particleOpacity": 0.2
+    }
+}

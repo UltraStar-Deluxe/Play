@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -28,9 +29,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public StyleSheet largeScreenStyleSheet;
 
-    [InjectedInInspector]
-    public StyleSheet redThemeStyleSheet;
-
     [Inject(Optional = true)]
     private UIDocument uiDocument;
 
@@ -47,37 +45,54 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
         AddScreenSpecificStyleSheets();
         UpdateThemeSpecificStyleSheets();
 
-        settings.GraphicSettings.ObserveEveryValueChanged(graphicSettings => graphicSettings.themeName)
+        settings.GraphicSettings.ObserveEveryValueChanged(graphicSettings => graphicSettings.CurrentThemeName)
             .Subscribe(_ => UpdateThemeSpecificStyleSheets())
             .AddTo(gameObject);
     }
 
-    private void UpdateThemeSpecificStyleSheets()
+    public void UpdateThemeSpecificStyleSheets()
     {
         if (uiDocument == null)
         {
             return;
         }
 
-        Dictionary<string, StyleSheet> themeNameToStyleSheet = new();
-        themeNameToStyleSheet.Add("RedTheme", redThemeStyleSheet);
+        ThemeManager.ThemeSettings theme = ThemeManager.Instance.currentTheme;
+        VisualElement root = uiDocument.rootVisualElement;
 
-        themeNameToStyleSheet.ForEach(entry =>
+        Color backgroundButtonColor = theme.buttonMainColor;
+        Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
+        Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
+
+        Color fontColorAll = theme.fontColor;
+        bool useGlobalFontColor = fontColorAll != Color.clear;
+
+        Color fontColorButtons = useGlobalFontColor ? fontColorAll : theme.fontColorButtons;
+        Color fontColorLabels = useGlobalFontColor ? fontColorAll : theme.fontColorLabels;
+
+        // Change color of UXML elements:
+        root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
+            .ForEach(el => el.style.color = backgroundButtonColor);
+
+        root.Query<Button>().ForEach(button =>
         {
-            string themeName = entry.Key;
-            StyleSheet styleSheet = entry.Value;
-            if (settings.GraphicSettings.themeName == themeName)
-            {
-                if (!uiDocument.rootVisualElement.styleSheets.Contains(styleSheet))
-                {
-                    uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
-                }
-            }
-            else
-            {
-                uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
-            }
+            UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+
+            VisualElement image = button.Q("image");
+            if (image != null) image.style.unityBackgroundImageTintColor = fontColorButtons;
+            VisualElement backImage = button.Q("backImage");
+            if (backImage != null) backImage.style.unityBackgroundImageTintColor = fontColorButtons;
         });
+        root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
+        {
+            UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+        });
+
+        UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);
+        UIUtils.ApplyFontColorForElements(root, new []{"itemLabel"}, null, fontColorButtons);
+
+        root.Query(null, "itemPickerItemLabel").ForEach(label => label.style.backgroundColor = itemPickerBackgroundColor);
+        root.Query("titleImage").ForEach(image => image.style.unityBackgroundImageTintColor = fontColorLabels);
     }
 
     private void AddScreenSpecificStyleSheets()

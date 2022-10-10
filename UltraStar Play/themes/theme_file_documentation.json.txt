@@ -1,0 +1,82 @@
+// This is an example theme file describing each of the available properties to
+// create custom themes.
+// Each line is preceded by a comment describing its function.
+// When files are linked, PNG and JPG formats are accepted.
+{
+    // The color of the main texts displayed over buttons.
+    "fontColorButtons": {
+        "r": 0.2,
+        "g": 0.2,
+        "b": 0.2,
+        "a": 1.0
+    },
+    // The color of the main texts displayed over the background.
+    "fontColorLabels": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+    },
+    // The color of all the texts, over buttons and backgrounds.
+    // If set, the values defined for "fontColorLabels" and "fontColorButtons"
+    // will be ignored.
+    "fontColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+    },
+    // The main color of the buttons, e.g. the buttons in the main menu
+    "buttonMainColor": {
+        "r": 0.2,
+        "g": 0.6,
+        "b": 0.85,
+        "a": 1.0
+    },
+    // This group defines the dynamic background parameters.
+    "dynamicBackground": {
+        // A single-pixel high image that defines the color gradient to use.
+        "gradientRampFile": "gradients/green lime.png",
+        // The type of gradient to use, accepted values are:
+        // Linear, Radial, Reflected, Repeated, RadialRepeated
+        "gradientType": "Repeated",
+        // The scale of the gradient.
+        "gradientScale": 4.5,
+        // The smoothness of the gradient, i.e. 0 will result in a crisp line
+        // between the brightest and the darkest colors.
+        // The value can exceed 1.
+        "gradientSmoothness": 0.6,
+        // The angle of the gradient, which is relevant for non-radial types.
+        "gradientAngle": 200,
+        // Enables sine-based wavy animation on the background gradient.
+        "gradientAnimation": true,
+        // Speed of the sine animation.
+        "gradientAnimSpeed": 1.0,
+        // Amplitude of the sine animation.
+        "gradientAnimAmplitude": 0.2,
+        
+        // The image to use for the background particles (preferably PNG with
+        // alpha). Leave empty to hide particles.
+        "particleFile": "",
+        // The opacity of the background particles.
+        "particleOpacity": 0.3
+        
+        // The pattern file, i.e. a repeated image that will be displayed in the
+        // background. PNG with alpha will work, to leave parts of the gradient
+        // visible. Leave empty to hide pattern.
+        "patternFile": "",
+        // The scale of the pattern texture. Note that it is already corrected
+        // for the selected aspect ratio by default.
+        "patternScale": { "x": 2.0, "y": 2.0 },
+        // The scrolling speed of the pattern. Set to 0 for no scrolling.
+        "patternScrolling": { "x": 0.02, "y": 0.04 },
+		// The tint color of the pattern. Leave white to get the image's default
+		// colors. You can also just change the alpha to change the opacity.
+        "patternColor": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0,
+            "a": 1.0
+        }
+    }
+}
