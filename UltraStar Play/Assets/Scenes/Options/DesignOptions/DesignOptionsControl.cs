@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -45,13 +46,7 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        LabeledItemPickerControl<ENoteDisplayMode> noteDisplayModePickerControl = new(noteDisplayModeContainer.Q<ItemPicker>(),
-            EnumUtils.GetValuesAsList<ENoteDisplayMode>());
-        noteDisplayModePickerControl.Bind(() => settings.GraphicSettings.noteDisplayMode,
-                  newValue => settings.GraphicSettings.noteDisplayMode = newValue);
-        noteDisplayModePickerControl.GetLabelTextFunction = noteDisplayMode => noteDisplayMode == ENoteDisplayMode.SentenceBySentence
-            ? TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_sentenceBySentence)
-            : TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_scrollingNoteStream);
+        new NoteDisplayModeItemPickerControl(noteDisplayModeContainer.Q<ItemPicker>());
 
         new BoolPickerControl(lyricsOnNotesContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.showLyricsOnNotes,

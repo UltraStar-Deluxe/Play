@@ -123,6 +123,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     public void SetLineCount(int lineCount)
     {
+        if (lineDisplayer == null)
+        {
+            return;
+        }
+
         // Notes can be placed on and between the drawn lines (between causes -1).
         // The first and last line is not used (which causes -2). Thus, in total it is -3.
         noteRowCount = (lineCount * 2) - 3;
