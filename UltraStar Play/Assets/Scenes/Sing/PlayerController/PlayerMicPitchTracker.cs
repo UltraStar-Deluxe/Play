@@ -265,6 +265,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     public void SendPositionInSongToClientRapidly()
     {
+        PlayerNoteRecorder playerNoteRecorder = GetComponent<PlayerNoteRecorder>();
+        if (playerNoteRecorder != null
+            && !playerNoteRecorder.isActiveAndEnabled)
+        {
+            // No need to synchronize with client.
+            return;
+        }
+
         // The position in the song changed dramatically.
         // But the client implements methods to ignore single messages with big position differences (resilient behavior).
         // Thus, send the new position in song more aggressively.
