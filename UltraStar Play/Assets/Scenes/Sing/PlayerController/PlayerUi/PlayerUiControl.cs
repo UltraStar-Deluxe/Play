@@ -67,19 +67,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
+        InitPlayerNameAndImage();
         InitNoteDisplayer(LineCount);
-
-        // Player name and image
-        playerNameLabel.text = playerProfile.Name;
-        injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
-
-        if (micProfile != null)
-        {
-            playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
-        }
-
-        HideLeadingPlayerIcon();
 
         // Show rating and score after each sentence
         if (singSceneControl.IsIndividualScore)
@@ -125,6 +114,30 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(xs => CreatePerfectSentenceEffect());
 
         ChangeLayoutByPlayerCount();
+    }
+
+    private void InitPlayerNameAndImage()
+    {
+        HideLeadingPlayerIcon();
+
+        if (settings.GameSettings.ScoreMode == EScoreMode.None
+            && (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.None
+                || settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
+        {
+            // No need to show a player image and name
+            // because it is neither associated with a score nor with lyrics.
+            playerNameLabel.HideByDisplay();
+            playerImage.HideByDisplay();
+            return;
+        }
+
+        playerNameLabel.text = playerProfile.Name;
+        injector.WithRootVisualElement(playerImage)
+            .CreateAndInject<AvatarImageControl>();
+        if (micProfile != null)
+        {
+            playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        }
     }
 
     private void ChangeLayoutByPlayerCount()
@@ -251,6 +264,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 break;
             case ENoteDisplayMode.ScrollingNoteStream:
                 noteDisplayer = new ScrollingNoteStreamDisplayer();
+                break;
+            case ENoteDisplayMode.None:
+                noteDisplayer = new NoNoteSingSceneDisplayer();
                 break;
             default:
                 throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);

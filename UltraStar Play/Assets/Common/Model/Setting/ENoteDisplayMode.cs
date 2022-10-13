@@ -4,5 +4,6 @@
 public enum ENoteDisplayMode
 {
     SentenceBySentence,
-    ScrollingNoteStream
+    ScrollingNoteStream,
+    None,
 }

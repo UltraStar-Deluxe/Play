@@ -128,6 +128,7 @@ public static partial class R
         public static readonly string options_noiseSuppression = "options_noiseSuppression";
         public static readonly string options_note = "options_note";
         public static readonly string options_noteDisplayMode = "options_noteDisplayMode";
+        public static readonly string options_noteDisplayMode_none = "options_noteDisplayMode_none";
         public static readonly string options_noteDisplayMode_scrollingNoteStream = "options_noteDisplayMode_scrollingNoteStream";
         public static readonly string options_noteDisplayMode_sentenceBySentence = "options_noteDisplayMode_sentenceBySentence";
         public static readonly string options_pitchDetectionAlgorithm = "options_pitchDetectionAlgorithm";
