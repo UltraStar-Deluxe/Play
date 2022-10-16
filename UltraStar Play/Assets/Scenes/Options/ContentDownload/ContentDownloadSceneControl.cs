@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Tar;
@@ -20,11 +21,8 @@ using static ThreadPool;
 
 public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    private static readonly List<string> defaultArchiveUrls = new()
-    {
-        "https://github.com/UltraStar-Deluxe/songs-stream/archive/refs/heads/main.zip",
-        "https://42.usplay.net/ultrastar-songs-cc.tar",
-    };
+    [InjectedInInspector]
+    public TextAsset songArchiveEntryTextAsset;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -49,6 +47,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject(UxmlName = R.UxmlNames.urlChooser)]
     private DropdownField urlChooser;
+
+    [Inject(UxmlName = R.UxmlNames.urlDescriptionLabel)]
+    private Label urlDescriptionLabel;
 
     [Inject(UxmlName = R.UxmlNames.urlTextField)]
     private TextField downloadPath;
@@ -75,18 +76,24 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private UnityWebRequest downloadRequest;
 
+    private List<SongArchiveEntry> songArchiveEntries = new();
+
     // The Ui log may only be filled from the main thread.
     // This string caches new log lines for other threads.
     private string newLogText;
 
-    void Start()
-    {
-        statusLabel.text = "";
-        urlChooser.choices = new List<string>(defaultArchiveUrls);
-        urlChooser.value = urlChooser.choices[0];
-        downloadPath.value = defaultArchiveUrls[0];
+    private int extractedEntryCount;
 
-        urlChooser.RegisterValueChangedCallback(evt => downloadPath.value = evt.newValue);
+    private void Start()
+    {
+        songArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
+
+        statusLabel.text = "";
+        urlChooser.choices = new List<string>(songArchiveEntries.Select(it => it.Url));
+        urlChooser.value = urlChooser.choices[0];
+        SelectSongArchiveUrl(songArchiveEntries[0].Url);
+
+        urlChooser.RegisterValueChangedCallback(evt => SelectSongArchiveUrl(evt.newValue));
 
         startDownloadButton.RegisterCallbackButtonTriggered(() => StartDownload());
         cancelDownloadButton.RegisterCallbackButtonTriggered(() => CancelDownload());
@@ -101,6 +108,13 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+    }
+
+    private void SelectSongArchiveUrl(string url)
+    {
+        downloadPath.value = url;
+        SongArchiveEntry songArchiveEntry = songArchiveEntries.FirstOrDefault(it => it.Url == url);
+        urlDescriptionLabel.text = songArchiveEntry != null ? songArchiveEntry.Description : "";
     }
 
     public void UpdateTranslation()
@@ -124,7 +138,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             Debug.Log("Disposing downloadRequest");
             downloadRequest.Dispose();
             downloadRequest = null;
-            SetCanceledStatus();
         }
 
         if (!newLogText.IsNullOrEmpty())
@@ -161,6 +174,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             Debug.Log("Aborting download");
             downloadRequest.Abort();
             AddToUiLog("Canceled download");
+            SetCanceledStatus();
         }
     }
 
@@ -333,6 +347,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         using Stream archiveStream = File.OpenRead(archivePath);
         using ZipFile zipFile = new(archiveStream);
+        extractedEntryCount = 0;
 
         try
         {
@@ -367,6 +382,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         using Stream zipEntryStream = zipFile.GetInputStream(zipEntry);
         using FileStream targetFileStream = File.Create(targetFilePath);
         StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
+        extractedEntryCount++;
     }
 
     private void ExtractTarArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
@@ -397,21 +413,26 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         string progress2 = "Unpacking file.. ";
         string progress3 = "Unpacking file...";
 
+        string GetStatusLabelProgress(string prefix)
+        {
+            return prefix + (extractedEntryCount > 0 ? $" {extractedEntryCount}" : "");
+        }
+
         while (handle != null && !handle.done)
         {
-            statusLabel.text = progress1;
+            statusLabel.text = GetStatusLabelProgress(progress1);
             yield return new WaitForSeconds(0.5f);
             if (handle == null || handle.done)
             {
                 break;
             }
-            statusLabel.text = progress2;
+            statusLabel.text = GetStatusLabelProgress(progress2);
             yield return new WaitForSeconds(0.5f);
             if (handle == null || handle.done)
             {
                 break;
             }
-            statusLabel.text = progress3;
+            statusLabel.text = GetStatusLabelProgress(progress3);
             yield return new WaitForSeconds(0.5f);
         }
 
@@ -469,5 +490,13 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void ResetFileSizeText()
     {
         fileSize.text = "??? KB";
+    }
+
+    private void OnDestroy()
+    {
+        if (downloadRequest != null)
+        {
+            downloadRequest.Dispose();
+        }
     }
 }
