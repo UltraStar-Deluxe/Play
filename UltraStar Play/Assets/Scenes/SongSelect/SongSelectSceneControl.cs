@@ -177,6 +177,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
     private ItemPicker scoreModePicker;
 
+    [Inject(UxmlName = R.UxmlNames.noteDisplayModeLabel)]
+    private Label noteDisplayModeLabel;
+
+    [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
+    private ItemPicker noteDisplayModePicker;
+
     [Inject(UxmlName = R.UxmlNames.micListOverlay)]
     private VisualElement micListOverlay;
 
@@ -366,6 +372,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                 newValue => settings.GameSettings.ScoreMode = newValue);
+        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
+            .Bind(() => settings.GraphicSettings.noteDisplayMode,
+                newValue => settings.GraphicSettings.noteDisplayMode = newValue);
     }
 
     public void HideSearchExpressionInfoOverlay()
@@ -962,6 +971,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
+        noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
         searchExpressionInfoLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo);
         searchExpressionInfoSyntaxTipsLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips);
