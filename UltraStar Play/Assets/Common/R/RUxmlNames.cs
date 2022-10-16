@@ -600,6 +600,7 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string urlChooser = "urlChooser";
         public const string urlContainer = "urlContainer";
+        public const string urlDescriptionLabel = "urlDescriptionLabel";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldContainer = "urlTextFieldContainer";

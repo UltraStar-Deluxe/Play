@@ -16,9 +16,10 @@
                 <ui:VisualElement name="urlTextFieldContainer" style="flex-grow: 1;">
                     <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.zip" name="urlTextField" style="width: auto;" />
                     <ui:DropdownField index="-1" name="urlChooser" style="flex-grow: 1;" />
+                    <ui:Label text="UrlDescription" display-tooltip-when-elided="true" name="urlDescriptionLabel" class="smallerFont" style="white-space: normal;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="downloadControlsContainer" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: center;">
+            <ui:VisualElement name="downloadControlsContainer" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end;">
                 <ui:Label text="9999 MB" display-tooltip-when-elided="true" name="sizeLabel" style="border-right-width: 20px; width: 20%;" />
                 <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="border-right-width: 20px; width: 20%;" />
                 <ui:VisualElement name="buttonContainer" style="flex-direction: row; flex-grow: 1; justify-content: flex-end;">
