@@ -323,6 +323,9 @@ public static partial class R
         public const string noteAreaSentences = "noteAreaSentences";
         public const string noteContainer = "noteContainer";
         public const string noteDisplayModeContainer = "noteDisplayModeContainer";
+        public const string noteDIsplayModeContainer = "noteDIsplayModeContainer";
+        public const string noteDisplayModeLabel = "noteDisplayModeLabel";
+        public const string noteDisplayModePicker = "noteDisplayModePicker";
         public const string noteEntry = "noteEntry";
         public const string noteImage = "noteImage";
         public const string noteLabel = "noteLabel";
