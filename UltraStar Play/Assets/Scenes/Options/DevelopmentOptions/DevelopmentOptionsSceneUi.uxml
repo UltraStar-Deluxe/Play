@@ -24,6 +24,10 @@
                     <ui:Label text="Analyze Beats Without Target Note" name="Label" class="controlLabel" />
                     <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
                 </ui:VisualElement>
+                <ui:VisualElement name="disableDynamicThemesContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Disable Dynamic Themes" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
                 <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
                 <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
                 <ui:VisualElement name="networkConfigContainer">

@@ -23,6 +23,9 @@ public class GraphicSettings
         get => currentThemeName;
         set
         {
+            if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+                return;
+
             currentThemeName = value;
             ThemeManager.Instance.LoadTheme(currentThemeName);
         }

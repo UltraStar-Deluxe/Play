@@ -52,6 +52,11 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
 
     public void UpdateThemeSpecificStyleSheets()
     {
+        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        {
+            return;
+        }
+
         if (uiDocument == null)
         {
             return;
