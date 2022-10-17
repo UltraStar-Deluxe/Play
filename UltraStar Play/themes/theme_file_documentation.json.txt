@@ -77,6 +77,11 @@
             "g": 1.0,
             "b": 1.0,
             "a": 1.0
-        }
+        },
+		// The opacity of the user interface drop shadow effect.
+		// Set to 0 to disable.
+		"uiShadowOpacity": 0.33,
+		// The offset coordinates for the drop shadow effect.
+		"uiShadowOffset": { "x": -16, "y": 10 }
     }
 }
