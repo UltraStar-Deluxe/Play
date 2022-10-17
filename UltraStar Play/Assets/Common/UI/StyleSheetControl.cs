@@ -83,6 +83,10 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             VisualElement backImage = button.Q("backImage");
             if (backImage != null) backImage.style.unityBackgroundImageTintColor = fontColorButtons;
         });
+        root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
+        {
+            UIUtils.SetBackgroundStyleWithHover(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+        });
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
             UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
