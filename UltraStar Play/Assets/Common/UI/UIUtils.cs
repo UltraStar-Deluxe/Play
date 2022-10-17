@@ -28,7 +28,13 @@ public static class UIUtils
     }
 
     static readonly Dictionary<VisualElement, Tuple<Color, Color>> elementsBgColorsDict = new ();
+
     public static void SetBackgroundStyleWithHover(VisualElement root, Color backgroundColor, Color hoverBackgroundColor, Color fontColor)
+    {
+        SetBackgroundStyleWithHover(root, root, backgroundColor, hoverBackgroundColor, fontColor);
+    }
+
+    public static void SetBackgroundStyleWithHover(VisualElement root, VisualElement hoverRoot, Color backgroundColor, Color hoverBackgroundColor, Color fontColor)
     {
         if (root == null) return;
 
@@ -36,26 +42,26 @@ public static class UIUtils
         root.style.backgroundColor = backgroundColor;
 
         // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them
-        if (!elementsBgColorsDict.ContainsKey(root))
+        if (!elementsBgColorsDict.ContainsKey(hoverRoot))
         {
-            elementsBgColorsDict.Add(root, new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor));
+            elementsBgColorsDict.Add(hoverRoot, new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor));
 
-            root.RegisterCallback<PointerEnterEvent>(evt =>
+            hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[root].Item2;
+                Color color = elementsBgColorsDict[hoverRoot].Item2;
                 color.a = root.resolvedStyle.backgroundColor.a;
                 root.style.backgroundColor = color;
             });
-            root.RegisterCallback<PointerLeaveEvent>(evt =>
+            hoverRoot.RegisterCallback<PointerLeaveEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[root].Item1;
+                Color color = elementsBgColorsDict[hoverRoot].Item1;
                 color.a = root.resolvedStyle.backgroundColor.a;
                 root.style.backgroundColor = color;
             });
         }
         else
         {
-            elementsBgColorsDict[root] = new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor);
+            elementsBgColorsDict[hoverRoot] = new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor);
         }
     }
 
