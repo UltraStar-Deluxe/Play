@@ -8,6 +8,7 @@ using UniInject;
 public class BackgroundImageEffect : MonoBehaviour, INeedInjection
 {
     public Material material;
+    static readonly int _UiTex = Shader.PropertyToID("_UiTex");
 
     void OnEnable()
     {
@@ -15,6 +16,11 @@ public class BackgroundImageEffect : MonoBehaviour, INeedInjection
         {
             this.enabled = false;
         }
+    }
+
+    public void SetUiRenderTexture(RenderTexture uiRenderTexture)
+    {
+        material.SetTexture(_UiTex, uiRenderTexture);
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dest)

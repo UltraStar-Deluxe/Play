@@ -57,16 +57,23 @@ public class UltraStarPlaySceneChangeAnimationControl : SceneChangeAnimationCont
             PlaySceneChangeAnimationSound();
         }
 
+        VisualElement newUiDocument = FindObjectOfType<UIDocument>().rootVisualElement.Q<VisualElement>("background");
         LeanTween.value(gameObject, 0, 1, 0.3f)
             .setOnUpdate((float animTimePercent) =>
             {
-                visualElement.style.opacity = 1 - (animTimePercent * 2);
+                // Scale and fade in the new UIDocument
+                float tEaseOutSine = Mathf.Sin(animTimePercent * Mathf.PI / 2f);
+                newUiDocument.style.opacity = tEaseOutSine;
+                float scaleIn = Mathf.Lerp(0.8f, 1.0f, tEaseOutSine);
+                newUiDocument.style.scale = new StyleScale(new Scale(new Vector3(scaleIn, scaleIn, 1)));
 
-                float scale = 1 + animTimePercent * 1.5f;
-                visualElement.style.scale = new StyleScale(new Scale(new Vector3(scale, scale, 1)));
+                // Scale and fade out the snapshot of the old UIDocument
+                float tEaseInSine = 1f - Mathf.Cos(animTimePercent * Mathf.PI / 2f);
+                visualElement.style.opacity = 1 - (tEaseInSine * 2);
+                float scaleOut = Mathf.Lerp(1.0f, 1.0f / 0.4f, tEaseInSine);
+                visualElement.style.scale = new StyleScale(new Scale(new Vector3(scaleOut, scaleOut, 1)));
             })
-            .setOnComplete(() => visualElement.RemoveFromHierarchy())
-            .setEaseInSine();
+            .setOnComplete(visualElement.RemoveFromHierarchy);
     }
 
     private void PlaySceneChangeAnimationSound()

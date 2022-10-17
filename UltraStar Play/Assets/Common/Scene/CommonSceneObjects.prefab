@@ -5928,7 +5928,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backgroundMaterial: {fileID: 2100000, guid: f7976d665216032408a77e0afc13b55f, type: 2}
   particleMaterial: {fileID: 2100000, guid: 8c900c152afa98e47b70ef388519dadd, type: 2}
-  particleSystem: {fileID: 2908706229821383298}
+  backgroundParticleSystem: {fileID: 2908706229821383298}
+  panelSettings: {fileID: 11400000, guid: 3fb3f80ff074a3b44af3c330bd91143e, type: 2}
 --- !u!1 &2981502673358573187
 GameObject:
   m_ObjectHideFlags: 0
@@ -6977,7 +6978,6 @@ MonoBehaviour:
     type: 3}
   m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
-  m_CursorLockBehavior: 0
 --- !u!1 &7551809489314000595
 GameObject:
   m_ObjectHideFlags: 0
@@ -7158,8 +7158,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   largeScreenStyleSheet: {fileID: 7433441132597879392, guid: 2e4c065aaef89214082b746b3a80b1bc,
-    type: 3}
-  redThemeStyleSheet: {fileID: 7433441132597879392, guid: c6f4134aaad5c82468c4311248808e20,
     type: 3}
 --- !u!1 &8668917355665245141
 GameObject:

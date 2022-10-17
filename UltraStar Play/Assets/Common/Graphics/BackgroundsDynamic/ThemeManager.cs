@@ -5,10 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UniInject;
-using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
-using Object = System.Object;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -130,9 +128,11 @@ public class ThemeManager : MonoBehaviour
         public Color patternColor = Color.white;
         public Vector2 patternScale = Vector2.one;
         public Vector2 patternScrolling = Vector2.zero;
+        public float uiShadowOpacity = 0;
+        public Vector2 uiShadowOffset;
         // Particles
         public string particleFile = null;
-        public float particleOpacity = 0.5f;
+        public float particleOpacity = 0f;
         // TODO particle movement pattern, based on an enum that will correspond to different prefabs
     }
 
@@ -158,13 +158,24 @@ public class ThemeManager : MonoBehaviour
 
     public Material backgroundMaterial;
     public Material particleMaterial;
-    public ParticleSystem particleSystem;
+    public ParticleSystem backgroundParticleSystem;
 
     internal ThemeSettings currentTheme;
 
     Material originalBackgroundMaterial;
     Material originalParticleMaterial;
     readonly List<Texture2D> dynamicTextures = new();
+
+    public PanelSettings panelSettings;
+    RenderTexture renderTextureUserInterface;
+
+    void Awake()
+    {
+        // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
+        renderTextureUserInterface = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+        panelSettings.targetTexture = renderTextureUserInterface;
+        this.GetComponentInChildren<BackgroundImageEffect>().SetUiRenderTexture(renderTextureUserInterface);
+    }
 
     void Start()
     {
@@ -241,7 +252,7 @@ public class ThemeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[THEME] Gradient Ramp file doesn't exist at path: {background.gradientRampFile}");
+                Debug.LogError($"[THEME] Gradient Ramp file can't be opened at path: {background.gradientRampFile}");
             }
         }
 
@@ -266,7 +277,7 @@ public class ThemeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[THEME] Pattern file doesn't exist at path: {background.patternFile}");
+                Debug.LogError($"[THEME] Pattern file can't be opened at path: {background.patternFile}");
             }
         }
 
@@ -280,6 +291,12 @@ public class ThemeManager : MonoBehaviour
         backgroundMaterial.SetFloat("_GradientAnimSpeed", background.gradientAnimSpeed);
         backgroundMaterial.SetFloat("_GradientAnimAmp", background.gradientAnimAmplitude);
         backgroundMaterial.SetFloat("_ColorRampScrolling", background.gradientScrollingSpeed);
+        backgroundMaterial.SetFloat("_UiShadowOpacity", background.uiShadowOpacity);
+        backgroundMaterial.SetVector("_UiShadowOffset", background.uiShadowOffset);
+
+        if (background.uiShadowOpacity > 0) backgroundMaterial.EnableKeyword("_UI_SHADOW");
+        else
+            backgroundMaterial.DisableKeyword("_UI_SHADOW");
 
         // Particles
         if (!string.IsNullOrEmpty(background.particleFile))
@@ -292,16 +309,23 @@ public class ThemeManager : MonoBehaviour
             }
             else
             {
-                // warning: file doesn't exist
+                Debug.LogError($"[THEME] Particle file can't be opened at path: {background.particleFile}");
             }
         }
 
-        ParticleSystem.MainModule main = particleSystem.main;
+        ParticleSystem.MainModule main = backgroundParticleSystem.main;
         main.startColor = new Color(1, 1, 1, background.particleOpacity);
 
-        particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        particleSystem.Play();
+        backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        backgroundParticleSystem.Play();
 
         #endregion
+    }
+
+    static readonly int _TimeApplication = Shader.PropertyToID("_TimeApplication");
+    void Update()
+    {
+        // Use that in shaders instead of _Time so that value doesn't reset on each scene change
+        Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 }
