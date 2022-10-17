@@ -76,6 +76,9 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
 
         root.Query<Button>().ForEach(button =>
         {
+            if (button.ClassListContains("transparentBackgroundColor"))
+                return;
+
             UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
 
             VisualElement image = button.Q("image");

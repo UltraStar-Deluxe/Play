@@ -3,6 +3,7 @@ Shader "UltraStar Play/Background Shader"
     Properties
     {
         [NoScaleOffset][HideInInspector] _MainTex ("Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
         [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
         _ColorRampScrolling ("Gradient Scrolling", Float) = 0
         [Space]
@@ -21,6 +22,10 @@ Shader "UltraStar Play/Background Shader"
         _GradientAnimAmp ("Animation Amplitude", Float) = 0.1
         [Toggle(_DITHERING)] _EnableDithering ("Enable Gradient Dithering", Float) = 0
         [NoScaleOffset] _NoiseTex ("Dithering Noise", 2D) = "gray" {}
+        [Header(UI Effects)]
+        [Space]
+        _UiShadowOpacity ("Shadow Opacity", Float) = 0
+        _UiShadowOffset ("Shadow Offset", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -37,11 +42,13 @@ Shader "UltraStar Play/Background Shader"
             #include "UnityCG.cginc"
 
             #pragma shader_feature_fragment _ _DITHERING
+            #pragma shader_feature_fragment _ _UI_SHADOW
 
             half _Gradient;
             half _EnableGradientAnimation;
 
             sampler2D _MainTex;
+            sampler2D _UiTex;
             sampler2D _ColorRampTex;
             sampler2D _PatternTex;
             sampler2D _NoiseTex;
@@ -55,6 +62,10 @@ Shader "UltraStar Play/Background Shader"
             half _Smoothness;
             half _Angle;
             half4 _PatternColor;
+            half _UiShadowOpacity;
+            float4 _UiShadowOffset;
+
+            float _TimeApplication;
 
             // ----------------------------------------------------------------
             // The MIT License
@@ -91,7 +102,7 @@ Shader "UltraStar Play/Background Shader"
                 output.texcoord0.xy = input.texcoord0.xy;
                 output.texcoord0.zw = input.texcoord0.xy * _Scale - (_Scale - 1.0) / 2.0;
                 float2 patternRatio = float2(_PatternTex_TexelSize.x / _PatternTex_TexelSize.y, 1);
-                output.patternTexcoord.xy = input.texcoord0.xy * _PatternTex_ST.xy * patternRatio + frac(_Time.yy * _PatternTex_ST.zw);
+                output.patternTexcoord.xy = input.texcoord0.xy * _PatternTex_ST.xy * patternRatio + frac(_TimeApplication.xx * _PatternTex_ST.zw);
                 output.screenCoord = ComputeScreenPos(output.positionCS);
 
                 #if !defined(_GRADIENT_RADIAL)
@@ -107,12 +118,10 @@ Shader "UltraStar Play/Background Shader"
 
             half4 frag (Varyings input) : SV_Target
             {
-                // half4 sceneImage = tex2D(_MainTex, input.texcoord0);
-
                 // Sine animation
                 if (_EnableGradientAnimation > 0)
                 {
-                    half time = _Time.y * _GradientAnimSpeed;
+                    half time = _TimeApplication * _GradientAnimSpeed;
                     input.texcoord0.z += sin(input.texcoord0.w * 3.2 + time * 0.2)
                             * sin(input.texcoord0.w * 0.7 + time * 0.7)
                             * sin(input.texcoord0.w * 2.1 + time * 0.5)
@@ -184,11 +193,22 @@ Shader "UltraStar Play/Background Shader"
                 half sceneGrayscale = tex2D(_MainTex, input.texcoord0.xy).r;
                 // and remap colors using the selected gradient texture
                 half coords =  lerp(gradient, 1 - gradient, sceneGrayscale);
-                half3 color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_Time.yy * _ColorRampScrolling), 0, 0).rgb;
+                half3 color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_TimeApplication.xx * _ColorRampScrolling), 0, 0).rgb;
 
                 // Pattern
                 half4 pattern = tex2D(_PatternTex, input.patternTexcoord.xy) * _PatternColor;
                 color.rgb = lerp(color.rgb, pattern.rgb, pattern.a);
+
+#if defined(_UI_SHADOW)
+                // UIToolkit shadow
+                float2 shadowOffset = _UiShadowOffset / _ScreenParams.xy;
+                half4 uiShadow = tex2D(_UiTex, input.texcoord0.xy + shadowOffset);
+                color.rgb = lerp(color.rgb, 0, uiShadow.a * _UiShadowOpacity);
+#endif
+
+                // Blend UIToolkit interface
+                half4 uiTexture = tex2D(_UiTex, input.texcoord0.xy);
+                color.rgb = uiTexture.rgb + color.rgb * (1.0 - uiTexture.a);
 
                 return half4(color, 1.0);
             }
