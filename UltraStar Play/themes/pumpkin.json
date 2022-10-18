@@ -31,7 +31,17 @@
         "patternScale": { "x": 2.0, "y": 2.0 },
         "patternScrolling": { "x": 0.02, "y": 0.04 },
         "patternColor": { "r": 0.0, "g": 0.0, "b": 0.0, "a": 0.5 },
-		"uiShadowOpacity": 0.33,
-		"uiShadowOffset": { "x": -16, "y": 10 }
+        "uiShadowOpacity": 0.33,
+        "uiShadowOffset": { "x": -16, "y": 10 }
+    },
+    "songRatingIcons": {
+        "toneDeaf": "icons/pumpkins/rating_0.png",
+        "amateur": "icons/pumpkins/rating_1.png",
+        "wannabe": "icons/pumpkins/rating_2.png",
+        "hopeful": "icons/pumpkins/rating_3.png",
+        "risingStar": "icons/pumpkins/rating_4.png",
+        "leadSinger": "icons/pumpkins/rating_5.png",
+        "superstar": "icons/pumpkins/rating_6.png",
+        "ultrastar": "icons/pumpkins/rating_7.png"
     }
 }

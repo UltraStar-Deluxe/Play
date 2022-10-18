@@ -3,11 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using SceneChangeAnimations;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -32,7 +29,7 @@ public class ThemeManager : MonoBehaviour
     // ----------------------------------------------------------------
 
     [Serializable]
-    internal class ThemeSettings
+    public class ThemeSettings
     {
         // These correspond to the possible JSON properties defined in a theme file.
         // Eventually a theme builder UI can be considered, but meanwhile this will
@@ -40,6 +37,7 @@ public class ThemeManager : MonoBehaviour
         // See the files in the "themes" folder at the root of the project/build.
 
         public DynamicBackground dynamicBackground;
+        public SongRatingIcons songRatingIcons;
         public Color buttonMainColor;
         public Color fontColorButtons;
         public Color fontColorLabels;
@@ -54,6 +52,12 @@ public class ThemeManager : MonoBehaviour
                 throw new Exception("Couldn't parse supplied JSON as ThemeSettings data.");
             }
             return theme;
+        }
+
+        public bool GetRatingIconFor(SongRating.ESongRating songRating, out Sprite sprite)
+        {
+            sprite = songRatingIcons?.GetSpriteForRating(songRating);
+            return sprite != null;
         }
 
         // Process JSON to parse certain values, e.g. allow hex colors and convert
@@ -105,7 +109,78 @@ public class ThemeManager : MonoBehaviour
     }
 
     [Serializable]
-    internal class DynamicBackground
+    public class SongRatingIcons
+    {
+        public string toneDeaf;
+        public string amateur;
+        public string wannabe;
+        public string hopeful;
+        public string risingStar;
+        public string leadSinger;
+        public string superstar;
+        public string ultrastar;
+
+        Dictionary<string, Sprite> loadedSprites = new Dictionary<string, Sprite>();
+
+        public Sprite GetSpriteForRating(SongRating.ESongRating songRating)
+        {
+            switch (songRating)
+            {
+                case SongRating.ESongRating.ToneDeaf: return GetSprite(toneDeaf);
+                case SongRating.ESongRating.Amateur: return GetSprite(amateur);
+                case SongRating.ESongRating.Wannabe: return GetSprite(wannabe);
+                case SongRating.ESongRating.Hopeful: return GetSprite(hopeful);
+                case SongRating.ESongRating.RisingStar: return GetSprite(risingStar);
+                case SongRating.ESongRating.LeadSinger: return GetSprite(leadSinger);
+                case SongRating.ESongRating.Superstar: return GetSprite(superstar);
+                case SongRating.ESongRating.Ultrastar: return GetSprite(ultrastar);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(songRating), songRating, null);
+            }
+        }
+
+        private Sprite GetSprite(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return null;
+            }
+
+            if (loadedSprites.ContainsKey(filePath))
+            {
+                return loadedSprites[filePath];
+            }
+
+            string fullPath = $"{Application.dataPath}/../themes/{filePath}";
+            if (!File.Exists(fullPath))
+            {
+                Debug.LogError($"[THEME] Couldn't load image at path: '{fullPath}'");
+                return null;
+            }
+
+            byte[] imageBytes = File.ReadAllBytes(fullPath);
+            Texture2D texture = new(2, 2, TextureFormat.RGBA32, true)
+            {
+                alphaIsTransparency = true,
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear
+            };
+            texture.LoadImage(imageBytes, true);
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+        }
+
+        internal void CleanupLoadedSprites()
+        {
+            foreach (KeyValuePair<string,Sprite> loadedSprite in loadedSprites)
+            {
+                Destroy(loadedSprite.Value);
+            }
+            loadedSprites.Clear();
+        }
+    }
+
+    [Serializable]
+    public class DynamicBackground
     {
         public enum GradientType
         {
@@ -162,7 +237,7 @@ public class ThemeManager : MonoBehaviour
     public Material particleMaterial;
     public ParticleSystem backgroundParticleSystem;
 
-    internal ThemeSettings currentTheme;
+    public ThemeSettings currentTheme;
 
     Material originalBackgroundMaterial;
     Material originalParticleMaterial;
@@ -210,6 +285,7 @@ public class ThemeManager : MonoBehaviour
         backgroundMaterial.CopyPropertiesFromMaterial(originalBackgroundMaterial);
         particleMaterial.CopyPropertiesFromMaterial(originalParticleMaterial);
         CleanupDynamicTextures();
+        this.currentTheme?.songRatingIcons?.CleanupLoadedSprites();
     }
 
     Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
@@ -240,9 +316,10 @@ public class ThemeManager : MonoBehaviour
         // we wait so the background changes at the same frame
         yield return null;
 
-        #region Dynamic background
-
+        this.currentTheme?.songRatingIcons?.CleanupLoadedSprites();
         CleanupDynamicTextures();
+
+        #region Dynamic background
 
         DynamicBackground background = data.dynamicBackground;
 

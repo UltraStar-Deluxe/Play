@@ -70,18 +70,30 @@
         "patternScale": { "x": 2.0, "y": 2.0 },
         // The scrolling speed of the pattern. Set to 0 for no scrolling.
         "patternScrolling": { "x": 0.02, "y": 0.04 },
-		// The tint color of the pattern. Leave white to get the image's default
-		// colors. You can also just change the alpha to change the opacity.
+        // The tint color of the pattern. Leave white to get the image's default
+        // colors. You can also just change the alpha to change the opacity.
         "patternColor": {
             "r": 1.0,
             "g": 1.0,
             "b": 1.0,
             "a": 1.0
         },
-		// The opacity of the user interface drop shadow effect.
-		// Set to 0 to disable.
-		"uiShadowOpacity": 0.33,
-		// The offset coordinates for the drop shadow effect.
-		"uiShadowOffset": { "x": -16, "y": 10 }
+        // The opacity of the user interface drop shadow effect.
+        // Set to 0 to disable.
+        "uiShadowOpacity": 0.33,
+        // The offset coordinates for the drop shadow effect.
+        "uiShadowOffset": { "x": -16, "y": 10 }
+    },
+    // Defines the paths to custom icons for the song rating emojis.
+    // If not set, default icons will be used.
+    "songRatingIcons": {
+        "toneDeaf": "icons/theme name/rating_0.png",
+        "amateur": "icons/theme name/rating_1.png",
+        "wannabe": "icons/theme name/rating_2.png",
+        "hopeful": "icons/theme name/rating_3.png",
+        "risingStar": "icons/theme name/rating_4.png",
+        "leadSinger": "icons/theme name/rating_5.png",
+        "superstar": "icons/theme name/rating_6.png",
+        "ultrastar": "icons/theme name/rating_7.png"
     }
 }
