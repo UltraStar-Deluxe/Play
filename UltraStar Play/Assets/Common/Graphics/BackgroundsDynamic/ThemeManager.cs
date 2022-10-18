@@ -310,8 +310,13 @@ public class ThemeManager : MonoBehaviour
         dynamicTextures.Clear();
     }
 
+    // Updating background colors might be called multiple times
+    internal static readonly HashSet<VisualElement> AlreadyProcessedElements = new ();
+
     IEnumerator Apply(ThemeSettings data)
     {
+        AlreadyProcessedElements.Clear();
+
         // UIToolkit takes one frame to apply the style changes,
         // we wait so the background changes at the same frame
         yield return null;
