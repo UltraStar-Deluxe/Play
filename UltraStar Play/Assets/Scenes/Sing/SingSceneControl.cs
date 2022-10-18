@@ -231,6 +231,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
+
+            StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
         }
 
         // Associate LyricsDisplayer with one of the (duett) players
