@@ -76,6 +76,8 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             profileList.Add(CreatePlayerProfileEntry(playerProfile, index));
             index++;
         });
+
+        StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
     }
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
