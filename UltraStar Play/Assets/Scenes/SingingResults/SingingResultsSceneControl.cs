@@ -49,6 +49,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private Settings settings;
+
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -249,6 +252,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public Sprite GetSongRatingSprite(SongRating.ESongRating songRatingEnumValue)
     {
+        if (!settings.DeveloperSettings.disableDynamicThemes)
+        {
+            if (ThemeManager.Instance.currentTheme.GetRatingIconFor(songRatingEnumValue, out Sprite sprite))
+            {
+                return sprite;
+            }
+        }
+
         SongRatingImageReference songRatingImageReference = songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
         return songRatingImageReference?.sprite;
