@@ -50,6 +50,7 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
     }
 
+    /// <summary>Queries all the relevant UI controls and change their style according to the currently loaded theme.</summary>
     public void UpdateThemeSpecificStyleSheets()
     {
         if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
@@ -89,6 +90,12 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
                 }
             }
 
+            if (ThemeManager.AlreadyProcessedElements.Contains(button))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(button);
+
             UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
 
             VisualElement image = button.Q("image");
@@ -98,10 +105,20 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
         });
         root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
         {
+            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHover(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
         });
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
+            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
         });
 
