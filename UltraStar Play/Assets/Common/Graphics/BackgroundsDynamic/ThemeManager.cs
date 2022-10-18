@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using SceneChangeAnimations;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -174,7 +176,10 @@ public class ThemeManager : MonoBehaviour
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
         renderTextureUserInterface = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
         panelSettings.targetTexture = renderTextureUserInterface;
-        this.GetComponentInChildren<BackgroundImageEffect>().SetUiRenderTexture(renderTextureUserInterface);
+        this.GetComponentInChildren<BackgroundImageEffect>().SetUiRenderTextures(
+            renderTextureUserInterface,
+            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture
+            );
     }
 
     void Start()

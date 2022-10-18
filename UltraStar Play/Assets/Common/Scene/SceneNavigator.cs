@@ -50,19 +50,14 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
-        Action doChangeScene = () => SceneManager.LoadScene((int)scene);
+        void DoChangeScene() => SceneManager.LoadScene((int)scene);
         if (settings.GraphicSettings.AnimateSceneChange)
         {
-            sceneChangeAnimationControl.AnimateChangeToScene(
-                doChangeScene,
-                (visualElement) => sceneChangeAnimationControl.StartSceneChangeAnimation(
-                    visualElement,
-                    currentScene,
-                    scene));
+            sceneChangeAnimationControl.AnimateChangeToScene(DoChangeScene, () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
         }
         else
         {
-            doChangeScene();
+            DoChangeScene();
         }
     }
 
