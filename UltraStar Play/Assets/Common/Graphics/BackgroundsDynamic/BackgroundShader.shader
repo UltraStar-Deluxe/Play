@@ -4,6 +4,7 @@ Shader "UltraStar Play/Background Shader"
     {
         [NoScaleOffset][HideInInspector] _MainTex ("Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
         [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
         _ColorRampScrolling ("Gradient Scrolling", Float) = 0
         [Space]
@@ -26,6 +27,9 @@ Shader "UltraStar Play/Background Shader"
         [Space]
         _UiShadowOpacity ("Shadow Opacity", Float) = 0
         _UiShadowOffset ("Shadow Offset", Vector) = (0,0,0,0)
+        [Header(Animation)]
+        [Space]
+        _TransitionTime ("Transition Time", Range(0,1)) = 0
     }
     SubShader
     {
@@ -43,12 +47,14 @@ Shader "UltraStar Play/Background Shader"
 
             #pragma shader_feature_fragment _ _DITHERING
             #pragma shader_feature_fragment _ _UI_SHADOW
+            #pragma shader_feature_fragment _ _UI_TRANSITION_ANIM
 
             half _Gradient;
             half _EnableGradientAnimation;
 
             sampler2D _MainTex;
             sampler2D _UiTex;
+            sampler2D _TransitionTex;
             sampler2D _ColorRampTex;
             sampler2D _PatternTex;
             sampler2D _NoiseTex;
@@ -64,6 +70,7 @@ Shader "UltraStar Play/Background Shader"
             half4 _PatternColor;
             half _UiShadowOpacity;
             float4 _UiShadowOffset;
+            float _TransitionTime;
 
             float _TimeApplication;
 
@@ -199,16 +206,42 @@ Shader "UltraStar Play/Background Shader"
                 half4 pattern = tex2D(_PatternTex, input.patternTexcoord.xy) * _PatternColor;
                 color.rgb = lerp(color.rgb, pattern.rgb, pattern.a);
 
-#if defined(_UI_SHADOW)
-                // UIToolkit shadow
-                float2 shadowOffset = _UiShadowOffset / _ScreenParams.xy;
-                half4 uiShadow = tex2D(_UiTex, input.texcoord0.xy + shadowOffset);
-                color.rgb = lerp(color.rgb, 0, uiShadow.a * _UiShadowOpacity);
-#endif
+                half4 uiColors = half4(0, 0, 0, 0);
 
-                // Blend UIToolkit interface
-                half4 uiTexture = tex2D(_UiTex, input.texcoord0.xy);
-                color.rgb = uiTexture.rgb + color.rgb * (1.0 - uiTexture.a);
+                #if defined(_UI_SHADOW)
+                    // UIToolkit shadow
+                    float2 shadowOffset = _UiShadowOffset / _ScreenParams.xy;
+                    half4 uiShadow = tex2D(_UiTex, input.texcoord0.xy + shadowOffset);
+                    uiColors.a += uiShadow.a * _UiShadowOpacity;
+                #endif
+
+                #if !defined(_UI_TRANSITION_ANIM)
+                    // Blend UIToolkit interface
+                    half4 uiTexture = tex2D(_UiTex, input.texcoord0.xy);
+                    uiColors = saturate(uiColors + uiTexture);
+                    color.rgb = uiColors.rgb + color.rgb * (1.0 - uiColors.a);
+                #else
+                    // Transition animations
+                    float4 transitionCoords = input.texcoord0.xyxy - 0.5;
+                    transitionCoords.xy *= lerp(1.25, 1.0, _TransitionTime).xx;
+                    transitionCoords.zw *= lerp(1.0, 0.4, _TransitionTime).xx;
+                    transitionCoords += 0.5;
+
+                    // Transition the new screen in by scaling it up (1.0/1.25 -> 1.0) and fading it in
+                    half4 uiTexture = tex2D(_UiTex, transitionCoords.xy);
+                    uiColors = saturate(uiColors + uiTexture);
+                    color.rgb = uiColors.rgb * _TransitionTime + color.rgb * (1.0 - uiColors.a * _TransitionTime);
+
+                    // Transition the old screen out by scaling it up (1.0 -> 1.0/0.4) and fading it out
+                    half4 transitionTexture = tex2D(_TransitionTex, transitionCoords.zw);
+                    #if defined(_UI_SHADOW)
+                        // Reapply the shadow to the fading out UI
+                        half4 uiShadowTransition = tex2D(_TransitionTex, transitionCoords.zw + shadowOffset);
+                        transitionTexture.a += saturate(uiShadowTransition.a - transitionTexture.a) * _UiShadowOpacity;
+                    #endif
+                    float timeFade = (1.0 - _TransitionTime);
+                    color.rgb = transitionTexture.rgb * timeFade + color.rgb * (1.0 - transitionTexture.a * timeFade);
+                #endif
 
                 return half4(color, 1.0);
             }
