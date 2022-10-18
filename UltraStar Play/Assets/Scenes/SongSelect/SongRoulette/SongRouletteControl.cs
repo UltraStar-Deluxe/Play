@@ -207,6 +207,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void SpawnAndRemoveSongRouletteItems()
     {
+        bool uiModified = false;
         List<SongEntryControl> usedSongRouletteItems = new();
 
         // Spawn roulette items for songs to be displayed (i.e. selected song and its surrounding songs)
@@ -220,6 +221,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
             if (songRouletteItem == null)
             {
                 songRouletteItem = CreateSongRouletteItem(songMeta, placeholderControl);
+                uiModified = true;
             }
 
             // Update target
@@ -233,11 +235,15 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
             if (!usedSongRouletteItems.Contains(songRouletteItem))
             {
                 RemoveSongRouletteItem(songRouletteItem);
+                uiModified = true;
             }
         }
 
         // Update style sheet
-        StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
+        if (uiModified)
+        {
+            StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
+        }
     }
 
     public void RemoveSongRouletteItem(SongEntryControl songRouletteItem)
