@@ -81,8 +81,13 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
 
         root.Query<Button>().ForEach(button =>
         {
-            if (button.ClassListContains("transparentBackgroundColor"))
-                return;
+            foreach (string excludedNameOrClass in new []{"transparentBackgroundColor", "hiddenContinueButton"})
+            {
+                if (button.ClassListContains(excludedNameOrClass) || button.name == excludedNameOrClass)
+                {
+                    return;
+                }
+            }
 
             UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
 
