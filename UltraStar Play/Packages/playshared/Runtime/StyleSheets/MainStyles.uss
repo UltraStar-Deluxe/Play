@@ -22,6 +22,7 @@
     --control-color-accent2: rgb(99, 154, 183);
     --main-scene-button-width: 150px;
     --main-scene-sing-button-width: 310px;
+    --default-button-radius: 5px;
 }
 
 .unity-label {
@@ -135,7 +136,7 @@
     font-size: var(--font-size);
     border-width: 0;
     border-color: rgba(0, 0, 0, 0);
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
     align-items: center;
     justify-content: center;
     padding: 6px 6px 5px 5px;
@@ -182,7 +183,7 @@
 }
 
 .unity-toggle VisualElement {
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
     border-width: 0;
 }
 
@@ -205,7 +206,7 @@
 }
 
 .roundCorners {
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
 }
 
 .transparentBackgroundColor {
@@ -222,7 +223,7 @@
 
 #searchTextField #unity-text-input {
     height: 100%;
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
 }
 
 .transparentBackgroundColor #unity-text-input {
@@ -362,8 +363,7 @@ TextInput {
     align-items: center;
 }
 
-.optionsOverviewButton .warning
-{
+.optionsOverviewButton .warning {
     color: var(--text-color-warning);
     -unity-background-image-tint-color: var(--text-color-warning);
 }
@@ -851,18 +851,18 @@ Label.tinyFont {
     display: none;
 }
 
-.unity-scroller--vertical > .unity-scroller__slider  {
+.unity-scroller--vertical > .unity-scroller__slider {
     width: 12px;
     min-width: auto;
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
     margin: 0;
     padding: 0;
 }
 
-.unity-scroller--horizontal > .unity-scroller__slider  {
+.unity-scroller--horizontal > .unity-scroller__slider {
     height: 12px;
     min-height: auto;
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
     margin: 0;
     padding: 0;
 }
@@ -875,13 +875,13 @@ Label.tinyFont {
 .unity-base-slider--vertical .unity-base-slider__dragger {
     width: 10px;
     left: 1px;
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
 }
 
 .unity-base-slider--horizontal .unity-base-slider__dragger {
     height: 10px;
     top: 1px;
-    border-radius: 5px;
+    border-radius: var(--default-button-radius);
 }
 
 .textColorTint {
