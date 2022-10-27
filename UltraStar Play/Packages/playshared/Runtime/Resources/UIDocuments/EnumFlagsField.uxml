@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="container" class="optionsLabelAndItemPicker">
+        <ui:Label text="Label" name="Label" class="controlLabel" />
+        <ui:VisualElement name="container" style="flex-direction: row; width: 300px; height: 30px;">
+            <ui:Label text="Value" display-tooltip-when-elided="true" name="Value" class="labelField buttonLeft" style="-unity-text-align: middle-left; flex-grow: 1;" />
+            <ui:Button text="Select" display-tooltip-when-elided="true" class="buttonRight" style="width: 100px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; height: 100%;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
