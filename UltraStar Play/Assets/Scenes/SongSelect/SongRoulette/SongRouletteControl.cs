@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
@@ -93,6 +94,19 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
+        Selection.Subscribe(selection =>
+        {
+            IEnumerator CoroutineDelayedSetSelectedClass()
+            {
+                yield return null;
+                foreach (SongEntryControl songEntryControl in songEntryControls)
+                {
+                    songEntryControl?.VisualElement.EnableInClassList("selected", songEntryControl.SongMeta == selection.SongMeta);
+                }
+            }
+            StartCoroutine(CoroutineDelayedSetSelectedClass());
+        });
+
         songEntryPlaceholderControls = songEntryPlaceholders
             .Select(it => new SongEntryPlaceholderControl(it))
             .ToList();

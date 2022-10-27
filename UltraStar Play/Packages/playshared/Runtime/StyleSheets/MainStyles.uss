@@ -935,6 +935,19 @@ Label.tinyFont {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+#songEntryUiRoot
+{
+    opacity:    0.7;
+    scale:      0.9;
+    transition: scale 0.3s ease-out;
+}
+
+#songEntryUiRoot.selected
+{
+    opacity:    1.0;
+    scale:      1.1;
+    transition: scale 0.3s ease-out;
+}
 
 #fader
 { transition: opacity 2.5s; }
