@@ -935,4 +935,8 @@ Label.tinyFont {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+
+#fader
+{ transition: opacity 2.5s; }
+
 }

@@ -77,6 +77,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UltraStarPlayInputManager inputManager;
 
+    [Inject(UxmlName = R.UxmlNames.fader)]
+    private VisualElement blackFader;
+
     [Inject(UxmlName = R.UxmlNames.topLyricsContainer)]
     private VisualElement topLyricsContainer;
 
@@ -169,6 +172,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void Start()
     {
+        blackFader.style.display = DisplayStyle.Flex;
+
+        IEnumerator CoroutineFadeOut() { yield return null; blackFader.style.opacity = 0; }
+        StartCoroutine(CoroutineFadeOut());
+
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
