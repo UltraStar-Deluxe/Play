@@ -14,7 +14,11 @@
             <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center;">
                 <ui:Button text="Sing" name="startButton" class="startButtonClass mainSceneButton" style="text-shadow: 1px 1px 0 rgb(0, 0, 0); -unity-font-style: bold;" />
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
-                <ui:Button text="Party" name="partyButton" class="mainSceneButton" />
+                <ui:VisualElement name="partyButtonsContainer" class="mainSceneButton">
+                    <ui:Button text="Party" name="partyButton" class="mainSceneButton" />
+                    <ui:Button text="Teams" display-tooltip-when-elided="true" name="partyTeamButton" style="width: 100%; height: 49%; display: none; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                    <ui:Button text="Free for All" display-tooltip-when-elided="true" name="partyFfaButton" style="width: 100%; height: 49%; display: none; margin-left: 0; margin-right: 0; margin-top: 1%; margin-bottom: 0;" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
             <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center; align-items: center;">

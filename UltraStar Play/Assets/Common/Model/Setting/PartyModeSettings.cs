@@ -15,6 +15,7 @@ public enum EPartySongSelection
     PlayersChoose // players choose the song
 }
 
+// TODO use this to filter the randomly selected songs
 [Flags]
 public enum EPartySongFiltering
 {

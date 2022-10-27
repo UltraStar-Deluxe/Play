@@ -201,6 +201,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void FinishScene()
     {
+        if (sceneData.IsPartyMode)
+        {
+            // TODO intermediary scene that sums up all the rounds after last round
+            SceneNavigator.Instance.LoadScene(PartyModeManager.CurrentRoundData.isLastRound ? EScene.MainScene : EScene.PartyModeVersus);
+            return;
+        }
+
         if (statistics.HasHighscore(sceneData.SongMeta))
         {
             // Go to highscore scene

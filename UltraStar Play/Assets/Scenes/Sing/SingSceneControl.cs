@@ -107,6 +107,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private VisualElement[] playerUiColumns;
 
+    VisualElement[] allPlayersUi;
+
     private SingSceneData sceneData;
     public SingSceneData SceneData
     {
@@ -170,6 +172,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                                      || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                          && SceneData.SelectedPlayerProfiles.Count <= 1);
 
+    // Win conditions & party mode
+    private int leadingPlayerPhrasesCount;
+    private bool playerHasWon;
+    private float[] playerScores;
+
     private void Start()
     {
         blackFader.style.display = DisplayStyle.Flex;
@@ -188,6 +195,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         PreparePlayerUiLayout();
 
         // Create PlayerControl (and PlayerUi) for each player
+        allPlayersUi = new VisualElement[SceneData.SelectedPlayerProfiles.Count];
         List<PlayerProfile> playerProfilesWithoutMic = new();
         for (int i = 0; i < SceneData.SelectedPlayerProfiles.Count; i++)
         {
@@ -211,6 +219,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
+
+        playerScores = new float[PlayerControls.Count];
 
         // Handle dummy singers
         if (Application.isEditor)
@@ -255,10 +265,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         // Register ContextMenu
-        contextMenuControl = injector
-            .WithRootVisualElement(doubleClickToTogglePauseElement)
-            .CreateAndInject<ContextMenuControl>();
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
+        if (!sceneData.IsPartyMode)
+        {
+            contextMenuControl = injector
+                .WithRootVisualElement(doubleClickToTogglePauseElement)
+                .CreateAndInject<ContextMenuControl>();
+            contextMenuControl.FillContextMenuAction = FillContextMenu;
+        }
 
         // Automatically start recording on companion apps
         PlayerControls.ForEach(playerControl =>
@@ -282,7 +295,229 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+
+        // Modifiers apply callbacks
+        foreach (SingModifier modifier in sceneData.SingModifiers)
+        {
+            modifier.onApply = OnApplyModifier;
+            modifier.onDisable = OnDisableModifier;
+        }
+
+        // Apply any instant or always-on modifiers instantly
+        foreach (SingModifier modifier in sceneData.SingModifiers)
+        {
+            modifier.UpdateModifier(0, songAudioPlayer.DurationOfSongInMillis, playerScores);
+        }
+        LTDescr[] instantTweens = ongoingTweens.Values.ToArray();
+        foreach (LTDescr ongoingTween in instantTweens)
+        {
+            ongoingTween.callOnCompletes();
+            LeanTween.cancel(ongoingTween.id);
+        }
+        ongoingTweens.Clear();
     }
+
+    void CheckWinCondition()
+    {
+        if (playerHasWon)
+        {
+            return;
+        }
+
+        switch (sceneData?.WinCondition?.winType)
+        {
+            default: return;
+            case EPartyWinCondition.FirstToScore:
+            {
+                for (int playerIndex = 0; playerIndex < playerScores.Length; playerIndex++)
+                {
+                    float playerScore = playerScores[playerIndex];
+                    if (playerScore >= sceneData.WinCondition.score)
+                    {
+                        OnPlayerWon(PlayerControls[playerIndex]);
+                        return;
+                    }
+                }
+                break;
+            }
+
+            case EPartyWinCondition.LeadForNumberOfPhrases:
+            {
+                PlayerControl leadingPlayer = FindLeadingPlayer();
+                if (lastLeadingPlayerControl != leadingPlayer || leadingPlayer == null)
+                {
+                    leadingPlayerPhrasesCount = 0;
+                }
+
+                if (leadingPlayerPhrasesCount >= sceneData.WinCondition.phrases)
+                {
+                    // TODO count phrases for leading player and trigger winning
+                }
+                break;
+            }
+        }
+    }
+
+    void OnPlayerWon(PlayerControl player)
+    {
+        // TODO play sound + visual feedbacks
+        // TODO Implement winning player UI in Song Results scene
+        playerHasWon = true;
+        Debug.Log($"{player.name} just won!");
+    }
+
+    void OnApplyModifier(SingModifier.EModifierAction actions, int playerIndex)
+    {
+        // TODO cache enum values
+        foreach (SingModifier.EModifierAction flag in Enum.GetValues(typeof(SingModifier.EModifierAction)))
+        {
+            if (actions.HasFlag(flag))
+            {
+                switch (flag)
+                {
+                    case SingModifier.EModifierAction.HideNotes:
+                    {
+                        if (playerIndex >= 0) HidePlayerNotes(playerIndex);
+                        else HideAllPlayersNotes();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.HideLyrics:
+                    {
+                        HideLyrics();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.HideScore:
+                    {
+                        if (playerIndex >= 0) HidePlayerScore(playerIndex);
+                        else HideAllPlayersScore();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.MuteAudio:
+                    {
+                        AudioVolumeAnim(true);
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(actions), actions, null);
+                }
+            }
+        }
+    }
+
+    void OnDisableModifier(SingModifier.EModifierAction actions, int playerIndex)
+    {
+        // TODO cache enum values
+        foreach (SingModifier.EModifierAction flag in Enum.GetValues(typeof(SingModifier.EModifierAction)))
+        {
+            if (actions.HasFlag(flag))
+            {
+                switch (flag)
+                {
+                    case SingModifier.EModifierAction.HideNotes:
+                    {
+                        if (playerIndex >= 0) ShowPlayerNotes(playerIndex);
+                        else ShowAllPlayersNotes();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.HideLyrics:
+                    {
+                        ShowLyrics();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.HideScore:
+                    {
+                        if (playerIndex >= 0) ShowPlayerScore(playerIndex);
+                        else ShowAllPlayersScore();
+                        break;
+                    }
+                    case SingModifier.EModifierAction.MuteAudio:
+                    {
+                        AudioVolumeAnim(false);
+                        break;
+                    }
+                    default:
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(actions), actions, null);
+                    }
+                }
+            }
+        }
+    }
+
+    #region Visual Element Animation Methods
+
+    void HideLyrics() { LyricsVisibilityAnim(false); }
+    void ShowLyrics() { LyricsVisibilityAnim(true); }
+    void HidePlayerScore(int playerIndex) { PlayerScoreVisibilityAnim(playerIndex, false); }
+    void ShowPlayerScore(int playerIndex) { PlayerScoreVisibilityAnim(playerIndex, true); }
+    void HideAllPlayersScore() { for (int i = 0; i < allPlayersUi.Length; i++) { PlayerScoreVisibilityAnim(i, false); } }
+    void ShowAllPlayersScore() { for (int i = 0; i < allPlayersUi.Length; i++) { PlayerScoreVisibilityAnim(i, true); } }
+    void HidePlayerNotes(int playerIndex) { PlayerNotesVisibilityAnim(playerIndex, false); }
+    void ShowPlayerNotes(int playerIndex) { PlayerNotesVisibilityAnim(playerIndex, true); }
+    void HideAllPlayersNotes() { for (int i = 0; i < allPlayersUi.Length; i++) { PlayerNotesVisibilityAnim(i, false); } }
+    void ShowAllPlayersNotes() { for (int i = 0; i < allPlayersUi.Length; i++) { PlayerNotesVisibilityAnim(i, true); } }
+
+    void LyricsVisibilityAnim(bool reveal)
+    {
+        VisualElement topSentence1 = topLyricsContainer.Q<VisualElement>("currentSentenceContainer");
+        VisualElement topSentence2 = topLyricsContainer.Q<VisualElement>("nextSentenceContainer");
+        VisualElement bottomSentence1 = bottomLyricsContainer.Q<VisualElement>("currentSentenceContainer");
+        VisualElement bottomSentence2 = bottomLyricsContainer.Q<VisualElement>("nextSentenceContainer");
+        TweenValue("lyrics", 0.33f, value =>
+        {
+            float opacity = reveal ? value : 1 - value;
+            topSentence1.style.opacity = opacity;
+            topSentence2.style.opacity = opacity;
+            bottomSentence1.style.opacity = opacity;
+            bottomSentence2.style.opacity = opacity;
+        });
+    }
+
+    void PlayerScoreVisibilityAnim(int playerIndex, bool reveal)
+    {
+        VisualElement pUi = allPlayersUi[playerIndex];
+        VisualElement score = pUi.Q<VisualElement>("playerScoreContainer");
+        TweenValue($"score_{playerIndex}", 0.33f, value => { score.style.opacity = reveal ? value : 1 - value; });
+    }
+
+    void PlayerNotesVisibilityAnim(int playerIndex, bool reveal)
+    {
+        VisualElement pUi = allPlayersUi[playerIndex];
+        VisualElement notesContainer = pUi.Q<VisualElement>("noteContainer");
+        TweenValue($"notes_{playerIndex}", 0.33f, value => { notesContainer.style.opacity = reveal ? value : 1 - value; });
+    }
+
+    void AudioVolumeAnim(bool mute)
+    {
+        TweenValue("songAudioPlayer", 1.0f, value =>
+        {
+            float muteVolume = 0.1f;
+            float volume = Mathf.Lerp(mute ? 1 : muteVolume, mute ? muteVolume : 1, value);
+            songAudioPlayer.audioPlayer.volume = volume;
+        });
+    }
+
+    readonly Dictionary<string, LTDescr> ongoingTweens = new Dictionary<string, LTDescr>();
+
+    void TweenValue(string key, float duration, Action<float> onUpdate)
+    {
+        if (ongoingTweens.ContainsKey(key))
+        {
+            LeanTween.cancel(ongoingTweens[key].id);
+            ongoingTweens.Remove(key);
+        }
+
+        LTDescr tween = LeanTween.value(gameObject, 0, 1, duration)
+            .setOnUpdate(onUpdate)
+            .setOnComplete(() =>
+            {
+                onUpdate(1);
+                ongoingTweens.Remove(key);
+            });
+        ongoingTweens.Add(key, tween);
+    }
+
+    #endregion
 
     private void InitDummySingers()
     {
@@ -382,18 +617,31 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
+    /// <summary>Find the leading player, return null if there is a tie.</summary>
+    PlayerControl FindLeadingPlayer()
+    {
+        PlayerControl leadingPlayer = PlayerControls[0];
+        bool tie = false;
+        for (int i = 1; i < PlayerControls.Count; i++)
+        {
+            int score = PlayerControls[i].PlayerScoreControl.TotalScore;
+            if (score > leadingPlayer.PlayerScoreControl.TotalScore)
+            {
+                leadingPlayer = PlayerControls[i];
+                tie = false;
+            }
+            else if (score == leadingPlayer.PlayerScoreControl.TotalScore)
+            {
+                tie = true;
+            }
+        }
+        return tie ? null : leadingPlayer;
+    }
+
     private void UpdateLeadingPlayerIcon()
     {
         // Find best player with score > 0
-        PlayerControl leadingPlayerControl = null;
-        foreach (PlayerControl playerController in PlayerControls)
-        {
-            if ((leadingPlayerControl == null && playerController.PlayerScoreControl.TotalScore > 0)
-               || (leadingPlayerControl != null && playerController.PlayerScoreControl.TotalScore > leadingPlayerControl.PlayerScoreControl.TotalScore))
-            {
-                leadingPlayerControl = playerController;
-            }
-        }
+        PlayerControl leadingPlayerControl = FindLeadingPlayer();
 
         // // Show icon for best player only
         if (leadingPlayerControl != null
@@ -462,6 +710,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
+
+
+        for (int i = 0; i < PlayerControls.Count; i++)
+        {
+            PlayerControl playerControl = PlayerControls[i];
+            playerScores[i] = playerControl.PlayerScoreControl.TotalScore;
+        }
+
+        foreach (SingModifier modifier in sceneData.SingModifiers)
+        {
+            modifier.UpdateModifier(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis, playerScores);
+        }
+
+        CheckWinCondition();
     }
 
     public void SkipToNextSingableNote()
@@ -557,9 +819,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         singingResultsSceneData.SongMeta = SongMeta;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
 
+        singingResultsSceneData.IsPartyMode = sceneData.IsPartyMode;
+
         // Add scores, either for individual players, or as one common score.
         List<SongStatistic> songStatistics = new();
-        if (IsIndividualScore)
+        if (IsIndividualScore || sceneData.IsPartyMode)
         {
             // Add and record score for each player individually.
             singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
@@ -664,6 +928,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void AddPlayerUi(VisualElement visualElement, int playerIndex)
     {
+        allPlayersUi[playerIndex] = visualElement;
+
         int playerCount = SceneData.SelectedPlayerProfiles.Count;
         if (playerCount <= 3)
         {

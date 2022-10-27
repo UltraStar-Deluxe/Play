@@ -66,6 +66,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject(UxmlName = R.UxmlNames.background)]
+    private VisualElement sceneRoot;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -83,6 +86,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.songIndexButton)]
     private Button songIndexButton;
+
+    [Inject(UxmlName = R.UxmlNames.buttonJoker)]
+    private Button buttonJoker;
 
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
@@ -284,6 +290,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         sceneData = SceneNavigator.Instance.GetSceneData(CreateDefaultSceneData());
 
+        // Hide/show elements for Party Mode
+        if (sceneData.IsPartyMode)
+        {
+            sceneRoot.Query<VisualElement>(null, "hideInPartyMode").ForEach(item =>
+            {
+                item.style.display = DisplayStyle.None;
+            });
+        }
+        sceneRoot.Query<VisualElement>(null, "showInPartyMode").ForEach(item =>
+        {
+            item.style.display = sceneData.IsPartyMode ? DisplayStyle.Flex : DisplayStyle.None;
+        });
+
         InitSongMetas();
 
         HidePlayerSelectOverlay();
@@ -363,6 +382,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
+
+        buttonJoker.RegisterCallbackButtonTriggered(() =>
+        {
+            sceneData.SongMetaSet = PartyModeManager.GetSongMetasSubset();
+            UpdateFilteredSongs();
+        });
 
         // Toggle player select and singing options container
         ShowPlayerSelectContainer();
@@ -662,6 +687,36 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
+        if (sceneData.IsPartyMode)
+        {
+            var playerToMicDict = new Dictionary<PlayerProfile, MicProfile>();
+            var playerProfiles = new List<PlayerProfile>();
+            for (int i = 0; i < PartyModeManager.CurrentRoundData.playerNames.Count; i++)
+            {
+                string playerName = PartyModeManager.CurrentRoundData.playerNames[i];
+                var profile = settings.PlayerProfiles.Find(item => item.Name == playerName);
+                if (profile == null)
+                {
+                    profile = new PlayerProfile(playerName, EDifficulty.Easy, EAvatar.GenericPlayer01);
+                }
+
+                playerProfiles.Add(profile);
+                playerToMicDict.Add(profile, settings.MicProfiles[i]);
+            }
+
+            var data = new SingSceneData()
+            {
+                IsPartyMode = true,
+                SelectedSongMeta = songMeta,
+                SelectedPlayerProfiles = playerProfiles,
+                PlayerProfileToMicProfileMap = playerToMicDict,
+                SingModifiers = PartyModeManager.CurrentRoundData.round.singModifiers
+            };
+            PartyModeManager.UseSong(songMeta);
+            SceneNavigator.Instance.LoadScene(EScene.SingScene, data);
+            return;
+        }
+
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
         if (singSceneData != null)
         {
@@ -715,6 +770,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void CheckAudioAndStartSingScene()
     {
+        if (sceneData.IsPartyMode)
+        {
+            StartSingScene(SelectedSong);
+            return;
+        }
+
         if (playerSelectOverlayContainer.IsVisibleByDisplay())
         {
             StartSingScene(SelectedSong);
@@ -924,7 +985,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateFilteredSongs()
     {
-        songRouletteControl.SetSongs(GetFilteredSongMetas());
+        if (sceneData.SongMetaSet != null && sceneData.SongMetaSet.Length > 0)
+        {
+            songRouletteControl.SetSongs(sceneData.SongMetaSet);
+        }
+        else
+        {
+            songRouletteControl.SetSongs(GetFilteredSongMetas());
+        }
     }
 
     public bool IsPlaylistActive()

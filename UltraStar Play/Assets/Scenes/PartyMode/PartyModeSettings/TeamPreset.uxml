@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="team" class="optionsLabelAndItemPicker partyModeTeamColumn" style="flex-direction: column; background-color: rgba(0, 0, 0, 0.05); margin-left: 5px; margin-right: 5px; margin-top: 5px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; height: 250px; width: 130px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;">
+        <ui:Label text="Team 1" name="labelTeamName" class="controlLabel" style="width: 100%; -unity-text-align: middle-center;" />
+        <ui:ScrollView style="height: 100%; padding-left: 10px;">
+            <ui:VisualElement name="playersContainer" class="partyModePlayerBlock" />
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

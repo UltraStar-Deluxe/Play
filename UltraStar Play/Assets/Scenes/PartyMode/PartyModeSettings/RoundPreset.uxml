@@ -1,0 +1,41 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="round" class="optionsLabelAndItemPicker" style="flex-direction: column; padding-left: 8px; padding-right: 8px; padding-top: 8px; padding-bottom: 8px; background-color: rgba(0, 0, 0, 0.2); border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; margin-bottom: 8px;">
+        <ui:Label text="Round" name="Label" class="controlLabel" style="font-size: 20px;" />
+        <ui:VisualElement name="winConditionContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Win Condition" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="winScoreContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Score" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="winPhrasesContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Number of Bars" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="modifierTriggerContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="When to trigger" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="triggerTimeContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Time" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="triggerTimeMaxContainer" class="optionsLabelAndItemPicker" style="justify-content: flex-end;">
+            <ui:Label text="to" name="Label" class="controlLabel" style="-unity-text-align: middle-right; margin-right: 8px;" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="triggerScoreContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Score" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="triggerScoreMaxContainer" class="optionsLabelAndItemPicker" style="justify-content: flex-end;">
+            <ui:Label text="to" name="Label" class="controlLabel" style="-unity-text-align: middle-right; margin-right: 8px;" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+        <ui:VisualElement name="triggerWhoContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Trigger for" name="Label" class="controlLabel" />
+            <ItemPicker wrapAround="true" minValue="2" maxValue="100" stepValue="10" name="ItemPicker" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

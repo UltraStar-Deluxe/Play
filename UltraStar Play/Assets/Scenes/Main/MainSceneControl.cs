@@ -59,6 +59,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.partyButton)]
     private Button partyButton;
 
+    [Inject(UxmlName = R.UxmlNames.partyTeamButton)]
+    private Button partyTeamButton;
+
+    [Inject(UxmlName = R.UxmlNames.partyFfaButton)]
+    private Button partyFfaButton;
+
     [Inject(UxmlName = R.UxmlNames.createSongButton)]
     private Button createSongButton;
 
@@ -84,6 +90,23 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     {
         startButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
+        partyButton.RegisterCallbackButtonTriggered(() =>
+        {
+            partyTeamButton.style.display = DisplayStyle.Flex;
+            partyFfaButton.style.display = DisplayStyle.Flex;
+            partyButton.style.display = DisplayStyle.None;
+
+            partyTeamButton.RegisterCallbackButtonTriggered(() =>
+            {
+                PartyModeSettingsSceneData partySceneData = new () { Mode = EPartyModeType.Teams };
+                SceneNavigator.Instance.LoadScene(EScene.PartyModeSettings, partySceneData);
+            });
+            partyFfaButton.RegisterCallbackButtonTriggered(() =>
+            {
+                PartyModeSettingsSceneData partySceneData = new () { Mode = EPartyModeType.FreeForAll };
+                SceneNavigator.Instance.LoadScene(EScene.PartyModeSettings, partySceneData);
+            });
+        });
         settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
         creditsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.CreditsScene));
@@ -91,12 +114,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
         InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
+        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_party_description));
         InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
         InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
         InitButtonDescription(creditsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_credits_description));
         InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
         InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
-        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
 
         UpdateVersionInfoText();
 

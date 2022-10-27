@@ -935,21 +935,87 @@ Label.tinyFont {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
-#songEntryUiRoot
-{
-    opacity:    0.7;
-    scale:      0.9;
+}
+
+.partyModePlayerBlock {
+    width: 100%;
+}
+
+.partyModePlayerBlock TextField > TextInput {
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.partyModeTeamColumn #labelTeamName {
+    border-bottom-width: 1px;
+    border-bottom-color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.playerCard {
+    height: 18px;
+    font-size: 10px;
+
+    margin: 2px;
+    padding: 4px;
+    border-radius: 4px;
+
+    -unity-text-align: middle-center;
+
+    background-color: var(--control-color);
+    color: var(--text-color);
+}
+
+.playerCard:hover {
+    background-color: var(--control-color-accent1);
+}
+
+.drag-hover {
+    border-color: var(--text-color);
+}
+
+#songEntryUiRoot {
+    opacity: 0.7;
+    scale: 0.9;
     transition: scale 0.3s ease-out;
 }
 
-#songEntryUiRoot.selected
-{
-    opacity:    1.0;
-    scale:      1.1;
+#songEntryUiRoot.selected {
+    opacity: 1.0;
+    scale: 1.1;
     transition: scale 0.3s ease-out;
 }
 
-#fader
-{ transition: opacity 2.5s; }
+#versusContainer > #labelPlayer1,
+#versusContainer > #labelPlayer2,
+#versusContainer > #labelVs,
+#continueButton.versusGoButton,
+#subtextContainer {
+    transition: scale 1.5s ease-out-elastic, opacity 0.3s;
+}
 
+#versusContainer > #labelPlayer1,
+#versusContainer > #labelPlayer2 { transition-delay: 0.3s; }
+
+#versusContainer > #labelVs { transition-delay: 1.3s; }
+
+#subtextContainer { transition-delay: 0.3s; }
+
+#continueButton.versusGoButton { transition-delay: 0.8s; }
+
+#fader { transition: opacity 2.5s; }
+
+.labelField {
+    background-color: var(--control-color-accent2);
+    border-radius: var(--default-button-radius);
+    padding: 2px 8px;
+}
+
+.buttonRight {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.buttonLeft {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }

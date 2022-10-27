@@ -12,4 +12,7 @@ public class SingSceneData : SceneData
     public bool IsRestart { get; set; }
     public int NextBeatToScore { get; set; }
     public Dictionary<PlayerProfile, PlayerScoreControlData> PlayerProfileToScoreDataMap { get; set; } = new();
+    public List<SingModifier> SingModifiers { get; set; } = new();
+    public WinCondition WinCondition { get; set; }
+    public bool IsPartyMode { get; set; }
 }
