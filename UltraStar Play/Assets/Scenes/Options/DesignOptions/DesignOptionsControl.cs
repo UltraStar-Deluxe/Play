@@ -73,7 +73,8 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
         LabeledItemPickerControl<string> themePickerControl = new(themeContainer.Q<ItemPicker>(), beautifiedToFilename.Keys.ToList());
         themePickerControl.Bind(() => UIUtils.BeautifyString(settings.GraphicSettings.CurrentThemeName),
-            newValue => settings.GraphicSettings.CurrentThemeName = beautifiedToFilename[newValue]);
+            newValue => settings.GraphicSettings.CurrentThemeName = !beautifiedToFilename.ContainsKey(newValue) ? ThemeManager.DEFAULT_THEME : beautifiedToFilename[newValue]
+        );
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

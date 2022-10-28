@@ -14,20 +14,20 @@ public class GraphicSettings
     public bool useImageAsCursor = true;
     public bool showLyricsOnNotes;
     public bool analyzeBeatsWithoutTargetNote = true;
-    public string themeName = "BaseTheme";
+    public string themeName = ThemeManager.DEFAULT_THEME;
     public bool AnimateSceneChange { get; set; } = true;
 
-    string currentThemeName = ThemeManager.DEFAULT_THEME;
     public string CurrentThemeName
     {
-        get => currentThemeName;
+        get => themeName;
         set
         {
+            themeName = value;
+
             if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
                 return;
 
-            currentThemeName = value;
-            ThemeManager.Instance.LoadTheme(currentThemeName);
+            ThemeManager.Instance.LoadTheme(themeName);
         }
     }
 }

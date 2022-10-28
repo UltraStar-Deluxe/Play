@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,10 +14,10 @@ using UnityEngine.UIElements;
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
 
-public class ThemeManager : MonoBehaviour
+public class ThemeManager : MonoBehaviour, INeedInjection
 {
     // the theme to load by default (filename without json extension)
-    internal const string DEFAULT_THEME = "default_blue";
+    public const string DEFAULT_THEME = "default_blue";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -27,6 +28,9 @@ public class ThemeManager : MonoBehaviour
     public static ThemeManager Instance { get; private set; }
 
     // ----------------------------------------------------------------
+
+    [Inject]
+    private Settings settings;
 
     [Serializable]
     public class ThemeSettings
@@ -217,11 +221,17 @@ public class ThemeManager : MonoBehaviour
 
     public void LoadTheme(string filename)
     {
+        string originalName = filename;
+
         if (!filename.EndsWith(".json")) filename += ".json";
         string fullPath = $"{Application.dataPath}/../themes/{filename}";
         if (!File.Exists(fullPath))
         {
-            Debug.LogError($"[THEME] Couldn't load theme at path: '{fullPath}'");
+            Debug.LogWarning($"[THEME] Couldn't load theme at path: '{fullPath}'");
+            if (originalName != DEFAULT_THEME)
+            {
+                LoadTheme(DEFAULT_THEME);
+            }
             return;
         }
 
@@ -269,7 +279,7 @@ public class ThemeManager : MonoBehaviour
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(this.gameObject);
 
         // Load default theme
-        this.LoadTheme(DEFAULT_THEME);
+        this.LoadTheme(settings.GraphicSettings.themeName);
     }
 
     void OnEnable()
