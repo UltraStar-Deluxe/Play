@@ -36,4 +36,4 @@ You can support this project by
 If you need help or found a bug, then visit the [chat](https://discord.com/invite/PAUJFKCGbb) or [issue tracker](https://github.com/UltraStar-Deluxe/Play/issues)
 
 ### Follow us on Social Media
-UltraStar Play is on [Discord](https://discord.gg/PAUJFKCGbb), [Twitter](https://twitter.com/UltraStar_Play), [YouTube](https://www.youtube.com/channel/UCr481bd1jFp5d9wixQecwVw), [Facebook](https://www.facebook.com/UltraStar-Play-101984782475359)
+UltraStar Play is on [Discord](https://discord.gg/PAUJFKCGbb), [Twitter](https://twitter.com/UltraStar_Play), [YouTube](https://youtube.com/@ultrastar-play), [Facebook](https://www.facebook.com/UltraStar-Play-101984782475359)
