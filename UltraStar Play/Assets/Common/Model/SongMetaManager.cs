@@ -199,12 +199,12 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         // Audio is mandatory. Without working audio file, the song cannot be played.
         if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
         {
-            Debug.LogWarning("Unsupported audio format: " + songMeta.Mp3);
+            Debug.LogError("Unsupported audio format: " + songMeta.Mp3);
             return false;
         }
         else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetAudioUri(songMeta)))
         {
-            Debug.LogWarning("Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta));
+            Debug.LogError("Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta));
             return false;
         }
 

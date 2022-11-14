@@ -7,6 +7,7 @@ using UnityEngine;
 public class Settings : ISettings
 {
     public GameSettings GameSettings { get; set; } = new();
+    public PartyModeSettings PartyModeSettings { get; set; } = new();
     public GraphicSettings GraphicSettings { get; set; } = new();
     public AudioSettings AudioSettings { get; set; } = new();
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();

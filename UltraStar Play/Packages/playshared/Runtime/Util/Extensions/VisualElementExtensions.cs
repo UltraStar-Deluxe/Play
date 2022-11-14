@@ -170,4 +170,12 @@ public static class VisualElementExtensions
         }
         return ancestors;
     }
+
+    public static void AddNextTo(this VisualElement source, VisualElement target)
+    {
+        if (target.parent == null) throw new Exception("Can't AddNextTo, target has no parent.");
+
+        target.parent.Add(source);
+        source.PlaceInFront(target);
+    }
 }

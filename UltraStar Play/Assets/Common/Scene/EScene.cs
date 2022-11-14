@@ -28,6 +28,10 @@
     // sing
     SingScene = 11,
 
+    // party mode
+    PartyModeSettings = 22,
+    PartyModeVersus = 23,
+
     // song selection
     SongSelectScene = 12,
 

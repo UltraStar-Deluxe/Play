@@ -21,12 +21,15 @@ public static partial class R
         public const string focusableNavigatorIgnore = "focusableNavigatorIgnore";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
+        public const string hideInPartyMode = "hideInPartyMode";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
+        public const string itemPickerButton = "itemPickerButton";
+        public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string largeFont = "largeFont";
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
@@ -48,6 +51,8 @@ public static partial class R
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
         public const string panel = "panel";
+        public const string partyModePlayerBlock = "partyModePlayerBlock";
+        public const string partyModeTeamColumn = "partyModeTeamColumn";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
@@ -55,6 +60,7 @@ public static partial class R
         public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondarySideBarPanel = "secondarySideBarPanel";
         public const string secondarySideBarTitle = "secondarySideBarTitle";
+        public const string showInPartyMode = "showInPartyMode";
         public const string singingLyrics = "singingLyrics";
         public const string singScenePlayerUi = "singScenePlayerUi";
         public const string smallControl = "smallControl";

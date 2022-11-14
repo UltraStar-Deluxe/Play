@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="playerChooser" class="optionsLabelAndItemPicker">
+        <ui:Label text="Player 1" name="Label" class="controlLabel" />
+        <ui:VisualElement class="partyModePlayerBlock" style="flex-direction: row; width: 300px; height: 30px;">
+            <ui:Button text="&lt;" display-tooltip-when-elided="true" name="previousItemButton" class="itemPickerButton" style="width: 60px;" />
+            <ui:Label text="Player Name" name="labelPlayerName" display-tooltip-when-elided="true" class="itemPickerItemLabel" style="flex-grow: 1; -unity-text-align: middle-center;" />
+            <ui:TextField picking-mode="Ignore" name="textFieldGuestPlayerName" is-delayed="true" class="itemPickerItemLabel" />
+            <ui:Button text="&gt;" display-tooltip-when-elided="true" name="nextItemButton" class="itemPickerButton" style="width: 60px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
