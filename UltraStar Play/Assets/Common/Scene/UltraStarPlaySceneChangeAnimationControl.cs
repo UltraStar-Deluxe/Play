@@ -26,18 +26,34 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         }
     }
 
-    [NonSerialized] public RenderTexture uiCopyRenderTexture;
+    [NonSerialized]
+    public RenderTexture uiCopyRenderTexture;
     private Action animateAction;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
-
-    [Inject]
     private Settings settings;
+    private bool isInitialized;
+
+    private void Init()
+    {
+        // TODO: Custom initialization because OnSceneLoaded works around the current SceneInjection flow. Do SceneInjection earlier?
+        isInitialized = true;
+        settings = FindObjectOfType<SettingsManager>().Settings;
+        audioSource = GetComponentInChildren<AudioSource>();
+    }
 
     void Start()
     {
-        if (this != instance) return;
+        if (this != Instance)
+        {
+            Destroy(this);
+            return;
+        }
+
+        if (!isInitialized)
+        {
+            Init();
+        }
 
         UltraStarPlaySceneChangeAnimationControl self = this;
         GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
@@ -50,16 +66,36 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
 
     void OnEnable()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void OnDisable()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
+        if (!isInitialized)
+        {
+            Init();
+        }
+
         if (!settings.GraphicSettings.AnimateSceneChange)
         {
             return;
