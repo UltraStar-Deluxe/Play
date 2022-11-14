@@ -71,6 +71,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Credits/CreditsScene.unity
     guid: abcc8b3cf45b71840970d2d07bd15cac
+  - enabled: 1
+    path: Assets/Scenes/PartyMode/PartyModeSettings/PartyModeSettingsScene.unity
+    guid: edee41e37dd6b474d8bffd5f3b169fe1
+  - enabled: 1
+    path: Assets/Scenes/PartyMode/PartyModeVersus/PartyModeVersusScene.unity
+    guid: 8c2d7a1d04dfe2745a01d0807e66e262
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}
