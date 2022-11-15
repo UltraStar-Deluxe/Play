@@ -239,6 +239,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songArchiveEntryTextAsset: {fileID: 4900000, guid: 1cb54a3a8160c184c813ffe7ada6b8eb,
     type: 3}
+  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+    type: 3}
 --- !u!1 &1805424251
 GameObject:
   m_ObjectHideFlags: 0

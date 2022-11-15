@@ -134,6 +134,7 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string dropdownIcon = "dropdownIcon";
+        public const string dropDownIcon = "dropDownIcon";
         public const string duetIcon = "duetIcon";
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
@@ -606,12 +607,11 @@ public static partial class R
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
-        public const string urlChooser = "urlChooser";
+        public const string urlChooserButton = "urlChooserButton";
+        public const string urlChooserComboContainer = "urlChooserComboContainer";
         public const string urlContainer = "urlContainer";
-        public const string urlDescriptionLabel = "urlDescriptionLabel";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
-        public const string urlTextFieldContainer = "urlTextFieldContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

@@ -978,3 +978,9 @@ Label.tinyFont {
     margin-left: auto;
     margin-right: auto;
 }
+
+.songArchiveInfoLabel {
+    font-size: var(--font-size-xs);
+    margin-bottom: 15px;
+    white-space: normal;
+}
