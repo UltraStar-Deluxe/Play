@@ -54,8 +54,14 @@
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 85%; max-height: 200px; align-items: center;" />
                     <ui:Instance template="SongSelectSongEntryUi" name="songEntryPlaceholder" style="width: 20%; height: 100%; position: absolute; left: 908px; max-height: 200px; top: 0; align-items: center;" />
                 </ui:VisualElement>
+                <ui:VisualElement name="noSongsFoundContainer" style="position: absolute; width: 100%; height: 100%; justify-content: center;">
+                    <ui:Label text="No songs found" display-tooltip-when-elided="true" name="noSongsFoundLabel" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto;" />
+                    <ui:VisualElement name="noSongsFoundButtonContainer" style="flex-direction: column; justify-content: center; align-items: center;">
+                        <ui:Button text="Download Songs" display-tooltip-when-elided="true" name="downloadSongsButton" style="width: 33%; margin-bottom: 5px;" />
+                        <ui:Button text="Add Song Folder" display-tooltip-when-elided="true" name="addSongFolderButton" style="width: 33%;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="No songs found" display-tooltip-when-elided="true" name="noSongsFoundLabel" class="titleText" style="position: absolute; width: 100%; -unity-text-align: middle-center; height: 100%; white-space: normal; display: none;" />
             <ui:VisualElement name="lowerCenterContainer" class="roundCorners" style="display: flex; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 1px; padding-left: 10px; padding-right: 10px; flex-direction: row;">
                 <ui:VisualElement name="highScoreContainer" class="roundCorners smallFont" style="flex-direction: row; justify-content: space-between; width: 25%; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); padding-right: 10px;">
                     <ui:VisualElement name="localHighScoreContainer" style="position: relative; align-items: auto;">
