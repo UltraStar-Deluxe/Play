@@ -24,6 +24,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [InjectedInInspector]
     public TextAsset songArchiveEntryTextAsset;
 
+    [InjectedInInspector]
+    public VisualTreeAsset dialogUi;
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -45,12 +48,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.urlLabel)]
     private Label urlLabel;
 
-    [Inject(UxmlName = R.UxmlNames.urlChooser)]
-    private DropdownField urlChooser;
-
-    [Inject(UxmlName = R.UxmlNames.urlDescriptionLabel)]
-    private Label urlDescriptionLabel;
-
     [Inject(UxmlName = R.UxmlNames.urlTextField)]
     private TextField downloadPath;
 
@@ -63,6 +60,12 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.cancelButton)]
     private Button cancelDownloadButton;
 
+    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
+    private VisualElement dialogContainer;
+
+    [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
+    private Button urlChooserButton;
+
     [Inject]
     private SettingsManager settingsManager;
     
@@ -71,6 +74,11 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     
     [Inject]
     private SongMetaManager songMetaManager;
+
+    [Inject]
+    private Injector injector;
+
+    private MessageDialogControl urlChooserDialogControl;
 
     private string DownloadUrl => downloadPath.value.Trim();
 
@@ -89,11 +97,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         songArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
 
         statusLabel.text = "";
-        urlChooser.choices = new List<string>(songArchiveEntries.Select(it => it.Url));
-        urlChooser.value = urlChooser.choices[0];
         SelectSongArchiveUrl(songArchiveEntries[0].Url);
-
-        urlChooser.RegisterValueChangedCallback(evt => SelectSongArchiveUrl(evt.newValue));
 
         startDownloadButton.RegisterCallbackButtonTriggered(() => StartDownload());
         cancelDownloadButton.RegisterCallbackButtonTriggered(() => CancelDownload());
@@ -106,15 +110,68 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
         backButton.Focus();
 
+        urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+    }
+
+    private void ShowUrlChooserDialog()
+    {
+        if (urlChooserDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
+        dialogContainer.ShowByDisplay();
+        dialogContainer.Add(dialog);
+
+        urlChooserDialogControl = injector
+            .WithRootVisualElement(dialog)
+            .CreateAndInject<MessageDialogControl>();
+
+        urlChooserDialogControl.Title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
+
+        Button closeDialogButton = urlChooserDialogControl.AddButton(
+            TranslationManager.GetTranslation(R.Messages.close), () => CloseUrlChooserDialog());
+        closeDialogButton.Focus();
+
+        // Create a button in the dialog for every archive URL
+        songArchiveEntries.ForEach(songArchiveEntry =>
+        {
+            Button songArchiveUrlButton = new();
+            songArchiveUrlButton.text = songArchiveEntry.Url;
+            songArchiveUrlButton.RegisterCallbackButtonTriggered(() =>
+            {
+                SelectSongArchiveUrl(songArchiveEntry.Url);
+                CloseUrlChooserDialog();
+            });
+            songArchiveUrlButton.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
+
+            Label songArchiveInfoLabel = new(songArchiveEntry.Description);
+            songArchiveInfoLabel.AddToClassList("songArchiveInfoLabel");
+            urlChooserDialogControl.AddVisualElement(songArchiveInfoLabel);
+        });
+    }
+
+    private void CloseUrlChooserDialog()
+    {
+        if (urlChooserDialogControl == null)
+        {
+            return;
+        }
+
+        urlChooserDialogControl.CloseDialog();
+        urlChooserDialogControl = null;
+        dialogContainer.HideByDisplay();
+        backButton.Focus();
     }
 
     private void SelectSongArchiveUrl(string url)
     {
         downloadPath.value = url;
-        SongArchiveEntry songArchiveEntry = songArchiveEntries.FirstOrDefault(it => it.Url == url);
-        urlDescriptionLabel.text = songArchiveEntry != null ? songArchiveEntry.Description : "";
     }
 
     public void UpdateTranslation()
