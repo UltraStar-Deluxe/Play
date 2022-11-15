@@ -112,6 +112,7 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
+        public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string detectBpmButton = "detectBpmButton";
@@ -349,6 +350,8 @@ public static partial class R
         public const string okButton = "okButton";
         public const string onePlayerLayout = "onePlayerLayout";
         public const string onlineHighScoreContainer = "onlineHighScoreContainer";
+        public const string openFolderButton = "openFolderButton";
+        public const string openFolderIcon = "openFolderIcon";
         public const string openSongEditorButton = "openSongEditorButton";
         public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
@@ -531,6 +534,8 @@ public static partial class R
         public const string songIndexLabel = "songIndexLabel";
         public const string songInfo = "songInfo";
         public const string songInfoContainer = "songInfoContainer";
+        public const string songIssueButton = "songIssueButton";
+        public const string songIssueIcon = "songIssueIcon";
         public const string songList = "songList";
         public const string songListContainer = "songListContainer";
         public const string songMenuOverlay = "songMenuOverlay";

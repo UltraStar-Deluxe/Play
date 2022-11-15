@@ -29,6 +29,9 @@
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
                 <ui:Button text="Download Songs" name="downloadSceneButton" style="width: 240px;" />
                 <ui:VisualElement style="flex-direction: row;">
+                    <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px; margin-left: 5px;">
+                        <ui:VisualElement name="songIssueIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                    </ui:Button>
                     <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; margin-left: 5px;">
                         <ui:VisualElement name="helpIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/help_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=088f9b8e2490ed44a862efc470dafb60&amp;type=3#help_outline_white_24dp&apos;);" />
                     </ui:Button>

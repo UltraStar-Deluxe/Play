@@ -11,6 +11,7 @@ public static partial class R
         public const string creditsRegularBanner = "creditsRegularBanner";
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
+        public const string dangerButton = "dangerButton";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";
         public const string dialogTextButton = "dialogTextButton";

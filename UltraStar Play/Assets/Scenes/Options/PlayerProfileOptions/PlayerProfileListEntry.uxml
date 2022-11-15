@@ -7,12 +7,14 @@
             <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="flex-shrink: 1; width: 100%;" />
             <ItemPicker name="difficultyPicker" style="width: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around;">
-            <ui:VisualElement name="enabledContainer" style="flex-direction: row; width: 100%;">
+        <ui:VisualElement name="row" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around; flex-direction: row;">
+            <ui:VisualElement name="enabledContainer" style="flex-direction: row;">
                 <ui:Label text="Enabled" name="enabledLabel" class="middleCenterText" style="margin-right: 20px;" />
                 <ui:Toggle name="enabledToggle" />
             </ui:VisualElement>
-            <ui:Button name="deleteButton" text="Delete" style="width: 100%;" />
+            <ui:Button name="deleteButton" class="dangerButton squareButton">
+                <ui:VisualElement name="deleteIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/delete_forever_white_24dp.svg?fileID=7388822144124034973&amp;guid=7b2404ad4c9053840a3db02464d2ddbd&amp;type=3#delete_forever_white_24dp&apos;);" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

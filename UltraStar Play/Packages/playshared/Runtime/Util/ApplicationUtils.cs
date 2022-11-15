@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class ApplicationUtils
 {
+    public static void OpenDirectory(string path)
+    {
+        Application.OpenURL("file://" + path);
+    }
+
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR

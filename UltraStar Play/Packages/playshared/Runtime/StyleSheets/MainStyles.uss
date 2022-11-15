@@ -20,6 +20,8 @@
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
+    --control-danger: #dc3545;
+    --control-danger-accent1: #c82333;
     --main-scene-button-width: 150px;
     --main-scene-sing-button-width: 310px;
 }
@@ -202,6 +204,22 @@
     width: var(--control-width-half);
     height: var(--control-width-half);
     border-radius: var(--control-width-half);
+}
+
+.squareButton {
+    width: var(--control-height);
+}
+
+.dangerButton {
+    background-color: var(--control-danger);
+}
+
+.dangerButton:hover {
+    background-color: var(--control-danger-accent1);
+}
+
+.dangerButton:focus {
+    background-color: var(--control-danger-accent1);
 }
 
 .roundCorners {
@@ -389,10 +407,6 @@ TextInput {
     -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-xl);
     height: var(--font-size-xl);
-}
-
-.squareButton {
-    width: var(--control-height);
 }
 
 .iconImageTextSized {
