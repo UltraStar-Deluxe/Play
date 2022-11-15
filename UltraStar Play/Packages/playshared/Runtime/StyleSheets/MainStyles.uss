@@ -972,3 +972,9 @@ Label.tinyFont {
     border-color: rgb(50, 50, 50);
     border-width: 1px;
 }
+
+.noSongsFoundLabel {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}

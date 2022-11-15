@@ -19,7 +19,9 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1; margin-bottom: 20px;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;" />
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;">
+                    <ui:Label text="Label" display-tooltip-when-elided="true" />
+                </ui:ScrollView>
                 <ui:Button name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 30px; font-size: 30px;">
                     <ui:VisualElement name="addIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/add_white_24dp.svg?fileID=7388822144124034973&amp;guid=38d7fadad6e9e4349944a7152b75fef8&amp;type=3#add_white_24dp&apos;);" />
                 </ui:Button>
