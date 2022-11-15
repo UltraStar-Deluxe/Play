@@ -27,6 +27,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     public VisualTreeAsset accordionUi;
 
     [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
@@ -64,9 +67,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private FocusableNavigator focusableNavigator;
-
-    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
-    private VisualElement dialogContainer;
 
     [Inject(UxmlName = R.UxmlNames.songIssueButton)]
     private Button songIssueButton;
@@ -126,7 +126,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
         songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
-        dialogContainer.HideByDisplay();
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -186,8 +185,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         }
 
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
-        dialogContainer.Add(helpDialog);
-        dialogContainer.ShowByDisplay();
+        uiDocument.rootVisualElement.Add(helpDialog);
 
         helpDialogControl = injector
             .WithRootVisualElement(helpDialog)
@@ -223,7 +221,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     {
         helpDialogControl.CloseDialog();
         helpDialogControl = null;
-        dialogContainer.HideByDisplay();
         helpButton.Focus();
     }
 
@@ -273,8 +270,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         }
 
         VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
-        dialogContainer.Add(dialog);
-        dialogContainer.ShowByDisplay();
+        uiDocument.rootVisualElement.Add(dialog);
 
         songIssueDialogControl = injector
             .WithRootVisualElement(dialog)
@@ -309,7 +305,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     {
         songIssueDialogControl.CloseDialog();
         songIssueDialogControl = null;
-        dialogContainer.HideByDisplay();
         songIssueButton.Focus();
     }
 

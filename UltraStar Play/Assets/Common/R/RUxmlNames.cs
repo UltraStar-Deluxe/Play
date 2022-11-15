@@ -121,7 +121,6 @@ public static partial class R
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
-        public const string dialogContainer = "dialogContainer";
         public const string dialogContent = "dialogContent";
         public const string dialogContentContainer = "dialogContentContainer";
         public const string dialogMessage = "dialogMessage";
@@ -355,6 +354,7 @@ public static partial class R
         public const string openSongEditorButton = "openSongEditorButton";
         public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
+        public const string overlay = "overlay";
         public const string overviewArea = "overviewArea";
         public const string overviewAreaIssues = "overviewAreaIssues";
         public const string overviewAreaLabel = "overviewAreaLabel";
