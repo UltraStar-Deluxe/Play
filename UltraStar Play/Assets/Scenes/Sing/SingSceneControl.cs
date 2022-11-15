@@ -167,10 +167,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                                      || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                          && SceneData.SelectedPlayerProfiles.Count <= 1);
 
+    private float startTimeInSeconds;
+    private bool hasRecordedSongStartedStatistics;
+
     private void Start()
     {
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
+
+        startTimeInSeconds = Time.time;
 
         pauseOverlay.HideByDisplay();
         new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
@@ -235,10 +240,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         // Associate LyricsDisplayer with one of the (duett) players
         InitSingingLyricsControls();
-
-        //Save information about the song being started into stats
-        Statistics stats = StatsManager.Instance.Statistics;
-        stats.RecordSongStarted(SongMeta);
 
         StartCoroutine(StartMusicAndVideo());
 
@@ -454,6 +455,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
+
+        if (!hasRecordedSongStartedStatistics)
+        {
+            // Save information that the song has been started after some seconds or half of the song.
+            float songSingingDuration = Time.time - startTimeInSeconds;
+            float songDurationInSeconds = (float)songAudioPlayer.DurationOfSongInMillis / 1000;
+            if (songSingingDuration >= 30
+                || (songDurationInSeconds > 0
+                    && songSingingDuration >= songDurationInSeconds / 2))
+            {
+                hasRecordedSongStartedStatistics = true;
+                statistics.RecordSongStarted(SongMeta);
+            }
+        }
     }
 
     public void SkipToNextSingableNote()
