@@ -387,6 +387,10 @@ TextInput {
     height: var(--font-size-xl);
 }
 
+.squareButton {
+    width: var(--control-height);
+}
+
 .iconImageTextSized {
     -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size);
@@ -888,8 +892,40 @@ Label.tinyFont {
     -unity-background-image-tint-color: var(--text-color);
 }
 
+.modalDialogContainer {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
 .dialogBackground {
     background-color: rgb(14, 28, 42);
+}
+
+#accordionItemContent {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s;
+}
+
+#accordionItemRoot {
+    width: 100%;
+    border-width: 0;
+}
+
+#toggleAccordionItemContentButton.unity-button {
+    border-radius: 0;
+}
+
+#accordionItemRoot.expanded #accordionItemContent {
+    height: auto;
+}
+
+#toggleAccordionItemContentIcon {
+    transition: rotate 0.3s;
+}
+
+#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+    transform-origin: 50% 50%;
+    rotate: -180deg;
 }
 
 #targetNoteImage {

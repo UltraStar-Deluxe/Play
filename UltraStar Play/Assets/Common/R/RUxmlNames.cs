@@ -10,6 +10,7 @@ public static partial class R
         public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
         public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
         public const string addButton = "addButton";
+        public const string addIcon = "addIcon";
         public const string adjustFollowingNotesContainer = "adjustFollowingNotesContainer";
         public const string adjustFollowingNotesLabel = "adjustFollowingNotesLabel";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
@@ -118,6 +119,7 @@ public static partial class R
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
+        public const string dialogContainer = "dialogContainer";
         public const string dialogContent = "dialogContent";
         public const string dialogContentContainer = "dialogContentContainer";
         public const string dialogMessage = "dialogMessage";
@@ -160,6 +162,7 @@ public static partial class R
         public const string fpsContainer = "fpsContainer";
         public const string fullscreenContainer = "fullscreenContainer";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
+        public const string gameLogo = "gameLogo";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string genreLabel = "genreLabel";
         public const string genrePropertyContainer = "genrePropertyContainer";
@@ -174,6 +177,7 @@ public static partial class R
         public const string gridSizeContainer = "gridSizeContainer";
         public const string gridSizeTextField = "gridSizeTextField";
         public const string gridTitle = "gridTitle";
+        public const string helpButton = "helpButton";
         public const string helpIcon = "helpIcon";
         public const string helpSideBarContainer = "helpSideBarContainer";
         public const string helpTitle = "helpTitle";
@@ -214,6 +218,7 @@ public static partial class R
         public const string ItemPicker = "ItemPicker";
         public const string label = "label";
         public const string Label = "Label";
+        public const string labelContainer = "labelContainer";
         public const string labels = "labels";
         public const string languageChooser = "languageChooser";
         public const string languageContainer = "languageContainer";
@@ -236,9 +241,11 @@ public static partial class R
         public const string legendContainer = "legendContainer";
         public const string legendInnerContainer = "legendInnerContainer";
         public const string lo = "lo";
+        public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logLevelContainer = "logLevelContainer";
         public const string logLevelItemPicker = "logLevelItemPicker";
+        public const string logoContainer = "logoContainer";
         public const string logOverlay = "logOverlay";
         public const string logOverlayButtonRow = "logOverlayButtonRow";
         public const string logPathLabel = "logPathLabel";
@@ -351,6 +358,7 @@ public static partial class R
         public const string ownHostContainer = "ownHostContainer";
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
+        public const string padding = "padding";
         public const string partyButton = "partyButton";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";

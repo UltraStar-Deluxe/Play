@@ -148,6 +148,15 @@ public static partial class R
         public static readonly string options_songLibrary_addSdCardSongFolder = "options_songLibrary_addSdCardSongFolder";
         public static readonly string options_songLibrary_androidFolderHint = "options_songLibrary_androidFolderHint";
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
+        public static readonly string options_songLibrary_helpDialog_addSongInfo = "options_songLibrary_helpDialog_addSongInfo";
+        public static readonly string options_songLibrary_helpDialog_addSongInfo_title = "options_songLibrary_helpDialog_addSongInfo_title";
+        public static readonly string options_songLibrary_helpDialog_createSongInfo = "options_songLibrary_helpDialog_createSongInfo";
+        public static readonly string options_songLibrary_helpDialog_createSongInfo_title = "options_songLibrary_helpDialog_createSongInfo_title";
+        public static readonly string options_songLibrary_helpDialog_downloadSongInfo = "options_songLibrary_helpDialog_downloadSongInfo";
+        public static readonly string options_songLibrary_helpDialog_downloadSongInfo_title = "options_songLibrary_helpDialog_downloadSongInfo_title";
+        public static readonly string options_songLibrary_helpDialog_songFormatInfo = "options_songLibrary_helpDialog_songFormatInfo";
+        public static readonly string options_songLibrary_helpDialog_songFormatInfo_title = "options_songLibrary_helpDialog_songFormatInfo_title";
+        public static readonly string options_songLibrary_helpDialog_title = "options_songLibrary_helpDialog_title";
         public static readonly string options_songLibrary_title = "options_songLibrary_title";
         public static readonly string options_sound_button = "options_sound_button";
         public static readonly string options_sound_title = "options_sound_title";

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Linq;
 using UniInject;
 using UnityEngine.UIElements;
 
-public class MessageDialogControl : AbstractDialogControl
+public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = "dialogTitleImage")]
     public VisualElement DialogTitleImage { get; private set; }
@@ -10,11 +11,17 @@ public class MessageDialogControl : AbstractDialogControl
     [Inject(UxmlName = "dialogTitle")]
     private Label dialogTitle;
 
+    [Inject(UxmlName = "dialogMessageContainer")]
+    private VisualElement dialogMessageContainer;
+
     [Inject(UxmlName = "dialogMessage")]
     private Label dialogMessage;
 
     [Inject(UxmlName = "dialogButtonContainer")]
     private VisualElement dialogButtonContainer;
+
+    [Inject]
+    private Injector injector;
 
     public string Title
     {
@@ -42,6 +49,12 @@ public class MessageDialogControl : AbstractDialogControl
         }
     }
 
+    public void OnInjectionFinished()
+    {
+        dialogTitle.text = "";
+        dialogMessage.text = "";
+    }
+
     public Button AddButton(string text, Action callback)
     {
         Button button = new();
@@ -52,5 +65,10 @@ public class MessageDialogControl : AbstractDialogControl
         button.RegisterCallbackButtonTriggered(callback);
 
         return button;
+    }
+
+    public void AddVisualElement(VisualElement visualElement)
+    {
+        dialogMessageContainer.Add(visualElement);
     }
 }
