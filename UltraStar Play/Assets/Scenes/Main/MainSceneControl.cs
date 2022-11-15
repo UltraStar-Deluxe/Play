@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -177,15 +178,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             return;
         }
 
-        VisualElement visualElement = quitGameDialogUi.CloneTree();
-        visualElement.AddToClassList("overlay");
+        VisualElement visualElement = quitGameDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
 
         quitGameDialogControl = injector
             .WithRootVisualElement(visualElement)
             .CreateAndInject<MessageDialogControl>();
         quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
-        quitGameDialogControl.Message = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message);
+        quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
 
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
         Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
@@ -199,8 +199,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             return;
         }
 
-        VisualElement visualElement = newSongDialogUi.CloneTree();
-        visualElement.AddToClassList("overlay");
+        VisualElement visualElement = newSongDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
 
         newSongDialogControl = injector

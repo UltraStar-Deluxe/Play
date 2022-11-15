@@ -35,6 +35,5 @@
                 <ui:Button text="Back" name="backButton" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="dialogContainer" class="overlay modalDialogContainer" style="display: none;" />
     </ui:VisualElement>
 </ui:UXML>

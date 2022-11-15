@@ -170,12 +170,14 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
 
     private void CreateNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
     {
-        VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree();
+        VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree().Children().FirstOrDefault();
         dialogRootVisualElement.AddToClassList("overlay");
         NewVersionAvailableDialogControl newVersionAvailableDialogControl = new(dialogRootVisualElement,
-            uiDocument.rootVisualElement.Children().First(),
+            uiDocument.rootVisualElement,
             remoteVersionProperties);
-        injector.WithRootVisualElement(dialogRootVisualElement).Inject(newVersionAvailableDialogControl);
+        injector
+            .WithRootVisualElement(dialogRootVisualElement)
+            .Inject(newVersionAvailableDialogControl);
         dialogWasShown = true;
     }
 

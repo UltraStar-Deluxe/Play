@@ -28,6 +28,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     public VisualTreeAsset dialogUi;
 
     [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
@@ -59,9 +62,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject(UxmlName = R.UxmlNames.cancelButton)]
     private Button cancelDownloadButton;
-
-    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
-    private VisualElement dialogContainer;
 
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
@@ -124,8 +124,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
-        dialogContainer.ShowByDisplay();
-        dialogContainer.Add(dialog);
+        uiDocument.rootVisualElement.Add(dialog);
 
         urlChooserDialogControl = injector
             .WithRootVisualElement(dialog)
@@ -165,7 +164,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         urlChooserDialogControl.CloseDialog();
         urlChooserDialogControl = null;
-        dialogContainer.HideByDisplay();
         backButton.Focus();
     }
 

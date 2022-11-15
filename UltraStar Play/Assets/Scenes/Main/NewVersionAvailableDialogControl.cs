@@ -95,8 +95,10 @@ public class NewVersionAvailableDialogControl : INeedInjection, IInjectionFinish
 
     public void UpdateTranslation()
     {
-        string displayName = releaseName.IsNullOrEmpty() ? remoteRelease : releaseName;
-        dialogMessage.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink);
+        string displayName = releaseName.IsNullOrEmpty()
+            ? remoteRelease.NullToEmpty()
+            : releaseName.NullToEmpty();
+        dialogMessage.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
         dialogTitle.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_title);
         ignoreThisVersionButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
         ignoreAllFutureVersionsButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);

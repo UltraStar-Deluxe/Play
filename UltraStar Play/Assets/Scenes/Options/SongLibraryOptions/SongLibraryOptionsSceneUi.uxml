@@ -39,6 +39,5 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="dialogContainer" class="modalDialogContainer overlay" style="display: none;" />
     </ui:VisualElement>
 </ui:UXML>
