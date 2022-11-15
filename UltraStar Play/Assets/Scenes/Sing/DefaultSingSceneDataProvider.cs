@@ -47,7 +47,8 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
         // The default song meta is for debugging in the Unity editor.
         // A specific song is searched, so first wait for the scan to complete.
         SongMetaManager.Instance.WaitUntilSongScanFinished();
-        SongMeta defaultSongMeta = SongMetaManager.Instance.FindSongMeta(it => it.Title.Trim() == GetDefaultSongName());
+        SongMeta defaultSongMeta = SongMetaManager.Instance.GetSongMetas()
+            .FirstOrDefault(it => it.Title.Trim() == GetDefaultSongName());
         if (defaultSongMeta == null)
         {
             Debug.LogWarning($"No song with title '{GetDefaultSongName()}' was found. Using the first found song instead.");

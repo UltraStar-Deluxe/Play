@@ -158,6 +158,10 @@ public static partial class R
         public static readonly string options_songLibrary_helpDialog_songFormatInfo_title = "options_songLibrary_helpDialog_songFormatInfo_title";
         public static readonly string options_songLibrary_helpDialog_title = "options_songLibrary_helpDialog_title";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
+        public static readonly string options_songLibrary_songIssueDialog_errors = "options_songLibrary_songIssueDialog_errors";
+        public static readonly string options_songLibrary_songIssueDialog_noIssues = "options_songLibrary_songIssueDialog_noIssues";
+        public static readonly string options_songLibrary_songIssueDialog_title = "options_songLibrary_songIssueDialog_title";
+        public static readonly string options_songLibrary_songIssueDialog_warnings = "options_songLibrary_songIssueDialog_warnings";
         public static readonly string options_songLibrary_title = "options_songLibrary_title";
         public static readonly string options_sound_button = "options_sound_button";
         public static readonly string options_sound_title = "options_sound_title";

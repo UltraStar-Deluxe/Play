@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -37,7 +38,9 @@ public class DefaultSongEditorSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         // The default song meta is for debugging in the Unity editor.
         // A specific song is searched, so first wait for the scan to complete.
         SongMetaManager.Instance.WaitUntilSongScanFinished();
-        SongMeta defaultSongMeta = SongMetaManager.Instance.FindSongMeta(it => it.Title == GetDefaultSongName());
+        SongMeta defaultSongMeta = SongMetaManager.Instance
+            .GetSongMetas()
+            .FirstOrDefault(it => it.Title == GetDefaultSongName());
         if (defaultSongMeta == null)
         {
             Debug.LogWarning($"No song with title '{GetDefaultSongName()}' was found. Using the first found song instead.");
