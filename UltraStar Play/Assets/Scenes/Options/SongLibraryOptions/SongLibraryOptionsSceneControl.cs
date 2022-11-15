@@ -243,12 +243,22 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void UpdateSongFolderList()
     {
         songList.Clear();
-        int index = 0;
-        settings.GameSettings.songDirs.ForEach(songDir =>
+        if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
-            songList.Add(CreateSongFolderEntry(songDir, index));
-            index++;
-        });
+            Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
+            noSongsFoundLabel.AddToClassList("noSongsFoundLabel");
+            songList.Add(noSongsFoundLabel);
+        }
+        else
+        {
+            int index = 0;
+            settings.GameSettings.songDirs.ForEach(songDir =>
+            {
+                songList.Add(CreateSongFolderEntry(songDir, index));
+                index++;
+            });
+        }
+
         UpdateAddAndroidSongFoldersButtons();
     }
 
