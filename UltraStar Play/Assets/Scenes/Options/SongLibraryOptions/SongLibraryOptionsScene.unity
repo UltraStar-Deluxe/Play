@@ -288,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songFolderListEntryAsset: {fileID: 9197481963319205126, guid: 93410e816f6baad4ea324850e317c505,
     type: 3}
-  helpDialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
     type: 3}
   accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
     type: 3}

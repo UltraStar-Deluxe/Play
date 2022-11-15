@@ -43,6 +43,10 @@ public static class SongMetaUtils
 
     public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return "";
+        }
         return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Filename;
     }
 
@@ -245,5 +249,51 @@ public static class SongMetaUtils
             sb.Append("\n");
         });
         return sb.ToString();
+    }
+
+    // Checks whether the audio and video file formats of the song are supported.
+    // Returns true iff the audio file of the SongMeta exists and is supported.
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta)
+    {
+        List<SongIssue> songIssues = new();
+
+        // Check video format.
+        // Video is optional.
+        if (!songMeta.Video.IsNullOrEmpty())
+        {
+            if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Video)))
+            {
+                songIssues.Add(SongIssue.CreateWarning(songMeta, "Unsupported video format: " + Path.GetExtension(songMeta.Video)));
+                // Do not attempt to load the video file
+                songMeta.Video = "";
+            }
+            else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetVideoUri(songMeta)))
+            {
+                songIssues.Add(SongIssue.CreateWarning(songMeta, "Video file resource does not exist: " + SongMetaUtils.GetVideoUri(songMeta)));
+                // Do not attempt to load the video file
+                songMeta.Video = "";
+            }
+        }
+
+        // Check audio format.
+        // Audio is mandatory. Without working audio file, the song cannot be played.
+        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
+        {
+            songIssues.Add(SongIssue.CreateError(songMeta, "Unsupported audio format: " + Path.GetExtension(songMeta.Mp3)));
+        }
+        else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetAudioUri(songMeta)))
+        {
+            songIssues.Add(SongIssue.CreateError(songMeta, "Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta)));
+        }
+
+        // Log found issues
+        songIssues.ForEach(songIssue => songIssue.Log());
+
+        return songIssues;
+    }
+
+    public static string GetArtistDashTitle(SongMeta songMeta)
+    {
+        return $"{songMeta?.Artist} - {songMeta?.Title}";
     }
 }

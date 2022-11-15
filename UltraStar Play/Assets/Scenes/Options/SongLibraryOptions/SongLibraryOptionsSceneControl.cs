@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
@@ -20,7 +21,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     public VisualTreeAsset songFolderListEntryAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset helpDialogUi;
+    public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
     public VisualTreeAsset accordionUi;
@@ -67,16 +68,37 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.dialogContainer)]
     private VisualElement dialogContainer;
 
+    [Inject(UxmlName = R.UxmlNames.songIssueButton)]
+    private Button songIssueButton;
+
+    [Inject(UxmlName = R.UxmlNames.songIssueIcon)]
+    private VisualElement songIssueIcon;
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongMetaManager songMetaManager;
+
     private MessageDialogControl helpDialogControl;
+    private MessageDialogControl songIssueDialogControl;
 
     private void Start()
     {
+        if (SongMetaManager.IsSongScanFinished)
+        {
+            UpdateSongIssues();
+        }
+        else
+        {
+            songMetaManager.ScanFilesIfNotDoneYet();
+            songMetaManager.SongScanFinishedEventStream
+                .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
+        }
+
         settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
@@ -91,7 +113,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
@@ -102,6 +124,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, downloadSceneButton, true);
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+        songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
         dialogContainer.HideByDisplay();
 
 #if UNITY_ANDROID
@@ -125,11 +148,28 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 #endif
     }
 
+    private void UpdateSongIssues()
+    {
+        // Update icon
+        if (songMetaManager.GetSongErrors().Count > 0)
+        {
+            songIssueIcon.AddToClassList("error");
+        }
+        else if (songMetaManager.GetSongWarnings().Count > 0)
+        {
+            songIssueIcon.AddToClassList("warning");
+        }
+    }
+
     private void OnBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+        }
+        else if (songIssueDialogControl != null)
+        {
+            CloseSongIssues();
         }
         else
         {
@@ -144,7 +184,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             return;
         }
 
-        VisualElement helpDialog = helpDialogUi.CloneTree().Children().FirstOrDefault();
+        VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
         dialogContainer.Add(helpDialog);
         dialogContainer.ShowByDisplay();
 
@@ -181,9 +221,95 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void CloseHelp()
     {
         helpDialogControl.CloseDialog();
-        dialogContainer.HideByDisplay();
         helpDialogControl = null;
-        backButton.Focus();
+        dialogContainer.HideByDisplay();
+        helpButton.Focus();
+    }
+
+    private void ShowSongIssues()
+    {
+        if (songIssueDialogControl != null)
+        {
+            return;
+        }
+
+        void FillWithSongIssues(AccordionItemControl accordionItemControl, IReadOnlyList<SongIssue> songIssues)
+        {
+            if (songIssues.IsNullOrEmpty())
+            {
+                accordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
+                return;
+            }
+
+            List<SongIssue> sortedSongIssues = songIssues.ToList();
+            sortedSongIssues.Sort(SongIssue.compareBySongMetaArtistAndTitle);
+
+            string lastSongMetaPath = "";
+            sortedSongIssues.ForEach(songIssue =>
+            {
+                string songMetaArtistAndTitle = songIssue.SongMeta != null
+                    ? songIssue.SongMeta.Artist + " - " + songIssue.SongMeta.Title
+                    : "";
+                string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaPath(songIssue.SongMeta);
+                if (lastSongMetaPath != songMetaPath)
+                {
+                    if (!lastSongMetaPath.IsNullOrEmpty())
+                    {
+                        // Add empty line
+                        accordionItemControl.AddVisualElement(new Label(""));
+                    }
+                    Label songMetaPathLabel = new(songMetaArtistAndTitle);
+                    songMetaPathLabel.AddToClassList("songIssueSongMetaTitle");
+                    accordionItemControl.AddVisualElement(songMetaPathLabel);
+                }
+
+                string messageWithBackslashReplaced = songIssue.Message.Replace("\\", "|");
+                Label songIssueLabel = new($"• {messageWithBackslashReplaced}");
+                songIssueLabel.AddToClassList("songIssueMessage");
+                accordionItemControl.AddVisualElement(songIssueLabel);
+                lastSongMetaPath = songMetaPath;
+            });
+        }
+
+        VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
+        dialogContainer.Add(dialog);
+        dialogContainer.ShowByDisplay();
+
+        songIssueDialogControl = injector
+            .WithRootVisualElement(dialog)
+            .CreateAndInject<MessageDialogControl>();
+        songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
+
+        AccordionItemControl errorsAccordionItemControl = CreateAccordionItemControl();
+        errorsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors);
+        songIssueDialogControl.AddVisualElement(errorsAccordionItemControl.VisualElement);
+        FillWithSongIssues(errorsAccordionItemControl, songMetaManager.GetSongErrors());
+
+        AccordionItemControl warningsAccordionItemControl = CreateAccordionItemControl();
+        warningsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings);
+        songIssueDialogControl.AddVisualElement(warningsAccordionItemControl.VisualElement);
+        FillWithSongIssues(warningsAccordionItemControl, songMetaManager.GetSongWarnings());
+
+        if (songMetaManager.GetSongErrors().Count > 0)
+        {
+            errorsAccordionItemControl.ShowAccordionContent();
+        }
+        else if (songMetaManager.GetSongWarnings().Count > 0)
+        {
+            warningsAccordionItemControl.ShowAccordionContent();
+        }
+
+        Button closeDialogButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            () => CloseSongIssues());
+        closeDialogButton.Focus();
+    }
+
+    private void CloseSongIssues()
+    {
+        songIssueDialogControl.CloseDialog();
+        songIssueDialogControl = null;
+        dialogContainer.HideByDisplay();
+        songIssueButton.Focus();
     }
 
     private AccordionItemControl CreateAccordionItemControl()

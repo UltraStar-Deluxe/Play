@@ -251,7 +251,7 @@ public class SongMeta
 
     public void Reload()
     {
-        SongMeta other = SongMetaBuilder.ParseFile(SongMetaUtils.GetAbsoluteSongMetaPath(this));
+        SongMeta other = SongMetaBuilder.ParseFile(SongMetaUtils.GetAbsoluteSongMetaPath(this), out List<SongIssue> _);
 
         // Copy values
         Encoding = other.Encoding;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ public class EncodingTest
     private void TestFile(string fileName)
     {
         string filePath = folderPath + fileName;
-        SongMeta songMeta = SongMetaBuilder.ParseFile(filePath);
+        SongMeta songMeta = SongMetaBuilder.ParseFile(filePath, out List<SongIssue> _);
         Assert.AreEqual(testSongTitle, songMeta.Title);
     }
 }
