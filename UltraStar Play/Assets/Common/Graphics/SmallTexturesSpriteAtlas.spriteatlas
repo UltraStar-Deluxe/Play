@@ -46,7 +46,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: a3752a11b653e7b478d17714e6f4ffef, type: 3}
   - {fileID: 21300000, guid: 1d183c612f1866943a54609ced7fece7, type: 3}
   - {fileID: 21300000, guid: 5deb6694a398abc4ab780d5d83778900, type: 3}
-  - {fileID: 21300000, guid: 3a770ae44a43b6e4c8f744668b0fb921, type: 3}
   - {fileID: 21300000, guid: 3406fac525d9a894b9906cb27b4def17, type: 3}
   - {fileID: 21300000, guid: 2b09f4367842bc1418c7062bfe03f99a, type: 3}
   - {fileID: 21300000, guid: 83cbc846d56ee8d48b9ba347ed508287, type: 3}
@@ -70,7 +69,6 @@ SpriteAtlas:
   - silhouette-01
   - NoCover
   - '[score]rating_0'
-  - '[icon]leader_crown'
   - '[score]rating_1'
   - silhouette-06
   - '[score]rating_6'

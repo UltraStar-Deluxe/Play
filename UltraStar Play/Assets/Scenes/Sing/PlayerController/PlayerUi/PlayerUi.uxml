@@ -1,12 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="NoteUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteUi.uxml?fileID=9197481963319205126&amp;guid=726e4c425e366bc4781f431b540ceb7f&amp;type=3#NoteUi" />
-    <ui:VisualElement name="root" class="singScenePlayerUi" style="flex-grow: 1;">
+    <ui:VisualElement name="root" class="singScenePlayerUi" style="flex-grow: 1; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
         <ui:VisualElement name="column">
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
                 <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: flex-end;">
-                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;);" />
-                    <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" class="textOutline" style="margin-left: 10px; margin-right: 10px; -unity-text-align: middle-left;" />
-                    <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]leader_crown.png?fileID=2800000&amp;guid=3a770ae44a43b6e4c8f744668b0fb921&amp;type=3#[icon]leader_crown&apos;); margin-left: 10px; margin-right: 10px;" />
+                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); align-items: center;" />
+                    <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
+                        <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&amp;guid=8f8cd0bf8e4776546b467068aacdf098&amp;type=3#LeadingPlayerCrown&apos;); -unity-background-scale-mode: scale-to-fit; margin-top: -5px; margin-bottom: -5px; flex-shrink: 2;" />
+                        <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" class="textOutline largeFont" style="-unity-text-align: middle-left; flex-shrink: 1;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                 <ui:VisualElement name="micDisconnectedContainer" style="flex-direction: row; align-items: flex-end; width: auto; height: 100%;">
