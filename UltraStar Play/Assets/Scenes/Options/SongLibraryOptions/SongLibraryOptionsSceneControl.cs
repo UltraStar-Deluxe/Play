@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
@@ -82,7 +83,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {
-            settings.GameSettings.songDirs.Add("./Songs");
+            settings.GameSettings.songDirs.Add("");
             UpdateSongFolderList();
 
             RequestExternalStoragePermissionIfNeeded();
@@ -274,6 +275,11 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             {
                 warningContainer.HideByDisplay();
             }
+            else if (path.IsNullOrEmpty())
+            {
+                warningContainer.ShowByDisplay();
+                warningLabel.text = "Enter the path to a song folder.";
+            }
             else if (File.Exists(path))
             {
                 warningContainer.ShowByDisplay();
@@ -282,7 +288,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             else
             {
                 warningContainer.ShowByDisplay();
-                warningLabel.text = "File does not exist.";
+                warningLabel.text = "Folder does not exist.";
             }
         }
 
@@ -309,5 +315,13 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         CheckFolderExists(songDir);
 
         return result;
+    }
+
+    private void OnDestroy()
+    {
+        // Remove duplicate song folders
+        settings.GameSettings.songDirs = settings.GameSettings.songDirs
+            .Distinct()
+            .ToList();
     }
 }
