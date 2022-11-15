@@ -121,7 +121,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         // Custom navigation targets
         focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, helpButton, true);
-        focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, downloadSceneButton, true);
+        focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, songIssueButton, true);
+        focusableNavigator.AddCustomNavigationTarget(songIssueButton, Vector2.left, downloadSceneButton, true);
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
         songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
