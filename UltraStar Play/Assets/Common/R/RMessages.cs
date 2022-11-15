@@ -223,6 +223,8 @@ public static partial class R
         public static readonly string songSelectScene_noPlayerSelected_message = "songSelectScene_noPlayerSelected_message";
         public static readonly string songSelectScene_noPlayerSelected_title = "songSelectScene_noPlayerSelected_title";
         public static readonly string songSelectScene_noSongsFound = "songSelectScene_noSongsFound";
+        public static readonly string songSelectScene_noSongsFound_addSongFolderButton = "songSelectScene_noSongsFound_addSongFolderButton";
+        public static readonly string songSelectScene_noSongsFound_downloadSongsButton = "songSelectScene_noSongsFound_downloadSongsButton";
         public static readonly string songSelectScene_onlineTopScoresTitle = "songSelectScene_onlineTopScoresTitle";
         public static readonly string songSelectScene_playlistDropdownTitle = "songSelectScene_playlistDropdownTitle";
         public static readonly string songSelectScene_searchExpressionError = "songSelectScene_searchExpressionError";

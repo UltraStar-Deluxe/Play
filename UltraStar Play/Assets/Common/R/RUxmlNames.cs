@@ -11,6 +11,7 @@ public static partial class R
         public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
         public const string addButton = "addButton";
         public const string addIcon = "addIcon";
+        public const string addSongFolderButton = "addSongFolderButton";
         public const string adjustFollowingNotesContainer = "adjustFollowingNotesContainer";
         public const string adjustFollowingNotesLabel = "adjustFollowingNotesLabel";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
@@ -133,6 +134,7 @@ public static partial class R
         public const string doubleClickToTogglePauseElement = "doubleClickToTogglePauseElement";
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
+        public const string downloadSongsButton = "downloadSongsButton";
         public const string dropdownIcon = "dropdownIcon";
         public const string dropDownIcon = "dropDownIcon";
         public const string duetIcon = "duetIcon";
@@ -319,6 +321,8 @@ public static partial class R
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
         public const string noMicsFoundLabel = "noMicsFoundLabel";
         public const string normalNoteScore = "normalNoteScore";
+        public const string noSongsFoundButtonContainer = "noSongsFoundButtonContainer";
+        public const string noSongsFoundContainer = "noSongsFoundContainer";
         public const string noSongsFoundLabel = "noSongsFoundLabel";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";

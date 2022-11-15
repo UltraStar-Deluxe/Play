@@ -304,6 +304,10 @@ TextInput {
     width: var(--control-width-large);
 }
 
+.wideControl {
+    width: var(--control-width-large);
+}
+
 .mainSceneButton {
     -unity-font-style: bold;
     width: var(--main-scene-button-width);
