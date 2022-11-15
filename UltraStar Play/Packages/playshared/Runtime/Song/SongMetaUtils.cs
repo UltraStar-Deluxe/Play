@@ -219,7 +219,7 @@ public static class SongMetaUtils
             return;
         }
 
-        Application.OpenURL("file://" + songMeta.Directory);
+        ApplicationUtils.OpenDirectory(songMeta.Directory);
     }
 
     public static string GetLyrics(SongMeta songMeta, string voiceName)

@@ -304,13 +304,22 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             });
 
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
         deleteButton.RegisterCallbackButtonTriggered(() =>
             {
                 settings.GameSettings.songDirs.RemoveAt(indexInList);
                 UpdateSongFolderList();
                 backButton.Focus();
             });
+
+        Button openSongFolderButton = result.Q<Button>(R.UxmlNames.openFolderButton);
+        if (PlatformUtils.IsStandalone)
+        {
+            openSongFolderButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(songDir));
+        }
+        else
+        {
+            openSongFolderButton.HideByDisplay();
+        }
 
         CheckFolderExists(songDir);
 
