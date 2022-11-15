@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -16,6 +17,12 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 {
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryAsset;
+
+    [InjectedInInspector]
+    public VisualTreeAsset helpDialogUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset accordionUi;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -41,6 +48,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
     private VisualElement androidSongFolderHintContainer;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
     private Label androidSongFolderHintLabel;
 
@@ -53,8 +63,16 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private FocusableNavigator focusableNavigator;
 
+    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
+    private VisualElement dialogContainer;
+
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private Injector injector;
+
+    private MessageDialogControl helpDialogControl;
 
     private void Start()
     {
@@ -76,10 +94,14 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+            .Subscribe(_ => OnBack());
 
         // Custom navigation targets
-        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, downloadSceneButton, true);
+        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, helpButton, true);
+        focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, downloadSceneButton, true);
+
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+        dialogContainer.HideByDisplay();
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -100,6 +122,76 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 #else
         androidSongFolderHintContainer.HideByDisplay();
 #endif
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
+    }
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement helpDialog = helpDialogUi.CloneTree().Children().FirstOrDefault();
+        dialogContainer.Add(helpDialog);
+        dialogContainer.ShowByDisplay();
+
+        helpDialogControl = injector
+            .WithRootVisualElement(helpDialog)
+            .CreateAndInject<MessageDialogControl>();
+        helpDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title);
+
+        AccordionItemControl songFormatInfoAccordionItemControl = CreateAccordionItemControl();
+        songFormatInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title);
+        songFormatInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo)));
+        helpDialogControl.AddVisualElement(songFormatInfoAccordionItemControl.VisualElement);
+
+        AccordionItemControl addSongInfoAccordionItemControl = CreateAccordionItemControl();
+        addSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title);
+        addSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo)));
+        helpDialogControl.AddVisualElement(addSongInfoAccordionItemControl.VisualElement);
+
+        AccordionItemControl createSongInfoAccordionItemControl = CreateAccordionItemControl();
+        createSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title);
+        createSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo)));
+        helpDialogControl.AddVisualElement(createSongInfoAccordionItemControl.VisualElement);
+
+        AccordionItemControl downloadSongInfoAccordionItemControl = CreateAccordionItemControl();
+        downloadSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title);
+        downloadSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo)));
+        helpDialogControl.AddVisualElement(downloadSongInfoAccordionItemControl.VisualElement);
+
+        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            () => CloseHelp());
+        closeDialogButton.Focus();
+    }
+
+    private void CloseHelp()
+    {
+        helpDialogControl.CloseDialog();
+        dialogContainer.HideByDisplay();
+        helpDialogControl = null;
+        backButton.Focus();
+    }
+
+    private AccordionItemControl CreateAccordionItemControl()
+    {
+        VisualElement accordionItem = accordionUi.CloneTree().Children().FirstOrDefault();
+        AccordionItemControl accordionItemControl = injector
+            .WithRootVisualElement(accordionItem)
+            .CreateAndInject<AccordionItemControl>();
+        return accordionItemControl;
     }
 
     private void AddSongFolderIfNotContains(string basePath)

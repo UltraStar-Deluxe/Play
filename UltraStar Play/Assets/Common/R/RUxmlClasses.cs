@@ -35,6 +35,7 @@ public static partial class R
         public const string mainSceneExitButton = "mainSceneExitButton";
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string middleCenterText = "middleCenterText";
+        public const string modalDialogContainer = "modalDialogContainer";
         public const string multiline = "multiline";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
@@ -47,6 +48,7 @@ public static partial class R
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
+        public const string overlay = "overlay";
         public const string panel = "panel";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
@@ -62,6 +64,7 @@ public static partial class R
         public const string smallFont = "smallFont";
         public const string songEditorSettingsGroup = "songEditorSettingsGroup";
         public const string songEditorSettingsGroupTitle = "songEditorSettingsGroupTitle";
+        public const string squareButton = "squareButton";
         public const string startButtonClass = "startButtonClass";
         public const string textColorTint = "textColorTint";
         public const string textOutline = "textOutline";
