@@ -59,8 +59,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        BackslashReplacingTextFieldControl backslashReplacingTextFieldControl = null;
-
         voice = songMeta.GetVoices()[0];
         UpdateLyrics();
         textField.RegisterCallback<FocusEvent>(evt =>
@@ -71,7 +69,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         {
             if (lyricsAreaMode == LyricsAreaMode.EditMode)
             {
-                OnEndEdit(backslashReplacingTextFieldControl.UnescapeBackslashes(textField.text));
+                OnEndEdit(textField.text);
             }
         });
 
@@ -80,18 +78,16 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
-        backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
         // Replace white space with visible characters when in edit mode
-        backslashReplacingTextFieldControl.ValueChangedEventStream
-            .Subscribe(newValue =>
+        textField.RegisterValueChangedCallback(evt =>
+        {
+            if (lyricsAreaMode == LyricsAreaMode.EditMode)
             {
-                if (lyricsAreaMode == LyricsAreaMode.EditMode)
-                {
-                    string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newValue);
-                    string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
-                    textField.SetValueWithoutNotify(visibleWhiteSpaceText);
-                }
-            });
+                string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(evt.newValue);
+                string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
+                textField.SetValueWithoutNotify(visibleWhiteSpaceText);
+            }
+        });
 
         lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.firstVoiceName));
         lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.secondVoiceName));
