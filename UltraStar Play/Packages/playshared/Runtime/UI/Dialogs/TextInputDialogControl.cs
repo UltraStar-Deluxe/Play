@@ -26,8 +26,6 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
     [Inject(UxmlName = "cancelButton")]
     protected Button cancelButton;
 
-    protected BackslashReplacingTextFieldControl backslashReplacingTextFieldControl;
-
     private readonly Subject<string> submitValueEventStream = new();
     public IObservable<string> SubmitValueEventStream => submitValueEventStream;
 
@@ -95,13 +93,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
     {
         okButton.RegisterCallbackButtonTriggered(() => TrySubmitValue(textField.value));
         cancelButton.RegisterCallbackButtonTriggered(() => CloseDialog());
-
-        if (backslashReplacingTextFieldControl == null)
-        {
-            backslashReplacingTextFieldControl = new BackslashReplacingTextFieldControl(textField);
-            backslashReplacingTextFieldControl.ValueChangedEventStream
-                .Subscribe(newValue => ValidateValue(newValue, true));
-        }
+        textField.RegisterValueChangedCallback(evt => ValidateValue(evt.newValue, true));
 
         cancelButton.Focus();
         InitialValue = "";

@@ -261,8 +261,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                     accordionItemControl.AddVisualElement(songMetaPathLabel);
                 }
 
-                string messageWithBackslashReplaced = songIssue.Message.Replace("\\", "|");
-                Label songIssueLabel = new($"• {messageWithBackslashReplaced}");
+                Label songIssueLabel = new($"• {songIssue.Message}");
                 songIssueLabel.AddToClassList("songIssueMessage");
                 accordionItemControl.AddVisualElement(songIssueLabel);
                 lastSongMetaPath = songMetaPath;
@@ -416,14 +415,12 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
         textField.value = songDir;
-        PathTextFieldControl pathTextFieldControl = new(textField);
-        pathTextFieldControl.ValueChangedEventStream
-            .Subscribe(newValueUnescaped =>
-            {
-                settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
-                CheckFolderExists(newValueUnescaped);
-                UpdateAddAndroidSongFoldersButtons();
-            });
+        textField.RegisterValueChangedCallback(evt =>
+        {
+            settings.GameSettings.songDirs[indexInList] = evt.newValue;
+            CheckFolderExists(evt.newValue);
+            UpdateAddAndroidSongFoldersButtons();
+        });
 
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(() =>
