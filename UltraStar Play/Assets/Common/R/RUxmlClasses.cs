@@ -28,6 +28,7 @@ public static partial class R
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
+        public const string labelIcon = "labelIcon";
         public const string largeFont = "largeFont";
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
