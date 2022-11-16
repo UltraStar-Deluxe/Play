@@ -33,6 +33,18 @@
     -unity-background-image-tint-color: rgb(196, 196, 196);
 }
 
+#leftSideBarMainColumn .icon
+{
+    width: 50%;
+    height: 50%;
+}
+
+#leftSideBarMainColumn .labelIcon
+{
+    width: 50%;
+    height: 50%;
+}
+
 #virtualPiano {
     background-color: rgb(49, 51, 53);
 }

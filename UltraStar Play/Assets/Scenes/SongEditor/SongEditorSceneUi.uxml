@@ -51,7 +51,7 @@
                             <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/arrow_back_white_24dp.svg?fileID=7388822144124034973&amp;guid=7fc79e8503465d646b086162a6c643fc&amp;type=3#arrow_back_white_24dp&apos;);" />
                         </ui:Button>
                         <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
-                            <ui:Label display-tooltip-when-elided="true" name="label" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/unfold_less_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=1380d7f505c7b8b49a5d4a25bf03ab3d&amp;type=3#unfold_less_horizontal_white_24dp&apos;);" />
+                            <ui:Label display-tooltip-when-elided="true" name="label" class="labelIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/unfold_less_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=1380d7f505c7b8b49a5d4a25bf03ab3d&amp;type=3#unfold_less_horizontal_white_24dp&apos;);" />
                             <ui:VisualElement name="icon" class="icon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/unfold_more_horizontal_white_24dp.svg?fileID=7388822144124034973&amp;guid=9c1a6809250de8b4782b910be636a423&amp;type=3#unfold_more_horizontal_white_24dp&apos;);" />
                         </ui:Button>
                     </ui:ScrollView>
