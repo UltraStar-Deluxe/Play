@@ -5,9 +5,9 @@
             <ui:VisualElement name="songPreviewVideoImage" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/SongSelect/Preview/SongSelectVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=363c6948b86eebc4daacef28984654ff&amp;type=2#SongSelectVideoRenderTexture&apos;);" />
             <ui:VisualElement name="songPreviewBackgroundImage" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="songInfo" picking-mode="Ignore" class="smallFont" style="height: 25%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 0; flex-shrink: 0; min-height: 50px; flex-grow: 1;">
-            <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="ellipsis" style="-unity-font-style: bold; margin-bottom: 5px; max-height: 33px;" />
-            <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis" style="width: 90%; flex-grow: 1; white-space: normal; max-height: 66%;" />
+        <ui:VisualElement name="songInfo" picking-mode="Ignore" style="height: 25%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 0; flex-shrink: 0; min-height: 50px; flex-grow: 1;">
+            <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="ellipsis smallFont" style="-unity-font-style: bold; margin-bottom: 5px; max-height: 33px;" />
+            <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis smallFont" style="width: 90%; flex-grow: 1; white-space: normal; max-height: 66%;" />
             <ui:VisualElement name="titleRow" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; align-items: center;" />
         </ui:VisualElement>
         <ui:VisualElement name="iconBar" picking-mode="Ignore" style="position: absolute; flex-shrink: 0; right: 5px; top: 5px; align-items: center;">

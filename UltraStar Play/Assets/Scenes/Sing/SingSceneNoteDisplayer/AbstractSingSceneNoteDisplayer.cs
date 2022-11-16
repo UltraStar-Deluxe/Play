@@ -231,6 +231,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         {
             label.text = "";
         }
+        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => UpdateNoteLabelFontSize(label));
 
         targetNoteEntryContainer.Add(visualElement);
         UpdateNotePosition(visualElement, note.MidiNote, note.StartBeat, note.EndBeat);
@@ -238,6 +239,21 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         noteToTargetNoteControl[note] = targetNoteControl;
 
         return targetNoteControl;
+    }
+
+    private void UpdateNoteLabelFontSize(Label label)
+    {
+        // Update font size
+        if (label == null
+            || label.text.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        float noteHeightPx = noteHeightPercent * targetNoteEntryContainer.resolvedStyle.height;
+        float textHeight = NumberUtils.Limit(noteHeightPx + 2, 8, 12);
+        label.style.fontSize = new StyleLength(new Length(textHeight, LengthUnit.Pixel));
+        Debug.Log($"text: {label.text}, noteHeightPx: {noteHeightPx}, textHeight: {textHeight}");
     }
 
     public string GetDisplayText(Note note)
@@ -362,7 +378,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     private Vector2 GetRandomVector2(float min, float max)
     {
-        return new Vector3(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
+        return new Vector2(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
     }
 
     protected virtual int CalculateNoteRow(int midiNote)
