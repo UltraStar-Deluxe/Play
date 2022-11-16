@@ -45,6 +45,9 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
     [Inject]
     private UIDocument uiDocument;
 
+    private NewVersionAvailableDialogControl newVersionAvailableDialogControl;
+    public bool IsNewVersionAvailableDialogOpen => newVersionAvailableDialogControl != null;
+
     private void Start()
     {
         if (dialogWasShown)
@@ -155,7 +158,7 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
             {
                 // (localRelease is smaller)
                 // or ((localRelease is equal to remoteRelease) and (localBuildTimeStamp is smaller))
-                CreateNewVersionAvailableDialog(remoteVersionProperties);
+                OpenNewVersionAvailableDialog(remoteVersionProperties);
             }
             else
             {
@@ -168,17 +171,28 @@ public class NewVersionChecker : MonoBehaviour, INeedInjection
         }
     }
 
-    private void CreateNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
+    private void OpenNewVersionAvailableDialog(Dictionary<string, string> remoteVersionProperties)
     {
         VisualElement dialogRootVisualElement = newVersionDialogUxml.CloneTree().Children().FirstOrDefault();
         dialogRootVisualElement.AddToClassList("overlay");
-        NewVersionAvailableDialogControl newVersionAvailableDialogControl = new(dialogRootVisualElement,
+        newVersionAvailableDialogControl = new(dialogRootVisualElement,
             uiDocument.rootVisualElement,
             remoteVersionProperties);
         injector
             .WithRootVisualElement(dialogRootVisualElement)
             .Inject(newVersionAvailableDialogControl);
+        newVersionAvailableDialogControl.DialogClosedEventStream
+            .Subscribe(evt => newVersionAvailableDialogControl = null);
         dialogWasShown = true;
+    }
+
+    public void CloseNewVersionAvailableDialog()
+    {
+        if (newVersionAvailableDialogControl != null)
+        {
+            newVersionAvailableDialogControl.CloseDialog();
+        }
+        newVersionAvailableDialogControl = null;
     }
 
     /**

@@ -86,6 +86,8 @@ public static partial class R
         public static readonly string mainScene_button_settings_label = "mainScene_button_settings_label";
         public static readonly string mainScene_button_sing_description = "mainScene_button_sing_description";
         public static readonly string mainScene_button_sing_label = "mainScene_button_sing_label";
+        public static readonly string mainScene_kickstarterDialog_message = "mainScene_kickstarterDialog_message";
+        public static readonly string mainScene_kickstarterDialog_title = "mainScene_kickstarterDialog_title";
         public static readonly string mainScene_quitDialog_message = "mainScene_quitDialog_message";
         public static readonly string mainScene_quitDialog_title = "mainScene_quitDialog_title";
         public static readonly string mainScene_title = "mainScene_title";
