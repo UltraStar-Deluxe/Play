@@ -9,10 +9,8 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewVersionAvailableDialogControl : INeedInjection, IInjectionFinishedListener, ITranslator
+public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectionFinishedListener, ITranslator
 {
-    private const int CloseNewVersionAvailableDialogInputActionPriority = 10;
-
     [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
 
@@ -35,7 +33,6 @@ public class NewVersionAvailableDialogControl : INeedInjection, IInjectionFinish
     private readonly string websiteLink;
     private readonly string releaseName;
 
-    private readonly VisualElement dialogRootVisualElement;
     private readonly VisualElement parentVisualElement;
 
     private readonly List<IDisposable> disposables = new();
@@ -77,19 +74,11 @@ public class NewVersionAvailableDialogControl : INeedInjection, IInjectionFinish
         parentVisualElement.Add(dialogRootVisualElement);
 
         closeButton.Focus();
-
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back)
-            .PerformedAsObservable(CloseNewVersionAvailableDialogInputActionPriority)
-            .Subscribe(_ =>
-            {
-                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
-                CloseDialog();
-            }));
     }
 
-    public void CloseDialog()
+    public override void CloseDialog()
     {
-        parentVisualElement.Remove(dialogRootVisualElement);
+        base.CloseDialog();
         disposables.ForEach(it => it.Dispose());
     }
 
