@@ -191,8 +191,8 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
             {
                 songMetas.Add(newSongMeta);
-                songIssues.AddRange(newSongIssues);
             }
+            songIssues.AddRange(newSongIssues);
         }
     }
 
