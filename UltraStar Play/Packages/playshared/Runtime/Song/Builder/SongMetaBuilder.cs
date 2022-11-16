@@ -36,7 +36,7 @@ public static class SongMetaBuilder
             {
                 if (lineNumber == 1)
                 {
-                    throw new SongMetaBuilderException(path + " does not look like a song file; ignoring");
+                    throw new SongMetaBuilderException("Does not look like a song file; ignoring");
                 }
                 // Finished headers
                 break;
@@ -111,14 +111,12 @@ public static class SongMetaBuilder
             }
         }
 
-        // this _should_ get handled by the ArgumentNullException
-        // further down below, but that produces really vague
-        // messages about a parameter 's' for some reason
-        foreach (var item in requiredFields)
+        // Check that required tags are set.
+        foreach (var requiredFieldName in requiredFields)
         {
-            if (item.Value == null)
+            if (requiredFieldName.Value == null)
             {
-                throw new SongMetaBuilderException("Required tag '" + item.Key + "' was not set in file: " + path);
+                throw new SongMetaBuilderException("Required tag '" + requiredFieldName.Key + "' was not set");
             }
         }
 
@@ -208,7 +206,7 @@ public static class SongMetaBuilder
         catch (ArgumentNullException e)
         {
             // if you get these with e.ParamName == "s", it's probably one of the non-nullable things (ie, float, uint, etc)
-            throw new SongMetaBuilderException("Required tag '" + e.ParamName + "' was not set in file: " + path);
+            throw new SongMetaBuilderException("Required tag '" + e.ParamName + "' was not set");
         }
     }
 
@@ -243,10 +241,6 @@ public static class SongMetaBuilder
 [Serializable]
 public class SongMetaBuilderException : Exception
 {
-    public SongMetaBuilderException()
-    {
-    }
-
     public SongMetaBuilderException(string message)
         : base(message)
     {
