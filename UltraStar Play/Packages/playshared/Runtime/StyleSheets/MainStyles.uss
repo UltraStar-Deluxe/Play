@@ -240,7 +240,8 @@
 
 #searchTextField #unity-text-input {
     height: 100%;
-    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 .transparentBackgroundColor #unity-text-input {
@@ -494,6 +495,10 @@ Label.tinyFont {
     font-size: var(--font-size-xxs);
 }
 
+Button.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
 .ellipsis {
     text-overflow: ellipsis;
     -unity-text-overflow-position: end;
@@ -643,7 +648,7 @@ Label.tinyFont {
 }
 
 .characterQuickJumpCharacterButton {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-xxs);
 }
 
 .characterQuickJumpCharacter {
@@ -1018,4 +1023,27 @@ Label.tinyFont {
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+}
+
+.comboBoxTextField {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.comboBoxTextField #unity-text-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.comboBoxButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+TextField.placeholderVisible {
+    -unity-font-style: italic;
+}
+
+TextField.placeholderVisible #unity-text-input {
+    font-size: var(--font-size-xs);
 }

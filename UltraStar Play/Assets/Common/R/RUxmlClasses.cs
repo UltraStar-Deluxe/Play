@@ -6,6 +6,8 @@ public static partial class R
         public const string backgroundImage = "backgroundImage";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
+        public const string comboBoxButton = "comboBoxButton";
+        public const string comboBoxTextField = "comboBoxTextField";
         public const string controlLabel = "controlLabel";
         public const string creditsEntryCharacter = "creditsEntryCharacter";
         public const string creditsRegularBanner = "creditsRegularBanner";
