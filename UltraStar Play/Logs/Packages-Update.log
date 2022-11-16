@@ -155,3 +155,19 @@ The following packages were updated:
   com.unity.test-framework from version 1.1.31 to 1.1.33
   com.unity.timeline from version 1.6.4 to 1.7.1
   com.unity.xr.legacyinputhelpers from version 2.1.9 to 2.1.10
+
+=== Wed Nov 16 09:31:18 2022
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were added:
+  com.unity.ai.navigation@1.1.1
+The following packages were updated:
+  com.unity.ads from version 4.3.0 to 4.4.1
+  com.unity.analytics from version 3.7.1 to 3.8.1
+  com.unity.collab-proxy from version 1.17.2 to 1.17.6
+  com.unity.ext.nunit from version 1.0.6 to 2.0.3
+  com.unity.ide.rider from version 3.0.15 to 3.0.16
+  com.unity.purchasing from version 4.4.1 to 4.5.0
+  com.unity.timeline from version 1.7.1 to 1.7.2
