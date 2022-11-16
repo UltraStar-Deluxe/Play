@@ -37,24 +37,37 @@ public class TimeBarControl : INeedInjection
     public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)
     {
         innerTimeBarSentenceEntryContainer.Clear();
-        foreach (PlayerControl playerController in playerControls)
+        int playerControlIndex = 0;
+        foreach (PlayerControl playerControl in playerControls)
         {
-            CreateRectangles(songMeta, playerController, durationOfSongInMillis);
+            CreateRectangles(songMeta, playerControl, durationOfSongInMillis, playerControlIndex, playerControls.Count);
+            playerControlIndex++;
         }
     }
 
-    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationOfSongInMillis)
+    private void CreateRectangles(SongMeta songMeta, PlayerControl playerControl, double durationOfSongInMillis, int playerIndex, int playerCount)
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
         {
             double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
             double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
-            MicProfile micProfile = playerControl.MicProfile;
-            CreateRectangle(micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis);
+            if (playerCount <= 3)
+            {
+                // Show individual rectangles for each player
+                float heightPercent = playerCount > 0 ? (100 / playerCount) : 100;
+                float topPercent = playerIndex * heightPercent;
+                MicProfile micProfile = playerControl.MicProfile;
+                CreateRectangle(micProfile, startPosInMillis, endPosInMillis, durationOfSongInMillis, topPercent, heightPercent);
+            }
+            else
+            {
+                // Just show where the lyrics are, independent of the concrete player
+                CreateRectangle(null, startPosInMillis, endPosInMillis, durationOfSongInMillis, 0, 100);
+            }
         }
     }
 
-    private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis)
+    private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis, float topPercent, float heightPercent)
     {
         float startPosPercentage = (float)(100 * startPosInMillis / durationOfSongInMillis);
         float endPosPercentage = (float)(100 * endPosInMillis / durationOfSongInMillis);
@@ -63,7 +76,8 @@ public class TimeBarControl : INeedInjection
         rectangle.style.position = new StyleEnum<Position>(Position.Absolute);
         rectangle.style.left = new StyleLength(new Length(startPosPercentage, LengthUnit.Percent));
         rectangle.style.width = new StyleLength(new Length(endPosPercentage - startPosPercentage, LengthUnit.Percent));
-        rectangle.style.height = new StyleLength(new Length(100, LengthUnit.Percent));
+        rectangle.style.top = new StyleLength(new Length(topPercent, LengthUnit.Percent));
+        rectangle.style.height = new StyleLength(new Length(heightPercent, LengthUnit.Percent));
 
         // Set color of rectangle to color of mic.
         if (micProfile != null)
