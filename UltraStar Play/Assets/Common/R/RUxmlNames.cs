@@ -464,7 +464,6 @@ public static partial class R
         public const string searchPropertyDropdownTitle = "searchPropertyDropdownTitle";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
         public const string searchTextField = "searchTextField";
-        public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
         public const string secondBackground = "secondBackground";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
