@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 [Serializable]
 public class SongMeta
@@ -251,33 +252,42 @@ public class SongMeta
 
     public void Reload()
     {
-        SongMeta other = SongMetaBuilder.ParseFile(SongMetaUtils.GetAbsoluteSongMetaPath(this), out List<SongIssue> _);
+        string path = SongMetaUtils.GetAbsoluteSongMetaPath(this);
+        try
+        {
+            SongMeta other = SongMetaBuilder.ParseFile(path, out List<SongIssue> _);
 
-        // Copy values
-        Encoding = other.Encoding;
-        SongHash = other.SongHash;
+            // Copy values
+            Encoding = other.Encoding;
+            SongHash = other.SongHash;
 
-        voiceNames = other.voiceNames;
-        voices = new List<Voice>();
+            voiceNames = other.voiceNames;
+            voices = new List<Voice>();
 
-        Artist = other.Artist;
-        Title = other.Title;
-        Bpm = other.Bpm;
-        Mp3 = other.Mp3;
+            Artist = other.Artist;
+            Title = other.Title;
+            Bpm = other.Bpm;
+            Mp3 = other.Mp3;
 
-        Background = other.Background;
-        Cover = other.Cover;
-        Edition = other.Edition;
-        End = other.End;
-        Gap = other.Gap;
-        Genre = other.Genre;
-        Language = other.Language;
-        Relative = other.Relative;
-        Start = other.Start;
-        PreviewStart = other.PreviewStart;
-        PreviewEnd = other.PreviewEnd;
-        Video = other.Video;
-        VideoGap = other.VideoGap;
-        Year = other.Year;
+            Background = other.Background;
+            Cover = other.Cover;
+            Edition = other.Edition;
+            End = other.End;
+            Gap = other.Gap;
+            Genre = other.Genre;
+            Language = other.Language;
+            Relative = other.Relative;
+            Start = other.Start;
+            PreviewStart = other.PreviewStart;
+            PreviewEnd = other.PreviewEnd;
+            Video = other.Video;
+            VideoGap = other.VideoGap;
+            Year = other.Year;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to reload song {path}: " + e.Message);
+            Debug.LogException(e);
+        }
     }
 }
