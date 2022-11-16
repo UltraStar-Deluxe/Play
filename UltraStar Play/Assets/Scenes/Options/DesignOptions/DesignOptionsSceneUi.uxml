@@ -24,6 +24,10 @@
                     <ui:Label text="Show Lyrics on Notes" name="Label" class="controlLabel" />
                     <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
                 </ui:VisualElement>
+                <ui:VisualElement name="staticLyricsContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Show Static Lyrics" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                </ui:VisualElement>
                 <ui:VisualElement name="pitchIndicatorContainer" class="optionsLabelAndItemPicker">
                     <ui:Label text="Show Pitch Indicator" name="Label" class="controlLabel" />
                     <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />

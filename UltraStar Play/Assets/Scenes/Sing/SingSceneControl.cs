@@ -335,16 +335,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void InitSingingLyricsControls()
     {
-        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
+        if (PlayerControls.IsNullOrEmpty()
+            || !settings.GraphicSettings.showStaticLyrics)
         {
-            // Lyrics are shown in each PlayerUi
             topLyricsContainer.HideByDisplay();
             bottomLyricsContainer.HideByDisplay();
-            return;
-        }
-
-        if (PlayerControls.IsNullOrEmpty())
-        {
             return;
         }
 

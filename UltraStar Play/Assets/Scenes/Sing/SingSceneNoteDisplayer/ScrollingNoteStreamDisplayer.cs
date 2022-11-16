@@ -123,13 +123,8 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             return null;
         }
 
-        // Create label for dedicated lyrics bar
-        Label label = new(targetNoteControl.Note.Text.Trim());
-        targetNoteControl.Label.GetClasses().ForEach(className => label.AddToClassList(className));
-        lyricsContainer.Add(label);
-        noteToLyricsContainerLabel[targetNoteControl.Note] = label;
-
-        UpdateNoteLyricsPosition(targetNoteControl);
+        // Hide dedicated lyrics bar in PlayerUi for now
+        lyricsContainer.HideByDisplay();
         return targetNoteControl;
     }
 
