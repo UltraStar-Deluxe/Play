@@ -1049,16 +1049,20 @@ TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-xs);
 }
 
-.materialSymbols {
+.materialSymbol {
     font-size: var(--material-symbol-size);
     -unity-font-style: normal;
     -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular SDF.asset');
 }
 
-.materialSymbols.outlined {
+.materialSymbol.outlined {
     -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular SDF.asset');
 }
 
-.materialSymbols.rounded {
+.materialSymbol.rounded {
     -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular SDF.asset');
+}
+
+#titleImageAndText #titleImage {
+    margin-right: 10px;
 }
