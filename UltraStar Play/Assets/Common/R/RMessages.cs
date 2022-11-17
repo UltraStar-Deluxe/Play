@@ -212,6 +212,7 @@ public static partial class R
         public static readonly string settingsProblem_noPlayerProfile = "settingsProblem_noPlayerProfile";
         public static readonly string settingsProblem_noSongFolders = "settingsProblem_noSongFolders";
         public static readonly string settingsProblem_songFolderDoesNotExist = "settingsProblem_songFolderDoesNotExist";
+        public static readonly string settingsProblem_thereAreSongIssues = "settingsProblem_thereAreSongIssues";
         public static readonly string singingResultsScene_title = "singingResultsScene_title";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";
         public static readonly string singScene_missingMicrophones_title = "singScene_missingMicrophones_title";
