@@ -158,28 +158,31 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() =>
             settings.SongEditorSettings.SmallLeftSideBar = !settings.SongEditorSettings.SmallLeftSideBar);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.SmallLeftSideBar)
-            .Subscribe(newValue => UpdateLeftSideBarClasses())
+            .Subscribe(newValue =>
+            {
+                UpdatePlayPauseIcon();
+                UpdateLeftSideBarClasses();
+            })
             .AddTo(gameObject);
         UpdateLeftSideBarClasses();
+        UpdatePlayPauseIcon();
 
         songAudioPlayer.PlaybackStartedEventStream
-            .Subscribe(_ => ShowPauseIcon());
+            .Subscribe(_ => UpdatePlayPauseIcon());
         songAudioPlayer.PlaybackStoppedEventStream
-            .Subscribe(_ => ShowPlayIcon());
+            .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
     }
 
-    private void ShowPlayIcon()
+    private void UpdatePlayPauseIcon()
     {
-        playIcon.ShowByDisplay();
-        pauseIcon.HideByDisplay();
-    }
-
-    private void ShowPauseIcon()
-    {
-        playIcon.HideByDisplay();
-        pauseIcon.ShowByDisplay();
+        bool playIconVisible = settings.SongEditorSettings.SmallLeftSideBar
+                               && !songAudioPlayer.IsPlaying;
+        bool pauseIconVisible = settings.SongEditorSettings.SmallLeftSideBar
+                               && songAudioPlayer.IsPlaying;
+        playIcon.SetVisibleByDisplay(playIconVisible);
+        pauseIcon.SetVisibleByDisplay(pauseIconVisible);
     }
 
     private void UpdateLeftSideBarClasses()
@@ -187,10 +190,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         if (settings.SongEditorSettings.SmallLeftSideBar)
         {
             leftSideBarMainColumn.AddToClassList("small");
+            leftSideBarMainColumn.RemoveFromClassList("wide");
         }
         else
         {
             leftSideBarMainColumn.RemoveFromClassList("small");
+            leftSideBarMainColumn.AddToClassList("wide");
         }
     }
 

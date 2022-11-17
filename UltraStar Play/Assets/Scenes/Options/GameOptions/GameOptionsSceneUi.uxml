@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="sports_esports" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Game Options" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>

@@ -13,7 +13,7 @@
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px; display: none;">
                 <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
+                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Credits" name="sceneTitle" class="titleText" />
                             <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />

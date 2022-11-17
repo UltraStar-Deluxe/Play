@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="mic" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Recording Device" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
@@ -48,8 +48,8 @@
             <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row-reverse;">
                 <ui:Button text="Back" name="backButton" />
                 <ui:VisualElement name="notConnectedContainer" style="width: 300px; flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="warningIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 32px; height: 32px; -unity-background-image-tint-color: rgb(219, 214, 20); margin-right: 20px;" />
-                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" />
+                    <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
+                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
                 </ui:VisualElement>
                 <ui:Button text="Delete" name="deleteButton" style="visibility: visible; display: flex;" />
             </ui:VisualElement>

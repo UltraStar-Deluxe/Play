@@ -15,7 +15,7 @@ public class MaterialIcon : Label
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
         // Additional XML attributes
-        private readonly UxmlStringAttributeDescription icon = new() { name = "icon", defaultValue = "", use = UxmlAttributeDescription.Use.Required};
+        private readonly UxmlStringAttributeDescription icon = new() { name = "icon", defaultValue = "" };
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
@@ -25,8 +25,6 @@ public class MaterialIcon : Label
             // Read additional attributes from XML
             target.icon = icon.GetValueFromBag(bag, cc);
 
-            // Create label with required USS classes and text to render the icon.
-            Label iconLabel = new Label();
             // Set USS classes and text (codepoint of the icon) to render the icon from a Font Asset.
             if (string.IsNullOrEmpty(target.icon))
             {

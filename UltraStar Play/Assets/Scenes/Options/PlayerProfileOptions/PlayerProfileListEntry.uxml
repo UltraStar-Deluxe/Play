@@ -13,7 +13,7 @@
                 <ui:Toggle name="enabledToggle" />
             </ui:VisualElement>
             <ui:Button name="deleteButton" class="dangerButton squareButton">
-                <ui:VisualElement name="deleteIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/delete_forever_white_24dp.svg?fileID=7388822144124034973&amp;guid=7b2404ad4c9053840a3db02464d2ddbd&amp;type=3#delete_forever_white_24dp&apos;);" />
+                <MaterialIcon name="deleteIcon" icon="delete" />
             </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
