@@ -68,6 +68,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private Settings settings;
 
     [Inject]
+    private SongMetaManager songMetaManager;
+
+    [Inject]
     private UIDocument uiDoc;
 
     [Inject]
@@ -100,7 +103,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         new SettingsProblemHintControl(
             songSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings),
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager),
             injector);
 
         new SettingsProblemHintControl(

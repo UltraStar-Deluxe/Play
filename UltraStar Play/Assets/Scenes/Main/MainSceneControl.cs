@@ -128,7 +128,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         new SettingsProblemHintControl(
             settingsProblemHintIcon,
-            SettingsProblemHintControl.GetAllSettingsProblems(settings),
+            SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager),
             injector);
     }
 
