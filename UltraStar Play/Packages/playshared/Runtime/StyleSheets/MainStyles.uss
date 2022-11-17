@@ -1132,3 +1132,13 @@ TextField.placeholderVisible #unity-text-input {
 .unity-base-slider--horizontal .unity-base-slider__dragger {
     margin-top: 6px;
 }
+
+.wordWrap
+{
+    white-space: normal;
+}
+
+.wordWrap Label
+{
+    white-space: normal;
+}
