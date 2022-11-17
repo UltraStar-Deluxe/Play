@@ -186,6 +186,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(helpDialog);
+        helpDialog.AddToClassList("wordWrap");
 
         helpDialogControl = injector
             .WithRootVisualElement(helpDialog)
