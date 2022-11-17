@@ -6,6 +6,7 @@
     --font-size-l: 18px;
     --font-size-xl: 20px;
     --font-size-xxl: 22px;
+    --material-symbol-size: 26px;
     --control-height: 30px;
     --control-width: 100px;
     --control-width-half: 50px;
