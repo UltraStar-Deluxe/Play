@@ -97,8 +97,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.duetIcon)]
     private VisualElement duetIcon;
 
-    [Inject(UxmlName = R.UxmlNames.toggleFavoriteIcon)]
-    private VisualElement favoriteIcon;
+    [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
+    private MaterialIcon noFavoriteIcon;
+
+    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    private MaterialIcon favoriteIcon;
 
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
@@ -462,10 +465,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateFavoriteIcon()
     {
-        VectorImage vectorImage = IsFavorite(SelectedSong)
-            ? favoriteImageAsset
-            : noFavoriteImageAsset;
-        favoriteIcon.style.backgroundImage = new StyleBackground(vectorImage);
+        bool isFavorite = IsFavorite(SelectedSong);
+        favoriteIcon.SetVisibleByDisplay(isFavorite);
+        noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
     public void InitSongMetas()

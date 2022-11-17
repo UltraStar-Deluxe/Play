@@ -2,7 +2,7 @@
     <ui:VisualElement name="accordionItemRoot" class="accordionRoot expanded">
         <ui:Button display-tooltip-when-elided="true" name="toggleAccordionItemContentButton" style="width: 100%; align-items: center; padding-left: 10px; padding-right: 10px; flex-direction: row; justify-content: space-between; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
             <ui:Label text="Accordion Title Text" display-tooltip-when-elided="true" name="accordionItemTitle" />
-            <ui:VisualElement name="toggleAccordionItemContentIcon" class="iconImageTextSized" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/expand_more_white_24dp.svg?fileID=7388822144124034973&amp;guid=1db7cee5a04ba614882c5a9cde785f2c&amp;type=3#expand_more_white_24dp&apos;);" />
+            <MaterialIcon name="toggleAccordionItemContentIcon" icon="expand_more" />
         </ui:Button>
         <ui:VisualElement name="accordionItemContent">
             <ui:Label text="Label" display-tooltip-when-elided="true" />

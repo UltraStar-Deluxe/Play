@@ -4,7 +4,8 @@
             <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
                 <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
+                        <MaterialIcon name="titleImage" icon="info_outline" />
+                        <ui:VisualElement name="backIcon" class="iconImage" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="About" name="sceneTitle" class="titleText" />
                             <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
@@ -21,7 +22,7 @@
                 </ui:ScrollView>
             </ui:VisualElement>
             <ui:VisualElement name="bottomContent" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" />
+                <ui:Button name="backButton" value="This is the about text on multiple lines." />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

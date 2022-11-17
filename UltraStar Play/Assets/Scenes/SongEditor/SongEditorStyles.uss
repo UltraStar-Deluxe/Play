@@ -33,18 +33,6 @@
     -unity-background-image-tint-color: rgb(196, 196, 196);
 }
 
-#leftSideBarMainColumn .icon
-{
-    width: 50%;
-    height: 50%;
-}
-
-#leftSideBarMainColumn .labelIcon
-{
-    width: 50%;
-    height: 50%;
-}
-
 #virtualPiano {
     background-color: rgb(49, 51, 53);
 }
@@ -130,24 +118,46 @@ Button.selected:hover {
     -unity-background-image-tint-color: var(--text-color);
 }
 
-.leftSideBar .icon {
+.leftSideBar MaterialIcon {
     position: absolute;
     width: 100%;
     height: 100%;
     -unity-background-scale-mode: scale-to-fit;
-    display: none;
 }
 
-.leftSideBar.small {
+#leftSideBarMainColumn.small {
     width: 30px;
 }
 
-.leftSideBar.small Label {
+#leftSideBarMainColumn MaterialIcon
+{
+    font-size: 24px;
+    width: auto;
+    height: auto;
+}
+
+#leftSideBarMainColumn.small Label {
     display: none;
 }
 
-.leftSideBar.small .icon {
+#leftSideBarMainColumn.wide Label {
     display: flex;
+}
+
+#leftSideBarMainColumn.small MaterialIcon#wideIcon {
+    display: none;
+}
+
+#leftSideBarMainColumn.wide MaterialIcon#wideIcon {
+    display: flex;
+}
+
+#leftSideBarMainColumn.small MaterialIcon {
+    display: flex;
+}
+
+#leftSideBarMainColumn.wide MaterialIcon {
+    display: none;
 }
 
 .secondarySideBarPanel {

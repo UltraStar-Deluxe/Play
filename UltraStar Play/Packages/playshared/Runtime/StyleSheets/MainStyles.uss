@@ -332,7 +332,7 @@ TextInput {
     -unity-font-style: bold;
     width: var(--main-scene-button-width);
     height: var(--control-height-large);
-    margin: 0px;
+    margin: 0;
 }
 
 .mainSceneButton.roundButton {
@@ -386,8 +386,7 @@ TextInput {
     align-items: center;
 }
 
-.optionsOverviewButton .warning
-{
+.optionsOverviewButton .warning {
     color: var(--text-color-warning);
     -unity-background-image-tint-color: var(--text-color-warning);
 }
@@ -706,10 +705,16 @@ Button.tinyFont {
 }
 
 .inputLegendBar {
+    width: 100%;
     flex-direction: row;
     justify-content: space-around;
     padding: 5px 50px;
     background-color: rgba(32, 32, 32, 0.88);
+}
+
+#inputDeviceIcon {
+    height: 90%;
+    width: 20px;
 }
 
 #menuOverlay .inputLegendLabel {
@@ -879,7 +884,7 @@ Button.tinyFont {
     display: none;
 }
 
-.unity-scroller--vertical > .unity-scroller__slider  {
+.unity-scroller--vertical > .unity-scroller__slider {
     width: 12px;
     min-width: auto;
     border-radius: 5px;
@@ -887,7 +892,7 @@ Button.tinyFont {
     padding: 0;
 }
 
-.unity-scroller--horizontal > .unity-scroller__slider  {
+.unity-scroller--horizontal > .unity-scroller__slider {
     height: 12px;
     min-height: auto;
     border-radius: 5px;
@@ -1016,7 +1021,6 @@ Button.tinyFont {
     margin-right: auto;
     font-size: var(--font-size-s);
     white-space: normal;
-    /* Underline */
     border-bottom-color: var(--text-color);
     border-bottom-width: 1px;
 }
@@ -1049,20 +1053,82 @@ TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-xs);
 }
 
+.unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    height: 55%;
+}
+
+.unity-toggle > .unity-toggle__input:focus:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    height: 55%;
+}
+
+.unity-toggle > .unity-toggle__input:hover:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    height: 55%;
+}
+
 .materialSymbol {
     font-size: var(--material-symbol-size);
     -unity-font-style: normal;
-    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
 }
 
 .materialSymbol.outlined {
-    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
 }
 
 .materialSymbol.rounded {
-    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
+}
+
+.materialSymbol.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+.materialSymbol.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+.materialSymbol.smallFont {
+    font-size: var(--font-size-s);
+}
+
+#toggleFavoriteButton MaterialIcon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: 48px;
 }
 
 #titleImageAndText #titleImage {
     margin-right: 10px;
+}
+
+.settingsProblemHintIcon {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+#positionBeforeLyricsIndicator {
+    width: 20px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    color: rgb(66, 163, 231);
+    margin-left: -25px;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#searchErrorIcon {
+    position: absolute;
+    top: auto;
+    bottom: 100%;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger {
+    margin-top: 6px;
 }

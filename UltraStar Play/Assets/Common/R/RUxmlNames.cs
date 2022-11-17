@@ -37,12 +37,11 @@ public static partial class R
         public const string b = "b";
         public const string backButton = "backButton";
         public const string backButtonContainer = "backButtonContainer";
-        public const string backButtonLabel = "backButtonLabel";
         public const string background = "background";
         public const string backgroundMusicVolumeChooser = "backgroundMusicVolumeChooser";
         public const string backgroundMusicVolumeContainer = "backgroundMusicVolumeContainer";
         public const string backgroundMusicVolumeLabel = "backgroundMusicVolumeLabel";
-        public const string backImage = "backImage";
+        public const string backIcon = "backIcon";
         public const string backToMainMenuButton = "backToMainMenuButton";
         public const string banner = "banner";
         public const string bonusLabel = "bonusLabel";
@@ -160,6 +159,7 @@ public static partial class R
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
+        public const string favoriteIcon = "favoriteIcon";
         public const string filledScoreBar = "filledScoreBar";
         public const string first = "first";
         public const string fpsContainer = "fpsContainer";
@@ -318,6 +318,7 @@ public static partial class R
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nextSongButton = "nextSongButton";
         public const string nicknameCharacterContainer = "nicknameCharacterContainer";
+        public const string noFavoriteIcon = "noFavoriteIcon";
         public const string noiseSuppressionContainer = "noiseSuppressionContainer";
         public const string noMicsFoundLabel = "noMicsFoundLabel";
         public const string normalNoteScore = "normalNoteScore";
@@ -593,7 +594,6 @@ public static partial class R
         public const string titleTextField = "titleTextField";
         public const string toggle = "toggle";
         public const string toggleFavoriteButton = "toggleFavoriteButton";
-        public const string toggleFavoriteIcon = "toggleFavoriteIcon";
         public const string toggleHelpButton = "toggleHelpButton";
         public const string toggleIssuesButton = "toggleIssuesButton";
         public const string toggleLayersButton = "toggleLayersButton";

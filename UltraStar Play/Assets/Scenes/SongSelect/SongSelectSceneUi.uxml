@@ -2,12 +2,13 @@
     <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSongEntryUi" />
     <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
     <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
+    <Style src="project://database/Packages/playshared/Runtime/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;);">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
                 <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;); display: flex;" />
+                        <MaterialIcon name="titleImage" icon="music_note" />
                         <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
                             <ui:Label text="Song Select" name="sceneTitle" class="titleText" />
                             <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto; display: none;" />
@@ -27,14 +28,14 @@
                     <ui:Button text="R2 &gt;" display-tooltip-when-elided="true" name="nextCharacterButton" class="transparentBackgroundColor characterQuickJumpCharacterButton focusableNavigatorIgnore" style="width: 25px; height: 100%;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row; height: 100%;">
-                    <ui:VisualElement name="searchErrorIcon" class="iconImage warning" style="position: absolute; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); top: auto; bottom: 100%;" />
+                    <MaterialIcon name="searchErrorIcon" icon="warning" class="warning rounded" />
                     <ui:TextField picking-mode="Ignore" name="searchTextField" placeholder-text="Search artist, title" hide-placeholder-on-focus="true" class="comboBoxTextField" style="align-items: center; height: 100%; flex-grow: 1;" />
                     <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="outlineOnFocus roundCorners comboBoxButton" style="width: 30px; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px;">
-                        <ui:VisualElement picking-mode="Ignore" name="searchIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/manage_search_white_24dp.svg?fileID=7388822144124034973&amp;guid=daabccae6b8e38a4996aa4ff2fd68ece&amp;type=3#manage_search_white_24dp&apos;); width: 100%; height: 100%;" />
+                        <MaterialIcon name="searchIcon" icon="manage_search" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="playlistChooserContainer" class="outline roundCorners" style="width: 30%; height: 100%;">
-                    <ui:VisualElement picking-mode="Ignore" name="dropdownIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/arrow_drop_down_white_24dp.svg?fileID=7388822144124034973&amp;guid=9daceb62ee39f1146b9d9c2b2da3786b&amp;type=3#arrow_drop_down_white_24dp&apos;); width: 12px; height: 100%; position: absolute; right: 10px; -unity-background-scale-mode: scale-to-fit;" />
+                    <MaterialIcon name="dropDownIcon" icon="arrow_drop_down" style="position: absolute; right: 10px;" />
                     <ui:Button text="Playlist A" name="playlistChooserButton" class="transparentBackgroundColor outlineOnFocus roundCorners" style="width: 100%; height: 100%; -unity-text-align: middle-left; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 10px; padding-right: 10px; padding-top: 0; padding-bottom: 0;" />
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -87,14 +88,15 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="iconContainer" style="position: absolute; height: 100%; width: 30%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
                         <ui:VisualElement name="duetIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 24px; height: 24px; display: flex;" />
-                        <ui:VisualElement name="toggleFavoriteIcon" style="height: 40px; width: 40px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/favorite_white_24dp.svg?fileID=7388822144124034973&amp;guid=5fd6f255d5637614eae7dfe140b680d7&amp;type=3#favorite_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit;">
-                            <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
-                        </ui:VisualElement>
+                        <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; overflow: visible; width: 40px; height: 40px;">
+                            <MaterialIcon name="favoriteIcon" icon="favorite" />
+                            <MaterialIcon name="noFavoriteIcon" icon="favorite_border" />
+                        </ui:Button>
                         <ui:VisualElement name="videoIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/VideoIcon.png?fileID=2800000&amp;guid=7383f98aba0fc1f4c97010b513d5b884&amp;type=3#VideoIcon&apos;); width: 24px; height: 24px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="songIndexContainer" class="smallFont roundCorners" style="width: 25%; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); justify-content: flex-end; flex-direction: row; align-items: flex-end;">
-                    <ui:VisualElement name="songIndexIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]cd.png?fileID=2800000&amp;guid=b31378768ea13604c86e1c1de8c3b8f4&amp;type=3#[icon]cd&apos;); height: 100%; width: 32px; -unity-background-scale-mode: scale-to-fit; margin-right: 5px;" />
+                    <MaterialIcon name="songIndexIcon" icon="album" style="font-size: 48px;" />
                     <ui:Label text="10000&#10;of 99999" display-tooltip-when-elided="true" name="songIndexLabel" style="-unity-text-align: upper-right; font-size: 18px;" />
                     <ui:Button display-tooltip-when-elided="true" name="songIndexButton" class="transparentBackgroundColor" style="position: absolute; width: 80%; height: 90%; right: 0;" />
                 </ui:VisualElement>
@@ -106,8 +108,8 @@
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closePlayerSelectOverlayButton" style="width: auto; flex-grow: 1;" />
                     <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" style="width: auto; flex-grow: 1;" />
                     <ui:Button display-tooltip-when-elided="true" name="toggleSingingOptionsButton" style="width: auto; flex-grow: 1;">
-                        <ui:VisualElement name="settingsIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/settings_white_24dp.svg?fileID=7388822144124034973&amp;guid=12ed75580d6e33342af3ffd0e8b3e86a&amp;type=3#settings_white_24dp&apos;); width: 24px; height: 24px; position: absolute; display: flex; -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="playersIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/manage_accounts_white_24dp.svg?fileID=7388822144124034973&amp;guid=36032a914369e374caa3114d42761509&amp;type=3#manage_accounts_white_24dp&apos;); width: 24px; height: 24px; position: absolute; -unity-background-scale-mode: scale-to-fit; display: none;" />
+                        <MaterialIcon name="settingsIcon" icon="settings" style="position: absolute;" />
+                        <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 90%; flex-grow: 1;">
@@ -145,8 +147,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; width: 100%; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); height: auto; display: flex; flex-wrap: wrap;">
-            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); width: 24px; height: 100%; -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
+        <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); display: flex; flex-wrap: wrap;">
+            <ui:VisualElement name="inputDeviceIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/keyboard_and_mouse_white_24dp.svg?fileID=7388822144124034973&amp;guid=3595fdd3d728cc2418a169be1d969e46&amp;type=3#keyboard_and_mouse_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; position: absolute; left: 10px;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />
@@ -232,7 +234,7 @@
                         <ui:Label text="Advanced search available" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
                         <ui:VisualElement style="align-items: auto; width: 100%;">
                             <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" style="width: auto; height: auto;">
-                                <ui:VisualElement name="helpIcon" picking-mode="Ignore" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/help_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=088f9b8e2490ed44a862efc470dafb60&amp;type=3#help_outline_white_24dp&apos;);" />
+                                <MaterialIcon name="helpIcon" icon="help_outline" />
                             </ui:Button>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -250,12 +252,12 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="searchExpressionInfoOverlay" style="position: absolute; width: 100%; height: 100%; align-items: center; justify-content: center; display: none;">
-            <ui:VisualElement name="innerSearchExpressionInfoOverlay" style="position: absolute; background-color: rgba(32, 32, 32, 0.88); border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; min-width: 400px; min-height: 300px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="flex-grow: 1;">
+            <ui:VisualElement name="innerSearchExpressionInfoOverlay" style="background-color: rgba(32, 32, 32, 0.88); border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; max-width: 90%; max-height: 90%;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
                     <ui:Label text="You can use C# expressions to search songs." display-tooltip-when-elided="true" name="searchExpressionInfoLabel" style="margin-bottom: 10px; white-space: normal;" />
                     <ui:Label text="Note that C# syntax rules apply." display-tooltip-when-elided="true" name="searchExpressionInfoSyntaxTipsLabel" style="white-space: normal;" />
                 </ui:ScrollView>
-                <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: flex-end;">
+                <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: center;">
                     <ui:Button text="Close" display-tooltip-when-elided="true" name="closeSearchExpressionInfoButton" />
                 </ui:VisualElement>
             </ui:VisualElement>

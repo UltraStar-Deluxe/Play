@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="music_note" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Song Library" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
@@ -22,18 +22,18 @@
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;">
                     <ui:Label text="Label" display-tooltip-when-elided="true" />
                 </ui:ScrollView>
-                <ui:Button name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 30px; font-size: 30px;">
-                    <ui:VisualElement name="addIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/add_white_24dp.svg?fileID=7388822144124034973&amp;guid=38d7fadad6e9e4349944a7152b75fef8&amp;type=3#add_white_24dp&apos;);" />
+                <ui:Button name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 29px; font-size: 30px;">
+                    <MaterialIcon name="addIcon" icon="add" />
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
                 <ui:Button text="Download Songs" name="downloadSceneButton" style="width: 240px;" />
                 <ui:VisualElement style="flex-direction: row;">
                     <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px; margin-left: 5px;">
-                        <ui:VisualElement name="songIssueIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                        <MaterialIcon name="songIssueIcon" icon="warning" class="rounded" />
                     </ui:Button>
-                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; margin-left: 5px;">
-                        <ui:VisualElement name="helpIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/help_outline_white_24dp.svg?fileID=7388822144124034973&amp;guid=088f9b8e2490ed44a862efc470dafb60&amp;type=3#help_outline_white_24dp&apos;);" />
+                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; margin-left: 5px; flex-direction: row;">
+                        <MaterialIcon name="helpIcon" icon="help_outline" />
                     </ui:Button>
                     <ui:Button text="Back" name="backButton" />
                 </ui:VisualElement>

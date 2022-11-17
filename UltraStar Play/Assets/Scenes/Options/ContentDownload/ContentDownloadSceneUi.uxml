@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="cloud_download" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Content Download" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
@@ -16,7 +16,7 @@
                 <ui:VisualElement name="urlChooserComboContainer" style="flex-direction: row; width: 100%;">
                     <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.zip" name="urlTextField" style="width: auto; flex-grow: 1;" />
                     <ui:Button name="urlChooserButton" class="squareButton" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0;">
-                        <ui:VisualElement name="dropDownIcon" class="iconImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/arrow_drop_down_white_24dp.svg?fileID=7388822144124034973&amp;guid=9daceb62ee39f1146b9d9c2b2da3786b&amp;type=3#arrow_drop_down_white_24dp&apos;);" />
+                        <MaterialIcon name="dropDownIcon" icon="arrow_drop_down" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

@@ -6,7 +6,7 @@
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
                 <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;);" />
+                        <MaterialIcon name="titleImage" icon="auto_awesome" />
                         <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
                             <ui:Label text="Highscores" name="sceneTitle" class="titleText" />
                             <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
