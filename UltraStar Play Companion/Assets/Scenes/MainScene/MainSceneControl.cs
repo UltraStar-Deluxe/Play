@@ -168,6 +168,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             settings.SetMicProfileName(Microphone.devices.FirstOrDefault());
         }
 
+        menuOverlay.ShowByDisplay();
+
         settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(_ => OnMicProfileChanged());
         micSampleRecorder.IsRecording.Subscribe(OnRecordingStateChanged);
