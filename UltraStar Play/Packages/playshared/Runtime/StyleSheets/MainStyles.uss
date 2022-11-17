@@ -11,6 +11,7 @@
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
+    --material-symbol-size: 32px;
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
@@ -1046,4 +1047,18 @@ TextField.placeholderVisible {
 
 TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-xs);
+}
+
+.materialSymbols {
+    font-size: var(--material-symbol-size);
+    -unity-font-style: normal;
+    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular SDF.asset');
+}
+
+.materialSymbols.outlined {
+    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular SDF.asset');
+}
+
+.materialSymbols.rounded {
+    -unity-font-definition: url('/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular SDF.asset');
 }
