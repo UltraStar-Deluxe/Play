@@ -289,7 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Kryptonite
+  defaultSongName: Dare Master
   defaultSongNamePasteBin: 'Summer Wine
 
     Me And My Broken Heart
@@ -308,7 +308,10 @@ MonoBehaviour:
 
     Kryptonite
 
-    On the run'
+    On the run
+
+    Dare
+    Master'
 --- !u!4 &242235910
 Transform:
   m_ObjectHideFlags: 0
@@ -671,6 +674,8 @@ MonoBehaviour:
   perfectEffectStarUi: {fileID: 9197481963319205126, guid: 1a17d33675a3b2f4fb69ca0b3c8c6661,
     type: 3}
   goldenNoteStarUi: {fileID: 9197481963319205126, guid: e7f43ec8168761646ab238a5567dcdf8,
+    type: 3}
+  goldenNoteHitStarUi: {fileID: 9197481963319205126, guid: 3eff55d6e9108b64d8c3bd404f479e1e,
     type: 3}
   songAudioPlayer: {fileID: 1098468898}
   songVideoPlayer: {fileID: 227833046}

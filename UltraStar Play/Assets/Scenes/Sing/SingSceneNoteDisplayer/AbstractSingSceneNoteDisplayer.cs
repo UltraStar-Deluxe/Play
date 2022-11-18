@@ -205,13 +205,10 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         VisualElement visualElement = noteUi.CloneTree().Children().First();
 
-        Injector childInjector = UniInjectUtils.CreateInjector(injector);
-        childInjector.AddBindingForInstance(childInjector);
-        childInjector.AddBindingForInstance(note);
-        childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, visualElement);
-
-        TargetNoteControl targetNoteControl = new(effectsContainer);
-        childInjector.Inject(targetNoteControl);
+        TargetNoteControl targetNoteControl = injector
+            .WithBindingForInstance(note)
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<TargetNoteControl>();
 
         Label label = targetNoteControl.Label;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
