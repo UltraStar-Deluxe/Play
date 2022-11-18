@@ -9,7 +9,7 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
 {
     public string defaultSongName;
 
-    [TextArea(3, 8)]
+    [TextArea(10, 20)]
     [Tooltip("Convenience text field to paste and copy song names when debugging.")]
     public string defaultSongNamePasteBin;
 

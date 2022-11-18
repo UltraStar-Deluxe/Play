@@ -40,7 +40,7 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private void Awake()
     {
-        LeanTween.init(800);
+        LeanTween.init(10000);
     }
 
     private void Start()
