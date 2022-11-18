@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; width: 100%;">
+        <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        <ui:Label tabindex="-1" text="The Artist - The Title" display-tooltip-when-elided="true" name="title" class="songIssueSongMetaTitle" />
+        <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+        <ui:Button display-tooltip-when-elided="true" name="openFolderButton" class="squareButton">
+            <MaterialIcon name="openFolderIcon" icon="open_in_new" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>
