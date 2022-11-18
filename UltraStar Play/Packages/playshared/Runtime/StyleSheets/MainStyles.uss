@@ -11,13 +11,14 @@
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
-    --material-symbol-size: 32px;
+    --font-icon-size: 32px;
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
     --control-width: 120px;
     --control-width-half: 60px;
     --control-width-large: 150px;
+    --round-button-size: 50px;
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
@@ -202,9 +203,9 @@
 }
 
 .roundButton {
-    width: var(--control-width-half);
-    height: var(--control-width-half);
-    border-radius: var(--control-width-half);
+    width: var(--round-button-size);
+    height: var(--round-button-size);
+    border-radius: var(--round-button-size);
 }
 
 .squareButton {
@@ -1068,29 +1069,36 @@ TextField.placeholderVisible #unity-text-input {
     height: 55%;
 }
 
-.materialSymbol {
-    font-size: var(--material-symbol-size);
-    -unity-font-style: normal;
+.materialIcon {
     -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
 }
 
-.materialSymbol.outlined {
+.materialIcon.outlined {
     -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
 }
 
-.materialSymbol.rounded {
+.materialIcon.rounded {
     -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
 }
 
-.materialSymbol.tinyFont {
+.bootstrapIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset');
+}
+
+.fontIcon {
+    font-size: var(--font-icon-size);
+    -unity-font-style: normal;
+}
+
+.fontIcon.tinyFont {
     font-size: var(--font-size-xxs);
 }
 
-.materialSymbol.smallerFont {
+.fontIcon.smallerFont {
     font-size: var(--font-size-xs);
 }
 
-.materialSymbol.smallFont {
+.fontIcon.smallFont {
     font-size: var(--font-size-s);
 }
 
