@@ -6,11 +6,12 @@
     --font-size-l: 18px;
     --font-size-xl: 20px;
     --font-size-xxl: 22px;
-    --material-symbol-size: 26px;
+    --font-icon-size: 26px;
     --control-height: 30px;
     --control-width: 100px;
     --control-width-half: 50px;
     --control-width-large: 120px;
+    --round-button-size: 40px;
     --control-height-large: 74px;
     --control-height-small: 20px;
 }
