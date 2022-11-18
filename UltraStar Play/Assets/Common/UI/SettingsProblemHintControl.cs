@@ -47,6 +47,16 @@ public class SettingsProblemHintControl
         {
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_thereAreSongIssues));
         }
+
+        // Check if song folder is subfolder of other song folder
+        foreach (string songFolder in settings.GameSettings.songDirs)
+        {
+            if (IsSubfolderOfAnyOtherFolder(songFolder, settings.GameSettings.songDirs, out string _))
+            {
+                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
+            }
+        }
+
         return result;
     }
 
@@ -79,5 +89,41 @@ public class SettingsProblemHintControl
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noEnabledPlayerProfile));
         }
         return result;
+    }
+
+    public static bool IsSubfolderOfAnyOtherFolder(string potentialSubfolder, List<string> potentialParentFolders, out string parentFolder)
+    {
+        foreach (string potentialParentFolder in potentialParentFolders)
+        {
+            if (potentialSubfolder != potentialParentFolder
+                && IsSubfolder(potentialSubfolder, potentialParentFolder))
+            {
+                parentFolder = potentialParentFolder;
+                return true;
+            }
+        }
+
+        parentFolder = "";
+        return false;
+    }
+
+    private static bool IsSubfolder(string potentialSubfolder, string potentialParentFolder)
+    {
+        if (potentialSubfolder.IsNullOrEmpty() || potentialParentFolder.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        DirectoryInfo potentialSubfolderInfo = new(potentialSubfolder);
+        DirectoryInfo potentialParentInfo = new(potentialParentFolder);
+
+        // FullName returns the normalized absolute path.
+        if (potentialSubfolderInfo.FullName == potentialParentInfo.FullName)
+        {
+            // Equal paths do not count as subfolder.
+            return false;
+        }
+
+        return potentialSubfolderInfo.FullName.StartsWith(potentialParentInfo.FullName);
     }
 }

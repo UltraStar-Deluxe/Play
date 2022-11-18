@@ -161,6 +161,10 @@ public static partial class R
         public static readonly string options_songLibrary_helpDialog_songFormatInfo_title = "options_songLibrary_helpDialog_songFormatInfo_title";
         public static readonly string options_songLibrary_helpDialog_title = "options_songLibrary_helpDialog_title";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
+        public static readonly string options_songLibrary_songFolder_doesNotExist = "options_songLibrary_songFolder_doesNotExist";
+        public static readonly string options_songLibrary_songFolder_missingValue = "options_songLibrary_songFolder_missingValue";
+        public static readonly string options_songLibrary_songFolder_noFolder = "options_songLibrary_songFolder_noFolder";
+        public static readonly string options_songLibrary_songFolder_subfolderOfOtherFolder = "options_songLibrary_songFolder_subfolderOfOtherFolder";
         public static readonly string options_songLibrary_songIssueDialog_errors = "options_songLibrary_songIssueDialog_errors";
         public static readonly string options_songLibrary_songIssueDialog_noIssues = "options_songLibrary_songIssueDialog_noIssues";
         public static readonly string options_songLibrary_songIssueDialog_title = "options_songLibrary_songIssueDialog_title";
@@ -212,6 +216,7 @@ public static partial class R
         public static readonly string settingsProblem_noPlayerProfile = "settingsProblem_noPlayerProfile";
         public static readonly string settingsProblem_noSongFolders = "settingsProblem_noSongFolders";
         public static readonly string settingsProblem_songFolderDoesNotExist = "settingsProblem_songFolderDoesNotExist";
+        public static readonly string settingsProblem_songFolderIsSubfolderOfOtherSongFolder = "settingsProblem_songFolderIsSubfolderOfOtherSongFolder";
         public static readonly string settingsProblem_thereAreSongIssues = "settingsProblem_thereAreSongIssues";
         public static readonly string singingResultsScene_title = "singingResultsScene_title";
         public static readonly string singScene_missingMicrophones_message = "singScene_missingMicrophones_message";

@@ -85,6 +85,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
     private MessageDialogControl helpDialogControl;
     private MessageDialogControl songIssueDialogControl;
+    private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
 
     private void Start()
     {
@@ -366,6 +367,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void UpdateSongFolderList()
     {
         songList.Clear();
+        songFolderListEntryControls.Clear();
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
@@ -377,7 +379,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             int index = 0;
             settings.GameSettings.songDirs.ForEach(songDir =>
             {
-                songList.Add(CreateSongFolderEntry(songDir, index));
+                CreateSongFolderEntryControl(songDir, index);
                 index++;
             });
         }
@@ -385,65 +387,30 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         UpdateAddAndroidSongFoldersButtons();
     }
 
-    private VisualElement CreateSongFolderEntry(string songDir, int indexInList)
+    private void CreateSongFolderEntryControl(string path, int indexInList)
     {
-        VisualElement result = songFolderListEntryAsset.CloneTree();
-        VisualElement warningContainer = result.Q<VisualElement>(R.UxmlNames.warningContainer);
-        Label warningLabel = warningContainer.Q<Label>(R.UxmlNames.warningLabel);
+        VisualElement visualElement = songFolderListEntryAsset.CloneTree();
+        SongFolderListEntryControl songFolderListEntryControl = new(path);
+        injector
+            .WithRootVisualElement(visualElement)
+            .Inject(songFolderListEntryControl);
 
-        void CheckFolderExists(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                warningContainer.HideByDisplay();
-            }
-            else if (path.IsNullOrEmpty())
-            {
-                warningContainer.ShowByDisplay();
-                warningLabel.text = "Enter the path to a song folder.";
-            }
-            else if (File.Exists(path))
-            {
-                warningContainer.ShowByDisplay();
-                warningLabel.text = "Not a folder.";
-            }
-            else
-            {
-                warningContainer.ShowByDisplay();
-                warningLabel.text = "Folder does not exist.";
-            }
-        }
-
-        TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
-        textField.value = songDir;
-        textField.RegisterValueChangedCallback(evt =>
+        songFolderListEntryControl.TextField.RegisterValueChangedCallback(evt =>
         {
             settings.GameSettings.songDirs[indexInList] = evt.newValue;
-            CheckFolderExists(evt.newValue);
             UpdateAddAndroidSongFoldersButtons();
+
+            songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
+        });
+        songFolderListEntryControl.DeleteButton.RegisterCallbackButtonTriggered(() =>
+        {
+            settings.GameSettings.songDirs.RemoveAt(indexInList);
+            UpdateSongFolderList();
+            backButton.Focus();
         });
 
-        Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.RegisterCallbackButtonTriggered(() =>
-            {
-                settings.GameSettings.songDirs.RemoveAt(indexInList);
-                UpdateSongFolderList();
-                backButton.Focus();
-            });
-
-        Button openSongFolderButton = result.Q<Button>(R.UxmlNames.openFolderButton);
-        if (PlatformUtils.IsStandalone)
-        {
-            openSongFolderButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(songDir));
-        }
-        else
-        {
-            openSongFolderButton.HideByDisplay();
-        }
-
-        CheckFolderExists(songDir);
-
-        return result;
+        songFolderListEntryControls.Add(songFolderListEntryControl);
+        songList.Add(visualElement);
     }
 
     private void OnDestroy()
