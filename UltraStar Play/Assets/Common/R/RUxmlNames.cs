@@ -134,7 +134,6 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string downloadSongsButton = "downloadSongsButton";
-        public const string dropdownIcon = "dropdownIcon";
         public const string dropDownIcon = "dropDownIcon";
         public const string duetIcon = "duetIcon";
         public const string duetLegend = "duetLegend";
@@ -467,6 +466,7 @@ public static partial class R
         public const string searchTextField = "searchTextField";
         public const string second = "second";
         public const string secondBackground = "secondBackground";
+        public const string selectAllNotesIcon = "selectAllNotesIcon";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
         public const string selectionIndicator = "selectionIndicator";
         public const string semanticVersionText = "semanticVersionText";
@@ -513,6 +513,7 @@ public static partial class R
         public const string singThisSongButton = "singThisSongButton";
         public const string sizeLabel = "sizeLabel";
         public const string skipButton = "skipButton";
+        public const string smallIcon = "smallIcon";
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
@@ -541,6 +542,7 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songMenuOverlay = "songMenuOverlay";
         public const string songMenuOverlayScrollView = "songMenuOverlayScrollView";
+        public const string songMetaLabel = "songMetaLabel";
         public const string songOrderPicker = "songOrderPicker";
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewVideoImage = "songPreviewVideoImage";
@@ -643,6 +645,7 @@ public static partial class R
         public const string warningContainer = "warningContainer";
         public const string warningIcon = "warningIcon";
         public const string warningLabel = "warningLabel";
+        public const string wideIcon = "wideIcon";
         public const string yearLabel = "yearLabel";
         public const string yearPropertyContainer = "yearPropertyContainer";
     }

@@ -26,6 +26,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [InjectedInInspector]
     public VisualTreeAsset accordionUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset songIssueSongEntryUi;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -258,9 +261,21 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                         // Add empty line
                         accordionItemControl.AddVisualElement(new Label(""));
                     }
-                    Label songMetaPathLabel = new(songMetaArtistAndTitle);
-                    songMetaPathLabel.AddToClassList("songIssueSongMetaTitle");
-                    accordionItemControl.AddVisualElement(songMetaPathLabel);
+                    // Add label for song
+                    VisualElement visualElement = songIssueSongEntryUi.CloneTree().Children().First();
+                    visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
+                    Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
+                    if (PlatformUtils.IsStandalone
+                        && !songIssue.SongMeta.Directory.IsNullOrEmpty()
+                        && Directory.Exists(songIssue.SongMeta.Directory))
+                    {
+                        openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+                    }
+                    else
+                    {
+                        openFolderButtonOfSongMeta.HideByDisplay();
+                    }
+                    accordionItemControl.AddVisualElement(visualElement);
                 }
 
                 Label songIssueLabel = new($"• {songIssue.Message}");
