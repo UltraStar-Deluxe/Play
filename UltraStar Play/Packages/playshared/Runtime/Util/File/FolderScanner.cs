@@ -27,7 +27,9 @@ public class FolderScanner
 
     public List<string> GetFiles(string folder, bool recursive)
     {
-        if (!includeHiddenFolders && IsHiddenFolder(folder))
+        if (folder.IsNullOrEmpty()
+            || !Directory.Exists(folder)
+            || (!includeHiddenFolders && IsHiddenFolder(folder)))
         {
             return new List<string>();
         }

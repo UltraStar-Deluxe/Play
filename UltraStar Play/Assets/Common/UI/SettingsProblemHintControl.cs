@@ -48,11 +48,22 @@ public class SettingsProblemHintControl
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_thereAreSongIssues));
         }
 
-        // Check if song folder is subfolder of other song folder
+        // Check song folders
+        bool hasDuplicateFolder = false;
+        bool hasDuplicateSubfolder = false;
         foreach (string songFolder in settings.GameSettings.songDirs)
         {
-            if (IsSubfolderOfAnyOtherFolder(songFolder, settings.GameSettings.songDirs, out string _))
+            if (!hasDuplicateFolder
+                && IsDuplicateFolder(songFolder, settings.GameSettings.songDirs))
             {
+                hasDuplicateFolder = true;
+                result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_duplicateSongFolders));
+            }
+
+            if (!hasDuplicateSubfolder
+                && IsSubfolderOfAnyOtherFolder(songFolder, settings.GameSettings.songDirs, out string _))
+            {
+                hasDuplicateSubfolder = true;
                 result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));
             }
         }
@@ -89,6 +100,20 @@ public class SettingsProblemHintControl
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noEnabledPlayerProfile));
         }
         return result;
+    }
+
+    public static bool IsDuplicateFolder(string path, List<string> folders)
+    {
+        if (path.IsNullOrEmpty()
+            || !Directory.Exists(path))
+        {
+            return false;
+        }
+
+        return folders
+            .Where(folder => !folder.IsNullOrEmpty() && Directory.Exists(folder))
+            // FullName returns the normalized absolute path.
+            .Count(folder => new DirectoryInfo(folder).FullName == new DirectoryInfo(path).FullName) >= 2;
     }
 
     public static bool IsSubfolderOfAnyOtherFolder(string potentialSubfolder, List<string> potentialParentFolders, out string parentFolder)
