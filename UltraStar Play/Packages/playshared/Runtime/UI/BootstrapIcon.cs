@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 public class BootstrapIcon : FontIcon
 {
-    private static Dictionary<string, string> bootstrapIconNameToCodepointCache;
+    private static readonly Dictionary<string, string> bootstrapIconNameToCodepointCache = new();
 
     // UIToolkit factory classes
     public new class UxmlFactory : UxmlFactory<BootstrapIcon, UxmlTraits> {}

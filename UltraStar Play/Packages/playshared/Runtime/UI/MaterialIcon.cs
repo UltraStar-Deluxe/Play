@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 public class MaterialIcon : FontIcon
 {
-    private static Dictionary<string, string> materialDesignIconNameToCodepointCache;
+    private static readonly Dictionary<string, string> materialDesignIconNameToCodepointCache = new();
 
     // UIToolkit factory classes
     public new class UxmlFactory : UxmlFactory<MaterialIcon, UxmlTraits> {}
