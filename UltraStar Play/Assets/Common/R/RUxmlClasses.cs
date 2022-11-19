@@ -72,6 +72,7 @@ public static partial class R
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string squareButton = "squareButton";
         public const string startButtonClass = "startButtonClass";
+        public const string textFieldHint = "textFieldHint";
         public const string textOutline = "textOutline";
         public const string timeBar = "timeBar";
         public const string tinyFont = "tinyFont";
