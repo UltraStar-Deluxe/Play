@@ -247,6 +247,7 @@ public static partial class R
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logLevelContainer = "logLevelContainer";
         public const string logLevelItemPicker = "logLevelItemPicker";
+        public const string logo = "logo";
         public const string logoContainer = "logoContainer";
         public const string logOverlay = "logOverlay";
         public const string logOverlayButtonRow = "logOverlayButtonRow";
@@ -310,6 +311,7 @@ public static partial class R
         public const string nameTextField = "nameTextField";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
+        public const string nextDifficultyButton = "nextDifficultyButton";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
@@ -542,7 +544,6 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songMenuOverlay = "songMenuOverlay";
         public const string songMenuOverlayScrollView = "songMenuOverlayScrollView";
-        public const string songMetaLabel = "songMetaLabel";
         public const string songOrderPicker = "songOrderPicker";
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewVideoImage = "songPreviewVideoImage";

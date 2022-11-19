@@ -18,7 +18,7 @@
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
-                <ui:Button text="Back" name="backButton" />
+                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

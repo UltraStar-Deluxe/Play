@@ -9,6 +9,7 @@ public static partial class R
         public const string comboBoxButton = "comboBoxButton";
         public const string comboBoxTextField = "comboBoxTextField";
         public const string controlLabel = "controlLabel";
+        public const string controlMinWidth = "controlMinWidth";
         public const string creditsEntryCharacter = "creditsEntryCharacter";
         public const string creditsRegularBanner = "creditsRegularBanner";
         public const string currentLyrics = "currentLyrics";
@@ -25,7 +26,6 @@ public static partial class R
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string iconImage = "iconImage";
-        public const string iconImageTextSized = "iconImageTextSized";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
@@ -69,6 +69,7 @@ public static partial class R
         public const string smallFont = "smallFont";
         public const string songEditorSettingsGroup = "songEditorSettingsGroup";
         public const string songEditorSettingsGroupTitle = "songEditorSettingsGroupTitle";
+        public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string squareButton = "squareButton";
         public const string startButtonClass = "startButtonClass";
         public const string textOutline = "textOutline";

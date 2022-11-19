@@ -28,7 +28,7 @@
                 <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="animateSceneChangeVolumePicker" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" name="backButton" />
+                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

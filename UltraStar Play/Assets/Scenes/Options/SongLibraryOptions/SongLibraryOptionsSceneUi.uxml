@@ -14,7 +14,7 @@
             <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
                 <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" style="width: 100%; white-space: normal;" />
                 <ui:VisualElement name="buttonRow" style="align-items: center; justify-content: flex-start; flex-direction: row;">
-                    <ui:Button text="Add Internal Folder" display-tooltip-when-elided="true" name="addAndroidInternalSongFolderButton" style="width: auto;" />
+                    <ui:Button text="Add Internal Folder" display-tooltip-when-elided="true" name="addAndroidInternalSongFolderButton" style="width: auto; margin-right: 5px;" />
                     <ui:Button text="Add SD Card Folder" display-tooltip-when-elided="true" name="addAndroidSdCardSongFolderButton" style="width: auto;" />
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -29,13 +29,13 @@
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
                 <ui:Button text="Download Songs" name="downloadSceneButton" style="width: 240px;" />
                 <ui:VisualElement style="flex-direction: row;">
-                    <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px; margin-left: 5px;">
+                    <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px;">
                         <MaterialIcon name="songIssueIcon" icon="warning" class="rounded" />
                     </ui:Button>
-                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; margin-left: 5px; flex-direction: row;">
+                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
                         <MaterialIcon name="helpIcon" icon="help_outline" />
                     </ui:Button>
-                    <ui:Button text="Back" name="backButton" />
+                    <ui:Button text="Back" name="backButton" class="controlMinWidth" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

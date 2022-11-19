@@ -29,7 +29,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="delayContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Delay" name="Label" class="controlLabel" style="width: 100px;" />
-                    <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" style="width: 200px;" />
+                    <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis" style="width: 200px; flex-shrink: 1;" />
                     <ItemPicker wrapAround="true" minValue="0" maxValue="1000" stepValue="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="amplificationContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
@@ -46,12 +46,12 @@
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row-reverse;">
-                <ui:Button text="Back" name="backButton" />
-                <ui:VisualElement name="notConnectedContainer" style="width: 300px; flex-direction: row; align-items: center;">
+                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
+                <ui:Button text="Delete" name="deleteButton" class="controlMinWidth" style="visibility: visible; display: flex;" />
+                <ui:VisualElement name="notConnectedContainer" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
                     <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
                     <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
                 </ui:VisualElement>
-                <ui:Button text="Delete" name="deleteButton" style="visibility: visible; display: flex;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

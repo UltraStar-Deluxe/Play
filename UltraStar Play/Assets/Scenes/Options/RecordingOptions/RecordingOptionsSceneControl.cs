@@ -72,7 +72,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private VisualElement notConnectedContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedLabel)]
-    private VisualElement notConnectedLabel;
+    private Label notConnectedLabel;
 
     [Inject(UxmlName = R.UxmlNames.sampleRateContainer)]
     private VisualElement sampleRateContainer;
@@ -338,6 +338,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
         calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
+        notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
     }
 
     private List<MicProfile> CreateMicProfiles()
