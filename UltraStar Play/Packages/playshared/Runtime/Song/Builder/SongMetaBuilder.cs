@@ -43,70 +43,78 @@ public static class SongMetaBuilder
             }
             char[] separator = { ':' };
             string[] parts = line.Substring(1).Split(separator, 2);
-            if (parts.Length < 2 || parts[0].Length < 1 || parts[1].Length < 1)
+            if (parts.Length < 2)
             {
-                songIssues.Add(SongIssue.CreateWarning(null, "Invalid line formatting on line " + line));
+                songIssues.Add(SongIssue.CreateWarning(null, "Invalid formatting on line " + line));
                 // Ignore this line. Continue with the next line.
                 continue;
             }
-            string tag = parts[0].ToLowerInvariant();
-            string val = parts[1];
 
-            if (tag.Equals("encoding", StringComparison.Ordinal))
+            string tagName = parts[0].TrimEnd();
+            string tagNameLowerCase = tagName.ToLowerInvariant();
+            if (tagNameLowerCase.Length < 1)
             {
-                if (val.Equals("UTF8", StringComparison.Ordinal))
+                songIssues.Add(SongIssue.CreateWarning(null, "Missing tag name on line " + line));
+                // Ignore this line. Continue with the next line.
+                continue;
+            }
+
+            string tagValue = parts[1].TrimStart();
+            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal))
+            {
+                if (tagValue.Equals("UTF8", StringComparison.Ordinal))
                 {
-                    val = "UTF-8";
+                    tagValue = "UTF-8";
                 }
-                Encoding newEncoding = Encoding.GetEncoding(val);
+                Encoding newEncoding = Encoding.GetEncoding(tagValue);
                 if (!newEncoding.Equals(reader.CurrentEncoding))
                 {
                     reader.Dispose();
                     return ParseFile(path, out songIssues, newEncoding);
                 }
             }
-            else if (requiredFields.ContainsKey(tag))
+            else if (requiredFields.ContainsKey(tagNameLowerCase))
             {
-                requiredFields[tag] = val;
+                requiredFields[tagNameLowerCase] = tagValue;
             }
-            else if (tag.Equals("previewstart"))
+            else if (tagNameLowerCase.Equals("previewstart"))
             {
-                otherFields[tag] = val;
+                otherFields[tagNameLowerCase] = tagValue;
             }
-            else if (tag.StartsWith("previewend"))
+            else if (tagNameLowerCase.StartsWith("previewend"))
             {
-                otherFields[tag] = val;
+                otherFields[tagNameLowerCase] = tagValue;
             }
-            else if (tag.StartsWith("p", StringComparison.Ordinal)
-                     && tag.Length == 2
-                     && Char.IsDigit(tag, 1))
+            else if (tagNameLowerCase.StartsWith("p", StringComparison.Ordinal)
+                     && tagNameLowerCase.Length == 2
+                     && Char.IsDigit(tagNameLowerCase, 1))
             {
-                if (!voiceNames.ContainsKey(tag.ToUpperInvariant()))
+                if (!voiceNames.ContainsKey(tagNameLowerCase.ToUpperInvariant()))
                 {
-                    voiceNames.Add(tag.ToUpperInvariant(), val);
+                    voiceNames.Add(tagNameLowerCase.ToUpperInvariant(), tagValue);
                 }
                 // silently ignore already set voiceNames
             }
-            else if (tag.StartsWith("duetsingerp", StringComparison.Ordinal)
-                     && tag.Length == 12
-                     && Char.IsDigit(tag, 11))
+            else if (tagNameLowerCase.StartsWith("duetsingerp", StringComparison.Ordinal)
+                     && tagNameLowerCase.Length == 12
+                     && Char.IsDigit(tagNameLowerCase, 11))
             {
-                string shorttag = tag.Substring(10).ToUpperInvariant();
+                string shorttag = tagNameLowerCase.Substring(10).ToUpperInvariant();
                 if (!voiceNames.ContainsKey(shorttag))
                 {
-                    voiceNames.Add(shorttag, val);
+                    voiceNames.Add(shorttag, tagValue);
                 }
                 // silently ignore already set voiceNames
             }
             else
             {
-                if (otherFields.ContainsKey(tag))
+                if (otherFields.ContainsKey(tagNameLowerCase))
                 {
-                    songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{tag}' multiple times"));
+                    songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{tagName}' multiple times"));
                 }
                 else
                 {
-                    otherFields[tag] = val;
+                    otherFields[tagNameLowerCase] = tagValue;
                 }
             }
         }
@@ -227,6 +235,11 @@ public static class SongMetaBuilder
 
     private static uint ConvertToUInt32(string s)
     {
+        if (s.IsNullOrEmpty())
+        {
+            return 0;
+        }
+
         try
         {
             return Convert.ToUInt32(s, 10);
