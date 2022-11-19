@@ -206,6 +206,7 @@ public static partial class R
         public static readonly string rating_song_toneDeaf = "rating_song_toneDeaf";
         public static readonly string rating_song_ultraStar = "rating_song_ultraStar";
         public static readonly string rating_song_wannabe = "rating_song_wannabe";
+        public static readonly string refresh = "refresh";
         public static readonly string save = "save";
         public static readonly string score_goldenNotes = "score_goldenNotes";
         public static readonly string score_notes = "score_notes";
