@@ -96,12 +96,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         {
             UpdateSongIssues();
         }
-        else
-        {
-            songMetaManager.ScanFilesIfNotDoneYet();
-            songMetaManager.SongScanFinishedEventStream
-                .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
-        }
+        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.SongScanFinishedEventStream
+            .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
 
         settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
             .Subscribe(onNext => UpdateSongFolderList())
@@ -155,6 +152,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void UpdateSongIssues()
     {
         // Update icon
+        songIssueIcon.RemoveFromClassList("error");
+        songIssueIcon.RemoveFromClassList("warning");
         if (songMetaManager.GetSongErrors().Count > 0)
         {
             songIssueIcon.AddToClassList("error");
@@ -312,6 +311,12 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             warningsAccordionItemControl.ShowAccordionContent();
         }
 
+        Button refreshButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh),
+            () =>
+            {
+                songMetaManager.ReloadSongMetas();
+                CloseSongIssues();
+            });
         Button closeDialogButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
             () => CloseSongIssues());
         closeDialogButton.Focus();
