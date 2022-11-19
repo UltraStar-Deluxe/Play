@@ -19,6 +19,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
+    [Inject(UxmlName = R.UxmlNames.searchTextFieldHint)]
+    private Label searchTextFieldHint;
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
 
@@ -72,10 +75,12 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
-            UpdateSearchTextFieldPlaceholderStyle();
+            UpdateSearchTextFieldHint();
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
-        UpdateSearchTextFieldPlaceholderStyle();
+        searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
+        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint());
+        UpdateSearchTextFieldHint();
 
         searchErrorIcon.HideByDisplay();
         searchErrorIconTooltipControl = injector
@@ -111,9 +116,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         UpdateTextFieldHint();
     }
 
-    private void UpdateSearchTextFieldPlaceholderStyle()
+    private void UpdateSearchTextFieldHint()
     {
-        searchTextField.SetInClassList("placeholderVisible", GetRawSearchText().IsNullOrEmpty());
+        searchTextFieldHint.SetVisibleByDisplay(
+            GetRawSearchText().IsNullOrEmpty()
+            && searchTextField.focusController.focusedElement != searchTextField);
     }
 
     private void UpdateTextFieldHint()
@@ -124,7 +131,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchPropertyStrings.Sort();
         string hint = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint,
             "properties", string.Join(", ", searchPropertyStrings));
-        searchTextField.textEdition.placeholder = hint;
+        searchTextFieldHint.text = hint;
     }
 
     private string GetTranslation(ESearchProperty searchProperty)

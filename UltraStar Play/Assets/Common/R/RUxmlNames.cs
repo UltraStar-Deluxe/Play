@@ -224,7 +224,6 @@ public static partial class R
         public const string labels = "labels";
         public const string languageChooser = "languageChooser";
         public const string languageContainer = "languageContainer";
-        public const string languageImage = "languageImage";
         public const string languagePropertyContainer = "languagePropertyContainer";
         public const string layerColor = "layerColor";
         public const string layerEnabledToggle = "layerEnabledToggle";
@@ -466,6 +465,7 @@ public static partial class R
         public const string searchPropertyDropdownTitle = "searchPropertyDropdownTitle";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
         public const string searchTextField = "searchTextField";
+        public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
         public const string secondBackground = "secondBackground";
         public const string selectAllNotesIcon = "selectAllNotesIcon";

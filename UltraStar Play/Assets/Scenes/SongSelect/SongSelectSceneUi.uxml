@@ -29,7 +29,9 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="searchBarContainer" class="outline roundCorners" style="width: 30%; flex-direction: row; height: 100%;">
                     <MaterialIcon name="searchErrorIcon" icon="warning" class="warning rounded" />
-                    <ui:TextField picking-mode="Ignore" name="searchTextField" placeholder-text="Search artist, title" hide-placeholder-on-focus="true" class="comboBoxTextField" style="align-items: center; height: 100%; flex-grow: 1;" />
+                    <ui:TextField picking-mode="Ignore" name="searchTextField" hide-placeholder-on-focus="true" class="comboBoxTextField" style="align-items: center; height: 100%; flex-grow: 1;">
+                        <ui:Label tabindex="-1" text="Search artist, title" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint" />
+                    </ui:TextField>
                     <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="outlineOnFocus roundCorners comboBoxButton" style="width: 30px; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px;">
                         <MaterialIcon name="searchIcon" icon="manage_search" />
                     </ui:Button>
