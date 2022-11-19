@@ -11,7 +11,6 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="languageContainer" style="flex-direction: row; align-items: center; justify-content: flex-end;">
-                    <MaterialIcon name="languageImage" icon="language" />
                     <ItemPicker name="languageChooser" />
                 </ui:VisualElement>
             </ui:VisualElement>

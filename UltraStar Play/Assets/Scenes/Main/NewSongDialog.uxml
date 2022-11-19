@@ -28,8 +28,8 @@
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: center; width: 100%; flex-shrink: 0;">
-                <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelButton" />
-                <ui:Button text="OK" display-tooltip-when-elided="true" name="okButton" />
+                <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelButton" class="controlMinWidth" style="margin-right: 5px;" />
+                <ui:Button text="OK" display-tooltip-when-elided="true" name="okButton" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

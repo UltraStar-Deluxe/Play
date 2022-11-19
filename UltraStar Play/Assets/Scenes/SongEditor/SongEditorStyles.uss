@@ -106,6 +106,7 @@ Button.selected:hover {
 
 .leftSideBar Button {
     padding: 6px;
+    margin-bottom: 5px;
     width: 100%;
 }
 

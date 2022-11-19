@@ -134,7 +134,6 @@
 .unity-button {
     background-color: var(--control-color);
     color: var(--text-color);
-    width: var(--control-width);
     height: var(--control-height);
     font-size: var(--font-size);
     border-width: 0;
@@ -142,9 +141,13 @@
     border-radius: 5px;
     align-items: center;
     justify-content: center;
-    padding: 6px 6px 5px 5px;
-    margin: 2px 2px 2px 2px;
+    padding: 5px 10px;
+    margin: 0;
     -unity-font-style: bold;
+}
+
+.controlMinWidth {
+    min-width: var(--control-width);
 }
 
 .unity-button:hover {
@@ -210,6 +213,7 @@
 
 .squareButton {
     width: var(--control-height);
+    padding: 5px;
 }
 
 .dangerButton {
@@ -340,6 +344,7 @@ TextInput {
     width: 40px;
     height: 40px;
     border-radius: 40px;
+    padding: 5px;
 }
 
 #startButton.mainSceneButton {
@@ -355,6 +360,11 @@ TextInput {
 .dialogButton {
     margin-left: 10px;
     margin-right: 10px;
+}
+
+#dialogButtonContainer Button {
+    margin-right: 5px;
+    min-width: var(--control-width);
 }
 
 .dialogTextButton {
@@ -767,6 +777,11 @@ Button.tinyFont {
     border-bottom-left-radius: 0;
 }
 
+#songMenuOverlay Button {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
 .lyricsContainer {
     align-items: center;
     background-color: rgba(64, 64, 64, 0.75);
@@ -1149,4 +1164,8 @@ TextField.placeholderVisible #unity-text-input {
 .wordWrap Label
 {
     white-space: normal;
+}
+
+#playlistChooserDropdownOverlay Button {
+    margin-bottom: 5px;
 }

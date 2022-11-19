@@ -3,7 +3,7 @@
         <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
         <ui:Label tabindex="-1" text="The Artist - The Title" display-tooltip-when-elided="true" name="title" class="songIssueSongMetaTitle" />
         <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-        <ui:Button display-tooltip-when-elided="true" name="openFolderButton" class="squareButton">
+        <ui:Button display-tooltip-when-elided="true" name="openFolderButton" class="squareButton" style="margin-right: 5px;">
             <MaterialIcon name="openFolderIcon" icon="open_in_new" />
         </ui:Button>
     </ui:VisualElement>

@@ -115,6 +115,7 @@ public static partial class R
         public static readonly string options_design_title = "options_design_title";
         public static readonly string options_development_button = "options_development_button";
         public static readonly string options_development_title = "options_development_title";
+        public static readonly string options_deviceNotConnected = "options_deviceNotConnected";
         public static readonly string options_downloadSongs_button = "options_downloadSongs_button";
         public static readonly string options_downloadSongs_title = "options_downloadSongs_title";
         public static readonly string options_fullscreenMode = "options_fullscreenMode";
