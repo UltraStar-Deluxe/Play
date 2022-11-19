@@ -124,6 +124,12 @@ public class SettingsProblemHintControl
             return false;
         }
 
-        return potentialSubfolderInfo.FullName.StartsWith(potentialParentInfo.FullName);
+        // Additional slash at the end to only check the full name, not any parts of it.
+        string potentialParentAbsolutePath = potentialParentInfo.FullName;
+        if (!potentialParentAbsolutePath.EndsWith(Path.DirectorySeparatorChar))
+        {
+            potentialParentAbsolutePath += Path.DirectorySeparatorChar;
+        }
+        return potentialSubfolderInfo.FullName.StartsWith(potentialParentAbsolutePath);
     }
 }
