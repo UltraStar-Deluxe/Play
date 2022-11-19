@@ -203,7 +203,12 @@ public static partial class R
         public const string innerSongDetailOverlay = "innerSongDetailOverlay";
         public const string innerTimeBar = "innerTimeBar";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
-        public const string inputDeviceIcon = "inputDeviceIcon";
+        public const string inputDeviceIconContainer = "inputDeviceIconContainer";
+        public const string InputDeviceIconContainer = "InputDeviceIconContainer";
+        public const string inputDeviceIconGamepad = "inputDeviceIconGamepad";
+        public const string inputDeviceIconKeyboardAndMouse = "inputDeviceIconKeyboardAndMouse";
+        public const string inputDeviceIconTemplate = "inputDeviceIconTemplate";
+        public const string inputDeviceIconTouch = "inputDeviceIconTouch";
         public const string inputLegend = "inputLegend";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string internetOptionsButton = "internetOptionsButton";

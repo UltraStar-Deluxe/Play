@@ -64,9 +64,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
-    [Inject(UxmlName = R.UxmlNames.inputDeviceIcon)]
-    private VisualElement inputDeviceIcon;
-
     [Inject(UxmlName = R.UxmlNames.menuOverlayInputLegend)]
     private VisualElement menuOverlayInputLegend;
 
@@ -1015,6 +1012,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void UpdateInputLegend()
     {
         inputLegend.Query<Label>()
+            .Where(label => label is not FontIcon)
             .ForEach(label => label.RemoveFromHierarchy());
 
         if (IsPlayerSelectOverlayVisible)

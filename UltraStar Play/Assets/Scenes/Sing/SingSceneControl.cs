@@ -790,6 +790,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void UpdateInputLegend()
     {
         inputLegend.Query<Label>()
+            .Where(label => label is not FontIcon)
             .ForEach(label => label.RemoveFromHierarchy());
 
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
