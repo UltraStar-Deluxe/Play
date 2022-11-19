@@ -731,9 +731,15 @@ Button.tinyFont {
     background-color: rgba(32, 32, 32, 0.88);
 }
 
-#inputDeviceIcon {
+#inputDeviceIconContainer {
     height: 90%;
     width: 20px;
+}
+
+#inputDeviceIconContainer .unity-label {
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
 }
 
 #menuOverlay .inputLegendLabel {
@@ -1078,17 +1084,17 @@ TextField.placeholderVisible #unity-text-input {
 }
 
 .unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 
 .unity-toggle > .unity-toggle__input:focus:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 
 .unity-toggle > .unity-toggle__input:hover:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/check_white_24dp.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#check_white_24dp');
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 
@@ -1105,7 +1111,7 @@ TextField.placeholderVisible #unity-text-input {
 }
 
 .bootstrapIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
 }
 
 .fontIcon {
@@ -1164,13 +1170,11 @@ TextField.placeholderVisible #unity-text-input {
     margin-top: 6px;
 }
 
-.wordWrap
-{
+.wordWrap {
     white-space: normal;
 }
 
-.wordWrap Label
-{
+.wordWrap Label {
     white-space: normal;
 }
 
