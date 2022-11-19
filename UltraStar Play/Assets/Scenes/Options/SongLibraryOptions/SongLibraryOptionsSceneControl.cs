@@ -311,12 +311,11 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             warningsAccordionItemControl.ShowAccordionContent();
         }
 
-        Button refreshButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh),
-            () =>
-            {
-                songMetaManager.ReloadSongMetas();
-                CloseSongIssues();
-            });
+        songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>
+        {
+            songMetaManager.ReloadSongMetas();
+            CloseSongIssues();
+        });
         Button closeDialogButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
             () => CloseSongIssues());
         closeDialogButton.Focus();

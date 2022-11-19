@@ -52,10 +52,8 @@ public abstract class FontIcon : Label
         out string codepoint)
     {
         // Lazy load mapping
-        if (iconNameToCodepointCache == null
-            || iconNameToCodepointCache.Count == 0)
+        if (iconNameToCodepointCache.Count == 0)
         {
-            iconNameToCodepointCache = new();
             TextAsset codepointsTextAsset = Resources.Load<TextAsset>(textAssetPath);
             if (codepointsTextAsset == null)
             {
