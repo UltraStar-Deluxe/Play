@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using ProTrans;
 using UniInject;
 using UnityEngine.UIElements;
@@ -68,8 +69,12 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     {
         if (Directory.Exists(path))
         {
-            // Check this is not a subfolder of another song folder. Otherwise songs may be loaded multiple times.
-            if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(path, settings.GameSettings.songDirs, out string parentFolder))
+            // Check this song folder is not already added, either directly or indirectly as subfolder.
+            if (SettingsProblemHintControl.IsDuplicateFolder(path, settings.GameSettings.songDirs))
+            {
+                ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_duplicate));
+            }
+            else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(path, settings.GameSettings.songDirs, out string parentFolder))
             {
                 ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
                     "parentFolder", parentFolder));

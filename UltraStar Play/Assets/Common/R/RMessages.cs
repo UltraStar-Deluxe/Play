@@ -162,6 +162,7 @@ public static partial class R
         public static readonly string options_songLibrary_helpDialog_title = "options_songLibrary_helpDialog_title";
         public static readonly string options_songLibrary_noSongFoldersFoundInfo = "options_songLibrary_noSongFoldersFoundInfo";
         public static readonly string options_songLibrary_songFolder_doesNotExist = "options_songLibrary_songFolder_doesNotExist";
+        public static readonly string options_songLibrary_songFolder_duplicate = "options_songLibrary_songFolder_duplicate";
         public static readonly string options_songLibrary_songFolder_missingValue = "options_songLibrary_songFolder_missingValue";
         public static readonly string options_songLibrary_songFolder_noFolder = "options_songLibrary_songFolder_noFolder";
         public static readonly string options_songLibrary_songFolder_subfolderOfOtherFolder = "options_songLibrary_songFolder_subfolderOfOtherFolder";
@@ -210,6 +211,7 @@ public static partial class R
         public static readonly string score_notes = "score_notes";
         public static readonly string score_phraseBonus = "score_phraseBonus";
         public static readonly string score_total = "score_total";
+        public static readonly string settingsProblem_duplicateSongFolders = "settingsProblem_duplicateSongFolders";
         public static readonly string settingsProblem_noConnectedAndEnabledMicProfile = "settingsProblem_noConnectedAndEnabledMicProfile";
         public static readonly string settingsProblem_noEnabledPlayerProfile = "settingsProblem_noEnabledPlayerProfile";
         public static readonly string settingsProblem_noMicProfiles = "settingsProblem_noMicProfiles";
