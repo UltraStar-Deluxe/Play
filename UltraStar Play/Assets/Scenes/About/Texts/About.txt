@@ -1,8 +1,9 @@
-UltraStar Play is a free and open source sing-along karaoke game.
-It enables you to sing along to your favorite music in order to score points, depending on the pitch of the voice and the rhythm of singing.
+UltraStar Play is a free and open source singing game with integrated song editor.
+The game plays an audio file, displays lyrics, notes, and optionally a background video or image, while the players sing along to earn points.
 
-This project is developed as community effort on GitHub.
-Please consider contributing to this project, for example by submitting bug reports, art assets, sounds, art assets or source code.
+We love to receive contributions from our community — you!
+Get involved, add styles, ideas, translations, features, and bug reports on GitHub.
+Make UltraStar Play YOUR GAME as well!
 
-https://usplay.net
+https://ultrastar-play.com
 https://github.com/UltraStar-Deluxe/Play

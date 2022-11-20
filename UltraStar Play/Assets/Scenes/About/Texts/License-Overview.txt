@@ -28,6 +28,9 @@ MIT License
 - UniRX
     - https://github.com/neuecc/UniRx
 
+- Bootstrap icons
+    - https://github.com/twbs/icons
+
 - Unity Builder (GitHub Actions, not included in build)
     - https://github.com/game-ci/unity-builder
 
