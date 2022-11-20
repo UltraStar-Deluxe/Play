@@ -1,9 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background" class="backgroundImage">
+        <ui:VisualElement name="logo" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); position: absolute; width: 100%; -unity-background-scale-mode: scale-to-fit; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2022_09.png?fileID=2800000&amp;guid=031fb3adf3099b840887ff7dc60c7ad2&amp;type=3#UltraStarPlayLogo_2022_09&apos;); height: 20%; top: 10px;" />
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
             <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
                 <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
+                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;);" />
                     <ui:VisualElement name="titleAndDescription">
                         <ui:Label text="Main Menu" name="sceneTitle" class="titleText" />
                         <ui:Label text="Button description" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
@@ -21,7 +22,7 @@
                 <ui:Button text="Create Song" name="createSongButton" class="mainSceneButton" />
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Settings" name="settingsButton" class="mainSceneButton">
-                    <ui:VisualElement name="settingsProblemHintIcon" class="iconImage warning" style="position: absolute; bottom: 5px; right: 5px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;);" />
+                    <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon warning rounded" />
                 </ui:Button>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton mainSceneExitButton" style="display: flex;" />
@@ -30,11 +31,11 @@
             <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
             <ui:VisualElement name="bottomButtonRow" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 5px;">
                 <ui:Button name="creditsButton" class="roundButton mainSceneButton" style="right: 5px;">
-                    <ui:VisualElement name="creditsIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/groups_white_24dp.svg?fileID=7388822144124034973&amp;guid=997a4abfa63f0ca4aacbd7053d7c8606&amp;type=3#groups_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 90%; height: 90%;" />
+                    <MaterialIcon name="creditsIcon" icon="groups" />
                 </ui:Button>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button name="aboutButton" class="roundButton mainSceneButton" style="right: 5px;">
-                    <ui:VisualElement name="aboutIcon" class="iconImage textColorTint" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/info_white_24dp.svg?fileID=7388822144124034973&amp;guid=65f497815bf9b0441b2c67b69b56213b&amp;type=3#info_white_24dp&apos;); -unity-background-scale-mode: scale-to-fit; width: 70%; height: 70%;" />
+                    <MaterialIcon name="aboutIcon" icon="info_outline" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

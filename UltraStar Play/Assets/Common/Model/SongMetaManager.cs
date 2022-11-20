@@ -15,7 +15,10 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
     // The collection of songs is static to be persisted across scenes.
     // The collection is filled with song datas from a background thread, thus a thread-safe collection is used.
-    private static ConcurrentBag<SongMeta> songMetas = new();
+    private static ConcurrentBag<SongMeta> allSongMetas = new();
+    private static ConcurrentBag<SongIssue> allSongIssues = new();
+    private static List<SongIssue> SongErrors => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Error).ToList();
+    private static List<SongIssue> SongWarnings => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Warning).ToList();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -47,10 +50,6 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
-    public int SongsFound { get; private set; }
-    public int SongsSuccess { get; private set; }
-    public int SongsFailed { get; private set; }
-
     [Inject]
     private Settings settings;
     
@@ -58,7 +57,8 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     {
         lock (scanLock)
         {
-            songMetas = new ConcurrentBag<SongMeta>();
+            allSongMetas = new ConcurrentBag<SongMeta>();
+            allSongIssues = new ConcurrentBag<SongIssue>();
             isSongScanStarted = false;
             isSongScanFinished = false;
         }
@@ -92,20 +92,14 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public void Add(SongMeta songMeta)
+    private void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             throw new ArgumentNullException(nameof(songMeta));
         }
 
-        songMetas.Add(songMeta);
-    }
-
-    public SongMeta FindSongMeta(Func<SongMeta, bool> predicate)
-    {
-        SongMeta songMeta = songMetas.Where(predicate).FirstOrDefault();
-        return songMeta;
+        allSongMetas.Add(songMeta);
     }
 
     public SongMeta GetFirstSongMeta()
@@ -115,7 +109,22 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
     public IReadOnlyCollection<SongMeta> GetSongMetas()
     {
-        return songMetas;
+        return allSongMetas;
+    }
+
+    public IReadOnlyList<SongIssue> GetSongIssues()
+    {
+        return allSongIssues.ToList();
+    }
+
+    public IReadOnlyList<SongIssue> GetSongErrors()
+    {
+        return SongErrors;
+    }
+
+    public IReadOnlyList<SongIssue> GetSongWarnings()
+    {
+        return SongWarnings;
     }
 
     public void ScanFilesIfNotDoneYet()
@@ -147,10 +156,6 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         List<string> txtFiles;
         lock (scanLock)
         {
-            SongsFound = 0;
-            SongsSuccess = 0;
-            SongsFailed = 0;
-
             FolderScanner txtScanner = new("*.txt");
 
             // Find all txt files in the song directories
@@ -166,83 +171,32 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             Debug.Log("Started song-scan-thread.");
             lock (scanLock)
             {
-                LoadTxtFiles(txtFiles);
+                LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
+                allSongMetas.AddRange(newSongMetas);
+                allSongIssues.AddRange(newSongIssues);
                 isSongScanFinished = true;
             }
             stopwatch.Stop();
-            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {songMetas.Count} songs. Failed {SongsFailed} songs.");
+            Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs. Errors: {SongErrors.Count}, Warnings: {SongWarnings.Count}.");
             songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
         });
     }
 
-    // Checks whether the audio and video file formats of the song are supported.
-    // Returns true iff the audio file of the SongMeta exists and is supported.
-    private bool CheckSupportedMediaFormats(SongMeta songMeta)
+    private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
     {
-        // Check video format.
-        // Video is optional.
-        if (!songMeta.Video.IsNullOrEmpty())
+        songMetas = new();
+        songIssues = new();
+        foreach (string path in txtFiles)
         {
-            if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Video)))
+            if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
             {
-                Debug.LogWarning("Unsupported video format: " + songMeta.Video);
-                songMeta.Video = "";
+                songMetas.Add(newSongMeta);
             }
-            else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetVideoUri(songMeta)))
-            {
-                Debug.LogWarning("Video file resource does not exist: " + SongMetaUtils.GetVideoUri(songMeta));
-                songMeta.Video = "";
-            }
+            songIssues.AddRange(newSongIssues);
         }
-
-        // Check audio format.
-        // Audio is mandatory. Without working audio file, the song cannot be played.
-        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
-        {
-            Debug.LogWarning("Unsupported audio format: " + songMeta.Mp3);
-            return false;
-        }
-        else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetAudioUri(songMeta)))
-        {
-            Debug.LogWarning("Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta));
-            return false;
-        }
-
-        return true;
     }
 
-    private void LoadTxtFiles(List<string> txtFiles)
-    {
-        txtFiles.ForEach(path =>
-        {
-            try
-            {
-                SongMeta newSongMeta = SongMetaBuilder.ParseFile(path);
-                if (CheckSupportedMediaFormats(newSongMeta))
-                {
-                    Add(newSongMeta);
-                    SongsSuccess++;
-                }
-                else
-                {
-                    SongsFailed++;
-                }
-            }
-            catch (SongMetaBuilderException e)
-            {
-                Debug.LogWarning("SongMetaBuilderException: " + path + "\n" + e.Message);
-                SongsFailed++;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError(path);
-                SongsFailed++;
-            }
-        });
-    }
-
-    private List<string> ScanForTxtFiles(FolderScanner txtScanner)
+    private static List<string> ScanForTxtFiles(FolderScanner txtScanner)
     {
         List<string> txtFiles = new();
         List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
@@ -258,14 +212,8 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
                 Debug.LogException(ex);
             }
         }
-        SongsFound = txtFiles.Count;
-        Debug.Log($"Found {SongsFound} songs in {songDirs.Count} configured song directories");
+        Debug.Log($"Found {allSongMetas.Count} songs in {songDirs.Count} configured song directories");
         return txtFiles;
-    }
-
-    public int GetNumberOfSongsFound()
-    {
-        return SongsFound;
     }
 
     public void WaitUntilSongScanFinished()
@@ -284,39 +232,57 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         Debug.LogError("Song scan did not finish - timeout reached.");
     }
 
-    public List<SongMeta> LoadNewSongMetasFromFolder(string songFolder)
+    public bool TryLoadAndAddSongMetasFromFolder(string songFolder, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
     {
-        List<SongMeta> result = new();
+        songMetas = new List<SongMeta>();
+        songIssues = new List<SongIssue>();
         if (!Directory.Exists(songFolder))
         {
-            return result;
+            return false;
         }
 
         FolderScanner txtScanner = new("*.txt");
         List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
 
-        txtFiles.ForEach(path =>
-        {
-            try
-            {
-                SongMeta newSongMeta = SongMetaBuilder.ParseFile(path);
-                if (CheckSupportedMediaFormats(newSongMeta))
-                {
-                    result.Add(newSongMeta);
-                }
-            }
-            catch (SongMetaBuilderException e)
-            {
-                Debug.LogWarning("SongMetaBuilderException: " + path + "\n" + e.Message);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError(path);
-            }
-        });
+        LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
+        allSongMetas.AddRange(newSongMetas);
+        allSongIssues.AddRange(newSongIssues);
 
-        result.ForEach(songMeta => Add(songMeta));
-        return result;
+        songMetas.AddRange(newSongMetas);
+        newSongIssues.AddRange(newSongIssues);
+
+        return true;
+    }
+
+    private bool TryLoadSongMetaFromFile(string path, out SongMeta songMeta, out List<SongIssue> songIssues)
+    {
+        songIssues = new List<SongIssue>();
+        try
+        {
+            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues);
+            songIssues.AddRange(parseFileIssues);
+
+            List<SongIssue> mediaFormatIssues = SongMetaUtils.GetSupportedMediaFormatIssues(newSongMeta);
+            songIssues.AddRange(mediaFormatIssues);
+
+            if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
+            {
+                // No issues or only warnings, thus ok.
+                songMeta = newSongMeta;
+                return true;
+            }
+        }
+        catch (SongMetaBuilderException e)
+        {
+            Debug.LogError("SongMetaBuilderException: " + path + "\n" + e.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError(path);
+        }
+
+        songMeta = null;
+        return false;
     }
 }

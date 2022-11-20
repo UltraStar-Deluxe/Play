@@ -21,15 +21,6 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
 
     private static readonly Dictionary<InputDevice, InputDeviceChange> inputDeviceToLastChange = new();
 
-    [InjectedInInspector]
-    public VectorImage gamepadIcon;
-
-    [InjectedInInspector]
-    public VectorImage keyboardAndMouseIcon;
-
-    [InjectedInInspector]
-    public VectorImage touchIcon;
-
     private readonly Subject<InputDeviceChangeEvent> inputDeviceChangeEventStream = new();
     public IObservable<InputDeviceChangeEvent> InputDeviceChangeEventStream => inputDeviceChangeEventStream;
 
@@ -49,8 +40,14 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         }
     }
 
-    [Inject(UxmlName = R.UxmlNames.inputDeviceIcon, Optional = true)]
-    private VisualElement inputDeviceIcon;
+    [Inject(UxmlName = R.UxmlNames.inputDeviceIconKeyboardAndMouse, Optional = true)]
+    private VisualElement inputDeviceIconKeyboardAndMouse;
+
+    [Inject(UxmlName = R.UxmlNames.inputDeviceIconGamepad, Optional = true)]
+    private VisualElement inputDeviceIconGamepad;
+
+    [Inject(UxmlName = R.UxmlNames.inputDeviceIconTouch, Optional = true)]
+    private VisualElement inputDeviceIconTouch;
 
     private void OnEnable()
     {
@@ -74,11 +71,8 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
             Log.Logger.Error(e, "Could not enable enhanced touch support");
         }
 
-        if (inputDeviceIcon != null)
-        {
-            UpdateInputDeviceIcon();
-            InputDeviceChangeEventStream.Subscribe(_ => UpdateInputDeviceIcon());
-        }
+        UpdateInputDeviceIcon();
+        InputDeviceChangeEventStream.Subscribe(_ => UpdateInputDeviceIcon());
 
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.1f, () => UpdateInputDeviceEnum()));
     }
@@ -130,32 +124,10 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         return EInputDevice.Touch;
     }
 
-    private static bool IsLastInputDeviceChangeOneOf(InputDevice inputDevice, params InputDeviceChange[] values)
-    {
-        if (!inputDeviceToLastChange.TryGetValue(inputDevice, out InputDeviceChange inputDeviceChange))
-        {
-            return false;
-        }
-
-        return values.Contains(inputDeviceChange);
-    }
-
     private void UpdateInputDeviceIcon()
     {
-        switch (inputDeviceEnum)
-        {
-            case EInputDevice.Gamepad:
-                inputDeviceIcon.style.backgroundImage = new StyleBackground(gamepadIcon);
-                break;
-            case EInputDevice.KeyboardAndMouse:
-                inputDeviceIcon.style.backgroundImage = new StyleBackground(keyboardAndMouseIcon);
-                break;
-            case EInputDevice.Touch:
-                inputDeviceIcon.style.backgroundImage = new StyleBackground(touchIcon);
-                break;
-            default:
-                Debug.Log("Unhandled EInputDevice: " + inputDeviceEnum);
-                break;
-        }
+        inputDeviceIconKeyboardAndMouse?.SetVisibleByDisplay(inputDeviceEnum == EInputDevice.KeyboardAndMouse);
+        inputDeviceIconGamepad?.SetVisibleByDisplay(inputDeviceEnum == EInputDevice.Gamepad);
+        inputDeviceIconTouch?.SetVisibleByDisplay(inputDeviceEnum == EInputDevice.Touch);
     }
 }

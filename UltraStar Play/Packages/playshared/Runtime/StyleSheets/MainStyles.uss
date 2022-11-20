@@ -2,8 +2,8 @@
     --text-color: rgb(240, 240, 240);
     --text-color-inverted: rgb(64, 64, 64);
     --text-color-accent1: lightgrey;
-    --text-color-error: rgb(200, 48, 48);
-    --text-color-warning: rgb(200, 200, 48);
+    --text-color-error: rgb(220, 53, 69);
+    --text-color-warning: rgb(255, 193, 7);
     --font-size-xxs: 10px;
     --font-size-xs: 12px;
     --font-size-s: 14px;
@@ -11,15 +11,19 @@
     --font-size-l: 20px;
     --font-size-xl: 24px;
     --font-size-xxl: 26px;
+    --font-icon-size: 32px;
     --control-height: 40px;
     --control-height-small: 30px;
     --control-height-large: 92px;
     --control-width: 120px;
     --control-width-half: 60px;
     --control-width-large: 150px;
+    --round-button-size: 50px;
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
+    --control-danger: rgb(220, 53, 69);
+    --control-danger-accent1: rgb(200, 35, 51);
     --main-scene-button-width: 150px;
     --main-scene-sing-button-width: 310px;
 }
@@ -130,7 +134,6 @@
 .unity-button {
     background-color: var(--control-color);
     color: var(--text-color);
-    width: var(--control-width);
     height: var(--control-height);
     font-size: var(--font-size);
     border-width: 0;
@@ -138,9 +141,13 @@
     border-radius: 5px;
     align-items: center;
     justify-content: center;
-    padding: 6px 6px 5px 5px;
-    margin: 2px 2px 2px 2px;
+    padding: 5px 10px;
+    margin: 0;
     -unity-font-style: bold;
+}
+
+.controlMinWidth {
+    min-width: var(--control-width);
 }
 
 .unity-button:hover {
@@ -199,9 +206,26 @@
 }
 
 .roundButton {
-    width: var(--control-width-half);
-    height: var(--control-width-half);
-    border-radius: var(--control-width-half);
+    width: var(--round-button-size);
+    height: var(--round-button-size);
+    border-radius: var(--round-button-size);
+}
+
+.squareButton {
+    width: var(--control-height);
+    padding: 5px;
+}
+
+.dangerButton {
+    background-color: var(--control-danger);
+}
+
+.dangerButton:hover {
+    background-color: var(--control-danger-accent1);
+}
+
+.dangerButton:focus {
+    background-color: var(--control-danger-accent1);
 }
 
 .roundCorners {
@@ -222,7 +246,16 @@
 
 #searchTextField #unity-text-input {
     height: 100%;
-    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.textFieldHint {
+    position: absolute;
+    left: 10px;
+    color: var(--text-color-inverted);
+    -unity-font-style: italic;
+    font-size: var(--font-size-s);
 }
 
 .transparentBackgroundColor #unity-text-input {
@@ -304,17 +337,22 @@ TextInput {
     width: var(--control-width-large);
 }
 
+.wideControl {
+    width: var(--control-width-large);
+}
+
 .mainSceneButton {
     -unity-font-style: bold;
     width: var(--main-scene-button-width);
     height: var(--control-height-large);
-    margin: 0px;
+    margin: 0;
 }
 
 .mainSceneButton.roundButton {
     width: 40px;
     height: 40px;
     border-radius: 40px;
+    padding: 5px;
 }
 
 #startButton.mainSceneButton {
@@ -330,6 +368,11 @@ TextInput {
 .dialogButton {
     margin-left: 10px;
     margin-right: 10px;
+}
+
+#dialogButtonContainer Button {
+    margin-right: 5px;
+    min-width: var(--control-width);
 }
 
 .dialogTextButton {
@@ -362,8 +405,7 @@ TextInput {
     align-items: center;
 }
 
-.optionsOverviewButton .warning
-{
+.optionsOverviewButton .warning {
     color: var(--text-color-warning);
     -unity-background-image-tint-color: var(--text-color-warning);
 }
@@ -469,6 +511,10 @@ Label.smallerFont {
 }
 
 Label.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+Button.tinyFont {
     font-size: var(--font-size-xxs);
 }
 
@@ -621,7 +667,7 @@ Label.tinyFont {
 }
 
 .characterQuickJumpCharacterButton {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-xxs);
 }
 
 .characterQuickJumpCharacter {
@@ -678,10 +724,22 @@ Label.tinyFont {
 }
 
 .inputLegendBar {
+    width: 100%;
     flex-direction: row;
     justify-content: space-around;
     padding: 5px 50px;
     background-color: rgba(32, 32, 32, 0.88);
+}
+
+#inputDeviceIconContainer {
+    height: 90%;
+    width: 20px;
+}
+
+#inputDeviceIconContainer .unity-label {
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
 }
 
 #menuOverlay .inputLegendLabel {
@@ -731,6 +789,11 @@ Label.tinyFont {
 #nextItemButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+#songMenuOverlay Button {
+    margin-bottom: 5px;
+    width: 100%;
 }
 
 .lyricsContainer {
@@ -851,7 +914,7 @@ Label.tinyFont {
     display: none;
 }
 
-.unity-scroller--vertical > .unity-scroller__slider  {
+.unity-scroller--vertical > .unity-scroller__slider {
     width: 12px;
     min-width: auto;
     border-radius: 5px;
@@ -859,7 +922,7 @@ Label.tinyFont {
     padding: 0;
 }
 
-.unity-scroller--horizontal > .unity-scroller__slider  {
+.unity-scroller--horizontal > .unity-scroller__slider {
     height: 12px;
     min-height: auto;
     border-radius: 5px;
@@ -888,8 +951,40 @@ Label.tinyFont {
     -unity-background-image-tint-color: var(--text-color);
 }
 
+.modalDialogContainer {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
 .dialogBackground {
     background-color: rgb(14, 28, 42);
+}
+
+#accordionItemContent {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s;
+}
+
+#accordionItemRoot {
+    width: 100%;
+    border-width: 0;
+}
+
+#toggleAccordionItemContentButton.unity-button {
+    border-radius: 0;
+}
+
+#accordionItemRoot.expanded #accordionItemContent {
+    height: auto;
+}
+
+#toggleAccordionItemContentIcon {
+    transition: rotate 0.3s;
+}
+
+#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+    transform-origin: 50% 50%;
+    rotate: -180deg;
 }
 
 #targetNoteImage {
@@ -935,4 +1030,154 @@ Label.tinyFont {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+}
+
+.noSongsFoundLabel {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.songArchiveInfoLabel {
+    font-size: var(--font-size-xs);
+    margin-bottom: 15px;
+    white-space: normal;
+}
+
+.songIssueSongMetaTitle {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: var(--font-size-s);
+    white-space: normal;
+    border-bottom-color: var(--text-color);
+    border-bottom-width: 1px;
+}
+
+.songIssueMessage {
+    font-size: var(--font-size-s);
+    white-space: normal;
+}
+
+.comboBoxTextField {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.comboBoxTextField #unity-text-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.comboBoxButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+TextField.placeholderVisible {
+    -unity-font-style: italic;
+}
+
+TextField.placeholderVisible #unity-text-input {
+    font-size: var(--font-size-xs);
+}
+
+.unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    height: 55%;
+}
+
+.unity-toggle > .unity-toggle__input:focus:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    height: 55%;
+}
+
+.unity-toggle > .unity-toggle__input:hover:checked > .unity-toggle__checkmark {
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    height: 55%;
+}
+
+.materialIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
+}
+
+.materialIcon.outlined {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
+}
+
+.materialIcon.rounded {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
+}
+
+.bootstrapIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
+}
+
+.fontIcon {
+    font-size: var(--font-icon-size);
+    -unity-font-style: normal;
+}
+
+.fontIcon.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+.fontIcon.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+.fontIcon.smallFont {
+    font-size: var(--font-size-s);
+}
+
+#toggleFavoriteButton MaterialIcon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: 48px;
+}
+
+#titleImageAndText #titleImage {
+    margin-right: 10px;
+}
+
+.settingsProblemHintIcon {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+#positionBeforeLyricsIndicator {
+    width: 20px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    color: rgb(66, 163, 231);
+    margin-left: -25px;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#searchErrorIcon {
+    position: absolute;
+    top: auto;
+    bottom: 100%;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger {
+    margin-top: 6px;
+}
+
+.wordWrap {
+    white-space: normal;
+}
+
+.wordWrap Label {
+    white-space: normal;
+}
+
+#playlistChooserDropdownOverlay Button {
+    margin-bottom: 5px;
 }

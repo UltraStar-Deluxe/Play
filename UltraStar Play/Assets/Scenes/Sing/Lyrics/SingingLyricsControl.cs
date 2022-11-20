@@ -161,7 +161,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
     {
-        visualElement.Query<Label>().ToList().ForEach(label => label.RemoveFromHierarchy());
+        visualElement.Query<Label>()
+            .ToList()
+            .ForEach(label =>
+            {
+                if (label != positionBeforeLyricsIndicator)
+                {
+                    label.RemoveFromHierarchy();
+                }
+            });
         if (visualElement == currentSentenceContainer)
         {
             currentSentenceNoteToLabelMap.Clear();

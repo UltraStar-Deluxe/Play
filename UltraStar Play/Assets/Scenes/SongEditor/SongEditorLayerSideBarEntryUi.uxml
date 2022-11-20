@@ -1,10 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="layerEntryUiRoot" class="smallFont" style="width: 100%; height: auto; align-items: center; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-bottom: 2px; padding-top: 2px;">
+    <ui:VisualElement name="layerEntryUiRoot" style="width: 100%; height: auto; align-items: center; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-bottom: 2px; padding-top: 2px;">
         <ui:VisualElement name="layerColor" class="roundCorners" style="width: 20px; height: 20px; background-color: rgb(32, 168, 72); flex-shrink: 0;" />
-        <ui:Label text="Layer 01" display-tooltip-when-elided="true" name="layerNameLabel" style="margin-left: 10px; flex-shrink: 1;" />
+        <ui:Label text="Layer 01" display-tooltip-when-elided="true" name="layerNameLabel" class="smallFont" style="margin-left: 10px; flex-shrink: 1;" />
         <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-        <ui:Toggle name="layerEnabledToggle" class="smallControl" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        <ui:Toggle name="layerEnabledToggle" class="smallControl" />
         <ui:VisualElement name="spacer" style="flex-grow: 0; width: 5px;" />
-        <ui:Button display-tooltip-when-elided="true" name="selectAllNotesOfLayerButton" class="roundCorners transparentBackgroundColor textColorTint" style="width: 20px; height: 20px; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/highlight_alt_white_24dp.svg?fileID=7388822144124034973&amp;guid=cc1f4a7a1d31bfa49b40093ec15a193a&amp;type=3#highlight_alt_white_24dp&apos;);" />
+        <ui:Button display-tooltip-when-elided="true" name="selectAllNotesOfLayerButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; overflow: visible; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
+            <MaterialIcon name="selectAllNotesIcon" icon="highlight_alt" />
+        </ui:Button>
     </ui:VisualElement>
 </ui:UXML>

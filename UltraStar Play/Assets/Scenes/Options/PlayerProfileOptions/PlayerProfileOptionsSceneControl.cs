@@ -83,7 +83,6 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         VisualElement result = playerProfileListEntryAsset.CloneTree();
 
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
         deleteButton.RegisterCallbackButtonTriggered(() =>
             {
                 settings.PlayerProfiles.RemoveAt(indexInList);

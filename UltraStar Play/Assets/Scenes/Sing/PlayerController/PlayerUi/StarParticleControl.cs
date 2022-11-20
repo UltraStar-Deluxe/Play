@@ -37,9 +37,23 @@ public class StarParticleControl : INeedInjection
         }
     }
 
+    public float RotationVelocityInDegreesPerSecond { get; set; }
+
+    public Vector2 VelocityInPercentPerSecond { get; set; }
+
     public void Update()
     {
-        Rotation += 1f;
+        if (RotationVelocityInDegreesPerSecond != 0)
+        {
+            Rotation += RotationVelocityInDegreesPerSecond * Time.deltaTime;
+        }
+
+        if (VelocityInPercentPerSecond.x != 0 || VelocityInPercentPerSecond.y != 0)
+        {
+            Vector2 positionInPercent = new(VisualElement.style.left.value.value, VisualElement.style.top.value.value);
+            Vector2 newPositionInPercent = positionInPercent + VelocityInPercentPerSecond * Time.deltaTime;
+            SetPosition(newPositionInPercent);
+        }
         FollowTargetVisualElement();
     }
 
@@ -54,14 +68,19 @@ public class StarParticleControl : INeedInjection
         }
     }
 
-    public void SetPosition(Vector2 pos)
+    public void SetPosition(Vector2 pos, LengthUnit lengthUnit = LengthUnit.Percent)
     {
-        VisualElement.style.left = new StyleLength(new Length(pos.x, LengthUnit.Percent));
-        VisualElement.style.top = new StyleLength(new Length(pos.y, LengthUnit.Percent));
+        VisualElement.style.left = new StyleLength(new Length(pos.x, lengthUnit));
+        VisualElement.style.top = new StyleLength(new Length(pos.y, lengthUnit));
     }
 
     public void SetScale(Vector2 scale)
     {
         VisualElement.style.scale = new StyleScale(new Scale(scale));
+    }
+
+    public void SetOpacity(float alpha)
+    {
+        VisualElement.style.opacity = alpha;
     }
 }

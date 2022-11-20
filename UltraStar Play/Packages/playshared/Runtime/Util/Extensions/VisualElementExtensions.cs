@@ -30,6 +30,18 @@ public static class VisualElementExtensions
         });
     }
 
+    public static void SetInClassList(this VisualElement visualElement, string newClass, bool shouldBePresent)
+    {
+        if (shouldBePresent)
+        {
+            visualElement.AddToClassList(newClass);
+        }
+        else
+        {
+            visualElement.RemoveFromClassList(newClass);
+        }
+    }
+
     public static bool IsVisibleByDisplay(this VisualElement visualElement)
     {
         return visualElement.style.display != DisplayStyle.None;
