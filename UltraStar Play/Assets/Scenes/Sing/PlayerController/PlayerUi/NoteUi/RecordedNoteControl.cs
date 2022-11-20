@@ -6,6 +6,8 @@ using UnityEngine.UIElements;
 
 public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 {
+    private static int goldenNoteHitParticlesPerSecond = 150;
+
     [Inject(Key = nameof(goldenNoteHitStarUi))]
     protected VisualTreeAsset goldenNoteHitStarUi;
 
@@ -82,7 +84,7 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void CreateGoldenNoteHitEffect()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < goldenNoteHitParticlesPerSecond * Time.deltaTime; i++)
         {
             CreateGoldenNoteHitStar();
         }
