@@ -8,7 +8,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                <ui:VisualElement name="menuIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/menu_white_24dp.svg?fileID=7388822144124034973&amp;guid=3a1f291f5afd8ce47a65ce133facea36&amp;type=3#menu_white_24dp&apos;); width: 28px; height: 28px; -unity-background-scale-mode: scale-to-fit;" />
+                <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
             <ui:Label text="FPS: 30" display-tooltip-when-elided="true" name="fpsText" style="font-size: 15px; margin-left: 0; position: absolute; margin-right: 0; margin-top: 0; margin-bottom: 0; top: 0; right: 50%;" />
         </ui:VisualElement>
@@ -24,7 +24,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="toggleRecordingButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
                     <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" style="margin-bottom: 0; width: 256px; height: 256px; border-top-left-radius: 128px; border-bottom-left-radius: 128px; border-top-right-radius: 128px; border-bottom-right-radius: 128px; margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                        <ui:VisualElement name="micIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/mic_white_24dp.svg?fileID=7388822144124034973&amp;guid=d2510bd105a74f54792f8a032452222d&amp;type=3#mic_white_24dp&apos;); width: 128px; height: 128px; -unity-background-scale-mode: scale-to-fit;" />
+                        <MaterialIcon icon="mic" name="micIcon" style="font-size: 176px;" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="visualizeAudioToggleContainer" style="align-items: center; justify-content: center; width: 100%; flex-direction: row;">

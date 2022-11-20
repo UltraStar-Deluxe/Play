@@ -32,6 +32,9 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.lyricsOnNotesContainer)]
     private VisualElement lyricsOnNotesContainer;
 
+    [Inject(UxmlName = R.UxmlNames.staticLyricsContainer)]
+    private VisualElement staticLyricsContainer;
+
     [Inject(UxmlName = R.UxmlNames.pitchIndicatorContainer)]
     private VisualElement pitchIndicatorContainer;
 
@@ -46,11 +49,17 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void Start()
     {
-        new NoteDisplayModeItemPickerControl(noteDisplayModeContainer.Q<ItemPicker>());
+        new NoteDisplayModeItemPickerControl(noteDisplayModeContainer.Q<ItemPicker>())
+            .Bind(() => settings.GraphicSettings.noteDisplayMode,
+                newValue => settings.GraphicSettings.noteDisplayMode = newValue);
 
         new BoolPickerControl(lyricsOnNotesContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.showLyricsOnNotes,
                 newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
+
+        new BoolPickerControl(staticLyricsContainer.Q<ItemPicker>())
+            .Bind(() => settings.GraphicSettings.showStaticLyrics,
+                newValue => settings.GraphicSettings.showStaticLyrics = newValue);
 
         new BoolPickerControl(pitchIndicatorContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.showPitchIndicator,
@@ -79,6 +88,7 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         }
         themeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_theme);
         noteDisplayModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
+        staticLyricsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
         lyricsOnNotesContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
         pitchIndicatorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
         imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);

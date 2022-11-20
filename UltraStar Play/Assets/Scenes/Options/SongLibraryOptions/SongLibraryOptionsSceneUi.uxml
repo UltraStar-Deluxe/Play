@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="music_note" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Song Library" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
@@ -14,17 +14,29 @@
             <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
                 <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" style="width: 100%; white-space: normal;" />
                 <ui:VisualElement name="buttonRow" style="align-items: center; justify-content: flex-start; flex-direction: row;">
-                    <ui:Button text="Add Internal Folder" display-tooltip-when-elided="true" name="addAndroidInternalSongFolderButton" style="width: auto;" />
+                    <ui:Button text="Add Internal Folder" display-tooltip-when-elided="true" name="addAndroidInternalSongFolderButton" style="width: auto; margin-right: 5px;" />
                     <ui:Button text="Add SD Card Folder" display-tooltip-when-elided="true" name="addAndroidSdCardSongFolderButton" style="width: auto;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1; margin-bottom: 20px;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;" />
-                <ui:Button text="+" name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 30px; font-size: 30px;" />
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;">
+                    <ui:Label text="Label" display-tooltip-when-elided="true" />
+                </ui:ScrollView>
+                <ui:Button name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 29px; font-size: 30px;">
+                    <MaterialIcon name="addIcon" icon="add" />
+                </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
                 <ui:Button text="Download Songs" name="downloadSceneButton" style="width: 240px;" />
-                <ui:Button text="Back" name="backButton" />
+                <ui:VisualElement style="flex-direction: row;">
+                    <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px;">
+                        <MaterialIcon name="songIssueIcon" icon="warning" class="rounded" />
+                    </ui:Button>
+                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
+                        <MaterialIcon name="helpIcon" icon="help_outline" />
+                    </ui:Button>
+                    <ui:Button text="Back" name="backButton" class="controlMinWidth" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

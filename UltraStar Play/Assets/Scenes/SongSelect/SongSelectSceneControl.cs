@@ -16,14 +16,6 @@ using IBinding = UniInject.IBinding;
 
 public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
 {
-    public static SongSelectSceneControl Instance
-    {
-        get
-        {
-            return FindObjectOfType<SongSelectSceneControl>();
-        }
-    }
-
     [InjectedInInspector]
     public VectorImage favoriteImageAsset;
 
@@ -72,9 +64,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
-    [Inject(UxmlName = R.UxmlNames.inputDeviceIcon)]
-    private VisualElement inputDeviceIcon;
-
     [Inject(UxmlName = R.UxmlNames.menuOverlayInputLegend)]
     private VisualElement menuOverlayInputLegend;
 
@@ -105,8 +94,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.duetIcon)]
     private VisualElement duetIcon;
 
-    [Inject(UxmlName = R.UxmlNames.toggleFavoriteIcon)]
-    private VisualElement favoriteIcon;
+    [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
+    private MaterialIcon noFavoriteIcon;
+
+    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    private MaterialIcon favoriteIcon;
 
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
@@ -220,6 +212,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
     private Label noSongsFoundLabel;
+
+    [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
+    private VisualElement noSongsFoundContainer;
+
+    [Inject(UxmlName = R.UxmlNames.downloadSongsButton)]
+    private Button downloadSongsButton;
+
+    [Inject(UxmlName = R.UxmlNames.addSongFolderButton)]
+    private Button addSongFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
@@ -364,6 +365,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
 
+        downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
+        addSongFolderButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+
         // Toggle player select and singing options container
         ShowPlayerSelectContainer();
         toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() => TogglePlayerSelectAndSingingOptions());
@@ -458,10 +462,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateFavoriteIcon()
     {
-        VectorImage vectorImage = IsFavorite(SelectedSong)
-            ? favoriteImageAsset
-            : noFavoriteImageAsset;
-        favoriteIcon.style.backgroundImage = new StyleBackground(vectorImage);
+        bool isFavorite = IsFavorite(SelectedSong);
+        favoriteIcon.SetVisibleByDisplay(isFavorite);
+        noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
     public void InitSongMetas()
@@ -469,6 +472,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songMetas = new List<SongMeta>(SongMetaManager.Instance.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
         noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
+        noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
     }
 
     private void Update()
@@ -975,6 +979,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
         searchExpressionInfoLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo);
         searchExpressionInfoSyntaxTipsLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips);
+        downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
+        addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
@@ -1006,6 +1012,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void UpdateInputLegend()
     {
         inputLegend.Query<Label>()
+            .Where(label => label is not FontIcon)
             .ForEach(label => label.RemoveFromHierarchy());
 
         if (IsPlayerSelectOverlayVisible)

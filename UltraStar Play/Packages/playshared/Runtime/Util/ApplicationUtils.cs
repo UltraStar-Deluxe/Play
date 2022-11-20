@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class ApplicationUtils
 {
+    public static void OpenDirectory(string path)
+    {
+        Application.OpenURL("file://" + path);
+    }
+
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR
@@ -80,5 +85,25 @@ public static class ApplicationUtils
             Path.GetFullPath(path1).TrimEnd('\\'),
             Path.GetFullPath(path2).TrimEnd('\\'),
             StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static bool IsLargeScreen()
+    {
+        return GetPhysicalDiagonalScreenSizeInInches() > 10;
+    }
+
+    public static bool IsSmallScreen()
+    {
+        return !IsLargeScreen();
+    }
+
+    public static float GetPhysicalDiagonalScreenSizeInInches()
+    {
+        // Get diagonal of right-angled triangle via Pythagoras theorem
+        float widthInPixels = Screen.width * Screen.width;
+        float heightInPixels = Screen.height * Screen.height;
+        float diagonalInPixels = Mathf.Sqrt(widthInPixels + heightInPixels);
+        float diagonalInInches = diagonalInPixels / Screen.dpi;
+        return diagonalInInches;
     }
 }

@@ -1,9 +1,16 @@
-﻿using UniInject;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 {
+    private static int goldenNoteHitParticlesPerSecond = 150;
+
+    [Inject(Key = nameof(goldenNoteHitStarUi))]
+    protected VisualTreeAsset goldenNoteHitStarUi;
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
 
@@ -24,6 +31,19 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     public RecordedNote RecordedNote { get; private set; }
+
+    [Inject(UxmlName = R.UxmlNames.effectsContainer)]
+    private VisualElement effectsContainer;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private GameObject gameObject;
+
+    private readonly List<StarParticleControl> starParticleControls = new();
+
+    private float lastNoteWidth;
 
     public int MidiNote { get; set; }
 
@@ -49,6 +69,74 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     public void Update()
     {
         LifeTimeInSeconds += Time.deltaTime;
+
+        starParticleControls.ForEach(starParticleControl => starParticleControl.Update());
+
+        if (EndBeat < TargetEndBeat
+            && MidiNote == RecordedNote.TargetNote.MidiNote
+            && RecordedNote.TargetNote.IsGolden)
+        {
+            CreateGoldenNoteHitEffect();
+        }
+
+        lastNoteWidth = VisualElement.style.width.value.value;
+    }
+
+    private void CreateGoldenNoteHitEffect()
+    {
+        for (int i = 0; i < goldenNoteHitParticlesPerSecond * Time.deltaTime; i++)
+        {
+            CreateGoldenNoteHitStar();
+        }
+    }
+
+    private void CreateGoldenNoteHitStar()
+    {
+        VisualElement star = goldenNoteHitStarUi.CloneTree().Children().First();
+        star.style.position = new StyleEnum<Position>(Position.Absolute);
+        effectsContainer.Add(star);
+
+        StarParticleControl starControl = injector
+            .WithRootVisualElement(star)
+            .CreateAndInject<StarParticleControl>();
+        starControl.VisualElementToFollow = VisualElement;
+
+        float noteWidth = VisualElement.style.width.value.value;
+        float noteHeight = VisualElement.style.height.value.value;
+        // Place at right side of recorded note.
+        float xPercent = VisualElement.style.left.value.value + Random.Range(lastNoteWidth, noteWidth);
+        float yPercent = VisualElement.style.top.value.value + Random.Range(noteHeight * 0.9f, 0);
+        Vector2 startPos = new(xPercent, yPercent);
+        starControl.SetPosition(startPos);
+        starControl.Rotation = Random.Range(0, 360);
+
+        float startSize = Random.Range(0.4f, 0.5f);
+        Vector2 startScale = new(startSize, startSize);
+        starControl.SetScale(startScale);
+
+        // Move and rotate a little bit
+        starControl.RotationVelocityInDegreesPerSecond = 60;
+        starControl.VelocityInPercentPerSecond = new Vector2(Random.Range(-3, 0), Random.Range(-10, 10));
+
+        // Shrink size and fade out then remove
+        LeanTween.value(gameObject, 1, 0, Random.Range(0.3f, 0.7f))
+            .setOnUpdate(factor =>
+            {
+                starControl.SetScale(startScale * factor);
+                starControl.SetOpacity(factor);
+            })
+            .setOnComplete(() =>
+            {
+                RemoveStarControl(starControl);
+            });
+
+        starParticleControls.Add(starControl);
+    }
+
+    private void RemoveStarControl(StarParticleControl starParticleControl)
+    {
+        starParticleControl.VisualElement.RemoveFromHierarchy();
+        starParticleControls.Remove(starParticleControl);
     }
 
     private void SetStyleByMicProfile(MicProfile micProfile)
@@ -65,5 +153,6 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     public void Dispose()
     {
         VisualElement.RemoveFromHierarchy();
+        starParticleControls.ToList().ForEach(starParticleControl => RemoveStarControl(starParticleControl));
     }
 }

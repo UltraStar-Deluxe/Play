@@ -4,7 +4,7 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon icon="bug_report" name="titleImage" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Development Options" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
@@ -42,8 +42,8 @@
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-between; width: 100%;">
-                <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogOverlayButton" />
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" />
+                <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogOverlayButton" class="controlMinWidth" />
+                <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="logOverlay" class="optionsSceneMainContainer focusableNavigatorRoot" style="position: absolute; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none; top: 0; left: 0;">

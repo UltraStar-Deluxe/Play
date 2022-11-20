@@ -25,6 +25,16 @@ public static class StringExtensions
         return string.IsNullOrEmpty(txt);
     }
 
+    public static string NullToEmpty(this string txt)
+    {
+        if (txt == null)
+        {
+            return "";
+        }
+
+        return txt;
+    }
+
     // Removes opening and ending part from a string.
     public static string Strip(this string txt, string opening, string ending)
     {

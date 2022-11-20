@@ -41,6 +41,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject]
     private TranslationManager translationManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
+    private Injector injector;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -72,7 +78,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private VisualElement notConnectedContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedLabel)]
-    private VisualElement notConnectedLabel;
+    private Label notConnectedLabel;
 
     [Inject(UxmlName = R.UxmlNames.sampleRateContainer)]
     private VisualElement sampleRateContainer;
@@ -89,12 +95,17 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
     private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
     private NumberPickerControl delayPickerControl;
     private ColorPickerControl colorPickerControl;
+
+    private MessageDialogControl helpDialogControl;
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
 
@@ -125,6 +136,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
 
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
@@ -173,7 +185,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+            .Subscribe(_ => OnBack());
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(() => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
@@ -192,6 +204,18 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                         "error");
                 }
             });
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
     }
 
     private void Update()
@@ -338,6 +362,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
         calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
+        notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
     }
 
     private List<MicProfile> CreateMicProfiles()
@@ -397,6 +422,40 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 devicePickerControl.UpdateLabelText();
             }
         }
+    }
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
+                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay) },
+            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration_title),
+                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelayCalibration) },
+            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification_title),
+                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_amplification) },
+            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression_title),
+                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_noiseSuppression) },
+            { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
+                TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(titleToContentMap, CloseHelp);
+    }
+
+    private void CloseHelp()
+    {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
+        helpDialogControl.CloseDialog();
+        helpDialogControl = null;
+        helpButton.Focus();
     }
 
     private List<Color32> GetColorItems()

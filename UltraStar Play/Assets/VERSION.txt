@@ -1,4 +1,4 @@
-release = 0.7.0
-build_timestamp = 2208102013
-commit_hash = 752d4fdf
-website_link = https://usplay.net/get
+release = 0.8.0
+build_timestamp = 2211161548
+commit_hash = e0574ab1
+website_link = https://ultrastar-play.com/get
