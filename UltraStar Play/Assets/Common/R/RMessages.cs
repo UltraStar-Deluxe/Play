@@ -139,6 +139,17 @@ public static partial class R
         public static readonly string options_playerProfiles_title = "options_playerProfiles_title";
         public static readonly string options_previewVolume = "options_previewVolume";
         public static readonly string options_recording_button = "options_recording_button";
+        public static readonly string options_recording_helpDialog_amplification = "options_recording_helpDialog_amplification";
+        public static readonly string options_recording_helpDialog_amplification_title = "options_recording_helpDialog_amplification_title";
+        public static readonly string options_recording_helpDialog_micDelay = "options_recording_helpDialog_micDelay";
+        public static readonly string options_recording_helpDialog_micDelay_title = "options_recording_helpDialog_micDelay_title";
+        public static readonly string options_recording_helpDialog_micDelayCalibration = "options_recording_helpDialog_micDelayCalibration";
+        public static readonly string options_recording_helpDialog_micDelayCalibration_title = "options_recording_helpDialog_micDelayCalibration_title";
+        public static readonly string options_recording_helpDialog_noiseSuppression = "options_recording_helpDialog_noiseSuppression";
+        public static readonly string options_recording_helpDialog_noiseSuppression_title = "options_recording_helpDialog_noiseSuppression_title";
+        public static readonly string options_recording_helpDialog_sampleRate = "options_recording_helpDialog_sampleRate";
+        public static readonly string options_recording_helpDialog_sampleRate_title = "options_recording_helpDialog_sampleRate_title";
+        public static readonly string options_recording_helpDialog_title = "options_recording_helpDialog_title";
         public static readonly string options_recording_title = "options_recording_title";
         public static readonly string options_resolution = "options_resolution";
         public static readonly string options_sampleRate = "options_sampleRate";
