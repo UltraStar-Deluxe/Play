@@ -24,13 +24,13 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset accordionUi;
-
-    [InjectedInInspector]
     public VisualTreeAsset songIssueSongEntryUi;
 
     [Inject]
     private UIDocument uiDocument;
+
+    [Inject]
+    private UiManager uiManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -187,42 +187,26 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             return;
         }
 
-        VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(helpDialog);
-        helpDialog.AddToClassList("wordWrap");
-
-        helpDialogControl = injector
-            .WithRootVisualElement(helpDialog)
-            .CreateAndInject<MessageDialogControl>();
-        helpDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title);
-
-        AccordionItemControl songFormatInfoAccordionItemControl = CreateAccordionItemControl();
-        songFormatInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title);
-        songFormatInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo)));
-        helpDialogControl.AddVisualElement(songFormatInfoAccordionItemControl.VisualElement);
-
-        AccordionItemControl addSongInfoAccordionItemControl = CreateAccordionItemControl();
-        addSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title);
-        addSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo)));
-        helpDialogControl.AddVisualElement(addSongInfoAccordionItemControl.VisualElement);
-
-        AccordionItemControl createSongInfoAccordionItemControl = CreateAccordionItemControl();
-        createSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title);
-        createSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo)));
-        helpDialogControl.AddVisualElement(createSongInfoAccordionItemControl.VisualElement);
-
-        AccordionItemControl downloadSongInfoAccordionItemControl = CreateAccordionItemControl();
-        downloadSongInfoAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title);
-        downloadSongInfoAccordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo)));
-        helpDialogControl.AddVisualElement(downloadSongInfoAccordionItemControl.VisualElement);
-
-        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            () => CloseHelp());
-        closeDialogButton.Focus();
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(titleToContentMap, CloseHelp);
     }
 
     private void CloseHelp()
     {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
         helpDialogControl.CloseDialog();
         helpDialogControl = null;
         helpButton.Focus();
@@ -292,12 +276,12 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             .CreateAndInject<MessageDialogControl>();
         songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
-        AccordionItemControl errorsAccordionItemControl = CreateAccordionItemControl();
+        AccordionItemControl errorsAccordionItemControl = uiManager.CreateAccordionItemControl();
         errorsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors);
         songIssueDialogControl.AddVisualElement(errorsAccordionItemControl.VisualElement);
         FillWithSongIssues(errorsAccordionItemControl, songMetaManager.GetSongErrors());
 
-        AccordionItemControl warningsAccordionItemControl = CreateAccordionItemControl();
+        AccordionItemControl warningsAccordionItemControl = uiManager.CreateAccordionItemControl();
         warningsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings);
         songIssueDialogControl.AddVisualElement(warningsAccordionItemControl.VisualElement);
         FillWithSongIssues(warningsAccordionItemControl, songMetaManager.GetSongWarnings());
@@ -328,15 +312,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         songIssueButton.Focus();
     }
 
-    private AccordionItemControl CreateAccordionItemControl()
-    {
-        VisualElement accordionItem = accordionUi.CloneTree().Children().FirstOrDefault();
-        AccordionItemControl accordionItemControl = injector
-            .WithRootVisualElement(accordionItem)
-            .CreateAndInject<AccordionItemControl>();
-        return accordionItemControl;
-    }
-
+    // This method is only used on Android
     private void AddSongFolderIfNotContains(string basePath)
     {
         settings.GameSettings.songDirs.AddIfNotContains(basePath + "/Songs");
