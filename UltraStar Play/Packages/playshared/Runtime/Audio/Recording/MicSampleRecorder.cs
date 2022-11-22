@@ -213,20 +213,15 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
     public static int GetFinalSampleRate(string deviceName, int targetSampleRate)
     {
-        Microphone.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate);
-        int finalSampleRate;
-        if (targetSampleRate <= 0)
+        if (targetSampleRate > 0)
         {
-            // Select best sample rate
-            finalSampleRate = GetMaxSampleRate(maxSampleRate);
-        }
-        else
-        {
-            // Select the target sample rate.
-            finalSampleRate = targetSampleRate;
+            // Use explicitly set sample rate
+            return targetSampleRate;
         }
 
-        return finalSampleRate;
+        // Use best available sample rate
+        Microphone.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate);
+        return GetMaxSampleRate(maxSampleRate);
     }
 
     private static int GetMaxSampleRate(int maxSampleRate)

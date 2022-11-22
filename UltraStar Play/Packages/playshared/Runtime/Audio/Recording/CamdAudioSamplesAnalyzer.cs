@@ -41,7 +41,12 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
     }
 
-    public override PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile micProfile)
+    public override PitchEvent ProcessAudioSamples(
+        float[] sampleBuffer,
+        int startIndexInclusive,
+        int endIndexExclusive,
+        int amplificationMultiplier,
+        int noiseSuppression)
     {
         int sampleLength = endIndexExclusive - startIndexInclusive;
         if (sampleLength < MinSampleLength)
@@ -67,10 +72,10 @@ public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         }
 
         // Apply amplification
-        ApplyAmplification(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.AmplificationMultiplier);
+        ApplyAmplification(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, amplificationMultiplier);
 
         // Check if samples is louder than threshold
-        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, micProfile.NoiseSuppression))
+        if (!IsAboveNoiseSuppressionThreshold(sampleBuffer, startIndexInclusive, startIndexInclusive + sampleCountToUse, noiseSuppression))
         {
             OnNoPitchDetected();
             return null;
