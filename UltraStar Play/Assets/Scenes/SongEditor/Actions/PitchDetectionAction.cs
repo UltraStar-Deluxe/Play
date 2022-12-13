@@ -7,7 +7,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class TryFindPitchAction : INeedInjection
+public class PitchDetectionAction : INeedInjection
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -26,7 +26,13 @@ public class TryFindPitchAction : INeedInjection
 
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
-    public void TryFindPitch(IEnumerable<Note> selectedNotes)
+    public void MoveToAnalyzedPitchAndNotify(IEnumerable<Note> selectedNotes)
+    {
+        MoveToAnalyzedPitch(selectedNotes);
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+    }
+
+    public void MoveToAnalyzedPitch(IEnumerable<Note> selectedNotes)
     {
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
@@ -82,9 +88,8 @@ public class TryFindPitchAction : INeedInjection
         float[] noteSamplesMono = GetMonoAudioSamples(noteSamplesStereo, audioClip.channels);
 
         // Debug.Log($"Start in ms: {startBeatInMillis}, length in ms: {noteLengthInMillis}, end in ms: {startBeatInMillis + noteLengthInMillis}, start in samples: {startBeatInSamplesMono}, length in samples: {noteLengthInSamplesStereo}, end in samples: {startBeatInSamplesMono + noteLengthInSamplesStereo}");
-
-        WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, noteSamplesStereo);
-        WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, noteSamplesMono);
+        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, noteSamplesStereo);
+        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, noteSamplesMono);
 
         if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
         {
@@ -159,12 +164,6 @@ public class TryFindPitchAction : INeedInjection
             }
         }
         return result;
-    }
-
-    public void TryFindPitchAndNotify(IEnumerable<Note> selectedNotes)
-    {
-        TryFindPitch(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 
     private void InitAudioSamplesAnalyzerIfNotDoneYet(AudioClip audioClip)

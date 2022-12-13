@@ -40,7 +40,10 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject]
-    private TryFindPitchAction tryFindPitchAction;
+    private PitchDetectionAction pitchDetectionAction;
+
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
 
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
@@ -64,7 +67,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
         contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
-        contextMenu.AddItem("Try find pitch", () => tryFindPitchAction.TryFindPitchAndNotify(selectedNotes));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(selectedNotes));
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
