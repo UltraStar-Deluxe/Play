@@ -114,7 +114,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             && lastCaretPosition != textField.cursorIndex)
         {
             lastCaretPosition = textField.cursorIndex;
-            SyncPositionInSongWithSelectedText();
+            // TODO: Make this optional
+            // SyncPositionInSongWithSelectedText();
         }
     }
 
