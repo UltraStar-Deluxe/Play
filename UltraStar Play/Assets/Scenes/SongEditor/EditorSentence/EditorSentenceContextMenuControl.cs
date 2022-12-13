@@ -16,6 +16,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     private SongMeta songMeta;
 
     [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
     private EditorSentenceControl sentenceControl;
 
     public override void OnInjectionFinished()
@@ -30,6 +33,8 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(new List<Sentence> {sentenceControl.Sentence}));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
