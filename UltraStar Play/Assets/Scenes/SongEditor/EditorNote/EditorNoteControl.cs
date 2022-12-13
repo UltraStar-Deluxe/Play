@@ -111,6 +111,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(this)
             .CreateAndInject<EditorNoteContextMenuControl>();
+        disposables.Add(contextMenuControl);
 
         SyncWithNote();
     }
