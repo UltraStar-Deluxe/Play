@@ -19,6 +19,11 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
         dywaPitchTracker.SampleRateHz = sampleRateHz;
     }
 
+    public void ClearPitchHistory()
+    {
+        dywaPitchTracker.ClearPitchHistory();
+    }
+
     public override PitchEvent ProcessAudioSamples(
         float[] sampleBuffer,
         int startIndexInclusive,
