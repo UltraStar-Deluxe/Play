@@ -25,53 +25,96 @@ public class SpeechRecognitionAction : INeedInjection
     [Inject]
     private AudioManager audioManager;
 
-    private VoskRecognizer voskRecognizer;
+    private EnglishSyllableSplitter englishSyllableSplitter = new();
 
     private string voskModelPath = @"F:\Dev\VoskModels\vosk-model-small-en-us-0.15";
-    // private List<string> speechRecognitionPhrases = new() {"one", "two", "test"};
-    private List<string> speechRecognitionPhrases = new();
+    private Model voskModel;
     private int maxSpeechRecognitionAlternatives = 3;
 
-    public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Note> selectedNotes)
+    public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Sentence> selectedSentences)
+    {
+        SetTextToAnalyzedSpeech(selectedSentences);
+        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+    }
+
+    public void SetTextToAnalyzedSpeech(IEnumerable<Sentence> selectedSentences)
+    {
+        // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
+        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+
+        using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
+        if (voskRecognizer == null)
+        {
+            return;
+        }
+
+        selectedSentences.ForEach(sentence =>
+        {
+            int sentenceLengthInBeats = sentence.ExtendedMaxBeat - sentence.MinBeat;
+            List<string> analyzedSpeech = AnalyzeBeats(sentence.MinBeat, sentenceLengthInBeats, audioClip, voskRecognizer);
+            Debug.Log($"Analyzed text from beat {sentence.MinBeat} to beat {sentence.ExtendedMaxBeat}: {analyzedSpeech.ToCsv()}");
+            if (!analyzedSpeech.IsNullOrEmpty())
+            {
+                // Assume whole words. Thus, take first word and separate notes by space.
+                MapAnalyzedSpeechToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList());
+            }
+        });
+    }
+
+    public void SetTextToAnalyzedSpeechAndNotify(List<Note> selectedNotes)
     {
         SetTextToAnalyzedSpeech(selectedNotes);
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
     }
 
-    public void SetTextToAnalyzedSpeech(IEnumerable<Note> selectedNotes)
+    public void SetTextToAnalyzedSpeech(List<Note> selectedNotes)
     {
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
 
-        selectedNotes.ForEach(note =>
+        using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
+        if (voskRecognizer == null)
         {
-            List<string> analyzedSpeech = AnalyzeNote(note, audioClip);
-            Debug.Log($"Analyzed text of note '{note.Text}' from beat {note.StartBeat} to beat {note.EndBeat}: {analyzedSpeech.ToCsv()}");
-            if (!analyzedSpeech.IsNullOrEmpty())
-            {
-                // Assume whole words. Thus, take first word and separate notes by space.
-                string newText = analyzedSpeech.FirstOrDefault();
-                string[] newWords = newText.Split(" ");
-                if (!newWords.IsNullOrEmpty())
-                {
-                    string newWord = newWords[0];
-                    note.SetText(newWord.Trim() + " ");
-                }
-            }
-        });
-    }
-
-    private List<string> AnalyzeNote(Note note, AudioClip audioClip)
-    {
-        List<string> result = new();
-        if (note == null
-            || note.Length <= 0)
-        {
-            return result;
+            return;
         }
 
-        InitSpeechRecognizerIfNotDoneYet(audioClip);
-        if (voskRecognizer == null)
+        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
+        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
+        int lengthInBeats = maxBeat - minBeat;
+        List<string> analyzedSpeech = AnalyzeBeats(minBeat, lengthInBeats, audioClip, voskRecognizer);
+        Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {analyzedSpeech.ToCsv()}");
+        if (!analyzedSpeech.IsNullOrEmpty())
+        {
+            MapAnalyzedSpeechToNotes(analyzedSpeech.FirstOrDefault(), selectedNotes);
+        }
+    }
+
+    private List<string> GetSpeechRecognitionPhrases()
+    {
+        HashSet<string> wordsOfSong = new();
+        songMeta.GetVoices().ForEach(voice =>
+        {
+            string lyricsOfVoice = SongMetaUtils.GetLyrics(songMeta, voice);
+            string[] wordsOfVoice = lyricsOfVoice.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+            wordsOfVoice.ForEach(word =>
+            {
+                string normalizedWord = word.Replace("~", "")
+                    .Replace("?", "")
+                    .Replace("!", "")
+                    .Replace(".", "")
+                    .Replace("-", "")
+                    .Trim();
+                wordsOfSong.Add(normalizedWord);
+            });
+        });
+        return wordsOfSong.ToList();
+    }
+
+    private List<string> AnalyzeBeats(int startBeat, int lengthInBeats, AudioClip audioClip, VoskRecognizer voskRecognizer)
+    {
+        List<string> result = new();
+        if (lengthInBeats <= 0
+            || voskRecognizer == null)
         {
             return result;
         }
@@ -79,29 +122,29 @@ public class SpeechRecognitionAction : INeedInjection
         int samplesPerSecondMono = audioClip.frequency;
         int samplesPerSecond = samplesPerSecondMono * audioClip.channels;
         int maxSample = audioClip.samples * audioClip.channels;
-        double beatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
-        double noteLengthInMillis = beatLengthInMillis * note.Length;
-        double noteLengthInSamplesStereo = noteLengthInMillis / 1000.0 * samplesPerSecond;
+        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
+        double lengthInSamplesStereo = lengthInMillis / 1000.0 * samplesPerSecond;
 
-        float[] noteSamplesStereo = new float[(int)noteLengthInSamplesStereo];
+        float[] beatSamplesStereo = new float[(int)lengthInSamplesStereo];
 
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
         int startBeatInSamplesMono = (int) (startBeatInMillis / 1000.0 * samplesPerSecondMono);
         startBeatInSamplesMono = NumberUtils.Limit(startBeatInSamplesMono, 0, maxSample);
         // Note that GetData always takes the offset in MONO samples, even if there are more channels.
-        audioClip.GetData(noteSamplesStereo, startBeatInSamplesMono);
-        float[] noteSamplesMono = GetMonoAudioSamples(noteSamplesStereo, audioClip.channels);
+        audioClip.GetData(beatSamplesStereo, startBeatInSamplesMono);
+        float[] beatSamplesMono = GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
 
-        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, noteSamplesStereo);
-        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, noteSamplesMono);
+        WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-stereo.wav", audioClip.frequency, audioClip.channels, beatSamplesStereo);
+        WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-mono.wav", audioClip.frequency, 1, beatSamplesMono);
 
-        short[] noteSamplesMonoShortArray = new short[noteSamplesMono.Length];
-        for (int i = 0; i < noteSamplesMono.Length; i++)
+        short[] beatSamplesMonoShortArray = new short[beatSamplesMono.Length];
+        for (int i = 0; i < beatSamplesMono.Length; i++)
         {
-            noteSamplesMonoShortArray[i] = (short)Math.Floor(noteSamplesMono[i] * short.MaxValue);
+            beatSamplesMonoShortArray[i] = (short)Math.Floor(beatSamplesMono[i] * short.MaxValue);
         }
 
-        voskRecognizer.AcceptWaveform(noteSamplesMonoShortArray, noteSamplesMonoShortArray.Length);
+        voskRecognizer.AcceptWaveform(beatSamplesMonoShortArray, beatSamplesMonoShortArray.Length);
         string voskResultJsonString = voskRecognizer.FinalResult();
         Debug.Log("Vosk result: " + voskResultJsonString);
         if (voskResultJsonString.IsNullOrEmpty())
@@ -144,6 +187,36 @@ public class SpeechRecognitionAction : INeedInjection
         return result;
     }
 
+    private void MapAnalyzedSpeechToNotes(string analyzedSpeech, List<Note> notes)
+    {
+        string[] words = analyzedSpeech.Split(" ");
+
+        // Map words to notes alternatingly from start and end
+        int noteIndex = 0;
+        foreach (string word in words)
+        {
+            List<string> syllables = englishSyllableSplitter.GetSyllables(word);
+            for (int syllableIndex = 0; syllableIndex < syllables.Count; syllableIndex++)
+            {
+                if (noteIndex >= notes.Count)
+                {
+                    return;
+                }
+
+                if (syllableIndex == syllables.Count - 1)
+                {
+                    // Add space for end of word
+                    notes[noteIndex].SetText(syllables[syllableIndex] + " ");
+                }
+                else
+                {
+                    notes[noteIndex].SetText(syllables[syllableIndex]);
+                }
+                noteIndex++;
+            }
+        }
+    }
+
     private float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)
     {
         if (channelCount <= 1)
@@ -170,15 +243,22 @@ public class SpeechRecognitionAction : INeedInjection
         return monoSamples;
     }
 
-    private void InitSpeechRecognizerIfNotDoneYet(AudioClip audioClip)
+    private VoskRecognizer CreateSpeechRecognizer(AudioClip audioClip)
     {
-        if (voskRecognizer != null
-            || !songAudioPlayer.HasAudioClip)
+        if (audioClip == null
+            || audioClip.samples <= 0
+            || audioClip.frequency <= 0)
         {
-            return;
+            return null;
         }
 
-        Model voskModel = new(voskModelPath);
+        if (voskModel == null)
+        {
+            voskModel = new(voskModelPath);
+        }
+
+        VoskRecognizer voskRecognizer;
+        List<string> speechRecognitionPhrases = GetSpeechRecognitionPhrases();
         if (!speechRecognitionPhrases.IsNullOrEmpty())
         {
             string voskGrammar = JsonConverter.ToJson(speechRecognitionPhrases);
@@ -191,6 +271,8 @@ public class SpeechRecognitionAction : INeedInjection
 
         voskRecognizer.SetMaxAlternatives(maxSpeechRecognitionAlternatives);
         // voskRecognizer.SetWords();
+
+        return voskRecognizer;
     }
 
     private class VoskResultJson

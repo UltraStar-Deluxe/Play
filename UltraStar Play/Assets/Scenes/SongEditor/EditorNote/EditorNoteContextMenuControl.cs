@@ -67,15 +67,21 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
         contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(selectedNotes));
-        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
+        FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherVoice(contextMenu, selectedNotes);
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
+    }
+
+    private void FillContextMenuForAiTools(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
+    {
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
