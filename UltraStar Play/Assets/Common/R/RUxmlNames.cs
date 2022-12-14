@@ -580,6 +580,8 @@ public static partial class R
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";
+        public const string syncLyricsAreaContainer = "syncLyricsAreaContainer";
+        public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string targetNote = "targetNote";
         public const string targetNoteEntryContainer = "targetNoteEntryContainer";
         public const string targetNoteImage = "targetNoteImage";

@@ -21,6 +21,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice2Button)]
     private Button lyricsAreaVoice2Button;
 
+    [Inject(UxmlName = R.UxmlNames.syncLyricsAreaToggle)]
+    private Toggle syncLyricsAreaToggle;
+
     [Inject]
     private SongMeta songMeta;
 
@@ -147,8 +150,10 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             && lastCaretPosition != textField.cursorIndex)
         {
             lastCaretPosition = textField.cursorIndex;
-            // TODO: Make this optional
-            // SyncPositionInSongWithSelectedText();
+            if (syncLyricsAreaToggle.value)
+            {
+                SyncPositionInSongWithSelectedText();
+            }
         }
     }
 
