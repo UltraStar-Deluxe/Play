@@ -96,6 +96,8 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    public double PositionInSongInSeconds => positionInSongInMillis / 1000.0;
+
     /**
      * Returns the exact position in the song based on current sample position.
      * Note that this changes concurrently,

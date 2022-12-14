@@ -56,6 +56,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [InjectedInInspector]
     public SongEditorSceneInputControl songEditorSceneInputControl;
 
+    [InjectedInInspector]
+    public SongEditorRecordedAudioPlayer songEditorRecordedAudioPlayer;
+
     [Inject]
     private Injector injector;
 
@@ -97,6 +100,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
+    private readonly SongEditorSampleRecorderControl songEditorSampleRecorderControl = new();
 
     public SongMeta SongMeta
     {
@@ -143,6 +147,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector.Inject(songEditorSampleRecorderControl);
     }
 
     private void Start()
@@ -160,6 +165,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
+
+        // Reset usage of recorded audio buffer. The buffer starts empty.
+        settings.SongEditorSettings.UseRecordedSamples = false;
+        settings.SongEditorSettings.PlayRecordedSamples = false;
     }
 
     private void OnDestroy()
@@ -492,6 +501,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(songEditorMicPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(songEditorSampleRecorderControl);
+        bb.BindExistingInstance(songEditorRecordedAudioPlayer);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);

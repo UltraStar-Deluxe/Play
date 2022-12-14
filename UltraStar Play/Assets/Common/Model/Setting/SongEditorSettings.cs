@@ -18,6 +18,8 @@ public class SongEditorSettings
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public bool RecordSamplesInsteadOfNotes { get; set; }
+    public bool UseRecordedSamples;
+    public bool PlayRecordedSamples;
 
     public bool AdjustFollowingNotes { get; set; }
 

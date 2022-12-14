@@ -115,13 +115,13 @@
                                     <ui:Label text="Microphone" display-tooltip-when-elided="true" name="label" />
                                     <ItemPicker noPreviousButton="true" name="micDeviceItemPicker" wrapAround="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
                                 </ui:VisualElement>
-                                <ui:VisualElement name="micOctaveOffsetContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
-                                    <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />
-                                    <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
-                                </ui:VisualElement>
                                 <ui:VisualElement name="micDelayContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                                     <ui:Label text="Mic delay (ms)" display-tooltip-when-elided="true" name="label" />
                                     <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="micOctaveOffsetContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />
+                                    <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                                 </ui:VisualElement>
                                 <ui:RadioButtonGroup value="-1" name="recordNoteOrAudioRadioButtonGroup" style="flex-direction: column;">
                                     <ui:VisualElement name="recordNotesContainer" style="flex-direction: row; align-items: center; margin-bottom: 5px;">
@@ -135,6 +135,16 @@
                                         <ui:RadioButton name="recordAudioRadioButton" />
                                     </ui:VisualElement>
                                 </ui:RadioButtonGroup>
+                                <ui:VisualElement name="useRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Use recorded audio&#10;for speech recognition&#10;and pitch detection" display-tooltip-when-elided="true" />
+                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                    <ui:Toggle name="useRecordedAudioToggle" class="smallControl" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="playRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Play recorded audio" display-tooltip-when-elided="true" />
+                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                    <ui:Toggle name="playRecordedAudioToggle" class="smallControl" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="buttonRecordingContainer">
                                 <ui:VisualElement name="buttonRecordingButtonContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
@@ -154,7 +164,7 @@
                                 <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                             </ui:VisualElement>
                             <ui:VisualElement name="speechRecognitionPhrasesContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
-                                <ui:Label text="Words" display-tooltip-when-elided="true" name="label" enable-rich-text="true" />
+                                <ui:Label text="Speech Recognition Words" display-tooltip-when-elided="true" name="label" enable-rich-text="true" />
                                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: 100px; flex-grow: 1;">
                                     <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
                                 </ui:ScrollView>
@@ -285,6 +295,7 @@
         <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">
             <ui:VisualElement name="overviewAreaSentences" style="position: absolute; height: 100%; width: 100%; visibility: hidden;" />
             <ui:VisualElement name="overviewAreaWaveform" style="position: absolute; height: 100%; width: 100%;" />
+            <ui:VisualElement name="overviewAreaRecordedAudioWaveform" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaNotes" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaIssues" style="position: absolute; height: 100%; width: 100%;" />
             <ui:VisualElement name="overviewAreaViewportIndicator" style="position: absolute; height: 100%; width: 30px; background-color: rgba(125, 198, 233, 0.5);" />
