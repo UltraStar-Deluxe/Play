@@ -31,6 +31,8 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
         contextMenu.AddSeparator();
+        contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
+        contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
 }

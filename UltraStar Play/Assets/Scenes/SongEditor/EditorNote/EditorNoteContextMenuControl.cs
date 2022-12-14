@@ -60,7 +60,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
-        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);

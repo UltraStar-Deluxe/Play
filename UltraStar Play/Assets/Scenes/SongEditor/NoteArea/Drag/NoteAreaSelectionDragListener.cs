@@ -262,7 +262,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             && lastScrollVerticalTime + 0.1f < Time.time)
         {
             lastScrollVerticalTime = Time.time;
-            noteAreaControl.SetViewportY(noteAreaControl.ViewportY + (int)(scrollAmount.y));
+            noteAreaControl.SetViewportY(noteAreaControl.ViewportY - (int)(scrollAmount.y));
         }
 
         if (scrollAmount.x != 0

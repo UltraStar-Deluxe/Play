@@ -394,7 +394,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
     
-    public void StartEditingNoteText()
+    public void StartEditingSelectedNoteText()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.Count == 1)
@@ -403,7 +403,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(selectedNote);
             if (noteControl != null)
             {
-                noteControl.StartEditingNoteText();
+                noteControl.StartEditingLyrics();
             }
         }
     }
