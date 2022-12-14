@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniInject;
 using UnityEngine;
@@ -26,13 +27,13 @@ public class SpeechRecognitionAction : INeedInjection
     [Inject]
     private AudioManager audioManager;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
-    private TextField speechRecognitionPhrasesTextField;
+    [Inject]
+    private UiManager uiManager;
 
-    private EnglishSyllableSplitter englishSyllableSplitter = new();
+    private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
 
-    private string voskModelPath = @"F:\Dev\VoskModels\vosk-model-small-en-us-0.15";
     private Model voskModel;
+    private string voskModelPath;
     private int maxSpeechRecognitionAlternatives = 3;
 
     public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Sentence> selectedSentences)
@@ -95,14 +96,14 @@ public class SpeechRecognitionAction : INeedInjection
 
     private List<string> GetSpeechRecognitionPhrases()
     {
-        if (speechRecognitionPhrasesTextField.text.Trim().IsNullOrEmpty())
+        if (settings.SongEditorSettings.SpeechRecognitionPhrases.Trim().IsNullOrEmpty())
         {
             return new List<string>();
         }
 
-        HashSet<string> wordsOfSong = new();
-        string[] wordsOfVoice = speechRecognitionPhrasesTextField.text.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
-        wordsOfVoice.ForEach(word =>
+        HashSet<string> wordsHashSet = new();
+        string[] words = settings.SongEditorSettings.SpeechRecognitionPhrases.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+        words.ForEach(word =>
         {
             string normalizedWord = word.Replace("~", "")
                 .Replace("?", "")
@@ -110,9 +111,9 @@ public class SpeechRecognitionAction : INeedInjection
                 .Replace(".", "")
                 .Replace("-", "")
                 .Trim();
-            wordsOfSong.Add(normalizedWord);
+            wordsHashSet.Add(normalizedWord);
         });
-        return wordsOfSong.ToList();
+        return wordsHashSet.ToList();
     }
 
     private List<string> AnalyzeBeats(int startBeat, int lengthInBeats, AudioClip audioClip, VoskRecognizer voskRecognizer)
@@ -227,11 +228,9 @@ public class SpeechRecognitionAction : INeedInjection
             return null;
         }
 
-        if (voskModel == null)
-        {
-            voskModel = new(voskModelPath);
-        }
+        CreateOrUpdateSpeechRecognitionModel();
 
+        // Create the recognizer
         VoskRecognizer voskRecognizer;
         List<string> speechRecognitionPhrases = GetSpeechRecognitionPhrases();
         if (!speechRecognitionPhrases.IsNullOrEmpty())
@@ -244,10 +243,33 @@ public class SpeechRecognitionAction : INeedInjection
             voskRecognizer = new(voskModel, audioClip.frequency);
         }
 
-        voskRecognizer.SetMaxAlternatives(maxSpeechRecognitionAlternatives);
+        // voskRecognizer.SetMaxAlternatives(maxSpeechRecognitionAlternatives);
         // voskRecognizer.SetWords();
 
         return voskRecognizer;
+    }
+
+    private void CreateOrUpdateSpeechRecognitionModel()
+    {
+        if (settings.SongEditorSettings.SpeechRecognitionModelPath.IsNullOrEmpty()
+            || !Directory.Exists(settings.SongEditorSettings.SpeechRecognitionModelPath))
+        {
+            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
+            return;
+        }
+
+        if (voskModelPath != settings.SongEditorSettings.SpeechRecognitionModelPath
+            && voskModel != null)
+        {
+            // The model path changed. Thus, dispose the old model.
+            voskModel.Dispose();
+            voskModel = null;
+        }
+
+        if (voskModel == null)
+        {
+            voskModel = new(settings.SongEditorSettings.SpeechRecognitionModelPath);
+        }
     }
 
     private class VoskResultJson

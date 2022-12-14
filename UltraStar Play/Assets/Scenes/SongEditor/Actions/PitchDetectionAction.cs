@@ -25,6 +25,7 @@ public class PitchDetectionAction : INeedInjection
     private AudioManager audioManager;
 
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
+    private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
     public void MoveToAnalyzedPitchAndNotify(IEnumerable<Note> selectedNotes)
     {
@@ -37,7 +38,10 @@ public class PitchDetectionAction : INeedInjection
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
 
-        selectedNotes.ForEach(note =>
+        List<Note> sortedNotes = selectedNotes.ToList();
+        sortedNotes.Sort(Note.comparerByStartBeat);
+
+        sortedNotes.ForEach(note =>
         {
             List<int> relativePitches = AnalyzeNote(note, audioClip);
             if (relativePitches.IsNullOrEmpty())
@@ -54,6 +58,12 @@ public class PitchDetectionAction : INeedInjection
                 note.SetMidiNote(newAbsoluteMidiNote);
             }
         });
+
+        if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
+        {
+            // This is not the common use case of the Dynamic Wavelet algorithm. The next analysis will be independent of the previous one.
+            dywaAudioSamplesAnalyzer.ClearPitchHistory();
+        }
     }
 
     private List<int> AnalyzeNote(Note note, AudioClip audioClip)
@@ -65,7 +75,7 @@ public class PitchDetectionAction : INeedInjection
             return result;
         }
 
-        InitAudioSamplesAnalyzerIfNotDoneYet(audioClip);
+        CreateOrUpdateAudioSamplesAnalyzer(audioClip);
         if (audioSamplesAnalyzer == null)
         {
             return result;
@@ -90,12 +100,6 @@ public class PitchDetectionAction : INeedInjection
         // Debug.Log($"Start in ms: {startBeatInMillis}, length in ms: {noteLengthInMillis}, end in ms: {startBeatInMillis + noteLengthInMillis}, start in samples: {startBeatInSamplesMono}, length in samples: {noteLengthInSamplesStereo}, end in samples: {startBeatInSamplesMono + noteLengthInSamplesStereo}");
         // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, noteSamplesStereo);
         // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, noteSamplesMono);
-
-        if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
-        {
-            // This is note the common use case of the Dynamic Wavelet algorithm. Here, each analysis is independent of the previous.
-            dywaAudioSamplesAnalyzer.ClearPitchHistory();
-        }
 
         PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(noteSamplesMono, 0, noteSamplesMono.Length, 1, 0);
         if (pitchEvent != null)
@@ -140,7 +144,7 @@ public class PitchDetectionAction : INeedInjection
             return result;
         }
 
-        InitAudioSamplesAnalyzerIfNotDoneYet(audioClip);
+        CreateOrUpdateAudioSamplesAnalyzer(audioClip);
         if (audioSamplesAnalyzer == null)
         {
             return result;
@@ -166,16 +170,18 @@ public class PitchDetectionAction : INeedInjection
         return result;
     }
 
-    private void InitAudioSamplesAnalyzerIfNotDoneYet(AudioClip audioClip)
+    private void CreateOrUpdateAudioSamplesAnalyzer(AudioClip audioClip)
     {
-        if (audioSamplesAnalyzer != null
+        if ((audioSamplesAnalyzer != null
+                && audioSamplesAnalyzerPitchDetectionAlgorithm == settings.SongEditorSettings.PitchDetectionAlgorithm)
             || !songAudioPlayer.HasAudioClip)
         {
             return;
         }
 
         audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(
-            settings.PitchDetectionAlgorithm,
+            settings.SongEditorSettings.PitchDetectionAlgorithm,
             audioClip.frequency);
+        audioSamplesAnalyzerPitchDetectionAlgorithm = settings.SongEditorSettings.PitchDetectionAlgorithm;
     }
 }

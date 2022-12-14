@@ -19,6 +19,7 @@
     --control-width-half: 60px;
     --control-width-large: 150px;
     --round-button-size: 50px;
+    --radio-button-size: 20px;
     --control-color: rgb(66, 163, 231);
     --control-color-accent1: rgb(125, 198, 233);
     --control-color-accent2: rgb(99, 154, 183);
@@ -160,6 +161,20 @@
 
 .unity-button:active {
     background-color: var(--control-color-accent2);
+}
+
+.unity-radio-button {
+    margin: 0;
+    padding: 0;
+}
+
+.unity-radio-button__checkmark-background {
+    width: var(--radio-button-size);
+    height: var(--radio-button-size);
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
 }
 
 .unity-toggle {

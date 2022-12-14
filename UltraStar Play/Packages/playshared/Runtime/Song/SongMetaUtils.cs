@@ -234,19 +234,26 @@ public static class SongMetaUtils
             return "";
         }
 
-        return GetLyrics(songMeta, voice);
+        return GetLyrics(voice);
     }
 
-    public static string GetLyrics(SongMeta songMeta, Voice voice)
+    public static string GetLyrics(Voice voice)
     {
         StringBuilder sb = new();
         voice.Sentences.ForEach(sentence =>
         {
-            sentence.Notes.ForEach(note =>
-            {
-                sb.Append(note.Text);
-            });
+            sb.Append(GetLyrics(sentence));
             sb.Append("\n");
+        });
+        return sb.ToString();
+    }
+
+    public static string GetLyrics(Sentence sentence)
+    {
+        StringBuilder sb = new();
+        sentence.Notes.ForEach(note =>
+        {
+            sb.Append(note.Text);
         });
         return sb.ToString();
     }

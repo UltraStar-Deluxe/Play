@@ -19,6 +19,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     private SpeechRecognitionAction speechRecognitionAction;
 
     [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+
+    [Inject]
     private EditorSentenceControl sentenceControl;
 
     public override void OnInjectionFinished()
@@ -37,6 +40,7 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(new List<Sentence> {sentenceControl.Sentence}));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(sentenceControl.Sentence.Notes));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }

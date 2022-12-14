@@ -380,6 +380,9 @@ public static partial class R
         public const string pauseOverlayTitle = "pauseOverlayTitle";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
+        public const string pitchDetectionAlgorithmItemPicker = "pitchDetectionAlgorithmItemPicker";
+        public const string pitchDetectionGroup = "pitchDetectionGroup";
+        public const string pitchDetectionTitle = "pitchDetectionTitle";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string pitchLabel = "pitchLabel";
         public const string player = "player";
@@ -421,6 +424,9 @@ public static partial class R
         public const string quitButton = "quitButton";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
+        public const string recordAudioContainer = "recordAudioContainer";
+        public const string recordAudioLabel = "recordAudioLabel";
+        public const string recordAudioRadioButton = "recordAudioRadioButton";
         public const string recordedNote = "recordedNote";
         public const string recordedNoteEntryContainer = "recordedNoteEntryContainer";
         public const string recordedNoteImage = "recordedNoteImage";
@@ -431,6 +437,10 @@ public static partial class R
         public const string recordingSourceContainer = "recordingSourceContainer";
         public const string recordingSourceItemPicker = "recordingSourceItemPicker";
         public const string recordingTitle = "recordingTitle";
+        public const string recordNoteOrAudioRadioButtonGroup = "recordNoteOrAudioRadioButtonGroup";
+        public const string recordNotesContainer = "recordNotesContainer";
+        public const string recordNotesLabel = "recordNotesLabel";
+        public const string recordNotesRadioButton = "recordNotesRadioButton";
         public const string redoButton = "redoButton";
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
@@ -567,8 +577,13 @@ public static partial class R
         public const string soundOptionsButton = "soundOptionsButton";
         public const string space = "space";
         public const string spacer = "spacer";
+        public const string speechRecognitionGroup = "speechRecognitionGroup";
+        public const string speechRecognitionModelPathContainer = "speechRecognitionModelPathContainer";
+        public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
         public const string speechRecognitionPhrasesArea = "speechRecognitionPhrasesArea";
+        public const string speechRecognitionPhrasesContainer = "speechRecognitionPhrasesContainer";
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
+        public const string speechRecognitionTitle = "speechRecognitionTitle";
         public const string startButton = "startButton";
         public const string staticLyricsContainer = "staticLyricsContainer";
         public const string statusBar = "statusBar";
