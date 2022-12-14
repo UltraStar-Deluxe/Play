@@ -136,7 +136,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songEditorSceneControl.StartEditingNoteText());
+            .Subscribe(_ => songEditorSceneControl.StartEditingSelectedNoteText());
         
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()

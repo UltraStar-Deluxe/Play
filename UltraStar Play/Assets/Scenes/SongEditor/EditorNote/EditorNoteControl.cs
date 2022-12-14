@@ -240,7 +240,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         lastClickTime = Time.time;
         if (isDoubleClick)
         {
-            StartEditingNoteText();
+            StartEditingLyrics();
             songAudioPlayer.PauseAudio();
             return;
         }
@@ -296,7 +296,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         selectionIndicator.SetVisibleByDisplay(isSelected);
     }
 
-    public void StartEditingNoteText()
+    public void StartEditingLyrics()
     {
         // Position TextField
         float margin = 5;

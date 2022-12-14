@@ -1,5 +1,6 @@
 ﻿using UniInject;
 using UnityEngine;
+using UniRx;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -24,8 +25,14 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.selectionIndicator)]
     private VisualElement selectionIndicator;
 
+    [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
+    private VisualElement editLyricsPopup;
+
     [Inject]
     public Sentence Sentence { get; private set; }
+
+    [Inject]
+    public SongAudioPlayer songAudioPlayer;
 
     [Inject(UxmlName = R.UxmlNames.sentenceLabel)]
     private Label sentenceLabel;
@@ -47,6 +54,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 
     private EditorSentenceContextMenuControl contextMenuControl;
     private ManipulateSentenceDragListener dragListener;
+    private EditorSentenceLyricsInputControl lyricsInputControl;
 
     public bool IsPointerOver { get; private set; }
     public bool IsPointerOverRightHandle { get; private set; }
@@ -77,6 +85,14 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
             .WithBindingForInstance(this)
             .WithBindingForInstance(contextMenuControl)
             .CreateAndInject<ManipulateSentenceDragListener>();
+
+        // Double click to edit lyrics
+        new DoubleClickControl(VisualElement).DoublePointerDownEventStream
+            .Subscribe(_ =>
+            {
+                // Opening the lyrics needs a little delay. Otherwise the lyrics will close again because of blur event.
+                MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => StartEditingLyrics()));
+            });
     }
 
     public void SetColor(Color color)
@@ -87,6 +103,23 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     public void SetText(string label)
     {
         sentenceLabel.text = label;
+    }
+
+    public void StartEditingLyrics()
+    {
+        // Position TextField
+        float margin = 5;
+        float width = Mathf.Max(VisualElement.worldBound.width + margin * 2, 400);
+        float height = VisualElement.worldBound.height + margin * 2;
+        editLyricsPopup.style.position = new StyleEnum<Position>(Position.Absolute);
+        editLyricsPopup.style.left = VisualElement.worldBound.x;
+        editLyricsPopup.style.top = VisualElement.worldBound.y - margin;
+        editLyricsPopup.style.width = width;
+        editLyricsPopup.style.height = height;
+
+        lyricsInputControl = injector
+            .WithBindingForInstance(this)
+            .CreateAndInject<EditorSentenceLyricsInputControl>();
     }
 
     private void OnPointerMove(IPointerEvent evt)

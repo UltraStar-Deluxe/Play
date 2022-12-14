@@ -1,107 +1,53 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UniInject;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedListener
+public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 {
-    [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
-
-    [Inject]
-    private SongEditorSceneControl songEditorSceneControl;
-
     [Inject]
     private EditorNoteControl editorNoteControl;
 
-    [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
-    private VisualElement editLyricsPopup;
-
-    [Inject(UxmlName = R.UxmlNames.editLyricsPopupTextField)]
-    private TextField textField;
-
-    private bool isActive;
-
-    private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    public void OnInjectionFinished()
+    protected override string GetInitialText()
     {
-        textField.value = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
-        textField.Focus();
-        RegisterEvents();
+        return ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
     }
 
-    private void OnTextFieldValueChanged(string newInputFieldText)
+    protected override void PreviewNewText(string newText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
-        if (textField.value != visibleWhitespaceText)
-        {
-            textField.value = visibleWhitespaceText;
-        }
+        // Immediately apply changed lyrics to notes, but do not record it in the history.
+        ApplyEditModeText(newText, false);
     }
 
-    public void SubmitAndCloseLyricsDialog()
+    protected override void ApplyNewText(string newText)
     {
-        string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
+        ApplyEditModeText(newText, true);
+    }
+
+    private void ApplyEditModeText(string newText, bool undoable)
+    {
+        string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
 
         // Replace multiple control characters with a single character
-        newText = Regex.Replace(newText, @"\s+", " ");
-        newText = Regex.Replace(newText, @";+", ";");
+        viewModeText = Regex.Replace(viewModeText, @"\s+", " ");
+        viewModeText = Regex.Replace(viewModeText, @";+", ";");
 
         // Replace any text after control characters.
         // Otherwise the text would mess up following notes when using the LyricsArea.
-        newText = Regex.Replace(newText, @" .+", " ");
-        newText = Regex.Replace(newText, @";.+", ";");
+        viewModeText = Regex.Replace(viewModeText, @" .+", " ");
+        viewModeText = Regex.Replace(viewModeText, @";.+", ";");
 
-        if (!IsOnlyWhitespace(newText))
+        // Remove the semicolon to separate notes. In contrast, a leading / trailing space needs to be preserved.
+        viewModeText = viewModeText.Replace(";", "");
+
+        if (!LyricsUtils.IsOnlyWhitespace(newText))
         {
-            editorNoteControl.Note.SetText(newText);
-            editorNoteControl.SetLyrics(newText);
-            songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+            string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(viewModeText);
+            editorNoteControl.Note.SetText(visibleWhiteSpaceText);
+            editorNoteControl.SetLyrics(visibleWhiteSpaceText);
+            songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
-
-        UnregisterEvents();
-        songEditorSceneControl.HideEditLyricsPopup();
-        if (textField.focusController.focusedElement == textField)
-        {
-            textField.Blur();
-        }
-    }
-
-    private bool IsOnlyWhitespace(string newText)
-    {
-        return newText.IsNullOrEmpty() || whitespaceRegex.IsMatch(newText);
-    }
-
-    private void RegisterEvents()
-    {
-        textField.RegisterValueChangedCallback(ValueChangedCallback);
-        textField.RegisterCallback<BlurEvent>(OnBlur);
-        isActive = true;
-    }
-
-    private void UnregisterEvents()
-    {
-        textField.UnregisterValueChangedCallback(ValueChangedCallback);
-        textField.UnregisterCallback<BlurEvent>(OnBlur);
-        isActive = false;
-    }
-
-    private void ValueChangedCallback(ChangeEvent<string> evt)
-    {
-        OnTextFieldValueChanged(evt.newValue);
-    }
-
-    private void OnBlur(BlurEvent evt)
-    {
-        SubmitAndCloseLyricsDialog();
-        UnregisterEvents();
-    }
-
-    public bool IsActive()
-    {
-        return isActive;
     }
 }
