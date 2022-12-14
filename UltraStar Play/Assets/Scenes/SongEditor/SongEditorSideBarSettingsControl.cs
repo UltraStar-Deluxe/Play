@@ -115,6 +115,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
     private ItemPicker pitchDetectionAlgorithmItemPicker;
 
+    [Inject(UxmlName = R.UxmlNames.useRecordedAudioToggle)]
+    private Toggle useRecordedAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
+
     [Inject]
     private Settings settings;
 
@@ -205,6 +211,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(recordNotesRadioButton,
             () => !settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
             newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = !newValue);
+
+        Bind(useRecordedAudioToggle,
+            () => settings.SongEditorSettings.UseRecordedSamples,
+            newValue => settings.SongEditorSettings.UseRecordedSamples = newValue);
+        Bind(playRecordedAudioToggle,
+            () => settings.SongEditorSettings.PlayRecordedSamples,
+            newValue => settings.SongEditorSettings.PlayRecordedSamples = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,

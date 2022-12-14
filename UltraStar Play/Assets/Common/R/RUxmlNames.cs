@@ -366,6 +366,7 @@ public static partial class R
         public const string overviewAreaLabel = "overviewAreaLabel";
         public const string overviewAreaNotes = "overviewAreaNotes";
         public const string overviewAreaPositionInSongIndicator = "overviewAreaPositionInSongIndicator";
+        public const string overviewAreaRecordedAudioWaveform = "overviewAreaRecordedAudioWaveform";
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string overviewAreaWaveform = "overviewAreaWaveform";
@@ -409,6 +410,8 @@ public static partial class R
         public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
         public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
+        public const string playRecordedAudioContainer = "playRecordedAudioContainer";
+        public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
@@ -580,7 +583,6 @@ public static partial class R
         public const string speechRecognitionGroup = "speechRecognitionGroup";
         public const string speechRecognitionModelPathContainer = "speechRecognitionModelPathContainer";
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
-        public const string speechRecognitionPhrasesArea = "speechRecognitionPhrasesArea";
         public const string speechRecognitionPhrasesContainer = "speechRecognitionPhrasesContainer";
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
         public const string speechRecognitionTitle = "speechRecognitionTitle";
@@ -647,6 +649,8 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
+        public const string useRecordedAudioContainer = "useRecordedAudioContainer";
+        public const string useRecordedAudioToggle = "useRecordedAudioToggle";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

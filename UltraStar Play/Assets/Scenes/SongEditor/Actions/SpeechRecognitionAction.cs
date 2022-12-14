@@ -28,6 +28,9 @@ public class SpeechRecognitionAction : INeedInjection
     private AudioManager audioManager;
 
     [Inject]
+    private SongEditorSampleRecorderControl songEditorSampleRecorderControl;
+
+    [Inject]
     private UiManager uiManager;
 
     private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
@@ -44,8 +47,7 @@ public class SpeechRecognitionAction : INeedInjection
 
     public void SetTextToAnalyzedSpeech(IEnumerable<Sentence> selectedSentences)
     {
-        // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        AudioClip audioClip = GetAudioClip();
 
         using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
         if (voskRecognizer == null)
@@ -66,6 +68,20 @@ public class SpeechRecognitionAction : INeedInjection
         });
     }
 
+    private AudioClip GetAudioClip()
+    {
+        if (settings.SongEditorSettings.UseRecordedSamples)
+        {
+            return songEditorSampleRecorderControl.AudioClip;
+        }
+        else
+        {
+            // Use the song's audio.
+            // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
+            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        }
+    }
+
     public void SetTextToAnalyzedSpeechAndNotify(List<Note> selectedNotes)
     {
         SetTextToAnalyzedSpeech(selectedNotes);
@@ -74,8 +90,7 @@ public class SpeechRecognitionAction : INeedInjection
 
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes)
     {
-        // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        AudioClip audioClip = GetAudioClip();
 
         using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
         if (voskRecognizer == null)

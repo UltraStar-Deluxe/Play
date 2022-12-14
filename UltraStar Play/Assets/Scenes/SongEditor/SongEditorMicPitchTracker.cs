@@ -43,6 +43,11 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
 
     protected override void OnRecordingEvent(RecordingEvent recordingEvent)
     {
+        if (songEditorSettings.SongEditorSettings.RecordSamplesInsteadOfNotes)
+        {
+            return;
+        }
+
         int firstBeatToAnalyze = nextBeatToAnalyze;
         float positionInSongInMillisConsideringMicDelay = (float)songAudioPlayer.PositionInSongInMillis - MicDelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillisConsideringMicDelay);

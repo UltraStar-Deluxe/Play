@@ -34,8 +34,19 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         }
     }
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
-    public MicSampleRecorder MicSampleRecorder { get; protected set; }
+    private MicSampleRecorder micSampleRecorder;
+    public MicSampleRecorder MicSampleRecorder
+    {
+        get
+        {
+            if (micSampleRecorder == null)
+            {
+                micSampleRecorder = GetComponent < MicSampleRecorder>();
+            }
+
+            return micSampleRecorder;
+        }
+    }
 
     protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;
