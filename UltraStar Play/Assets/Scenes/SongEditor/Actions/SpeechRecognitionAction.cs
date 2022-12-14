@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -24,6 +25,9 @@ public class SpeechRecognitionAction : INeedInjection
 
     [Inject]
     private AudioManager audioManager;
+
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
+    private TextField speechRecognitionPhrasesTextField;
 
     private EnglishSyllableSplitter englishSyllableSplitter = new();
 
@@ -56,7 +60,7 @@ public class SpeechRecognitionAction : INeedInjection
             if (!analyzedSpeech.IsNullOrEmpty())
             {
                 // Assume whole words. Thus, take first word and separate notes by space.
-                MapAnalyzedSpeechToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList());
+                EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList(), englishSyllableSplitter);
             }
         });
     }
@@ -85,27 +89,28 @@ public class SpeechRecognitionAction : INeedInjection
         Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {analyzedSpeech.ToCsv()}");
         if (!analyzedSpeech.IsNullOrEmpty())
         {
-            MapAnalyzedSpeechToNotes(analyzedSpeech.FirstOrDefault(), selectedNotes);
+            EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), selectedNotes, englishSyllableSplitter);
         }
     }
 
     private List<string> GetSpeechRecognitionPhrases()
     {
-        HashSet<string> wordsOfSong = new();
-        songMeta.GetVoices().ForEach(voice =>
+        if (speechRecognitionPhrasesTextField.text.Trim().IsNullOrEmpty())
         {
-            string lyricsOfVoice = SongMetaUtils.GetLyrics(songMeta, voice);
-            string[] wordsOfVoice = lyricsOfVoice.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
-            wordsOfVoice.ForEach(word =>
-            {
-                string normalizedWord = word.Replace("~", "")
-                    .Replace("?", "")
-                    .Replace("!", "")
-                    .Replace(".", "")
-                    .Replace("-", "")
-                    .Trim();
-                wordsOfSong.Add(normalizedWord);
-            });
+            return new List<string>();
+        }
+
+        HashSet<string> wordsOfSong = new();
+        string[] wordsOfVoice = speechRecognitionPhrasesTextField.text.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+        wordsOfVoice.ForEach(word =>
+        {
+            string normalizedWord = word.Replace("~", "")
+                .Replace("?", "")
+                .Replace("!", "")
+                .Replace(".", "")
+                .Replace("-", "")
+                .Trim();
+            wordsOfSong.Add(normalizedWord);
         });
         return wordsOfSong.ToList();
     }
@@ -185,36 +190,6 @@ public class SpeechRecognitionAction : INeedInjection
             result.Add(bestResultText);
         }
         return result;
-    }
-
-    private void MapAnalyzedSpeechToNotes(string analyzedSpeech, List<Note> notes)
-    {
-        string[] words = analyzedSpeech.Split(" ");
-
-        // Map words to notes alternatingly from start and end
-        int noteIndex = 0;
-        foreach (string word in words)
-        {
-            List<string> syllables = englishSyllableSplitter.GetSyllables(word);
-            for (int syllableIndex = 0; syllableIndex < syllables.Count; syllableIndex++)
-            {
-                if (noteIndex >= notes.Count)
-                {
-                    return;
-                }
-
-                if (syllableIndex == syllables.Count - 1)
-                {
-                    // Add space for end of word
-                    notes[noteIndex].SetText(syllables[syllableIndex] + " ");
-                }
-                else
-                {
-                    notes[noteIndex].SetText(syllables[syllableIndex]);
-                }
-                noteIndex++;
-            }
-        }
     }
 
     private float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)
