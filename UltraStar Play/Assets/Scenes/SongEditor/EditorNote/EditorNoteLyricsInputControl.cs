@@ -81,5 +81,11 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
                 noteIndex++;
             }
         }
+
+        // Remove text of notes that did not receive any new text
+        for (int i = noteIndex; i < notes.Count; i++)
+        {
+            notes[i].SetText(" ");
+        }
     }
 }

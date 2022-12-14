@@ -17,6 +17,7 @@ public class SongEditorSettings
     public int MicDelayInMillis { get; set; } = 450;
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
+    public bool RecordSamplesInsteadOfNotes { get; set; }
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -41,4 +42,11 @@ public class SongEditorSettings
 
     public int GridSizeInDevicePixels { get; set; } = 1;
     public int SentenceLineSizeInDevicePixels { get; set; } = 2;
+
+    // Speech recognition
+    public string SpeechRecognitionModelPath { get; set; } = "";
+    public string SpeechRecognitionPhrases { get; set; } = "";
+
+    // Pitch detection
+    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
 }

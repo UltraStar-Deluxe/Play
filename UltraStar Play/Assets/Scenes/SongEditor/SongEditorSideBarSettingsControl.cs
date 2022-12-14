@@ -100,6 +100,21 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
 
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
+    private TextField speechRecognitionModelPathTextField;
+
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
+    private TextField speechRecognitionPhrasesTextField;
+
+    [Inject(UxmlName = R.UxmlNames.recordNotesRadioButton)]
+    private RadioButton recordNotesRadioButton;
+
+    [Inject(UxmlName = R.UxmlNames.recordAudioRadioButton)]
+    private RadioButton recordAudioRadioButton;
+
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
+    private ItemPicker pitchDetectionAlgorithmItemPicker;
+
     [Inject]
     private Settings settings;
 
@@ -183,6 +198,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MicDelayInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
 
+        // Record notes or audio
+        Bind(recordAudioRadioButton,
+            () => settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
+            newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = newValue);
+        Bind(recordNotesRadioButton,
+            () => !settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
+            newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = !newValue);
+
         // Button recording settings
         Bind(buttonRecordingPitchTextField,
             () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.MidiNoteForButtonRecording),
@@ -216,6 +239,19 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
         importMidiFileButton.RegisterCallbackButtonTriggered(() => CreateImportMidiFileDialog());
+
+        // Speech recognition
+        Bind(speechRecognitionModelPathTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionModelPath,
+            newValue => settings.SongEditorSettings.SpeechRecognitionModelPath = newValue);
+        Bind(speechRecognitionPhrasesTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionPhrases,
+            newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
+
+        // Pitch detection
+        new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
+            .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
+                newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,

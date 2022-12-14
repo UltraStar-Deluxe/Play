@@ -3,9 +3,9 @@
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PitchDetectionAlgorithmPicker : LabeledItemPickerControl<EPitchDetectionAlgorithm>
+public class PitchDetectionAlgorithmPickerControl : LabeledItemPickerControl<EPitchDetectionAlgorithm>
 {
-    public PitchDetectionAlgorithmPicker(ItemPicker itemPicker)
+    public PitchDetectionAlgorithmPickerControl(ItemPicker itemPicker)
         : base(itemPicker, EnumUtils.GetValuesAsList<EPitchDetectionAlgorithm>())
     {
         GetLabelTextFunction = item =>

@@ -94,7 +94,7 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                       }
                   });
 
-        new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
+        new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
             .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,
                 newValue => settings.AudioSettings.pitchDetectionAlgorithm = newValue);
 
