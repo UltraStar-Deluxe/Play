@@ -567,6 +567,8 @@ public static partial class R
         public const string soundOptionsButton = "soundOptionsButton";
         public const string space = "space";
         public const string spacer = "spacer";
+        public const string speechRecognitionPhrasesArea = "speechRecognitionPhrasesArea";
+        public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
         public const string startButton = "startButton";
         public const string staticLyricsContainer = "staticLyricsContainer";
         public const string statusBar = "statusBar";

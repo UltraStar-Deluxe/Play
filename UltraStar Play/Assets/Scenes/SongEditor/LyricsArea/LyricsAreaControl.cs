@@ -2,16 +2,13 @@
 using System.Text;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
 public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 {
-    private static readonly char syllableSeparator = ';';
-    private static readonly char sentenceSeparator = '\n';
-    private static readonly char spaceCharacter = ' ';
-
     [Inject(UxmlName = R.UxmlNames.lyricsAreaTextField)]
     private TextField textField;
 
@@ -78,15 +75,51 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.doubleClickSelectsWord = true;
         textField.tripleClickSelectsLine = true;
 
+        // Check when a newline has been added. This requires adding an additional character to show white space.
+        bool addedNewline = false;
+        bool removeCharacter = false;
+        textField.RegisterCallback<KeyDownEvent>(evt =>
+        {
+            if (evt.keyCode == KeyCode.Return)
+            {
+                addedNewline = true;
+            }
+            else if (evt.keyCode == KeyCode.Delete
+                    || evt.keyCode == KeyCode.Backspace)
+            {
+                removeCharacter = true;
+            }
+        });
+
         // Replace white space with visible characters when in edit mode
         textField.RegisterValueChangedCallback(evt =>
         {
-            if (lyricsAreaMode == LyricsAreaMode.EditMode)
+            if (lyricsAreaMode != LyricsAreaMode.EditMode)
             {
-                string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(evt.newValue);
-                string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
-                textField.SetValueWithoutNotify(visibleWhiteSpaceText);
+                return;
             }
+
+            string newText = evt.newValue;
+            if (addedNewline)
+            {
+                addedNewline = false;
+                // Add whitespace character for newly added newline character
+                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                    .Replace("\n", "⌇")
+                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+            }
+            else if (removeCharacter)
+            {
+                removeCharacter = false;
+                // Remove whitespace character or newline character where the counterpart is missing
+                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                    .Replace("\n", "")
+                    .Replace(ShowWhiteSpaceText.newlineVisibleWhiteSpaceCharacter, "")
+                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+            }
+            string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
+            string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
+            textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
         lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.firstVoiceName));
@@ -165,8 +198,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     public void UpdateLyrics()
     {
         string text = (lyricsAreaMode == LyricsAreaMode.ViewMode)
-            ? GetViewModeText()
-            : GetEditModeText();
+            ? LyricsUtils.GetViewModeText(Voice)
+            : LyricsUtils.GetEditModeText(Voice);
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(text);
         SetInputFieldText(newInputFieldText);
     }
@@ -175,7 +208,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         // Map lyrics of notes to edit-mode text.
         lastEditModeText = null;
-        string editModeText = GetEditModeText();
+        string editModeText = LyricsUtils.GetEditModeText(Voice);
         string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
 
@@ -186,7 +219,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         ApplyEditModeText(newText, true);
 
-        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(GetViewModeText());
+        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(LyricsUtils.GetViewModeText(Voice));
         SetInputFieldText(newInputFieldText);
 
         lyricsAreaMode = LyricsAreaMode.ViewMode;
@@ -196,7 +229,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         // Map edit-mode text to lyrics of notes
         string text = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
-        MapEditModeTextToNotes(text);
+        LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
 
@@ -215,138 +248,6 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private string GetEditModeText()
-    {
-        StringBuilder stringBuilder = new();
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
-        Note lastNote = null;
-
-        void ProcessNote(Note note)
-        {
-            if (lastNote != null
-                && lastNote.Sentence == note.Sentence)
-            {
-                // Add a space when the last note ended or the current note started with a space.
-                // Otherwise use the non-whitespace syllabeSeparator as end-of-note.
-                if (lastNote.Text.EndsWith(spaceCharacter)
-                    || note.Text.StartsWith(spaceCharacter))
-                {
-                    stringBuilder.Append(spaceCharacter);
-                }
-                else
-                {
-                    stringBuilder.Append(syllableSeparator);
-                }
-            }
-            stringBuilder.Append(note.Text.Trim());
-
-            lastNote = note;
-        }
-
-        void ProcessSentence(Sentence sentence)
-        {
-            List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
-            sortedNotes.ForEach(ProcessNote);
-
-            stringBuilder.Append(sentenceSeparator);
-        }
-
-        sortedSentences.ForEach(ProcessSentence);
-
-        return stringBuilder.ToString();
-    }
-
-    private string GetViewModeText()
-    {
-        StringBuilder stringBuilder = new();
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
-        foreach (Sentence sentence in sortedSentences)
-        {
-            List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
-            foreach (Note note in sortedNotes)
-            {
-                stringBuilder.Append(note.Text);
-            }
-            stringBuilder.Append(sentenceSeparator);
-        }
-        return stringBuilder.ToString();
-    }
-
-    private void MapEditModeTextToNotes(string editModeText)
-    {
-        int sentenceIndex = 0;
-        int noteIndex = 0;
-        List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(Voice);
-        List<Note> sortedNotes = (sentenceIndex < sortedSentences.Count)
-            ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
-            : new List<Note>();
-
-        StringBuilder stringBuilder = new();
-
-        void ApplyNoteText()
-        {
-            if (noteIndex < sortedNotes.Count)
-            {
-                sortedNotes[noteIndex].SetText(stringBuilder.ToString());
-            }
-            stringBuilder = new StringBuilder();
-        }
-
-        void SelectNextSentence()
-        {
-            ApplyNoteText();
-
-            for (int i = noteIndex + 1; i < sortedNotes.Count; i++)
-            {
-                sortedNotes[i].SetText("");
-            }
-
-            sentenceIndex++;
-            noteIndex = 0;
-
-            sortedNotes = (sentenceIndex < sortedSentences.Count)
-                    ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
-                    : new List<Note>();
-        }
-
-        void SelectNextNote()
-        {
-            ApplyNoteText();
-
-            noteIndex++;
-        }
-
-        foreach (char c in editModeText)
-        {
-            if (c == sentenceSeparator)
-            {
-                SelectNextSentence();
-            }
-            else if (c == syllableSeparator)
-            {
-                SelectNextNote();
-            }
-            else if (c == ' ')
-            {
-                stringBuilder.Append(c);
-                SelectNextNote();
-            }
-            else
-            {
-                stringBuilder.Append(c);
-            }
-        }
-
-        for (int s = sentenceIndex; s < sortedSentences.Count; s++)
-        {
-            sortedNotes = SongMetaUtils.GetSortedNotes(sortedSentences[s]);
-            for (int n = noteIndex; n < sortedNotes.Count; n++)
-            {
-                sortedNotes[n].SetText("");
-            }
-        }
-    }
-
     private Note GetNoteForCaretPosition(string text, int caretPosition)
     {
         // Count sentence borders
@@ -354,7 +255,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         int relevantSentenceTextStartIndex = 0;
         for (int i = 0; i < text.Length && i < caretPosition; i++)
         {
-            if (text[i] == sentenceSeparator)
+            if (text[i] == LyricsUtils.sentenceSeparator)
             {
                 relevantSentenceIndex++;
                 relevantSentenceTextStartIndex = i + 1;
@@ -375,9 +276,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         for (int i = relevantSentenceTextStartIndex; i < text.Length && i < caretPosition; i++)
         {
             char c = text[i];
-            if (c == spaceCharacter
+            if (c == LyricsUtils.spaceCharacter
                 || c == ShowWhiteSpaceText.spaceReplacement[0]
-                || c == syllableSeparator)
+                || c == LyricsUtils.syllableSeparator)
             {
                 noteIndex++;
             }

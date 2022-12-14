@@ -3,9 +3,15 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public class EnglishSyllableSplitter
+public class EnglishSyllableSplitter : ISyllableSplitter
 {
-    private Dictionary<string, string[]> wordToSyllables;
+    private static Dictionary<string, string[]> wordToSyllables;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        wordToSyllables = null;
+    }
 
     public List<string> GetSyllables(string word)
     {
