@@ -46,6 +46,10 @@
                 </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
+                <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
+                    <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
+                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
+                </ui:VisualElement>
                 <ui:Button text="Delete" name="deleteButton" class="controlMinWidth" style="visibility: visible; display: flex;" />
                 <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
@@ -53,10 +57,6 @@
                         <MaterialIcon name="helpIcon" icon="help_outline" />
                     </ui:Button>
                     <ui:Button text="Back" name="backButton" class="controlMinWidth" />
-                </ui:VisualElement>
-                <ui:VisualElement name="notConnectedContainer" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
-                    <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
-                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

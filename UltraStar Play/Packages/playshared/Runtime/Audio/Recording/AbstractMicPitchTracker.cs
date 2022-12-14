@@ -76,19 +76,28 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         SongMeta songMeta,
         int beat,
         double positionInSongInMillis,
-        MicProfile micProfile,
+        int micSampleRate,
+        int micDelayInMillis,
+        int micAmplificationFactor,
+        int micNoiseSuppression,
         float[] micSampleBuffer,
         IAudioSamplesAnalyzer audioSamplesAnalyzer)
     {
+        if (micSampleRate <= 0)
+        {
+            Debug.LogWarning("Sample rate should be a positive value");
+            return null;
+        }
+
         float beatStartInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
         float beatEndInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat + 1);
         float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
-        int beatLengthInSamples = (int)(beatLengthInMillis * micProfile.SampleRate / 1000f);
+        int beatLengthInSamples = (int)(beatLengthInMillis * micSampleRate / 1000f);
 
         // The newest sample in the buffer corresponds to (positionInSong - micDelay)
-        float positionInSongInMillisConsideringMicDelay = (float)(positionInSongInMillis - micProfile.DelayInMillis);
+        float positionInSongInMillisConsideringMicDelay = (float)(positionInSongInMillis - micDelayInMillis);
         float distanceToNewestSamplesInMillis = positionInSongInMillisConsideringMicDelay - beatEndInMillis;
-        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * micProfile.DelayInMillis / 1000f);
+        int distanceToNewestSamplesInSamples = (int)(distanceToNewestSamplesInMillis * micDelayInMillis / 1000f);
         distanceToNewestSamplesInSamples = NumberUtils.Limit(distanceToNewestSamplesInSamples, 0, micSampleBuffer.Length - 1);
 
         int endIndex = micSampleBuffer.Length - distanceToNewestSamplesInSamples;
@@ -101,7 +110,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             return null;
         }
 
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleBuffer, startIndex, endIndex, micProfile);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleBuffer, startIndex, endIndex, micAmplificationFactor, micNoiseSuppression);
         return pitchEvent;
     }
 
