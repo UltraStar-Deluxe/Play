@@ -114,7 +114,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         foreach (Note note in notes)
         {
             if (!note.IsEditable
-                || !layerManager.IsVisible(note))
+                || !layerManager.IsNoteVisible(note))
             {
                 continue;
             }
