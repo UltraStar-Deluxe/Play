@@ -70,6 +70,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private int lastViewportWidthInMillis;
 
+    private readonly Dictionary<ESongEditorLayer, VisualElement> songEditorLayerToParentElement = new();
+
     private void Start()
     {
         noteAreaNotes.Clear();
@@ -78,6 +80,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceToControlMap.Clear();
 
         ReloadSentences();
+
+        songEditorLayerToParentElement.Add(ESongEditorLayer.ButtonRecording, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.MicRecording, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.MidiFile, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.PitchDetection, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.CopyPaste, noteAreaNotesForeground);
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream
@@ -400,16 +408,16 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInLayer(ESongEditorLayer layerKey)
     {
-        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
-            .Where(note => note.Sentence == null).ToList();
-        List<Note> notesInViewport = notesInLayer
-            .Where(note => noteAreaControl.IsInViewport(note))
-            .ToList();
+        IEnumerable<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
+            .Where(note => note.Sentence == null);
+        IEnumerable<Note> notesInViewport = notesInLayer
+            .Where(note => noteAreaControl.IsInViewport(note));
 
         Color layerColor = songEditorLayerManager.GetColor(layerKey);
+        SongEditorLayer layer = songEditorLayerManager.GetLayer(layerKey);
         foreach (Note note in notesInViewport)
         {
-            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note);
+            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note, layer);
             if (noteControl != null)
             {
                 noteControl.SetColor(layerColor);
@@ -439,7 +447,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Note note in notesInViewport)
         {
-            UpdateOrCreateNoteControl(note);
+            UpdateOrCreateNoteControl(note, null);
         }
     }
 
@@ -523,18 +531,20 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private EditorNoteControl UpdateOrCreateNoteControl(Note note)
+    private EditorNoteControl UpdateOrCreateNoteControl(Note note, SongEditorLayer layer)
     {
-        songEditorLayerManager.TryGetLayer(note, out SongEditorLayer layer);
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
+            DisposableStopwatch stopwatchA = new("");
             VisualElement noteVisualElement = editorNoteUi.CloneTree().Children().First();
             editorNoteControl = injector
                 .WithRootVisualElement(noteVisualElement)
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
             noteToControlMap.Add(note, editorNoteControl);
-            VisualElement parentElement = GetParentElement(layer);
+            VisualElement parentElement = layer != null
+                ? songEditorLayerToParentElement[layer.LayerEnum]
+                : noteAreaNotes;
             parentElement.Add(noteVisualElement);
         }
         else
@@ -545,54 +555,26 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
         ShowNoteControl(editorNoteControl);
 
-        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        if (note.IsEditable
+            && noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            editorNoteControl.HideLabels();
+            editorNoteControl.ShowLabels();
         }
         else
         {
-            editorNoteControl.ShowLabels();
+            editorNoteControl.HideLabels();
         }
 
-        if (note.IsEditable
-            && IsShowLabels())
+        if (note.IsEditable)
         {
-            editorNoteControl.ShowLabels();
             editorNoteControl.VisualElement.pickingMode = PickingMode.Position;
         }
         else
         {
-            editorNoteControl.HideLabels();
             editorNoteControl.VisualElement.pickingMode = PickingMode.Ignore;
         }
 
         return editorNoteControl;
-    }
-
-    private bool IsShowLabels()
-    {
-        // Hide notes when more than one minute is visible.
-        return noteAreaControl.ViewportWidth < 60000;
-    }
-
-    private VisualElement GetParentElement(SongEditorLayer layer)
-    {
-        if (layer == null)
-        {
-            return noteAreaNotes;
-        }
-
-        switch(layer.LayerEnum)
-        {
-            case ESongEditorLayer.ButtonRecording:
-            case ESongEditorLayer.MicRecording:
-            case ESongEditorLayer.MidiFile:
-            case ESongEditorLayer.PitchDetection:
-                return noteAreaNotesBackground;
-            case  ESongEditorLayer.CopyPaste:
-                return noteAreaNotesForeground;
-            default: return noteAreaNotes;
-        };
     }
 
     private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat)
