@@ -72,21 +72,21 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
-    public bool IsLayerLocked(ESongEditorLayer layerEnum)
+    public bool IsLayerEditable(ESongEditorLayer layerEnum)
     {
-        return layerEnumToLayerMap[layerEnum].IsLocked;
+        return layerEnumToLayerMap[layerEnum].IsEditable;
     }
 
-    public void SetLayerLocked(ESongEditorLayer layerEnum, bool newValue)
+    public void SetLayerEditable(ESongEditorLayer layerEnum, bool newValue)
     {
-        if (newValue == layerEnumToLayerMap[layerEnum].IsLocked)
+        if (newValue == layerEnumToLayerMap[layerEnum].IsEditable)
         {
             return;
         }
 
-        layerEnumToLayerMap[layerEnum].IsLocked = newValue;
+        layerEnumToLayerMap[layerEnum].IsEditable = newValue;
 
-        GetNotes(layerEnum).ForEach(note => note.IsEditable = !newValue);
+        GetNotes(layerEnum).ForEach(note => note.IsEditable = newValue);
 
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
@@ -115,8 +115,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799", 200);
         result[ESongEditorLayer.PitchDetection].Color = Colors.CreateColor("#ADBBE0", 200);
 
-        result[ESongEditorLayer.CopyPaste].IsLocked = true;
-        result[ESongEditorLayer.PitchDetection].IsLocked = true;
+        result[ESongEditorLayer.CopyPaste].IsEditable = false;
+        result[ESongEditorLayer.PitchDetection].IsEditable = false;
 
         return result;
     }
