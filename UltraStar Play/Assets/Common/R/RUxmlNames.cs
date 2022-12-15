@@ -511,6 +511,8 @@ public static partial class R
         public const string showLogOverlayButton = "showLogOverlayButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
+        public const string showNotePitchLabelContainer = "showNotePitchLabelContainer";
+        public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
         public const string showSearchExpressionInfoContainer = "showSearchExpressionInfoContainer";
         public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";

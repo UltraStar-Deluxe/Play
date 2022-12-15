@@ -12,7 +12,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
     public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
 
-    private const int HideElementThresholdInMillis = 60 * 1000;
+    private const int HideElementThresholdInMillis = 40 * 1000;
 
     [InjectedInInspector]
     public VisualTreeAsset editorNoteUi;
@@ -148,6 +148,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                     UpdateSentenceMarkerLines();
                 }
             })
+            .AddTo(gameObject);
+
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.ShowNotePitchLabel)
+            .Subscribe(_ => UpdateNotesAndSentences())
             .AddTo(gameObject);
 
         songEditorLayerManager.LayerChangedEventStream
@@ -559,14 +564,22 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
         ShowNoteControl(editorNoteControl);
 
-        if (note.IsEditable
-            && noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
+        if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            editorNoteControl.ShowLabels();
+            if (settings.SongEditorSettings.ShowNotePitchLabel)
+            {
+                editorNoteControl.ShowPitchLabel();
+            }
+            else
+            {
+                editorNoteControl.HidePitchLabel();
+            }
+            editorNoteControl.ShowLyricsLabel();
         }
         else
         {
-            editorNoteControl.HideLabels();
+            editorNoteControl.HidePitchLabel();
+            editorNoteControl.HideLyricsLabel();
         }
 
         if (note.IsEditable)

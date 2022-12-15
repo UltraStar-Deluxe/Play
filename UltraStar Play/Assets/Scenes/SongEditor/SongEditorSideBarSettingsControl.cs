@@ -73,6 +73,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.showVirtualPianoToggle)]
     private Toggle showVirtualPianoToggle;
 
+    [Inject(UxmlName = R.UxmlNames.showNotePitchLabelToggle)]
+    private Toggle showNotePitchLabelToggle;
+
     [Inject(UxmlName = R.UxmlNames.gridSizeTextField)]
     private TextField gridSizeTextField;
 
@@ -233,6 +236,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(showVirtualPianoToggle,
             () => settings.SongEditorSettings.ShowVirtualPianoArea,
             newValue => settings.SongEditorSettings.ShowVirtualPianoArea = newValue);
+        Bind(showNotePitchLabelToggle,
+            () => settings.SongEditorSettings.ShowNotePitchLabel,
+            newValue => settings.SongEditorSettings.ShowNotePitchLabel = newValue);
 
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowLyricsArea)
             .Subscribe(newValue => lyricsArea.SetVisibleByDisplay(newValue))
