@@ -31,11 +31,11 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
     [Inject(UxmlName = R.UxmlNames.layerVisibleButton)]
     private Button layerVisibleButton;
 
-    [Inject(UxmlName = R.UxmlNames.layerLockedButton)]
-    private Button layerLockedButton;
+    [Inject(UxmlName = R.UxmlNames.layerEditableButton)]
+    private Button layerEditableButton;
 
     private ToogleButtonControl layerVisibleToggleButtonControl;
-    private ToogleButtonControl layerLockedToggleButtonControl;
+    private ToogleButtonControl layerEditableToggleButtonControl;
 
     public void OnInjectionFinished()
     {
@@ -51,17 +51,17 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
         layerVisibleToggleButtonControl.ValueChangedEventStream
             .Subscribe(evt => layerManager.SetLayerEnabled(layer.LayerEnum, evt.NewValue));
 
-        layerLockedToggleButtonControl = new ToogleButtonControl(layerLockedButton,
-            layerLockedButton.Q<VisualElement>(R.UxmlNames.layerLockedIcon),
-            layerLockedButton.Q<VisualElement>(R.UxmlNames.layerUnlockedIcon),
-            layerManager.IsLayerLocked(layer.LayerEnum));
-        layerLockedToggleButtonControl.ValueChangedEventStream
-            .Subscribe(evt => layerManager.SetLayerLocked(layer.LayerEnum, evt.NewValue));
+        layerEditableToggleButtonControl = new ToogleButtonControl(layerEditableButton,
+            layerEditableButton.Q<VisualElement>(R.UxmlNames.layerEditableIcon),
+            layerEditableButton.Q<VisualElement>(R.UxmlNames.layerNotEditableIcon),
+            layerManager.IsLayerEditable(layer.LayerEnum));
+        layerEditableToggleButtonControl.ValueChangedEventStream
+            .Subscribe(evt => layerManager.SetLayerEditable(layer.LayerEnum, evt.NewValue));
     }
 
     public void UpdateInputControls()
     {
         layerVisibleToggleButtonControl.IsOn = layerManager.IsLayerEnabled(layer.LayerEnum);
-        layerLockedToggleButtonControl.IsOn = layerManager.IsLayerLocked(layer.LayerEnum);
+        layerEditableToggleButtonControl.IsOn = layerManager.IsLayerEditable(layer.LayerEnum);
     }
 }

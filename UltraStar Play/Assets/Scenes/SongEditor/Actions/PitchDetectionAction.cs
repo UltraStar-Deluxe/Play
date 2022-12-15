@@ -73,7 +73,7 @@ public class PitchDetectionAction : INeedInjection
             else
             {
                 Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
-                analyzedNote.IsEditable = !songEditorLayerManager.IsLayerLocked(ESongEditorLayer.PitchDetection);
+                analyzedNote.IsEditable = songEditorLayerManager.IsLayerEditable(ESongEditorLayer.PitchDetection);
                 songEditorLayerManager.AddNoteToLayer(ESongEditorLayer.PitchDetection, analyzedNote);
                 lastAnalyzedNote = analyzedNote;
             }
