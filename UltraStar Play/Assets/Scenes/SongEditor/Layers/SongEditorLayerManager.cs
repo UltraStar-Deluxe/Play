@@ -4,19 +4,24 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private readonly Dictionary<ESongEditorLayer, SongEditorLayer> layerEnumToLayerMap = CreateLayerEnumToLayerMap();
+    private readonly Dictionary<ESongEditorLayer, SongEditorEnumLayer> layerEnumToLayerMap = CreateLayerEnumToLayerMap();
+    private readonly Dictionary<string, SongEditorVoiceLayer> voiceNameToLayerMap = CreateVoiceNameToLayerMap();
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private SongMeta songMeta;
 
     private readonly Subject<LayerChangedEvent> layerChangedEventStream = new();
     public IObservable<LayerChangedEvent> LayerChangedEventStream => layerChangedEventStream;
@@ -32,52 +37,113 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             mntve.Notes
                 .Where(note => note.Sentence != null)
-                .ForEach(note => RemoveNoteFromAllLayers(note));
+                .ForEach(note => RemoveNoteFromAllEnumLayers(note));
         }
     }
     
-    public void AddNoteToLayer(ESongEditorLayer layerEnum, Note note)
+    public void AddNoteToEnumLayer(ESongEditorLayer layerEnum, Note note)
     {
         layerEnumToLayerMap[layerEnum].AddNote(note);
     }
 
-    public void ClearLayer(ESongEditorLayer layerEnum)
+    public void ClearEnumLayer(ESongEditorLayer layerEnum)
     {
         layerEnumToLayerMap[layerEnum].ClearNotes();
     }
 
-    public List<Note> GetNotes(ESongEditorLayer layerEnum)
+    public List<Note> GetEnumLayerNotes(ESongEditorLayer layerEnum)
     {
         return layerEnumToLayerMap[layerEnum].GetNotes();
     }
 
-    public Color GetColor(ESongEditorLayer layerEnum)
+    public List<Note> GetVoiceLayerNotes(string voiceName)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        return SongMetaUtils.GetAllNotes(songMeta.GetVoice(voiceName));
+    }
+
+    public Color GetEnumLayerColor(ESongEditorLayer layerEnum)
     {
         return layerEnumToLayerMap[layerEnum].Color;
     }
 
-    public bool IsLayerEnabled(ESongEditorLayer layerEnum)
+    public Color GetVoiceLayerColor(string voiceName)
     {
-        return layerEnumToLayerMap[layerEnum].IsEnabled;
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (voiceNameToLayerMap.TryGetValue(voiceName, out SongEditorVoiceLayer layer))
+        {
+            return layer.Color;
+        }
+        return Colors.beige;
     }
 
-    public void SetLayerEnabled(ESongEditorLayer layerEnum, bool newValue)
+    public bool IsEnumLayerVisible(ESongEditorLayer layerEnum)
     {
-        if (newValue == layerEnumToLayerMap[layerEnum].IsEnabled)
+        return layerEnumToLayerMap[layerEnum].IsVisible;
+    }
+
+    public void SetEnumLayerVisible(ESongEditorLayer layerEnum, bool newValue)
+    {
+        if (newValue == layerEnumToLayerMap[layerEnum].IsVisible)
         {
             return;
         }
 
-        layerEnumToLayerMap[layerEnum].IsEnabled = newValue;
+        layerEnumToLayerMap[layerEnum].IsVisible = newValue;
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
-    public bool IsLayerEditable(ESongEditorLayer layerEnum)
+    public bool IsVoiceLayerVisible(string voiceName)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (voiceNameToLayerMap.TryGetValue(voiceName, out SongEditorVoiceLayer layer))
+        {
+            return layer.IsVisible;
+        }
+        return true;
+    }
+
+    public void SetVoiceLayerVisible(string voiceName, bool newValue)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (newValue == voiceNameToLayerMap[voiceName].IsVisible)
+        {
+            return;
+        }
+
+        voiceNameToLayerMap[voiceName].IsVisible = newValue;
+        layerChangedEventStream.OnNext(new LayerChangedEvent(voiceName));
+    }
+
+    public bool IsVoiceLayerEditable(string voiceName)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (voiceNameToLayerMap.TryGetValue(voiceName, out SongEditorVoiceLayer layer))
+        {
+            return layer.IsEditable;
+        }
+        return true;
+    }
+
+    public void SetVoiceLayerEditable(string voiceName, bool newValue)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (newValue == voiceNameToLayerMap[voiceName].IsEditable)
+        {
+            return;
+        }
+
+        voiceNameToLayerMap[voiceName].IsEditable = newValue;
+        GetVoiceLayerNotes(voiceName).ForEach(note => note.IsEditable = newValue);
+        layerChangedEventStream.OnNext(new LayerChangedEvent(voiceName));
+    }
+
+    public bool IsEnumLayerEditable(ESongEditorLayer layerEnum)
     {
         return layerEnumToLayerMap[layerEnum].IsEditable;
     }
 
-    public void SetLayerEditable(ESongEditorLayer layerEnum, bool newValue)
+    public void SetEnumLayerEditable(ESongEditorLayer layerEnum, bool newValue)
     {
         if (newValue == layerEnumToLayerMap[layerEnum].IsEditable)
         {
@@ -85,29 +151,46 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
 
         layerEnumToLayerMap[layerEnum].IsEditable = newValue;
-
-        GetNotes(layerEnum).ForEach(note => note.IsEditable = newValue);
-
+        GetEnumLayerNotes(layerEnum).ForEach(note => note.IsEditable = newValue);
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
-    public SongEditorLayer GetLayer(ESongEditorLayer layerEnum)
+    public SongEditorEnumLayer GetEnumLayer(ESongEditorLayer layerEnum)
     {
         return layerEnumToLayerMap[layerEnum];
     }
 
-    public List<SongEditorLayer> GetLayers()
+    public List<SongEditorEnumLayer> GetEnumLayers()
     {
-        return new List<SongEditorLayer>(layerEnumToLayerMap.Values);
+        return new List<SongEditorEnumLayer>(layerEnumToLayerMap.Values);
     }
 
-    private static Dictionary<ESongEditorLayer, SongEditorLayer> CreateLayerEnumToLayerMap()
+    public List<SongEditorVoiceLayer> GetVoiceLayers()
     {
-        Dictionary<ESongEditorLayer, SongEditorLayer> result = new();
+        return new List<SongEditorVoiceLayer>(voiceNameToLayerMap.Values);
+    }
+
+    private static Dictionary<string,SongEditorVoiceLayer> CreateVoiceNameToLayerMap()
+    {
+        Dictionary<string, SongEditorVoiceLayer> result = new();
+        List<string> voiceNames = new() { Voice.firstVoiceName, Voice.secondVoiceName };
+        foreach (string voiceName in voiceNames)
+        {
+            result.Add(voiceName, new SongEditorVoiceLayer(voiceName));
+        }
+        result[Voice.firstVoiceName].Color = Colors.CreateColor("#2ecc71");
+        result[Voice.secondVoiceName].Color = Colors.CreateColor("#9b59b6");
+
+        return result;
+    }
+
+    private static Dictionary<ESongEditorLayer, SongEditorEnumLayer> CreateLayerEnumToLayerMap()
+    {
+        Dictionary<ESongEditorLayer, SongEditorEnumLayer> result = new();
         List<ESongEditorLayer> layerEnums = EnumUtils.GetValuesAsList<ESongEditorLayer>();
         foreach (ESongEditorLayer layerEnum in layerEnums)
         {
-            result.Add(layerEnum, new SongEditorLayer(layerEnum));
+            result.Add(layerEnum, new SongEditorEnumLayer(layerEnum));
         }
         result[ESongEditorLayer.MicRecording].Color = Colors.CreateColor("#1D67C2", 200);
         result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA", 200);
@@ -121,77 +204,142 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return result;
     }
 
-    public List<Note> GetAllNotes()
+    public List<Note> GetAllEnumLayerNotes()
     {
         List<Note> notes = new();
         foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
         {
-            List<Note> notesOfLayer = GetNotes(layerEnum);
+            List<Note> notesOfLayer = GetEnumLayerNotes(layerEnum);
             notes.AddRange(notesOfLayer);
         }
         return notes;
     }
 
-    public List<Note> GetAllVisibleNotes()
+    public List<Note> GetAllVisibleEnumLayerNotes()
     {
         List<Note> notes = new();
         foreach (ESongEditorLayer layerEnum in layerEnumToLayerMap.Keys)
         {
-            if (IsLayerEnabled(layerEnum))
+            if (IsEnumLayerVisible(layerEnum))
             {
-                List<Note> notesOfLayer = GetNotes(layerEnum);
+                List<Note> notesOfLayer = GetEnumLayerNotes(layerEnum);
                 notes.AddRange(notesOfLayer);
             }
         }
         return notes;
     }
 
-    public void RemoveNoteFromAllLayers(Note note)
+    public void RemoveNoteFromAllEnumLayers(Note note)
     {
-        foreach (SongEditorLayer layer in layerEnumToLayerMap.Values)
+        foreach (SongEditorEnumLayer layer in layerEnumToLayerMap.Values)
         {
             layer.RemoveNote(note);
         }
     }
 
-    public bool IsVisible(Note note)
+    public bool IsNoteVisible(Note note)
     {
         if (note.Sentence?.Voice != null)
         {
-            return IsVoiceVisible(note.Sentence.Voice);
+            return IsVoiceLayerVisible(note.Sentence.Voice.Name);
         }
 
-        if (TryGetLayer(note, out SongEditorLayer layer))
+        if (TryGetEnumLayer(note, out SongEditorEnumLayer layer))
         {
-            return IsLayerEnabled(layer.LayerEnum);
+            return IsEnumLayerVisible(layer.LayerEnum);
         }
 
         return true;
     }
 
-    public bool TryGetLayer(Note note, out SongEditorLayer layer)
+    public bool TryGetEnumLayer(Note note, out SongEditorEnumLayer enumLayer)
     {
-        foreach (SongEditorLayer songEditorLayer in GetLayers())
+        foreach (SongEditorEnumLayer songEditorLayer in GetEnumLayers())
         {
             if (songEditorLayer.ContainsNote(note))
             {
-                layer = songEditorLayer;
+                enumLayer = songEditorLayer;
                 return true;
             }
         }
 
-        layer = null;
+        enumLayer = null;
         return false;
     }
 
-    public bool IsVoiceVisible(Voice voice)
+    public Color GetLayerColor(AbstractSongEditorLayer layer)
     {
-        return !IsVoiceHidden(voice);
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            return GetEnumLayerColor(enumLayer.LayerEnum);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            return GetVoiceLayerColor(voiceLayer.VoiceName);
+        }
+        return Colors.beige;
     }
 
-    public bool IsVoiceHidden(Voice voice)
+    public List<Note> GetLayerNotes(AbstractSongEditorLayer layer)
     {
-        return voice != null
-               && settings.SongEditorSettings.HideVoices.AnyMatch(voiceName => voice.VoiceNameEquals(voiceName));
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            return GetEnumLayerNotes(enumLayer.LayerEnum);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            return GetVoiceLayerNotes(voiceLayer.VoiceName);
+        }
+        return new List<Note>();
+    }
+
+    public bool IsLayerVisible(AbstractSongEditorLayer layer)
+    {
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            return IsEnumLayerVisible(enumLayer.LayerEnum);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            return IsVoiceLayerVisible(voiceLayer.VoiceName);
+        }
+        return true;
+    }
+
+    public void SetLayerVisible(AbstractSongEditorLayer layer, bool newValue)
+    {
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            SetEnumLayerVisible(enumLayer.LayerEnum, newValue);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            SetVoiceLayerVisible(voiceLayer.VoiceName, newValue);
+        }
+    }
+
+    public bool IsLayerEditable(AbstractSongEditorLayer layer)
+    {
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            return IsEnumLayerEditable(enumLayer.LayerEnum);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            return IsVoiceLayerEditable(voiceLayer.VoiceName);
+        }
+        return true;
+    }
+
+    public void SetLayerEditable(AbstractSongEditorLayer layer, bool newValue)
+    {
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            SetEnumLayerEditable(enumLayer.LayerEnum, newValue);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            SetVoiceLayerEditable(voiceLayer.VoiceName, newValue);
+        }
     }
 }

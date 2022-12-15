@@ -141,12 +141,12 @@ public class SongEditorMidiSoundPlayAlongThread : INeedInjection
     private List<Note> GetUpcomingSortedNotes(double positionInSongInMillis)
     {
         List<Note> notesInSongMeta = songMeta.GetVoices()
-            .Where(voice => layerManager.IsVoiceVisible(voice))
+            .Where(voice => layerManager.IsVoiceLayerVisible(voice.Name))
             .SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes)
             .ToList();
         List<Note> allNotes = notesInSongMeta
-            .Union(layerManager.GetAllVisibleNotes())
+            .Union(layerManager.GetAllVisibleEnumLayerNotes())
             .ToList();
         List<Note> allUpcomingNotes = allNotes
             .Where(note => !note.IsFreestyle && !note.IsRap)

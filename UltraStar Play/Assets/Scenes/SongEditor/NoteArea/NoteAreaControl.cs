@@ -178,7 +178,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void FitViewportVerticalToNotes()
     {
-        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllEnumLayerNotes();
         List<Note> notesInVoices = songMeta.GetVoices().SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes).ToList();
         List<Note> notes = new();
