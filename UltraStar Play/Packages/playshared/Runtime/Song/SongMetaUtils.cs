@@ -134,6 +134,10 @@ public static class SongMetaUtils
 
     public static List<Note> GetAllNotes(Voice voice)
     {
+        if (voice == null)
+        {
+            return new List<Note>();
+        }
         List<Note> result = voice.Sentences.SelectMany(sentence => sentence.Notes).ToList();
         return result;
     }

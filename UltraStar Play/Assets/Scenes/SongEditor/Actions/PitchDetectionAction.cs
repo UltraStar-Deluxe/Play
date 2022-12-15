@@ -45,13 +45,13 @@ public class PitchDetectionAction : INeedInjection
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
 
         // Remove old analyzed notes
-        songEditorLayerManager.GetNotes(ESongEditorLayer.PitchDetection)
+        songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)
             .Where(oldNote =>
                 oldNote.StartBeat >= startBeatInclusive && oldNote.EndBeat <= oldNote.StartBeat + lengthInBeats)
             .ForEach(oldNote =>
             {
                 editorNoteDisplayer.RemoveNoteControl(oldNote);
-                songEditorLayerManager.RemoveNoteFromAllLayers(oldNote);
+                songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
         Note lastAnalyzedNote = null;
@@ -73,8 +73,8 @@ public class PitchDetectionAction : INeedInjection
             else
             {
                 Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
-                analyzedNote.IsEditable = songEditorLayerManager.IsLayerEditable(ESongEditorLayer.PitchDetection);
-                songEditorLayerManager.AddNoteToLayer(ESongEditorLayer.PitchDetection, analyzedNote);
+                analyzedNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
+                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, analyzedNote);
                 lastAnalyzedNote = analyzedNote;
             }
         }

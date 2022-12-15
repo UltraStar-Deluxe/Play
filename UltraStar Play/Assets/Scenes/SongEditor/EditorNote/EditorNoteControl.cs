@@ -61,6 +61,9 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
+    [Inject]
     private CursorManager cursorManager;
 
     [Inject]
@@ -130,7 +133,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorSceneControl.GetColorForVoice(Note.Sentence.Voice);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Name);
             SetColor(color);
         }
     }
