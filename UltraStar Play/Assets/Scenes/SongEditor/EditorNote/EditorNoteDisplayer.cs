@@ -558,6 +558,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorNoteControl.ShowLabels();
         }
 
+        if (songEditorLayerManager.TryGetLayer(note, out SongEditorLayer layer)
+            && layer.LayerEnum == ESongEditorLayer.CopyPaste)
+        {
+            editorNoteControl.IsEditable = false;
+        }
+
         return editorNoteControl;
     }
 
