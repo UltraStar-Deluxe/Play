@@ -32,7 +32,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     public Sentence Sentence { get; private set; }
 
     [Inject]
-    public SongAudioPlayer songAudioPlayer;
+    private SongEditorLayerManager songEditorLayerManager;
 
     [Inject(UxmlName = R.UxmlNames.sentenceLabel)]
     private Label sentenceLabel;
@@ -71,7 +71,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 
         if (Sentence.Voice != null)
         {
-            Color color = songEditorSceneControl.GetColorForVoice(Sentence.Voice);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Sentence.Voice.Name);
             SetColor(color);
         }
 

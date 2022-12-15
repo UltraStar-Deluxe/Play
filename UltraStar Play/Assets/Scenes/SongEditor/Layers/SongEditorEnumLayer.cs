@@ -2,20 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class SongEditorLayer
+public class SongEditorEnumLayer : AbstractSongEditorLayer
 {
     public ESongEditorLayer LayerEnum { get; private set; }
-    public bool IsEnabled { get; set; } = true;
-    public bool IsEditable { get; set; } = true;
-    public Color Color { get; set; } = Colors.indigo;
 
     private readonly List<Note> notes = new();
     private readonly HashSet<Note> notesHashSet = new();
 
-    public SongEditorLayer(ESongEditorLayer layerEnum)
+    public SongEditorEnumLayer(ESongEditorLayer layerEnum)
     {
-        this.LayerEnum = layerEnum;
+        LayerEnum = layerEnum;
     }
 
     public void AddNote(Note note)
@@ -40,11 +36,11 @@ public class SongEditorLayer
         return new List<Note>(notes);
     }
 
-    public SongEditorLayer CloneDeep()
+    public SongEditorEnumLayer CloneDeep()
     {
-        SongEditorLayer clone = new(LayerEnum);
+        SongEditorEnumLayer clone = new(LayerEnum);
         clone.Color = Color;
-        clone.IsEnabled = IsEnabled;
+        clone.IsVisible = IsVisible;
         notes.ForEach(note =>
         {
             Note noteCopy = note.Clone();
@@ -56,5 +52,10 @@ public class SongEditorLayer
     public void ClearNotes()
     {
         notes.Clear();
+    }
+
+    public override string GetDisplayName()
+    {
+        return LayerEnum.ToString();
     }
 }

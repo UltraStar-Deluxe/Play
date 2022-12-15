@@ -2,13 +2,12 @@
 using System.Linq;
 using UniInject;
 using UniRx;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    private SongEditorLayer layer;
+    private AbstractSongEditorLayer layer;
 
     [Inject]
     private SongEditorLayerManager layerManager;
@@ -39,29 +38,31 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
 
     public void OnInjectionFinished()
     {
-        layerColorElement.style.backgroundColor = layerManager.GetColor(layer.LayerEnum);
-        layerNameLabel.text = layer.LayerEnum.ToString();
+        layerColorElement.style.backgroundColor = layerManager.GetLayerColor(layer);
+        layerNameLabel.text = layer.GetDisplayName();
         selectAllNotesOfLayerButton.RegisterCallbackButtonTriggered(
-            () => selectionControl.SetSelection(layerManager.GetNotes(layer.LayerEnum)));
+            () => selectionControl.SetSelection(layerManager.GetLayerNotes(layer)));
 
+        // IsVisible
         layerVisibleToggleButtonControl = new ToogleButtonControl(layerVisibleButton,
             layerVisibleButton.Q<VisualElement>(R.UxmlNames.layerVisibleIcon),
             layerVisibleButton.Q<VisualElement>(R.UxmlNames.layerInvisibleIcon),
-            layerManager.IsLayerEnabled(layer.LayerEnum));
+            layerManager.IsLayerVisible(layer));
         layerVisibleToggleButtonControl.ValueChangedEventStream
-            .Subscribe(evt => layerManager.SetLayerEnabled(layer.LayerEnum, evt.NewValue));
+            .Subscribe(evt => layerManager.SetLayerVisible(layer, evt.NewValue));
 
+        // IsEditable
         layerEditableToggleButtonControl = new ToogleButtonControl(layerEditableButton,
             layerEditableButton.Q<VisualElement>(R.UxmlNames.layerEditableIcon),
             layerEditableButton.Q<VisualElement>(R.UxmlNames.layerNotEditableIcon),
-            layerManager.IsLayerEditable(layer.LayerEnum));
+            layerManager.IsLayerEditable(layer));
         layerEditableToggleButtonControl.ValueChangedEventStream
-            .Subscribe(evt => layerManager.SetLayerEditable(layer.LayerEnum, evt.NewValue));
+            .Subscribe(evt => layerManager.SetLayerEditable(layer, evt.NewValue));
     }
 
     public void UpdateInputControls()
     {
-        layerVisibleToggleButtonControl.IsOn = layerManager.IsLayerEnabled(layer.LayerEnum);
-        layerEditableToggleButtonControl.IsOn = layerManager.IsLayerEditable(layer.LayerEnum);
+        layerVisibleToggleButtonControl.IsOn = layerManager.IsLayerVisible(layer);
+        layerEditableToggleButtonControl.IsOn = layerManager.IsLayerEditable(layer);
     }
 }

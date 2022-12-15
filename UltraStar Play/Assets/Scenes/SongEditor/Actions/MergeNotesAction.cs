@@ -39,9 +39,9 @@ public class MergeNotesAction : INeedInjection
         Note mergedNote = new(targetNote.Type, minBeat, maxBeat - minBeat, targetNote.TxtPitch, stringBuilder.ToString());
         mergedNote.SetSentence(targetNote.Sentence);
 
-        if (layerManager.TryGetLayer(targetNote, out SongEditorLayer songEditorLayer))
+        if (layerManager.TryGetEnumLayer(targetNote, out SongEditorEnumLayer songEditorLayer))
         {
-            layerManager.AddNoteToLayer(songEditorLayer.LayerEnum, mergedNote);
+            layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, mergedNote);
         }
 
         // Remove old notes

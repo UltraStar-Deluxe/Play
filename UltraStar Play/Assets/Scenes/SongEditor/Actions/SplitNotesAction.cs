@@ -39,9 +39,9 @@ public class SplitNotesAction : INeedInjection
                 Note newNote = new(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, newNoteText);
                 newNote.SetSentence(note.Sentence);
 
-                if (layerManager.TryGetLayer(note, out SongEditorLayer songEditorLayer))
+                if (layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer songEditorLayer))
                 {
-                    layerManager.AddNoteToLayer(songEditorLayer.LayerEnum, newNote);
+                    layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote);
                 }
 
                 note.SetEndBeat(splitBeat);
