@@ -7,6 +7,10 @@ public class DisposableStopwatch : IDisposable
     private Stopwatch stopwatch;
     private readonly Action<Stopwatch> action;
 
+    public double ElapsedMilliseconds => stopwatch.ElapsedMilliseconds;
+    public TimeSpan Elapsed => stopwatch.Elapsed;
+    public long ElapsedTicks => stopwatch.ElapsedTicks;
+
     public DisposableStopwatch(Action<Stopwatch> action, bool startStopwatch = true)
     {
         this.action = action;
