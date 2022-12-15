@@ -163,6 +163,11 @@
     background-color: var(--control-color-accent2);
 }
 
+.unity-radio-button-group {
+    margin: 0;
+    padding: 0;
+}
+
 .unity-radio-button {
     margin: 0;
     padding: 0;
