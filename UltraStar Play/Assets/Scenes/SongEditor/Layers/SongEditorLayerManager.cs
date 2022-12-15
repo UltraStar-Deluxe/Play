@@ -67,6 +67,11 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
+    public SongEditorLayer GetLayer(ESongEditorLayer layerEnum)
+    {
+        return layerEnumToLayerMap[layerEnum];
+    }
+
     public List<SongEditorLayer> GetLayers()
     {
         return new List<SongEditorLayer>(layerEnumToLayerMap.Values);

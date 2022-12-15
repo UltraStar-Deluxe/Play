@@ -45,10 +45,16 @@ public class PitchDetectionAction : INeedInjection
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
 
         // Remove old analyzed notes
-        List<Note> oldPitchDetectionNotes = songEditorLayerManager.GetNotes(ESongEditorLayer.PitchDetection);
-        Dictionary<int, Note> startBeatToNote = new();
-        oldPitchDetectionNotes.ForEach(note => startBeatToNote.Add(note.StartBeat, note));
+        songEditorLayerManager.GetNotes(ESongEditorLayer.PitchDetection)
+            .Where(oldNote =>
+                oldNote.StartBeat >= startBeatInclusive && oldNote.EndBeat <= oldNote.StartBeat + lengthInBeats)
+            .ForEach(oldNote =>
+            {
+                editorNoteDisplayer.RemoveNoteControl(oldNote);
+                songEditorLayerManager.RemoveNoteFromAllLayers(oldNote);
+            });
 
+        Note lastAnalyzedNote = null;
         int endBeatExclusive = startBeatInclusive + lengthInBeats;
         for (int beat = startBeatInclusive; beat < endBeatExclusive; beat++)
         {
@@ -58,15 +64,18 @@ public class PitchDetectionAction : INeedInjection
                 continue;
             }
 
-            if (startBeatToNote.TryGetValue(beat, out Note existingNote))
+            if (lastAnalyzedNote != null
+                && lastAnalyzedNote.MidiNote == pitchEvent.MidiNote)
             {
-                existingNote.SetMidiNote(pitchEvent.MidiNote);
+                // Extend previously generated note to this beat
+                lastAnalyzedNote.SetLength(lastAnalyzedNote.Length + 1);
             }
             else
             {
-               Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
-               analyzedNote.IsEditable = false;
-               songEditorLayerManager.AddNoteToLayer(ESongEditorLayer.PitchDetection, analyzedNote);
+                Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
+                analyzedNote.IsEditable = false;
+                songEditorLayerManager.AddNoteToLayer(ESongEditorLayer.PitchDetection, analyzedNote);
+                lastAnalyzedNote = analyzedNote;
             }
         }
 
