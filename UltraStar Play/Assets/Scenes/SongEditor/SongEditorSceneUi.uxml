@@ -188,6 +188,11 @@
                                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                                 <ui:Toggle name="showControlHintsToggle" class="smallControl" />
                             </ui:VisualElement>
+                            <ui:VisualElement name="showNotePitchLabelContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Show pitch on notes" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="showNotePitchLabelToggle" class="smallControl" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Grid" display-tooltip-when-elided="true" name="gridTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="gridGroup" class="songEditorSettingsGroup">
