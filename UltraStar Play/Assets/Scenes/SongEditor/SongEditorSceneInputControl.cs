@@ -68,6 +68,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private Vector2[] zoomStartTouchPositions;
     private Vector2 zoomStartTouchDistancePerDimension;
+
+    private float startNavigatePlaybackPosition;
     
     private void Start()
     {
@@ -294,7 +296,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                     noteAreaControl.ScrollHorizontal(1);
                 }
             }
-            
+
             List<Note> selectedNotes = selectionControl.GetSelectedNotes();
             if (selectedNotes.IsNullOrEmpty())
             {
@@ -346,16 +348,47 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Move playback position in small steps by holding Ctrl when no note is selected
+        // Change playback position beat per beat via control
+        UpdateChangePlaybackPosition();
+
+        // Use the shortcuts that are also used in the YASS song editor.
+        UpdateInputForYassShortcuts();
+
+        UpdateTouchInputForZoom();
+
+        inputFieldHasFocusOld = inputFieldHasFocus;
+    }
+
+    private void UpdateChangePlaybackPosition()
+    {
         if (Keyboard.current != null
             && InputUtils.IsKeyboardControlPressed()
             && (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             && selectionControl.GetSelectedNotes().IsNullOrEmpty())
         {
-            int stepInMillis = InputUtils.IsKeyboardShiftPressed()
-                ? 1
-                : 10;
-            
+            int stepInMillis;
+            if (startNavigatePlaybackPosition <= 0)
+            {
+                startNavigatePlaybackPosition = Time.time;
+                stepInMillis = (int)BpmUtils.MillisecondsPerBeat(songMeta);
+            }
+            else if (Time.time - startNavigatePlaybackPosition > 0.5f)
+            {
+                stepInMillis = (int)(BpmUtils.MillisecondsPerBeat(songMeta) * 10 * Time.deltaTime);
+                if (Keyboard.current.leftArrowKey.isPressed)
+                {
+                    songAudioPlayer.PositionInSongInMillis -= stepInMillis;
+                }
+                else if (Keyboard.current.rightArrowKey.isPressed)
+                {
+                    songAudioPlayer.PositionInSongInMillis += stepInMillis;
+                }
+            }
+            else
+            {
+                stepInMillis = 0;
+            }
+
             if (Keyboard.current.leftArrowKey.isPressed)
             {
                 songAudioPlayer.PositionInSongInMillis -= stepInMillis;
@@ -365,13 +398,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                 songAudioPlayer.PositionInSongInMillis += stepInMillis;
             }
         }
-        
-        // Use the shortcuts that are also used in the YASS song editor.
-        UpdateInputForYassShortcuts();
-
-        UpdateTouchInputForZoom();
-
-        inputFieldHasFocusOld = inputFieldHasFocus;
+        else
+        {
+            startNavigatePlaybackPosition = 0;
+        }
     }
 
     private void UpdateTouchInputForZoom()
