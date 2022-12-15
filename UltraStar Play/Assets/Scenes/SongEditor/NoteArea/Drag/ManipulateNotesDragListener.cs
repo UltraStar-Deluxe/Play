@@ -69,6 +69,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
         Note dragStartNote = songEditorSceneControl
             .GetAllVisibleNotes()
+            .Where(note => note.IsEditable)
             .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
                                     && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
                                     && note.MidiNote <= dragEvent.MidiNoteDragStart
