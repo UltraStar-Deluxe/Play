@@ -88,6 +88,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOverRightHandle { get; private set; }
     public bool IsPointerOverLeftHandle { get; private set; }
     public bool IsPointerOverCenter { get; private set; }
+    public bool IsEditable { get; set; } = true;
 
     private float lastClickTime;
 
@@ -132,6 +133,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerMove(IPointerEvent evt)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         Vector2 localPoint = evt.localPosition;
         float width = VisualElement.worldBound.width;
         double xPercent = localPoint.x / width;
@@ -192,6 +198,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateHandles()
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         bool isSelected = (selectionControl != null) && selectionControl.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
             || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));

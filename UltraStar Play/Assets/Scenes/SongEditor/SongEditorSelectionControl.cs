@@ -43,6 +43,13 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         return new List<Note>(selectedNotes);
     }
 
+    public List<EditorNoteControl> GetSelectedNoteControls()
+    {
+        return GetSelectedNotes()
+            .Select(note => editorNoteDisplayer.GetNoteControl(note))
+            .ToList();
+    }
+
     public bool HasSelectedNotes()
     {
         return selectedNotes != null
