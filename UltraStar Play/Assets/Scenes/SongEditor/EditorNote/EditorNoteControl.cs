@@ -98,10 +98,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         UpdateHandles();
-        if (Note.IsEditable)
-        {
-            InitNoteEditing();
-        }
+        InitNoteEditing();
 
         SyncWithNote();
     }
@@ -335,12 +332,22 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerEnter()
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         IsPointerOver = true;
         statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void OnPointerExit()
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         IsPointerOver = false;
         IsPointerOverCenter = false;
         IsPointerOverLeftHandle = false;
@@ -352,6 +359,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerDown(IPointerEvent eventData)
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         pointerDownPosition = eventData.position;
         // Play midi sound via Ctrl
         if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed())
@@ -363,6 +375,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerUp(IPointerEvent eventData)
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         if (isPlayingMidiSound)
         {
             midiManager.StopMidiNote(Note.MidiNote);

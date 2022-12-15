@@ -7,6 +7,7 @@ public class SongEditorLayer
 {
     public ESongEditorLayer LayerEnum { get; private set; }
     public bool IsEnabled { get; set; } = true;
+    public bool IsLocked { get; set; }
     public Color Color { get; set; } = Colors.indigo;
 
     private readonly List<Note> notes = new();
