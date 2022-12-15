@@ -79,9 +79,10 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
     private void FillAudioClipWithRecordingBuffer()
     {
+        InitAudioClipIfNeeded();
         if (audioClip == null)
         {
-            InitAudioClipIfNeeded();
+            return;
         }
 
         audioClip.SetData(RecordingBuffer, 0);
@@ -140,7 +141,12 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
         {
             return;
         }
+
         InitRecordingBufferIfNeeded();
+        if (RecordingBuffer.IsNullOrEmpty())
+        {
+            return;
+        }
 
         int channels = 1;
         audioClip = AudioClip.Create(GetType().Name, RecordingBuffer.Length, channels, SampleRate, false);
