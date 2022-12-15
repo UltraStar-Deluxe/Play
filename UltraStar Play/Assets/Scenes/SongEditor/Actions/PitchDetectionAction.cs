@@ -24,40 +24,51 @@ public class PitchDetectionAction : INeedInjection
     [Inject]
     private AudioManager audioManager;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void MoveToAnalyzedPitchAndNotify(IEnumerable<Note> selectedNotes)
+    public void DetectPitchAndNotify(int startBeatInclusive, int lengthInBeats)
     {
-        MoveToAnalyzedPitch(selectedNotes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        DetectPitch(startBeatInclusive, lengthInBeats);
+        editorNoteDisplayer.UpdateNotes();
     }
 
-    public void MoveToAnalyzedPitch(IEnumerable<Note> selectedNotes)
+    public void DetectPitch(int startBeatInclusive, int lengthInBeats)
     {
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
 
-        List<Note> sortedNotes = selectedNotes.ToList();
-        sortedNotes.Sort(Note.comparerByStartBeat);
+        // Remove old analyzed notes
+        List<Note> oldPitchDetectionNotes = songEditorLayerManager.GetNotes(ESongEditorLayer.PitchDetection);
+        Dictionary<int, Note> startBeatToNote = new();
+        oldPitchDetectionNotes.ForEach(note => startBeatToNote.Add(note.StartBeat, note));
 
-        sortedNotes.ForEach(note =>
+        int endBeatExclusive = startBeatInclusive + lengthInBeats;
+        for (int beat = startBeatInclusive; beat < endBeatExclusive; beat++)
         {
-            List<int> relativePitches = AnalyzeNote(note, audioClip);
-            if (relativePitches.IsNullOrEmpty())
+            PitchEvent pitchEvent = AnalyzeBeat(beat, audioClip);
+            if (pitchEvent == null)
             {
-                // The note may be too long. Try again by analyzing each beat individually.
-                relativePitches = AnalyzeBeatsOfNote(note, audioClip);
+                continue;
             }
 
-            Debug.Log($"Relative pitches of note '{note.Text}' from beat {note.StartBeat} to beat {note.EndBeat}: {relativePitches.ToCsv()}");
-            if (!relativePitches.IsNullOrEmpty())
+            if (startBeatToNote.TryGetValue(beat, out Note existingNote))
             {
-                int relativeMidiNoteMedian = NumberUtils.Median(relativePitches);
-                int newAbsoluteMidiNote = relativeMidiNoteMedian + (12 * (1 + MidiUtils.GetOctave(note.MidiNote)));
-                note.SetMidiNote(newAbsoluteMidiNote);
+                existingNote.SetMidiNote(pitchEvent.MidiNote);
             }
-        });
+            else
+            {
+               Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
+               analyzedNote.IsEditable = false;
+               songEditorLayerManager.AddNoteToLayer(ESongEditorLayer.PitchDetection, analyzedNote);
+            }
+        }
 
         if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
         {
@@ -66,47 +77,35 @@ public class PitchDetectionAction : INeedInjection
         }
     }
 
-    private List<int> AnalyzeNote(Note note, AudioClip audioClip)
+    private PitchEvent AnalyzeBeat(int beat, AudioClip audioClip)
     {
-        List<int> result = new();
-        if (note == null
-            || note.Length <= 0)
-        {
-            return result;
-        }
-
         CreateOrUpdateAudioSamplesAnalyzer(audioClip);
         if (audioSamplesAnalyzer == null)
         {
-            return result;
+            return null;
         }
 
         int samplesPerSecondMono = audioClip.frequency;
         int samplesPerSecond = samplesPerSecondMono * audioClip.channels;
         int maxSample = audioClip.samples * audioClip.channels;
         double beatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
-        double noteLengthInMillis = beatLengthInMillis * note.Length;
-        double noteLengthInSamplesStereo = noteLengthInMillis / 1000.0 * samplesPerSecond;
+        double beatLengthInSamplesStereo = beatLengthInMillis / 1000.0 * samplesPerSecond;
 
-        float[] noteSamplesStereo = new float[(int)noteLengthInSamplesStereo];
+        float[] beatSamplesStereo = new float[(int)beatLengthInSamplesStereo];
 
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
         int startBeatInSamplesMono = (int) (startBeatInMillis / 1000.0 * samplesPerSecondMono);
         startBeatInSamplesMono = NumberUtils.Limit(startBeatInSamplesMono, 0, maxSample);
         // Note that GetData always takes the offset in MONO samples, even if there are more channels.
-        audioClip.GetData(noteSamplesStereo, startBeatInSamplesMono);
-        float[] noteSamplesMono = GetMonoAudioSamples(noteSamplesStereo, audioClip.channels);
+        audioClip.GetData(beatSamplesStereo, startBeatInSamplesMono);
+        float[] beatSamplesMono = GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
 
         // Debug.Log($"Start in ms: {startBeatInMillis}, length in ms: {noteLengthInMillis}, end in ms: {startBeatInMillis + noteLengthInMillis}, start in samples: {startBeatInSamplesMono}, length in samples: {noteLengthInSamplesStereo}, end in samples: {startBeatInSamplesMono + noteLengthInSamplesStereo}");
-        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, noteSamplesStereo);
-        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, noteSamplesMono);
+        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, beatSamplesStereo);
+        // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, beatSamplesMono);
 
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(noteSamplesMono, 0, noteSamplesMono.Length, 1, 0);
-        if (pitchEvent != null)
-        {
-            result.Add(MidiUtils.GetRelativePitch(pitchEvent.MidiNote));
-        }
-        return result;
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(beatSamplesMono, 0, beatSamplesMono.Length, 1, 0);
+        return pitchEvent;
     }
 
     private float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)

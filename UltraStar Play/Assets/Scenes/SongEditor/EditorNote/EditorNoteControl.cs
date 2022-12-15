@@ -88,7 +88,6 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOverRightHandle { get; private set; }
     public bool IsPointerOverLeftHandle { get; private set; }
     public bool IsPointerOverCenter { get; private set; }
-    public bool IsEditable { get; set; } = true;
 
     private float lastClickTime;
 
@@ -133,7 +132,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerMove(IPointerEvent evt)
     {
-        if (!IsEditable)
+        if (!Note.IsEditable)
         {
             return;
         }
@@ -198,7 +197,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateHandles()
     {
-        if (!IsEditable)
+        if (!Note.IsEditable)
         {
             return;
         }

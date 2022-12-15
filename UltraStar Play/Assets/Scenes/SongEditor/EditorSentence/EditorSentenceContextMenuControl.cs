@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -40,7 +41,11 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(new List<Sentence> {sentenceControl.Sentence}));
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(sentenceControl.Sentence.Notes));
+
+        int minBeat = sentenceControl.Sentence.MinBeat;
+        int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
+        int lengthInBeats = maxBeat - minBeat;
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.DetectPitchAndNotify(minBeat, lengthInBeats));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }

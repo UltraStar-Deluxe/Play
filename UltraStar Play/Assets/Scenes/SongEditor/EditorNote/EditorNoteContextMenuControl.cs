@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -81,7 +82,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     {
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.MoveToAnalyzedPitchAndNotify(selectedNotes));
+
+        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
+        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
+        int lengthInBeats = maxBeat - minBeat;
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.DetectPitchAndNotify(minBeat, lengthInBeats));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
