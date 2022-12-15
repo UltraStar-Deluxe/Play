@@ -53,6 +53,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
+        if (!noteControl.Note.IsEditable)
+        {
+            return;
+        }
+
         if (!selectionControl.IsSelected(noteControl.Note))
         {
             selectionControl.SetSelection(new List<EditorNoteControl> { noteControl });

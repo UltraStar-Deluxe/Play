@@ -13,6 +13,9 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     private VisualElement layersSideBarContainer;
 
     [Inject]
+    private Injector injector;
+
+    [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
@@ -33,7 +36,7 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
-    private readonly List<EditorLayerInputControl> editorLayerInputControls = new();
+    private readonly List<SongEditorSideBarLayerEntryControl> layerEntryControls = new();
 
     public void OnInjectionFinished()
     {
@@ -48,10 +51,7 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
 
     private void UpdateLayerInputControls()
     {
-        editorLayerInputControls.ForEach(editorLayerInputControl =>
-        {
-            editorLayerInputControl.Toggle.value = layerManager.IsLayerEnabled(editorLayerInputControl.Layer.LayerEnum);
-        });
+        layerEntryControls.ForEach(editorLayerInputControl => editorLayerInputControl.UpdateInputControls());
     }
 
     private void CreateLayerInputControl(SongEditorLayer layer)
@@ -59,27 +59,12 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
         VisualElement visualElement = songEditorLayerSideBarEntryUi.CloneTree().Children().First();
         layersSideBarContainer.Add(visualElement);
 
-        visualElement.Q<VisualElement>(R.UxmlNames.layerColor).style.backgroundColor = layerManager.GetColor(layer.LayerEnum);
-        visualElement.Q<Label>(R.UxmlNames.layerNameLabel).text = layer.LayerEnum.ToString();
-        visualElement.Q<Button>(R.UxmlNames.selectAllNotesOfLayerButton).RegisterCallbackButtonTriggered(() =>
-        {
-            selectionControl.SetSelection(layerManager.GetNotes(layer.LayerEnum));
-        });
-        Toggle toggle = visualElement.Q<Toggle>(R.UxmlNames.layerEnabledToggle);
-        toggle.value = layerManager.IsLayerEnabled(layer.LayerEnum);
-        toggle.RegisterValueChangedCallback(evt =>
-        {
-            if (layerManager.IsLayerEnabled(layer.LayerEnum) != evt.newValue)
-            {
-                layerManager.SetLayerEnabled(layer.LayerEnum, evt.newValue);
-            }
-        });
+        SongEditorSideBarLayerEntryControl songEditorSideBarLayerEntryControl = injector
+            .WithRootVisualElement(visualElement)
+            .WithBindingForInstance(layer)
+            .CreateAndInject<SongEditorSideBarLayerEntryControl>();
 
-        editorLayerInputControls.Add(new EditorLayerInputControl
-        {
-            Toggle = toggle,
-            Layer = layer
-        });
+        layerEntryControls.Add(songEditorSideBarLayerEntryControl);
     }
 
     private void CreateVoiceVisibleInputControl(string voiceName)
@@ -99,9 +84,11 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
                 selectionControl.SetSelection(SongMetaUtils.GetAllNotes(voice));
             }
         });
-        Toggle toggle = visualElement.Q<Toggle>(R.UxmlNames.layerEnabledToggle);
-        toggle.value = !isHidden;
-        toggle.RegisterValueChangedCallback(evt => OnVoiceVisibleToggleChanged(voiceName, evt.newValue));
+
+        // TODO: the voices should be associated with a layer
+        // Toggle toggle = visualElement.Q<Toggle>(R.UxmlNames.layerEnabledToggle);
+        // toggle.value = !isHidden;
+        // toggle.RegisterValueChangedCallback(evt => OnVoiceVisibleToggleChanged(voiceName, evt.newValue));
     }
 
     private void OnVoiceVisibleToggleChanged(string voiceName, bool isVisible)
@@ -115,11 +102,5 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
             settings.SongEditorSettings.HideVoices.AddIfNotContains(voiceName);
         }
         editorNoteDisplayer.UpdateNotesAndSentences();
-    }
-
-    private class EditorLayerInputControl
-    {
-        public Toggle Toggle { get; set; }
-        public SongEditorLayer Layer { get; set; }
     }
 }

@@ -231,11 +231,16 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languagePropertyContainer = "languagePropertyContainer";
         public const string layerColor = "layerColor";
-        public const string layerEnabledToggle = "layerEnabledToggle";
         public const string layerEntryUiRoot = "layerEntryUiRoot";
+        public const string layerInvisibleIcon = "layerInvisibleIcon";
+        public const string layerLockedButton = "layerLockedButton";
+        public const string layerLockedIcon = "layerLockedIcon";
         public const string layerNameLabel = "layerNameLabel";
         public const string layersSideBarContainer = "layersSideBarContainer";
         public const string layersTitle = "layersTitle";
+        public const string layerUnlockedIcon = "layerUnlockedIcon";
+        public const string layerVisibleButton = "layerVisibleButton";
+        public const string layerVisibleIcon = "layerVisibleIcon";
         public const string layoutGroup = "layoutGroup";
         public const string layoutTitle = "layoutTitle";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
