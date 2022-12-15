@@ -153,6 +153,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             pastedNotes.AddRange(copiedNotesFromVoice);
         });
 
+        // Make editable again
+        pastedNotes.ForEach(note => note.IsEditable = true);
+
         // All done, nothing to copy anymore.
         ClearCopiedNotes();
 
@@ -192,6 +195,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             };
 
             copiedNote.SetSentence(null);
+            copiedNote.IsEditable = false;
             CopiedNotes.Add(copiedNote);
             layerManager.AddNoteToLayer(ESongEditorLayer.CopyPaste, copiedNote);
         });
