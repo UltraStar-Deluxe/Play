@@ -98,6 +98,16 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         UpdateHandles();
+        if (Note.IsEditable)
+        {
+            InitNoteEditing();
+        }
+
+        SyncWithNote();
+    }
+
+    private void InitNoteEditing()
+    {
         disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
             .Subscribe(_ => UpdateHandles()));
 
@@ -112,8 +122,6 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             .WithBindingForInstance(this)
             .CreateAndInject<EditorNoteContextMenuControl>();
         disposables.Add(contextMenuControl);
-
-        SyncWithNote();
     }
 
     public void SyncWithNote()
@@ -199,6 +207,8 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     {
         if (!Note.IsEditable)
         {
+            leftHandle.HideByDisplay();
+            rightHandle.HideByDisplay();
             return;
         }
 
