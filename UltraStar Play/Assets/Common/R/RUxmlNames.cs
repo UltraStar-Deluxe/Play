@@ -336,6 +336,8 @@ public static partial class R
         public const string noteArea = "noteArea";
         public const string noteAreaIssues = "noteAreaIssues";
         public const string noteAreaNotes = "noteAreaNotes";
+        public const string noteAreaNotesBackground = "noteAreaNotesBackground";
+        public const string noteAreaNotesForeground = "noteAreaNotesForeground";
         public const string noteAreaPositionInSongIndicator = "noteAreaPositionInSongIndicator";
         public const string noteAreaSelectionFrame = "noteAreaSelectionFrame";
         public const string noteAreaSentences = "noteAreaSentences";

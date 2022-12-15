@@ -23,6 +23,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.noteAreaNotes)]
     private VisualElement noteAreaNotes;
 
+    [Inject(UxmlName = R.UxmlNames.noteAreaNotesBackground)]
+    private VisualElement noteAreaNotesBackground;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaNotesForeground)]
+    private VisualElement noteAreaNotesForeground;
+
     [Inject(UxmlName = R.UxmlNames.sentenceLines)]
     private VisualElement sentenceLines;
 
@@ -53,8 +59,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private DynamicTexture sentenceLinesDynamicTexture;
 
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new();
-
-    private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
 
     private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new();
     public IReadOnlyCollection<EditorNoteControl> EditorNoteControls => noteToControlMap.Values;
@@ -309,8 +313,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         HideNoteControlsOutsideOfViewport();
 
+        DrawNotesInLayers(EnumUtils.GetValuesAsList<ESongEditorLayer>());
         DrawNotesInSongFile();
-        DrawNotesInLayers();
     }
 
     public EditorNoteControl GetNoteControl(Note note)
@@ -364,9 +368,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         editorNoteControl.VisualElement.ShowByDisplay();
     }
 
-    private void DrawNotesInLayers()
+    private void DrawNotesInLayers(List<ESongEditorLayer> layerEnums)
     {
-        foreach (ESongEditorLayer layerKey in songEditorLayerKeys)
+        foreach (ESongEditorLayer layerKey in layerEnums)
         {
             if (songEditorLayerManager.IsLayerEnabled(layerKey))
             {
@@ -531,6 +535,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private EditorNoteControl UpdateOrCreateNoteControl(Note note)
     {
+        songEditorLayerManager.TryGetLayer(note, out SongEditorLayer layer);
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
             VisualElement noteVisualElement = editorNoteUi.CloneTree().Children().First();
@@ -539,7 +544,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
             noteToControlMap.Add(note, editorNoteControl);
-            noteAreaNotes.Add(noteVisualElement);
+            VisualElement parentElement = GetParentElement(layer);
+            parentElement.Add(noteVisualElement);
         }
         else
         {
@@ -558,13 +564,38 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorNoteControl.ShowLabels();
         }
 
-        if (songEditorLayerManager.TryGetLayer(note, out SongEditorLayer layer)
-            && layer.LayerEnum == ESongEditorLayer.CopyPaste)
+        if (note.IsEditable)
         {
-            editorNoteControl.IsEditable = false;
+            editorNoteControl.ShowLabels();
+            editorNoteControl.VisualElement.pickingMode = PickingMode.Position;
+        }
+        else
+        {
+            editorNoteControl.HideLabels();
+            editorNoteControl.VisualElement.pickingMode = PickingMode.Ignore;
         }
 
         return editorNoteControl;
+    }
+
+    private VisualElement GetParentElement(SongEditorLayer layer)
+    {
+        if (layer == null)
+        {
+            return noteAreaNotes;
+        }
+
+        switch(layer.LayerEnum)
+        {
+            case ESongEditorLayer.ButtonRecording:
+            case ESongEditorLayer.MicRecording:
+            case ESongEditorLayer.MidiFile:
+            case ESongEditorLayer.PitchDetection:
+                return noteAreaNotesBackground;
+            case  ESongEditorLayer.CopyPaste:
+                return noteAreaNotesForeground;
+            default: return noteAreaNotes;
+        };
     }
 
     private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat)
