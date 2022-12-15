@@ -181,4 +181,14 @@ public static class MidiUtils
         midiNote = 0;
         return false;
     }
+
+    public static int GetUltraStarTxtPitch(int midiNote)
+    {
+        return midiNote - 60;
+    }
+
+    public static int GetMidiNotePitch(int ultraStarTxtPitch)
+    {
+        return ultraStarTxtPitch + 60;
+    }
 }
