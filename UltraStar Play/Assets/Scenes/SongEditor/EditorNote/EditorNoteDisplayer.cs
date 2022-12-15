@@ -564,7 +564,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorNoteControl.ShowLabels();
         }
 
-        if (note.IsEditable)
+        if (note.IsEditable
+            && IsShowLabels())
         {
             editorNoteControl.ShowLabels();
             editorNoteControl.VisualElement.pickingMode = PickingMode.Position;
@@ -576,6 +577,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
 
         return editorNoteControl;
+    }
+
+    private bool IsShowLabels()
+    {
+        // Hide notes when more than one minute is visible.
+        return noteAreaControl.ViewportWidth < 60000;
     }
 
     private VisualElement GetParentElement(SongEditorLayer layer)
