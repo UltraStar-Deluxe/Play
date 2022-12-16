@@ -45,6 +45,7 @@ public class SongEditorSettings
     // Speech recognition
     public string SpeechRecognitionModelPath { get; set; } = "";
     public string SpeechRecognitionPhrases { get; set; } = "";
+    public bool SplitSyllables { get; set; }
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
