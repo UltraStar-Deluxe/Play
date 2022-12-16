@@ -10,25 +10,13 @@ using Vosk;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SpeechRecognitionAction : INeedInjection
+public class SpeechRecognitionAction : AbstractAudioClipAction
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
-    private SongMeta songMeta;
-
-    [Inject]
-    private Settings settings;
-
-    [Inject]
     private SongAudioPlayer songAudioPlayer;
-
-    [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
-    private SongEditorSampleRecorderControl songEditorSampleRecorderControl;
 
     [Inject]
     private UiManager uiManager;
@@ -69,20 +57,6 @@ public class SpeechRecognitionAction : INeedInjection
                         : null);
             }
         });
-    }
-
-    private AudioClip GetAudioClip()
-    {
-        if (settings.SongEditorSettings.UseRecordedSamples)
-        {
-            return songEditorSampleRecorderControl.AudioClip;
-        }
-        else
-        {
-            // Use the song's audio.
-            // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
-        }
     }
 
     public void SetTextToAnalyzedSpeechAndNotify(List<Note> selectedNotes)

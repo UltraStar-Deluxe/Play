@@ -91,7 +91,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
         int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
         int lengthInBeats = maxBeat - minBeat;
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.DetectPitchAndNotify(minBeat, lengthInBeats));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
+        contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitchAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)

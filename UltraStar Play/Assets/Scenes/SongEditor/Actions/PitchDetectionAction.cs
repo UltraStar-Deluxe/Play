@@ -7,22 +7,13 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PitchDetectionAction : INeedInjection
+public class PitchDetectionAction : AbstractAudioClipAction
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     [Inject]
-    private SongMeta songMeta;
-
-    [Inject]
-    private Settings settings;
-
-    [Inject]
     private SongAudioPlayer songAudioPlayer;
-
-    [Inject]
-    private AudioManager audioManager;
 
     [Inject]
     private SongEditorLayerManager songEditorLayerManager;
@@ -33,16 +24,57 @@ public class PitchDetectionAction : INeedInjection
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void DetectPitchAndNotify(int startBeatInclusive, int lengthInBeats)
+    public void MoveNotesToDetectedPitchAndNotify(List<Note> notes)
     {
-        DetectPitch(startBeatInclusive, lengthInBeats);
+        MoveNotesToDetectedPitch(notes);
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 
-    public void DetectPitch(int startBeatInclusive, int lengthInBeats)
+    private void MoveNotesToDetectedPitch(List<Note> notes)
     {
-        // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        AudioClip audioClip = GetAudioClip();
+
+        int minBeat = notes.Select(note => note.StartBeat).Min();
+        int maxBeat = notes.Select(note => note.EndBeat).Max();
+        Dictionary<Note, List<int>> noteToDetectedPitches = new();
+        for (int beat = minBeat; beat < maxBeat; beat++)
+        {
+            PitchEvent pitchEvent = AnalyzeBeat(beat, audioClip);
+            if (pitchEvent == null)
+            {
+                continue;
+            }
+
+            List<Note> notesAtBeat = notes
+                .Where(note => note.StartBeat <= beat && beat <= note.EndBeat)
+                .ToList();
+            notesAtBeat.ForEach(note =>
+            {
+                if (!noteToDetectedPitches.ContainsKey(note))
+                {
+                    noteToDetectedPitches.Add(note, new List<int>());
+                }
+                noteToDetectedPitches[note].Add(pitchEvent.MidiNote);
+            });
+        }
+
+        noteToDetectedPitches.ForEach(entry =>
+        {
+            Note note = entry.Key;
+            List<int> detectedPitches = entry.Value;
+            note.SetMidiNote(NumberUtils.Median(detectedPitches));
+        });
+    }
+
+    public void CreateNotesForDetectedPitchAndNotify(int startBeatInclusive, int lengthInBeats)
+    {
+        CreateNotesForDetectedPitch(startBeatInclusive, lengthInBeats);
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+    }
+
+    public void CreateNotesForDetectedPitch(int startBeatInclusive, int lengthInBeats)
+    {
+        AudioClip audioClip = GetAudioClip();
 
         // Remove old analyzed notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)
