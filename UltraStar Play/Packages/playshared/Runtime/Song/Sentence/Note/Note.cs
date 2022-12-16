@@ -86,6 +86,7 @@ public class Note
         IsFreestyle = other.IsFreestyle;
         IsRap = other.IsRap;
         Text = other.Text;
+        IsEditable = other.IsEditable;
     }
 
     public void SetSentence(Sentence sentence)
