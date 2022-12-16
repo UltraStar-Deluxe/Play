@@ -85,7 +85,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         // Remove text of notes that did not receive any new text
         for (int i = noteIndex; i < notes.Count; i++)
         {
-            notes[i].SetText(" ");
+            notes[i].SetText("_");
         }
     }
 }

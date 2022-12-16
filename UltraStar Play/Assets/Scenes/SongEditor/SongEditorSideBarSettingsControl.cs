@@ -76,6 +76,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.showNotePitchLabelToggle)]
     private Toggle showNotePitchLabelToggle;
 
+    [Inject(UxmlName = R.UxmlNames.splitSyllablesToggle)]
+    private Toggle splitSyllablesToggle;
+
     [Inject(UxmlName = R.UxmlNames.gridSizeTextField)]
     private TextField gridSizeTextField;
 
@@ -263,6 +266,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(speechRecognitionPhrasesTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPhrases,
             newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
+        Bind(splitSyllablesToggle,
+            () => settings.SongEditorSettings.SplitSyllables,
+            newValue => settings.SongEditorSettings.SplitSyllables = newValue);
 
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)

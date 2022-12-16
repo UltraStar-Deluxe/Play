@@ -178,6 +178,11 @@
                                     <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" class="smallFont" style="height: 100%; white-space: normal; width: 100%;" />
                                 </ui:ScrollView>
                             </ui:VisualElement>
+                            <ui:VisualElement name="splitSyllablesContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Split syllables (EN)" display-tooltip-when-elided="true" name="label" />
+                                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                <ui:Toggle name="splitSyllablesToggle" class="smallControl" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Pitch Detection" display-tooltip-when-elided="true" name="pitchDetectionTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="pitchDetectionGroup" class="songEditorSettingsGroup">

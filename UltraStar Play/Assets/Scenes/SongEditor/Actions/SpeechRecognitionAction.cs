@@ -63,7 +63,10 @@ public class SpeechRecognitionAction : INeedInjection
             if (!analyzedSpeech.IsNullOrEmpty())
             {
                 // Assume whole words. Thus, take first word and separate notes by space.
-                EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList(), englishSyllableSplitter);
+                EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList(),
+                    settings.SongEditorSettings.SplitSyllables
+                        ? englishSyllableSplitter
+                        : null);
             }
         });
     }
