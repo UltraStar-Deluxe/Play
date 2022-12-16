@@ -44,3 +44,6 @@ Apache License 2.0
 
 - Serilog
     - https://github.com/serilog/serilog
+
+- Vosk Speech Recognition Toolkit
+    - https://github.com/alphacep/vosk-api
