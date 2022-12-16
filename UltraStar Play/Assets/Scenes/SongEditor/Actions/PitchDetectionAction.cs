@@ -36,7 +36,7 @@ public class PitchDetectionAction : INeedInjection
     public void DetectPitchAndNotify(int startBeatInclusive, int lengthInBeats)
     {
         DetectPitch(startBeatInclusive, lengthInBeats);
-        editorNoteDisplayer.UpdateNotes();
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 
     public void DetectPitch(int startBeatInclusive, int lengthInBeats)
