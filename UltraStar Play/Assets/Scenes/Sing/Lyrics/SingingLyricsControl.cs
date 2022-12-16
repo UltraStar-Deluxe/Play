@@ -184,18 +184,21 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
         sentence.Notes.ForEach(note =>
         {
+            // Show underscore as space.
+            // Underscore is used in song editor to show notes with missing lyrics after speech recognition.
+            string displayText = note.Text.Replace("_", " ");
             string richText = IsItalicDisplayText(note.Type)
-                ? $"<i>{note.Text.Trim()}</i>"
-                : note.Text.Trim();
+                ? $"<i>{displayText.Trim()}</i>"
+                : displayText.Trim();
 
             Label label = new(richText);
             label.enableRichText = true;
 
-            if (note.Text.StartsWith(" "))
+            if (displayText.StartsWith(" "))
             {
                 label.style.marginLeft = SpaceWidthInPx;
             }
-            if (note.Text.EndsWith(" "))
+            if (displayText.EndsWith(" "))
             {
                 label.style.marginRight = SpaceWidthInPx;
             }
@@ -212,7 +215,6 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             visualElement.Add(label);
-
         });
     }
 

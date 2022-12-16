@@ -255,17 +255,20 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     public string GetDisplayText(Note note)
     {
+        // Show underscore as space.
+        // Underscore is used in song editor to show notes with missing lyrics after speech recognition.
+        string displayText = note.Text.Replace("_", " ");
         switch (note.Type)
         {
             case ENoteType.Freestyle:
-                return $"<i><b><color=#c00000>{note.Text}</color></b></i>";
+                return $"<i><b><color=#c00000>{displayText}</color></b></i>";
             case ENoteType.Golden:
-                return $"<b>{note.Text}</b>";
+                return $"<b>{displayText}</b>";
             case ENoteType.Rap:
             case ENoteType.RapGolden:
-                return $"<i><b><color=#ffa500ff>{note.Text}</color></b></i>";
+                return $"<i><b><color=#ffa500ff>{displayText}</color></b></i>";
             default:
-                return note.Text;
+                return displayText;
         }
     }
 
