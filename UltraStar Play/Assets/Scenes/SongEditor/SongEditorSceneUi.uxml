@@ -34,6 +34,10 @@
                             <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
                             <MaterialIcon name="icon" icon="help_outline" class="rounded" />
                         </ui:Button>
+                        <ui:Button display-tooltip-when-elided="true" name="openSongFolderButton">
+                            <ui:Label text="Folder" display-tooltip-when-elided="true" name="label" />
+                            <MaterialIcon name="icon" icon="folder" class="rounded" />
+                        </ui:Button>
                         <ui:Button display-tooltip-when-elided="true" name="undoButton">
                             <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
                             <MaterialIcon name="icon" icon="undo" class="rounded" />
