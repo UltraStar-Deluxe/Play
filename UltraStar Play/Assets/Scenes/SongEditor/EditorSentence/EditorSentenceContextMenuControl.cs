@@ -45,7 +45,7 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         int minBeat = sentenceControl.Sentence.MinBeat;
         int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
         int lengthInBeats = maxBeat - minBeat;
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.DetectPitchAndNotify(minBeat, lengthInBeats));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }
