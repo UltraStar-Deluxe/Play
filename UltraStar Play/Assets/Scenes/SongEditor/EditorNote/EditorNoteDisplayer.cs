@@ -74,7 +74,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void Start()
     {
+        noteAreaNotesBackground.Clear();
         noteAreaNotes.Clear();
+        noteAreaNotesForeground.Clear();
         noteToControlMap.Clear();
         noteAreaSentences.Clear();
         sentenceToControlMap.Clear();
@@ -100,7 +102,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             if (evt is LoadedMementoEvent)
             {
                 // The object instances have changed. All maps must be cleared.
+                noteAreaNotesBackground.Clear();
                 noteAreaNotes.Clear();
+                noteAreaNotesForeground.Clear();
                 noteToControlMap.Clear();
                 noteAreaSentences.Clear();
                 sentenceToControlMap.Clear();
@@ -205,7 +209,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     public void ClearNoteControls()
     {
+        noteAreaNotesBackground.Clear();
         noteAreaNotes.Clear();
+        noteAreaNotesForeground.Clear();
         noteToControlMap.Values.ForEach(editorNoteControl => editorNoteControl.Dispose());
         noteToControlMap.Clear();
     }
