@@ -421,18 +421,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorSentenceControl.VisualElement.worldBound.Contains(pos));
     }
 
-    private void DrawNotesInLayer(ESongEditorLayer layerKey)
+    private void DrawNotesInLayer(ESongEditorLayer layerEnum)
     {
-        IEnumerable<Note> notesInLayer = songEditorLayerManager.GetEnumLayerNotes(layerKey)
+        IEnumerable<Note> notesInLayer = songEditorLayerManager.GetEnumLayerNotes(layerEnum)
             .Where(note => note.Sentence == null);
         IEnumerable<Note> notesInViewport = notesInLayer
             .Where(note => noteAreaControl.IsInViewport(note));
 
-        Color layerColor = songEditorLayerManager.GetEnumLayerColor(layerKey);
-        SongEditorEnumLayer enumLayer = songEditorLayerManager.GetEnumLayer(layerKey);
+        Color layerColor = songEditorLayerManager.GetEnumLayerColor(layerEnum);
+        SongEditorEnumLayer layer = songEditorLayerManager.GetEnumLayer(layerEnum);
         foreach (Note note in notesInViewport)
         {
-            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note, enumLayer);
+            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note, layer);
             if (noteControl != null)
             {
                 noteControl.SetColor(layerColor);
@@ -546,7 +546,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private EditorNoteControl UpdateOrCreateNoteControl(Note note, SongEditorEnumLayer enumLayer)
+    private EditorNoteControl UpdateOrCreateNoteControl(Note note, SongEditorEnumLayer layer)
     {
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
@@ -557,8 +557,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
             noteToControlMap.Add(note, editorNoteControl);
-            VisualElement parentElement = enumLayer != null
-                ? songEditorLayerToParentElement[enumLayer.LayerEnum]
+            VisualElement parentElement = layer != null
+                ? songEditorLayerToParentElement[layer.LayerEnum]
                 : noteAreaNotes;
             parentElement.Add(noteVisualElement);
         }
@@ -567,7 +567,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorNoteControl.SyncWithNote();
         }
 
-        PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        float heightFactor = layer != null
+            ? 0.66f
+            : 1f;
+        PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat, heightFactor);
         ShowNoteControl(editorNoteControl);
 
         if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
@@ -600,9 +603,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         return editorNoteControl;
     }
 
-    private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat)
+    private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat, float heightFactor)
     {
-        float heightPercent = noteAreaControl.HeightForSingleNote;
+        float heightPercent = noteAreaControl.HeightForSingleNote * heightFactor;
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(startBeat);
         float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(endBeat);
