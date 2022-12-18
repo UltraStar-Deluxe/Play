@@ -68,6 +68,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleSideBarSizeButton)]
     private Button toggleSideBarSizeButton;
 
+    [Inject(UxmlName = R.UxmlNames.openSongFolderButton)]
+    private Button openSongFolderButton;
+
     [Inject(UxmlName = R.UxmlNames.playIcon)]
     private VisualElement playIcon;
 
@@ -118,6 +121,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         injector.Inject(propertiesControl);
         injector.Inject(sideBarLayersControl);
         injector.Inject(sideBarSettingsControl);
+
+        if (PlatformUtils.IsStandalone)
+        {
+            openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(songMeta));
+        }
+        else
+        {
+            openSongFolderButton.HideByDisplay();
+        }
 
         togglePlaybackButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(() =>

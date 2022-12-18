@@ -69,6 +69,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
         Note dragStartNote = songEditorSceneControl
             .GetAllVisibleNotes()
+            .Where(note => note.IsEditable)
             .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
                                     && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
                                     && note.MidiNote <= dragEvent.MidiNoteDragStart
@@ -79,6 +80,10 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         }
 
         EditorNoteControl dragStartNoteControl = editorNoteDisplayer.GetNoteControl(dragStartNote);
+        if (!dragStartNoteControl.Note.IsEditable)
+        {
+            return;
+        }
 
         isCanceled = false;
         if (!selectionControl.IsSelected(dragStartNoteControl.Note))

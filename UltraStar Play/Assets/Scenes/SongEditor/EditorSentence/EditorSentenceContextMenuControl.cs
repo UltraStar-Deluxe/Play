@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -16,6 +17,12 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     private SongMeta songMeta;
 
     [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+
+    [Inject]
     private EditorSentenceControl sentenceControl;
 
     public override void OnInjectionFinished()
@@ -30,6 +37,15 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(new List<Sentence> {sentenceControl.Sentence}));
+
+        int minBeat = sentenceControl.Sentence.MinBeat;
+        int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
+        int lengthInBeats = maxBeat - minBeat;
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
     }

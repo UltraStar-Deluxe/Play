@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -40,6 +41,12 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
@@ -53,6 +60,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
+        if (!noteControl.Note.IsEditable)
+        {
+            return;
+        }
+
         if (!selectionControl.IsSelected(noteControl.Note))
         {
             selectionControl.SetSelection(new List<EditorNoteControl> { noteControl });
@@ -60,14 +72,27 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
-        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
+        FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherVoice(contextMenu, selectedNotes);
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
+    }
+
+    private void FillContextMenuForAiTools(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
+    {
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
+
+        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
+        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
+        int lengthInBeats = maxBeat - minBeat;
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
+        contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitchAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)

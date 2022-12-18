@@ -22,6 +22,9 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
     [Inject(UxmlName = R.UxmlNames.overviewAreaNotes)]
     private VisualElement overviewAreaNotes;
 
@@ -58,7 +61,7 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         dynamicTexture.ClearTexture();
         foreach (Voice voice in songMeta.GetVoices())
         {
-            Color color = songEditorSceneControl.GetColorForVoice(voice);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(voice.Name);
             DrawNotes(voice, color);
         }
         dynamicTexture.ApplyTexture();
