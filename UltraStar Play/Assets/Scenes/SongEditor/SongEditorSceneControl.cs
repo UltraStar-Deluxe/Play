@@ -56,6 +56,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [InjectedInInspector]
     public SongEditorSceneInputControl songEditorSceneInputControl;
 
+    [InjectedInInspector]
+    public SongEditorRecordedAudioPlayer songEditorRecordedAudioPlayer;
+
     [Inject]
     private Injector injector;
 
@@ -97,6 +100,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
+    private readonly SongEditorSampleRecorderControl songEditorSampleRecorderControl = new();
 
     public SongMeta SongMeta
     {
@@ -143,6 +147,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector.Inject(songEditorSampleRecorderControl);
     }
 
     private void Start()
@@ -160,6 +165,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
+
+        // Reset usage of recorded audio buffer. The buffer starts empty.
+        settings.SongEditorSettings.UseRecordedSamples = false;
+        settings.SongEditorSettings.PlayRecordedSamples = false;
     }
 
     private void OnDestroy()
@@ -253,28 +262,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         positionInSongInMillisWhenPlaybackStarted = positionInSongInMillis;
     }
 
-    public Color GetColorForVoice(Voice voice)
-    {
-        string voiceName = voice.Name == Voice.soloVoiceName
-            ? Voice.firstVoiceName
-            : voice.Name;
-        return GetColorForVoiceName(voiceName);
-    }
-
-    public Color GetColorForVoiceName(string voiceName)
-    {
-        if (voiceNameToColorMap.TryGetValue(voiceName, out Color color))
-        {
-            return color;
-        }
-        else
-        {
-            // Define colors for the voices.
-            CreateVoiceToColorMap();
-            return voiceNameToColorMap[voiceName];
-        }
-    }
-
     public List<Note> GetAllVisibleNotes()
     {
         List<Note> result = new();
@@ -283,9 +270,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             .Reverse()
             .SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes)
-            .Where(note => songEditorLayerManager.IsVisible(note))
+            .Where(note => songEditorLayerManager.IsNoteVisible(note))
             .ToList();
-        List<Note> notesInLayers = songEditorLayerManager.GetAllNotes();
+        List<Note> notesInLayers = songEditorLayerManager.GetAllEnumLayerNotes();
         result.AddRange(notesInLayers);
         result.AddRange(notesInVoices);
         return result;
@@ -295,8 +282,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         List<Color> colors = new()
         {
-            Colors.CreateColor("#2ecc71"),
-            Colors.CreateColor("#9b59b6"),
+            Colors.CreateColor("#"),
+            Colors.CreateColor("#"),
         };
         int index = 0;
         foreach (Color color in colors)
@@ -394,7 +381,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
     }
     
-    public void StartEditingNoteText()
+    public void StartEditingSelectedNoteText()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.Count == 1)
@@ -403,7 +390,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(selectedNote);
             if (noteControl != null)
             {
-                noteControl.StartEditingNoteText();
+                noteControl.StartEditingLyrics();
             }
         }
     }
@@ -492,6 +479,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorLayerManager);
         bb.BindExistingInstance(songEditorMicPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
+        bb.BindExistingInstance(songEditorSampleRecorderControl);
+        bb.BindExistingInstance(songEditorRecordedAudioPlayer);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);

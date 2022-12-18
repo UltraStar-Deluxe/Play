@@ -1,3 +1,5 @@
+using System;
+
 public static class ObjectUtils
 {
     // Swaps the values of a and b.
@@ -7,5 +9,13 @@ public static class ObjectUtils
         T tmp = a;
         a = b;
         b = tmp;
+    }
+
+    public static void AssertNotNull(object nullableReference, string paramName)
+    {
+        if (nullableReference == null)
+        {
+            throw new ArgumentNullException(paramName);
+        }
     }
 }

@@ -48,8 +48,8 @@ public class SongEditorMidiFileImporter : INeedInjection
             loadedNotes = ShiftNotesToPlaybackPosition(loadedNotes);
 
             editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
-            layerManager.ClearLayer(ESongEditorLayer.MidiFile);
-            loadedNotes.ForEach(loadedNote => layerManager.AddNoteToLayer(ESongEditorLayer.MidiFile, loadedNote));
+            layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
+            loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.MidiFile, loadedNote));
             editorNoteDisplayer.UpdateNotes();
             uiManager.CreateNotificationVisualElement("Loaded MIDI file successfully");
         }

@@ -41,6 +41,9 @@ public class Note
     public bool IsFreestyle { get; private set; }
     public bool IsRap { get; private set; }
 
+    // Is the note editable in the song editor?
+    public bool IsEditable { get; set; } = true;
+
     public Note()
     {
         SetType(ENoteType.Normal);
@@ -83,6 +86,7 @@ public class Note
         IsFreestyle = other.IsFreestyle;
         IsRap = other.IsRap;
         Text = other.Text;
+        IsEditable = other.IsEditable;
     }
 
     public void SetSentence(Sentence sentence)
@@ -108,16 +112,16 @@ public class Note
         Text = text ?? throw new UnityException("Text cannot be null");
     }
 
-    public void SetTxtPitch(int pitch)
+    public void SetTxtPitch(int txtPitch)
     {
-        TxtPitch = pitch;
-        MidiNote = TxtPitch + 60;
+        TxtPitch = txtPitch;
+        MidiNote = MidiUtils.GetMidiNotePitch(TxtPitch);
     }
 
     public void SetMidiNote(int midiNote)
     {
         MidiNote = midiNote;
-        TxtPitch = MidiNote - 60;
+        TxtPitch = MidiUtils.GetUltraStarTxtPitch(MidiNote);
     }
 
     public void SetType(ENoteType type)
