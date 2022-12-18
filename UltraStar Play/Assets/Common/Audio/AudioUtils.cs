@@ -43,4 +43,30 @@ public static class AudioUtils
             return downloadHandler.audioClip;
         }
     }
+
+    public static float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)
+    {
+        if (channelCount <= 1)
+        {
+            return originalSamples;
+        }
+
+        // Stereo to mono => take the average of the channels
+        float[] monoSamples = new float[originalSamples.Length / channelCount];
+        int monoSampleIndex = 0;
+        for (int stereoSampleIndex = 0; stereoSampleIndex < originalSamples.Length && monoSampleIndex < monoSamples.Length; stereoSampleIndex += channelCount)
+        {
+            float sampleSum = 0;
+            for (int channelIndex = 0; channelIndex < channelCount && (stereoSampleIndex + channelIndex) < originalSamples.Length; channelIndex++)
+            {
+                sampleSum += originalSamples[stereoSampleIndex + channelIndex];
+            }
+
+            float sampleAverage = sampleSum / channelCount;
+            monoSamples[monoSampleIndex] = sampleAverage;
+            monoSampleIndex++;
+        }
+
+        return monoSamples;
+    }
 }

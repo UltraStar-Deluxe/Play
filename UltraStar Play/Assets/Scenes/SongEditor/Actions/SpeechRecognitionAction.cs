@@ -21,11 +21,13 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject]
     private UiManager uiManager;
 
-    private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
 
-    private Model voskModel;
-    private string voskModelPath;
-    private int maxSpeechRecognitionAlternatives = 3;
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
+    private TextField speechRecognitionModelPathTextField;
+
+    private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
 
     public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Sentence> selectedSentences)
     {
@@ -35,18 +37,22 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     public void SetTextToAnalyzedSpeech(IEnumerable<Sentence> selectedSentences)
     {
-        AudioClip audioClip = GetAudioClip();
-
-        using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
-        if (voskRecognizer == null)
+        if (GetSpeechRecognitionModelPath().IsNullOrEmpty()
+            || !Directory.Exists(GetSpeechRecognitionModelPath()))
         {
+            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
             return;
         }
 
+        AudioClip audioClip = GetAudioClip();
         selectedSentences.ForEach(sentence =>
         {
             int sentenceLengthInBeats = sentence.ExtendedMaxBeat - sentence.MinBeat;
-            List<string> analyzedSpeech = AnalyzeBeats(sentence.MinBeat, sentenceLengthInBeats, audioClip, voskRecognizer);
+            List<string> analyzedSpeech = AnalyzeBeats(
+                sentence.MinBeat,
+                sentenceLengthInBeats,
+                audioClip,
+                speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
             Debug.Log($"Analyzed text from beat {sentence.MinBeat} to beat {sentence.ExtendedMaxBeat}: {analyzedSpeech.ToCsv()}");
             if (!analyzedSpeech.IsNullOrEmpty())
             {
@@ -59,6 +65,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         });
     }
 
+    private string GetSpeechRecognitionModelPath()
+    {
+        return speechRecognitionModelPathTextField.text;
+    }
+
     public void SetTextToAnalyzedSpeechAndNotify(List<Note> selectedNotes)
     {
         SetTextToAnalyzedSpeech(selectedNotes);
@@ -69,21 +80,24 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     {
         AudioClip audioClip = GetAudioClip();
 
-        using VoskRecognizer voskRecognizer = CreateSpeechRecognizer(audioClip);
-        if (voskRecognizer == null)
-        {
-            return;
-        }
-
         int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
         int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
         int lengthInBeats = maxBeat - minBeat;
-        List<string> analyzedSpeech = AnalyzeBeats(minBeat, lengthInBeats, audioClip, voskRecognizer);
+        List<string> analyzedSpeech = AnalyzeBeats(
+            minBeat,
+            lengthInBeats,
+            audioClip,
+            speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
         Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {analyzedSpeech.ToCsv()}");
         if (!analyzedSpeech.IsNullOrEmpty())
         {
             EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), selectedNotes, englishSyllableSplitter);
         }
+    }
+
+    private VoskModelParameters CreateSpeechRecognizerParameters(AudioClip audioClip)
+    {
+        return new VoskModelParameters(audioClip.frequency, GetSpeechRecognitionModelPath(), GetSpeechRecognitionPhrases());
     }
 
     private List<string> GetSpeechRecognitionPhrases()
@@ -131,7 +145,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         startBeatInSamplesMono = NumberUtils.Limit(startBeatInSamplesMono, 0, maxSample);
         // Note that GetData always takes the offset in MONO samples, even if there are more channels.
         audioClip.GetData(beatSamplesStereo, startBeatInSamplesMono);
-        float[] beatSamplesMono = GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
+        float[] beatSamplesMono = AudioUtils.GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
 
         WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-stereo.wav", audioClip.frequency, audioClip.channels, beatSamplesStereo);
         WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-mono.wav", audioClip.frequency, 1, beatSamplesMono);
@@ -142,8 +156,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             beatSamplesMonoShortArray[i] = (short)Math.Floor(beatSamplesMono[i] * short.MaxValue);
         }
 
+        DisposableStopwatch stopwatch = new("");
         voskRecognizer.AcceptWaveform(beatSamplesMonoShortArray, beatSamplesMonoShortArray.Length);
         string voskResultJsonString = voskRecognizer.FinalResult();
+        Debug.Log($"Speech recognition took {stopwatch.ElapsedMilliseconds}");
+
         Debug.Log("Vosk result: " + voskResultJsonString);
         if (voskResultJsonString.IsNullOrEmpty())
         {
@@ -183,96 +200,5 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             result.Add(bestResultText);
         }
         return result;
-    }
-
-    private float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)
-    {
-        if (channelCount <= 1)
-        {
-            return originalSamples;
-        }
-
-        // Stereo to mono => take the average of the channels
-        float[] monoSamples = new float[originalSamples.Length / channelCount];
-        int monoSampleIndex = 0;
-        for (int stereoSampleIndex = 0; stereoSampleIndex < originalSamples.Length && monoSampleIndex < monoSamples.Length; stereoSampleIndex += channelCount)
-        {
-            float sampleSum = 0;
-            for (int channelIndex = 0; channelIndex < channelCount && (stereoSampleIndex + channelIndex) < originalSamples.Length; channelIndex++)
-            {
-                sampleSum += originalSamples[stereoSampleIndex + channelIndex];
-            }
-
-            float sampleAverage = sampleSum / channelCount;
-            monoSamples[monoSampleIndex] = sampleAverage;
-            monoSampleIndex++;
-        }
-
-        return monoSamples;
-    }
-
-    private VoskRecognizer CreateSpeechRecognizer(AudioClip audioClip)
-    {
-        if (audioClip == null
-            || audioClip.samples <= 0
-            || audioClip.frequency <= 0)
-        {
-            return null;
-        }
-
-        CreateOrUpdateSpeechRecognitionModel();
-
-        // Create the recognizer
-        VoskRecognizer voskRecognizer;
-        List<string> speechRecognitionPhrases = GetSpeechRecognitionPhrases();
-        if (!speechRecognitionPhrases.IsNullOrEmpty())
-        {
-            string voskGrammar = JsonConverter.ToJson(speechRecognitionPhrases);
-            voskRecognizer = new(voskModel, audioClip.frequency, voskGrammar);
-        }
-        else
-        {
-            voskRecognizer = new(voskModel, audioClip.frequency);
-        }
-
-        // voskRecognizer.SetMaxAlternatives(maxSpeechRecognitionAlternatives);
-        // voskRecognizer.SetWords();
-
-        return voskRecognizer;
-    }
-
-    private void CreateOrUpdateSpeechRecognitionModel()
-    {
-        if (settings.SongEditorSettings.SpeechRecognitionModelPath.IsNullOrEmpty()
-            || !Directory.Exists(settings.SongEditorSettings.SpeechRecognitionModelPath))
-        {
-            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
-            return;
-        }
-
-        if (voskModelPath != settings.SongEditorSettings.SpeechRecognitionModelPath
-            && voskModel != null)
-        {
-            // The model path changed. Thus, dispose the old model.
-            voskModel.Dispose();
-            voskModel = null;
-        }
-
-        if (voskModel == null)
-        {
-            voskModel = new(settings.SongEditorSettings.SpeechRecognitionModelPath);
-        }
-    }
-
-    private class VoskResultJson
-    {
-        public List<VoskResultAlternativeJson> alternatives;
-        public string text;
-    }
-
-    private class VoskResultAlternativeJson
-    {
-        public double confidence;
-        public string text;
     }
 }
