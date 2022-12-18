@@ -31,6 +31,7 @@ TagManager:
   - ContextMenuPopupManager
   - BackgroundMusicManager
   - SceneChangeAnimationControl
+  - SpeechRecognitionManager
   layers:
   - Default
   - TransparentFX
