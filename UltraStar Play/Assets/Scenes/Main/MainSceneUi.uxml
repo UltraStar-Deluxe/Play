@@ -21,9 +21,10 @@
             <ui:VisualElement name="buttonRow" style="flex-direction: row; width: 100%; justify-content: center; align-items: center;">
                 <ui:Button text="Create Song" name="createSongButton" class="mainSceneButton" />
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
-                <ui:Button text="Settings" name="settingsButton" class="mainSceneButton">
+                <ui:VisualElement name="settingsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Button text="Settings" name="settingsButton" class="mainSceneButton" />
                     <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon warning rounded" />
-                </ui:Button>
+                </ui:VisualElement>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton mainSceneExitButton" style="display: flex;" />
                 <ui:VisualElement style="position: absolute; right: 5px;" />
