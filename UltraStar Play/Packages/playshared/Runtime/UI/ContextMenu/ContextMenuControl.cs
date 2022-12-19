@@ -32,7 +32,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private bool isPointerDown;
     private Vector2 pointerDownPosition;
 
-    private List<IDisposable> disposables = new();
+    private readonly List<IDisposable> disposables = new();
 
     public virtual void OnInjectionFinished()
     {

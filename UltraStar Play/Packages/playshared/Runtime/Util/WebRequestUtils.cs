@@ -52,7 +52,6 @@ public static class WebRequestUtils
 
     public static string AbsoluteFilePathToUri(string absolutePath)
     {
-        string uri;
         if (absolutePath.StartsWith(@"\\"))
         {
             // This is a Windows-like network path.
