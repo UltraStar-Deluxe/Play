@@ -62,7 +62,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
         {
             Note note = entry.Key;
             List<int> detectedPitches = entry.Value;
-            note.SetMidiNote(NumberUtils.Median(detectedPitches));
+            note.SetMidiNote(NumberUtils.MostOccuringEntry(detectedPitches));
         });
     }
 
@@ -86,6 +86,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
+        List<Note> createdNotes = new();
         Note lastAnalyzedNote = null;
         int endBeatExclusive = startBeat + lengthInBeats;
         for (int beat = startBeat; beat < endBeatExclusive; beat++)
@@ -104,12 +105,15 @@ public class PitchDetectionAction : AbstractAudioClipAction
             }
             else
             {
-                Note analyzedNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
-                analyzedNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
-                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, analyzedNote);
-                lastAnalyzedNote = analyzedNote;
+                Note newNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
+                createdNotes.Add(newNote);
+                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, newNote);
+
+                lastAnalyzedNote = newNote;
             }
         }
+
+        createdNotes.ForEach(note => note.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection));
 
         if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
         {
