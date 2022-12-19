@@ -66,20 +66,20 @@ public class PitchDetectionAction : AbstractAudioClipAction
         });
     }
 
-    public void CreateNotesForDetectedPitchAndNotify(int startBeatInclusive, int lengthInBeats)
+    public void CreateNotesForDetectedPitchAndNotify(int startBeat, int lengthInBeats)
     {
-        CreateNotesForDetectedPitch(startBeatInclusive, lengthInBeats);
+        CreateNotesForDetectedPitch(startBeat, lengthInBeats);
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 
-    public void CreateNotesForDetectedPitch(int startBeatInclusive, int lengthInBeats)
+    public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats)
     {
         AudioClip audioClip = GetAudioClip();
 
         // Remove old analyzed notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)
             .Where(oldNote =>
-                oldNote.StartBeat >= startBeatInclusive && oldNote.EndBeat <= oldNote.StartBeat + lengthInBeats)
+                oldNote.StartBeat >= startBeat && oldNote.EndBeat <= startBeat + lengthInBeats)
             .ForEach(oldNote =>
             {
                 editorNoteDisplayer.RemoveNoteControl(oldNote);
@@ -87,8 +87,8 @@ public class PitchDetectionAction : AbstractAudioClipAction
             });
 
         Note lastAnalyzedNote = null;
-        int endBeatExclusive = startBeatInclusive + lengthInBeats;
-        for (int beat = startBeatInclusive; beat < endBeatExclusive; beat++)
+        int endBeatExclusive = startBeat + lengthInBeats;
+        for (int beat = startBeat; beat < endBeatExclusive; beat++)
         {
             PitchEvent pitchEvent = AnalyzeBeat(beat, audioClip);
             if (pitchEvent == null)
