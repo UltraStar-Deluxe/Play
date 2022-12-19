@@ -54,4 +54,15 @@ public static class NumberUtils
         list.Sort();
         return list[list.Count / 2];
     }
+
+    public static T MostOccuringEntry<T>(IEnumerable<T> enumerable)
+    {
+        // See https://stackoverflow.com/questions/355945/find-the-most-occurring-number-in-a-listint
+        T result = enumerable
+            .GroupBy(entry => entry)
+            .OrderByDescending(group => group.Count())
+            .Select(grp => grp.Key)
+            .First();
+        return result;
+    }
 }
