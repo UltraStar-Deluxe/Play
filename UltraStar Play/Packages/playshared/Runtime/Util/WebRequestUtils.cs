@@ -10,50 +10,37 @@ public static class WebRequestUtils
     // Instead, use the ImageManager where Sprites and Textures are cached and released when no longer needed.
     public static IEnumerator LoadTexture2DFromUri(string uri, Action<Texture2D> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
-        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(uri))
+        using UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(new Uri(uri));
+        DownloadHandlerTexture downloadHandler = webRequest.downloadHandler as DownloadHandlerTexture;
+        webRequest.SendWebRequest();
+
+        while (!webRequest.isDone)
         {
-            DownloadHandlerTexture downloadHandler = webRequest.downloadHandler as DownloadHandlerTexture;
-            webRequest.SendWebRequest();
+            yield return null;
+        }
 
-            while (!webRequest.isDone)
+        if (webRequest.result
+            is UnityWebRequest.Result.ConnectionError
+            or UnityWebRequest.Result.ProtocolError)
+        {
+            if (onFailure != null)
             {
-                yield return null;
-            }
-
-            if (webRequest.result
-                is UnityWebRequest.Result.ConnectionError
-                or UnityWebRequest.Result.ProtocolError)
-            {
-                if (onFailure != null)
-                {
-                    onFailure(webRequest);
-                    yield break;
-                }
-
-                Debug.LogError("Error loading Texture2D from: " + uri);
-                Debug.LogError(webRequest.error);
+                onFailure(webRequest);
                 yield break;
             }
 
-            onSuccess(downloadHandler.texture);
+            Debug.LogError("Error loading Texture2D from: " + uri);
+            Debug.LogError(webRequest.error);
+            yield break;
         }
+
+        onSuccess(downloadHandler.texture);
     }
 
     public static bool IsHttpOrHttpsUri(string uri)
     {
-        return uri.StartsWith("http://")
-               || uri.StartsWith("https://");
-    }
-
-    public static bool ResourceExists(string uri)
-    {
-        if (!uri.IsNullOrEmpty()
-            && uri.StartsWith("file://")
-            && !File.Exists(uri.Replace("file://", "")))
-        {
-            return false;
-        }
-
-        return !uri.IsNullOrEmpty();
+        return !uri.IsNullOrEmpty()
+                && (uri.StartsWith("http://")
+                    || uri.StartsWith("https://"));
     }
 }
