@@ -57,7 +57,7 @@ public static class SongMetaUtils
             return true;
         }
 
-        return File.Exists(GetUri(songMeta, pathOrUri));
+        return File.Exists(GetAbsoluteFilePath(songMeta, pathOrUri));
     }
 
     /**
@@ -76,7 +76,13 @@ public static class SongMetaUtils
         }
 
         // The given path is relative to the song file. Make it absolute.
-        return songMeta.Directory + Path.DirectorySeparatorChar + pathOrUri;
+        string absoluteFilePath = GetAbsoluteFilePath(songMeta, pathOrUri);
+        return WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
+    }
+
+    private static string GetAbsoluteFilePath(SongMeta songMeta, string path)
+    {
+        return songMeta.Directory + Path.DirectorySeparatorChar + path;
     }
 
     public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
