@@ -24,10 +24,72 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
+    [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
     private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
+
+    public void CreateNotesAndNotify(int startBeat, int lengthInBeats)
+    {
+        CreateNotes(startBeat, lengthInBeats);
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+    }
+
+    public void CreateNotes(int startBeat, int lengthInBeats)
+    {
+        if (GetSpeechRecognitionModelPath().IsNullOrEmpty()
+            || !Directory.Exists(GetSpeechRecognitionModelPath()))
+        {
+            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
+            return;
+        }
+
+        // Remove old notes
+        songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.SpeechRecognition)
+            .Where(oldNote =>
+                oldNote.StartBeat >= startBeat && oldNote.EndBeat <= startBeat + lengthInBeats)
+            .ForEach(oldNote =>
+            {
+                editorNoteDisplayer.RemoveNoteControl(oldNote);
+                songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
+            });
+
+        // Analyze audio
+        AudioClip audioClip = GetAudioClip();
+        VoskResultJson voskResultJson = AnalyzeBeats(
+            startBeat,
+            lengthInBeats,
+            audioClip,
+            speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
+        if (voskResultJson != null && !voskResultJson.result.IsNullOrEmpty())
+        {
+            Debug.Log($"Analyzed text from beat {startBeat} to beat {startBeat + lengthInBeats}: {voskResultJson.text}");
+            // Create new notes
+            CreateNotesOfVoskResult(startBeat, voskResultJson.result);
+        }
+    }
+
+    private void CreateNotesOfVoskResult(int offsetInBeats, List<VoskResultWordJson> resultList)
+    {
+        double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
+        resultList.ForEach(resultEntry =>
+        {
+            int noteStartInBeats = offsetInBeats + (int)(resultEntry.start * beatsPerSeconds);
+            int noteEndInBeats = offsetInBeats + (int)(resultEntry.end * beatsPerSeconds);
+            int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
+            string text = resultEntry.word + " ";
+            int midiNote = settings.SongEditorSettings.MidiNoteForSpeechRecognition;
+            Note newNote = new Note(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
+            newNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
+            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, newNote);
+        });
+    }
 
     public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Sentence> selectedSentences)
     {
@@ -48,16 +110,16 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         selectedSentences.ForEach(sentence =>
         {
             int sentenceLengthInBeats = sentence.ExtendedMaxBeat - sentence.MinBeat;
-            List<string> analyzedSpeech = AnalyzeBeats(
+            VoskResultJson voskResultJson = AnalyzeBeats(
                 sentence.MinBeat,
                 sentenceLengthInBeats,
                 audioClip,
                 speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
-            Debug.Log($"Analyzed text from beat {sentence.MinBeat} to beat {sentence.ExtendedMaxBeat}: {analyzedSpeech.ToCsv()}");
-            if (!analyzedSpeech.IsNullOrEmpty())
+            if (voskResultJson != null)
             {
+                Debug.Log($"Analyzed text from beat {sentence.MinBeat} to beat {sentence.ExtendedMaxBeat}: {voskResultJson.text}");
                 // Assume whole words. Thus, take first word and separate notes by space.
-                EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), sentence.Notes.ToList(),
+                EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson.text, sentence.Notes.ToList(),
                     settings.SongEditorSettings.SplitSyllables
                         ? englishSyllableSplitter
                         : null);
@@ -83,15 +145,15 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
         int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
         int lengthInBeats = maxBeat - minBeat;
-        List<string> analyzedSpeech = AnalyzeBeats(
+        VoskResultJson voskResultJson = AnalyzeBeats(
             minBeat,
             lengthInBeats,
             audioClip,
             speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
-        Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {analyzedSpeech.ToCsv()}");
-        if (!analyzedSpeech.IsNullOrEmpty())
+        if (voskResultJson != null)
         {
-            EditorNoteLyricsInputControl.MapTextToNotes(analyzedSpeech.FirstOrDefault(), selectedNotes, englishSyllableSplitter);
+            Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {voskResultJson.text}");
+            EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson.text, selectedNotes, englishSyllableSplitter);
         }
     }
 
@@ -122,13 +184,12 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         return wordsHashSet.ToList();
     }
 
-    private List<string> AnalyzeBeats(int startBeat, int lengthInBeats, AudioClip audioClip, VoskRecognizer voskRecognizer)
+    private VoskResultJson AnalyzeBeats(int startBeat, int lengthInBeats, AudioClip audioClip, VoskRecognizer voskRecognizer)
     {
-        List<string> result = new();
         if (lengthInBeats <= 0
             || voskRecognizer == null)
         {
-            return result;
+            return null;
         }
 
         int samplesPerSecondMono = audioClip.frequency;
@@ -164,41 +225,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         Debug.Log("Vosk result: " + voskResultJsonString);
         if (voskResultJsonString.IsNullOrEmpty())
         {
-            return result;
+            return null;
         }
 
         VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
-        if (!voskResultJson.text.IsNullOrEmpty())
-        {
-            // There is one definitive result given by Vosk
-            result.Add(voskResultJson.text);
-            return result;
-        }
-        if (voskResultJson.alternatives.IsNullOrEmpty())
-        {
-            // Vosk did not find any plausible match
-            return result;
-        }
-
-        // Take the alternative with highest confidence.
-        VoskResultAlternativeJson bestVoskResultAlternativeJson;
-        if (voskResultJson.alternatives.Count == 1)
-        {
-            bestVoskResultAlternativeJson = voskResultJson.alternatives.FirstOrDefault();
-        }
-        else
-        {
-            bestVoskResultAlternativeJson = voskResultJson.alternatives
-                .Where(alternative => alternative != null && alternative.confidence > 0 && !alternative.text.IsNullOrEmpty())
-                .ToList()
-                .FindMaxElement(alternative => (float)alternative.confidence);
-        }
-
-        string bestResultText = bestVoskResultAlternativeJson.text.Trim();
-        if (!bestResultText.IsNullOrEmpty())
-        {
-            result.Add(bestResultText);
-        }
-        return result;
+        return voskResultJson;
     }
 }

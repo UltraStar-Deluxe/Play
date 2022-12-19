@@ -594,6 +594,8 @@ public static partial class R
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
         public const string speechRecognitionPhrasesContainer = "speechRecognitionPhrasesContainer";
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
+        public const string speechRecognitionPitchContainer = "speechRecognitionPitchContainer";
+        public const string speechRecognitionPitchTextField = "speechRecognitionPitchTextField";
         public const string speechRecognitionTitle = "speechRecognitionTitle";
         public const string splitSyllablesContainer = "splitSyllablesContainer";
         public const string splitSyllablesToggle = "splitSyllablesToggle";

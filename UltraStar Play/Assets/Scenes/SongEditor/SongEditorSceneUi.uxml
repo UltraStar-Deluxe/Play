@@ -183,6 +183,10 @@
                                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                                 <ui:Toggle name="splitSyllablesToggle" class="smallControl" />
                             </ui:VisualElement>
+                            <ui:VisualElement name="speechRecognitionPitchContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Speech recognition pitch" display-tooltip-when-elided="true" name="label" />
+                                <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Pitch Detection" display-tooltip-when-elided="true" name="pitchDetectionTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="pitchDetectionGroup" class="songEditorSettingsGroup">

@@ -46,12 +46,6 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 
     public void CreateOrUpdateSpeechRecognizer(VoskModelParameters voskModelParameters)
     {
-        if (voskModelParameters.Equals(lastVoskModelParameters))
-        {
-            // Use previous version
-            return;
-        }
-
         // Update the model
         using (new DisposableStopwatch("Create speech recognition model took <ms>"))
         {
@@ -68,12 +62,8 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 
     private void CreateOrUpdateVoskRecognizer(VoskModelParameters voskModelParameters)
     {
-        if (voskModelParameters.RecognizerParametersEquals(lastVoskModelParameters))
-        {
-            // Nothing changed, use old recognizer
-            return;
-        }
-
+        // Vosk always expects a new recognizer object for a new stream
+        // See https://github.com/alphacep/vosk-api/issues/919
         voskRecognizer?.Dispose();
         if (!voskModelParameters.Phrases.IsNullOrEmpty())
         {
@@ -85,8 +75,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
             voskRecognizer = new(voskModel, voskModelParameters.SampleRate);
         }
 
-        // TODO: Set to true for timing information of the words, which can then be used to map them to notes
-        // voskRecognizer.SetWords(true);
+        voskRecognizer.SetWords(true);
     }
 
     private void CreateOrUpdateVoskModel(VoskModelParameters voskModelParameters)
