@@ -9,6 +9,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     private static readonly float defaultShowDelayInSeconds = 1f;
     private static readonly float defaultCloseDelayInSeconds = 0.2f;
     private static readonly Vector2 tooltipOffsetInPx = new(10, 10);
+    private static readonly float showTooltipOnPointerDownTimeInSeconds = 4f;
 
     public float ShowDelayInSeconds { get; set; } = defaultShowDelayInSeconds;
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;
@@ -27,28 +28,57 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     private PanelHelper panelHelper;
     private IEnumerator showTooltipCoroutine;
     private IEnumerator closeTooltipCoroutine;
-
+    private bool showTooltipByPointerDown;
 
     public void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
         target.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
         target.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
+        target.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
+    }
+
+    private void OnPointerDown()
+    {
+        showTooltipByPointerDown = true;
+        ShowTooltip();
+        coroutineManager.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
+        {
+            showTooltipByPointerDown = false;
+            CloseTooltip();
+        }));
     }
 
     private void OnPointerEnter()
     {
+        if (showTooltipByPointerDown)
+        {
+            return;
+        }
+
         if (closeTooltipCoroutine != null)
         {
             coroutineManager.StopCoroutine(closeTooltipCoroutine);
         }
 
-        showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () => ShowTooltip());
+        showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
+        {
+            if (showTooltipByPointerDown)
+            {
+                return;
+            }
+            ShowTooltip();
+        });
         coroutineManager.StartCoroutine(showTooltipCoroutine);
     }
 
     private void OnPointerExit()
     {
+        if (showTooltipByPointerDown)
+        {
+            return;
+        }
+
         if (showTooltipCoroutine != null)
         {
             coroutineManager.StopCoroutine(showTooltipCoroutine);
