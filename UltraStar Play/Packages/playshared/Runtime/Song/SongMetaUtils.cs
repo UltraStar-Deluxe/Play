@@ -6,6 +6,26 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
+    public static bool CoverResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.Cover);
+    }
+
+    public static bool BackgroundResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.Background);
+    }
+
+    public static bool VideoResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.Video);
+    }
+
+    public static bool AudioResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.Mp3);
+    }
+
     public static string GetCoverUri(SongMeta songMeta)
     {
         return GetUri(songMeta, songMeta.Cover);
@@ -26,6 +46,23 @@ public static class SongMetaUtils
         return GetUri(songMeta, songMeta.Mp3);
     }
 
+    /**
+     * Checks if a file exists.
+     * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
+     */
+    private static bool ResourceExists(SongMeta songMeta, string pathOrUri)
+    {
+        if (WebRequestUtils.IsHttpOrHttpsUri(pathOrUri))
+        {
+            return true;
+        }
+
+        return File.Exists(GetUri(songMeta, pathOrUri));
+    }
+
+    /**
+     * Returns the URI or absolute file system path to a resource.
+     */
     private static string GetUri(SongMeta songMeta, string pathOrUri)
     {
         if (pathOrUri.IsNullOrEmpty())
@@ -38,7 +75,8 @@ public static class SongMetaUtils
             return pathOrUri;
         }
 
-        return "file://" + songMeta.Directory + Path.DirectorySeparatorChar + pathOrUri;
+        // The given path is relative to the song file. Make it absolute.
+        return songMeta.Directory + Path.DirectorySeparatorChar + pathOrUri;
     }
 
     public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
@@ -267,9 +305,9 @@ public static class SongMetaUtils
                 // Do not attempt to load the video file
                 songMeta.Video = "";
             }
-            else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetVideoUri(songMeta)))
+            else if (!VideoResourceExists(songMeta))
             {
-                songIssues.Add(SongIssue.CreateWarning(songMeta, "Video file resource does not exist: " + SongMetaUtils.GetVideoUri(songMeta)));
+                songIssues.Add(SongIssue.CreateWarning(songMeta, "Video file resource does not exist: " + GetVideoUri(songMeta)));
                 // Do not attempt to load the video file
                 songMeta.Video = "";
             }
@@ -281,9 +319,9 @@ public static class SongMetaUtils
         {
             songIssues.Add(SongIssue.CreateError(songMeta, "Unsupported audio format: " + Path.GetExtension(songMeta.Mp3)));
         }
-        else if (!WebRequestUtils.ResourceExists(SongMetaUtils.GetAudioUri(songMeta)))
+        else if (!AudioResourceExists(songMeta))
         {
-            songIssues.Add(SongIssue.CreateError(songMeta, "Audio file resource does not exist: " + SongMetaUtils.GetAudioUri(songMeta)));
+            songIssues.Add(SongIssue.CreateError(songMeta, "Audio file resource does not exist: " + GetAudioUri(songMeta)));
         }
 
         // Log found issues

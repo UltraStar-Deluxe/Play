@@ -233,12 +233,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         }
 
-        if (!WebRequestUtils.ResourceExists(coverUri))
-        {
-            Debug.Log("Cover image resource does not exist: " + coverUri);
-            return;
-        }
-
         ImageManager.LoadSpriteFromUri(coverUri, loadedSprite =>
         {
             songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);

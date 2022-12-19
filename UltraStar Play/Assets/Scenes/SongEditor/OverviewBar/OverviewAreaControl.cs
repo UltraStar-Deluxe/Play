@@ -85,8 +85,15 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
         using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
         {
+            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+            if (!SongMetaUtils.AudioResourceExists(songMeta))
+            {
+                Debug.Log($"Audio file resource does not exist {audioUri}");
+                return;
+            }
+
             // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-            AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+            AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
         }
     }
