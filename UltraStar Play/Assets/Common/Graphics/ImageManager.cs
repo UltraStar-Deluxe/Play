@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -22,7 +23,13 @@ public static class ImageManager
 
     public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
-        LoadSpriteFromUri("file://" + path, onSuccess, onFailure);
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Image file does not exist: " + path);
+            return;
+        }
+
+        LoadSpriteFromUri(path, onSuccess, onFailure);
     }
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
@@ -51,12 +58,6 @@ public static class ImageManager
             && cachedSprite.Sprite != null)
         {
             onSuccess(cachedSprite.Sprite);
-            return;
-        }
-
-        if (!WebRequestUtils.ResourceExists(uri))
-        {
-            Debug.LogError("Image resource does not exist: " + uri);
             return;
         }
 

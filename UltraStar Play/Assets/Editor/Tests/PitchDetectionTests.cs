@@ -34,7 +34,7 @@ public class PitchDetectionTests
         foreach (KeyValuePair<string, string> pathAndNoteName in pathToExpectedMidiNoteNameMap)
         {
             // Load the audio clip
-            string uri = "file://" + pathAndNoteName.Key;
+            string uri = pathAndNoteName.Key;
             AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, false);
             float[] samples = new float[audioClip.samples];
             audioClip.GetData(samples, 0);
