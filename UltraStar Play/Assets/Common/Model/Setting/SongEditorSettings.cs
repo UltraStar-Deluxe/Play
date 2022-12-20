@@ -46,6 +46,7 @@ public class SongEditorSettings
     public string SpeechRecognitionModelPath { get; set; } = "";
     public string SpeechRecognitionPhrases { get; set; } = "";
     public bool SplitSyllables { get; set; }
+    public int MidiNoteForSpeechRecognition { get; set; } = MidiUtils.MidiNoteConcertPitch;
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;

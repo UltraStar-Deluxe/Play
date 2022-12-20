@@ -74,6 +74,11 @@ public class Note
 
     public void CopyValues(Note other)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         sentence = other.sentence;
         Type = other.Type;
         StartBeat = other.StartBeat;
@@ -91,6 +96,11 @@ public class Note
 
     public void SetSentence(Sentence sentence)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         if (this.sentence == sentence)
         {
             return;
@@ -109,23 +119,43 @@ public class Note
 
     public void SetText(string text)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         Text = text ?? throw new UnityException("Text cannot be null");
     }
 
     public void SetTxtPitch(int txtPitch)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         TxtPitch = txtPitch;
         MidiNote = MidiUtils.GetMidiNotePitch(TxtPitch);
     }
 
     public void SetMidiNote(int midiNote)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         MidiNote = midiNote;
         TxtPitch = MidiUtils.GetUltraStarTxtPitch(MidiNote);
     }
 
     public void SetType(ENoteType type)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         Type = type;
         IsGolden = (Type == ENoteType.Golden || Type == ENoteType.RapGolden);
         IsNormal = (Type == ENoteType.Normal || Type == ENoteType.Rap);
@@ -135,6 +165,11 @@ public class Note
 
     public void SetStartBeat(int newStartBeat)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         if (newStartBeat > EndBeat)
         {
             throw new UnityException("StartBeat must be less or equal to EndBeat");
@@ -160,6 +195,11 @@ public class Note
 
     public void SetEndBeat(int newEndBeat)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         if (newEndBeat < StartBeat)
         {
             throw new UnityException("EndBeat must be greater or equal to StartBeat");
@@ -185,6 +225,11 @@ public class Note
 
     public void SetLength(int newLength)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         if (newLength < 0)
         {
             throw new UnityException("Length cannot be negative");
@@ -220,6 +265,11 @@ public class Note
 
     public void SetStartAndEndBeat(int newStartBeat, int newEndBeat)
     {
+        if (!IsEditable)
+        {
+            return;
+        }
+
         if (newStartBeat > newEndBeat)
         {
             throw new UnityException("StartBeat cannot be greater than EndBeat");
