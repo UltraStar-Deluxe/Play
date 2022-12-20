@@ -5,6 +5,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
+using UnityEngine.Windows;
 
 public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
@@ -145,12 +146,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void LoadVideo(string uri)
     {
-        if (!WebRequestUtils.ResourceExists(uri))
-        {
-            Debug.LogWarning("Video file resource does not exist: " + uri);
-            return;
-        }
-
         videoPlayer.url = GetVideoPlayerUri(uri);
         // The url is empty if loading the video failed.
         HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
@@ -269,17 +264,18 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             videoImageVisualElement.HideByDisplay();
         }
-        if (string.IsNullOrEmpty(SongMeta.Background))
+        if (SongMeta.Background.IsNullOrEmpty())
         {
             ShowCoverImageAsBackground();
             return;
         }
 
         string backgroundUri = SongMetaUtils.GetBackgroundUri(SongMeta);
-        if (!WebRequestUtils.ResourceExists(backgroundUri))
+        if (!SongMetaUtils.BackgroundResourceExists(songMeta))
         {
             Debug.LogWarning("Showing cover image because background image resource does not exist: " + backgroundUri);
             ShowCoverImageAsBackground();
+            return;
         }
 
         LoadBackgroundImage(backgroundUri);
@@ -293,7 +289,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        if (!WebRequestUtils.ResourceExists(coverUri))
+        if (!SongMetaUtils.CoverResourceExists(SongMeta))
         {
             Debug.LogWarning("Cover image resource does not exist: " + coverUri);
             return;
@@ -337,7 +333,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        LoadVideo(SongMetaUtils.GetVideoUri(initSongMeta));
+        string videoUri = SongMetaUtils.GetVideoUri(initSongMeta);
+        if (!SongMetaUtils.VideoResourceExists(initSongMeta))
+        {
+            Debug.LogWarning("Video file resource does not exist: " + videoUri);
+            return;
+        }
+
+        LoadVideo(videoUri);
     }
 
     void OnEnable()

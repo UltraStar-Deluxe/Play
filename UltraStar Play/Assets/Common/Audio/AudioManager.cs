@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,7 +29,13 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
     {
-        return LoadAudioClipFromUri("file://" + path, streamAudio);
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Audio file does not exist: " + path);
+            return null;
+        }
+
+        return LoadAudioClipFromUri(path, streamAudio);
     }
 
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
@@ -61,12 +68,6 @@ public class AudioManager : MonoBehaviour
 
     private AudioClip LoadAndCacheAudioClip(string uri, bool streamAudio)
     {
-        if (!WebRequestUtils.ResourceExists(uri))
-        {
-            Debug.LogError("Audio file resource does not exist: " + uri);
-            return null;
-        }
-
         AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, streamAudio);
         if (audioClip == null)
         {

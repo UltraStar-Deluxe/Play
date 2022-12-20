@@ -14,6 +14,9 @@ public class MergeNotesAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
+    [Inject]
+    private SongEditorLayerManager layerManager;
+
     public bool CanExecute(IReadOnlyCollection<Note> selectedNotes)
     {
         return selectedNotes.Count > 1;
@@ -35,6 +38,11 @@ public class MergeNotesAction : INeedInjection
         }
         Note mergedNote = new(targetNote.Type, minBeat, maxBeat - minBeat, targetNote.TxtPitch, stringBuilder.ToString());
         mergedNote.SetSentence(targetNote.Sentence);
+
+        if (layerManager.TryGetLayer(targetNote, out SongEditorLayer songEditorLayer))
+        {
+            layerManager.AddNoteToLayer(songEditorLayer.LayerEnum, mergedNote);
+        }
 
         // Remove old notes
         deleteNotesAction.Execute(sortedNotes);

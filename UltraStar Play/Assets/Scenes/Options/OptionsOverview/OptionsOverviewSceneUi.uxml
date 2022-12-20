@@ -20,11 +20,13 @@
                         <MaterialIcon icon="sports_esports" name="image" />
                         <ui:Label text="Game" name="label" />
                     </ui:Button>
-                    <ui:Button name="songsOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="music_note" name="image" />
-                        <ui:Label text="Songs" name="label" />
+                    <ui:VisualElement name="songOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Button name="songsOptionsButton" class="optionsOverviewButton">
+                            <MaterialIcon icon="music_note" name="image" />
+                            <ui:Label text="Songs" name="label" />
+                        </ui:Button>
                         <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:Button>
+                    </ui:VisualElement>
                     <ui:Button name="graphicsOptionsButton" class="optionsOverviewButton">
                         <MaterialIcon icon="desktop_windows" name="image" />
                         <ui:Label text="Graphics" name="label" />
@@ -35,16 +37,20 @@
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
-                    <ui:Button name="recordingOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="mic" name="image" />
-                        <ui:Label text="Recording" name="label" />
+                    <ui:VisualElement name="recordingOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Button name="recordingOptionsButton" class="optionsOverviewButton">
+                            <MaterialIcon icon="mic" name="image" />
+                            <ui:Label text="Recording" name="label" />
+                        </ui:Button>
                         <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:Button>
-                    <ui:Button name="profileOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="people" name="image" />
-                        <ui:Label text="Players" name="label" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="profileOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Button name="profileOptionsButton" class="optionsOverviewButton">
+                            <MaterialIcon icon="people" name="image" />
+                            <ui:Label text="Players" name="label" />
+                        </ui:Button>
                         <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:Button>
+                    </ui:VisualElement>
                     <ui:Button name="designOptionsButton" class="optionsOverviewButton">
                         <MaterialIcon icon="filter_b_and_w" name="image" />
                         <ui:Label text="Design" name="label" />

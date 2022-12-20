@@ -744,7 +744,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
             {
                 string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
-                if (!WebRequestUtils.ResourceExists(audioUri))
+                if (!SongMetaUtils.AudioResourceExists(SelectedSong))
                 {
                     string message = "Audio file resource does not exist: " + audioUri;
                     Debug.Log(message);
