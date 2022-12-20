@@ -53,6 +53,11 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     public static void MapTextToNotes(string text, List<Note> notes, ISyllableSplitter syllableSplitter)
     {
+        if (text.IsNullOrEmpty())
+        {
+            return;
+        }
+
         string[] words = text.Split(" ");
 
         // Map words to notes alternatingly from start and end

@@ -112,6 +112,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
     private TextField speechRecognitionPhrasesTextField;
 
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionPitchTextField)]
+    private TextField speechRecognitionPitchTextField;
+
     [Inject(UxmlName = R.UxmlNames.recordNotesRadioButton)]
     private RadioButton recordNotesRadioButton;
 
@@ -269,6 +272,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(splitSyllablesToggle,
             () => settings.SongEditorSettings.SplitSyllables,
             newValue => settings.SongEditorSettings.SplitSyllables = newValue);
+        Bind(speechRecognitionPitchTextField,
+            () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.MidiNoteForSpeechRecognition),
+            newValue =>
+            {
+                if (MidiUtils.TryParseMidiNoteName(newValue, out int newMidiNote))
+                {
+                    settings.SongEditorSettings.MidiNoteForSpeechRecognition = newMidiNote;
+                }
+            });
 
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)

@@ -5,4 +5,5 @@
     CopyPaste = 2,
     MidiFile = 3,
     PitchDetection = 4,
+    SpeechRecognition = 5,
 }

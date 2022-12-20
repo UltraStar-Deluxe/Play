@@ -40,7 +40,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddSeparator();
         contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(new List<Sentence> {sentenceControl.Sentence}));
+        contextMenu.AddItem("Set note text via speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedSentences));
+        int extendedSentenceLengthInBeats = sentenceControl.Sentence.ExtendedMaxBeat - sentenceControl.Sentence.MinBeat;
+        contextMenu.AddItem("Create notes via speech recognition", () => speechRecognitionAction.CreateNotesAndNotify(sentenceControl.Sentence.MinBeat, extendedSentenceLengthInBeats));
 
         int minBeat = sentenceControl.Sentence.MinBeat;
         int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
