@@ -1,9 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public static class ApplicationUtils
 {
+    public const string GeneratedFolderName = "Generated";
+
+    public static readonly IReadOnlyList<string> supportedAudioFiles = new List<string>
+    {
+        "mp3",
+        "ogg",
+        "wav"
+    };
+
+    public static readonly IReadOnlyList<string> supportedVideoFiles = new List<string>
+    {
+        "avi",
+        "mp4",
+        "mpg",
+        "mpeg",
+        "vp8",
+        "webm",
+        "m4v",
+        "mov",
+        "dv",
+        "afs",
+        "wmf",
+    };
+
     public static void OpenDirectory(string path)
     {
         Application.OpenURL("file://" + path);
@@ -43,27 +69,13 @@ public static class ApplicationUtils
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension
-            is "mp3"
-            or "ogg"
-            or "wav";
+        return supportedAudioFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedVideoFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
-        return fileExtension
-            is "avi"
-            or "mp4"
-            or "mpg"
-            or "mpeg"
-            or "vp8"
-            or "webm"
-            or "m4v"
-            or "mov"
-            or "dv"
-            or "afs"
-            or "wmf";
+        return supportedVideoFiles.Contains(fileExtension);
     }
 
     private static string NormalizeFileExtension(string fileExtension)
@@ -77,14 +89,6 @@ public static class ApplicationUtils
             fileExtension = fileExtension.Substring(1);
         }
         return fileExtension.ToLowerInvariant();
-    }
-
-    public static int ComparePaths(string path1, string path2)
-    {
-        return string.Compare(
-            Path.GetFullPath(path1).TrimEnd('\\'),
-            Path.GetFullPath(path2).TrimEnd('\\'),
-            StringComparison.InvariantCultureIgnoreCase);
     }
 
     public static bool IsLargeScreen()

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using UniInject;
 using UniRx;
@@ -153,13 +154,21 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     {
         Debug.Log("ScanFilesAsynchronously");
 
+        string generatedSongFolderAbsolutePath = GetGeneratedSongFolderAbsolutePath();
+        InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
+
         List<string> txtFiles;
+        List<string> audioFiles;
         lock (scanLock)
         {
-            FolderScanner txtScanner = new("*.txt");
+            // Find all txt and audio files in configured song folders and the generated song folder
+            List<string> allSongFolders = SettingsManager.Instance.Settings.GameSettings.songDirs
+                .Union(new List<string> { generatedSongFolderAbsolutePath })
+                .ToList();
+            txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
 
-            // Find all txt files in the song directories
-            txtFiles = ScanForTxtFiles(txtScanner);
+            // Only search for audio files in configured song folders, not in the generated song folder
+            audioFiles = ScanForFiles(SettingsManager.Instance.Settings.GameSettings.songDirs, GetAudioFileExtensionPatterns());
         }
 
         // Load the txt files in a background thread
@@ -178,8 +187,79 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             }
             stopwatch.Stop();
             Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs. Errors: {SongErrors.Count}, Warnings: {SongWarnings.Count}.");
+
+            // Generate song meta for audio files that do not have a corresponding SongMeta.
+            GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
+
             songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
         });
+    }
+
+    private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
+    {
+        List<string> existingSongMetaAudioFiles = existingSongMetas
+            .Select(songMeta => Path.GetFullPath(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)))
+            .ToList();
+
+        List<string> audioFilesWithoutSongMeta = audioFiles
+            .Select(audioFile => Path.GetFullPath(audioFile))
+            .Except(existingSongMetaAudioFiles)
+            .ToList();
+
+        Debug.Log($"Found {audioFilesWithoutSongMeta.Count} audio files without corresponding SongMeta");
+
+        List<SongMeta> generatedSongMetas = audioFilesWithoutSongMeta
+            .Select(audioFile => GenerateSongMetaForAudioFile(generatedSongFolderAbsolutePath, audioFile))
+            .ToList();
+
+        generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
+    }
+
+    private SongMeta GenerateSongMetaForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
+    {
+        if (!AudioFileMetaTagUtils.TryGetArtist(audioFile, out string artist))
+        {
+            artist = "";
+        }
+        if (!AudioFileMetaTagUtils.TryGetTitle(audioFile, out string title))
+        {
+            title = Path.GetFileNameWithoutExtension(audioFile);
+        }
+
+        // TODO: use https://github.com/WestHillApps/UniBpmAnalyzer to analyze bpm
+        float bpm = 300;
+
+        string absoluteSongMetaFilePath = GetAbsoluteSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
+        string songMetaFileName = Path.GetFileName(absoluteSongMetaFilePath);
+        string songMetaDirectory = Path.GetDirectoryName(songMetaFileName);
+        Dictionary<string, string> voiceNames = new();
+        SongMeta songMeta = new(songMetaDirectory, songMetaFileName, "", artist, bpm, audioFile, title, voiceNames, Encoding.UTF8);
+        Debug.Log("Generated SongMeta: " + songMeta);
+        return songMeta;
+    }
+
+    private string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
+    {
+        string audioFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioFile);
+        int audioFilePathHash = audioFile.GetHashCode();
+        string songMetaFolderName = $"{audioFileNameWithoutExtension}-{audioFilePathHash}";
+        return generatedSongFolderAbsolutePath + $"/{songMetaFolderName}/song-info.txt";
+    }
+
+    private List<string> GetAudioFileExtensionPatterns()
+    {
+        return ApplicationUtils.supportedAudioFiles
+            .Select(fileExtension => $"*.{fileExtension}")
+            .ToList();
+    }
+
+    private void InitFolderIfNotDoneYet(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            Debug.Log("Creating folder: " + path);
+            Directory.CreateDirectory(path);
+        }
     }
 
     private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
@@ -196,24 +276,24 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static List<string> ScanForTxtFiles(FolderScanner txtScanner)
+    private static List<string> ScanForFiles(List<string> folders, List<string> fileExtensionPatterns)
     {
-        List<string> txtFiles = new();
-        List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
-        foreach (string songDir in songDirs)
+        FolderScanner folderScanner = new(fileExtensionPatterns);
+        List<string> files = new();
+        foreach (string songDir in folders)
         {
             try
             {
-                List<string> txtFilesInSongDir = txtScanner.GetFiles(songDir, true);
-                txtFiles.AddRange(txtFilesInSongDir);
+                List<string> txtFilesInSongDir = folderScanner.GetFiles(songDir, true);
+                files.AddRange(txtFilesInSongDir);
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
             }
         }
-        Debug.Log($"Found {allSongMetas.Count} songs in {songDirs.Count} configured song directories");
-        return txtFiles;
+        Debug.Log($"Found {files.Count} files matching pattern {fileExtensionPatterns.ToCsv()} in folders: {folders.ToCsv()}");
+        return files;
     }
 
     public void WaitUntilSongScanFinished()
@@ -284,5 +364,10 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
         songMeta = null;
         return false;
+    }
+
+    private string GetGeneratedSongFolderAbsolutePath()
+    {
+        return Application.persistentDataPath + $"/{ApplicationUtils.GeneratedFolderName}/Songs";
     }
 }
