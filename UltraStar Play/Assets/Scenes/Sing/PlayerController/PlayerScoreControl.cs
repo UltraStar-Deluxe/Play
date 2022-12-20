@@ -38,7 +38,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         get
         {
-            if (ScoreData.NormalBeatData.PerfectAndGoodBeats <= 0)
+            if (ScoreData.NormalBeatData.PerfectAndGoodBeats <= 0
+                || ScoreData.NormalNoteLengthTotal <= 0)
             {
                 return 0;
             }
@@ -50,7 +51,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         get
         {
-            if (ScoreData.GoldenBeatData.PerfectAndGoodBeats <= 0)
+            if (ScoreData.GoldenBeatData.PerfectAndGoodBeats <= 0
+                || ScoreData.GoldenNoteLengthTotal <= 0)
             {
                 return 0;
             }
@@ -62,7 +64,13 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         get
         {
-            int targetSentenceCount = (ScoreData.TotalSentenceCount > 20) ? 20 : ScoreData.TotalSentenceCount;
+            int targetSentenceCount = ScoreData.TotalSentenceCount > 20
+                ? 20
+                : ScoreData.TotalSentenceCount;
+            if (targetSentenceCount <= 0)
+            {
+                return 0;
+            }
             double score = (double)maxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
 
             // Round the score up
@@ -242,6 +250,13 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
     {
+        if (sentences.IsNullOrEmpty())
+        {
+            // Everything is zero
+            ScoreData = new PlayerScoreControlData();
+            return;
+        }
+
         // Calculate the points for a single beat of a normal or golden note
         ScoreData.NormalNoteLengthTotal = 0;
         ScoreData.GoldenNoteLengthTotal = 0;
