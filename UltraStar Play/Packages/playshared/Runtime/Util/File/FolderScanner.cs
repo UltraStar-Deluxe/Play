@@ -5,18 +5,23 @@ using UnityEngine;
 
 public class FolderScanner
 {
-    private readonly string fileExtensionPattern;
+    private readonly List<string> fileExtensionPatterns;
     private readonly bool includeHiddenFolders;
 
     public FolderScanner(string fileExtensionPattern, bool includeHiddenFolders = false)
+    : this(new List<string> { fileExtensionPattern }, includeHiddenFolders)
     {
-        this.fileExtensionPattern = fileExtensionPattern;
+    }
+
+    public FolderScanner(List<string> fileExtensionPatterns, bool includeHiddenFolders = false)
+    {
+        this.fileExtensionPatterns = fileExtensionPatterns;
         this.includeHiddenFolders = includeHiddenFolders;
 
         // Checks
-        if (this.fileExtensionPattern == null || this.fileExtensionPattern.Trim().Length < 3)
+        if (this.fileExtensionPatterns.IsNullOrEmpty())
         {
-            throw new UnityException("Can not scan for songs. Invalid file extension specified!");
+            throw new UnityException("Can not scan for files. No file extensions specified.");
         }
     }
 
@@ -44,16 +49,20 @@ public class FolderScanner
 
         try
         {
-            foreach (FileInfo file in dirInfo.GetFiles(fileExtensionPattern))
+            fileExtensionPatterns.ForEach(fileExtensionPattern =>
             {
-                // Ignore hidden files (notably on MacOS) and licenses.
-                string lowerFileName = file.Name.ToLowerInvariant();
-                if (!lowerFileName.StartsWith(".")
-                    && !lowerFileName.Equals("license.txt"))
+                dirInfo.GetFiles(fileExtensionPattern)
+                    .ForEach(fileInfo =>
                 {
-                    result.Add(file.FullName);
-                }
-            }
+                    // Ignore hidden files (notably on MacOS) and licenses.
+                    string lowerFileName = fileInfo.Name.ToLowerInvariant();
+                    if (!lowerFileName.StartsWith(".")
+                        && !lowerFileName.Equals("license.txt"))
+                    {
+                        result.Add(fileInfo.FullName);
+                    }
+                });
+            });
 
             if (recursive)
             {
