@@ -80,18 +80,23 @@ public static class SongMetaUtils
         return WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
     }
 
-    private static string GetAbsoluteFilePath(SongMeta songMeta, string path)
+    public static string GetAbsoluteFilePath(SongMeta songMeta, string path)
     {
-        return songMeta.Directory + Path.DirectorySeparatorChar + path;
-    }
+        if (PathUtils.IsAbsolutePath(path))
+        {
+            return path;
+        }
 
-    public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
-    {
         if (songMeta == null)
         {
             return "";
         }
-        return songMeta.Directory + Path.DirectorySeparatorChar + songMeta.Filename;
+        return songMeta.Directory + $"/{path}";
+    }
+
+    public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
+    {
+        return GetAbsoluteFilePath(songMeta, songMeta.Filename);
     }
 
     public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)

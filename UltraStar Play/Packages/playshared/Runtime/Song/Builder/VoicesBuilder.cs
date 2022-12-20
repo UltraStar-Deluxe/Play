@@ -26,10 +26,15 @@ public class VoicesBuilder
         currentVoice = new Voice(Voice.soloVoiceName);
         voiceNameToVoiceMap.Add(Voice.soloVoiceName, currentVoice);
 
-        using (StreamReader reader = TxtReader.GetFileStreamReader(path, encoding))
+        if (path == null
+            || !File.Exists(path))
         {
-            ParseStreamReader(reader);
+            // Nothing to load. This could be a generated song meta.
+            return;
         }
+
+        using StreamReader reader = TxtReader.GetFileStreamReader(path, encoding);
+        ParseStreamReader(reader);
     }
 
     public IReadOnlyList<Voice> GetVoices()
