@@ -29,6 +29,7 @@ public class SongMeta
      * Artist of the song.
      */
     public string Artist { get; set; } = "";
+
     /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
      * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
@@ -39,6 +40,18 @@ public class SongMeta
      * Path to the audio file.
      */
     public string Mp3 { get; set; } = "";
+
+    /**
+     * Path to the audio file that contains only the voice of the singers.
+     * This audio file is created from the source audio file using AI.
+     */
+    public string VoiceAudio { get; set; } = "";
+
+    /**
+     * Path to the audio file that contains only the instruments and no singing.
+     * This audio file is created from the source audio file using AI.
+     */
+    public string InstrumentalAudio { get; set; } = "";
 
     /**
      * Title of the song.
@@ -147,6 +160,13 @@ public class SongMeta
      * End in MILLISECONDS to skip the ending of the audio file.
      */
     public float End { get; set; }
+
+    /**
+     * Contains the hash of the file that was used for the creation of this SongMeta.
+     */
+    public string SourceFileHash => UnknownHeaderEntries.TryGetValue("SourceFileHash", out string result)
+        ? result
+        : "";
 
     private List<Voice> voices = new();
 
@@ -289,5 +309,11 @@ public class SongMeta
             Debug.LogError($"Failed to reload song {path}: " + e.Message);
             Debug.LogException(e);
         }
+    }
+
+    public override string ToString()
+    {
+        return base.ToString()
+               + $"(artist: {Artist}, title: {Title}, file name: {Filename}, folder: {Directory})";
     }
 }
