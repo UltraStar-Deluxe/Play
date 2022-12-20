@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ public static class WavFileWriter
 
     public static void WriteFile(string outputPath, int frequency, int channels, float[] samples)
     {
-        if (!outputPath.ToLower().EndsWith(".wav"))
+        if (!outputPath.ToLowerInvariant().EndsWith(".wav", StringComparison.InvariantCulture))
         {
             outputPath += ".wav";
         }
