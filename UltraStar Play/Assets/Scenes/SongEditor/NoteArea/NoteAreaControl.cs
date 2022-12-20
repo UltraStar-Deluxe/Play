@@ -541,8 +541,20 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void InitializeViewport()
     {
-        int minMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Min();
-        int maxMidiNote = SongMetaUtils.GetAllNotes(songMeta).Select(note => note.MidiNote).Max();
+        int minMidiNote;
+        int maxMidiNote;
+        List<Note> allNotes = SongMetaUtils.GetAllNotes(songMeta);
+        if (allNotes.IsNullOrEmpty())
+        {
+            minMidiNote = MidiUtils.MidiNoteConcertPitch;
+            maxMidiNote = minMidiNote + 18;
+        }
+        else
+        {
+            minMidiNote = allNotes.Select(note => note.MidiNote).Min();
+            maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
+        }
+
         // 10 seconds
         int width = DefaultViewportWidthInMillis;
         // Start at the beginning
