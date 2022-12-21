@@ -3,7 +3,8 @@ name: Build Companion App
 on:
   push:
     branches:
-      - master
+      #- master
+      - none
   workflow_dispatch: {}
 
 env:

@@ -3,10 +3,12 @@ name: Test Main Game
 on:
   push:
     branches:
-      - master
+      #- master
+      - none
   pull_request:
     branches:
-      - master
+      #- master
+      - none
   workflow_dispatch: {}
 
 env:
