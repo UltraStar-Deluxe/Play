@@ -11,7 +11,8 @@
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",
-        "Vosk"
+        "Vosk",
+        "SpleeterSharp"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

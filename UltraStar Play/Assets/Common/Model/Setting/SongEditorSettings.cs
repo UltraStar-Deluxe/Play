@@ -48,6 +48,9 @@ public class SongEditorSettings
     public bool SplitSyllables { get; set; }
     public int MidiNoteForSpeechRecognition { get; set; } = MidiUtils.MidiNoteConcertPitch;
 
+    // Audio separation
+    public string AudioSeparationCommand { get; set; } = "python -m spleeter";
+
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
 }

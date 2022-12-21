@@ -130,6 +130,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
     private Toggle playRecordedAudioToggle;
 
+    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
+    private TextField audioSeparationCommandTextField;
+
+    [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
+    private Button audioSeparationButton;
+
+    [Inject]
+    private SongMeta songMeta;
+
     [Inject]
     private Settings settings;
 
@@ -144,6 +153,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
+    [Inject]
+    private AudioSeparationManager audioSeparationManager;
 
     [Inject]
     private Injector injector;
@@ -281,6 +293,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                     settings.SongEditorSettings.MidiNoteForSpeechRecognition = newMidiNote;
                 }
             });
+
+        // Audio separation (Spleeter)
+        Bind(audioSeparationCommandTextField,
+            () => settings.SongEditorSettings.AudioSeparationCommand,
+            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
+        audioSeparationButton.RegisterCallbackButtonTriggered(() => audioSeparationManager.QueueSongToSeparateVoiceAndInstrumentalAudio(songMeta));
 
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
