@@ -366,7 +366,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         return false;
     }
 
-    private string GetGeneratedSongFolderAbsolutePath()
+    public string GetGeneratedSongFolderAbsolutePath()
     {
         return Application.persistentDataPath + $"/{ApplicationUtils.GeneratedFolderName}/Songs";
     }

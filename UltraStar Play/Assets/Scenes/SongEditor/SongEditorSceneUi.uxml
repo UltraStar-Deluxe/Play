@@ -195,6 +195,14 @@
                                 <ItemPicker noPreviousButton="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
                             </ui:VisualElement>
                         </ui:VisualElement>
+                        <ui:Label text="Audio separation" display-tooltip-when-elided="true" name="audioSeparationTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:VisualElement name="audioSeparationGroup" class="songEditorSettingsGroup">
+                            <ui:VisualElement name="audioSeparationCommandContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
+                                <ui:Label text="Command" display-tooltip-when-elided="true" name="label" />
+                                <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+                            </ui:VisualElement>
+                            <ui:Button text="Extract Voice Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
+                        </ui:VisualElement>
                         <ui:Label text="MIDI" display-tooltip-when-elided="true" name="midiTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="midiGroup" class="songEditorSettingsGroup">
                             <ui:VisualElement name="midiSoundPlayAlongContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">

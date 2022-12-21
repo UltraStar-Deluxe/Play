@@ -7,6 +7,9 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Spleeter models
+pretrained_models/
+
 # Rider (JetBrains IDE) data
 .idea/
 
