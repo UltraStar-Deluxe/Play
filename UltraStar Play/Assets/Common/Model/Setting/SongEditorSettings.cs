@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 [Serializable]
 public class SongEditorSettings
@@ -8,6 +7,7 @@ public class SongEditorSettings
 
     public float MusicVolume { get; set; } = 1;
     public float MusicPlaybackSpeed { get; set; } = 1;
+    public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
     // Recording in SongEditorScene
@@ -18,8 +18,6 @@ public class SongEditorSettings
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public bool RecordSamplesInsteadOfNotes { get; set; }
-    public bool UseRecordedSamples;
-    public bool PlayRecordedSamples;
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -47,10 +45,12 @@ public class SongEditorSettings
     public string SpeechRecognitionPhrases { get; set; } = "";
     public bool SplitSyllables { get; set; }
     public int MidiNoteForSpeechRecognition { get; set; } = MidiUtils.MidiNoteConcertPitch;
-
-    // Audio separation
-    public string AudioSeparationCommand { get; set; } = "python -m spleeter";
+    public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
+    public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
+
+    // Audio separation
+    public string AudioSeparationCommand { get; set; } = "python -m spleeter";
 }

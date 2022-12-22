@@ -96,7 +96,7 @@
                                 <ui:Toggle name="syncLyricsAreaToggle" class="smallControl" />
                             </ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:Label text="Music" display-tooltip-when-elided="true" name="musicTitle" class="songEditorSettingsGroupTitle" />
+                        <ui:Label text="Playback" display-tooltip-when-elided="true" name="musicTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="musicGroup" class="songEditorSettingsGroup">
                             <ui:VisualElement name="goToLastPlaybackPositionContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
                                 <ui:Label text="Jump back on pause" display-tooltip-when-elided="true" name="goToLastPlaybackPositionLabel" />
@@ -111,6 +111,10 @@
                                 <ui:Label text="Playback Speed" display-tooltip-when-elided="true" name="musicPlaybackSpeedLabel" />
                                 <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" style="margin-bottom: 5px;" />
                                 <ui:Button text="Reset Playback Speed" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="playbackAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                                <ui:Label text="Playback Audio" display-tooltip-when-elided="true" name="label" />
+                                <ItemPicker name="playbackAudioPicker" noPreviousButton="true" wrapAround="true" style="width: 100%;" />
                             </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Recording" display-tooltip-when-elided="true" name="recordingTitle" class="songEditorSettingsGroupTitle" />
@@ -144,16 +148,6 @@
                                         <ui:RadioButton name="recordAudioRadioButton" />
                                     </ui:VisualElement>
                                 </ui:RadioButtonGroup>
-                                <ui:VisualElement name="useRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
-                                    <ui:Label text="Use recorded audio&#10;for speech recognition&#10;and pitch detection" display-tooltip-when-elided="true" />
-                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                                    <ui:Toggle name="useRecordedAudioToggle" class="smallControl" />
-                                </ui:VisualElement>
-                                <ui:VisualElement name="playRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
-                                    <ui:Label text="Play recorded audio" display-tooltip-when-elided="true" />
-                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                                    <ui:Toggle name="playRecordedAudioToggle" class="smallControl" />
-                                </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="buttonRecordingContainer">
                                 <ui:VisualElement name="buttonRecordingButtonContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
@@ -187,12 +181,20 @@
                                 <ui:Label text="Speech recognition pitch" display-tooltip-when-elided="true" name="label" />
                                 <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                             </ui:VisualElement>
+                            <ui:VisualElement name="speechRecognitionAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                                <ui:Label text="Speech Recognition Audio" display-tooltip-when-elided="true" name="label" />
+                                <ItemPicker name="speechRecognitionAudioPicker" noPreviousButton="true" wrapAround="true" style="width: 100%;" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Pitch Detection" display-tooltip-when-elided="true" name="pitchDetectionTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="pitchDetectionGroup" class="songEditorSettingsGroup">
                             <ui:VisualElement name="pitchDetectionAlgorithmContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                                 <ui:Label text="Algorithm" display-tooltip-when-elided="true" name="label" />
                                 <ItemPicker noPreviousButton="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="pitchDetectionAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                                <ui:Label text="Pitch Detection Audio" display-tooltip-when-elided="true" name="label" />
+                                <ItemPicker name="pitchDetectionAudioPicker" noPreviousButton="true" wrapAround="true" style="width: 100%;" />
                             </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:Label text="Audio separation" display-tooltip-when-elided="true" name="audioSeparationTitle" class="songEditorSettingsGroupTitle" />

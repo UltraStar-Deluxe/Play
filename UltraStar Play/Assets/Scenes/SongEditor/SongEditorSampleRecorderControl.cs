@@ -16,9 +16,6 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongEditorRecordedAudioPlayer recordedAudioPlayer;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
@@ -150,7 +147,6 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
         int channels = 1;
         audioClip = AudioClip.Create(GetType().Name, RecordingBuffer.Length, channels, SampleRate, false);
-        recordedAudioPlayer.AudioSource.clip = audioClip;
         audioClip.SetData(RecordingBuffer, 0);
     }
 

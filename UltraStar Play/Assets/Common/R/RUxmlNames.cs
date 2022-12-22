@@ -394,10 +394,14 @@ public static partial class R
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchDetectionAlgorithmItemPicker = "pitchDetectionAlgorithmItemPicker";
+        public const string pitchDetectionAudioContainer = "pitchDetectionAudioContainer";
+        public const string pitchDetectionAudioPicker = "pitchDetectionAudioPicker";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
         public const string pitchDetectionTitle = "pitchDetectionTitle";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string pitchLabel = "pitchLabel";
+        public const string playbackAudioContainer = "playbackAudioContainer";
+        public const string playbackAudioPicker = "playbackAudioPicker";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
         public const string playerImage = "playerImage";
@@ -599,6 +603,8 @@ public static partial class R
         public const string soundOptionsButton = "soundOptionsButton";
         public const string space = "space";
         public const string spacer = "spacer";
+        public const string speechRecognitionAudioContainer = "speechRecognitionAudioContainer";
+        public const string speechRecognitionAudioPicker = "speechRecognitionAudioPicker";
         public const string speechRecognitionGroup = "speechRecognitionGroup";
         public const string speechRecognitionModelPathContainer = "speechRecognitionModelPathContainer";
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
