@@ -161,6 +161,18 @@ Button.selected:hover {
     display: none;
 }
 
+.unity-toggle {
+    justify-content: space-between;
+}
+
+.unity-base-field:focus .unity-base-field__label {
+    color: var(--text-color);
+}
+
+SongEditorSideBarGroup .unity-toggle {
+    margin-bottom: 10px;
+}
+
 .secondarySideBarPanel {
     display: none;
     width: 200px;
