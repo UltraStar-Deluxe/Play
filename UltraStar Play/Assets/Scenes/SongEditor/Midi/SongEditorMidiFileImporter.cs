@@ -56,7 +56,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         catch (Exception e)
         {
             Debug.LogError(e);
-            uiManager.CreateNotificationVisualElement($"Loading MIDI file failed: {e.Message}", "error");
+            uiManager.CreateNotificationVisualElement($"Loading MIDI file failed: {e.Message}");
         }
     }
 

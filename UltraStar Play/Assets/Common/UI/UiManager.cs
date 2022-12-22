@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -87,13 +88,16 @@ public class UiManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public Label CreateNotificationVisualElement(
-        string text,
-        params string[] additionalTextClasses)
+    public void CreateNotificationVisualElement(string text)
+    {
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAction(() => DoCreateNotificationVisualElement(text)));
+    }
+
+    private void DoCreateNotificationVisualElement(string text)
     {
         if (uiDocument == null)
         {
-            return null;
+            return;
         }
 
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
@@ -109,16 +113,10 @@ public class UiManager : MonoBehaviour, INeedInjection
         VisualElement notification = templateContainer.Children().First();
         Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
-        if (additionalTextClasses != null)
-        {
-            additionalTextClasses.ForEach(className => notificationLabel.AddToClassList(className));
-        }
         notificationOverlay.Add(notification);
 
         // Fade out then remove
         StartCoroutine(FadeOutVisualElement(notification, 2, 1));
-
-        return notificationLabel;
     }
 
     public static IEnumerator FadeOutVisualElement(

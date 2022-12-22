@@ -562,6 +562,7 @@ public static partial class R
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
+        public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songImage = "songImage";

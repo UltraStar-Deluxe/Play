@@ -107,7 +107,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (!videoPlayerErrorMessage.IsNullOrEmpty())
         {
             Debug.LogError(videoPlayerErrorMessage);
-            UiManager.Instance.CreateNotificationVisualElement(videoPlayerErrorMessage, "error");
+            UiManager.Instance.CreateNotificationVisualElement(videoPlayerErrorMessage);
             videoPlayerErrorMessage = "";
             UnloadVideo();
             // Do not attempt to load the video again

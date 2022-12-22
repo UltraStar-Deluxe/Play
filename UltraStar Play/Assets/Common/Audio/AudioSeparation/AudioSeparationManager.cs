@@ -67,7 +67,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         if (!songMetasToProcess.IsNullOrEmpty()
             && currentlyProcessedSongMeta == null)
         {
-            string outputFolder = songMetaManager.GetGeneratedSongFolderAbsolutePath();
+            string outputFolder = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
 
             SongMeta songMeta = songMetasToProcess[0];
             songProcessingThread = new Thread(() =>
@@ -92,7 +92,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
     private void ProcessSongMeta(SongMeta songMeta, string outputFolder)
     {
-        Debug.Log($"Separating voice and instrumental audio from {songMeta}");
+        Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
         UpdateSpleeterSharpConfig();
 
         SpleeterParameters spleeterParameters = new();
@@ -100,7 +100,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         spleeterParameters.OutputFolder = outputFolder;
         spleeterParameters.OutputFileCodec = "ogg";
 
-        Debug.Log($"Calling spleeter with parameters {JsonConverter.ToJson(spleeterParameters)}");
+        Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
         SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
         UpdateSongMetaWithSpleeterResult(songMeta, spleeterResult);
     }
@@ -117,11 +117,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         if (songMetasToProcess.Contains(songMeta))
         {
-            Debug.Log($"Already added {songMeta} to separating voice and instrumental audio");
+            Debug.Log($"Already added song to separating voice and instrumental audio: {songMeta}");
         }
         else
         {
-            Debug.Log($"Adding {songMeta} to separating voice and instrumental audio");
+            Debug.Log($"Adding song to separating voice and instrumental audio: {songMeta}");
             songMetasToProcess.AddIfNotContains(songMeta);
         }
     }
@@ -142,13 +142,25 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        // Save the SongMeta if it changed
+        bool songMetaChanged = false;
+        // Prepare directory to move created audio files.
+        SongMetaUtils.CreateDirectory(songMeta);
+
         // Check voice audio
-        string voiceAudioPath = spleeterResult.WrittenFiles
+        string vocalsAudioPath = spleeterResult.WrittenFiles
             .FirstOrDefault(filePath => Path.GetFileNameWithoutExtension(filePath) == "vocals");
-        if (File.Exists(voiceAudioPath))
+        if (!vocalsAudioPath.IsNullOrEmpty()
+            && File.Exists(vocalsAudioPath))
         {
-            Debug.Log("Voice audio written to: " + voiceAudioPath);
-            songMeta.VoiceAudio = voiceAudioPath;
+            Debug.Log("Voice audio written to: " + vocalsAudioPath);
+
+            string destinationVocalsAudioPath = songMeta.Directory + $"/vocals.ogg";
+            Debug.Log("Moving voice audio to: " + songMeta.Directory);
+            FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
+
+            songMeta.VocalsAudio = destinationVocalsAudioPath;
+            songMetaChanged = true;
         }
         else
         {
@@ -158,14 +170,34 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Check instrumental audio
         string instrumentalAudioPath = spleeterResult.WrittenFiles
             .FirstOrDefault(filePath => Path.GetFileNameWithoutExtension(filePath) == "accompaniment");
-        if (File.Exists(instrumentalAudioPath))
+        if (!instrumentalAudioPath.IsNullOrEmpty()
+            && File.Exists(instrumentalAudioPath))
         {
-            Debug.Log("Instrumental audio written to: " + voiceAudioPath);
-            songMeta.InstrumentalAudio = instrumentalAudioPath;
+            Debug.Log("Instrumental audio written to: " + instrumentalAudioPath);
+
+            string destinationInstrumentalAudioPath = songMeta.Directory + "/instrumental.ogg";
+            Debug.Log("Moving instrumental audio to: " + songMeta.Directory);
+            FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
+
+            songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
+            songMetaChanged = true;
         }
         else
         {
             Debug.LogError($"Instrumental audio not found. Written files: {spleeterResult.WrittenFiles.ToCsv()}");
+        }
+
+        // Remove folder that was created by spleeter
+        string spleeterOutputFolder = Path.GetDirectoryName(instrumentalAudioPath);
+        if (Directory.Exists(spleeterOutputFolder))
+        {
+            Directory.Delete(spleeterOutputFolder);
+        }
+
+        // Save song meta
+        if (songMetaChanged)
+        {
+            songMetaManager.SaveSong(songMeta, true);
         }
     }
 
@@ -175,6 +207,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         SpleeterSharpConfig.Create()
             .SetSpleeterCommand(settings.SongEditorSettings.AudioSeparationCommand)
             .SetIsWindows(PlatformUtils.IsWindows())
-            .SetLogAction(message => Debug.Log(message));
+            .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
     }
 }

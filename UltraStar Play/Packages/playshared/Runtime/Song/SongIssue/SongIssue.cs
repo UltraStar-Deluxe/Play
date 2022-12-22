@@ -6,8 +6,8 @@ public class SongIssue
 {
     public static readonly Comparison<SongIssue> compareBySongMetaPath =
         (a, b) => string.Compare(
-            SongMetaUtils.GetAbsoluteSongMetaPath(a.SongMeta),
-            SongMetaUtils.GetAbsoluteSongMetaPath(b.SongMeta), StringComparison.InvariantCulture);
+            SongMetaUtils.GetAbsoluteSongMetaFilePath(a.SongMeta),
+            SongMetaUtils.GetAbsoluteSongMetaFilePath(b.SongMeta), StringComparison.InvariantCulture);
     public static readonly Comparison<SongIssue> compareBySongMetaArtistAndTitle =
         (a, b) => string.Compare(
             SongMetaUtils.GetArtistDashTitle(a.SongMeta),

@@ -61,6 +61,11 @@ public static class ApplicationUtils
         return res;
     }
 
+    public static string GetGeneratedSongFolderAbsolutePath()
+    {
+        return Application.persistentDataPath + $"/{GeneratedFolderName}/Songs";
+    }
+
     public static Vector2 GetScreenSizeInPanelCoordinates(PanelHelper panelHelper)
     {
         return panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));

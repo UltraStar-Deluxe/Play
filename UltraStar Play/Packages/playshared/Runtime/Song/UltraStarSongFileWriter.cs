@@ -17,10 +17,6 @@ public static class UltraStarSongFileWriter
         StringBuilder sb = new();
         AppendHeader(sb, songMeta);
         List<Voice> nonEmptyVoices = songMeta.GetVoices().Where(voice => IsNotEmpty(voice)).ToList();
-        if (nonEmptyVoices.Count == 0)
-        {
-            throw new UltraStarSongFileWriterException("The song does not contain any notes");
-        }
         nonEmptyVoices.Sort(Voice.comparerByName);
         foreach (Voice voice in nonEmptyVoices)
         {
@@ -107,6 +103,8 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
+        AppendHeaderField(sb, "VocalsAudio", songMeta.VocalsAudio);
+        AppendHeaderField(sb, "InstrumentalAudio", songMeta.InstrumentalAudio);
         AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString(CultureInfo.InvariantCulture));
         if (songMeta.Gap != 0)
         {

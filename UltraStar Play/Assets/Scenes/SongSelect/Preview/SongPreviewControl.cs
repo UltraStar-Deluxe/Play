@@ -220,7 +220,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
             Debug.LogError(errorMessage);
-            uiManager.CreateNotificationVisualElement(errorMessage, "error");
+            uiManager.CreateNotificationVisualElement(errorMessage);
         }
     }
 

@@ -78,7 +78,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             if (!errorMessage.IsNullOrEmpty())
             {
                 Debug.LogError(errorMessage);
-                uiManager.CreateNotificationVisualElement(errorMessage, "error");
+                uiManager.CreateNotificationVisualElement(errorMessage);
             }
             HideEditPlaylistDialog();
         });
@@ -168,7 +168,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         {
             // Show error in popup
             Debug.LogError(errorMessage);
-            uiManager.CreateNotificationVisualElement(errorMessage, "error");
+            uiManager.CreateNotificationVisualElement(errorMessage);
         }
         editPlaylistOverlay.HideByDisplay();
     }
