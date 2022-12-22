@@ -204,7 +204,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
             case ESongOrder.Language:
                 return songMeta.Language;
             case ESongOrder.Folder:
-                return songMeta.Directory + "/" + songMeta.Filename;
+                return SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
             default:
                 return songMeta.Artist;
         }

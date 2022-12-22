@@ -94,9 +94,31 @@ public static class SongMetaUtils
         return songMeta.Directory + $"/{path}";
     }
 
-    public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
+    public static bool IsImplicitlyGeneratedAndNotYetSaved(SongMeta songMeta)
     {
-        return GetAbsoluteFilePath(songMeta, songMeta.Filename);
+        if (songMeta.Directory.IsNullOrEmpty())
+        {
+            return true;
+        }
+
+        string songMetaAbsolutePath = new DirectoryInfo(songMeta.Directory).FullName;
+        string generatedSongFolderAbsolutePath = new DirectoryInfo(ApplicationUtils.GetGeneratedSongFolderAbsolutePath()).FullName;
+        return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
+               && !File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
+    }
+
+    public static void CreateDirectory(SongMeta songMeta)
+    {
+        if (!songMeta.Directory.IsNullOrEmpty()
+            && !Directory.Exists(songMeta.Directory))
+        {
+            Directory.CreateDirectory(songMeta.Directory);
+        }
+    }
+
+    public static string GetAbsoluteSongMetaFilePath(SongMeta songMeta)
+    {
+        return GetAbsoluteFilePath(songMeta, songMeta.FileName);
     }
 
     public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)

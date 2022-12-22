@@ -41,6 +41,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songEntryDuetIcon)]
     private VisualElement duetIcon;
 
+    [Inject(UxmlName = R.UxmlNames.songEntryNotSavedYetIcon)]
+    private VisualElement notSavedYetIcon;
+
     [Inject(UxmlName = R.UxmlNames.songEntryUiRoot)]
     private VisualElement songEntryUiRoot;
 
@@ -73,6 +76,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject]
     private UIDocument uiDocument;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     [Inject]
     private Injector injector;
@@ -334,7 +340,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
             reloadSongButton.RegisterCallbackButtonTriggered(() =>
             {
-                SongMeta.Reload();
+                songMetaManager.ReloadSong(songMeta);
                 HideSongMenuOverlay();
             });
         }
@@ -480,6 +486,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
+        notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsImplicitlyGeneratedAndNotYetSaved(songMeta));
     }
 
     public void UpdateTranslation()

@@ -72,6 +72,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private Settings settings;
 
     [Inject]
+    private SongMetaManager songMetaManager;
+
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
@@ -301,29 +304,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return;
         }
 
-        SaveSong(true);
-    }
-
-    public void SaveSong(bool isAutoSave=false)
-    {
-        string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
-
-        try
-        {
-            // Write the song data structure to the file.
-            UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
-            return;
-        }
-
-        if (!isAutoSave)
-        {
-            uiManager.CreateNotificationVisualElement("Saved file");
-        }
+        songMetaManager.SaveSong(SongMeta, settings.SongEditorSettings.AutoSave);
     }
 
     public void ContinueToSingScene()

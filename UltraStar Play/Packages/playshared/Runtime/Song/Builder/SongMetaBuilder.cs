@@ -195,6 +195,12 @@ public static class SongMetaBuilder
                     case "year":
                         songMeta.Year = ConvertToUInt32(item.Value);
                         break;
+                    case "vocalsaudio":
+                        songMeta.VocalsAudio = item.Value;
+                        break;
+                    case "instrumentalaudio":
+                        songMeta.InstrumentalAudio = item.Value;
+                        break;
                     default:
                         songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
                         break;

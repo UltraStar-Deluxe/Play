@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class CoroutineUtils
 {
+    public static IEnumerator ExecuteAction(Action action)
+    {
+        action();
+        yield return null;
+    }
+
     public static IEnumerator ExecuteWhenConditionIsTrue(Func<bool> condition, Action action)
     {
         while (!condition())
