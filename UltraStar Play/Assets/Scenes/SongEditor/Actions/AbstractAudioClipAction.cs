@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using System.IO;
+using UniInject;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -16,19 +17,44 @@ public class AbstractAudioClipAction : INeedInjection
     protected AudioManager audioManager;
 
     [Inject]
+    protected UiManager uiManager;
+
+    [Inject]
     protected SongEditorSampleRecorderControl songEditorSampleRecorderControl;
 
-    protected AudioClip GetAudioClip()
+    protected AudioClip GetAudioClip(ESongEditorSamplesSource samplesSource)
     {
-        if (settings.SongEditorSettings.UseRecordedSamples)
+        if (samplesSource == ESongEditorSamplesSource.Recording)
         {
             return songEditorSampleRecorderControl.AudioClip;
         }
-        else
+        else if (samplesSource == ESongEditorSamplesSource.Vocals)
         {
-            // Use the song's audio.
-            // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+            if (songMeta.VocalsAudio.IsNullOrEmpty()
+                || !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
+            {
+                uiManager.CreateNotificationVisualElement("No vocals audio found. Separate the audio first.");
+            }
+            else
+            {
+                return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+            }
         }
+        else if (samplesSource == ESongEditorSamplesSource.Instrumental)
+        {
+            if (songMeta.InstrumentalAudio.IsNullOrEmpty()
+                || !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
+            {
+                uiManager.CreateNotificationVisualElement("No instrumental audio found. Separate the audio first.");
+            }
+            else
+            {
+                return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
+            }
+        }
+
+        // Use the song's audio.
+        // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
+        return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
     }
 }

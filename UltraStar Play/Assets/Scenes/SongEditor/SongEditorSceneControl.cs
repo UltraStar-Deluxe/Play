@@ -57,7 +57,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongEditorSceneInputControl songEditorSceneInputControl;
 
     [InjectedInInspector]
-    public SongEditorRecordedAudioPlayer songEditorRecordedAudioPlayer;
+    public SongEditorAlternativeAudioPlayer songEditorAlternativeAudioPlayer;
 
     [Inject]
     private Injector injector;
@@ -168,10 +168,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
-
-        // Reset usage of recorded audio buffer. The buffer starts empty.
-        settings.SongEditorSettings.UseRecordedSamples = false;
-        settings.SongEditorSettings.PlayRecordedSamples = false;
     }
 
     private void OnDestroy()
@@ -461,7 +457,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorMicPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(songEditorSampleRecorderControl);
-        bb.BindExistingInstance(songEditorRecordedAudioPlayer);
+        bb.BindExistingInstance(songEditorAlternativeAudioPlayer);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);

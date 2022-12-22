@@ -46,6 +46,16 @@ public static class SongMetaUtils
         return GetUri(songMeta, songMeta.Mp3);
     }
 
+    public static string GetVocalsAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.VocalsAudio);
+    }
+
+    public static string GetInstrumentalAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.InstrumentalAudio);
+    }
+
     /**
      * Checks if a file exists.
      * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
