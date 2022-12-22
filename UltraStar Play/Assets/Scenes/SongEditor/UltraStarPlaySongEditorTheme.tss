@@ -1,0 +1,3 @@
+@import url("unity-theme://default");
+@import url("/Packages/PlayShared/Runtime/StyleSheets/MainStyles.uss");
+@import url("/Assets/Scenes/SongEditor/SongEditorStyles.uss");
