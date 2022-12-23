@@ -67,7 +67,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         if (!songMetasToProcess.IsNullOrEmpty()
             && currentlyProcessedSongMeta == null)
         {
-            string outputFolder = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
+            string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
 
             SongMeta songMeta = songMetasToProcess[0];
             songProcessingThread = new Thread(() =>
@@ -77,7 +77,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     try
                     {
                         currentlyProcessedSongMeta = songMeta;
-                        ProcessSongMeta(songMeta, outputFolder);
+                        ProcessSongMeta(songMeta, generatedSongFolderAbsolutePath);
                     }
                     finally
                     {
@@ -90,19 +90,19 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void ProcessSongMeta(SongMeta songMeta, string outputFolder)
+    private void ProcessSongMeta(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
         Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
         UpdateSpleeterSharpConfig();
 
         SpleeterParameters spleeterParameters = new();
         spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-        spleeterParameters.OutputFolder = outputFolder;
+        spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
         spleeterParameters.OutputFileCodec = "ogg";
 
         Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
         SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
-        UpdateSongMetaWithSpleeterResult(songMeta, spleeterResult);
+        UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
     }
 
     public void QueueSongToSeparateVoiceAndInstrumentalAudio(SongMeta songMeta)
@@ -126,7 +126,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateSongMetaWithSpleeterResult(SongMeta songMeta, SpleeterResult spleeterResult)
+    private void UpdateSongMetaWithSpleeterResult(SongMeta songMeta, string generatedSongFolderAbsolutePath, SpleeterResult spleeterResult)
     {
         if (spleeterResult.ExitCode != 0
             || !spleeterResult.Errors.IsNullOrEmpty())
@@ -144,8 +144,16 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         // Save the SongMeta if it changed
         bool songMetaChanged = false;
+
         // Prepare directory to move created audio files.
-        SongMetaUtils.CreateDirectory(songMeta);
+        string destinationFolder = DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath)
+            ? songMeta.Directory
+            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        if (!destinationFolder.IsNullOrEmpty()
+            && !Directory.Exists(destinationFolder))
+        {
+            Directory.CreateDirectory(destinationFolder);
+        }
 
         // Check voice audio
         string vocalsAudioPath = spleeterResult.WrittenFiles
@@ -155,8 +163,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         {
             Debug.Log("Voice audio written to: " + vocalsAudioPath);
 
-            string destinationVocalsAudioPath = songMeta.Directory + $"/vocals.ogg";
-            Debug.Log("Moving voice audio to: " + songMeta.Directory);
+            string destinationVocalsAudioPath = destinationFolder + $"/vocals.ogg";
+            Debug.Log("Moving voice audio to: " + destinationVocalsAudioPath);
             FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
 
             songMeta.VocalsAudio = destinationVocalsAudioPath;
@@ -175,8 +183,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         {
             Debug.Log("Instrumental audio written to: " + instrumentalAudioPath);
 
-            string destinationInstrumentalAudioPath = songMeta.Directory + "/instrumental.ogg";
-            Debug.Log("Moving instrumental audio to: " + songMeta.Directory);
+            string destinationInstrumentalAudioPath = destinationFolder + "/instrumental.ogg";
+            Debug.Log("Moving instrumental audio to: " + destinationInstrumentalAudioPath);
             FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
 
             songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
