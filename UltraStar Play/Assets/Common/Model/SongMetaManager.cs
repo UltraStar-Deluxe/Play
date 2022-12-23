@@ -248,13 +248,9 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         return songMeta;
     }
 
-    private string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
+    public static string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
     {
-        string audioFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioFile);
-        int audioFilePathHash = audioFile.GetHashCode();
-        string audioFilePathHashHex = Convert.ToString(audioFilePathHash, 16);
-        string songMetaFolderName = $"{audioFileNameWithoutExtension}__{audioFilePathHashHex}";
-        return generatedSongFolderAbsolutePath + $"/{songMetaFolderName}/song-info.txt";
+        return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
     }
 
     private List<string> GetAudioFileExtensionPatterns()
