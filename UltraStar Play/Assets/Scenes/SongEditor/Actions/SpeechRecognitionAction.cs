@@ -62,6 +62,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         // Analyze audio
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
+
         VoskResultJson voskResultJson = AnalyzeBeats(
             startBeat,
             lengthInBeats,
@@ -107,6 +112,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         }
 
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
+
         selectedSentences.ForEach(sentence =>
         {
             int sentenceLengthInBeats = sentence.ExtendedMaxBeat - sentence.MinBeat;
@@ -141,6 +151,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
 
         int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
         int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();

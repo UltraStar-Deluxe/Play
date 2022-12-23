@@ -33,6 +33,10 @@ public class PitchDetectionAction : AbstractAudioClipAction
     private void MoveNotesToDetectedPitch(List<Note> notes)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
 
         int minBeat = notes.Select(note => note.StartBeat).Min();
         int maxBeat = notes.Select(note => note.EndBeat).Max();
@@ -75,6 +79,10 @@ public class PitchDetectionAction : AbstractAudioClipAction
     public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
 
         // Remove old analyzed notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)

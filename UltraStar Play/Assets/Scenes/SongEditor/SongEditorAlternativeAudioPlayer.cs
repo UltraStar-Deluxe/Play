@@ -36,7 +36,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
                 && !sampleRecorderControl.HasRecordedAudio)
             {
-                uiManager.CreateNotificationVisualElement("No recorded audio. Use a microphone to record audio first.");
+                uiManager.CreateNotificationVisualElement("Cannot play recorded audio. Use a microphone to record audio first.");
             }
             AudioSource.Play();
         });
