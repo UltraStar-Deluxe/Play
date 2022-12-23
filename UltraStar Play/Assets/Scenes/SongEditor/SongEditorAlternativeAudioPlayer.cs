@@ -38,9 +38,18 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             {
                 uiManager.CreateNotificationVisualElement("Cannot play recorded audio. Use a microphone to record audio first.");
             }
+            else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Vocals
+                     && songMeta.VocalsAudio.IsNullOrEmpty())
+            {
+                uiManager.CreateNotificationVisualElement("No vocals audio found. Separate the audio first.");
+            }
+            else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Instrumental
+                     && songMeta.InstrumentalAudio.IsNullOrEmpty())
+            {
+                uiManager.CreateNotificationVisualElement("No instrumental audio found. Separate the audio first.");
+            }
             AudioSource.Play();
         });
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => AudioSource.Pause());
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
         songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => AudioSource.Pause());
@@ -101,7 +110,11 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             AudioSource.Stop();
             AudioSource.clip = targetAudioClip;
             AudioSource.time = songAudioPlayer.audioPlayer.time;
-            AudioSource.Play();
+
+            if (songAudioPlayer.IsPlaying)
+            {
+                AudioSource.Play();
+            }
         }
     }
 }

@@ -388,4 +388,19 @@ public static class SongMetaUtils
     {
         return $"{songMeta?.Artist} - {songMeta?.Title}";
     }
+
+    public static int MinBeat(List<Note> notes)
+    {
+        return notes.Select(note => note.StartBeat).Min();
+    }
+
+    public static int MaxBeat(List<Note> notes)
+    {
+        return notes.Select(note => note.EndBeat).Max();
+    }
+
+    public static int LengthInBeats(List<Note> notes)
+    {
+        return MaxBeat(notes) - MinBeat(notes);
+    }
 }

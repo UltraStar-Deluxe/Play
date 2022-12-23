@@ -85,12 +85,12 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenuForAiTools(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
-        contextMenu.AddSeparator();
-        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedNotes));
-
         int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
         int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
         int lengthInBeats = maxBeat - minBeat;
+
+        contextMenu.AddSeparator();
+        contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
         contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
         contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitchAndNotify(selectedNotes));
     }

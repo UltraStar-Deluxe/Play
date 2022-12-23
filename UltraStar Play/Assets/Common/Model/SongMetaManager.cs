@@ -205,6 +205,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             .ToList();
 
         List<string> audioFilesWithoutSongMeta = audioFiles
+            .Where(audioFile => !IsGeneratedAudioFile(audioFile))
             .Select(audioFile => Path.GetFullPath(audioFile))
             .Except(existingSongMetaAudioFiles)
             .ToList();
@@ -216,6 +217,12 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             .ToList();
 
         generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
+    }
+
+    private bool IsGeneratedAudioFile(string audioFile)
+    {
+        return Path.GetFileName(audioFile) == "vocals"
+               || Path.GetFileName(audioFile) != "instrumental";
     }
 
     private SongMeta GenerateSongMetaForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
