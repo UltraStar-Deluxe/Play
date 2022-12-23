@@ -121,11 +121,11 @@
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 90%; flex-grow: 1;">
                     <ui:VisualElement name="scoreModeContainer">
                         <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
-                        <ItemPicker noPreviousButton="true" name="scoreModePicker" wrapAround="true" class="smallControl" style="width: auto;" />
+                        <ItemPicker no-previous-button="true" name="scoreModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="noteDIsplayModeContainer">
                         <ui:Label text="Note Display Mode" display-tooltip-when-elided="true" name="noteDisplayModeLabel" class="smallFont" />
-                        <ItemPicker noPreviousButton="true" name="noteDisplayModePicker" wrapAround="true" class="smallControl" style="width: auto;" />
+                        <ItemPicker no-previous-button="true" name="noteDisplayModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
                     </ui:VisualElement>
                 </ui:ScrollView>
             </ui:VisualElement>
@@ -160,7 +160,7 @@
             <ui:VisualElement name="innerMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="menuScrollView" style="width: 100%; height: auto; flex-grow: 1;">
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
-                    <ItemPicker noPreviousButton="false" name="songOrderPicker" wrapAround="true" class="marginBottomSmaller" style="width: 100%;" />
+                    <ItemPicker no-previous-button="false" name="songOrderPicker" wrap-around="true" class="marginBottomSmaller" style="width: 100%;" />
                     <ui:Button text="Create Playlist" display-tooltip-when-elided="true" name="createPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Edit Playlist" display-tooltip-when-elided="true" name="editPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Song Details" display-tooltip-when-elided="true" name="toggleSongDetailOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
