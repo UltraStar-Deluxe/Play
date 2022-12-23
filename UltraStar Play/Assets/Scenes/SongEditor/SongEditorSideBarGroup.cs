@@ -4,11 +4,8 @@ using UnityEngine.UIElements;
 
 public class SongEditorSideBarGroup : VisualElement
 {
-    public override VisualElement contentContainer => this.Q<VisualElement>("groupContainer");
-
-    // UIToolkit factory classes
+    // UIToolkit factory class
     public new class UxmlFactory : UxmlFactory<SongEditorSideBarGroup, UxmlTraits> {};
-
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
         // Additional XML attributes
@@ -17,22 +14,39 @@ public class SongEditorSideBarGroup : VisualElement
         public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext cc)
         {
             base.Init(visualElement, bag, cc);
-            SongEditorSideBarGroup target = visualElement as SongEditorSideBarGroup;
+            var target = visualElement as SongEditorSideBarGroup;
 
-            // Load UXML and add as child element
-            string path = "SongEditorSideBarGroupUi";
-            VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
-            if (visualTreeAsset == null)
-            {
-                Debug.LogError("Could not load " + path);
-                return;
-            }
-            visualTreeAsset.CloneTree()
-                .Children()
-                .ToList()
-                .ForEach(child => target.hierarchy.Add(child));
-
-            target.Q<Label>("groupTitle").text = label.GetValueFromBag(bag, cc);
+            // Read additional attributes from XML.
+            // In the UIBuilder, the XML attributes and target object fields are synchronized implicitly by name.
+            target.Label = label.GetValueFromBag(bag, cc);
         }
+    }
+
+    // Parent of nested elements.
+    public override VisualElement contentContainer { get; }
+
+    public string Label
+    {
+        get => labelElement.text;
+        set => labelElement.text = value;
+    }
+
+    private readonly Label labelElement;
+
+    public SongEditorSideBarGroup()
+    {
+        // Load UXML and add as child element
+        const string path = "SongEditorSideBarGroupUi";
+        var visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
+        if (visualTreeAsset == null)
+        {
+            Debug.LogError("Could not load " + path);
+            return;
+        }
+        visualTreeAsset.CloneTree(this);
+
+        contentContainer = this.Q<VisualElement>("groupContainer");
+        labelElement = this.Q<Label>("groupTitle");
+        Label = "Group Title";
     }
 }
