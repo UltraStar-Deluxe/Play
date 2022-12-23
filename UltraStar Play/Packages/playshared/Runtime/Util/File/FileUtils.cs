@@ -18,4 +18,9 @@ public static class FileUtils
         }
         File.Move(sourceFile, destinationFile);
     }
+
+    public static bool Exists(string path)
+    {
+        return !path.IsNullOrEmpty() && File.Exists(path);
+    }
 }

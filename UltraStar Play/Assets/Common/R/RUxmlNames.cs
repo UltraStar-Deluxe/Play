@@ -426,8 +426,6 @@ public static partial class R
         public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
         public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
-        public const string playRecordedAudioContainer = "playRecordedAudioContainer";
-        public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
@@ -680,8 +678,6 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
-        public const string useRecordedAudioContainer = "useRecordedAudioContainer";
-        public const string useRecordedAudioToggle = "useRecordedAudioToggle";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

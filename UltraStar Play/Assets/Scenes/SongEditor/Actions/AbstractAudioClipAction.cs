@@ -26,31 +26,30 @@ public class AbstractAudioClipAction : INeedInjection
     {
         if (samplesSource == ESongEditorSamplesSource.Recording)
         {
+            if (!songEditorSampleRecorderControl.HasRecordedAudio)
+            {
+                uiManager.CreateNotificationVisualElement("No recorded audio found. Use a microphone to record audio first.");
+                return null;
+            }
             return songEditorSampleRecorderControl.AudioClip;
         }
         else if (samplesSource == ESongEditorSamplesSource.Vocals)
         {
-            if (songMeta.VocalsAudio.IsNullOrEmpty()
-                || !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
+            if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
             {
                 uiManager.CreateNotificationVisualElement("No vocals audio found. Separate the audio first.");
+                return null;
             }
-            else
-            {
-                return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
-            }
+            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
         }
         else if (samplesSource == ESongEditorSamplesSource.Instrumental)
         {
-            if (songMeta.InstrumentalAudio.IsNullOrEmpty()
-                || !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
+            if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
             {
                 uiManager.CreateNotificationVisualElement("No instrumental audio found. Separate the audio first.");
+                return null;
             }
-            else
-            {
-                return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
-            }
+            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
         }
 
         // Use the song's audio.

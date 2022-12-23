@@ -24,6 +24,9 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
     [Inject]
     private SongEditorMicPitchTracker songEditorMicPitchTracker;
 
+    [Inject]
+    private UiManager uiManager;
+
     [Inject(UxmlName = R.UxmlNames.overviewAreaRecordedAudioWaveform)]
     private VisualElement overviewAreaRecordedAudioWaveform;
 
@@ -134,6 +137,15 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
     private void InitAudioClipIfNeeded()
     {
+        if (audioClip != null
+            && (audioClip.frequency != SampleRate
+                || audioClip.samples != GetRequiredRecordingBufferLengthInSamples()))
+        {
+            // Create new recording buffer with different settings
+            GameObject.Destroy(audioClip);
+            audioClip = null;
+        }
+
         if (audioClip != null)
         {
             return;
@@ -157,7 +169,12 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        int recordingBufferLength = (int)(songAudioPlayer.DurationOfSongInMillis / 1000.0 * SampleRate);
+        int recordingBufferLength = GetRequiredRecordingBufferLengthInSamples();
         RecordingBuffer = new float[recordingBufferLength];
+    }
+
+    private int GetRequiredRecordingBufferLengthInSamples()
+    {
+        return (int)(songAudioPlayer.DurationOfSongInMillis / 1000.0 * SampleRate);
     }
 }
