@@ -56,6 +56,11 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 
     public override void SelectPreviousItem()
     {
+        if (Items.IsNullOrEmpty())
+        {
+            return;
+        }
+
         if (HasSelectedItem)
         {
             if (WrapAround || SelectedItemIndex > 0)
@@ -71,9 +76,15 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 
     public override void SelectNextItem()
     {
+        if (Items.IsNullOrEmpty())
+        {
+            return;
+        }
+
         if (HasSelectedItem)
         {
-            if (WrapAround || SelectedItemIndex < Items.Count - 1)
+            if (WrapAround
+                || SelectedItemIndex < Items.Count - 1)
             {
                 Selection.Value = Items.GetElementAfter(SelectedItem, WrapAround);
             }
