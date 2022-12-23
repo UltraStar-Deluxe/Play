@@ -108,12 +108,12 @@
                         <ui:VisualElement name="recordingGroup" class="songEditorSettingsGroup">
                             <ui:VisualElement name="recordingSourceContainer" style="margin-bottom: 10px;">
                                 <ui:Label text="Source" display-tooltip-when-elided="true" name="label" />
-                                <ItemPicker noPreviousButton="true" name="recordingSourceItemPicker" wrapAround="true" class="smallControl" style="width: auto;" />
+                                <ItemPicker no-previous-button="true" name="recordingSourceItemPicker" wrap-around="true" class="smallControl" style="width: auto;" />
                             </ui:VisualElement>
                             <ui:VisualElement name="micRecordingContainer">
                                 <ui:VisualElement name="micDeviceContainer" style="margin-bottom: 10px;">
                                     <ui:Label text="Microphone" display-tooltip-when-elided="true" name="label" />
-                                    <ItemPicker noPreviousButton="true" name="micDeviceItemPicker" wrapAround="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
+                                    <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
                                 </ui:VisualElement>
                                 <ui:VisualElement name="micOctaveOffsetContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                                     <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />

@@ -2,7 +2,9 @@
 
 public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 {
-    public bool WrapAround => ItemPicker.wrapAround;
+    public bool WrapAround => ItemPicker.WrapAround
+        || ItemPicker.NoPreviousButton
+        || ItemPicker.NoNextButton;
 
     protected ListedItemPickerControl(ItemPicker itemPicker)
         : base(itemPicker)
