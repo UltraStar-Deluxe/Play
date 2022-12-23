@@ -41,6 +41,11 @@ public class AudioManager : MonoBehaviour
     // When streamAudio is false, all audio data is loaded at once in a blocking way.
     public AudioClip LoadAudioClipFromUri(string uri, bool streamAudio = true)
     {
+        if (uri.IsNullOrEmpty())
+        {
+            return null;
+        }
+
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
             && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
         {

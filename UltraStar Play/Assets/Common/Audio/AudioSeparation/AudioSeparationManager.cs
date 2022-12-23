@@ -16,7 +16,7 @@ using UniRx;
 public class AudioSeparationManager : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void InitOnLoad()
+    static void StaticInit()
     {
         instance = null;
         lockObject = new();

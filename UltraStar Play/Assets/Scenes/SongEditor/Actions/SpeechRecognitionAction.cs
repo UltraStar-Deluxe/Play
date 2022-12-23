@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Vosk;
@@ -12,6 +14,14 @@ using Vosk;
 
 public class SpeechRecognitionAction : AbstractAudioClipAction
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void StaticInit()
+    {
+        speechRecognitionProcessCount = 0;
+    }
+    private static object lockObject = new();
+    private static int speechRecognitionProcessCount;
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
@@ -35,21 +45,26 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
 
-    public void CreateNotesAndNotify(int startBeat, int lengthInBeats)
+    public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
     {
-        CreateNotes(startBeat, lengthInBeats);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        DoSpeechRecognition(SongMetaUtils.MinBeat(selectedNotes), SongMetaUtils.LengthInBeats(selectedNotes))
+            // Execute on Background thread
+            .SubscribeOn(Scheduler.ThreadPool)
+            // Notify on Main thread
+            .ObserveOnMainThread()
+            .CatchIgnore((Exception ex) => Debug.LogError(ex))
+            .Subscribe(voskResultJson =>
+            {
+                EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson?.text, selectedNotes, englishSyllableSplitter);
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+                }
+            });
     }
 
-    public void CreateNotes(int startBeat, int lengthInBeats)
+    public void CreateNotes(int startBeat, int lengthInBeats, bool notify)
     {
-        if (GetSpeechRecognitionModelPath().IsNullOrEmpty()
-            || !Directory.Exists(GetSpeechRecognitionModelPath()))
-        {
-            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
-            return;
-        }
-
         // Remove old notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.SpeechRecognition)
             .Where(oldNote =>
@@ -60,24 +75,20 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        // Analyze audio
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
-        {
-            return;
-        }
-
-        VoskResultJson voskResultJson = AnalyzeBeats(
-            startBeat,
-            lengthInBeats,
-            audioClip,
-            speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
-        if (voskResultJson != null && !voskResultJson.result.IsNullOrEmpty())
-        {
-            Debug.Log($"Analyzed text from beat {startBeat} to beat {startBeat + lengthInBeats}: {voskResultJson.text}");
-            // Create new notes
-            CreateNotesOfVoskResult(startBeat, voskResultJson.result);
-        }
+        DoSpeechRecognition(startBeat, lengthInBeats)
+            // Execute on Background thread
+            .SubscribeOn(Scheduler.ThreadPool)
+            // Notify on Main thread
+            .ObserveOnMainThread()
+            .CatchIgnore((Exception ex) => Debug.LogError(ex))
+            .Subscribe(voskResultJson =>
+            {
+                CreateNotesOfVoskResult(startBeat, voskResultJson.result);
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+            });
     }
 
     private void CreateNotesOfVoskResult(int offsetInBeats, List<VoskResultWordJson> resultList)
@@ -96,84 +107,63 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         });
     }
 
-    public void SetTextToAnalyzedSpeechAndNotify(IEnumerable<Sentence> selectedSentences)
+    private IObservable<VoskResultJson> DoSpeechRecognition(int startBeat, int lengthInBeats)
     {
-        SetTextToAnalyzedSpeech(selectedSentences);
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
-    }
+        if (speechRecognitionProcessCount > 0)
+        {
+            uiManager.CreateNotificationVisualElement("Already performing speech recognition");
+            return Observable.Throw<VoskResultJson>(new IllegalStateException("Already performing speech recognition"));
+        }
 
-    public void SetTextToAnalyzedSpeech(IEnumerable<Sentence> selectedSentences)
-    {
         if (GetSpeechRecognitionModelPath().IsNullOrEmpty()
             || !Directory.Exists(GetSpeechRecognitionModelPath()))
         {
             uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
-            return;
+            return Observable.Throw<VoskResultJson>(new IllegalStateException("Invalid speech recognition model path"));
         }
 
+        // AudioClip can only be accessed on the main thread.
+        // Thus, read all needed data before creating the observable that will be executed on a background thread.
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         if (audioClip == null)
         {
-            return;
+            return Observable.Throw<VoskResultJson>(new IllegalStateException("No AudioClip"));
         }
+        VoskModelParameters speechRecognizerParameters = CreateSpeechRecognizerParameters(audioClip.frequency);
+        short[] audioSamplesForSpeechRecognition = GetAudioSamplesForSpeechRecognition(startBeat, lengthInBeats, audioClip);
 
-        selectedSentences.ForEach(sentence =>
+        // Do speech recognition in an observable. The observable's code may be executed on a background thread.
+        return Observable.Create<VoskResultJson>(o =>
         {
-            int sentenceLengthInBeats = sentence.ExtendedMaxBeat - sentence.MinBeat;
-            VoskResultJson voskResultJson = AnalyzeBeats(
-                sentence.MinBeat,
-                sentenceLengthInBeats,
-                audioClip,
-                speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
-            if (voskResultJson != null)
+            lock (lockObject)
             {
-                Debug.Log($"Analyzed text from beat {sentence.MinBeat} to beat {sentence.ExtendedMaxBeat}: {voskResultJson.text}");
-                // Assume whole words. Thus, take first word and separate notes by space.
-                EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson.text, sentence.Notes.ToList(),
-                    settings.SongEditorSettings.SplitSyllables
-                        ? englishSyllableSplitter
-                        : null);
+                try
+                {
+                    speechRecognitionProcessCount++;
+                    VoskResultJson voskResultJson = AnalyzeBeats(audioSamplesForSpeechRecognition,
+                        speechRecognitionManager.GetSpeechRecognizer(speechRecognizerParameters));
+                    Debug.Log($"Analyzed text from beat {startBeat} to beat {startBeat + lengthInBeats}. Result: {voskResultJson?.text}");
+                    o.OnNext(voskResultJson);
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                    return Disposable.Empty;
+                }
+                finally
+                {
+                    speechRecognitionProcessCount--;
+                }
+
+                o.OnCompleted();
+                return Disposable.Empty;
             }
         });
     }
 
-    private string GetSpeechRecognitionModelPath()
+    private VoskModelParameters CreateSpeechRecognizerParameters(int sampleRate)
     {
-        return speechRecognitionModelPathTextField.text;
-    }
-
-    public void SetTextToAnalyzedSpeechAndNotify(List<Note> selectedNotes)
-    {
-        SetTextToAnalyzedSpeech(selectedNotes);
-        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
-    }
-
-    public void SetTextToAnalyzedSpeech(List<Note> selectedNotes)
-    {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
-        {
-            return;
-        }
-
-        int minBeat = selectedNotes.Select(note => note.StartBeat).Min();
-        int maxBeat = selectedNotes.Select(note => note.EndBeat).Max();
-        int lengthInBeats = maxBeat - minBeat;
-        VoskResultJson voskResultJson = AnalyzeBeats(
-            minBeat,
-            lengthInBeats,
-            audioClip,
-            speechRecognitionManager.GetSpeechRecognizer(CreateSpeechRecognizerParameters(audioClip)));
-        if (voskResultJson != null)
-        {
-            Debug.Log($"Analyzed text from beat {minBeat} to beat {maxBeat}: {voskResultJson.text}");
-            EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson.text, selectedNotes, englishSyllableSplitter);
-        }
-    }
-
-    private VoskModelParameters CreateSpeechRecognizerParameters(AudioClip audioClip)
-    {
-        return new VoskModelParameters(audioClip.frequency, GetSpeechRecognitionModelPath(), GetSpeechRecognitionPhrases());
+        return new VoskModelParameters(sampleRate, GetSpeechRecognitionModelPath(), GetSpeechRecognitionPhrases());
     }
 
     private List<string> GetSpeechRecognitionPhrases()
@@ -198,51 +188,40 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         return wordsHashSet.ToList();
     }
 
-    private VoskResultJson AnalyzeBeats(int startBeat, int lengthInBeats, AudioClip audioClip, VoskRecognizer voskRecognizer)
+    private VoskResultJson AnalyzeBeats(short[] monoSamplesArray, VoskRecognizer voskRecognizer)
     {
-        if (lengthInBeats <= 0
-            || voskRecognizer == null)
+        using (new DisposableStopwatch("Speech recognition took <ms>"))
+        {
+            voskRecognizer.AcceptWaveform(monoSamplesArray, monoSamplesArray.Length);
+            string voskResultJsonString = voskRecognizer.FinalResult();
+            Debug.Log($"Raw speech recognition result: {voskResultJsonString}");
+            if (voskResultJsonString.IsNullOrEmpty())
+            {
+                return null;
+            }
+            VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
+            return voskResultJson;
+        }
+    }
+
+    private string GetSpeechRecognitionModelPath()
+    {
+        return speechRecognitionModelPathTextField.text;
+    }
+
+    private short[] GetAudioSamplesForSpeechRecognition(int startBeat, int lengthInBeats, AudioClip audioClip)
+    {
+        if (lengthInBeats <= 0)
         {
             return null;
         }
-
-        int samplesPerSecondMono = audioClip.frequency;
-        int samplesPerSecond = samplesPerSecondMono * audioClip.channels;
-        int maxSample = audioClip.samples * audioClip.channels;
-        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
-        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
-        double lengthInSamplesStereo = lengthInMillis / 1000.0 * samplesPerSecond;
-
-        float[] beatSamplesStereo = new float[(int)lengthInSamplesStereo];
 
         double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
-        int startBeatInSamplesMono = (int) (startBeatInMillis / 1000.0 * samplesPerSecondMono);
-        startBeatInSamplesMono = NumberUtils.Limit(startBeatInSamplesMono, 0, maxSample);
-        // Note that GetData always takes the offset in MONO samples, even if there are more channels.
-        audioClip.GetData(beatSamplesStereo, startBeatInSamplesMono);
-        float[] beatSamplesMono = AudioUtils.GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
+        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
 
-        WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-stereo.wav", audioClip.frequency, audioClip.channels, beatSamplesStereo);
-        WavFileWriter.WriteFile(Application.persistentDataPath + "/speech-recognition-samples-mono.wav", audioClip.frequency, 1, beatSamplesMono);
-
-        short[] beatSamplesMonoShortArray = new short[beatSamplesMono.Length];
-        for (int i = 0; i < beatSamplesMono.Length; i++)
-        {
-            beatSamplesMonoShortArray[i] = (short)Math.Floor(beatSamplesMono[i] * short.MaxValue);
-        }
-
-        DisposableStopwatch stopwatch = new("");
-        voskRecognizer.AcceptWaveform(beatSamplesMonoShortArray, beatSamplesMonoShortArray.Length);
-        string voskResultJsonString = voskRecognizer.FinalResult();
-        Debug.Log($"Speech recognition took {stopwatch.ElapsedMilliseconds}");
-
-        Debug.Log("Vosk result: " + voskResultJsonString);
-        if (voskResultJsonString.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
-        return voskResultJson;
+        float[] monoAudioSamples = AudioUtils.GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, true);
+        short[] monoAudioSamplesAsShorts = AudioUtils.ToShortSampleArray(monoAudioSamples);
+        return monoAudioSamplesAsShorts;
     }
 }

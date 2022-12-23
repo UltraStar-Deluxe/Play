@@ -71,11 +71,11 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
     {
         if (voskModel == null)
         {
-            throw new InvalidStateException("VoskModel is null");
+            throw new IllegalStateException("VoskModel is null");
         }
         if (voskModelParameters.SampleRate <= 0)
         {
-            throw new InvalidStateException("Invalid sample rate");
+            throw new IllegalStateException("Invalid sample rate");
         }
 
         // Vosk always expects a new recognizer object for a new stream
