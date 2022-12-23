@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="settingsSideBarContainer" class="secondarySideBarPanel smallFont" style="display: flex;">
         <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold; display: flex;" />
-        <SongEditorSideBarGroup group-title="Editing" name="editingGroup" label="Editing">
+        <SongEditorSideBarGroup name="editingGroup" label="Editing">
             <ui:Toggle name="adjustFollowingNotesToggle" label="Adjust following notes" class="smallControl" />
             <ui:Toggle name="autoSaveToggle" label="Auto save" class="smallControl" />
             <ui:Toggle name="syncLyricsAreaToggle" label="Synchronize position&#10;with lyrics cursor" class="smallControl" />
@@ -28,12 +28,12 @@
         <ui:VisualElement name="recordingGroup" class="songEditorSettingsGroup">
             <ui:VisualElement name="recordingSourceContainer" style="margin-bottom: 10px;">
                 <ui:Label text="Source" display-tooltip-when-elided="true" name="label" />
-                <ItemPicker noPreviousButton="true" name="recordingSourceItemPicker" wrapAround="true" class="smallControl" style="width: auto;" />
+                <ItemPicker name="recordingSourceItemPicker" no-previous-button="true" wrap-around="true" class="smallControl" style="width: auto;" />
             </ui:VisualElement>
             <ui:VisualElement name="micRecordingContainer">
                 <ui:VisualElement name="micDeviceContainer" style="margin-bottom: 10px;">
                     <ui:Label text="Microphone" display-tooltip-when-elided="true" name="label" />
-                    <ItemPicker noPreviousButton="true" name="micDeviceItemPicker" wrapAround="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
+                    <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="micDelayContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                     <ui:Label text="Mic delay (ms)" display-tooltip-when-elided="true" name="label" />
@@ -103,7 +103,7 @@
         <ui:VisualElement name="pitchDetectionGroup" class="songEditorSettingsGroup">
             <ui:VisualElement name="pitchDetectionAlgorithmContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                 <ui:Label text="Algorithm" display-tooltip-when-elided="true" name="label" />
-                <ItemPicker noPreviousButton="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
+                <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrap-around="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="Audio separation" display-tooltip-when-elided="true" name="audioSeparationTitle" class="songEditorSettingsGroupTitle" />
