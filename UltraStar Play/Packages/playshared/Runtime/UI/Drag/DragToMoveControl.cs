@@ -46,7 +46,7 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
         isCanceled = true;
     }
 
-    public bool IsCanceled()
+    public new bool IsCanceled()
     {
         return isCanceled;
     }

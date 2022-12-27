@@ -29,9 +29,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private UiManager uiManager;
-
-    [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
