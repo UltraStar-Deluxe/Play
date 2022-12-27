@@ -37,6 +37,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
+    [Inject]
+    private JobManager jobManager;
+
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
@@ -44,14 +47,23 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
     {
+        Job speechRecognitionJob = new Job("Speech recognition to set lyrics");
+        speechRecognitionJob.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(speechRecognitionJob);
+
         DoSpeechRecognition(SongMetaUtils.MinBeat(selectedNotes), SongMetaUtils.LengthInBeats(selectedNotes))
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
             .ObserveOnMainThread()
-            .CatchIgnore((Exception ex) => Debug.LogError(ex))
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError(ex);
+                speechRecognitionJob.SetResult(EJobResult.Error);
+            })
             .Subscribe(voskResultJson =>
             {
+                speechRecognitionJob.SetResult(EJobResult.Ok);
                 EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson?.text, selectedNotes, englishSyllableSplitter);
                 if (notify)
                 {
@@ -72,14 +84,23 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
+        Job speechRecognitionJob = new Job("Speech recognition to create notes");
+        speechRecognitionJob.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(speechRecognitionJob);
+
         DoSpeechRecognition(startBeat, lengthInBeats)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
             .ObserveOnMainThread()
-            .CatchIgnore((Exception ex) => Debug.LogError(ex))
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError(ex);
+                speechRecognitionJob.SetResult(EJobResult.Error);
+            })
             .Subscribe(voskResultJson =>
             {
+                speechRecognitionJob.SetResult(EJobResult.Ok);
                 CreateNotesOfVoskResult(startBeat, voskResultJson.result);
                 if (notify)
                 {
