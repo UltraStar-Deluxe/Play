@@ -30,6 +30,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
+        bb.BindExistingInstance(JobManager.Instance);
         bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
@@ -40,8 +41,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(eventSystem);
 
         // Lazy binding of UIDocument, because it does not exist in every scene (yet)
-        bb.BindExistingInstanceLazy(() => GetUiDocument());
-        bb.BindExistingInstanceLazy(() => new PanelHelper(GetUiDocument()));
+        bb.BindExistingInstanceLazy(() => UiManager.FindUiDocument());
+        bb.BindExistingInstanceLazy(() => new PanelHelper(UiManager.FindUiDocument()));
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);
@@ -49,15 +50,5 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
 
         return bb.GetBindings();
-    }
-
-    private static UIDocument GetUiDocument()
-    {
-        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
-        if (uiDocGameObject != null)
-        {
-            return uiDocGameObject.GetComponent<UIDocument>();
-        }
-        return null;
     }
 }

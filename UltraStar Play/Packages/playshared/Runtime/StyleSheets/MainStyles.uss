@@ -1167,6 +1167,18 @@ TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-s);
 }
 
+.fontIcon.largeFont {
+    font-size: var(--font-size-l);
+}
+
+.fontIcon.largerFont {
+    font-size: var(--font-size-xl);
+}
+
+.fontIcon.largestFont {
+    font-size: var(--font-size-xxl);
+}
+
 #toggleFavoriteButton MaterialIcon {
     position: absolute;
     width: 100%;
@@ -1212,4 +1224,30 @@ TextField.placeholderVisible #unity-text-input {
 
 #playlistChooserDropdownOverlay Button {
     margin-bottom: 5px;
+}
+
+#jobList {
+    position: absolute;
+    padding-bottom: 6px;
+    padding-right: 6px;
+    padding-left: 6px;
+    bottom: 0;
+    right: 0;
+    transition: bottom 0.5s, right 0.5s;
+}
+
+#jobList Button .fontIcon {
+    transition: rotate 0.3s;
+}
+
+#jobList.hidden Button .fontIcon {
+    rotate: -180deg;
+}
+
+#jobListEntry {
+    padding: 2px;
+}
+
+#jobListEntry.childJob {
+    margin-left: 20px;
 }

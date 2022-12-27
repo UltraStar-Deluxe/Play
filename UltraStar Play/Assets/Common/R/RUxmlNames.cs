@@ -189,6 +189,7 @@ public static partial class R
         public const string helpSideBarContainer = "helpSideBarContainer";
         public const string helpTitle = "helpTitle";
         public const string hiddenContinueButton = "hiddenContinueButton";
+        public const string hideJobListIcon = "hideJobListIcon";
         public const string highScoreContainer = "highScoreContainer";
         public const string highscoreEntry = "highscoreEntry";
         public const string HighscoreEntry = "HighscoreEntry";
@@ -228,6 +229,15 @@ public static partial class R
         public const string issueUiRoot = "issueUiRoot";
         public const string itemIndexLabel = "itemIndexLabel";
         public const string ItemPicker = "ItemPicker";
+        public const string jobErrorIcon = "jobErrorIcon";
+        public const string jobFinishedIcon = "jobFinishedIcon";
+        public const string jobList = "jobList";
+        public const string jobListEntry = "jobListEntry";
+        public const string JobListEntryUi = "JobListEntryUi";
+        public const string jobNameLabel = "jobNameLabel";
+        public const string jobPendingIcon = "jobPendingIcon";
+        public const string jobRunningIcon = "jobRunningIcon";
+        public const string jobStatusIconContainer = "jobStatusIconContainer";
         public const string label = "label";
         public const string Label = "Label";
         public const string labelContainer = "labelContainer";
@@ -528,6 +538,7 @@ public static partial class R
         public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showCoverButton = "showCoverButton";
         public const string showFpsContainer = "showFpsContainer";
+        public const string showJobListIcon = "showJobListIcon";
         public const string showLogOverlayButton = "showLogOverlayButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
@@ -652,6 +663,7 @@ public static partial class R
         public const string toggleFavoriteButton = "toggleFavoriteButton";
         public const string toggleHelpButton = "toggleHelpButton";
         public const string toggleIssuesButton = "toggleIssuesButton";
+        public const string toggleJobListButton = "toggleJobListButton";
         public const string toggleLayersButton = "toggleLayersButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
