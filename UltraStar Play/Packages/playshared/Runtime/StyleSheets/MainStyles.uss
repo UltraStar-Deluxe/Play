@@ -1249,16 +1249,14 @@ TextField.placeholderVisible #unity-text-input {
     padding-bottom: 6px;
     padding-right: 6px;
     padding-left: 6px;
-    bottom: 0;
-    right: 0;
-    transition: bottom 0.5s, right 0.5s;
+    transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
 }
 
 #jobList Button .fontIcon {
     transition: rotate 0.3s;
 }
 
-#jobList.hidden Button .fontIcon {
+#jobList.minimized Button .fontIcon {
     rotate: -180deg;
 }
 
