@@ -189,4 +189,14 @@ public class UiManager : MonoBehaviour, INeedInjection
             .CreateAndInject<AccordionItemControl>();
         return accordionItemControl;
     }
+
+    public static UIDocument FindUiDocument()
+    {
+        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
+        if (uiDocGameObject != null)
+        {
+            return uiDocGameObject.GetComponent<UIDocument>();
+        }
+        return null;
+    }
 }

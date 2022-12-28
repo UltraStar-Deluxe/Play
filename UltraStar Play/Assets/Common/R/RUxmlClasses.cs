@@ -31,6 +31,7 @@ public static partial class R
         public const string inputLegendLabel = "inputLegendLabel";
         public const string invertedVisibility = "invertedVisibility";
         public const string largeFont = "largeFont";
+        public const string largestFont = "largestFont";
         public const string leftSideBar = "leftSideBar";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
@@ -72,6 +73,7 @@ public static partial class R
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string squareButton = "squareButton";
         public const string startButtonClass = "startButtonClass";
+        public const string textColorTint = "textColorTint";
         public const string textFieldHint = "textFieldHint";
         public const string textOutline = "textOutline";
         public const string timeBar = "timeBar";

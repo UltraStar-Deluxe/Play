@@ -220,6 +220,24 @@
     height: 100%;
 }
 
+.unity-progress-bar {
+    margin: 0;
+    padding: 0;
+}
+
+.unity-progress-bar__container {
+    min-height: 12px;
+    max-height: 12px;
+}
+
+.unity-progress-bar__background {
+    /*background-color: var(--control-color);*/
+}
+
+.unity-progress-bar__progress {
+    /*background-color: var(--control-color-accent1);*/
+}
+
 .outline {
     border-color: var(--text-color);
     border-width: 1px;
@@ -1167,6 +1185,18 @@ TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-s);
 }
 
+.fontIcon.largeFont {
+    font-size: var(--font-size-l);
+}
+
+.fontIcon.largerFont {
+    font-size: var(--font-size-xl);
+}
+
+.fontIcon.largestFont {
+    font-size: var(--font-size-xxl);
+}
+
 #toggleFavoriteButton MaterialIcon {
     position: absolute;
     width: 100%;
@@ -1212,4 +1242,28 @@ TextField.placeholderVisible #unity-text-input {
 
 #playlistChooserDropdownOverlay Button {
     margin-bottom: 5px;
+}
+
+#jobList {
+    position: absolute;
+    padding-bottom: 6px;
+    padding-right: 6px;
+    padding-left: 6px;
+    transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
+}
+
+#jobList Button .fontIcon {
+    transition: rotate 0.3s;
+}
+
+#jobList.minimized Button .fontIcon {
+    rotate: -180deg;
+}
+
+#jobListEntry {
+    padding: 2px;
+}
+
+#jobListEntry.childJob {
+    margin-left: 20px;
 }
