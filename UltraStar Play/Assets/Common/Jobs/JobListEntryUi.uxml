@@ -9,7 +9,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="labelContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between; align-items: center;">
                 <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="jobNameLabel" />
-                <ui:Label tabindex="-1" text="99:99" display-tooltip-when-elided="true" name="jobDurationLabel" class="smallerFont" style="margin-left: 20px;" />
+                <ui:Label tabindex="-1" text="99:99" display-tooltip-when-elided="true" name="jobDurationLabel" class="smallerFont" style="min-width: 50px; -unity-text-align: upper-right;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:ProgressBar value="50" name="jobProgressBar" style="margin-top: 2px; margin-bottom: 5px; width: 90%; margin-left: auto;" />
