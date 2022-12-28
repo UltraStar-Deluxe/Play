@@ -127,4 +127,11 @@ public static class ApplicationUtils
     {
         return Application.persistentDataPath + $"/{GeneratedFolderName}/Songs";
     }
+
+    public static bool IsGeneratedAudioFile(string audioFile)
+    {
+        // Audio separation creates files called "vocals.ogg" and "instrumental.ogg"
+        return Path.GetFileName(audioFile) == "vocals"
+               || Path.GetFileName(audioFile) == "instrumental";
+    }
 }

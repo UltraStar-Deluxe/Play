@@ -6,6 +6,11 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
+    public static bool SongMetaFileExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.FileName);
+    }
+
     public static bool CoverResourceExists(SongMeta songMeta)
     {
         return ResourceExists(songMeta, songMeta.Cover);
