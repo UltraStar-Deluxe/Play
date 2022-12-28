@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -9,6 +10,14 @@ using UnityEngine;
 
 public class PitchDetectionAction : AbstractAudioClipAction
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void StaticInit()
+    {
+        pitchDetectionProcessCount = 0;
+    }
+    private static object lockObject = new();
+    private static int pitchDetectionProcessCount;
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
@@ -21,16 +30,13 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
+    [Inject]
+    private JobManager jobManager;
+
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void MoveNotesToDetectedPitchAndNotify(List<Note> notes)
-    {
-        MoveNotesToDetectedPitch(notes);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-    }
-
-    private void MoveNotesToDetectedPitch(List<Note> notes)
+    public void MoveNotesToDetectedPitch(List<Note> notes, bool notify)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
         if (audioClip == null)
@@ -40,50 +46,34 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
         int minBeat = notes.Select(note => note.StartBeat).Min();
         int maxBeat = notes.Select(note => note.EndBeat).Max();
-        Dictionary<Note, List<int>> noteToDetectedPitches = new();
-        for (int beat = minBeat; beat < maxBeat; beat++)
-        {
-            PitchEvent pitchEvent = AnalyzeBeat(beat, audioClip);
-            if (pitchEvent == null)
-            {
-                continue;
-            }
+        int lengthInBeats = maxBeat - minBeat;
 
-            List<Note> notesAtBeat = notes
-                .Where(note => note.StartBeat <= beat && beat <= note.EndBeat)
-                .ToList();
-            notesAtBeat.ForEach(note =>
+        Job pitchDetectionJob = CreateAndAddPitchDetectionJob("Pitch detection to move notes", lengthInBeats);
+        DoPitchDetectionAsObservable(minBeat, lengthInBeats)
+            // Execute on Background thread
+            .SubscribeOn(Scheduler.ThreadPool)
+            // Notify on Main thread
+            .ObserveOnMainThread()
+            // Handle Exceptions
+            .CatchIgnore((Exception ex) =>
             {
-                if (!noteToDetectedPitches.ContainsKey(note))
+                Debug.LogError(ex);
+                pitchDetectionJob.SetResult(EJobResult.Error);
+            })
+            .Subscribe(pitchDetectionResult =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Ok);
+
+                MoveNotesToPitchDetectionResult(notes, pitchDetectionResult);
+                if (notify)
                 {
-                    noteToDetectedPitches.Add(note, new List<int>());
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
                 }
-                noteToDetectedPitches[note].Add(pitchEvent.MidiNote);
             });
-        }
-
-        noteToDetectedPitches.ForEach(entry =>
-        {
-            Note note = entry.Key;
-            List<int> detectedPitches = entry.Value;
-            note.SetMidiNote(NumberUtils.MostOccuringEntry(detectedPitches));
-        });
     }
 
-    public void CreateNotesForDetectedPitchAndNotify(int startBeat, int lengthInBeats)
+    public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats, bool notify)
     {
-        CreateNotesForDetectedPitch(startBeat, lengthInBeats);
-        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-    }
-
-    public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats)
-    {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
-        if (audioClip == null)
-        {
-            return;
-        }
-
         // Remove old analyzed notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)
             .Where(oldNote =>
@@ -94,70 +84,109 @@ public class PitchDetectionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        List<Note> createdNotes = new();
-        Note lastAnalyzedNote = null;
-        int endBeatExclusive = startBeat + lengthInBeats;
-        for (int beat = startBeat; beat < endBeatExclusive; beat++)
-        {
-            PitchEvent pitchEvent = AnalyzeBeat(beat, audioClip);
-            if (pitchEvent == null)
+        Job pitchDetectionJob = CreateAndAddPitchDetectionJob("Pitch detection to create notes", lengthInBeats);
+        DoPitchDetectionAsObservable(startBeat, lengthInBeats)
+            // Execute on Background thread
+            .SubscribeOn(Scheduler.ThreadPool)
+            // Notify on Main thread
+            .ObserveOnMainThread()
+            // Handle Exceptions
+            .CatchIgnore((Exception ex) =>
             {
-                continue;
-            }
-
-            if (lastAnalyzedNote != null
-                && lastAnalyzedNote.MidiNote == pitchEvent.MidiNote)
+                Debug.LogError(ex);
+                pitchDetectionJob.SetResult(EJobResult.Error);
+            })
+            .Subscribe(pitchDetectionResult =>
             {
-                // Extend previously generated note to this beat
-                lastAnalyzedNote.SetLength(lastAnalyzedNote.Length + 1);
-            }
-            else
-            {
-                Note newNote = new Note(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(pitchEvent.MidiNote), "");
-                createdNotes.Add(newNote);
-                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, newNote);
+                pitchDetectionJob.SetResult(EJobResult.Ok);
 
-                lastAnalyzedNote = newNote;
-            }
-        }
-
-        createdNotes.ForEach(note => note.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection));
-
-        if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
-        {
-            // This is not the common use case of the Dynamic Wavelet algorithm. The next analysis will be independent of the previous one.
-            dywaAudioSamplesAnalyzer.ClearPitchHistory();
-        }
+                CreateNotesForPitchDetectionResult(pitchDetectionResult);
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+            });
     }
 
-    private PitchEvent AnalyzeBeat(int beat, AudioClip audioClip)
+    private IObservable<PitchDetectionResult> DoPitchDetectionAsObservable(int startBeat, int lengthInBeats)
     {
+        if (pitchDetectionProcessCount > 0)
+        {
+            uiManager.CreateNotificationVisualElement("Already performing pitch detection");
+            return Observable.Throw<PitchDetectionResult>(new IllegalStateException("Already performing pitch detection"));
+        }
+
+        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
+        if (audioClip == null)
+        {
+            return Observable.Throw<PitchDetectionResult>(new IllegalStateException("No AudioClip"));
+        }
+        int sampleRate = audioClip.frequency;
+
+        float[] audioSamplesForPitchDetection = GetAudioSamplesForPitchDetection(startBeat, lengthInBeats, audioClip);
+
+        // Create audio samples analyzer
         CreateOrUpdateAudioSamplesAnalyzer(audioClip);
         if (audioSamplesAnalyzer == null)
         {
             return null;
         }
 
-        int samplesPerSecondMono = audioClip.frequency;
-        int samplesPerSecond = samplesPerSecondMono * audioClip.channels;
-        int maxSample = audioClip.samples * audioClip.channels;
-        double beatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
-        double beatLengthInSamplesStereo = beatLengthInMillis / 1000.0 * samplesPerSecond;
+        // Do speech recognition in an observable. The observable's code may be executed on a background thread.
+        return Observable.Create<PitchDetectionResult>(o =>
+        {
+            lock (lockObject)
+            {
+                try
+                {
+                    pitchDetectionProcessCount++;
+                    PitchDetectionResult pitchDetectionResult = new();
+                    int endBeatExclusive = startBeat + lengthInBeats;
+                    for (int beat = startBeat; beat < endBeatExclusive; beat++)
+                    {
+                        int offsetInBeats = beat - startBeat;
+                        PitchEvent pitchEvent = AnalyzeBeat(audioSamplesForPitchDetection, offsetInBeats, sampleRate);
+                        if (pitchEvent == null)
+                        {
+                            continue;
+                        }
 
-        float[] beatSamplesStereo = new float[(int)beatLengthInSamplesStereo];
+                        pitchDetectionResult.Add(beat, pitchEvent.MidiNote);
+                    }
 
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        int startBeatInSamplesMono = (int) (startBeatInMillis / 1000.0 * samplesPerSecondMono);
-        startBeatInSamplesMono = NumberUtils.Limit(startBeatInSamplesMono, 0, maxSample);
-        // Note that GetData always takes the offset in MONO samples, even if there are more channels.
-        audioClip.GetData(beatSamplesStereo, startBeatInSamplesMono);
-        float[] beatSamplesMono = GetMonoAudioSamples(beatSamplesStereo, audioClip.channels);
+                    if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
+                    {
+                        // This is not the common use case of the Dynamic Wavelet algorithm. The next analysis will be independent of the previous one.
+                        dywaAudioSamplesAnalyzer.ClearPitchHistory();
+                    }
 
+                    o.OnNext(pitchDetectionResult);
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+                finally
+                {
+                    pitchDetectionProcessCount--;
+                }
+
+                o.OnCompleted();
+                return Disposable.Empty;
+            }
+        });
+    }
+
+    private PitchEvent AnalyzeBeat(float[] samplesMono, int offsetInBeats, int sampleRate)
+    {
         // Debug.Log($"Start in ms: {startBeatInMillis}, length in ms: {noteLengthInMillis}, end in ms: {startBeatInMillis + noteLengthInMillis}, start in samples: {startBeatInSamplesMono}, length in samples: {noteLengthInSamplesStereo}, end in samples: {startBeatInSamplesMono + noteLengthInSamplesStereo}");
         // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-stereo.wav", audioClip.frequency, audioClip.channels, beatSamplesStereo);
         // WavFileWriter.WriteFile(Application.persistentDataPath + "/note-samples-mono.wav", audioClip.frequency, 1, beatSamplesMono);
 
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(beatSamplesMono, 0, beatSamplesMono.Length, 1, 0);
+        int samplesPerBeat = (int)BpmUtils.GetSamplesPerBeat(songMeta, sampleRate);
+        int startIndexInclusive = offsetInBeats * samplesPerBeat;
+        int endIndexExclusive = startIndexInclusive + samplesPerBeat;
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samplesMono, startIndexInclusive, endIndexExclusive, 1, 0);
         return pitchEvent;
     }
 
@@ -235,5 +264,135 @@ public class PitchDetectionAction : AbstractAudioClipAction
             settings.SongEditorSettings.PitchDetectionAlgorithm,
             audioClip.frequency);
         audioSamplesAnalyzerPitchDetectionAlgorithm = settings.SongEditorSettings.PitchDetectionAlgorithm;
+    }
+
+    private float[] GetAudioSamplesForPitchDetection(int startBeat, int lengthInBeats, AudioClip audioClip)
+    {
+        using DisposableStopwatch ds = new("GetAudioSamplesForPitchDetection took <ms>");
+
+        if (lengthInBeats <= 0)
+        {
+            return null;
+        }
+
+        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
+        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
+
+        float[] monoAudioSamples = AudioUtils.GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, true);
+        return monoAudioSamples;
+    }
+
+    private Job CreateAndAddPitchDetectionJob(string name, int lengthInBeats)
+    {
+        Job job = new(name);
+
+        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        job.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 20);
+
+        job.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(job);
+        return job;
+    }
+
+    private void CreateNotesForPitchDetectionResult(PitchDetectionResult pitchDetectionResult)
+    {
+        if (pitchDetectionResult.IsEmpty)
+        {
+            return;
+        }
+
+        Note lastCreatedNote = null;
+        for (int beat = pitchDetectionResult.MinBeat; beat < pitchDetectionResult.MaxBeat; beat++)
+        {
+            if (!pitchDetectionResult.TryGetMidiNote(beat, out int midiNote))
+            {
+                continue;
+            }
+
+            if (lastCreatedNote != null
+                && lastCreatedNote.MidiNote == midiNote)
+            {
+                // Extend previously generated note to this beat
+                lastCreatedNote.SetLength(lastCreatedNote.Length + 1);
+            }
+            else
+            {
+                Note createdNote = new(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(midiNote),
+                    "");
+
+                createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
+                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, createdNote);
+
+                lastCreatedNote = createdNote;
+            }
+        }
+    }
+
+    private void MoveNotesToPitchDetectionResult(List<Note> notes, PitchDetectionResult pitchDetectionResult)
+    {
+        if (pitchDetectionResult.IsEmpty)
+        {
+            return;
+        }
+
+        Dictionary<Note, List<int>> noteToDetectedPitches = new();
+        for (int beat = pitchDetectionResult.MinBeat; beat < pitchDetectionResult.MaxBeat; beat++)
+        {
+            if (!pitchDetectionResult.TryGetMidiNote(beat, out int midiNote))
+            {
+                continue;
+            }
+
+            List<Note> notesAtBeat = notes
+                .Where(note => note.StartBeat <= beat && beat <= note.EndBeat)
+                .ToList();
+            notesAtBeat.ForEach(note =>
+            {
+                if (!noteToDetectedPitches.ContainsKey(note))
+                {
+                    noteToDetectedPitches.Add(note, new List<int>());
+                }
+                noteToDetectedPitches[note].Add(midiNote);
+            });
+        }
+
+        noteToDetectedPitches.ForEach(entry =>
+        {
+            Note note = entry.Key;
+            List<int> detectedPitches = entry.Value;
+            note.SetMidiNote(NumberUtils.MostOccuringEntry(detectedPitches));
+        });
+    }
+
+    private class PitchDetectionResult
+    {
+        private readonly Dictionary<int, int> beatToMidiNote = new();
+
+        public int MinBeat { get; private set; }
+        public int MaxBeat { get; private set; }
+
+        public bool IsEmpty => beatToMidiNote.Count <= 0;
+
+        public void Add(int beat, int midiNote)
+        {
+            if (IsEmpty
+                || beat < MinBeat)
+            {
+                MinBeat = beat;
+            }
+            if (IsEmpty
+                || beat > MaxBeat)
+            {
+                MaxBeat = beat;
+            }
+
+            beatToMidiNote[beat] = midiNote;
+        }
+
+        public bool TryGetMidiNote(int beat, out int midiNote)
+        {
+            return beatToMidiNote.TryGetValue(beat, out midiNote);
+        }
     }
 }

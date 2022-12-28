@@ -54,6 +54,8 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
     private readonly List<Job> jobsWithoutParent = new();
     private readonly Dictionary<Job, JobListEntryControl> jobToJobControl = new();
 
+    private readonly HashSet<Job> fadingJobs = new();
+
     private void Start()
     {
         // CreateDummyJobs();
@@ -62,6 +64,17 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
     void Update()
     {
         jobToJobControl.Values.ForEach(jobListEntryControl => jobListEntryControl.Update());
+
+        // Remove completed jobs
+        jobsWithoutParent.ForEach(job =>
+        {
+            if (job.Result.Value is EJobResult.Ok or EJobResult.Error
+                && !fadingJobs.Contains(job))
+            {
+                // This job is done. Thus, fade out, then remove
+                FadeOutThenRemoveJob(job);
+            }
+        });
     }
 
     public void AddJob(Job job)
@@ -99,8 +112,9 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             {
                 RemoveJob(job);
             });
-
         job.ChildJobs.ForEach(childJob => FadeOutThenRemoveJob(childJob));
+
+        fadingJobs.Add(job);
     }
 
     private void RemoveJob(Job job)
@@ -117,6 +131,7 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
         }
 
         jobToJobControl.Remove(job);
+        fadingJobs.Remove(job);
     }
 
     private void UpdateJobUi()
@@ -129,7 +144,6 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
     private void CreateJobUi(Job job)
     {
         VisualElement jobListEntryElement = jobListEntryUi.CloneTree().Children().FirstOrDefault();
-        jobListElement.Add(jobListEntryElement);
 
         JobListEntryControl jobListEntryControl = injector
             .WithRootVisualElement(jobListEntryElement)
@@ -137,22 +151,17 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             .CreateAndInject<JobListEntryControl>();
         jobToJobControl.Add(job, jobListEntryControl);
 
-        if (job.ParentJob == null)
-        {
-            job.Result
-                .Subscribe(newResult =>
-                {
-                    if (newResult is EJobResult.Ok or EJobResult.Error)
-                    {
-                        // This job is done. Thus, fade out, then remove
-                        FadeOutThenRemoveJob(job);
-                    }
-                });
-        }
-
         job.ChildJobs.ForEach(childJob => CreateJobUi(childJob));
 
-        jobListElement.ShowByDisplay();
+        // Only show this job in the UI if it takes a noticeable amount of time.
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
+        {
+            if (job.Result.Value is EJobResult.Pending)
+            {
+                jobListElement.Add(jobListEntryElement);
+                jobListElement.ShowByDisplay();
+            }
+        }));
     }
 
     public void OnSceneInjectionFinished()

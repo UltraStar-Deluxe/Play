@@ -91,8 +91,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
-        contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitchAndNotify(selectedNotes));
+        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
+        contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)

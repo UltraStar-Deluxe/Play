@@ -51,7 +51,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
         Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to set lyrics", lengthInBeats);
 
-        DoSpeechRecognition(minBeat, lengthInBeats)
+        DoSpeechRecognitionAsObservable(minBeat, lengthInBeats)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -86,11 +86,12 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to create notes", lengthInBeats);
 
-        DoSpeechRecognition(startBeat, lengthInBeats)
+        DoSpeechRecognitionAsObservable(startBeat, lengthInBeats)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
             .ObserveOnMainThread()
+            // Handle Exceptions
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
@@ -123,7 +124,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         });
     }
 
-    private IObservable<VoskResultJson> DoSpeechRecognition(int startBeat, int lengthInBeats)
+    private IObservable<VoskResultJson> DoSpeechRecognitionAsObservable(int startBeat, int lengthInBeats)
     {
         if (speechRecognitionProcessCount > 0)
         {
@@ -206,18 +207,17 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     private VoskResultJson AnalyzeBeats(short[] monoSamplesArray, VoskRecognizer voskRecognizer)
     {
-        using (new DisposableStopwatch("Speech recognition took <ms>"))
+        using DisposableStopwatch ds = new("Speech recognition took <ms>");
+
+        voskRecognizer.AcceptWaveform(monoSamplesArray, monoSamplesArray.Length);
+        string voskResultJsonString = voskRecognizer.FinalResult();
+        Debug.Log($"Raw speech recognition result: {voskResultJsonString}");
+        if (voskResultJsonString.IsNullOrEmpty())
         {
-            voskRecognizer.AcceptWaveform(monoSamplesArray, monoSamplesArray.Length);
-            string voskResultJsonString = voskRecognizer.FinalResult();
-            Debug.Log($"Raw speech recognition result: {voskResultJsonString}");
-            if (voskResultJsonString.IsNullOrEmpty())
-            {
-                return null;
-            }
-            VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
-            return voskResultJson;
+            return null;
         }
+        VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
+        return voskResultJson;
     }
 
     private string GetSpeechRecognitionModelPath()
@@ -239,6 +239,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     private short[] GetAudioSamplesForSpeechRecognition(int startBeat, int lengthInBeats, AudioClip audioClip)
     {
+        using DisposableStopwatch ds = new("GetAudioSamplesForSpeechRecognition took <ms>");
+
         if (lengthInBeats <= 0)
         {
             return null;
