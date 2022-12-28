@@ -56,13 +56,26 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
 
     private readonly HashSet<Job> fadingJobs = new();
 
-    private void Start()
-    {
-        // CreateDummyJobs();
-    }
+    private bool isJobListMinimized;
+
+    // private void Start()
+    // {
+    //     if (Instance != this)
+    //     {
+    //         return;
+    //     }
+    //
+    //     CreateDummyJobs();
+    //     StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
+    // }
 
     void Update()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         jobToJobControl.Values.ForEach(jobListEntryControl => jobListEntryControl.Update());
 
         // Remove completed jobs
@@ -75,6 +88,8 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
                 FadeOutThenRemoveJob(job);
             }
         });
+
+        UpdateJobListPosition();
     }
 
     public void AddJob(Job job)
@@ -92,8 +107,6 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
 
         jobsWithoutParent.Add(job);
         UpdateJobUi();
-
-        ShowJobList();
     }
 
     private void FadeOutThenRemoveJob(Job job)
@@ -151,8 +164,6 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             .CreateAndInject<JobListEntryControl>();
         jobToJobControl.Add(job, jobListEntryControl);
 
-        job.ChildJobs.ForEach(childJob => CreateJobUi(childJob));
-
         // Only show this job in the UI if it takes a noticeable amount of time.
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
         {
@@ -160,8 +171,15 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             {
                 jobListElement.Add(jobListEntryElement);
                 jobListElement.ShowByDisplay();
+
+                if (isJobListMinimized)
+                {
+                    MinimizeJobList();
+                }
             }
         }));
+
+        job.ChildJobs.ForEach(childJob => CreateJobUi(childJob));
     }
 
     public void OnSceneInjectionFinished()
@@ -179,35 +197,50 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             .ForEach(visualElement => visualElement.RemoveFromHierarchy());
 
         toggleJobListButton = jobListElement.Q<Button>(R.UxmlNames.toggleJobListButton);
-        toggleJobListButton.RegisterCallbackButtonTriggered(() => ToggleJobListVisible());
+        toggleJobListButton.RegisterCallbackButtonTriggered(() => ToggleJobListMinimized());
 
         jobListElement.HideByDisplay();
+        if (isJobListMinimized)
+        {
+            MinimizeJobList();
+        }
     }
 
-    private void ToggleJobListVisible()
+    private void ToggleJobListMinimized()
     {
-        if (jobListElement.ClassListContains("hidden"))
+        if (isJobListMinimized)
         {
-            ShowJobList();
+            MaximizeJobList();
         }
         else
         {
-            HideJobList();
+            MinimizeJobList();
         }
     }
 
-    private void ShowJobList()
+    private void MaximizeJobList()
     {
-        jobListElement.RemoveFromClassList("hidden");
-        jobListElement.style.bottom = 0;
-        jobListElement.style.right = 0;
+        isJobListMinimized = false;
+        jobListElement.RemoveFromClassList("minimized");
     }
 
-    private void HideJobList()
+    private void MinimizeJobList()
     {
-        jobListElement.AddToClassList("hidden");
-        jobListElement.style.bottom = -(jobListElement.contentRect.height - toggleJobListButton.contentRect.height);
-        jobListElement.style.right = -(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);
+        isJobListMinimized = true;
+        jobListElement.AddToClassList("minimized");
+    }
+
+    private void UpdateJobListPosition()
+    {
+        if (isJobListMinimized)
+        {
+            jobListElement.style.top = jobListElement.parent.contentRect.height - toggleJobListButton.contentRect.height;
+            jobListElement.style.right = -(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);        }
+        else
+        {
+            jobListElement.style.top = jobListElement.parent.contentRect.height - jobListElement.contentRect.height;
+            jobListElement.style.right = 0;
+        }
     }
 
     private void CreateDummyJobs()
