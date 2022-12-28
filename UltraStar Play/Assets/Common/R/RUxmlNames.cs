@@ -79,6 +79,7 @@ public static partial class R
         public const string closeLogOverlayButton = "closeLogOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
+        public const string closePlayerSelectOverlayIcon = "closePlayerSelectOverlayIcon";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
         public const string closeSearchExpressionInfoButton = "closeSearchExpressionInfoButton";
         public const string closeSearchPropertyDropdownButton = "closeSearchPropertyDropdownButton";
@@ -603,6 +604,8 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
+        public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
+        public const string SongSelectPlayerSelectUi = "SongSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
@@ -626,6 +629,7 @@ public static partial class R
         public const string splitSyllablesContainer = "splitSyllablesContainer";
         public const string splitSyllablesToggle = "splitSyllablesToggle";
         public const string startButton = "startButton";
+        public const string startSongButton = "startSongButton";
         public const string staticLyricsContainer = "staticLyricsContainer";
         public const string statusBar = "statusBar";
         public const string statusBarControlHintLabel = "statusBarControlHintLabel";

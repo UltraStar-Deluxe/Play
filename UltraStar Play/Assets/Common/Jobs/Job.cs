@@ -24,7 +24,8 @@ public class Job
                 return 100;
             }
 
-            if (EstimatedTotalDurationInMillis <= 0)
+            if (EstimatedTotalDurationInMillis <= 0
+                || startTimeInMillis == 0)
             {
                 return 0;
             }
@@ -42,6 +43,10 @@ public class Job
     {
         get
         {
+            if (startTimeInMillis == 0)
+            {
+                return 0;
+            }
             if (endTimeInMillis > 0)
             {
                 return endTimeInMillis - startTimeInMillis;
@@ -50,7 +55,7 @@ public class Job
         }
     }
 
-    private readonly long startTimeInMillis;
+    private long startTimeInMillis;
     private long endTimeInMillis;
 
     public Job(string name, Job parentJob = null)
@@ -60,8 +65,6 @@ public class Job
         {
             parentJob.AddChildJob(this);
         }
-
-        startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
     private void AddChildJob(Job childJob)
@@ -124,6 +127,11 @@ public class Job
             && newStatus != EJobStatus.Finished)
         {
             throw new IllegalStateException($"Cannot change state from {Status.Value} to {newStatus}");
+        }
+
+        if (newStatus == EJobStatus.Running)
+        {
+            startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         }
 
         Status.Value = newStatus;
