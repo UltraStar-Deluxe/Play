@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,6 +15,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void StaticInit()
     {
+        lockObject = new();
         pitchDetectionProcessCount = 0;
     }
     private static object lockObject = new();
@@ -302,6 +305,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
             return;
         }
 
+        List<Note> createdNotes = new();
         Note lastCreatedNote = null;
         for (int beat = pitchDetectionResult.MinBeat; beat < pitchDetectionResult.MaxBeat; beat++)
         {
@@ -320,13 +324,18 @@ public class PitchDetectionAction : AbstractAudioClipAction
             {
                 Note createdNote = new(ENoteType.Normal, beat, 1, MidiUtils.GetUltraStarTxtPitch(midiNote),
                     "");
-
-                createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
-                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, createdNote);
+                createdNotes.Add(createdNote);
 
                 lastCreatedNote = createdNote;
             }
         }
+
+        // IsEditable must be set AFTER the notes have been set completely. Otherwise SetLength will not work.
+        createdNotes.ForEach(createdNote =>
+        {
+            createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
+            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, createdNote);
+        });
     }
 
     private void MoveNotesToPitchDetectionResult(List<Note> notes, PitchDetectionResult pitchDetectionResult)
