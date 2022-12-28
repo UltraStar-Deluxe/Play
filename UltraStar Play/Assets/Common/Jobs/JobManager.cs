@@ -1,23 +1,25 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UniRx.Triggers;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class JobManager : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
     {
         instance = null;
+        jobsWithoutParent = new();
     }
+
+    // Static field to be persisted across scenes
+    private static List<Job> jobsWithoutParent = new();
 
     private static JobManager instance;
     public static JobManager Instance
@@ -26,11 +28,7 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
         {
             if (instance == null)
             {
-                JobManager instanceInScene = GameObjectUtils.FindComponentWithTag<JobManager>("JobManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
+                instance = GameObjectUtils.FindComponentWithTag<JobManager>("JobManager");
             }
             return instance;
         }
@@ -51,31 +49,23 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
     private VisualElement jobListElement;
     private Button toggleJobListButton;
 
-    private readonly List<Job> jobsWithoutParent = new();
     private readonly Dictionary<Job, JobListEntryControl> jobToJobControl = new();
-
     private readonly HashSet<Job> fadingJobs = new();
 
     private bool isJobListMinimized;
 
-    // private void Start()
-    // {
-    //     if (Instance != this)
-    //     {
-    //         return;
-    //     }
-    //
-    //     CreateDummyJobs();
-    //     StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
-    // }
+    private void Start()
+    {
+        CreateJobListUi();
+
+        // CreateDummyJobs();
+        // StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
+
+        UpdateJobUi();
+    }
 
     void Update()
     {
-        if (Instance != this)
-        {
-            return;
-        }
-
         jobToJobControl.Values.ForEach(jobListEntryControl => jobListEntryControl.Update());
 
         // Remove completed jobs
@@ -138,11 +128,6 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             jobListEntryControl.Dispose();
         }
 
-        if (jobsWithoutParent.IsNullOrEmpty())
-        {
-            jobListElement.HideByDisplay();
-        }
-
         jobToJobControl.Remove(job);
         fadingJobs.Remove(job);
     }
@@ -180,11 +165,6 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
         }));
 
         job.ChildJobs.ForEach(childJob => CreateJobUi(childJob));
-    }
-
-    public void OnSceneInjectionFinished()
-    {
-        CreateJobListUi();
     }
 
     private void CreateJobListUi()
@@ -232,10 +212,19 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
 
     private void UpdateJobListPosition()
     {
+        if (jobsWithoutParent.IsNullOrEmpty())
+        {
+            // Move outside of the screen
+            jobListElement.style.top = jobListElement.parent.contentRect.height;
+            jobListElement.style.right = -jobListElement.contentRect.width;
+            return;
+        }
+
         if (isJobListMinimized)
         {
             jobListElement.style.top = jobListElement.parent.contentRect.height - toggleJobListButton.contentRect.height;
-            jobListElement.style.right = -(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);        }
+            jobListElement.style.right = -(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);
+        }
         else
         {
             jobListElement.style.top = jobListElement.parent.contentRect.height - jobListElement.contentRect.height;
@@ -265,5 +254,13 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
             .CatchIgnore((Exception ex) => job.SetResult(EJobResult.Error))
             .Subscribe(_ => job.SetStatus(EJobStatus.Finished));
         return job;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            instance = null;
+        }
     }
 }
