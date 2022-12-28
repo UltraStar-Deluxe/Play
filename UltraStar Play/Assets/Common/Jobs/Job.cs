@@ -14,6 +14,45 @@ public class Job
     public IReadOnlyList<Job> ChildJobs => childJobs;
     public Job ParentJob { get; private set; }
 
+    public long EstimatedTotalDurationInMillis { get; set; }
+    public double EstimatedCurrentProgressInPercent
+    {
+        get
+        {
+            if (endTimeInMillis > 0)
+            {
+                return 100;
+            }
+
+            if (EstimatedTotalDurationInMillis <= 0)
+            {
+                return 0;
+            }
+
+            double progressInPercent = 100.0 * (double)CurrentDurationInMillis / EstimatedTotalDurationInMillis;
+            if (progressInPercent > 99)
+            {
+                progressInPercent = 99;
+            }
+            return progressInPercent;
+        }
+    }
+
+    public long CurrentDurationInMillis
+    {
+        get
+        {
+            if (endTimeInMillis > 0)
+            {
+                return endTimeInMillis - startTimeInMillis;
+            }
+            return TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis;
+        }
+    }
+
+    private readonly long startTimeInMillis;
+    private long endTimeInMillis;
+
     public Job(string name, Job parentJob = null)
     {
         Name = name;
@@ -21,6 +60,8 @@ public class Job
         {
             parentJob.AddChildJob(this);
         }
+
+        startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
     private void AddChildJob(Job childJob)
@@ -108,6 +149,7 @@ public class Job
         }
 
         Result.Value = newResult;
+        endTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         if (Status.Value != EJobStatus.Finished)
         {
             SetStatus(EJobStatus.Finished);

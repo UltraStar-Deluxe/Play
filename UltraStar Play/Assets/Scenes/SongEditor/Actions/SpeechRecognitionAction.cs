@@ -47,11 +47,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
     {
-        Job speechRecognitionJob = new Job("Speech recognition to set lyrics");
-        speechRecognitionJob.SetStatus(EJobStatus.Running);
-        jobManager.AddJob(speechRecognitionJob);
+        int minBeat = SongMetaUtils.MinBeat(selectedNotes);
+        int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
+        Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to set lyrics", lengthInBeats);
 
-        DoSpeechRecognition(SongMetaUtils.MinBeat(selectedNotes), SongMetaUtils.LengthInBeats(selectedNotes))
+        DoSpeechRecognition(minBeat, lengthInBeats)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -84,9 +84,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        Job speechRecognitionJob = new Job("Speech recognition to create notes");
-        speechRecognitionJob.SetStatus(EJobStatus.Running);
-        jobManager.AddJob(speechRecognitionJob);
+        Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to create notes", lengthInBeats);
 
         DoSpeechRecognition(startBeat, lengthInBeats)
             // Execute on Background thread
@@ -225,6 +223,18 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     private string GetSpeechRecognitionModelPath()
     {
         return speechRecognitionModelPathTextField.text;
+    }
+
+    private Job CreateAndAddSpeechRecognitionJob(string name, int lengthInBeats)
+    {
+        Job job = new(name);
+
+        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        job.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.5);
+
+        job.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(job);
+        return job;
     }
 
     private short[] GetAudioSamplesForSpeechRecognition(int startBeat, int lengthInBeats, AudioClip audioClip)
