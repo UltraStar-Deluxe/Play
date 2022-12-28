@@ -20,7 +20,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         instance = null;
         lockObject = new();
+        audioSeparationProcessCount = 0;
     }
+    private static object lockObject = new();
+    private static int audioSeparationProcessCount;
 
     private static AudioSeparationManager instance;
     public static AudioSeparationManager Instance
@@ -39,7 +42,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private static object lockObject = new();
+    [Inject]
+    private AudioManager audioManager;
+
+    [Inject]
+    private UiManager uiManager;
+
+    [Inject]
+    private JobManager jobManager;
 
     [Inject]
     private Settings settings;
@@ -49,9 +59,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
     private readonly List<SongMeta> songMetasToProcess = new();
     private readonly ConcurrentBag<SongMeta> doneSongMetas = new();
-
-    private SongMeta currentlyProcessedSongMeta;
-    private Thread songProcessingThread;
 
     private void Update()
     {
@@ -65,48 +72,84 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         // Process song metas one after the other on dedicated thread.
         if (!songMetasToProcess.IsNullOrEmpty()
-            && currentlyProcessedSongMeta == null)
+            && audioSeparationProcessCount <= 0)
         {
             string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
-
             SongMeta songMeta = songMetasToProcess[0];
-            songProcessingThread = new Thread(() =>
-            {
-                lock (lockObject)
+
+            AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+            int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
+
+            Job audioSeparationJob = CreateAndAddAudioSeparationJob($"Audio separation of '{songMeta.Mp3}'", lengthInMillis);
+            DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
+                // Execute on Background thread
+                .SubscribeOn(Scheduler.ThreadPool)
+                // Notify on Main thread
+                .ObserveOnMainThread()
+                // Handle Exceptions
+                .CatchIgnore((Exception ex) =>
                 {
-                    try
-                    {
-                        currentlyProcessedSongMeta = songMeta;
-                        ProcessSongMeta(songMeta, generatedSongFolderAbsolutePath);
-                    }
-                    finally
-                    {
-                        doneSongMetas.Add(songMeta);
-                        currentlyProcessedSongMeta = null;
-                    }
-                }
-            });
-            songProcessingThread.Start();
+                    Debug.LogError(ex);
+                    audioSeparationJob.SetResult(EJobResult.Error);
+                })
+                .Subscribe(audioSeparationResult =>
+                {
+                    audioSeparationJob.SetResult(EJobResult.Ok);
+                });
         }
     }
 
-    private void ProcessSongMeta(SongMeta songMeta, string generatedSongFolderAbsolutePath)
+    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
-        Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-        UpdateSpleeterSharpConfig();
+        return Observable.Create<AudioSeparationResult>(o =>
+        {
+            lock (lockObject)
+            {
+                try
+                {
+                    audioSeparationProcessCount++;
 
-        SpleeterParameters spleeterParameters = new();
-        spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-        spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
-        spleeterParameters.OutputFileCodec = "ogg";
+                    Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
+                    UpdateSpleeterSharpConfig();
 
-        Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-        SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
-        UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+                    SpleeterParameters spleeterParameters = new();
+                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
+                    spleeterParameters.OutputFileCodec = "ogg";
+
+                    Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
+                    SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
+                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+
+                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    string vocalsAudioFilePath = songMeta.VocalsAudio;
+                    string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
+                    o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+                finally
+                {
+                    doneSongMetas.Add(songMeta);
+                    audioSeparationProcessCount--;
+                }
+
+                o.OnCompleted();
+            }
+
+            return Disposable.Empty;
+        });
     }
 
     public void QueueSongToSeparateVoiceAndInstrumentalAudio(SongMeta songMeta)
     {
+        if (audioSeparationProcessCount > 0)
+        {
+            uiManager.CreateNotificationVisualElement("Already performing audio separation");
+        }
+
         if (songMeta == null
             || WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3))
         {
@@ -216,5 +259,28 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .SetSpleeterCommand(settings.SongEditorSettings.AudioSeparationCommand)
             .SetIsWindows(PlatformUtils.IsWindows())
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
+    }
+
+    private Job CreateAndAddAudioSeparationJob(string name, int lengthInMillis)
+    {
+        Job job = new(name);
+        job.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+        job.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(job);
+        return job;
+    }
+
+    private class AudioSeparationResult
+    {
+        public string OriginalAudioPath { get; private set; }
+        public string VocalsAudioPath { get; private set; }
+        public string InstrumentalAudioPath { get; private set; }
+
+        public AudioSeparationResult(string originalAudioPath, string vocalsAudioPath, string instrumentalAudioPath)
+        {
+            OriginalAudioPath = originalAudioPath;
+            VocalsAudioPath = vocalsAudioPath;
+            InstrumentalAudioPath = instrumentalAudioPath;
+        }
     }
 }

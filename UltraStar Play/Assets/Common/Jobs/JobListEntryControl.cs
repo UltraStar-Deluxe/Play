@@ -1,0 +1,96 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
+using UniInject;
+using UniRx;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
+{
+    private const float RotationVelocityInDegreesPerSecond = 90f;
+
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    public VisualElement VisualElement { get; private set; }
+
+    [Inject(UxmlName = R.UxmlNames.jobPendingIcon)]
+    private VisualElement jobPendingIcon;
+
+    [Inject(UxmlName = R.UxmlNames.jobRunningIcon)]
+    private VisualElement jobRunningIcon;
+
+    [Inject(UxmlName = R.UxmlNames.jobFinishedIcon)]
+    private VisualElement jobFinishedIcon;
+
+    [Inject(UxmlName = R.UxmlNames.jobErrorIcon)]
+    private VisualElement jobErrorIcon;
+
+    [Inject(UxmlName = R.UxmlNames.jobNameLabel)]
+    private Label jobNameLabel;
+
+    [Inject(UxmlName = R.UxmlNames.jobDurationLabel)]
+    private Label jobDurationLabel;
+
+    [Inject(UxmlName = R.UxmlNames.jobProgressBar)]
+    private ProgressBar jobProgressBar;
+
+    [Inject]
+    private Job job;
+
+    public void OnInjectionFinished()
+    {
+        jobNameLabel.text = job.Name;
+
+        UpdateIcons();
+        job.Result.Subscribe(_ => UpdateIcons());
+        job.Status.Subscribe(_ => UpdateIcons());
+
+        if (job.ParentJob != null)
+        {
+            VisualElement.AddToClassList("childJob");
+        }
+    }
+
+    private void UpdateIcons()
+    {
+        jobErrorIcon.SetVisibleByDisplay(job.Result.Value == EJobResult.Error);
+        jobPendingIcon.SetVisibleByDisplay(job.Result.Value != EJobResult.Error && job.Status.Value == EJobStatus.Pending);
+        jobRunningIcon.SetVisibleByDisplay(job.Result.Value != EJobResult.Error && job.Status.Value == EJobStatus.Running);
+        jobFinishedIcon.SetVisibleByDisplay(job.Result.Value != EJobResult.Error && job.Status.Value == EJobStatus.Finished);
+    }
+
+    public void Update()
+    {
+        UpdateIconRotation();
+        UpdateProgressBar();
+        UpdateDurationLabel();
+    }
+
+    private void UpdateDurationLabel()
+    {
+        TimeSpan timeSpan = new(0, 0, 0, 0, (int)job.CurrentDurationInMillis);
+        jobDurationLabel.text = $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";;
+    }
+
+    private void UpdateProgressBar()
+    {
+        jobProgressBar.SetVisibleByDisplay(job.EstimatedTotalDurationInMillis > 0);
+        jobProgressBar.value = (int)Math.Floor(job.EstimatedCurrentProgressInPercent);
+    }
+
+    private void UpdateIconRotation()
+    {
+        float newAngleInDegrees = jobRunningIcon.resolvedStyle.rotate.angle.ToDegrees() +
+                                  RotationVelocityInDegreesPerSecond * Time.deltaTime;
+        jobRunningIcon.style.rotate = new StyleRotate(new Rotate(new Angle(newAngleInDegrees, AngleUnit.Degree)));
+    }
+
+    public void Dispose()
+    {
+        VisualElement.RemoveFromHierarchy();
+    }
+}

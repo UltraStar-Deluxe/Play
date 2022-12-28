@@ -33,6 +33,7 @@ TagManager:
   - SceneChangeAnimationControl
   - SpeechRecognitionManager
   - AudioSeparationManager
+  - JobManager
   layers:
   - Default
   - TransparentFX

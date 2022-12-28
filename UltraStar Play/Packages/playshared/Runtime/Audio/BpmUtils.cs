@@ -26,6 +26,12 @@
         return GetBeatsPerMinute(songMeta) / 60.0;
     }
 
+    public static double GetSamplesPerBeat(SongMeta songMeta, int sampleRate)
+    {
+        double secondsPerBeat = MillisecondsPerBeat(songMeta) / 1000.0;
+        return secondsPerBeat * sampleRate;
+    }
+
     public static double MillisecondInSongToBeat(SongMeta songMeta, double millisInSong)
     {
         return MillisecondInSongToBeatWithoutGap(songMeta, millisInSong - songMeta.Gap);
