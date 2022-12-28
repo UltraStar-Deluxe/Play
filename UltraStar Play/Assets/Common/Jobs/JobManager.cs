@@ -115,6 +115,8 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
         {
             jobListElement.HideByDisplay();
         }
+
+        jobToJobControl.Remove(job);
     }
 
     private void UpdateJobUi()
@@ -163,6 +165,7 @@ public class JobManager : MonoBehaviour, INeedInjection, ISceneInjectionFinished
         jobListElement = jobListUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(jobListElement);
 
+        // Remove dummy entries
         jobListElement.Query<VisualElement>("jobListEntry")
             .ForEach(visualElement => visualElement.RemoveFromHierarchy());
 

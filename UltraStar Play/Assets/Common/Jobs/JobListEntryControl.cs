@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class JobListEntryControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IDisposable
+public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private const float RotationVelocityInDegreesPerSecond = 90f;
 
@@ -31,6 +31,12 @@ public class JobListEntryControl : MonoBehaviour, INeedInjection, IInjectionFini
 
     [Inject(UxmlName = R.UxmlNames.jobNameLabel)]
     private Label jobNameLabel;
+
+    [Inject(UxmlName = R.UxmlNames.jobDurationLabel)]
+    private Label jobDurationLabel;
+
+    [Inject(UxmlName = R.UxmlNames.jobProgressBar)]
+    private ProgressBar jobProgressBar;
 
     [Inject]
     private Job job;
@@ -59,8 +65,27 @@ public class JobListEntryControl : MonoBehaviour, INeedInjection, IInjectionFini
 
     public void Update()
     {
+        UpdateIconRotation();
+        UpdateProgressBar();
+        UpdateDurationLabel();
+    }
+
+    private void UpdateDurationLabel()
+    {
+        TimeSpan timeSpan = new(0, 0, 0, 0, (int)job.CurrentDurationInMillis);
+        jobDurationLabel.text = $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";;
+    }
+
+    private void UpdateProgressBar()
+    {
+        jobProgressBar.SetVisibleByDisplay(job.EstimatedTotalDurationInMillis > 0);
+        jobProgressBar.value = (int)Math.Floor(job.EstimatedCurrentProgressInPercent);
+    }
+
+    private void UpdateIconRotation()
+    {
         float newAngleInDegrees = jobRunningIcon.resolvedStyle.rotate.angle.ToDegrees() +
-                         RotationVelocityInDegreesPerSecond * Time.deltaTime;
+                                  RotationVelocityInDegreesPerSecond * Time.deltaTime;
         jobRunningIcon.style.rotate = new StyleRotate(new Rotate(new Angle(newAngleInDegrees, AngleUnit.Degree)));
     }
 
