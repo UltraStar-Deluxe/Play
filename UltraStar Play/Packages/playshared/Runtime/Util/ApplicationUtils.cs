@@ -110,4 +110,21 @@ public static class ApplicationUtils
         float diagonalInInches = diagonalInPixels / Screen.dpi;
         return diagonalInInches;
     }
+
+    public static string GetGeneratedOutputFolderForSourceFilePath(string generatedFolderBasePath, string sourceFilePath)
+    {
+        // Include hash code of file path in the generated folder name
+        int sourceFilePathHash = new FileInfo(sourceFilePath).FullName.GetHashCode();
+        string sourceFilePathHashHex = Convert.ToString(sourceFilePathHash, 16);
+        string sourceFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sourceFilePath);
+        string generatedFolderName = $"{sourceFileNameWithoutExtension}__{sourceFilePathHashHex}";
+
+        string generatedOutputFolder = generatedFolderBasePath + $"/{generatedFolderName}";
+        return generatedOutputFolder;
+    }
+
+    public static string GetGeneratedSongFolderAbsolutePath()
+    {
+        return Application.persistentDataPath + $"/{GeneratedFolderName}/Songs";
+    }
 }

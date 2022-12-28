@@ -236,7 +236,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 string songMetaArtistAndTitle = songIssue.SongMeta != null
                     ? songIssue.SongMeta.Artist + " - " + songIssue.SongMeta.Title
                     : "";
-                string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaPath(songIssue.SongMeta);
+                string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songIssue.SongMeta);
                 if (lastSongMetaPath != songMetaPath)
                 {
                     if (!lastSongMetaPath.IsNullOrEmpty())

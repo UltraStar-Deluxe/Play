@@ -3,10 +3,12 @@ name: Test Companion App
 on:
   push:
     branches:
-      - master
+      #- master
+      - none
   pull_request:
     branches:
-      - master
+      #- master
+      - none
   workflow_dispatch: {}
 
 env:

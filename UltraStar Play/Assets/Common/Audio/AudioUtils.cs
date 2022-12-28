@@ -36,7 +36,7 @@ public static class AudioUtils
         return downloadHandler.audioClip;
     }
 
-    public static float[] GetMonoAudioSamples(float[] originalSamples, int channelCount)
+    public static float[] ToMonoAudioSamples(float[] originalSamples, int channelCount)
     {
         if (channelCount <= 1)
         {
@@ -60,5 +60,49 @@ public static class AudioUtils
         }
 
         return monoSamples;
+    }
+
+    public static short[] ToShortSampleArray(float[] floatSampleArray)
+    {
+        short[] shortSampleArray = new short[floatSampleArray.Length];
+        for (int i = 0; i < floatSampleArray.Length; i++)
+        {
+            shortSampleArray[i] = (short)Math.Floor(floatSampleArray[i] * short.MaxValue);
+        }
+
+        return shortSampleArray;
+    }
+
+    public static float[] GetAudioSamples(double startInMillis, double lengthInMillis, AudioClip audioClip, bool convertToMono)
+    {
+        if (lengthInMillis <= 0)
+        {
+            return null;
+        }
+
+        int samplesPerSecondMono = audioClip.frequency;
+        int samplesPerSecond = samplesPerSecondMono * audioClip.channels;
+        int maxSample = audioClip.samples * audioClip.channels;
+        double lengthInSamplesStereo = lengthInMillis / 1000.0 * samplesPerSecond;
+
+        float[] samplesStereo = new float[(int)lengthInSamplesStereo];
+
+        int startInSamplesMono = (int) (startInMillis / 1000.0 * samplesPerSecondMono);
+        startInSamplesMono = NumberUtils.Limit(startInSamplesMono, 0, maxSample);
+        // Note that GetData always takes the offset in MONO samples, even if there are more channels.
+        audioClip.GetData(samplesStereo, startInSamplesMono);
+
+        WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-stereo.wav", audioClip.frequency, audioClip.channels, samplesStereo);
+
+        if (convertToMono)
+        {
+            float[] samplesMono = ToMonoAudioSamples(samplesStereo, audioClip.channels);
+            WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-mono.wav", audioClip.frequency, 1, samplesMono);
+            return samplesMono;
+        }
+        else
+        {
+            return samplesStereo;
+        }
     }
 }

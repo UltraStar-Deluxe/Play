@@ -46,6 +46,16 @@ public static class SongMetaUtils
         return GetUri(songMeta, songMeta.Mp3);
     }
 
+    public static string GetVocalsAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.VocalsAudio);
+    }
+
+    public static string GetInstrumentalAudioUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.InstrumentalAudio);
+    }
+
     /**
      * Checks if a file exists.
      * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
@@ -94,9 +104,31 @@ public static class SongMetaUtils
         return songMeta.Directory + $"/{path}";
     }
 
-    public static string GetAbsoluteSongMetaPath(SongMeta songMeta)
+    public static bool IsImplicitlyGeneratedAndNotYetSaved(SongMeta songMeta)
     {
-        return GetAbsoluteFilePath(songMeta, songMeta.Filename);
+        if (songMeta.Directory.IsNullOrEmpty())
+        {
+            return true;
+        }
+
+        string songMetaAbsolutePath = new DirectoryInfo(songMeta.Directory).FullName;
+        string generatedSongFolderAbsolutePath = new DirectoryInfo(ApplicationUtils.GetGeneratedSongFolderAbsolutePath()).FullName;
+        return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
+               && !File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
+    }
+
+    public static void CreateDirectory(SongMeta songMeta)
+    {
+        if (!songMeta.Directory.IsNullOrEmpty()
+            && !Directory.Exists(songMeta.Directory))
+        {
+            Directory.CreateDirectory(songMeta.Directory);
+        }
+    }
+
+    public static string GetAbsoluteSongMetaFilePath(SongMeta songMeta)
+    {
+        return GetAbsoluteFilePath(songMeta, songMeta.FileName);
     }
 
     public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)
@@ -355,5 +387,20 @@ public static class SongMetaUtils
     public static string GetArtistDashTitle(SongMeta songMeta)
     {
         return $"{songMeta?.Artist} - {songMeta?.Title}";
+    }
+
+    public static int MinBeat(List<Note> notes)
+    {
+        return notes.Select(note => note.StartBeat).Min();
+    }
+
+    public static int MaxBeat(List<Note> notes)
+    {
+        return notes.Select(note => note.EndBeat).Max();
+    }
+
+    public static int LengthInBeats(List<Note> notes)
+    {
+        return MaxBeat(notes) - MinBeat(notes);
     }
 }

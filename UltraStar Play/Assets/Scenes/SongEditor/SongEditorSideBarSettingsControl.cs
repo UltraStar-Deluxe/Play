@@ -28,11 +28,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.recordingSourceItemPicker)]
     private ItemPicker recordingSourceItemPicker;
-    private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
 
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
-    private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
 
     [Inject(UxmlName = R.UxmlNames.micOctaveOffsetTextField)]
     private TextField micOctaveOffsetTextField;
@@ -124,11 +122,23 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
     private ItemPicker pitchDetectionAlgorithmItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.useRecordedAudioToggle)]
-    private Toggle useRecordedAudioToggle;
+    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
+    private TextField audioSeparationCommandTextField;
 
-    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
-    private Toggle playRecordedAudioToggle;
+    [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
+    private Button audioSeparationButton;
+
+    [Inject(UxmlName = R.UxmlNames.playbackAudioPicker)]
+    private ItemPicker playbackAudioPicker;
+
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionAudioPicker)]
+    private ItemPicker speechRecognitionAudioPicker;
+
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioPicker)]
+    private ItemPicker pitchDetectionAudioPicker;
+
+    [Inject]
+    private SongMeta songMeta;
 
     [Inject]
     private Settings settings;
@@ -146,7 +156,16 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     [Inject]
+    private AudioSeparationManager audioSeparationManager;
+
+    [Inject]
     private Injector injector;
+
+    private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
+    private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
+    private LabeledItemPickerControl<ESongEditorSamplesSource> playbackAudioItemPickerControl;
+    private LabeledItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
+    private LabeledItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
@@ -184,8 +203,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             musicPlaybackSpeedSlider.value = 1;
         });
 
+        playbackAudioItemPickerControl = new(playbackAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        playbackAudioItemPickerControl.Bind(
+            () => settings.SongEditorSettings.PlaybackSamplesSource,
+            newValue => settings.SongEditorSettings.PlaybackSamplesSource = newValue);
+
         // Recording settings
-        recordingSourceItemPickerControl = new LabeledItemPickerControl<ESongEditorRecordingSource>(recordingSourceItemPicker, EnumUtils.GetValuesAsList<ESongEditorRecordingSource>());
+        recordingSourceItemPickerControl = new(recordingSourceItemPicker, EnumUtils.GetValuesAsList<ESongEditorRecordingSource>());
         recordingSourceItemPickerControl.Bind(
             () => settings.SongEditorSettings.RecordingSource,
             newValue => settings.SongEditorSettings.RecordingSource = newValue);
@@ -195,7 +219,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
-        micDeviceItemPickerControl = new LabeledItemPickerControl<MicProfile>(micDeviceItemPicker, enabledAndConnectedMicProfiles);
+        micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles);
         micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.Name : "";
         if (settings.SongEditorSettings.MicProfile == null
             || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
@@ -220,13 +244,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(recordNotesRadioButton,
             () => !settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
             newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = !newValue);
-
-        Bind(useRecordedAudioToggle,
-            () => settings.SongEditorSettings.UseRecordedSamples,
-            newValue => settings.SongEditorSettings.UseRecordedSamples = newValue);
-        Bind(playRecordedAudioToggle,
-            () => settings.SongEditorSettings.PlayRecordedSamples,
-            newValue => settings.SongEditorSettings.PlayRecordedSamples = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,
@@ -282,10 +299,26 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 }
             });
 
+        speechRecognitionAudioItemPickerControl = new(speechRecognitionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        speechRecognitionAudioItemPickerControl.Bind(
+            () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+            newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
+
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
             .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
                 newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
+
+        pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        pitchDetectionAudioItemPickerControl.Bind(
+            () => settings.SongEditorSettings.PitchDetectionSamplesSource,
+            newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
+
+        // Audio separation (Spleeter)
+        Bind(audioSeparationCommandTextField,
+            () => settings.SongEditorSettings.AudioSeparationCommand,
+            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
+        audioSeparationButton.RegisterCallbackButtonTriggered(() => audioSeparationManager.QueueSongToSeparateVoiceAndInstrumentalAudio(songMeta));
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,

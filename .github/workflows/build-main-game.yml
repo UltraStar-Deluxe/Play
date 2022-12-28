@@ -3,7 +3,8 @@ name: Build Main Game
 on:
   push:
     branches:
-      - master
+      #- master
+      - none
   workflow_dispatch: {}
 
 env:

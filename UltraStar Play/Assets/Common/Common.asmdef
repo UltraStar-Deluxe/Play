@@ -12,7 +12,8 @@
         "Unity.InputSystem",
         "playshared",
         "com.achimmihca.scenechangeanimations",
-        "Vosk"
+        "Vosk",
+        "SpleeterSharp"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

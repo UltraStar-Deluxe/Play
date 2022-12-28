@@ -90,6 +90,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private SongMetaManager songMetaManager;
+
+    [Inject]
     private SongEditorHistoryManager historyManager;
 
     [Inject]
@@ -147,7 +150,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         undoButton.RegisterCallbackButtonTriggered(() => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
         exitSceneButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ReturnToLastScene());
-        saveButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.SaveSong());
+        saveButton.RegisterCallbackButtonTriggered(() => songMetaManager.SaveSong(songMeta, false));
 
         // Hide save button if AutoSave is enabled
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)

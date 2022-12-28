@@ -34,19 +34,18 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
         List<Sentence> selectedSentences = new() { sentenceControl.Sentence };
+        int minBeat = sentenceControl.Sentence.MinBeat;
+        int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
+        int lengthInBeats = maxBeat - minBeat;
+        int extendedSentenceLengthInBeats = sentenceControl.Sentence.ExtendedMaxBeat - sentenceControl.Sentence.MinBeat;
 
         contextMenu.AddItem("Fit to notes", () => sentenceFitToNoteAction.ExecuteAndNotify(selectedSentences));
         contextMenu.AddItem("Fit to notes (all phrases)", () => sentenceFitToNoteAction.ExecuteAndNotify(SongMetaUtils.GetAllSentences(songMeta)));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Set note text via speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeechAndNotify(selectedSentences));
-        int extendedSentenceLengthInBeats = sentenceControl.Sentence.ExtendedMaxBeat - sentenceControl.Sentence.MinBeat;
-        contextMenu.AddItem("Create notes via speech recognition", () => speechRecognitionAction.CreateNotesAndNotify(sentenceControl.Sentence.MinBeat, extendedSentenceLengthInBeats));
-
-        int minBeat = sentenceControl.Sentence.MinBeat;
-        int maxBeat = sentenceControl.Sentence.ExtendedMaxBeat;
-        int lengthInBeats = maxBeat - minBeat;
+        contextMenu.AddItem("Set note text via speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), true));
+        contextMenu.AddItem("Create notes via speech recognition", () => speechRecognitionAction.CreateNotes(minBeat, extendedSentenceLengthInBeats, true));
         contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitchAndNotify(minBeat, lengthInBeats));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));

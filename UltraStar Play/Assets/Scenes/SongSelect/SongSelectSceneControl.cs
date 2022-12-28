@@ -868,7 +868,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             case ESongOrder.Language:
                 return songMeta.Language;
             case ESongOrder.Folder:
-                return songMeta.Directory + "/" + songMeta.Filename;
+                return SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
             case ESongOrder.Year:
                 return songMeta.Year;
             case ESongOrder.CountCanceled:
