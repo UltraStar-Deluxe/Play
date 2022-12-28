@@ -35,6 +35,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private SongEditorHistoryManager historyManager;
 
     [Inject]
+    private SongMetaManager songMetaManager;
+
+    [Inject]
     private Settings settings;
 
     [Inject]
@@ -130,8 +133,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Save
         InputManager.GetInputAction(R.InputActions.songEditor_save).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songEditorSceneControl.SaveSong());
-        
+            .Subscribe(_ => songMetaManager.SaveSong(songMeta, false));
+
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())

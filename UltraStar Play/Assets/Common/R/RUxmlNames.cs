@@ -30,6 +30,11 @@ public static partial class R
         public const string artistLabel = "artistLabel";
         public const string artistPropertyContainer = "artistPropertyContainer";
         public const string artistTextField = "artistTextField";
+        public const string audioSeparationButton = "audioSeparationButton";
+        public const string audioSeparationCommandContainer = "audioSeparationCommandContainer";
+        public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
+        public const string audioSeparationGroup = "audioSeparationGroup";
+        public const string audioSeparationTitle = "audioSeparationTitle";
         public const string audioWaveForm = "audioWaveForm";
         public const string autoSaveContainer = "autoSaveContainer";
         public const string autoSaveToggle = "autoSaveToggle";
@@ -389,10 +394,14 @@ public static partial class R
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchDetectionAlgorithmItemPicker = "pitchDetectionAlgorithmItemPicker";
+        public const string pitchDetectionAudioContainer = "pitchDetectionAudioContainer";
+        public const string pitchDetectionAudioPicker = "pitchDetectionAudioPicker";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
         public const string pitchDetectionTitle = "pitchDetectionTitle";
         public const string pitchIndicatorContainer = "pitchIndicatorContainer";
         public const string pitchLabel = "pitchLabel";
+        public const string playbackAudioContainer = "playbackAudioContainer";
+        public const string playbackAudioPicker = "playbackAudioPicker";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
         public const string playerImage = "playerImage";
@@ -417,8 +426,6 @@ public static partial class R
         public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
         public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
-        public const string playRecordedAudioContainer = "playRecordedAudioContainer";
-        public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
@@ -429,6 +436,7 @@ public static partial class R
         public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
+        public const string profileOptionsButtonContainer = "profileOptionsButtonContainer";
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
@@ -443,6 +451,7 @@ public static partial class R
         public const string recordedNoteLabel = "recordedNoteLabel";
         public const string recordingGroup = "recordingGroup";
         public const string recordingOptionsButton = "recordingOptionsButton";
+        public const string recordingOptionsButtonContainer = "recordingOptionsButtonContainer";
         public const string recordingSettingsProblemHintIcon = "recordingSettingsProblemHintIcon";
         public const string recordingSourceContainer = "recordingSourceContainer";
         public const string recordingSourceItemPicker = "recordingSourceItemPicker";
@@ -509,6 +518,7 @@ public static partial class R
         public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
+        public const string settingsButtonContainer = "settingsButtonContainer";
         public const string settingsIcon = "settingsIcon";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
@@ -554,6 +564,7 @@ public static partial class R
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
+        public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songImage = "songImage";
@@ -571,6 +582,7 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songMenuOverlay = "songMenuOverlay";
         public const string songMenuOverlayScrollView = "songMenuOverlayScrollView";
+        public const string songOptionsButtonContainer = "songOptionsButtonContainer";
         public const string songOrderPicker = "songOrderPicker";
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewVideoImage = "songPreviewVideoImage";
@@ -589,6 +601,8 @@ public static partial class R
         public const string soundOptionsButton = "soundOptionsButton";
         public const string space = "space";
         public const string spacer = "spacer";
+        public const string speechRecognitionAudioContainer = "speechRecognitionAudioContainer";
+        public const string speechRecognitionAudioPicker = "speechRecognitionAudioPicker";
         public const string speechRecognitionGroup = "speechRecognitionGroup";
         public const string speechRecognitionModelPathContainer = "speechRecognitionModelPathContainer";
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
@@ -664,8 +678,6 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
-        public const string useRecordedAudioContainer = "useRecordedAudioContainer";
-        public const string useRecordedAudioToggle = "useRecordedAudioToggle";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";

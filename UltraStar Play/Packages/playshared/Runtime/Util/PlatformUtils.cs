@@ -11,4 +11,13 @@
 #endif
         }
     }
+
+    public static bool IsWindows()
+    {
+#if UNITY_STANDALONE_WIN
+        return true;
+#else
+        return false;
+#endif
+    }
 }

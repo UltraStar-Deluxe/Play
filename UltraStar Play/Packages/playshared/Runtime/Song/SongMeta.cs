@@ -8,7 +8,6 @@ using UnityEngine;
 [Serializable]
 public class SongMeta
 {
-    // required helper fields
     /**
      * Path of the directory of the song's txt file.
      */
@@ -17,14 +16,13 @@ public class SongMeta
     /**
      * File name of the song's txt file (not including any directories).
      */
-    public string Filename { get; set; } = "";
+    public string FileName { get; set; } = "";
 
     /**
      * Hash for the song's txt file, used to uniquely identify it.
      */
     public string SongHash { get; private set; } = "";
 
-    // required 
     /**
      * Artist of the song.
      */
@@ -45,7 +43,7 @@ public class SongMeta
      * Path to the audio file that contains only the voice of the singers.
      * This audio file is created from the source audio file using AI.
      */
-    public string VoiceAudio { get; set; } = "";
+    public string VocalsAudio { get; set; } = "";
 
     /**
      * Path to the audio file that contains only the instruments and no singing.
@@ -58,7 +56,6 @@ public class SongMeta
      */
     public string Title { get; set; } = "";
 
-    // required special fields
     /**
      * Mapping from generic singer names ("P1", "P2", "P3", ...)
      * to custom names ("Elvis Presley", "Shakira")
@@ -88,7 +85,6 @@ public class SongMeta
      */
     public Encoding Encoding { get; private set; }
 
-    // optional fields
     /**
      * Path to an image file that should be displayed as background when singing.
      */
@@ -161,13 +157,6 @@ public class SongMeta
      */
     public float End { get; set; }
 
-    /**
-     * Contains the hash of the file that was used for the creation of this SongMeta.
-     */
-    public string SourceFileHash => UnknownHeaderEntries.TryGetValue("SourceFileHash", out string result)
-        ? result
-        : "";
-
     private List<Voice> voices = new();
 
     public bool FailedToLoadVoices { get; private set; }
@@ -201,7 +190,7 @@ public class SongMeta
     )
     {
         Directory = directory ?? throw new ArgumentNullException(nameof(directory));
-        Filename = filename ?? throw new ArgumentNullException(nameof(filename));
+        FileName = filename ?? throw new ArgumentNullException(nameof(filename));
         SongHash = songHash ?? throw new ArgumentNullException(nameof(songHash));
 
         Artist = artist ?? throw new ArgumentNullException(nameof(artist));
@@ -231,7 +220,7 @@ public class SongMeta
             // When there is an Exception, then this field is not reset.
             FailedToLoadVoices = true;
 
-            string path = Directory + Path.DirectorySeparatorChar + Filename;
+            string path = Directory + Path.DirectorySeparatorChar + FileName;
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
                 VoicesBuilder voicesBuilder = new(path, Encoding, Relative);
@@ -270,50 +259,40 @@ public class SongMeta
         unknownHeaderEntries[key] = value;
     }
 
-    public void Reload()
-    {
-        string path = SongMetaUtils.GetAbsoluteSongMetaPath(this);
-        try
-        {
-            SongMeta other = SongMetaBuilder.ParseFile(path, out List<SongIssue> _);
-
-            // Copy values
-            Encoding = other.Encoding;
-            SongHash = other.SongHash;
-
-            voiceNames = other.voiceNames;
-            voices = new List<Voice>();
-
-            Artist = other.Artist;
-            Title = other.Title;
-            Bpm = other.Bpm;
-            Mp3 = other.Mp3;
-
-            Background = other.Background;
-            Cover = other.Cover;
-            Edition = other.Edition;
-            End = other.End;
-            Gap = other.Gap;
-            Genre = other.Genre;
-            Language = other.Language;
-            Relative = other.Relative;
-            Start = other.Start;
-            PreviewStart = other.PreviewStart;
-            PreviewEnd = other.PreviewEnd;
-            Video = other.Video;
-            VideoGap = other.VideoGap;
-            Year = other.Year;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to reload song {path}: " + e.Message);
-            Debug.LogException(e);
-        }
-    }
-
     public override string ToString()
     {
         return base.ToString()
-               + $"(artist: {Artist}, title: {Title}, file name: {Filename}, folder: {Directory})";
+               + $"(artist: {Artist}, title: {Title}, file name: {FileName}, folder: {Directory})";
+    }
+
+    public void CopyValues(SongMeta other)
+    {
+        Encoding = other.Encoding;
+        SongHash = other.SongHash;
+
+        voiceNames = other.voiceNames;
+        voices = new List<Voice>();
+
+        Artist = other.Artist;
+        Title = other.Title;
+        Bpm = other.Bpm;
+        Mp3 = other.Mp3;
+        VocalsAudio = other.VocalsAudio;
+        InstrumentalAudio = other.InstrumentalAudio;
+
+        Background = other.Background;
+        Cover = other.Cover;
+        Edition = other.Edition;
+        End = other.End;
+        Gap = other.Gap;
+        Genre = other.Genre;
+        Language = other.Language;
+        Relative = other.Relative;
+        Start = other.Start;
+        PreviewStart = other.PreviewStart;
+        PreviewEnd = other.PreviewEnd;
+        Video = other.Video;
+        VideoGap = other.VideoGap;
+        Year = other.Year;
     }
 }

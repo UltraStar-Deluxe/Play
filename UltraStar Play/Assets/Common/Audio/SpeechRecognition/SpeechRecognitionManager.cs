@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UniInject;
 using UniRx;
@@ -34,6 +35,9 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         }
     }
 
+    [Inject]
+    private UiManager uiManager;
+
     private VoskModelParameters lastVoskModelParameters;
     private Model voskModel;
     private VoskRecognizer voskRecognizer;
@@ -49,7 +53,10 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         // Update the model
         using (new DisposableStopwatch("Create speech recognition model took <ms>"))
         {
-            CreateOrUpdateVoskModel(voskModelParameters);
+            if (!TryCreateOrUpdateVoskModel(voskModelParameters))
+            {
+                return;
+            }
         }
 
         using (new DisposableStopwatch("Create speech recognizer took <ms>"))
@@ -62,6 +69,15 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 
     private void CreateOrUpdateVoskRecognizer(VoskModelParameters voskModelParameters)
     {
+        if (voskModel == null)
+        {
+            throw new IllegalStateException("VoskModel is null");
+        }
+        if (voskModelParameters.SampleRate <= 0)
+        {
+            throw new IllegalStateException("Invalid sample rate");
+        }
+
         // Vosk always expects a new recognizer object for a new stream
         // See https://github.com/alphacep/vosk-api/issues/919
         voskRecognizer?.Dispose();
@@ -78,17 +94,29 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         voskRecognizer.SetWords(true);
     }
 
-    private void CreateOrUpdateVoskModel(VoskModelParameters voskModelParameters)
+    private bool TryCreateOrUpdateVoskModel(VoskModelParameters voskModelParameters)
     {
+        if (voskModelParameters.ModelPath.IsNullOrEmpty())
+        {
+            uiManager.CreateNotificationVisualElement("Set the speech recognition model path first.");
+            return false;
+        }
+        if (!Directory.Exists(voskModelParameters.ModelPath))
+        {
+            uiManager.CreateNotificationVisualElement("Speech recognition model path is not a valid folder path.");
+            return false;
+        }
+
         if (voskModelParameters.ModelParametersEquals(lastVoskModelParameters)
             && voskModel != null)
         {
             // Use the previous version
-            return;
+            return true;
         }
 
         voskModel?.Dispose();
         voskModel = new(voskModelParameters.ModelPath);
+        return true;
     }
 
     public void Dispose()

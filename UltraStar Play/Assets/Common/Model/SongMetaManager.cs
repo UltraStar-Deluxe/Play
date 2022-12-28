@@ -53,7 +53,10 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
-    
+
+    [Inject]
+    private UiManager uiManager;
+
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -154,7 +157,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     {
         Debug.Log("ScanFilesAsynchronously");
 
-        string generatedSongFolderAbsolutePath = GetGeneratedSongFolderAbsolutePath();
+        string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
         InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
 
         List<string> txtFiles;
@@ -202,6 +205,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             .ToList();
 
         List<string> audioFilesWithoutSongMeta = audioFiles
+            .Where(audioFile => !IsGeneratedAudioFile(audioFile))
             .Select(audioFile => Path.GetFullPath(audioFile))
             .Except(existingSongMetaAudioFiles)
             .ToList();
@@ -213,6 +217,12 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
             .ToList();
 
         generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
+    }
+
+    private bool IsGeneratedAudioFile(string audioFile)
+    {
+        return Path.GetFileName(audioFile) == "vocals"
+               || Path.GetFileName(audioFile) != "instrumental";
     }
 
     private SongMeta GenerateSongMetaForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
@@ -231,19 +241,16 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
         string absoluteSongMetaFilePath = GetAbsoluteSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
         string songMetaFileName = Path.GetFileName(absoluteSongMetaFilePath);
-        string songMetaDirectory = Path.GetDirectoryName(songMetaFileName);
+        string songMetaDirectory = Path.GetDirectoryName(absoluteSongMetaFilePath);
         Dictionary<string, string> voiceNames = new();
         SongMeta songMeta = new(songMetaDirectory, songMetaFileName, "", artist, bpm, audioFile, title, voiceNames, Encoding.UTF8);
         Debug.Log("Generated SongMeta: " + songMeta);
         return songMeta;
     }
 
-    private string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
+    public static string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
     {
-        string audioFileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioFile);
-        int audioFilePathHash = audioFile.GetHashCode();
-        string songMetaFolderName = $"{audioFileNameWithoutExtension}-{audioFilePathHash}";
-        return generatedSongFolderAbsolutePath + $"/{songMetaFolderName}/song-info.txt";
+        return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
     }
 
     private List<string> GetAudioFileExtensionPatterns()
@@ -366,8 +373,40 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         return false;
     }
 
-    private string GetGeneratedSongFolderAbsolutePath()
+    public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
-        return Application.persistentDataPath + $"/{ApplicationUtils.GeneratedFolderName}/Songs";
+        SongMetaUtils.CreateDirectory(songMeta);
+        string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
+        try
+        {
+            // Write the song data structure to the file.
+            UltraStarSongFileWriter.WriteFile(songFilePath, songMeta);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
+            return;
+        }
+
+        if (!isAutoSave)
+        {
+            uiManager.CreateNotificationVisualElement("Saved file");
+        }
+    }
+
+    public void ReloadSong(SongMeta songMeta)
+    {
+        string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
+        try
+        {
+            SongMeta other = SongMetaBuilder.ParseFile(absoluteFilePath, out List<SongIssue> _);
+            songMeta.CopyValues(other);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to reload song {absoluteFilePath}: " + e.Message);
+            Debug.LogException(e);
+        }
     }
 }

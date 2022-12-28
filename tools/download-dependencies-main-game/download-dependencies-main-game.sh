@@ -9,3 +9,4 @@ sh download-serilog.sh
 sh download-jokenizer.sh
 sh download-dynamicqueryable.sh
 sh download-vosk.sh
+sh download-spleetersharp.sh

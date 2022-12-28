@@ -57,7 +57,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongEditorSceneInputControl songEditorSceneInputControl;
 
     [InjectedInInspector]
-    public SongEditorRecordedAudioPlayer songEditorRecordedAudioPlayer;
+    public SongEditorAlternativeAudioPlayer songEditorAlternativeAudioPlayer;
 
     [Inject]
     private Injector injector;
@@ -70,6 +70,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -165,10 +168,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
-
-        // Reset usage of recorded audio buffer. The buffer starts empty.
-        settings.SongEditorSettings.UseRecordedSamples = false;
-        settings.SongEditorSettings.PlayRecordedSamples = false;
     }
 
     private void OnDestroy()
@@ -301,29 +300,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             return;
         }
 
-        SaveSong(true);
-    }
-
-    public void SaveSong(bool isAutoSave=false)
-    {
-        string songFile = SongMeta.Directory + Path.DirectorySeparatorChar + SongMeta.Filename;
-
-        try
-        {
-            // Write the song data structure to the file.
-            UltraStarSongFileWriter.WriteFile(songFile, SongMeta);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
-            return;
-        }
-
-        if (!isAutoSave)
-        {
-            uiManager.CreateNotificationVisualElement("Saved file");
-        }
+        songMetaManager.SaveSong(SongMeta, settings.SongEditorSettings.AutoSave);
     }
 
     public void ContinueToSingScene()
@@ -480,7 +457,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorMicPitchTracker);
         bb.BindExistingInstance(songEditorNoteRecorder);
         bb.BindExistingInstance(songEditorSampleRecorderControl);
-        bb.BindExistingInstance(songEditorRecordedAudioPlayer);
+        bb.BindExistingInstance(songEditorAlternativeAudioPlayer);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);
