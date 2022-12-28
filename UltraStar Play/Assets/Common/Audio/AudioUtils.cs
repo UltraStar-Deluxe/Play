@@ -92,12 +92,12 @@ public static class AudioUtils
         // Note that GetData always takes the offset in MONO samples, even if there are more channels.
         audioClip.GetData(samplesStereo, startInSamplesMono);
 
-        WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-stereo.wav", audioClip.frequency, audioClip.channels, samplesStereo);
+        // WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-stereo.wav", audioClip.frequency, audioClip.channels, samplesStereo);
 
         if (convertToMono)
         {
             float[] samplesMono = ToMonoAudioSamples(samplesStereo, audioClip.channels);
-            WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-mono.wav", audioClip.frequency, 1, samplesMono);
+            // WavFileWriter.WriteFile(Application.persistentDataPath + "/samples-mono.wav", audioClip.frequency, 1, samplesMono);
             return samplesMono;
         }
         else
