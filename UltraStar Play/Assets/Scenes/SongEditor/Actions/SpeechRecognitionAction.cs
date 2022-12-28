@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using UniInject;
 using UniRx;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Vosk;
@@ -47,11 +48,25 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
     {
+        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
+
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
-        Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to set lyrics", lengthInBeats);
+        Job speechRecognitionJob = new("Speech recognition to set lyrics");
+        jobManager.AddJob(speechRecognitionJob);
+        speechRecognitionJob.SetStatus(EJobStatus.Running);
+        speechRecognitionJob.EstimatedTotalDurationInMillis = SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(songMeta, lengthInBeats);
 
-        DoSpeechRecognitionAsObservable(minBeat, lengthInBeats)
+        SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
+                songMeta,
+                audioClip,
+                minBeat,
+                lengthInBeats,
+                CreateSpeechRecognizerParameters())
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -72,8 +87,14 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             });
     }
 
-    public void CreateNotes(int startBeat, int lengthInBeats, bool notify)
+    public void CreateNotesFromSpeechRecognition(int startBeat, int lengthInBeats, bool notify)
     {
+        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        if (audioClip == null)
+        {
+            return;
+        }
+
         // Remove old notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.SpeechRecognition)
             .Where(oldNote =>
@@ -84,23 +105,21 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        Job speechRecognitionJob = CreateAndAddSpeechRecognitionJob("Speech recognition to create notes", lengthInBeats);
+        SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
+                songMeta,
+                audioClip,
+                startBeat,
+                lengthInBeats,
+                CreateSpeechRecognizerParameters(),
+                settings.SongEditorSettings.MidiNoteForSpeechRecognition)
+            .Subscribe(createdNotes =>
+            {
+                createdNotes.ForEach(createdNote =>
+                {
+                    createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
+                    songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
+                });
 
-        DoSpeechRecognitionAsObservable(startBeat, lengthInBeats)
-            // Execute on Background thread
-            .SubscribeOn(Scheduler.ThreadPool)
-            // Notify on Main thread
-            .ObserveOnMainThread()
-            // Handle Exceptions
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogError(ex);
-                speechRecognitionJob.SetResult(EJobResult.Error);
-            })
-            .Subscribe(voskResultJson =>
-            {
-                speechRecognitionJob.SetResult(EJobResult.Ok);
-                CreateNotesOfVoskResult(startBeat, voskResultJson.result);
                 if (notify)
                 {
                     songMetaChangeEventStream.OnNext(new NotesChangedEvent());
@@ -108,150 +127,17 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             });
     }
 
-    private void CreateNotesOfVoskResult(int offsetInBeats, List<VoskResultWordJson> resultList)
+    private VoskModelParameters CreateSpeechRecognizerParameters()
     {
-        double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
-        resultList.ForEach(resultEntry =>
-        {
-            int noteStartInBeats = offsetInBeats + (int)(resultEntry.start * beatsPerSeconds);
-            int noteEndInBeats = offsetInBeats + (int)(resultEntry.end * beatsPerSeconds);
-            int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
-            string text = resultEntry.word + " ";
-            int midiNote = settings.SongEditorSettings.MidiNoteForSpeechRecognition;
-            Note newNote = new Note(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
-            newNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
-            songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, newNote);
-        });
-    }
-
-    private IObservable<VoskResultJson> DoSpeechRecognitionAsObservable(int startBeat, int lengthInBeats)
-    {
-        if (speechRecognitionProcessCount > 0)
-        {
-            uiManager.CreateNotificationVisualElement("Already performing speech recognition");
-            return Observable.Throw<VoskResultJson>(new IllegalStateException("Already performing speech recognition"));
-        }
-
-        if (GetSpeechRecognitionModelPath().IsNullOrEmpty()
-            || !Directory.Exists(GetSpeechRecognitionModelPath()))
-        {
-            uiManager.CreateNotificationVisualElement("Invalid speech recognition model path. Check the settings.");
-            return Observable.Throw<VoskResultJson>(new IllegalStateException("Invalid speech recognition model path"));
-        }
-
-        // AudioClip can only be accessed on the main thread.
-        // Thus, read all needed data before creating the observable that will be executed on a background thread.
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
-        {
-            return Observable.Throw<VoskResultJson>(new IllegalStateException("No AudioClip"));
-        }
-        VoskModelParameters speechRecognizerParameters = CreateSpeechRecognizerParameters(audioClip.frequency);
-        short[] audioSamplesForSpeechRecognition = GetAudioSamplesForSpeechRecognition(startBeat, lengthInBeats, audioClip);
-
-        // Do speech recognition in an observable. The observable's code may be executed on a background thread.
-        return Observable.Create<VoskResultJson>(o =>
-        {
-            lock (lockObject)
-            {
-                try
-                {
-                    speechRecognitionProcessCount++;
-                    VoskResultJson voskResultJson = AnalyzeBeats(audioSamplesForSpeechRecognition,
-                        speechRecognitionManager.GetSpeechRecognizer(speechRecognizerParameters));
-                    Debug.Log($"Analyzed text from beat {startBeat} to beat {startBeat + lengthInBeats}. Result: {voskResultJson?.text}");
-                    o.OnNext(voskResultJson);
-                }
-                catch (Exception ex)
-                {
-                    o.OnError(ex);
-                    return Disposable.Empty;
-                }
-                finally
-                {
-                    speechRecognitionProcessCount--;
-                }
-
-                o.OnCompleted();
-                return Disposable.Empty;
-            }
-        });
-    }
-
-    private VoskModelParameters CreateSpeechRecognizerParameters(int sampleRate)
-    {
-        return new VoskModelParameters(sampleRate, GetSpeechRecognitionModelPath(), GetSpeechRecognitionPhrases());
-    }
-
-    private List<string> GetSpeechRecognitionPhrases()
-    {
-        if (settings.SongEditorSettings.SpeechRecognitionPhrases.Trim().IsNullOrEmpty())
-        {
-            return new List<string>();
-        }
-
-        HashSet<string> wordsHashSet = new();
-        string[] words = settings.SongEditorSettings.SpeechRecognitionPhrases.Split(new string[]{" ", "\n"}, StringSplitOptions.RemoveEmptyEntries);
-        words.ForEach(word =>
-        {
-            string normalizedWord = word.Replace("~", "")
-                .Replace("?", "")
-                .Replace("!", "")
-                .Replace(".", "")
-                .Replace("-", "")
-                .Trim();
-            wordsHashSet.Add(normalizedWord);
-        });
-        return wordsHashSet.ToList();
-    }
-
-    private VoskResultJson AnalyzeBeats(short[] monoSamplesArray, VoskRecognizer voskRecognizer)
-    {
-        using DisposableStopwatch ds = new("Speech recognition took <ms>");
-
-        voskRecognizer.AcceptWaveform(monoSamplesArray, monoSamplesArray.Length);
-        string voskResultJsonString = voskRecognizer.FinalResult();
-        Debug.Log($"Raw speech recognition result: {voskResultJsonString}");
-        if (voskResultJsonString.IsNullOrEmpty())
-        {
-            return null;
-        }
-        VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
-        return voskResultJson;
+        return new VoskModelParameters(
+            audioClip.frequency,
+            GetSpeechRecognitionModelPath(),
+            SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
     }
 
     private string GetSpeechRecognitionModelPath()
     {
         return speechRecognitionModelPathTextField.text;
-    }
-
-    private Job CreateAndAddSpeechRecognitionJob(string name, int lengthInBeats)
-    {
-        Job job = new(name);
-
-        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
-        job.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.5);
-
-        job.SetStatus(EJobStatus.Running);
-        jobManager.AddJob(job);
-        return job;
-    }
-
-    private short[] GetAudioSamplesForSpeechRecognition(int startBeat, int lengthInBeats, AudioClip audioClip)
-    {
-        using DisposableStopwatch ds = new("GetAudioSamplesForSpeechRecognition took <ms>");
-
-        if (lengthInBeats <= 0)
-        {
-            return null;
-        }
-
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
-        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
-        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
-
-        float[] monoAudioSamples = AudioUtils.GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, true);
-        short[] monoAudioSamplesAsShorts = AudioUtils.ToShortSampleArray(monoAudioSamples);
-        return monoAudioSamplesAsShorts;
     }
 }

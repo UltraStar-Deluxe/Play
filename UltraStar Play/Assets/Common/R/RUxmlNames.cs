@@ -473,6 +473,7 @@ public static partial class R
         public const string recordNotesContainer = "recordNotesContainer";
         public const string recordNotesLabel = "recordNotesLabel";
         public const string recordNotesRadioButton = "recordNotesRadioButton";
+        public const string recreateSingAlongVersionButton = "recreateSingAlongVersionButton";
         public const string redoButton = "redoButton";
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";

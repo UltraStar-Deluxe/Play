@@ -212,9 +212,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private PlaylistManager playlistManager;
 
     [Inject]
-    private JobManager jobManager;
-
-    [Inject]
     private Injector injector;
 
     [Inject]
@@ -247,7 +244,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.searchExpressionInfoSyntaxTipsLabel)]
     private Label searchExpressionInfoSyntaxTipsLabel;
 
-    public PlaylistChooserControl PlaylistChooserControl { get; private set; }
+    public PlaylistChooserControl PlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
@@ -284,6 +281,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
+    private CreateSingAlongSongControl createSingAlongSongControl = new();
+
     private void Start()
     {
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
@@ -314,7 +313,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
         startSongButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
-        createSongButton.RegisterCallbackButtonTriggered(() => CreateSingAlongVersion(SelectedSong));
+        createSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
@@ -392,26 +391,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
     }
 
-    private void CreateSingAlongVersion(SongMeta songMeta)
-    {
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        // if (SongMetaUtils.SongMetaFileExists(songMeta))
-        // {
-        //     // Song file already exists
-        //     return;
-        // }
-
-        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
-        Job audioSeparationJob = new("Audio separation", processSongJob);
-        Job speechRecognitionJob = new("Speech recognition", processSongJob);
-        Job pitchDetectionJob = new("Pitch detection", processSongJob);
-
-        jobManager.AddJob(processSongJob);
-    }
 
     public void HideSearchExpressionInfoOverlay()
     {
@@ -759,13 +738,41 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void CheckAudioAndStartSingScene()
     {
-        if (playerSelectOverlayContainer.IsVisibleByDisplay())
+        if (SelectedSong == null)
+        {
+            return;
+        }
+
+        // Check that the audio file exists
+        if (!SongMetaUtils.AudioResourceExists(SelectedSong))
+        {
+            string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
+            string message = "Audio file resource does not exist: " + audioUri;
+            Debug.Log(message);
+            uiManager.CreateNotificationVisualElement(message);
+            return;
+        }
+
+        // Check that the used audio format can be loaded.
+        songAudioPlayer.Init(SelectedSong);
+        if (!songAudioPlayer.HasAudioClip)
+        {
+            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+            Debug.Log(message);
+            uiManager.CreateNotificationVisualElement(message);
+            return;
+        }
+
+        // Start the sing scene or show the player select overlay.
+        if (playerSelectOverlayContainer.IsVisibleByDisplay()
+            && !SongMetaUtils.IsGeneratedAndNotYetSaved(SelectedSong))
         {
             StartSingScene(SelectedSong);
         }
         else if (SelectedSong.VoiceNames.Count <= 1
                  && playerListControl.PlayerEntryControlControls.Count == 1
-                 && micListControl.MicEntryControls.Count == 1)
+                 && micListControl.MicEntryControls.Count == 1
+                 && !SongMetaUtils.IsGeneratedAndNotYetSaved(SelectedSong))
         {
             // There is one mic for only one player and only one voice to sing.
             // Thus, there is no choice to make and the song can be started immediately.
@@ -775,34 +782,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         else
         {
-            if (SelectedSong == null)
-            {
-                return;
-            }
-
-            // Check that the audio file exists
-            if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
-            {
-                string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
-                if (!SongMetaUtils.AudioResourceExists(SelectedSong))
-                {
-                    string message = "Audio file resource does not exist: " + audioUri;
-                    Debug.Log(message);
-                    uiManager.CreateNotificationVisualElement(message);
-                    return;
-                }
-            }
-
-            // Check that the used audio format can be loaded.
-            songAudioPlayer.Init(SelectedSong);
-            if (!songAudioPlayer.HasAudioClip)
-            {
-                string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
-                Debug.Log(message);
-                uiManager.CreateNotificationVisualElement(message);
-                return;
-            }
-
             ShowPlayerSelectOverlay();
         }
     }
@@ -952,6 +931,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(focusableNavigator);
+        bb.BindExistingInstance(PlaylistChooserControl);
+        bb.BindExistingInstance(createSingAlongSongControl);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
@@ -1058,8 +1039,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void OnInjectionFinished()
     {
-        PlaylistChooserControl = new PlaylistChooserControl();
         injector.Inject(PlaylistChooserControl);
+        injector.Inject(createSingAlongSongControl);
     }
 
     private void UpdateInputLegend()
