@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using SpleeterSharp;
 using UnityEngine;
 using UniInject;
@@ -32,11 +28,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         {
             if (instance == null)
             {
-                AudioSeparationManager instanceInScene = GameObjectUtils.FindComponentWithTag<AudioSeparationManager>("AudioSeparationManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
+                instance = GameObjectUtils.FindComponentWithTag<AudioSeparationManager>("AudioSeparationManager");
             }
             return instance;
         }
@@ -57,50 +49,49 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
-    private readonly List<SongMeta> songMetasToProcess = new();
-    private readonly ConcurrentBag<SongMeta> doneSongMetas = new();
-
-    private void Update()
+    public IObservable<AudioSeparationResult> ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
     {
-        UpdateSongMetasToProcess();
-    }
+        string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
 
-    private void UpdateSongMetasToProcess()
-    {
-        // Remove done song metas
-        doneSongMetas.ForEach(songMeta => songMetasToProcess.Remove(songMeta));
-
-        // Process song metas one after the other on dedicated thread.
-        if (!songMetasToProcess.IsNullOrEmpty()
-            && audioSeparationProcessCount <= 0)
+        // Create job to show in UI
+        if (audioSeparationJob == null)
         {
-            string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
-            SongMeta songMeta = songMetasToProcess[0];
-
-            AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
-            int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-
-            Job audioSeparationJob = CreateAndAddAudioSeparationJob($"Audio separation of '{songMeta.Mp3}'", lengthInMillis);
-            DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
-                // Execute on Background thread
-                .SubscribeOn(Scheduler.ThreadPool)
-                // Notify on Main thread
-                .ObserveOnMainThread()
-                // Handle Exceptions
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogError(ex);
-                    audioSeparationJob.SetResult(EJobResult.Error);
-                })
-                .Subscribe(audioSeparationResult =>
-                {
-                    audioSeparationJob.SetResult(EJobResult.Ok);
-                });
+            audioSeparationJob = new Job($"Audio separation of '{Path.GetFileName(songMeta.Mp3)}'");
+            jobManager.AddJob(audioSeparationJob);
         }
+        audioSeparationJob.SetStatus(EJobStatus.Running);
+        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
+        audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+
+        IObservable<AudioSeparationResult> audioSeparationObservable = DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
+            // Execute on Background thread
+            .SubscribeOn(Scheduler.ThreadPool)
+            // Notify on Main thread
+            .ObserveOnMainThread()
+            // Handle Exceptions
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError(ex);
+                audioSeparationJob.SetResult(EJobResult.Error);
+            });
+
+        audioSeparationObservable.Subscribe(audioSeparationResult =>
+            {
+                audioSeparationJob.SetResult(EJobResult.Ok);
+            });
+
+        return audioSeparationObservable;
     }
 
     private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
+        if (audioSeparationProcessCount > 0)
+        {
+            uiManager.CreateNotificationVisualElement("Already performing audio separation");
+            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing audio separation"));
+        }
+
         return Observable.Create<AudioSeparationResult>(o =>
         {
             lock (lockObject)
@@ -132,7 +123,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 }
                 finally
                 {
-                    doneSongMetas.Add(songMeta);
                     audioSeparationProcessCount--;
                 }
 
@@ -141,32 +131,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
             return Disposable.Empty;
         });
-    }
-
-    public void QueueSongToSeparateVoiceAndInstrumentalAudio(SongMeta songMeta)
-    {
-        if (audioSeparationProcessCount > 0)
-        {
-            uiManager.CreateNotificationVisualElement("Already performing audio separation");
-        }
-
-        if (songMeta == null
-            || WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3))
-        {
-            // The audio separation needs a local file.
-            Debug.Log("Cannot separate voice and instrumental audio. Song does not exist or is not on local file system.");
-            return;
-        }
-
-        if (songMetasToProcess.Contains(songMeta))
-        {
-            Debug.Log($"Already added song to separating voice and instrumental audio: {songMeta}");
-        }
-        else
-        {
-            Debug.Log($"Adding song to separating voice and instrumental audio: {songMeta}");
-            songMetasToProcess.AddIfNotContains(songMeta);
-        }
     }
 
     private void UpdateSongMetaWithSpleeterResult(SongMeta songMeta, string generatedSongFolderAbsolutePath, SpleeterResult spleeterResult)
@@ -261,26 +225,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
     }
 
-    private Job CreateAndAddAudioSeparationJob(string name, int lengthInMillis)
+    private void OnDestroy()
     {
-        Job job = new(name);
-        job.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
-        job.SetStatus(EJobStatus.Running);
-        jobManager.AddJob(job);
-        return job;
-    }
-
-    private class AudioSeparationResult
-    {
-        public string OriginalAudioPath { get; private set; }
-        public string VocalsAudioPath { get; private set; }
-        public string InstrumentalAudioPath { get; private set; }
-
-        public AudioSeparationResult(string originalAudioPath, string vocalsAudioPath, string instrumentalAudioPath)
-        {
-            OriginalAudioPath = originalAudioPath;
-            VocalsAudioPath = vocalsAudioPath;
-            InstrumentalAudioPath = instrumentalAudioPath;
-        }
+        // TODO: Kill spleeter process
     }
 }

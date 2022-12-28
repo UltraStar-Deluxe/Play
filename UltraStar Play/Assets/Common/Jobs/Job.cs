@@ -135,7 +135,8 @@ public class Job
         }
 
         Status.Value = newStatus;
-        if (Status.Value == EJobStatus.Finished && Result.Value == EJobResult.Pending)
+        if (Status.Value == EJobStatus.Finished
+            && Result.Value == EJobResult.Pending)
         {
             SetResult(EJobResult.Ok);
         }
