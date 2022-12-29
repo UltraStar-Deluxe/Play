@@ -21,7 +21,7 @@ public static class SpeechRecognitionUtils
     public static int GetEstimatedSpeechRecognitionDurationInMillis(SongMeta songMeta, int lengthInBeats)
     {
         double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
-        return (int)Math.Ceiling(lengthInMillis / 2.5);
+        return (int)Math.Ceiling(lengthInMillis / 4);
     }
 
     public static IObservable<List<Note>> CreateNotesFromSpeechRecognition(
