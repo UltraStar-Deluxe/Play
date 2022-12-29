@@ -102,7 +102,7 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
     private void UpdateRecordingStartIndex()
     {
-        recordingStartIndex = songAudioPlayer.audioPlayer.timeSamples;
+        recordingStartIndex = (int)Math.Floor(songAudioPlayer.audioPlayer.time * SampleRate);
     }
 
     private void FillAudioClipWithRecordingBuffer()
