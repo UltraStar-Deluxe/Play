@@ -50,47 +50,4 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
     }
-
-    public static void MapTextToNotes(string text, List<Note> notes, ISyllableSplitter syllableSplitter)
-    {
-        if (text.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        string[] words = text.Split(" ");
-
-        // Map words to notes alternatingly from start and end
-        int noteIndex = 0;
-        foreach (string word in words)
-        {
-            List<string> syllables = syllableSplitter != null
-                ? syllableSplitter.GetSyllables(word)
-                : new List<string> { word };
-            for (int syllableIndex = 0; syllableIndex < syllables.Count; syllableIndex++)
-            {
-                if (noteIndex >= notes.Count)
-                {
-                    return;
-                }
-
-                if (syllableIndex == syllables.Count - 1)
-                {
-                    // Add space for end of word
-                    notes[noteIndex].SetText(syllables[syllableIndex] + " ");
-                }
-                else
-                {
-                    notes[noteIndex].SetText(syllables[syllableIndex]);
-                }
-                noteIndex++;
-            }
-        }
-
-        // Remove text of notes that did not receive any new text
-        for (int i = noteIndex; i < notes.Count; i++)
-        {
-            notes[i].SetText("_");
-        }
-    }
 }
