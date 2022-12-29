@@ -35,6 +35,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
 
+    private Job lastProcessSongJob;
+
     public void OnInjectionFinished()
     {
 
@@ -47,10 +49,19 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             return;
         }
 
+        if (lastProcessSongJob != null
+            && lastProcessSongJob.Result.Value == EJobResult.Pending)
+        {
+            uiManager.CreateNotificationVisualElement("Already processing a song.\nWait until the running tasks have finished.");
+            return;
+        }
+
         Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
         Job audioSeparationJob = new("Audio separation", processSongJob);
         Job speechRecognitionJob = new("Speech recognition", processSongJob);
         Job pitchDetectionJob = new("Pitch detection", processSongJob);
+
+        lastProcessSongJob = processSongJob;
 
         // (1) Run audio separation (vocals and instrumental audio)
         IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMeta(songMeta, audioSeparationJob);
