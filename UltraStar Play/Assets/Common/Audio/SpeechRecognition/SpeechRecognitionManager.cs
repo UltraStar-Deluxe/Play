@@ -35,95 +35,89 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         }
     }
 
-    [Inject]
-    private UiManager uiManager;
+    private readonly Dictionary<string, Model> pathToSpeechRecognitionModel = new();
+    private VoskRecognizer lastVoskRecognizer;
 
-    private VoskModelParameters lastVoskModelParameters;
-    private Model voskModel;
-    private VoskRecognizer voskRecognizer;
-
-    public VoskRecognizer GetSpeechRecognizer(VoskModelParameters voskModelParameters)
+    public bool HasLoadedSpeechRecognitionModel(string modelPath)
     {
-        CreateOrUpdateSpeechRecognizer(voskModelParameters);
-        return voskRecognizer;
+        return pathToSpeechRecognitionModel.ContainsKey(modelPath);
     }
 
-    public void CreateOrUpdateSpeechRecognizer(VoskModelParameters voskModelParameters)
+    public VoskRecognizer CreateSpeechRecognizer(SpeechRecognitionParameters speechRecognitionParameters)
     {
-        // Update the model
-        using (new DisposableStopwatch("Create speech recognition model took <ms>"))
+        // Load the model if needed
+        if (!HasLoadedSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
         {
-            if (!TryCreateOrUpdateVoskModel(voskModelParameters))
+            using (new DisposableStopwatch("Create speech recognition model took <ms>"))
             {
-                return;
+                if (!TryLoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
+                {
+                    return null;
+                }
             }
         }
+        Model speechRecognitionModel = pathToSpeechRecognitionModel[speechRecognitionParameters.ModelPath];
 
         using (new DisposableStopwatch("Create speech recognizer took <ms>"))
         {
-            CreateOrUpdateVoskRecognizer(voskModelParameters);
+            if (!HasLoadedSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
+            {
+                throw new IllegalStateException("Speech recognition model not loaded");
+            }
+            if (speechRecognitionParameters.SampleRate <= 0)
+            {
+                throw new IllegalStateException("Invalid sample rate");
+            }
+
+            // Vosk always expects a new recognizer object for a new stream
+            // See https://github.com/alphacep/vosk-api/issues/919
+            lastVoskRecognizer?.Dispose();
+            if (!speechRecognitionParameters.Phrases.IsNullOrEmpty())
+            {
+                string voskGrammar = JsonConverter.ToJson(speechRecognitionParameters.Phrases);
+                lastVoskRecognizer = new(speechRecognitionModel, speechRecognitionParameters.SampleRate, voskGrammar);
+            }
+            else
+            {
+                lastVoskRecognizer = new(speechRecognitionModel, speechRecognitionParameters.SampleRate);
+            }
+
+            lastVoskRecognizer.SetWords(true);
         }
 
-        lastVoskModelParameters = voskModelParameters;
+        return lastVoskRecognizer;
     }
 
-    private void CreateOrUpdateVoskRecognizer(VoskModelParameters voskModelParameters)
+    public bool TryLoadSpeechRecognitionModel(string modelPath)
     {
-        if (voskModel == null)
+        if (HasLoadedSpeechRecognitionModel(modelPath))
         {
-            throw new IllegalStateException("VoskModel is null");
-        }
-        if (voskModelParameters.SampleRate <= 0)
-        {
-            throw new IllegalStateException("Invalid sample rate");
-        }
-
-        // Vosk always expects a new recognizer object for a new stream
-        // See https://github.com/alphacep/vosk-api/issues/919
-        voskRecognizer?.Dispose();
-        if (!voskModelParameters.Phrases.IsNullOrEmpty())
-        {
-            string voskGrammar = JsonConverter.ToJson(voskModelParameters.Phrases);
-            voskRecognizer = new(voskModel, voskModelParameters.SampleRate, voskGrammar);
-        }
-        else
-        {
-            voskRecognizer = new(voskModel, voskModelParameters.SampleRate);
-        }
-
-        voskRecognizer.SetWords(true);
-    }
-
-    private bool TryCreateOrUpdateVoskModel(VoskModelParameters voskModelParameters)
-    {
-        if (voskModelParameters.ModelPath.IsNullOrEmpty())
-        {
-            uiManager.CreateNotificationVisualElement("Set the speech recognition model path first.");
-            return false;
-        }
-        if (!Directory.Exists(voskModelParameters.ModelPath))
-        {
-            uiManager.CreateNotificationVisualElement("Speech recognition model path is not a valid folder path.");
-            return false;
-        }
-
-        if (voskModelParameters.ModelParametersEquals(lastVoskModelParameters)
-            && voskModel != null)
-        {
-            // Use the previous version
+            // Nothing to do
             return true;
         }
 
-        Debug.Log($"Loading speech recognition model from {voskModelParameters.ModelPath}");
-        voskModel?.Dispose();
-        voskModel = new(voskModelParameters.ModelPath);
+        if (modelPath.IsNullOrEmpty())
+        {
+            UiManager.Instance.CreateNotificationVisualElement("Set the speech recognition model path first.");
+            return false;
+        }
+        if (!Directory.Exists(modelPath))
+        {
+            UiManager.Instance.CreateNotificationVisualElement("Speech recognition model path is not a valid folder path.");
+            return false;
+        }
+
+        Debug.Log($"Loading speech recognition model from {modelPath}");
+        Model speechRecognitionModel = new(modelPath);
+        pathToSpeechRecognitionModel[modelPath] = speechRecognitionModel;
         return true;
     }
 
     public void Dispose()
     {
-        voskModel?.Dispose();
-        voskRecognizer?.Dispose();
+        lastVoskRecognizer?.Dispose();
+        pathToSpeechRecognitionModel.Values.ForEach(model => model?.Dispose());
+        pathToSpeechRecognitionModel.Clear();
     }
 
     public void OnDestroy()

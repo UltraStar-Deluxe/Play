@@ -61,7 +61,7 @@ public class JobManager : MonoBehaviour, INeedInjection
         // CreateDummyJobs();
         // StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
 
-        UpdateJobUi();
+        UpdateJobsUi();
     }
 
     void Update()
@@ -90,13 +90,12 @@ public class JobManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (job.ParentJob != null)
+        if (job.ParentJob == null)
         {
-            throw new IllegalArgumentException("Can only add top level jobs");
+            jobsWithoutParent.Add(job);
         }
 
-        jobsWithoutParent.Add(job);
-        UpdateJobUi();
+        UpdateJobsUi();
     }
 
     private void FadeOutThenRemoveJob(Job job)
@@ -132,11 +131,29 @@ public class JobManager : MonoBehaviour, INeedInjection
         fadingJobs.Remove(job);
     }
 
-    private void UpdateJobUi()
+    private void UpdateJobsUi()
     {
-        jobsWithoutParent
-            .Where(job => !jobToJobControl.TryGetValue(job, out JobListEntryControl _))
-            .ForEach(job => CreateJobUi(job));
+        jobsWithoutParent.ForEach(job => CreateOrUpdateJobUi(job));
+    }
+
+    private void CreateOrUpdateJobUi(Job job)
+    {
+        if (jobToJobControl.TryGetValue(job, out JobListEntryControl _))
+        {
+            UpdateJobUi(job);
+        }
+        else
+        {
+            CreateJobUi(job);
+        }
+    }
+
+    private void UpdateJobUi(Job job)
+    {
+        // Create UI for child jobs that do not have a UI yet
+        job.ChildJobs
+            .Where(childJob => !jobToJobControl.TryGetValue(childJob, out JobListEntryControl _))
+            .ForEach(childJob => CreateJobUi(childJob));
     }
 
     private void CreateJobUi(Job job)
@@ -164,7 +181,7 @@ public class JobManager : MonoBehaviour, INeedInjection
             }
         }));
 
-        job.ChildJobs.ForEach(childJob => CreateJobUi(childJob));
+        job.ChildJobs.ForEach(childJob => CreateOrUpdateJobUi(childJob));
     }
 
     private void CreateJobListUi()
