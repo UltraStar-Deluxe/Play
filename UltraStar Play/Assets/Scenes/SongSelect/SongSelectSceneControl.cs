@@ -128,11 +128,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.rightLyricsOverlay)]
     private VisualElement rightLyricsOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.startSongButton)]
-    private Button startSongButton;
+    [Inject(UxmlName = R.UxmlNames.playerSelectStartSongButton)]
+    private Button playerSelectStartSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.createSongButton)]
-    private Button createSongButton;
+    [Inject(UxmlName = R.UxmlNames.playerSelectOpenSongEditorButton)]
+    private Button playerSelectOpenSongEditorButton;
+
+    [Inject(UxmlName = R.UxmlNames.playerSelectCreateSongButton)]
+    private Button playerSelectCreateSongButton;
 
     [Inject(UxmlName = R.UxmlNames.menuButton)]
     private Button menuButton;
@@ -312,8 +315,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        startSongButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
-        createSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
+        playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+        playerSelectCreateSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
+        playerSelectOpenSongEditorButton.RegisterCallbackButtonTriggered(() => StartSongEditorScene());
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
@@ -554,8 +558,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdatePlayerSelectOverlayButtons(SongMeta selectedSong)
     {
-        startSongButton.SetVisibleByDisplay(SongMetaUtils.SongMetaFileExists(selectedSong));
-        createSongButton.SetVisibleByDisplay(!SongMetaUtils.SongMetaFileExists(selectedSong));
+        playerSelectStartSongButton.SetVisibleByDisplay(SongMetaUtils.SongMetaFileExists(selectedSong));
+        playerSelectCreateSongButton.SetVisibleByDisplay(!SongMetaUtils.SongMetaFileExists(selectedSong));
     }
 
     private void UpdateSongDurationLabel(double durationInMillis)
@@ -814,13 +818,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Focus start button, such that it can be triggered by keyboard
-        if (startSongButton.IsVisibleByDisplay())
+        if (playerSelectStartSongButton.IsVisibleByDisplay())
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => startSongButton.Focus()));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => playerSelectStartSongButton.Focus()));
         }
-        else if (createSongButton.IsVisibleByDisplay())
+        else if (playerSelectCreateSongButton.IsVisibleByDisplay())
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => createSongButton.Focus()));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => playerSelectCreateSongButton.Focus()));
         }
         else
         {
@@ -1006,8 +1010,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
         duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
         videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
-        closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        startSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+        playerSelectStartSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);

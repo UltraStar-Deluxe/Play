@@ -383,6 +383,7 @@ public static partial class R
         public const string openFolderButton = "openFolderButton";
         public const string openFolderIcon = "openFolderIcon";
         public const string openSongEditorButton = "openSongEditorButton";
+        public const string openSongEditorIcon = "openSongEditorIcon";
         public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
         public const string overlay = "overlay";
@@ -425,8 +426,11 @@ public static partial class R
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
+        public const string playerSelectCreateSongButton = "playerSelectCreateSongButton";
+        public const string playerSelectOpenSongEditorButton = "playerSelectOpenSongEditorButton";
         public const string playerSelectOverlay = "playerSelectOverlay";
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
+        public const string playerSelectStartSongButton = "playerSelectStartSongButton";
         public const string playersIcon = "playersIcon";
         public const string playerUi = "playerUi";
         public const string PlayerUi = "PlayerUi";
@@ -630,7 +634,6 @@ public static partial class R
         public const string splitSyllablesContainer = "splitSyllablesContainer";
         public const string splitSyllablesToggle = "splitSyllablesToggle";
         public const string startButton = "startButton";
-        public const string startSongButton = "startSongButton";
         public const string staticLyricsContainer = "staticLyricsContainer";
         public const string statusBar = "statusBar";
         public const string statusBarControlHintLabel = "statusBarControlHintLabel";
