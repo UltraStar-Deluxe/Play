@@ -114,7 +114,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         noteBatches.ForEach(noteBatch =>
                             MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName));
 
-                        // (4) Run pitch detection on vocals audio
+                        // (4) Add Space between notes
+                        AddSpaceBetweenNotesUtils.AddSpaceBetweenNotes(createdNotes, 1);
+
+                        // (5) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);
                         PitchDetectionUtils.MoveNotesToDetectedPitch(
                                 songMeta,
@@ -128,7 +131,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                             })
                             .Subscribe(_ =>
                             {
-                                // (5) Save and reload song
+                                // (6) Save and reload song
                                 songMetaManager.SaveSong(songMeta, true);
                                 songMetaManager.ReloadSong(songMeta);
 
