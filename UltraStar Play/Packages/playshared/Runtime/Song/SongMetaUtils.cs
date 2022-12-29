@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -434,5 +435,14 @@ public static class SongMetaUtils
     {
         songMeta.GetVoices().ForEach(voice =>
             voice.Sentences.ToList().ForEach(sentence => voice.RemoveSentence(sentence)));
+    }
+
+    public static double NoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
+    {
+        int noteDistanceInBeats = Math.Min(
+            Math.Abs(noteA.EndBeat - noteB.StartBeat),
+            Math.Abs(noteB.EndBeat - noteA.StartBeat));
+
+        return noteDistanceInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
     }
 }

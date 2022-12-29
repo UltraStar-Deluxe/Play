@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -133,5 +134,112 @@ public static class MoveNotesToOtherVoiceUtils
             ChangedSentences = changedSentences;
             RemovedSentences = removedSentences;
         }
+    }
+
+    public static List<List<Note>> SplitIntoSentences(SongMeta songMeta, List<Note> inputNotes)
+    {
+        // Copy input list because splitting is done in-place.
+        inputNotes = inputNotes.ToList();
+
+        List<List<Note>> result = new() { inputNotes };
+
+        void RemoveEmptyBatches()
+        {
+            result = result
+                .Where(batch => !batch.IsNullOrEmpty())
+                .ToList();
+        }
+
+        /////////////////// Split Batches
+        void SplitOnCondition(List<Note> inputBatch, Func<List<Note>, Note, Note, bool> shouldSplitFunction)
+        {
+            // Remove input batch from the result.
+            // The input batch will be split into smaller chunks and these chunks will be added to the result instead.
+            result.Remove(inputBatch);
+
+            List<Note> currentBatch = new();
+            Note lastNote = null;
+            foreach (Note note in inputBatch.ToList())
+            {
+                if (lastNote != null
+                    && !currentBatch.IsNullOrEmpty()
+                    && shouldSplitFunction(currentBatch, lastNote, note))
+                {
+                    result.Add(currentBatch);
+                    currentBatch = new List<Note>();
+                }
+
+                currentBatch.Add(note);
+                inputBatch.Remove(note);
+
+                lastNote = note;
+            }
+
+            // Add final batch to result
+            if (!currentBatch.IsNullOrEmpty())
+            {
+                result.Add(currentBatch);
+            }
+        }
+
+        void SplitOnLongPause(List<Note> inputBatch)
+        {
+            SplitOnCondition(inputBatch,
+                (currentBatch, lastNote, note) => SongMetaUtils.NoteDistanceInMillis(songMeta, note, lastNote) > 1000);
+        }
+        result.ToList().ForEach(batch => SplitOnLongPause(batch));
+        RemoveEmptyBatches();
+
+        void SplitOnLongSentence(List<Note> inputBatch)
+        {
+            SplitOnCondition(inputBatch,
+                (currentBatch, lastNote, note) =>
+                {
+                    // Split if sentence is long on time.
+                    int minBeat = currentBatch.FirstOrDefault().StartBeat;
+                    int maxBeat = currentBatch.LastOrDefault().EndBeat;
+                    int lengthInBeats = maxBeat - minBeat;
+                    double lengthInMillis = lengthInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
+                    if (lengthInMillis > 10000)
+                    {
+                        return true;
+                    }
+
+                    // Split if sentence is long on text.
+                    if (currentBatch.Select(batchNote => batchNote.Text.Length).Sum() > 30)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+        }
+        result.ToList().ForEach(batch => SplitOnLongSentence(batch));
+        RemoveEmptyBatches();
+
+        ////////////////////// Merge batches
+        void MergeTooShortSentences()
+        {
+            List<Note> lastBatch = null;
+            foreach (List<Note> batch in result.ToList())
+            {
+                if (lastBatch != null
+                    && batch.Count <= 2)
+                {
+                    // Remove this batch from the result and add its notes to the previous batch instead.
+                    result.Remove(batch);
+                    lastBatch.AddRange(batch);
+                }
+
+                if (!batch.IsNullOrEmpty())
+                {
+                    lastBatch = batch;
+                }
+            }
+        }
+        MergeTooShortSentences();
+        RemoveEmptyBatches();
+
+        return result;
     }
 }

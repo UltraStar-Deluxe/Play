@@ -50,6 +50,13 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
         // (1) Run audio separation (vocals and instrumental audio)
         IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMeta(songMeta, audioSeparationJob);
+        // IObservable<AudioSeparationResult> audioSeparationObservable = Observable.Create<AudioSeparationResult>(o =>
+        // {
+        //     o.OnNext(new AudioSeparationResult("", "", ""));
+        //     o.OnCompleted();
+        //     return Disposable.Empty;
+        // });
+
         audioSeparationObservable
             .CatchIgnore((Exception ex) =>
             {
@@ -90,9 +97,11 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     {
                         speechRecognitionJob.SetResult(EJobResult.Ok);
 
-                        // (3) Assign created notes to first player.
+                        // (3) Split created notes into sentences and assign to first player.
                         SongMetaUtils.RemoveAllNotes(songMeta);
-                        MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, createdNotes, Voice.firstVoiceName);
+                        List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
+                        noteBatches.ForEach(noteBatch =>
+                            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName));
 
                         // (4) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);

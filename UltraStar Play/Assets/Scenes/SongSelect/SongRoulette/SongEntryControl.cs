@@ -464,8 +464,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         InitModifyPlaylistButtons();
         songOverlayMenu.ShowByDisplay();
-        recreateSingAlongVersionButton.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndSaved(SongMeta));
         singThisSongButton.Focus();
+
+        // Only allow to automatically recreate a song with manually crafted UltraStar txt file during development.
+        if (!Application.isEditor)
+        {
+            recreateSingAlongVersionButton.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndSaved(SongMeta));
+        }
     }
 
     private void InitModifyPlaylistButtons()

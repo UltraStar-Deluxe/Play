@@ -114,6 +114,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
             return true;
         }
 
+        Debug.Log($"Loading speech recognition model from {voskModelParameters.ModelPath}");
         voskModel?.Dispose();
         voskModel = new(voskModelParameters.ModelPath);
         return true;
