@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
@@ -31,6 +32,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+
     public void OnInjectionFinished()
     {
 
@@ -50,42 +54,49 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
         // (1) Run audio separation (vocals and instrumental audio)
         IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMeta(songMeta, audioSeparationJob);
-        // IObservable<AudioSeparationResult> audioSeparationObservable = Observable.Create<AudioSeparationResult>(o =>
-        // {
-        //     o.OnNext(new AudioSeparationResult("", "", ""));
-        //     o.OnCompleted();
-        //     return Disposable.Empty;
-        // });
 
         audioSeparationObservable
             .CatchIgnore((Exception ex) =>
             {
                 audioSeparationJob.SetResult(EJobResult.Error);
+            })
+            .Subscribe(_ =>
+            {
+                audioSeparationJob.SetResult(EJobResult.Ok);
+            });
+
+        // Load speech recognition model in parallel while doing audio separation.
+        string speechRecognitionModelPath = settings.SongEditorSettings.SpeechRecognitionModelPath;
+        IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionModelPath, null);
+
+        // Continue when audio separation and loading speech recognition model have finished
+        Observable.Concat<object>(
+                loadSpeechRecognitionModelObservable,
+                audioSeparationObservable)
+            .CatchIgnore((Exception ex) =>
+            {
                 speechRecognitionJob.SetResult(EJobResult.Error);
                 pitchDetectionJob.SetResult(EJobResult.Error);
             })
             .Subscribe(_ =>
             {
-                audioSeparationJob.SetResult(EJobResult.Ok);
-
                 // (2) Run speech recognition on vocals audio
 
                 // Load vocals audio
                 AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
 
-                VoskModelParameters voskModelParameters = new(
+                SpeechRecognitionParameters speechRecognitionParameters = new(
                     vocalsAudioClip.frequency,
-                    settings.SongEditorSettings.SpeechRecognitionModelPath,
+                    speechRecognitionModelPath,
                     new List<string>());
 
-                speechRecognitionJob.SetStatus(EJobStatus.Running);
                 SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                         songMeta,
                         vocalsAudioClip,
                         0,
                         lengthInBeats,
-                        voskModelParameters,
+                        speechRecognitionParameters,
                         settings.SongEditorSettings.MidiNoteForSpeechRecognition,
                         speechRecognitionJob)
                     .CatchIgnore((Exception ex) =>

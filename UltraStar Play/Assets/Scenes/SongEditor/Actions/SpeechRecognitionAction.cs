@@ -58,33 +58,40 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
         Job speechRecognitionJob = new("Speech recognition to set lyrics");
         jobManager.AddJob(speechRecognitionJob);
-        speechRecognitionJob.SetStatus(EJobStatus.Running);
         speechRecognitionJob.EstimatedTotalDurationInMillis = SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(songMeta, lengthInBeats);
 
-        SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
-                songMeta,
-                audioClip,
-                minBeat,
-                lengthInBeats,
-                CreateSpeechRecognizerParameters())
-            // Execute on Background thread
-            .SubscribeOn(Scheduler.ThreadPool)
-            // Notify on Main thread
-            .ObserveOnMainThread()
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogError(ex);
-                speechRecognitionJob.SetResult(EJobResult.Error);
-            })
-            .Subscribe(voskResultJson =>
-            {
-                speechRecognitionJob.SetResult(EJobResult.Ok);
-                EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson?.text, selectedNotes, englishSyllableSplitter);
-                if (notify)
+        SpeechRecognitionParameters speechRecognizerParameters = CreateSpeechRecognizerParameters();
+        IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognizerParameters.ModelPath, speechRecognitionJob);
+        loadSpeechRecognitionModelObservable.Subscribe(_ =>
+        {
+            speechRecognitionJob.SetStatus(EJobStatus.Running);
+
+            SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
+                    songMeta,
+                    audioClip,
+                    minBeat,
+                    lengthInBeats,
+                    speechRecognizerParameters)
+                // Execute on Background thread
+                .SubscribeOn(Scheduler.ThreadPool)
+                // Notify on Main thread
+                .ObserveOnMainThread()
+                .CatchIgnore((Exception ex) =>
                 {
-                    songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
-                }
-            });
+                    Debug.LogError(ex);
+                    speechRecognitionJob.SetResult(EJobResult.Error);
+                })
+                .Subscribe(voskResultJson =>
+                {
+                    speechRecognitionJob.SetResult(EJobResult.Ok);
+                    EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson?.text, selectedNotes,
+                        englishSyllableSplitter);
+                    if (notify)
+                    {
+                        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+                    }
+                });
+        });
     }
 
     public void CreateNotesFromSpeechRecognition(int startBeat, int lengthInBeats, bool notify)
@@ -127,10 +134,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             });
     }
 
-    private VoskModelParameters CreateSpeechRecognizerParameters()
+    private SpeechRecognitionParameters CreateSpeechRecognizerParameters()
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        return new VoskModelParameters(
+        return new SpeechRecognitionParameters(
             audioClip.frequency,
             GetSpeechRecognitionModelPath(),
             SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));

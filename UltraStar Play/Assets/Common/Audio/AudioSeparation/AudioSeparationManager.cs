@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using SpleeterSharp;
 using UnityEngine;
 using UniInject;
@@ -64,7 +65,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 
-        IObservable<AudioSeparationResult> audioSeparationObservable = DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
+        Subject<AudioSeparationResult> processSongSubject = new();
+        DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -74,14 +76,16 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             {
                 Debug.LogError(ex);
                 audioSeparationJob.SetResult(EJobResult.Error);
-            });
-
-        audioSeparationObservable.Subscribe(audioSeparationResult =>
+                processSongSubject.OnError(ex);
+            })
+            .Subscribe(audioSeparationResult =>
             {
                 audioSeparationJob.SetResult(EJobResult.Ok);
+                processSongSubject.OnNext(audioSeparationResult);
+                processSongSubject.OnCompleted();
             });
 
-        return audioSeparationObservable;
+        return processSongSubject;
     }
 
     private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta, string generatedSongFolderAbsolutePath)
@@ -116,6 +120,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     string vocalsAudioFilePath = songMeta.VocalsAudio;
                     string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
                     o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
+
+                    // Thread.Sleep(5000);
+                    // o.OnNext(new AudioSeparationResult("", "", ""));
                 }
                 catch (Exception ex)
                 {
