@@ -12,6 +12,16 @@ using UniRx;
 
 public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishedListener
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        songMetaToRecordedAudioSamples = new();
+    }
+    private static Dictionary<SongMeta, float[]> songMetaToRecordedAudioSamples = new();
+
+    [Inject]
+    private SongMeta songMeta;
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
@@ -66,10 +76,28 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
         });
 
         recordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 800))
-            .Subscribe(_ =>
+            .Subscribe(events =>
+            {
+                if (events.Count > 0)
+                {
+                    DrawRecordedSamplesWaveForm();
+                }
+            });
+
+        // Load recorded samples from cache
+        if (songMetaToRecordedAudioSamples.ContainsKey(songMeta))
+        {
+            InitRecordingBufferIfNeeded();
+            if (float.IsNaN(overviewAreaRecordedAudioWaveform.contentRect.width)
+                || float.IsNaN(overviewAreaRecordedAudioWaveform.contentRect.height))
+            {
+                overviewAreaRecordedAudioWaveform.RegisterCallback<GeometryChangedEvent>(evt => DrawRecordedSamplesWaveForm());
+            }
+            else
             {
                 DrawRecordedSamplesWaveForm();
-            });
+            }
+        }
     }
 
     private void UpdateRecordingStartIndex()
@@ -169,8 +197,18 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        int recordingBufferLength = GetRequiredRecordingBufferLengthInSamples();
-        RecordingBuffer = new float[recordingBufferLength];
+        int requiredRecordingBufferLength = GetRequiredRecordingBufferLengthInSamples();
+        if (songMetaToRecordedAudioSamples.TryGetValue(songMeta, out float[] cachedRecordingBuffer)
+            && (requiredRecordingBufferLength <= 0
+                || requiredRecordingBufferLength == cachedRecordingBuffer.Length))
+        {
+            RecordingBuffer = cachedRecordingBuffer;
+            HasRecordedAudio = cachedRecordingBuffer.AnyMatch(sample => sample != 0);
+            return;
+        }
+
+        RecordingBuffer = new float[requiredRecordingBufferLength];
+        songMetaToRecordedAudioSamples[songMeta] = RecordingBuffer;
     }
 
     private int GetRequiredRecordingBufferLengthInSamples()
