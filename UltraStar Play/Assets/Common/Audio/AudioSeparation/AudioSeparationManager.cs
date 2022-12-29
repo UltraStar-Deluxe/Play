@@ -104,25 +104,25 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 {
                     audioSeparationProcessCount++;
 
-                    Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-                    UpdateSpleeterSharpConfig();
+                    // Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
+                    // UpdateSpleeterSharpConfig();
+                    //
+                    // SpleeterParameters spleeterParameters = new();
+                    // spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    // spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
+                    // spleeterParameters.OutputFileCodec = "ogg";
+                    //
+                    // Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
+                    // SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
+                    // UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+                    //
+                    // string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    // string vocalsAudioFilePath = songMeta.VocalsAudio;
+                    // string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
+                    // o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
 
-                    SpleeterParameters spleeterParameters = new();
-                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-                    spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
-                    spleeterParameters.OutputFileCodec = "ogg";
-
-                    Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-                    SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
-                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
-
-                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-                    string vocalsAudioFilePath = songMeta.VocalsAudio;
-                    string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
-                    o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
-
-                    // Thread.Sleep(5000);
-                    // o.OnNext(new AudioSeparationResult("", "", ""));
+                    Thread.Sleep(5000);
+                    o.OnNext(new AudioSeparationResult("", "", ""));
                 }
                 catch (Exception ex)
                 {

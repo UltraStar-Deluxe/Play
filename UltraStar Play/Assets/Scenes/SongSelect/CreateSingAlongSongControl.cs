@@ -89,7 +89,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 SpeechRecognitionParameters speechRecognitionParameters = new(
                     vocalsAudioClip.frequency,
                     speechRecognitionModelPath,
-                    new List<string>());
+                    SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
 
                 SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                         songMeta,

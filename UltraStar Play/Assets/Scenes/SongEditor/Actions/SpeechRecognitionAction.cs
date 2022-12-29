@@ -44,8 +44,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
-    private readonly EnglishSyllableSplitter englishSyllableSplitter = new();
-
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
@@ -84,8 +82,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 .Subscribe(voskResultJson =>
                 {
                     speechRecognitionJob.SetResult(EJobResult.Ok);
-                    EditorNoteLyricsInputControl.MapTextToNotes(voskResultJson?.text, selectedNotes,
-                        englishSyllableSplitter);
+                    SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, voskResultJson.result, selectedNotes, minBeat);
                     if (notify)
                     {
                         songMetaChangeEventStream.OnNext(new LyricsChangedEvent());

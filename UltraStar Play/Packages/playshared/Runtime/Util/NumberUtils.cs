@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public static class NumberUtils
 {
@@ -77,5 +78,56 @@ public static class NumberUtils
             .Select(grp => grp.Key)
             .First();
         return result;
+    }
+
+    /**
+     * Calculates the intersection of two intervals A and B.
+     */
+    public static double[] GetIntersection(double aStart, double aEnd, double bStart, double bEnd)
+    {
+        if (aEnd < aStart
+            || bEnd < bStart)
+        {
+            throw new IllegalArgumentException("'start' must be smaller than 'end'");
+        }
+
+        // https://scicomp.stackexchange.com/questions/26258/the-easiest-way-to-find-intersection-of-two-intervals
+        if (bStart > aEnd
+            || aStart > bEnd)
+        {
+            // no overlap
+            return null;
+        }
+
+        double intersectionStart = Math.Max(aStart, bStart);
+        double intersectionEnd = Math.Min(aEnd, bEnd);
+        return new double[] { intersectionStart, intersectionEnd };
+    }
+
+    /**
+     * Calculates the length of the intersection two intervals A and B.
+     */
+    public static double GetIntersectionLength(double aStart, double aEnd, double bStart, double bEnd)
+    {
+        double[] intersection = GetIntersection(aStart, aEnd, bStart, bEnd);
+        if (intersection == null
+            || intersection.Length < 2)
+        {
+            return -1;
+        }
+
+        return Math.Abs(intersection[1] - intersection[0]);
+    }
+
+    public static double GetIntersectionDistance(double aStart, double aEnd, double bStart, double bEnd)
+    {
+        if (GetIntersection(aStart, aEnd, bStart, bEnd) != null)
+        {
+            return 0;
+        }
+
+        return Math.Min(
+            Math.Abs(bStart - aEnd),
+            Math.Abs(aStart - bEnd));
     }
 }

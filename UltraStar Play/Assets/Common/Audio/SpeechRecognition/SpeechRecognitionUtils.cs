@@ -285,4 +285,43 @@ public static class SpeechRecognitionUtils
         });
         return wordsHashSet.ToList();
     }
+
+    public static void MapSpeechRecognitionResultTextToNotes(SongMeta songMeta, List<VoskResultWordJson> wordsJson, List<Note> notes, int wordOffsetInBeats)
+    {
+        List<VoskResultWordJson> unusedWordsJson = wordsJson.ToList();
+        List<Note> unsetNotes = notes.ToList();
+
+        // First round: Best matching word is the word that has the largest temporal overlap with the note
+        unsetNotes.ToList().ForEach(note =>
+        {
+            VoskResultWordJson bestMatchingWordJson = null;
+            double bestMatchingWordOverlapInMillis = 0;
+            foreach (VoskResultWordJson wordJson in unusedWordsJson)
+            {
+                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
+                double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
+
+                double overlapInMillis = NumberUtils.GetIntersectionLength(
+                    noteStartInMillis, noteEndInMillis,
+                    wordJson.start * 1000, wordJson.end * 1000);
+                if (overlapInMillis > 0
+                    && (bestMatchingWordJson == null
+                        || bestMatchingWordOverlapInMillis < overlapInMillis))
+                {
+                    bestMatchingWordJson = wordJson;
+                    bestMatchingWordOverlapInMillis = overlapInMillis;
+                }
+            }
+
+            if (bestMatchingWordJson != null)
+            {
+                note.SetText(bestMatchingWordJson.word + " ");
+                // Do not use this word again
+                unusedWordsJson.Remove(bestMatchingWordJson);
+                unsetNotes.Remove(note);
+            }
+        });
+
+        unsetNotes.ForEach(note => note.SetText("_"));
+    }
 }
