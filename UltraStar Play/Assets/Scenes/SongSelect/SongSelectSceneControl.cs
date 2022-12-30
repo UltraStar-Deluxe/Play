@@ -399,6 +399,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             uiManager.CreateNotificationVisualElement($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
             UpdatePlayerSelectOverlayButtons();
         });
+
+        // Close overlays by clicking none of its child elements
+        playerSelectOverlayContainer.RegisterCallback<ClickEvent>(evt =>
+        {
+            if (evt.target == playerSelectOverlayContainer)
+            {
+                HidePlayerSelectOverlay();
+            }
+        });
+
+        menuOverlay.RegisterCallback<ClickEvent>(evt =>
+        {
+            if (evt.target == menuOverlay)
+            {
+                HideMenuOverlay();
+            }
+        });
     }
 
 
