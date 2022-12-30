@@ -71,6 +71,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.recreateSingAlongVersionButton)]
     private Button recreateSingAlongVersionButton;
 
+    [Inject(UxmlName = R.UxmlNames.separateAudioButton)]
+    private Button separateAudioButton;
+
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     public VisualElement SongPreviewVideoImage { get; private set; }
 
@@ -82,6 +85,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
+
+    [Inject]
+    private AudioSeparationManager audioSeparationManager;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -365,6 +371,14 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             if (SongMeta != null)
             {
                 createSingAlongSongControl.CreateSingAlongSong(SongMeta);
+            }
+        });
+
+        separateAudioButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (SongMeta != null)
+            {
+                audioSeparationManager.ProcessSongMeta(SongMeta);
             }
         });
 
