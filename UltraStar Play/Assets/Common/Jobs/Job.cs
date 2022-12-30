@@ -37,6 +37,16 @@ public class Job
             }
             return progressInPercent;
         }
+
+        set
+        {
+            double progressFactor = value / 100.0;
+            if (progressFactor <= 0)
+            {
+                return;
+            }
+            EstimatedTotalDurationInMillis = (long)(CurrentDurationInMillis * (1 / progressFactor));
+        }
     }
 
     public long CurrentDurationInMillis

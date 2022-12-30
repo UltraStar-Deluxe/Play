@@ -49,6 +49,8 @@ public static class SpeechRecognitionUtils
         CancellationTokenSource cancellationTokenSource = new();
         speechRecognitionJob.OnCancel = () => cancellationTokenSource.Cancel();
 
+        Action<double> onProgress = progressInPercent => speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
+
         Subject<List<Note>> createNotesFromSpeechRecognitionSubject = new();
 
         IObservable<object> loadSpeechRecognitionModelObservable = LoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath, null);
@@ -62,7 +64,8 @@ public static class SpeechRecognitionUtils
                     startBeat,
                     lengthInBeats,
                     speechRecognitionParameters,
-                    cancellationTokenSource.Token)
+                    cancellationTokenSource.Token,
+                    onProgress)
                 // Execute on Background thread
                 .SubscribeOn(Scheduler.ThreadPool)
                 // Notify on Main thread
@@ -177,7 +180,8 @@ public static class SpeechRecognitionUtils
         int startBeat,
         int lengthInBeats,
         SpeechRecognitionParameters speechRecognitionParameters,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<double> onProgress)
     {
         if (speechRecognitionProcessCount > 0)
         {
@@ -201,7 +205,7 @@ public static class SpeechRecognitionUtils
                 {
                     speechRecognitionProcessCount++;
                     VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-                    VoskResultJson voskResultJson = AnalyzeSamples(audioSamplesForSpeechRecognition, speechRecognizer, sampleRate, cancellationToken);
+                    VoskResultJson voskResultJson = AnalyzeSamples(audioSamplesForSpeechRecognition, speechRecognizer, sampleRate, cancellationToken, onProgress);
                     Debug.Log($"Analyzed text from beat {startBeat} to beat {startBeat + lengthInBeats}. Result: {voskResultJson?.text}");
                     o.OnNext(voskResultJson);
                 }
@@ -225,7 +229,8 @@ public static class SpeechRecognitionUtils
         short[] monoSamplesArray,
         VoskRecognizer voskRecognizer,
         int sampleRate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<double> onProgress)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -235,16 +240,18 @@ public static class SpeechRecognitionUtils
         int targetWindowSizeInSamples = sampleRate * targetWindowSizeInSeconds;
         for (int sampleStartIndex = 0; sampleStartIndex < monoSamplesArray.Length; sampleStartIndex += targetWindowSizeInSamples)
         {
-            int progressPercent = (int)Math.Floor((double)sampleStartIndex / monoSamplesArray.Length * 100.0);
+            double progressPercent = (double)sampleStartIndex / monoSamplesArray.Length * 100.0;
             if (IsApplicationTerminating)
             {
-                throw new Exception($"Exiting speech recognition at {progressPercent} % because application is terminating");
+                throw new Exception($"Exiting speech recognition at {(int)progressPercent} % because application is terminating");
             }
             if (cancellationToken.IsCancellationRequested)
             {
-                Debug.Log($"Canceled speech recognition at {progressPercent} %");
+                Debug.Log($"Canceled speech recognition at {(int)progressPercent} %");
                 break;
             }
+
+            onProgress?.Invoke(progressPercent);
 
             // Create array for the samples to be processed in this iteration
             int remainingSampleCount = monoSamplesArray.Length - sampleStartIndex;
