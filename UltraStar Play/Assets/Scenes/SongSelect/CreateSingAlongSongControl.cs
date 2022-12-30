@@ -84,7 +84,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionModelPath, null);
 
         // Continue when audio separation and loading speech recognition model have finished
-        Observable.Concat<object>(
+        Observable.WhenAll<object>(
                 loadSpeechRecognitionModelObservable,
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
