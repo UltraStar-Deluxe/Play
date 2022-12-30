@@ -61,6 +61,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         CancellationTokenSource cancellationTokenSource = new();
         speechRecognitionJob.OnCancel = () => cancellationTokenSource.Cancel();
 
+        Action<double> onProgress = progressInPercent => speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
+
         SpeechRecognitionParameters speechRecognizerParameters = CreateSpeechRecognizerParameters();
         IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognizerParameters.ModelPath, speechRecognitionJob);
         loadSpeechRecognitionModelObservable.Subscribe(_ =>
@@ -73,7 +75,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     minBeat,
                     lengthInBeats,
                     speechRecognizerParameters,
-                    cancellationTokenSource.Token)
+                    cancellationTokenSource.Token,
+                    onProgress)
                 // Execute on Background thread
                 .SubscribeOn(Scheduler.ThreadPool)
                 // Notify on Main thread
