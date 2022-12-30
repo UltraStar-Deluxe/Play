@@ -21,7 +21,7 @@ public static class SpeechRecognitionUtils
     private static int speechRecognitionProcessCount;
 
     public static bool IsApplicationTerminating { get; set; }
-    public static bool IsExternalSpeechRecognitionProcessRunning { get; private set; }
+    public static bool IsExternalSpeechRecognitionCallRunning { get; private set; }
 
     public static int GetEstimatedSpeechRecognitionDurationInMillis(SongMeta songMeta, int lengthInBeats)
     {
@@ -248,7 +248,7 @@ public static class SpeechRecognitionUtils
             if (cancellationToken.IsCancellationRequested)
             {
                 Debug.Log($"Canceled speech recognition at {(int)progressPercent} %");
-                break;
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             onProgress?.Invoke(progressPercent);
@@ -264,12 +264,12 @@ public static class SpeechRecognitionUtils
             // Process the samples
             try
             {
-                IsExternalSpeechRecognitionProcessRunning = true;
+                IsExternalSpeechRecognitionCallRunning = true;
                 voskRecognizer.AcceptWaveform(windowSamples, windowSamples.Length);
             }
             finally
             {
-                IsExternalSpeechRecognitionProcessRunning = false;
+                IsExternalSpeechRecognitionCallRunning = false;
             }
         }
 

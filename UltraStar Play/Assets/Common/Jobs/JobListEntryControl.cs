@@ -49,8 +49,16 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
         jobNameLabel.text = job.Name;
 
         UpdateIcons();
-        job.Result.Subscribe(_ => UpdateIcons());
-        job.Status.Subscribe(_ => UpdateIcons());
+        job.Result.Subscribe(_ =>
+        {
+            UpdateIcons();
+            UpdateCancelJobButton();
+        });
+        job.Status.Subscribe(_ =>
+        {
+            UpdateIcons();
+            UpdateCancelJobButton();
+        });
 
         if (job.ParentJob != null)
         {
@@ -75,7 +83,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
     private void UpdateCancelJobButton()
     {
         cancelJobButton.SetVisibleByDisplay(job.IsCancelable.Value);
-        cancelJobButton.SetEnabled(!job.IsCanceled.Value);
+        cancelJobButton.SetEnabled(!job.IsCanceled.Value && job.Result.Value == EJobResult.Pending);
     }
 
     private void UpdateIcons()

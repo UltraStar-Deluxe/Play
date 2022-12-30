@@ -127,7 +127,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         SpeechRecognitionUtils.IsApplicationTerminating = true;
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
         long maxWaitDurationInMillis = 5000;
-        while (SpeechRecognitionUtils.IsExternalSpeechRecognitionProcessRunning
+        while (SpeechRecognitionUtils.IsExternalSpeechRecognitionCallRunning
                && TimeUtils.GetUnixTimeMilliseconds() - startTime < maxWaitDurationInMillis)
         {
             Debug.Log("Waiting for speech recognition to finish");
