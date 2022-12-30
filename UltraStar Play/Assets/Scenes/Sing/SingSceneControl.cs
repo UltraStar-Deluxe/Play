@@ -835,15 +835,29 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_togglePause),
             () => TogglePlayPause());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => Restart());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
             () => SkipToNextSingableNote());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => FinishScene(false));
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => OpenSongInEditor());
+
+        contextMenuPopup.AddSeparator();
+
+        contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
+        Slider vocalsVolumeSlider = new();
+        vocalsVolumeSlider.lowValue = 0;
+        vocalsVolumeSlider.highValue = 100;
+        vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
+        vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
+        {
+            settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
+        });
+
+        contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
     }
 }

@@ -111,7 +111,12 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         visualElement.Add(contextMenuItemVisualElement);
     }
 
-    public void AddItem(string text, Action action)
+    public void AddVisualElement(VisualElement newVisualElement)
+    {
+        visualElement.Add(newVisualElement);
+    }
+
+    public void AddButton(string text, Action action)
     {
         VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
         ContextMenuItemControl contextMenuItem = new(text, action);

@@ -535,6 +535,7 @@ public static partial class R
         public const string sentenceRatingContainer = "sentenceRatingContainer";
         public const string SentenceRatingUi = "SentenceRatingUi";
         public const string sentenceUiRoot = "sentenceUiRoot";
+        public const string separateAudioButton = "separateAudioButton";
         public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
