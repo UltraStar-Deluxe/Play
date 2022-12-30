@@ -58,6 +58,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         jobManager.AddJob(speechRecognitionJob);
         speechRecognitionJob.EstimatedTotalDurationInMillis = SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(songMeta, lengthInBeats);
 
+        CancellationTokenSource cancellationTokenSource = new();
+        speechRecognitionJob.OnCancel = () => cancellationTokenSource.Cancel();
+
         SpeechRecognitionParameters speechRecognizerParameters = CreateSpeechRecognizerParameters();
         IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognizerParameters.ModelPath, speechRecognitionJob);
         loadSpeechRecognitionModelObservable.Subscribe(_ =>
@@ -69,7 +72,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     audioClip,
                     minBeat,
                     lengthInBeats,
-                    speechRecognizerParameters)
+                    speechRecognizerParameters,
+                    cancellationTokenSource.Token)
                 // Execute on Background thread
                 .SubscribeOn(Scheduler.ThreadPool)
                 // Notify on Main thread
