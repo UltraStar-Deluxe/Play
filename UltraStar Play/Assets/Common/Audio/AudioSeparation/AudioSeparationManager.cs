@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using SpleeterSharp;
 using UnityEngine;
 using UniInject;
@@ -65,8 +66,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 
+        CancellationTokenSource cancellationTokenSource = new();
+        audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
+
         Subject<AudioSeparationResult> processSongSubject = new();
-        DoProcessSongMetaAsObservable(songMeta, generatedSongFolderAbsolutePath)
+        DoProcessSongMetaAsObservable(
+                songMeta,
+                generatedSongFolderAbsolutePath,
+                cancellationTokenSource.Token)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -88,7 +95,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         return processSongSubject;
     }
 
-    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta, string generatedSongFolderAbsolutePath)
+    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(
+        SongMeta songMeta,
+        string generatedSongFolderAbsolutePath,
+        CancellationToken cancellationToken)
     {
         if (audioSeparationProcessCount > 0)
         {
@@ -104,25 +114,38 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 {
                     audioSeparationProcessCount++;
 
-                    // Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-                    // UpdateSpleeterSharpConfig();
-                    //
-                    // SpleeterParameters spleeterParameters = new();
-                    // spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-                    // spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
-                    // spleeterParameters.OutputFileCodec = "ogg";
-                    //
-                    // Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
-                    // SpleeterResult spleeterResult = SpleeterUtils.Split(spleeterParameters);
-                    // UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
-                    //
-                    // string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-                    // string vocalsAudioFilePath = songMeta.VocalsAudio;
-                    // string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
-                    // o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
+                    Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
+                    UpdateSpleeterSharpConfig();
 
-                    Thread.Sleep(5000);
-                    o.OnNext(new AudioSeparationResult("", "", ""));
+                    SpleeterParameters spleeterParameters = new();
+                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
+                    spleeterParameters.OutputFileCodec = "ogg";
+
+                    Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
+                    Task<SpleeterResult> splitTask = SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
+                    splitTask.Wait();
+                    SpleeterResult spleeterResult = splitTask.Result;
+
+                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+
+                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    string vocalsAudioFilePath = songMeta.VocalsAudio;
+                    string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
+                    o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
+
+                    // long startTime = TimeUtils.GetUnixTimeMilliseconds();
+                    // while (TimeUtils.GetUnixTimeMilliseconds() - startTime < 10000)
+                    // {
+                    //     if (cancellationToken.IsCancellationRequested)
+                    //     {
+                    //         Debug.Log("Cancel requested");
+                    //         cancellationToken.ThrowIfCancellationRequested();
+                    //         break;
+                    //     }
+                    //     Thread.Sleep(200);
+                    // }
+                    // o.OnNext(new AudioSeparationResult("", "", ""));
                 }
                 catch (Exception ex)
                 {

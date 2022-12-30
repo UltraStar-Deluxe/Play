@@ -69,6 +69,8 @@ public static partial class R
         public const string calibrateDelayButton = "calibrateDelayButton";
         public const string cancelButton = "cancelButton";
         public const string cancelDeletePlaylistButton = "cancelDeletePlaylistButton";
+        public const string cancelJobButton = "cancelJobButton";
+        public const string cancelJobIcon = "cancelJobIcon";
         public const string categoryNameContainer = "categoryNameContainer";
         public const string categoryNameLabel = "categoryNameLabel";
         public const string centerContent = "centerContent";

@@ -58,6 +58,21 @@ public class Job
     private long startTimeInMillis;
     private long endTimeInMillis;
 
+    private Action onCancel;
+    public Action OnCancel {
+        get
+        {
+            return onCancel;
+        }
+        set
+        {
+            onCancel = value;
+            IsCancelable.Value = onCancel != null;
+        }
+    }
+    public ReactiveProperty<bool> IsCanceled { get; private set; } = new(false);
+    public ReactiveProperty<bool> IsCancelable { get; private set; } = new(false);
+
     public Job(string name, Job parentJob = null)
     {
         Name = name;
@@ -163,5 +178,25 @@ public class Job
         {
             SetStatus(EJobStatus.Finished);
         }
+    }
+
+    public void SetResultIfPending(EJobResult newResult)
+    {
+        if (Result.Value == EJobResult.Pending)
+        {
+            SetResult(newResult);
+        }
+    }
+
+    public void Cancel()
+    {
+        if (IsCanceled.Value
+            || !IsCancelable.Value)
+        {
+            return;
+        }
+
+        IsCanceled.Value = true;
+        onCancel();
     }
 }
