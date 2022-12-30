@@ -284,7 +284,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private CreateSingAlongSongControl createSingAlongSongControl = new();
+    private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
 
     private void Start()
     {
@@ -393,6 +393,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+
+        createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
+        {
+            uiManager.CreateNotificationVisualElement($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
+            UpdatePlayerSelectOverlayButtons();
+        });
     }
 
 
@@ -548,7 +554,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateSongStatistics(selectedSong);
 
-        UpdatePlayerSelectOverlayButtons(selectedSong);
+        UpdatePlayerSelectOverlayButtons();
 
         if (IsSongDetailOverlayVisible)
         {
@@ -556,10 +562,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private void UpdatePlayerSelectOverlayButtons(SongMeta selectedSong)
+    private void UpdatePlayerSelectOverlayButtons()
     {
-        playerSelectStartSongButton.SetVisibleByDisplay(SongMetaUtils.SongMetaFileExists(selectedSong));
-        playerSelectCreateSongButton.SetVisibleByDisplay(!SongMetaUtils.SongMetaFileExists(selectedSong));
+        playerSelectStartSongButton.SetVisibleByDisplay(SongMetaUtils.SongMetaFileExists(SelectedSong));
+        playerSelectCreateSongButton.SetVisibleByDisplay(!SongMetaUtils.SongMetaFileExists(SelectedSong));
     }
 
     private void UpdateSongDurationLabel(double durationInMillis)
@@ -792,7 +798,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void ShowPlayerSelectOverlay()
     {
-        UpdatePlayerSelectOverlayButtons(SelectedSong);
+        UpdatePlayerSelectOverlayButtons();
         songSelectPlayerSelectUi.ShowByDisplay();
         playerSelectOverlayContainer.ShowByDisplay();
         UpdateInputLegend();
