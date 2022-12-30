@@ -61,10 +61,21 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
         {
             job.Cancel();
         });
-        job.IsCancelable.Subscribe(isCancelable =>
+        job.IsCancelable.Subscribe(_ =>
         {
-            cancelJobButton.SetVisibleByDisplay(isCancelable);
+            UpdateCancelJobButton();
         });
+        job.IsCanceled.Subscribe(_ =>
+        {
+            UpdateCancelJobButton();
+        });
+        UpdateCancelJobButton();
+    }
+
+    private void UpdateCancelJobButton()
+    {
+        cancelJobButton.SetVisibleByDisplay(job.IsCancelable.Value);
+        cancelJobButton.SetEnabled(!job.IsCanceled.Value);
     }
 
     private void UpdateIcons()

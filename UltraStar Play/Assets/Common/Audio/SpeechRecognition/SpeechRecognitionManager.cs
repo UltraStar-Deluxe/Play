@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 using UniInject;
 using UniRx;
@@ -122,6 +123,17 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 
     public void OnDestroy()
     {
+        // Wait until the speech recognition process finished.
+        SpeechRecognitionUtils.IsApplicationTerminating = true;
+        long startTime = TimeUtils.GetUnixTimeMilliseconds();
+        long maxWaitDurationInMillis = 5000;
+        while (SpeechRecognitionUtils.IsExternalSpeechRecognitionProcessRunning
+                && TimeUtils.GetUnixTimeMilliseconds() - startTime < maxWaitDurationInMillis)
+        {
+            Debug.Log("Waiting for speech recognition to finish");
+            Thread.Sleep(500);
+        }
+
         Dispose();
     }
 }
