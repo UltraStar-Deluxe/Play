@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -51,6 +52,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
+    private readonly List<Job> audioSeparationJobs = new();
+
     public IObservable<AudioSeparationResult> ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
     {
         string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
@@ -68,6 +71,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
+        audioSeparationJobs.Add(audioSeparationJob);
 
         Subject<AudioSeparationResult> processSongSubject = new();
         DoProcessSongMetaAsObservable(
@@ -255,8 +259,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
     {
-        // TODO: Kill spleeter process
+        audioSeparationJobs.ForEach(job => job.Cancel());
     }
 }
