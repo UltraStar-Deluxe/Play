@@ -37,6 +37,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     private Job lastProcessSongJob;
 
+    private readonly Subject<SongMeta> createdSingAlongVersionEventStream = new();
+    public IObservable<SongMeta> CreatedSingAlongVersionEventStream => createdSingAlongVersionEventStream;
+
     public void OnInjectionFinished()
     {
 
@@ -142,14 +145,13 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                             })
                             .Subscribe(_ =>
                             {
+                                pitchDetectionJob.SetResult(EJobResult.Ok);
+
                                 // (6) Save and reload song
                                 songMetaManager.SaveSong(songMeta, true);
                                 songMetaManager.ReloadSong(songMeta);
 
-                                // TODO: fire event to update song select UI entries
-                                uiManager.CreateNotificationVisualElement($"Created sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
-
-                                pitchDetectionJob.SetResult(EJobResult.Ok);
+                                createdSingAlongVersionEventStream.OnNext(songMeta);
                             });
                     });
             });

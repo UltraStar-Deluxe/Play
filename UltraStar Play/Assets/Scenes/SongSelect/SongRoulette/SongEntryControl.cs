@@ -398,6 +398,15 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             }
         });
 
+        createSingAlongSongControl.CreatedSingAlongVersionEventStream
+            .Subscribe(processedSongMeta =>
+            {
+                if (processedSongMeta == songMeta)
+                {
+                    UpdateIcons();
+                }
+            });
+
         UpdateTranslation();
     }
 
