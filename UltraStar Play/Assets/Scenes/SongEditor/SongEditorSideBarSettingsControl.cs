@@ -38,6 +38,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
 
+    [Inject(UxmlName = R.UxmlNames.detectSpeechAfterRecordingToggle)]
+    private Toggle detectSpeechAfterRecordingToggle;
+
+    [Inject(UxmlName = R.UxmlNames.recordSamplesInsteadOfNotesToggle)]
+    private Toggle recordSamplesInsteadOfNotesToggle;
+
     [Inject(UxmlName = R.UxmlNames.buttonRecordingPitchTextField)]
     private TextField buttonRecordingPitchTextField;
 
@@ -113,12 +119,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPitchTextField)]
     private TextField speechRecognitionPitchTextField;
 
-    [Inject(UxmlName = R.UxmlNames.recordNotesRadioButton)]
-    private RadioButton recordNotesRadioButton;
-
-    [Inject(UxmlName = R.UxmlNames.recordAudioRadioButton)]
-    private RadioButton recordAudioRadioButton;
-
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
     private ItemPicker pitchDetectionAlgorithmItemPicker;
 
@@ -166,6 +166,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private LabeledItemPickerControl<ESongEditorSamplesSource> playbackAudioItemPickerControl;
     private LabeledItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
     private LabeledItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
+    private LabeledItemPickerControl<ERecordNotesOrAudio> recordNotesOrAudioItemPickerControl;
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
@@ -238,12 +239,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
 
         // Record notes or audio
-        Bind(recordAudioRadioButton,
+        Bind(recordSamplesInsteadOfNotesToggle,
             () => settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
             newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = newValue);
-        Bind(recordNotesRadioButton,
-            () => !settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
-            newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = !newValue);
+
+        Bind(detectSpeechAfterRecordingToggle,
+            () => settings.SongEditorSettings.DetectSpeechAfterRecording,
+            newValue => settings.SongEditorSettings.DetectSpeechAfterRecording = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,
@@ -409,5 +411,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 .Subscribe(newValue => baseField.value = newValue)
                 .AddTo(gameObject);
         }
+    }
+
+    public enum ERecordNotesOrAudio
+    {
+        RecordNotes,
+        RecordAudio,
     }
 }

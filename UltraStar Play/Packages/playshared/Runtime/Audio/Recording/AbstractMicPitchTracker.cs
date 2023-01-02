@@ -39,9 +39,10 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     {
         get
         {
-            if (micSampleRecorder == null)
+            if (micSampleRecorder == null
+                && gameObject)
             {
-                micSampleRecorder = GetComponent < MicSampleRecorder>();
+                micSampleRecorder = GetComponent<MicSampleRecorder>();
             }
 
             return micSampleRecorder;

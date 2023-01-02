@@ -51,9 +51,9 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         {
             using (new DisposableStopwatch("Create speech recognition model took <ms>"))
             {
-                if (!TryLoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
+                if (!TryLoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath, out string errorMessage))
                 {
-                    return null;
+                    throw new IllegalStateException(errorMessage);
                 }
             }
         }
@@ -89,28 +89,30 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
         return lastVoskRecognizer;
     }
 
-    public bool TryLoadSpeechRecognitionModel(string modelPath)
+    public bool TryLoadSpeechRecognitionModel(string modelPath, out string errorMessage)
     {
         if (HasLoadedSpeechRecognitionModel(modelPath))
         {
             // Nothing to do
+            errorMessage = "";
             return true;
         }
 
         if (modelPath.IsNullOrEmpty())
         {
-            UiManager.Instance.CreateNotificationVisualElement("Set the speech recognition model path first.");
+            errorMessage = "Set the speech recognition model path first.";
             return false;
         }
         if (!Directory.Exists(modelPath))
         {
-            UiManager.Instance.CreateNotificationVisualElement("Speech recognition model path is not a valid folder path.");
+            errorMessage = "Speech recognition model path is not a valid folder path.";
             return false;
         }
 
         Debug.Log($"Loading speech recognition model from {modelPath}");
         Model speechRecognitionModel = new(modelPath);
         pathToSpeechRecognitionModel[modelPath] = speechRecognitionModel;
+        errorMessage = "";
         return true;
     }
 

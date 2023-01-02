@@ -54,38 +54,47 @@ public static class SpeechRecognitionUtils
         Subject<List<Note>> createNotesFromSpeechRecognitionSubject = new();
 
         IObservable<object> loadSpeechRecognitionModelObservable = LoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath, null);
-        loadSpeechRecognitionModelObservable.Subscribe(_ =>
-        {
-            speechRecognitionJob.SetStatus(EJobStatus.Running);
+        loadSpeechRecognitionModelObservable
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError(ex);
+                speechRecognitionJob.SetResult(EJobResult.Error);
+                createNotesFromSpeechRecognitionSubject.OnError(ex);
+                UiManager.Instance.CreateNotificationVisualElement(ex.Message);
+            })
+            .Subscribe(_ =>
+            {
+                speechRecognitionJob.SetStatus(EJobStatus.Running);
 
-            DoSpeechRecognitionAsObservable(
-                    songMeta,
-                    audioClip,
-                    startBeat,
-                    lengthInBeats,
-                    speechRecognitionParameters,
-                    cancellationTokenSource.Token,
-                    onProgress)
-                // Execute on Background thread
-                .SubscribeOn(Scheduler.ThreadPool)
-                // Notify on Main thread
-                .ObserveOnMainThread()
-                // Handle Exceptions
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogError(ex);
-                    speechRecognitionJob.SetResult(EJobResult.Error);
-                    createNotesFromSpeechRecognitionSubject.OnError(ex);
-                })
-                .Subscribe(voskResultJson =>
-                {
-                    speechRecognitionJob.SetResult(EJobResult.Ok);
-                    List<Note> createdNotes = CreateNotesFromVoskResult(voskResultJson.result, songMeta, startBeat, midiNote);
+                DoSpeechRecognitionAsObservable(
+                        songMeta,
+                        audioClip,
+                        startBeat,
+                        lengthInBeats,
+                        speechRecognitionParameters,
+                        cancellationTokenSource.Token,
+                        onProgress)
+                    // Execute on Background thread
+                    .SubscribeOn(Scheduler.ThreadPool)
+                    // Notify on Main thread
+                    .ObserveOnMainThread()
+                    // Handle Exceptions
+                    .CatchIgnore((Exception ex) =>
+                    {
+                        Debug.LogError(ex);
+                        speechRecognitionJob.SetResult(EJobResult.Error);
+                        createNotesFromSpeechRecognitionSubject.OnError(ex);
+                        UiManager.Instance.CreateNotificationVisualElement(ex.Message);
+                    })
+                    .Subscribe(voskResultJson =>
+                    {
+                        speechRecognitionJob.SetResult(EJobResult.Ok);
+                        List<Note> createdNotes = CreateNotesFromVoskResult(voskResultJson.result, songMeta, startBeat, midiNote);
 
-                    createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
-                    createNotesFromSpeechRecognitionSubject.OnCompleted();
-                });
-        });
+                        createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
+                        createNotesFromSpeechRecognitionSubject.OnCompleted();
+                    });
+            });
 
         return createNotesFromSpeechRecognitionSubject;
     }
@@ -150,9 +159,11 @@ public static class SpeechRecognitionUtils
             {
                 try
                 {
-                    if (!speechRecognitionManager.TryLoadSpeechRecognitionModel(modelPath))
+                    speechRecognitionProcessCount++;
+
+                    if (!speechRecognitionManager.TryLoadSpeechRecognitionModel(modelPath, out string errorMessage))
                     {
-                        o.OnError(new Exception("Failed to load speech recognition model"));
+                        o.OnError(new IllegalStateException(errorMessage));
                         return Disposable.Empty;
                     }
 

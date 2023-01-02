@@ -52,6 +52,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     [Inject]
     private EditorNoteControl noteControl;
 
+    [Inject]
+    private Settings settings;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -91,7 +94,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
         contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
-        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, true));
+        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true));
         contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
         contextMenu.AddButton("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }
