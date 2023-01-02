@@ -715,6 +715,9 @@ public static partial class R
         public const string videoLegendIcon = "videoLegendIcon";
         public const string videoLegendLabel = "videoLegendLabel";
         public const string virtualPiano = "virtualPiano";
+        public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
+        public const string vocalsAudioVolumeContainer = "vocalsAudioVolumeContainer";
+        public const string vocalsAudioVolumeLabel = "vocalsAudioVolumeLabel";
         public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";
