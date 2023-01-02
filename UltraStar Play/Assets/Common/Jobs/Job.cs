@@ -24,7 +24,8 @@ public class Job
                 return 100;
             }
 
-            if (EstimatedTotalDurationInMillis <= 0)
+            if (EstimatedTotalDurationInMillis <= 0
+                || startTimeInMillis == 0)
             {
                 return 0;
             }
@@ -36,12 +37,26 @@ public class Job
             }
             return progressInPercent;
         }
+
+        set
+        {
+            double progressFactor = value / 100.0;
+            if (progressFactor <= 0)
+            {
+                return;
+            }
+            EstimatedTotalDurationInMillis = (long)(CurrentDurationInMillis * (1 / progressFactor));
+        }
     }
 
     public long CurrentDurationInMillis
     {
         get
         {
+            if (startTimeInMillis == 0)
+            {
+                return 0;
+            }
             if (endTimeInMillis > 0)
             {
                 return endTimeInMillis - startTimeInMillis;
@@ -50,8 +65,23 @@ public class Job
         }
     }
 
-    private readonly long startTimeInMillis;
+    private long startTimeInMillis;
     private long endTimeInMillis;
+
+    private Action onCancel;
+    public Action OnCancel {
+        get
+        {
+            return onCancel;
+        }
+        set
+        {
+            onCancel = value;
+            IsCancelable.Value = onCancel != null;
+        }
+    }
+    public ReactiveProperty<bool> IsCanceled { get; private set; } = new(false);
+    public ReactiveProperty<bool> IsCancelable { get; private set; } = new(false);
 
     public Job(string name, Job parentJob = null)
     {
@@ -60,8 +90,6 @@ public class Job
         {
             parentJob.AddChildJob(this);
         }
-
-        startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
     private void AddChildJob(Job childJob)
@@ -126,8 +154,14 @@ public class Job
             throw new IllegalStateException($"Cannot change state from {Status.Value} to {newStatus}");
         }
 
+        if (newStatus == EJobStatus.Running)
+        {
+            startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        }
+
         Status.Value = newStatus;
-        if (Status.Value == EJobStatus.Finished && Result.Value == EJobResult.Pending)
+        if (Status.Value == EJobStatus.Finished
+            && Result.Value == EJobResult.Pending)
         {
             SetResult(EJobResult.Ok);
         }
@@ -154,5 +188,25 @@ public class Job
         {
             SetStatus(EJobStatus.Finished);
         }
+    }
+
+    public void SetResultIfPending(EJobResult newResult)
+    {
+        if (Result.Value == EJobResult.Pending)
+        {
+            SetResult(newResult);
+        }
+    }
+
+    public void Cancel()
+    {
+        if (IsCanceled.Value
+            || !IsCancelable.Value)
+        {
+            return;
+        }
+
+        IsCanceled.Value = true;
+        onCancel();
     }
 }

@@ -45,7 +45,7 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddItem("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), true));
-        contextMenu.AddItem("Speech recognition to create notes", () => speechRecognitionAction.CreateNotes(minBeat, extendedSentenceLengthInBeats, true));
+        contextMenu.AddItem("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, extendedSentenceLengthInBeats, true));
         contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
         contextMenu.AddSeparator();
         contextMenu.AddItem("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));

@@ -1249,6 +1249,8 @@ TextField.placeholderVisible #unity-text-input {
     padding-bottom: 6px;
     padding-right: 6px;
     padding-left: 6px;
+    background-color: rgba(32, 32, 32, 0.88);
+    max-height: 100%;
     transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
 }
 

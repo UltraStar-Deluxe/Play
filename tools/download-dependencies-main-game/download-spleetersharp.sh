@@ -14,8 +14,8 @@ git remote add origin https://github.com/achimmihca/SpleeterSharp
 git config core.sparsecheckout true
 echo Source/SpleeterSharp/* >> .git/info/sparse-checkout
 git pull --depth=100 origin main
-# Commit from 21 December 2022: e0d9bb574223b5266e81fa9c02fe6df39cfce5d8
-git checkout e0d9bb574223b5266e81fa9c02fe6df39cfce5d8
+# Commit from 29 December 2022: 95b8612ec61794a82ab4b7eb030fb4ca996ed181
+git checkout 95b8612ec61794a82ab4b7eb030fb4ca996ed181
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v Source/SpleeterSharp/* ./

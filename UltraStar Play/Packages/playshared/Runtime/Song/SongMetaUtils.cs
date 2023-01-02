@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,11 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
+    public static bool SongMetaFileExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.FileName);
+    }
+
     public static bool CoverResourceExists(SongMeta songMeta)
     {
         return ResourceExists(songMeta, songMeta.Cover);
@@ -104,9 +110,30 @@ public static class SongMetaUtils
         return songMeta.Directory + $"/{path}";
     }
 
-    public static bool IsImplicitlyGeneratedAndNotYetSaved(SongMeta songMeta)
+    public static bool IsGeneratedAndSaved(SongMeta songMeta)
     {
-        if (songMeta.Directory.IsNullOrEmpty())
+        if (songMeta == null
+            || songMeta.Directory.IsNullOrEmpty()
+            || !Directory.Exists(songMeta.Directory))
+        {
+            return false;
+        }
+
+        string songMetaAbsolutePath = new DirectoryInfo(songMeta.Directory).FullName;
+        string generatedSongFolderAbsolutePath = new DirectoryInfo(ApplicationUtils.GetGeneratedSongFolderAbsolutePath()).FullName;
+        return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
+               && File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
+    }
+
+    public static bool IsGeneratedAndNotYetSaved(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (songMeta.Directory.IsNullOrEmpty()
+            || !Directory.Exists(songMeta.Directory))
         {
             return true;
         }
@@ -402,5 +429,20 @@ public static class SongMetaUtils
     public static int LengthInBeats(List<Note> notes)
     {
         return MaxBeat(notes) - MinBeat(notes);
+    }
+
+    public static void RemoveAllNotes(SongMeta songMeta)
+    {
+        songMeta.GetVoices().ForEach(voice =>
+            voice.Sentences.ToList().ForEach(sentence => voice.RemoveSentence(sentence)));
+    }
+
+    public static double NoteDistanceInMillis(SongMeta songMeta, Note noteA, Note noteB)
+    {
+        int noteDistanceInBeats = Math.Min(
+            Math.Abs(noteA.EndBeat - noteB.StartBeat),
+            Math.Abs(noteB.EndBeat - noteA.StartBeat));
+
+        return noteDistanceInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
     }
 }

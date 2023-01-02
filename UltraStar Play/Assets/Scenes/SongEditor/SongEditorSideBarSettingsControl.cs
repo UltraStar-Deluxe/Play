@@ -318,7 +318,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(audioSeparationCommandTextField,
             () => settings.SongEditorSettings.AudioSeparationCommand,
             newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-        audioSeparationButton.RegisterCallbackButtonTriggered(() => audioSeparationManager.QueueSongToSeparateVoiceAndInstrumentalAudio(songMeta));
+        audioSeparationButton.RegisterCallbackButtonTriggered(() => audioSeparationManager.ProcessSongMeta(songMeta));
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,

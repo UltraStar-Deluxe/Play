@@ -14,34 +14,7 @@ public class SpaceBetweenNotesAction : INeedInjection
 
     public void Execute(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)
     {
-        if (spaceInBeats <= 0)
-        {
-            uiManager.CreateNotificationVisualElement("Minimum amount of space (in beats) must be greater than 0.");
-            return;
-        }
-
-        // Sort notes
-        List<Note> sortedNotes = selectedNotes.OrderBy(note => note.StartBeat).ToList();
-        // Check if distance to following note satisfies the desired space. If not, then shorten note.
-        for (int i = 0; i < sortedNotes.Count - 1; i++)
-        {
-            Note note = sortedNotes[i];
-            Note followingNote = sortedNotes[i + 1];
-            int distance = followingNote.StartBeat - note.EndBeat;
-            if (distance < spaceInBeats)
-            {
-                int newEndBeat = followingNote.StartBeat - spaceInBeats;
-                if (newEndBeat > note.StartBeat)
-                {
-                    note.SetEndBeat(newEndBeat);
-                }
-                else
-                {
-                    // Shorten as much as possible without removing the note
-                    note.SetLength(1);
-                }
-            }
-        }
+        AddSpaceBetweenNotesUtils.AddSpaceBetweenNotes(selectedNotes, spaceInBeats);
     }
 
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)

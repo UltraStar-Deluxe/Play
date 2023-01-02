@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using ProTrans;
@@ -112,6 +113,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.fuzzySearchTextLabel)]
     private Label fuzzySearchTextLabel;
 
+    [Inject(UxmlName = R.UxmlNames.songSelectPlayerSelectUi)]
+    private VisualElement songSelectPlayerSelectUi;
+
     [Inject(UxmlName = R.UxmlNames.playerSelectOverlayContainer)]
     private VisualElement playerSelectOverlayContainer;
 
@@ -124,8 +128,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.rightLyricsOverlay)]
     private VisualElement rightLyricsOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.startButton)]
-    private Button startButton;
+    [Inject(UxmlName = R.UxmlNames.playerSelectStartSongButton)]
+    private Button playerSelectStartSongButton;
+
+    [Inject(UxmlName = R.UxmlNames.playerSelectOpenSongEditorButton)]
+    private Button playerSelectOpenSongEditorButton;
+
+    [Inject(UxmlName = R.UxmlNames.playerSelectCreateSongButton)]
+    private Button playerSelectCreateSongButton;
 
     [Inject(UxmlName = R.UxmlNames.menuButton)]
     private Button menuButton;
@@ -237,7 +247,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.searchExpressionInfoSyntaxTipsLabel)]
     private Label searchExpressionInfoSyntaxTipsLabel;
 
-    public PlaylistChooserControl PlaylistChooserControl { get; private set; }
+    public PlaylistChooserControl PlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
@@ -274,6 +284,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
+    private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
+
     private void Start()
     {
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
@@ -303,7 +315,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+        playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+        playerSelectCreateSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
+        playerSelectOpenSongEditorButton.RegisterCallbackButtonTriggered(() => StartSongEditorScene());
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
@@ -379,7 +393,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+
+        createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
+        {
+            uiManager.CreateNotificationVisualElement($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
+            UpdatePlayerSelectOverlayButtons();
+        });
+
+        // Close overlays by clicking none of its child elements
+        playerSelectOverlayContainer.RegisterCallback<ClickEvent>(evt =>
+        {
+            if (evt.target == playerSelectOverlayContainer)
+            {
+                HidePlayerSelectOverlay();
+            }
+        });
+
+        menuOverlay.RegisterCallback<ClickEvent>(evt =>
+        {
+            if (evt.target == menuOverlay)
+            {
+                HideMenuOverlay();
+            }
+        });
     }
+
 
     public void HideSearchExpressionInfoOverlay()
     {
@@ -533,10 +571,18 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateSongStatistics(selectedSong);
 
+        UpdatePlayerSelectOverlayButtons();
+
         if (IsSongDetailOverlayVisible)
         {
             UpdateSongDetailsInOverlay();
         }
+    }
+
+    private void UpdatePlayerSelectOverlayButtons()
+    {
+        playerSelectStartSongButton.SetVisibleByDisplay(SongMetaUtils.SongMetaFileExists(SelectedSong));
+        playerSelectCreateSongButton.SetVisibleByDisplay(!SongMetaUtils.SongMetaFileExists(SelectedSong));
     }
 
     private void UpdateSongDurationLabel(double durationInMillis)
@@ -719,13 +765,41 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void CheckAudioAndStartSingScene()
     {
-        if (playerSelectOverlayContainer.IsVisibleByDisplay())
+        if (SelectedSong == null)
+        {
+            return;
+        }
+
+        // Check that the audio file exists
+        if (!SongMetaUtils.AudioResourceExists(SelectedSong))
+        {
+            string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
+            string message = "Audio file resource does not exist: " + audioUri;
+            Debug.Log(message);
+            uiManager.CreateNotificationVisualElement(message);
+            return;
+        }
+
+        // Check that the used audio format can be loaded.
+        songAudioPlayer.Init(SelectedSong);
+        if (!songAudioPlayer.HasAudioClip)
+        {
+            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+            Debug.Log(message);
+            uiManager.CreateNotificationVisualElement(message);
+            return;
+        }
+
+        // Start the sing scene or show the player select overlay.
+        if (playerSelectOverlayContainer.IsVisibleByDisplay()
+            && !SongMetaUtils.IsGeneratedAndNotYetSaved(SelectedSong))
         {
             StartSingScene(SelectedSong);
         }
         else if (SelectedSong.VoiceNames.Count <= 1
                  && playerListControl.PlayerEntryControlControls.Count == 1
-                 && micListControl.MicEntryControls.Count == 1)
+                 && micListControl.MicEntryControls.Count == 1
+                 && !SongMetaUtils.IsGeneratedAndNotYetSaved(SelectedSong))
         {
             // There is one mic for only one player and only one voice to sing.
             // Thus, there is no choice to make and the song can be started immediately.
@@ -735,40 +809,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         else
         {
-            if (SelectedSong == null)
-            {
-                return;
-            }
-
-            // Check that the audio file exists
-            if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
-            {
-                string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
-                if (!SongMetaUtils.AudioResourceExists(SelectedSong))
-                {
-                    string message = "Audio file resource does not exist: " + audioUri;
-                    Debug.Log(message);
-                    uiManager.CreateNotificationVisualElement(message);
-                    return;
-                }
-            }
-
-            // Check that the used audio format can be loaded.
-            songAudioPlayer.Init(SelectedSong);
-            if (!songAudioPlayer.HasAudioClip)
-            {
-                string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
-                Debug.Log(message);
-                uiManager.CreateNotificationVisualElement(message);
-                return;
-            }
-
             ShowPlayerSelectOverlay();
         }
     }
 
     private void ShowPlayerSelectOverlay()
     {
+        UpdatePlayerSelectOverlayButtons();
+        songSelectPlayerSelectUi.ShowByDisplay();
         playerSelectOverlayContainer.ShowByDisplay();
         UpdateInputLegend();
 
@@ -793,12 +841,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Focus start button, such that it can be triggered by keyboard
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
-            playerSelectOverlayContainer.Q<Button>(R.UxmlNames.startButton).Focus()));
+        if (playerSelectStartSongButton.IsVisibleByDisplay())
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => playerSelectStartSongButton.Focus()));
+        }
+        else if (playerSelectCreateSongButton.IsVisibleByDisplay())
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => playerSelectCreateSongButton.Focus()));
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => closePlayerSelectOverlayButton.Focus()));
+        }
     }
 
     public void HidePlayerSelectOverlay()
     {
+        songSelectPlayerSelectUi.HideByDisplay();
         playerSelectOverlayContainer.HideByDisplay();
         UpdateInputLegend();
     }
@@ -899,6 +958,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(focusableNavigator);
+        bb.BindExistingInstance(PlaylistChooserControl);
+        bb.BindExistingInstance(createSingAlongSongControl);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
@@ -972,8 +1033,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
         duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
         videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
-        closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
+        playerSelectStartSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
@@ -1005,8 +1065,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void OnInjectionFinished()
     {
-        PlaylistChooserControl = new PlaylistChooserControl();
         injector.Inject(PlaylistChooserControl);
+        injector.Inject(createSingAlongSongControl);
     }
 
     private void UpdateInputLegend()

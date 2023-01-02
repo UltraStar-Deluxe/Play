@@ -7,6 +7,9 @@
                 <MaterialIcon tabindex="-1" name="jobFinishedIcon" icon="check_circle" class="iconImage largestFont" style="display: none;" />
                 <MaterialIcon tabindex="-1" name="jobErrorIcon" icon="cancel" class="iconImage largestFont" style="display: none;" />
             </ui:VisualElement>
+            <ui:Button display-tooltip-when-elided="true" name="cancelJobButton" class="squareButton" style="margin-left: 5px; margin-right: 5px;">
+                <MaterialIcon tabindex="-1" icon="delete" name="cancelJobIcon" />
+            </ui:Button>
             <ui:VisualElement name="labelContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between; align-items: center;">
                 <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="jobNameLabel" class="smallFont" />
                 <ui:Label tabindex="-1" text="99:99" display-tooltip-when-elided="true" name="jobDurationLabel" class="tinyFont" style="min-width: 50px; -unity-text-align: upper-right;" />

@@ -2,7 +2,7 @@
 
 public class VoskResultJson
 {
-    public List<VoskResultWordJson> result;
-    public List<VoskResultAlternativeJson> alternatives;
-    public string text;
+    public List<VoskResultWordJson> result = new();
+    public List<VoskResultAlternativeJson> alternatives = new();
+    public string text = "";
 }
