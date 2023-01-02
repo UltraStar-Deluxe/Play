@@ -66,7 +66,9 @@ public class LyricsUtils
             lastNote = note;
         }
 
-        sentence.Notes.ForEach(ProcessNote);
+        List<Note> sortedNotes = sentence.Notes.ToList();
+        sortedNotes.Sort(Note.comparerByStartBeat);
+        sortedNotes.ForEach(ProcessNote);
         return stringBuilder.ToString();
     }
 
@@ -75,6 +77,8 @@ public class LyricsUtils
         int sentenceIndex = 0;
         int noteIndex = 0;
         List<Sentence> sortedSentences = sentences.ToList();
+        sortedSentences.Sort(Sentence.comparerByStartBeat);
+
         List<Note> sortedNotes = (sentenceIndex < sortedSentences.Count)
             ? SongMetaUtils.GetSortedNotes(sortedSentences[sentenceIndex])
             : new List<Note>();

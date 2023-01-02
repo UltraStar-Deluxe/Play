@@ -111,15 +111,17 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        int currentNoteIndex = CurrentSentence.Notes.IndexOf(currentNote);
+        List<Note> sortedNotes = CurrentSentence.Notes.ToList();
+        sortedNotes.Sort(Note.comparerByStartBeat);
+        int currentNoteIndex = sortedNotes.IndexOf(currentNote);
         if (currentNoteIndex < 0)
         {
             return;
         }
 
-        for (int i = 0; i < CurrentSentence.Notes.Count && i <= currentNoteIndex; i++)
+        for (int i = 0; i < sortedNotes.Count && i <= currentNoteIndex; i++)
         {
-            Note note = SortedNotes[i];
+            Note note = sortedNotes[i];
             if (!currentSentenceNoteToLabelMap.TryGetValue(note, out Label label))
             {
                 continue;
@@ -182,7 +184,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        sentence.Notes.ForEach(note =>
+        List<Note> sortedNotes = sentence.Notes.ToList();
+        sortedNotes.Sort(Note.comparerByStartBeat);
+        sortedNotes.ForEach(note =>
         {
             string richText = IsItalicDisplayText(note.Type)
                 ? $"<i>{note.Text.Trim()}</i>"

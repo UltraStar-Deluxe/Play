@@ -160,9 +160,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
     {
         if (lyricsAreaMode == LyricsAreaMode.ViewMode
-            && (changeEvent is LyricsChangedEvent
-                || changeEvent is LoadedMementoEvent
-                || changeEvent is MovedNotesToVoiceEvent))
+            && changeEvent
+                is LyricsChangedEvent
+                or LoadedMementoEvent
+                or MovedNotesToVoiceEvent
+                or NotesSplitEvent)
         {
             UpdateLyrics();
         }
