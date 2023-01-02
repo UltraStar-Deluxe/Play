@@ -690,6 +690,10 @@ Button.tinyFont {
     border-bottom-width: 0;
 }
 
+#notificationLabel {
+    white-space: normal;
+}
+
 #notificationLabel.error {
     color: var(--text-color-error);
 }
