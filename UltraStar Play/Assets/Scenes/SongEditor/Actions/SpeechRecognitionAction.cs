@@ -39,6 +39,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
+    private SpaceBetweenNotesAction spaceBetweenNotesAction;
+
+    [Inject]
     private JobManager jobManager;
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
@@ -98,10 +101,16 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         });
     }
 
-    public void CreateNotesFromSpeechRecognition(int startBeat, int lengthInBeats, bool notify)
+    public void CreateNotesFromSpeechRecognition(
+        int startBeat,
+        int lengthInBeats,
+        ESongEditorSamplesSource speechRecognitionSampleSource,
+        int spaceBetweenNotesInBeats,
+        bool notify)
     {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        if (audioClip == null)
+        AudioClip audioClip = GetAudioClip(speechRecognitionSampleSource);
+        if (audioClip == null
+            || lengthInBeats <= 0)
         {
             return;
         }
@@ -130,6 +139,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
                     songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
                 });
+
+                if (spaceBetweenNotesInBeats > 0)
+                {
+                    spaceBetweenNotesAction.Execute(createdNotes, spaceBetweenNotesInBeats);
+                }
 
                 if (notify)
                 {

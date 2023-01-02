@@ -25,6 +25,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
     [Inject]
     private EditorSentenceControl sentenceControl;
 
+    [Inject]
+    private Settings settings;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -45,7 +48,7 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddButton("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
         contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), true));
-        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, extendedSentenceLengthInBeats, true));
+        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, extendedSentenceLengthInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true));
         contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
         contextMenu.AddSeparator();
         contextMenu.AddButton("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
