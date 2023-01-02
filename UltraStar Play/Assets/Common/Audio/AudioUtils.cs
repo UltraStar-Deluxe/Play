@@ -20,6 +20,11 @@ public static class AudioUtils
         downloadHandler.streamAudio = streamAudio;
 
         webRequest.SendWebRequest();
+        while (!webRequest.isDone)
+        {
+            Task.Delay(30);
+        }
+
         if (webRequest.result
             is UnityWebRequest.Result.ConnectionError
             or UnityWebRequest.Result.ProtocolError)
@@ -29,10 +34,6 @@ public static class AudioUtils
             return null;
         }
 
-        while (!webRequest.isDone)
-        {
-            Task.Delay(30);
-        }
         return downloadHandler.audioClip;
     }
 

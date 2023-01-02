@@ -72,7 +72,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
-        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
+        contextMenu.AddButton("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuForAiTools(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
@@ -90,33 +90,33 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int lengthInBeats = maxBeat - minBeat;
 
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
-        contextMenu.AddItem("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, true));
-        contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
-        contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
+        contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
+        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, true));
+        contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
+        contextMenu.AddButton("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
+        contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddItem("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
+        contextMenu.AddButton("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
     }
 
     private void FillContextMenuToSplitAndMergeNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         if (splitNotesAction.CanExecute(selectedNotes))
         {
-            contextMenu.AddItem("Split Notes", () => splitNotesAction.ExecuteAndNotify(selectedNotes));
+            contextMenu.AddButton("Split Notes", () => splitNotesAction.ExecuteAndNotify(selectedNotes));
         }
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
-            contextMenu.AddItem("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
+            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
 
@@ -125,27 +125,27 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         contextMenu.AddSeparator();
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Golden))
         {
-            contextMenu.AddItem("Make golden",
+            contextMenu.AddButton("Make golden",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Golden));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Freestyle))
         {
-            contextMenu.AddItem("Make freestyle",
+            contextMenu.AddButton("Make freestyle",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Freestyle));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Rap))
         {
-            contextMenu.AddItem("Make rap",
+            contextMenu.AddButton("Make rap",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Rap));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.RapGolden))
         {
-            contextMenu.AddItem("Make rap-golden",
+            contextMenu.AddButton("Make rap-golden",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.RapGolden));
         }
         if (setNoteTypeAction.CanExecute(selectedNotes, ENoteType.Normal))
         {
-            contextMenu.AddItem("Make normal",
+            contextMenu.AddButton("Make normal",
                 () => setNoteTypeAction.ExecuteAndNotify(selectedNotes, ENoteType.Normal));
         }
     }
@@ -155,7 +155,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (mergeSentencesAction.CanExecute(selectedNotes))
         {
             contextMenu.AddSeparator();
-            contextMenu.AddItem("Merge sentences",
+            contextMenu.AddButton("Merge sentences",
                 () => mergeSentencesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
     }
@@ -167,7 +167,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddItem("Move to player 1",
+            contextMenu.AddButton("Move to player 1",
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.firstVoiceName));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
@@ -176,13 +176,13 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToVoice2)
         {
-            contextMenu.AddItem("Move to player 2",
+            contextMenu.AddButton("Move to player 2",
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceName));
         }
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
-            contextMenu.AddItem("Move to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
+            contextMenu.AddButton("Move to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
     }
 
@@ -193,7 +193,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToPreviousSentence)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddItem("Move to previous sentence",
+            contextMenu.AddButton("Move to previous sentence",
                 () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(noteControl.Note));
         }
         if (!canMoveToPreviousSentence && canMoveToNextSentence)
@@ -202,7 +202,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToNextSentence)
         {
-            contextMenu.AddItem("Move to next sentence",
+            contextMenu.AddButton("Move to next sentence",
                 () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(noteControl.Note));
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UniInject;
 using UniRx;
@@ -29,24 +31,16 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongMeta songMeta;
 
+    private readonly HashSet<string> failedAudioClipPaths = new();
+
     private void Start()
     {
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(_ =>
         {
-            if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
-                && !sampleRecorderControl.HasRecordedAudio)
+            if (!CanPlayAudio(out string errorMessage))
             {
-                uiManager.CreateNotificationVisualElement("Cannot play recorded audio. Use a microphone to record audio first.");
-            }
-            else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Vocals
-                     && songMeta.VocalsAudio.IsNullOrEmpty())
-            {
-                uiManager.CreateNotificationVisualElement("No vocals audio found. Separate the audio first.");
-            }
-            else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Instrumental
-                     && songMeta.InstrumentalAudio.IsNullOrEmpty())
-            {
-                uiManager.CreateNotificationVisualElement("No instrumental audio found. Separate the audio first.");
+                uiManager.CreateNotificationVisualElement(errorMessage);
+                return;
             }
             AudioSource.Play();
         });
@@ -89,22 +83,14 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        AudioClip GetAudioClip()
+        AudioClip targetAudioClip = LoadAudioClip();
+        if (targetAudioClip == null)
         {
-            switch (settings.SongEditorSettings.PlaybackSamplesSource)
-            {
-                case ESongEditorSamplesSource.Recording:
-                    return sampleRecorderControl.AudioClip;
-                case ESongEditorSamplesSource.Vocals:
-                    return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
-                case ESongEditorSamplesSource.Instrumental:
-                    return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
-                default:
-                    return null;
-            }
+            AudioSource.Stop();
+            AudioSource.clip = null;
+            return;
         }
 
-        AudioClip targetAudioClip = GetAudioClip();
         if (AudioSource.clip != targetAudioClip)
         {
             AudioSource.Stop();
@@ -116,5 +102,85 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
                 AudioSource.Play();
             }
         }
+    }
+
+    private AudioClip LoadAudioClip()
+    {
+        if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording)
+        {
+            return sampleRecorderControl.AudioClip;
+        }
+
+        string audioClipUri;
+        if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Vocals)
+        {
+            audioClipUri = SongMetaUtils.GetVocalsAudioUri(songMeta);
+        }
+        else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Instrumental)
+        {
+            audioClipUri = SongMetaUtils.GetInstrumentalAudioUri(songMeta);
+        }
+        else
+        {
+            return null;
+        }
+
+        if (failedAudioClipPaths.Contains(audioClipUri))
+        {
+            // Do not attempt to load this clip again.
+            return null;
+        }
+
+        AudioClip loadedAudioClip = audioManager.LoadAudioClipFromUri(audioClipUri, false);
+        if (loadedAudioClip == null)
+        {
+            uiManager.CreateNotificationVisualElement($"Failed to load {audioClipUri}");
+            failedAudioClipPaths.Add(audioClipUri);
+        }
+
+        return loadedAudioClip;
+    }
+
+    private bool CanPlayAudio(out string errorMessage)
+    {
+        if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
+            && !sampleRecorderControl.HasRecordedAudio)
+        {
+            errorMessage = "Cannot play recorded audio. Use a microphone to record audio first.";
+            return false;
+        }
+        else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Vocals)
+        {
+            if (songMeta.VocalsAudio.IsNullOrEmpty())
+            {
+                errorMessage = "No vocals audio found. Separate the audio first.";
+                return false;
+            }
+
+            if (!WebRequestUtils.IsHttpOrHttpsUri(songMeta.VocalsAudio)
+                && !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
+            {
+                errorMessage = $"File does not exist: {songMeta.VocalsAudio}";
+                return false;
+            }
+        }
+        else if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Instrumental)
+        {
+            if (songMeta.InstrumentalAudio.IsNullOrEmpty())
+            {
+                errorMessage = "No instrumental audio found. Separate the audio first.";
+                return false;
+            }
+
+            if (!WebRequestUtils.IsHttpOrHttpsUri(songMeta.InstrumentalAudio)
+                && !File.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
+            {
+                errorMessage = $"File does not exist: {songMeta.VocalsAudio}";
+                return false;
+            }
+        }
+
+        errorMessage = "";
+        return true;
     }
 }

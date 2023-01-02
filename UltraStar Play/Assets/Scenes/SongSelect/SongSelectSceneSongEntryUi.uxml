@@ -22,6 +22,7 @@
                 <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" />
                 <ui:Button text="Reload" display-tooltip-when-elided="true" name="reloadSongButton" />
                 <ui:Button text="Recreate&#10;sing-along version" display-tooltip-when-elided="true" name="recreateSingAlongVersionButton" class="smallerFont" />
+                <ui:Button text="Separate Audio" display-tooltip-when-elided="true" name="separateAudioButton" class="smallFont" />
                 <ui:Button text="Open Folder" display-tooltip-when-elided="true" name="openSongFolderButton" />
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" />
             </ui:ScrollView>

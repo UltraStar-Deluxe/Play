@@ -535,6 +535,7 @@ public static partial class R
         public const string sentenceRatingContainer = "sentenceRatingContainer";
         public const string SentenceRatingUi = "SentenceRatingUi";
         public const string sentenceUiRoot = "sentenceUiRoot";
+        public const string separateAudioButton = "separateAudioButton";
         public const string setBpmChangeNoteDurationButton = "setBpmChangeNoteDurationButton";
         public const string setBpmKeepNoteDurationButton = "setBpmKeepNoteDurationButton";
         public const string settingsButton = "settingsButton";
@@ -714,6 +715,9 @@ public static partial class R
         public const string videoLegendIcon = "videoLegendIcon";
         public const string videoLegendLabel = "videoLegendLabel";
         public const string virtualPiano = "virtualPiano";
+        public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
+        public const string vocalsAudioVolumeContainer = "vocalsAudioVolumeContainer";
+        public const string vocalsAudioVolumeLabel = "vocalsAudioVolumeLabel";
         public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";

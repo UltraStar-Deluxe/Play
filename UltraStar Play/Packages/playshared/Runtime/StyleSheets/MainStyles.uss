@@ -690,6 +690,10 @@ Button.tinyFont {
     border-bottom-width: 0;
 }
 
+#notificationLabel {
+    white-space: normal;
+}
+
 #notificationLabel.error {
     color: var(--text-color-error);
 }
@@ -893,6 +897,8 @@ Button.tinyFont {
 
 .contextMenuSeparator {
     height: 1px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     background-color: rgb(92, 92, 92);
 }
 
@@ -901,7 +907,14 @@ Button.tinyFont {
     padding: 2px;
 }
 
+.contextMenu Label {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 .contextMenu Button {
+    padding-left: 5px;
+    padding-right: 5px;
     background-color: rgb(64, 64, 64);
 }
 

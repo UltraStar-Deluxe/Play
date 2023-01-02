@@ -130,4 +130,9 @@ public static class NumberUtils
             Math.Abs(bStart - aEnd),
             Math.Abs(aStart - bEnd));
     }
+
+    public static float PercentToFactor(int zeroToHundred)
+    {
+        return zeroToHundred / 100f;
+    }
 }
