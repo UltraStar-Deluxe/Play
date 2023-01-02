@@ -91,7 +91,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         contextMenu.AddSeparator();
         contextMenu.AddItem("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
-        contextMenu.AddItem("Speech recognition to create notes", () => speechRecognitionAction.CreateNotes(minBeat, lengthInBeats, true));
+        contextMenu.AddItem("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, true));
         contextMenu.AddItem("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
         contextMenu.AddItem("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
     }

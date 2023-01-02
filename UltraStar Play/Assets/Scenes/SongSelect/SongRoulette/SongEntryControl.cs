@@ -68,6 +68,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.closeSongOverlayButton)]
     private Button closeSongOverlayButton;
 
+    [Inject(UxmlName = R.UxmlNames.recreateSingAlongVersionButton)]
+    private Button recreateSingAlongVersionButton;
+
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     public VisualElement SongPreviewVideoImage { get; private set; }
 
@@ -76,6 +79,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     [Inject]
     private UIDocument uiDocument;
+
+    [Inject]
+    private CreateSingAlongSongControl createSingAlongSongControl;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -353,6 +359,15 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
 
+        // Button to recreate the song
+        recreateSingAlongVersionButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (SongMeta != null)
+            {
+                createSingAlongSongControl.CreateSingAlongSong(SongMeta);
+            }
+        });
+
         // Add itself as IDragListener to be notified when it is dragged.
         dragControl = injector
             .WithRootVisualElement(songEntryUiRoot)
@@ -382,6 +397,15 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
                 StopShowSongMenuOverlayCoroutine();
             }
         });
+
+        createSingAlongSongControl.CreatedSingAlongVersionEventStream
+            .Subscribe(processedSongMeta =>
+            {
+                if (processedSongMeta == songMeta)
+                {
+                    UpdateIcons();
+                }
+            });
 
         UpdateTranslation();
     }
@@ -450,6 +474,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         InitModifyPlaylistButtons();
         songOverlayMenu.ShowByDisplay();
         singThisSongButton.Focus();
+
+        // Only allow to automatically recreate a song with manually crafted UltraStar txt file during development.
+        if (!Application.isEditor)
+        {
+            recreateSingAlongVersionButton.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndSaved(SongMeta));
+        }
     }
 
     private void InitModifyPlaylistButtons()
@@ -486,7 +516,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
-        notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsImplicitlyGeneratedAndNotYetSaved(songMeta));
+        notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta));
     }
 
     public void UpdateTranslation()

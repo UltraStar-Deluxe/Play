@@ -35,6 +35,9 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
     [Inject(UxmlName = R.UxmlNames.jobDurationLabel)]
     private Label jobDurationLabel;
 
+    [Inject(UxmlName = R.UxmlNames.cancelJobButton)]
+    private Button cancelJobButton;
+
     [Inject(UxmlName = R.UxmlNames.jobProgressBar)]
     private ProgressBar jobProgressBar;
 
@@ -46,13 +49,41 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
         jobNameLabel.text = job.Name;
 
         UpdateIcons();
-        job.Result.Subscribe(_ => UpdateIcons());
-        job.Status.Subscribe(_ => UpdateIcons());
+        job.Result.Subscribe(_ =>
+        {
+            UpdateIcons();
+            UpdateCancelJobButton();
+        });
+        job.Status.Subscribe(_ =>
+        {
+            UpdateIcons();
+            UpdateCancelJobButton();
+        });
 
         if (job.ParentJob != null)
         {
             VisualElement.AddToClassList("childJob");
         }
+
+        cancelJobButton.RegisterCallbackButtonTriggered(() =>
+        {
+            job.Cancel();
+        });
+        job.IsCancelable.Subscribe(_ =>
+        {
+            UpdateCancelJobButton();
+        });
+        job.IsCanceled.Subscribe(_ =>
+        {
+            UpdateCancelJobButton();
+        });
+        UpdateCancelJobButton();
+    }
+
+    private void UpdateCancelJobButton()
+    {
+        cancelJobButton.SetVisibleByDisplay(job.IsCancelable.Value);
+        cancelJobButton.SetEnabled(!job.IsCanceled.Value && job.Result.Value == EJobResult.Pending);
     }
 
     private void UpdateIcons()

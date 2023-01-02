@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class VoskModelParameters
+public class SpeechRecognitionParameters
 {
     public int SampleRate { get; private set; }
     public string ModelPath { get; private set; }
     public List<string> Phrases { get; private set; }
 
-    public VoskModelParameters(int sampleRate, string modelPath, List<string> phrases)
+    public SpeechRecognitionParameters(int sampleRate, string modelPath, List<string> phrases)
     {
         ObjectUtils.AssertNotNull(modelPath, nameof(modelPath));
         ObjectUtils.AssertNotNull(phrases, nameof(phrases));
@@ -18,7 +18,7 @@ public class VoskModelParameters
         Phrases = phrases;
     }
 
-    protected bool Equals(VoskModelParameters other)
+    protected bool Equals(SpeechRecognitionParameters other)
     {
         return SampleRate == other.SampleRate
                && ModelPath == other.ModelPath
@@ -42,7 +42,7 @@ public class VoskModelParameters
             return false;
         }
 
-        return Equals((VoskModelParameters)obj);
+        return Equals((SpeechRecognitionParameters)obj);
     }
 
     public override int GetHashCode()
@@ -50,16 +50,16 @@ public class VoskModelParameters
         return HashCode.Combine(SampleRate, ModelPath, Phrases);
     }
 
-    public bool ModelParametersEquals(VoskModelParameters otherVoskModelParameters)
+    public bool ModelParametersEquals(SpeechRecognitionParameters otherSpeechRecognitionParameters)
     {
-        return otherVoskModelParameters != null
-               && ModelPath.Equals(otherVoskModelParameters.ModelPath);
+        return otherSpeechRecognitionParameters != null
+               && ModelPath.Equals(otherSpeechRecognitionParameters.ModelPath);
     }
 
-    public bool RecognizerParametersEquals(VoskModelParameters otherVoskModelParameters)
+    public bool RecognizerParametersEquals(SpeechRecognitionParameters otherSpeechRecognitionParameters)
     {
-        return otherVoskModelParameters != null
-               && SampleRate == otherVoskModelParameters.SampleRate
-               && Phrases.SequenceEqual(otherVoskModelParameters.Phrases);
+        return otherSpeechRecognitionParameters != null
+               && SampleRate == otherSpeechRecognitionParameters.SampleRate
+               && Phrases.SequenceEqual(otherSpeechRecognitionParameters.Phrases);
     }
 }

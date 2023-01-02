@@ -293,9 +293,19 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceLinesDynamicTexture.ApplyTexture();
     }
 
+    private List<Sentence> GetSortedSentencesForVoice(Voice voice)
+    {
+        if (voiceToSortedSentencesMap.TryGetValue(voice, out List<Sentence> sortedSentences))
+        {
+            return sortedSentences;
+        }
+
+        return new();
+    }
+
     private void CreateSentenceControlForVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         int sentenceIndex = 0;
         sortedSentencesOfVoice.ForEach(sentence =>
         {
@@ -452,7 +462,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         List<Sentence> sentencesInViewport = sortedSentencesOfVoice
             .Where(sentence => noteAreaControl.IsInViewport(sentence))
             .ToList();
@@ -512,7 +522,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawSentenceMarkerLineForVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         sortedSentencesOfVoice.ForEach(sentence =>
         {
             float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.MinBeat);
