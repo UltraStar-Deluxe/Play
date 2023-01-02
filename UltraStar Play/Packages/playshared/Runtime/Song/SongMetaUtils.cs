@@ -32,6 +32,16 @@ public static class SongMetaUtils
         return ResourceExists(songMeta, songMeta.Mp3);
     }
 
+    public static bool VocalsAudioResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.VocalsAudio);
+    }
+
+    public static bool InstrumentalAudioResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, songMeta.InstrumentalAudio);
+    }
+
     public static string GetCoverUri(SongMeta songMeta)
     {
         return GetUri(songMeta, songMeta.Cover);
@@ -68,6 +78,11 @@ public static class SongMetaUtils
      */
     private static bool ResourceExists(SongMeta songMeta, string pathOrUri)
     {
+        if (pathOrUri.IsNullOrEmpty())
+        {
+            return false;
+        }
+
         if (WebRequestUtils.IsHttpOrHttpsUri(pathOrUri))
         {
             return true;

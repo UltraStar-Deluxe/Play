@@ -141,7 +141,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         return loadedAudioClip;
     }
 
-    public bool CanPlayAudio(out string errorMessage)
+    private bool CanPlayAudio(out string errorMessage)
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
             && !sampleRecorderControl.HasRecordedAudio)

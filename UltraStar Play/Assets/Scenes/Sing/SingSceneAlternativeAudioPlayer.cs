@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine.PlayerLoop;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -28,16 +30,35 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     private AudioManager audioManager;
 
     [Inject]
+    private AudioSeparationManager audioSeparationManager;
+
+    [Inject]
     private Settings settings;
 
     private bool hasLoadedInstrumentalAndVocalsAudio;
 
+    private bool isInitialized;
+
     private void Start()
     {
-        if (!FileUtils.Exists(songMeta.InstrumentalAudio)
-            || !FileUtils.Exists(songMeta.VocalsAudio))
+        audioSeparationManager.AudioSeparationFinishedEventStream
+            .Subscribe(evt =>
+            {
+                if (evt.SongMeta == songMeta)
+                {
+                    Init();
+                }
+            })
+            .AddTo(gameObject);
+
+        Init();
+    }
+
+    private void Init()
+    {
+        if (isInitialized
+            || !CanPlayAudio(out string errorMessage))
         {
-            Destroy(gameObject);
             return;
         }
 
@@ -53,6 +74,8 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         UpdateAudioSources();
         settings.ObserveEveryValueChanged(it => it.AudioSettings.VocalsAudioVolumePercent)
             .Subscribe(_ => UpdateAudioSources());
+
+        isInitialized = true;
     }
 
     private void PauseInstrumentalAndVocalsAudio()
@@ -127,5 +150,33 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             PlayInstrumentalAndVocalsAudio();
         }
+    }
+
+    private bool CanPlayAudio(out string errorMessage)
+    {
+        if (songMeta.VocalsAudio.IsNullOrEmpty())
+        {
+            errorMessage = "No vocals audio found. Separate the audio first.";
+            return false;
+        }
+        if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
+        {
+            errorMessage = $"Resource does not exist: {songMeta.VocalsAudio}";
+            return false;
+        }
+
+        if (songMeta.InstrumentalAudio.IsNullOrEmpty())
+        {
+            errorMessage = "No instrumental audio found. Separate the audio first.";
+            return false;
+        }
+        if (!SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
+        {
+            errorMessage = $"File does not exist: {songMeta.VocalsAudio}";
+            return false;
+        }
+
+        errorMessage = "";
+        return true;
     }
 }

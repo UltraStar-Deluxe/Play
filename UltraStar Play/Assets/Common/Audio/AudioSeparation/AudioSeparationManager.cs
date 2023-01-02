@@ -54,6 +54,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
     private readonly List<Job> audioSeparationJobs = new();
 
+    private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
+    public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
+
     public IObservable<AudioSeparationResult> ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
     {
         string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
@@ -94,6 +97,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 audioSeparationJob.SetResult(EJobResult.Ok);
                 processSongSubject.OnNext(audioSeparationResult);
                 processSongSubject.OnCompleted();
+
+                audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
             });
 
         return processSongSubject;

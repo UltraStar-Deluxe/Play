@@ -101,6 +101,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private AudioSeparationManager audioSeparationManager;
+
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -848,16 +851,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         contextMenuPopup.AddSeparator();
 
-        contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
-        Slider vocalsVolumeSlider = new();
-        vocalsVolumeSlider.lowValue = 0;
-        vocalsVolumeSlider.highValue = 100;
-        vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
-        vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
+        // Button to separate audio or slider to change vocals audio
+        if (SongMetaUtils.VocalsAudioResourceExists(SongMeta)
+            && SongMetaUtils.InstrumentalAudioResourceExists(SongMeta))
         {
-            settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
-        });
+            contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
+            Slider vocalsVolumeSlider = new();
+            vocalsVolumeSlider.lowValue = 0;
+            vocalsVolumeSlider.highValue = 100;
+            vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
+            vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
+            {
+                settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
+            });
 
-        contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
+            contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
+        }
+        else
+        {
+            contextMenuPopup.AddButton("Separate audio",
+                () => audioSeparationManager.ProcessSongMeta(SongMeta));
+        }
     }
 }
