@@ -203,7 +203,7 @@
                                 <ui:Label text="Command" display-tooltip-when-elided="true" name="label" />
                                 <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                             </ui:VisualElement>
-                            <ui:Button text="Extract Voice Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
+                            <ui:Button text="Extract Vocals Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
                         </ui:VisualElement>
                         <ui:Label text="MIDI" display-tooltip-when-elided="true" name="midiTitle" class="songEditorSettingsGroupTitle" />
                         <ui:VisualElement name="midiGroup" class="songEditorSettingsGroup">
