@@ -40,6 +40,12 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.overviewAreaRecordedAudioWaveform)]
     private VisualElement overviewAreaRecordedAudioWaveform;
 
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
+    private SongEditorNoteRecorder songEditorNoteRecorder;
+
     private AudioWaveFormVisualization recordedAudioWaveFormVisualization;
 
     private AudioClip audioClip;
@@ -56,6 +62,7 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
     public float[] RecordingBuffer { get; private set; }
     private int recordingStartIndex;
+    private int speechRecognitionStartBeat;
 
     private Subject<bool> recordedSamplesChangedEventStream = new Subject<bool>();
     public IObservable<bool> RecordedSamplesChangedEventStream => recordedSamplesChangedEventStream;
@@ -65,8 +72,26 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
     public void OnInjectionFinished()
     {
         songEditorMicPitchTracker.MicSampleRecorder.RecordingEventStream.Subscribe(OnRecordingEvent);
-        songAudioPlayer.PlaybackStartedEventStream.Subscribe(evt => UpdateRecordingStartIndex());
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(evt => FillAudioClipWithRecordingBuffer());
+        songAudioPlayer.PlaybackStartedEventStream.Subscribe(evt =>
+        {
+            UpdateRecordingStartIndex();
+            UpdateSpeechRecognitionStartBeat();
+        });
+        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(evt =>
+        {
+            UpdateRecordingStartIndex();
+            UpdateSpeechRecognitionStartBeat();
+        });
+        songAudioPlayer.JumpBackInSongEventStream.Subscribe(evt =>
+        {
+            UpdateRecordingStartIndex();
+            UpdateSpeechRecognitionStartBeat();
+        });
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(evt =>
+        {
+            FillAudioClipWithRecordingBuffer();
+            DoSpeechRecognitionForNewlyRecordedSamples();
+        });
         songEditorMicPitchTracker.MicSampleRecorder.IsRecording.Subscribe(newValue =>
         {
             if (newValue)
@@ -100,13 +125,39 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
         }
     }
 
+    private void DoSpeechRecognitionForNewlyRecordedSamples()
+    {
+        if (!settings.SongEditorSettings.DetectSpeechAfterRecording
+            || !songEditorNoteRecorder.IsRecordingEnabled)
+        {
+            return;
+        }
+
+        int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+        int lengthInBeats = currentBeat - speechRecognitionStartBeat;
+        Debug.Log($"Analyzing speech from beat {speechRecognitionStartBeat} to beat {currentBeat} (length: {lengthInBeats} beats)");
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(speechRecognitionStartBeat, lengthInBeats, ESongEditorSamplesSource.Recording, 2, true);
+
+        UpdateSpeechRecognitionStartBeat();
+    }
+
     private void UpdateRecordingStartIndex()
     {
         recordingStartIndex = (int)Math.Floor(songAudioPlayer.audioPlayer.time * SampleRate);
     }
 
+    private void UpdateSpeechRecognitionStartBeat()
+    {
+        speechRecognitionStartBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+    }
+
     private void FillAudioClipWithRecordingBuffer()
     {
+        if (!songEditorNoteRecorder.IsRecordingEnabled)
+        {
+            return;
+        }
+
         InitAudioClipIfNeeded();
         if (audioClip == null)
         {
@@ -148,13 +199,22 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
         // Copy samples from mic buffer to recording buffer
         int micDelayInSamples = songEditorMicPitchTracker.MicSampleRecorder.MicProfile.DelayInMillis / 1000 * SampleRate;
+        // bool isAboveNoiseSuppressionThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(
+        //     recordingEvent.MicSamples,
+        //     recordingEvent.NewSamplesStartIndex,
+        //     recordingEvent.NewSamplesEndIndex,
+        //     settings.SongEditorSettings.RecordSamplesThresholdVolumePercent);
         for (int i = 0; i < recordingEvent.NewSampleCount; i++)
         {
             int sampleIndexInRecordingBuffer = recordingStartIndex + i - micDelayInSamples;
             if (sampleIndexInRecordingBuffer > 0
                 && sampleIndexInRecordingBuffer < RecordingBuffer.Length)
             {
-                RecordingBuffer[sampleIndexInRecordingBuffer] = recordingEvent.MicSamples[recordingEvent.NewSamplesStartIndex + i];
+                float recordedSampleValue = recordingEvent.MicSamples[recordingEvent.NewSamplesStartIndex + i];
+                RecordingBuffer[sampleIndexInRecordingBuffer] = recordedSampleValue;
+                // RecordingBuffer[sampleIndexInRecordingBuffer] = isAboveNoiseSuppressionThreshold
+                //     ? recordedSampleValue
+                //     : 0;
             }
         }
         recordingStartIndex += recordingEvent.NewSampleCount;

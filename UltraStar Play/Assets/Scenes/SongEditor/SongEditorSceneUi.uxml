@@ -136,18 +136,16 @@
                                     <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />
                                     <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                                 </ui:VisualElement>
-                                <ui:RadioButtonGroup value="-1" name="recordNoteOrAudioRadioButtonGroup" style="flex-direction: column;">
-                                    <ui:VisualElement name="recordNotesContainer" style="flex-direction: row; align-items: center; margin-bottom: 5px;">
-                                        <ui:Label text="Record notes" display-tooltip-when-elided="true" name="recordNotesLabel" />
-                                        <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                                        <ui:RadioButton name="recordNotesRadioButton" style="align-items: center;" />
-                                    </ui:VisualElement>
-                                    <ui:VisualElement name="recordAudioContainer" style="flex-direction: row; align-items: center; margin-bottom: 5px;">
-                                        <ui:Label text="Record audio" display-tooltip-when-elided="true" name="recordAudioLabel" />
-                                        <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                                        <ui:RadioButton name="recordAudioRadioButton" />
-                                    </ui:VisualElement>
-                                </ui:RadioButtonGroup>
+                                <ui:VisualElement name="recordNoteOrAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Record audio samples" display-tooltip-when-elided="true" name="label" enable-rich-text="false" />
+                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                    <ui:Toggle name="recordSamplesInsteadOfNotesToggle" class="smallControl" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="detectSpeechAfterRecording" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                                    <ui:Label text="Speech recognition&#10;after recording" display-tooltip-when-elided="true" name="detectSpeechAfterRecordingLabel" enable-rich-text="false" />
+                                    <ui:VisualElement name="spacer" style="flex-grow: 1;" />
+                                    <ui:Toggle name="detectSpeechAfterRecordingToggle" class="smallControl" />
+                                </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="buttonRecordingContainer">
                                 <ui:VisualElement name="buttonRecordingButtonContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
