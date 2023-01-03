@@ -198,7 +198,10 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(titleToContentMap, CloseHelp);
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
     }
 
     private void CloseHelp()
