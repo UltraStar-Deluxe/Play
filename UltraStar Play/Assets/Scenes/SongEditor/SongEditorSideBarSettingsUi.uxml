@@ -23,17 +23,21 @@
                 <ui:Slider picking-mode="Ignore" value="42" high-value="1.5" name="musicPlaybackSpeedSlider" low-value="0.5" style="margin-bottom: 5px;" />
                 <ui:Button text="Reset Playback Speed" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
             </ui:VisualElement>
+            <ui:VisualElement name="playbackAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                <ui:Label text="Playback Audio" display-tooltip-when-elided="true" name="label" />
+                <ItemPicker name="playbackAudioPicker" no-previous-button="true" wrapAround="true" style="width: 100%;" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="Recording" display-tooltip-when-elided="true" name="recordingTitle" class="songEditorSettingsGroupTitle" />
         <ui:VisualElement name="recordingGroup" class="songEditorSettingsGroup">
             <ui:VisualElement name="recordingSourceContainer" style="margin-bottom: 10px;">
                 <ui:Label text="Source" display-tooltip-when-elided="true" name="label" />
-                <ItemPicker name="recordingSourceItemPicker" no-previous-button="true" wrap-around="true" class="smallControl" style="width: auto;" />
+                <ItemPicker no-previous-button="true" name="recordingSourceItemPicker" wrapAround="true" class="smallControl" style="width: auto;" />
             </ui:VisualElement>
             <ui:VisualElement name="micRecordingContainer">
                 <ui:VisualElement name="micDeviceContainer" style="margin-bottom: 10px;">
                     <ui:Label text="Microphone" display-tooltip-when-elided="true" name="label" />
-                    <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
+                    <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrapAround="true" class="smallControl" style="width: auto; height: auto; max-height: none; min-height: 20px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="micDelayContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                     <ui:Label text="Mic delay (ms)" display-tooltip-when-elided="true" name="label" />
@@ -43,27 +47,15 @@
                     <ui:Label text="Mic octave offset" display-tooltip-when-elided="true" name="label" />
                     <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
                 </ui:VisualElement>
-                <ui:RadioButtonGroup value="-1" name="recordNoteOrAudioRadioButtonGroup" style="flex-direction: column;">
-                    <ui:VisualElement name="recordNotesContainer" style="flex-direction: row; align-items: center; margin-bottom: 5px;">
-                        <ui:Label text="Record notes" display-tooltip-when-elided="true" name="recordNotesLabel" />
-                        <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                        <ui:RadioButton name="recordNotesRadioButton" style="align-items: center;" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="recordAudioContainer" style="flex-direction: row; align-items: center; margin-bottom: 5px;">
-                        <ui:Label text="Record audio" display-tooltip-when-elided="true" name="recordAudioLabel" />
-                        <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                        <ui:RadioButton name="recordAudioRadioButton" />
-                    </ui:VisualElement>
-                </ui:RadioButtonGroup>
-                <ui:VisualElement name="useRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
-                    <ui:Label text="Use recorded audio&#10;for speech recognition&#10;and pitch detection" display-tooltip-when-elided="true" />
+                <ui:VisualElement name="recordNoteOrAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                    <ui:Label text="Record audio samples" display-tooltip-when-elided="true" name="label" enable-rich-text="false" />
                     <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                    <ui:Toggle name="useRecordedAudioToggle" class="smallControl" />
+                    <ui:Toggle name="recordSamplesInsteadOfNotesToggle" class="smallControl" />
                 </ui:VisualElement>
-                <ui:VisualElement name="playRecordedAudioContainer" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
-                    <ui:Label text="Play recorded audio" display-tooltip-when-elided="true" />
+                <ui:VisualElement name="detectSpeechAfterRecording" style="flex-direction: row; align-items: center; width: 100%; margin-bottom: 10px;">
+                    <ui:Label text="Speech recognition&#10;after recording" display-tooltip-when-elided="true" name="detectSpeechAfterRecordingLabel" enable-rich-text="false" />
                     <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                    <ui:Toggle name="playRecordedAudioToggle" class="smallControl" />
+                    <ui:Toggle name="detectSpeechAfterRecordingToggle" class="smallControl" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="buttonRecordingContainer">
@@ -98,12 +90,20 @@
                 <ui:Label text="Speech recognition pitch" display-tooltip-when-elided="true" name="label" />
                 <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             </ui:VisualElement>
+            <ui:VisualElement name="speechRecognitionAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                <ui:Label text="Speech Recognition Audio" display-tooltip-when-elided="true" name="label" />
+                <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" style="width: 100%;" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="Pitch Detection" display-tooltip-when-elided="true" name="pitchDetectionTitle" class="songEditorSettingsGroupTitle" />
         <ui:VisualElement name="pitchDetectionGroup" class="songEditorSettingsGroup">
             <ui:VisualElement name="pitchDetectionAlgorithmContainer" style="flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 10px;">
                 <ui:Label text="Algorithm" display-tooltip-when-elided="true" name="label" />
-                <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrap-around="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
+                <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" class="smallControl" style="width: 100%; height: auto; max-height: none; min-height: 25px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pitchDetectionAudioContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+                <ui:Label text="Pitch Detection Audio" display-tooltip-when-elided="true" name="label" />
+                <ItemPicker name="pitchDetectionAudioPicker" no-previous-button="true" wrapAround="true" style="width: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="Audio separation" display-tooltip-when-elided="true" name="audioSeparationTitle" class="songEditorSettingsGroupTitle" />
@@ -112,7 +112,7 @@
                 <ui:Label text="Command" display-tooltip-when-elided="true" name="label" />
                 <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             </ui:VisualElement>
-            <ui:Button text="Extract Voice Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
+            <ui:Button text="Extract Vocals Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
         </ui:VisualElement>
         <ui:Label text="MIDI" display-tooltip-when-elided="true" name="midiTitle" class="songEditorSettingsGroupTitle" />
         <ui:VisualElement name="midiGroup" class="songEditorSettingsGroup">

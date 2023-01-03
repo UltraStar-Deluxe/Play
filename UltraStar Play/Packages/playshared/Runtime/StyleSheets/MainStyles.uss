@@ -223,24 +223,6 @@
     background-color: var(--control-color-accent2);
 }
 
-.unity-progress-bar {
-    margin: 0;
-    padding: 0;
-}
-
-.unity-progress-bar__container {
-    min-height: 12px;
-    max-height: 12px;
-}
-
-.unity-progress-bar__background {
-    /*background-color: var(--control-color);*/
-}
-
-.unity-progress-bar__progress {
-    /*background-color: var(--control-color-accent1);*/
-}
-
 .outline {
     border-color: var(--text-color);
     border-width: 1px;
