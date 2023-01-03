@@ -52,6 +52,58 @@ ItemPicker #nextItemButton {
 }
 
 /**************************************************/
+/* DIALOG */
+/**************************************************/
+
+.dialogTitle {
+    font-size: var(--font-size-l);
+}
+
+.dialogMessage {
+    font-size: var(--font-size);
+}
+
+.dialogTitleImage {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size-l);
+    height: var(--font-size-l);
+    margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dialogButton {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#dialogButtonContainer Button {
+    margin-right: 5px;
+    min-width: var(--control-width);
+}
+
+.dialogTextButton {
+    height: auto;
+    width: auto;
+    color: rgb(6, 170, 233);
+}
+
+.dialogTextButton:hover {
+    color: rgb(0, 102, 156);
+}
+
+.dialogTextButton:focus {
+    color: rgb(125, 198, 233);
+}
+
+.modalDialogContainer {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialogBackground {
+    background-color: rgb(14, 28, 42);
+}
+
+/**************************************************/
 /* COMBO BOX */
 /**************************************************/
 
@@ -187,6 +239,39 @@ TextField.placeholderVisible {
 
 TextField.placeholderVisible #unity-text-input {
     font-size: var(--font-size-xs);
+}
+
+/**************************************************/
+/* INPUT LEGEND */
+/**************************************************/
+
+.inputLegendLabel {
+    width: 20%;
+    -unity-text-align: middle-center;
+}
+
+.inputLegendBar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 50px;
+    background-color: rgba(32, 32, 32, 0.88);
+}
+
+#inputDeviceIconContainer {
+    height: 90%;
+    width: 20px;
+}
+
+#inputDeviceIconContainer .unity-label {
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+}
+
+#menuOverlay .inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
 }
 
 /**************************************************/
