@@ -124,6 +124,9 @@ public static partial class R
         public const string designOptionsButton = "designOptionsButton";
         public const string detectBpmButton = "detectBpmButton";
         public const string detectBpmLabel = "detectBpmLabel";
+        public const string detectSpeechAfterRecording = "detectSpeechAfterRecording";
+        public const string detectSpeechAfterRecordingLabel = "detectSpeechAfterRecordingLabel";
+        public const string detectSpeechAfterRecordingToggle = "detectSpeechAfterRecordingToggle";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
@@ -461,9 +464,6 @@ public static partial class R
         public const string quitButton = "quitButton";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
-        public const string recordAudioContainer = "recordAudioContainer";
-        public const string recordAudioLabel = "recordAudioLabel";
-        public const string recordAudioRadioButton = "recordAudioRadioButton";
         public const string recordedNote = "recordedNote";
         public const string recordedNoteEntryContainer = "recordedNoteEntryContainer";
         public const string recordedNoteImage = "recordedNoteImage";
@@ -475,10 +475,8 @@ public static partial class R
         public const string recordingSourceContainer = "recordingSourceContainer";
         public const string recordingSourceItemPicker = "recordingSourceItemPicker";
         public const string recordingTitle = "recordingTitle";
-        public const string recordNoteOrAudioRadioButtonGroup = "recordNoteOrAudioRadioButtonGroup";
-        public const string recordNotesContainer = "recordNotesContainer";
-        public const string recordNotesLabel = "recordNotesLabel";
-        public const string recordNotesRadioButton = "recordNotesRadioButton";
+        public const string recordNoteOrAudioContainer = "recordNoteOrAudioContainer";
+        public const string recordSamplesInsteadOfNotesToggle = "recordSamplesInsteadOfNotesToggle";
         public const string recreateSingAlongVersionButton = "recreateSingAlongVersionButton";
         public const string redoButton = "redoButton";
         public const string reloadSongButton = "reloadSongButton";
