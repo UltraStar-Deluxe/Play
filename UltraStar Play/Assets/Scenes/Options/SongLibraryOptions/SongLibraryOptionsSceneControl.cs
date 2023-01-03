@@ -366,7 +366,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
-            noSongsFoundLabel.AddToClassList("noSongsFoundLabel");
+            noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
+            noSongsFoundLabel.style.marginTop = 10;
             songList.Add(noSongsFoundLabel);
         }
         else
