@@ -190,6 +190,8 @@ public static partial class R
         public const string gridSizeContainer = "gridSizeContainer";
         public const string gridSizeTextField = "gridSizeTextField";
         public const string gridTitle = "gridTitle";
+        public const string groupContainer = "groupContainer";
+        public const string groupTitle = "groupTitle";
         public const string helpButton = "helpButton";
         public const string helpIcon = "helpIcon";
         public const string helpSideBarContainer = "helpSideBarContainer";
@@ -541,6 +543,7 @@ public static partial class R
         public const string settingsIcon = "settingsIcon";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
+        public const string settingsSideBarUi = "settingsSideBarUi";
         public const string settingsTitle = "settingsTitle";
         public const string showBackgroundButton = "showBackgroundButton";
         public const string showControlHintContainer = "showControlHintContainer";
@@ -580,6 +583,7 @@ public static partial class R
         public const string songDetailOverlay = "songDetailOverlay";
         public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
         public const string songEditorRoot = "songEditorRoot";
+        public const string SongEditorSideBarSettingsUi = "SongEditorSideBarSettingsUi";
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
@@ -611,9 +615,9 @@ public static partial class R
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
-        public const string SongSelectPlayerSelectUi = "SongSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
+        public const string SongSelectScenePlayerSelectUi = "SongSelectScenePlayerSelectUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
         public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
         public const string songsOptionsButton = "songsOptionsButton";

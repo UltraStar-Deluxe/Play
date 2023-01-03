@@ -115,8 +115,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         speechRecognitionJob)
                     .CatchIgnore((Exception ex) =>
                     {
+                        Debug.LogError(ex);
                         speechRecognitionJob.SetResult(EJobResult.Error);
                         pitchDetectionJob.SetResult(EJobResult.Error);
+                        uiManager.CreateNotificationVisualElement(ex.Message);
                     })
                     .Subscribe(createdNotes =>
                     {
