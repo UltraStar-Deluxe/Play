@@ -1,205 +1,3 @@
-:root {
-    --text-color: rgb(240, 240, 240);
-    --text-color-inverted: rgb(64, 64, 64);
-    --text-color-accent1: lightgrey;
-    --text-color-error: rgb(220, 53, 69);
-    --text-color-warning: rgb(255, 193, 7);
-    --font-size-xxs: 10px;
-    --font-size-xs: 12px;
-    --font-size-s: 14px;
-    --font-size: 18px;
-    --font-size-l: 20px;
-    --font-size-xl: 24px;
-    --font-size-xxl: 26px;
-    --font-icon-size: 32px;
-    --control-height: 40px;
-    --control-height-small: 30px;
-    --control-height-large: 92px;
-    --control-width: 120px;
-    --control-width-half: 60px;
-    --control-width-large: 150px;
-    --round-button-size: 50px;
-    --control-color: rgb(66, 163, 231);
-    --control-color-accent1: rgb(125, 198, 233);
-    --control-color-accent2: rgb(99, 154, 183);
-    --control-danger: rgb(220, 53, 69);
-    --control-danger-accent1: rgb(200, 35, 51);
-    --main-scene-button-width: 150px;
-    --main-scene-sing-button-width: 310px;
-}
-
-.unity-label {
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    font-size: var(--font-size);
-}
-
-.unity-base-text-field {
-    height: var(--control-height);
-    -unity-text-align: middle-left;
-    margin: 0;
-}
-
-.unity-base-text-field__input {
-    --unity-cursor-color: var(--text-color-inverted);
-    color: var(--text-color-inverted);
-    font-size: var(--font-size-s);
-    margin: 0;
-    padding: 0 5px;
-    overflow: visible;
-}
-
-.unity-base-text-field.disabled .unity-base-text-field__input {
-    background-color: rgb(146, 148, 150);
-}
-
-.unity-base-text-field__input:focus {
-    border-color: black;
-    border-width: 2px;
-}
-
-.unity-base-popup-field {
-    background-color: var(--control-color);
-    height: var(--control-height);
-    -unity-text-align: middle-left;
-}
-
-.unity-base-popup-field:hover {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-base-popup-field:focus {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-base-popup-field .unity-base-popup-field__input {
-    background-color: rgb(66, 163, 231);
-    padding: 0 5px;
-    border-width: 0;
-}
-
-.unity-base-popup-field:hover .unity-base-popup-field__input {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-base-popup-field:focus .unity-base-popup-field__input {
-    background-color: var(--control-color-accent2);
-}
-
-.unity-base-popup-field__text {
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    border-width: 0;
-    font-size: var(--font-size);
-}
-
-.unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: var(--text-color);
-    -unity-background-scale-mode: scale-to-fit;
-    border-width: 0;
-}
-
-.unity-base-dropdown__container-outer {
-    border-width: 0;
-    padding: 0;
-    margin: 0;
-    margin-top: 2px;
-}
-
-.unity-base-dropdown__container-inner {
-    border-width: 0;
-    padding: 0;
-    margin: 0;
-}
-
-.unity-base-dropdown__item {
-    background-color: var(--control-color);
-    padding: 0 5px;
-    margin: 0;
-    border-width: 0;
-    border-bottom-width: 2px;
-    border-color: var(--text-color);
-}
-
-.unity-base-dropdown__item:hover {
-    background-color: rgb(125, 198, 233);
-}
-
-.unity-base-dropdown__label {
-    font-size: var(--font-size);
-}
-
-.unity-button {
-    background-color: var(--control-color);
-    color: var(--text-color);
-    height: var(--control-height);
-    font-size: var(--font-size);
-    border-width: 0;
-    border-color: rgba(0, 0, 0, 0);
-    border-radius: 5px;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 10px;
-    margin: 0;
-    -unity-font-style: bold;
-}
-
-.controlMinWidth {
-    min-width: var(--control-width);
-}
-
-.unity-button:hover {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-button:focus {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-button:active {
-    background-color: var(--control-color-accent2);
-}
-
-.unity-toggle {
-    width: var(--control-height);
-    height: var(--control-height);
-    margin: 0;
-    padding: 0;
-}
-
-.unity-toggle VisualElement {
-    background-color: var(--control-color);
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-}
-
-.unity-toggle:hover VisualElement {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-toggle:focus VisualElement {
-    background-color: var(--control-color-accent1);
-}
-
-.unity-toggle:active VisualElement {
-    background-color: var(--control-color-accent2);
-}
-
-.unity-toggle VisualElement {
-    border-radius: 5px;
-    border-width: 0;
-}
-
-.unity-toggle__checkmark {
-    -unity-background-image-tint-color: var(--text-color);
-    -unity-background-scale-mode: scale-to-fit;
-    width: 100%;
-    height: 100%;
-}
-
 .outline {
     border-color: var(--text-color);
     border-width: 1px;
@@ -260,22 +58,6 @@
 
 .transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);
-}
-
-.unity-base-dropdown ScrollView #unity-content-container {
-    padding-right: 0;
-    padding-bottom: 0;
-}
-
-ScrollView #unity-content-container {
-    padding-right: 10px;
-    padding-bottom: 10px;
-}
-
-TextInput {
-    font-size: var(--font-size);
-    padding: 2px;
-    border-width: 2px;
 }
 
 .middleCenterText {
@@ -451,17 +233,6 @@ Button.smallerFont {
     font-size: var(--font-size-xs);
 }
 
-ItemPicker {
-    width: 300px;
-    height: var(--control-height);
-    min-width: var(--control-height-small);
-}
-
-ItemPicker Label {
-    -unity-background-scale-mode: scale-to-fit;
-    white-space: normal;
-}
-
 ItemPicker.smallFont Label {
     font-size: var(--font-size-s);
 }
@@ -523,34 +294,6 @@ Button.tinyFont {
     -unity-text-overflow-position: end;
     overflow: hidden;
     white-space: nowrap;
-}
-
-.itemPickerButton {
-    flex-grow: 0;
-    flex-shrink: 0;
-    width: 60px;
-    height: 100%;
-    min-width: var(--control-height-small);
-    min-height: var(--control-height-small);
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.itemPickerItemLabel {
-    background-color: var(--control-color-accent2);
-    flex-grow: 1;
-    flex-shrink: 1;
-    width: 100%;
-    height: 100%;
-    min-width: var(--control-height-small);
-    min-height: var(--control-height-small);
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    -unity-text-align: middle-center;
 }
 
 .optionsLabelAndItemPicker {
@@ -781,16 +524,6 @@ Button.tinyFont {
     color: var(--control-color);
 }
 
-#previousItemButton {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-#nextItemButton {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
 #songMenuOverlay Button {
     margin-bottom: 5px;
     width: 100%;
@@ -853,28 +586,6 @@ Button.tinyFont {
     height: var(--font-size);
 }
 
-.contextMenuSeparator {
-    height: 1px;
-    background-color: rgb(92, 92, 92);
-}
-
-.contextMenu {
-    background-color: rgb(64, 64, 64);
-    padding: 2px;
-}
-
-.contextMenu Button {
-    background-color: rgb(64, 64, 64);
-}
-
-.contextMenu Button:hover {
-    background-color: rgb(92, 92, 92);
-}
-
-.contextMenu Button:focus {
-    background-color: rgb(92, 92, 92);
-}
-
 .scrollingNoteStreamSentenceSeparator {
     height: 100%;
     width: 1px;
@@ -887,82 +598,6 @@ Button.tinyFont {
     -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }
 
-.fpsLabel {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    font-size: var(--font-size-xs);
-    -unity-text-align: middle-center;
-    padding: 10px;
-}
-
-.unity-scroller--vertical {
-    width: 12px;
-}
-
-.unity-scroller--horizontal {
-    height: 12px;
-}
-
-.unity-scroller__low-button {
-    width: 100%;
-    display: none;
-}
-
-.unity-scroller__high-button {
-    width: 100%;
-    display: none;
-}
-
-.unity-scroller--vertical > .unity-scroller__slider {
-    width: 12px;
-    min-width: auto;
-    border-radius: 5px;
-    margin: 0;
-    padding: 0;
-}
-
-.unity-scroller--horizontal > .unity-scroller__slider {
-    height: 12px;
-    min-height: auto;
-    border-radius: 5px;
-    margin: 0;
-    padding: 0;
-}
-
-.unity-base-slider--vertical {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-.unity-scroller--vertical .unity-base-slider--vertical .unity-base-slider__dragger {
-    width: 10px;
-    margin: 0;
-    left: 1px;
-    border-radius: 5px;
-}
-
-.unity-scroller--horizontal .unity-base-slider--horizontal .unity-base-slider__dragger {
-    height: 10px;
-    margin: 0;
-    top: 1px;
-    border-radius: 5px;
-}
-
-.unity-base-slider--vertical .unity-base-slider__dragger {
-    width: 10px;
-    margin: 0;
-    left: 8px;
-    border-radius: 5px;
-}
-
-.unity-base-slider--horizontal .unity-base-slider__dragger {
-    height: 10px;
-    margin: 0;
-    top: 8px;
-    border-radius: 5px;
-}
-
 .textColorTint {
     -unity-background-image-tint-color: var(--text-color);
 }
@@ -973,34 +608,6 @@ Button.tinyFont {
 
 .dialogBackground {
     background-color: rgb(14, 28, 42);
-}
-
-#accordionItemContent {
-    height: 0;
-    overflow: hidden;
-    transition: height 0.5s;
-}
-
-#accordionItemRoot {
-    width: 100%;
-    border-width: 0;
-}
-
-#toggleAccordionItemContentButton.unity-button {
-    border-radius: 0;
-}
-
-#accordionItemRoot.expanded #accordionItemContent {
-    height: auto;
-}
-
-#toggleAccordionItemContentIcon {
-    transition: rotate 0.3s;
-}
-
-#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
-    transform-origin: 50% 50%;
-    rotate: -180deg;
 }
 
 #targetNoteImage {
@@ -1039,15 +646,6 @@ Button.tinyFont {
     padding-bottom: 40px;
 }
 
-.tooltip {
-    font-size: var(--font-size-s);
-    -unity-font-style: bold;
-    padding: 5px;
-    background-color: rgb(60, 63, 65);
-    border-color: rgb(50, 50, 50);
-    border-width: 1px;
-}
-
 .noSongsFoundLabel {
     margin-top: 10px;
     margin-left: auto;
@@ -1074,77 +672,6 @@ Button.tinyFont {
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
-}
-
-.comboBoxTextField {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-}
-
-.comboBoxTextField #unity-text-input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.comboBoxButton {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-TextField.placeholderVisible {
-    -unity-font-style: italic;
-}
-
-TextField.placeholderVisible #unity-text-input {
-    font-size: var(--font-size-xs);
-}
-
-.unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
-    height: 55%;
-}
-
-.unity-toggle > .unity-toggle__input:focus:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
-    height: 55%;
-}
-
-.unity-toggle > .unity-toggle__input:hover:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
-    height: 55%;
-}
-
-.materialIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
-}
-
-.materialIcon.outlined {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
-}
-
-.materialIcon.rounded {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
-}
-
-.bootstrapIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
-}
-
-.fontIcon {
-    font-size: var(--font-icon-size);
-    -unity-font-style: normal;
-}
-
-.fontIcon.tinyFont {
-    font-size: var(--font-size-xxs);
-}
-
-.fontIcon.smallerFont {
-    font-size: var(--font-size-xs);
-}
-
-.fontIcon.smallFont {
-    font-size: var(--font-size-s);
 }
 
 #toggleFavoriteButton MaterialIcon {
