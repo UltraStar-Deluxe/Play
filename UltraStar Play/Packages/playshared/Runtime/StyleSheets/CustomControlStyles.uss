@@ -1,0 +1,288 @@
+/**************************************************/
+/* ITEM PICKER */
+/**************************************************/
+
+ItemPicker {
+    width: 300px;
+    height: var(--control-height);
+    min-width: var(--control-height-small);
+}
+
+ItemPicker Label {
+    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
+}
+
+.itemPickerItemLabel {
+    background-color: var(--control-color-accent2);
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.itemPickerButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 60px;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+ItemPicker #previousItemButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+ItemPicker #nextItemButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* DIALOG */
+/**************************************************/
+
+.dialogTitle {
+    font-size: var(--font-size-l);
+}
+
+.dialogMessage {
+    font-size: var(--font-size);
+}
+
+.dialogTitleImage {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size-l);
+    height: var(--font-size-l);
+    margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dialogButton {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#dialogButtonContainer Button {
+    margin-right: 5px;
+    min-width: var(--control-width);
+}
+
+.dialogTextButton {
+    height: auto;
+    width: auto;
+    color: rgb(6, 170, 233);
+}
+
+.dialogTextButton:hover {
+    color: rgb(0, 102, 156);
+}
+
+.dialogTextButton:focus {
+    color: rgb(125, 198, 233);
+}
+
+.modalDialogContainer {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialogBackground {
+    background-color: rgb(14, 28, 42);
+}
+
+/**************************************************/
+/* COMBO BOX */
+/**************************************************/
+
+.comboBoxTextField {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.comboBoxTextField #unity-text-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.comboBoxButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* CONTEXT MENU */
+/**************************************************/
+
+.contextMenuSeparator {
+    height: 1px;
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu {
+    background-color: rgb(64, 64, 64);
+    padding: 2px;
+}
+
+.contextMenu Button {
+    background-color: rgb(64, 64, 64);
+}
+
+.contextMenu Button:hover {
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu Button:focus {
+    background-color: rgb(92, 92, 92);
+}
+
+/**************************************************/
+/* TOOLTIP */
+/**************************************************/
+
+.tooltip {
+    font-size: var(--font-size-s);
+    -unity-font-style: bold;
+    padding: 5px;
+    background-color: rgb(60, 63, 65);
+    border-color: rgb(50, 50, 50);
+    border-width: 1px;
+}
+
+/**************************************************/
+/* ACCORDION */
+/**************************************************/
+
+#accordionItemContent {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s;
+}
+
+#accordionItemRoot {
+    width: 100%;
+    border-width: 0;
+}
+
+#toggleAccordionItemContentButton.unity-button {
+    border-radius: 0;
+}
+
+#accordionItemRoot.expanded #accordionItemContent {
+    height: auto;
+}
+
+#toggleAccordionItemContentIcon {
+    transition: rotate 0.3s;
+}
+
+#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+    transform-origin: 50% 50%;
+    rotate: -180deg;
+}
+
+/**************************************************/
+/* FONT ICONS */
+/**************************************************/
+.fontIcon {
+    font-size: var(--font-icon-size);
+    -unity-font-style: normal;
+}
+
+.fontIcon.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+.fontIcon.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+.fontIcon.smallFont {
+    font-size: var(--font-size-s);
+}
+
+.materialIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
+}
+
+.materialIcon.outlined {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
+}
+
+.materialIcon.rounded {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
+}
+
+.bootstrapIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
+}
+
+/**************************************************/
+/* TEXT FIELD PLACEHOLDER */
+/**************************************************/
+
+TextField.placeholderVisible {
+    -unity-font-style: italic;
+}
+
+TextField.placeholderVisible #unity-text-input {
+    font-size: var(--font-size-xs);
+}
+
+/**************************************************/
+/* INPUT LEGEND */
+/**************************************************/
+
+.inputLegendLabel {
+    width: 20%;
+    -unity-text-align: middle-center;
+}
+
+.inputLegendBar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 50px;
+    background-color: rgba(32, 32, 32, 0.88);
+}
+
+#inputDeviceIconContainer {
+    height: 90%;
+    width: 20px;
+}
+
+#inputDeviceIconContainer .unity-label {
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+}
+
+#menuOverlay .inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+}
+
+/**************************************************/
+/* FPS LABEL */
+/**************************************************/
+
+.fpsLabel {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: var(--font-size-xs);
+    -unity-text-align: middle-center;
+    padding: 10px;
+}

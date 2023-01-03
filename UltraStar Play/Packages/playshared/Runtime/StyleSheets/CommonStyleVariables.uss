@@ -1,0 +1,30 @@
+:root {
+    --text-color: rgb(240, 240, 240);
+    --text-color-inverted: rgb(64, 64, 64);
+    --text-color-accent1: lightgrey;
+    --text-color-error: rgb(220, 53, 69);
+    --text-color-warning: rgb(255, 193, 7);
+    --font-size-xxs: 10px;
+    --font-size-xs: 12px;
+    --font-size-s: 14px;
+    --font-size: 18px;
+    --font-size-l: 20px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 26px;
+    --font-icon-size: 32px;
+    --control-height: 40px;
+    --control-height-small: 30px;
+    --control-height-large: 92px;
+    --control-width: 120px;
+    --control-width-half: 60px;
+    --control-width-large: 150px;
+    --round-button-size: 50px;
+    --radio-button-size: 20px;
+    --control-color: rgb(66, 163, 231);
+    --control-color-accent1: rgb(125, 198, 233);
+    --control-color-accent2: rgb(99, 154, 183);
+    --control-danger: rgb(220, 53, 69);
+    --control-danger-accent1: rgb(200, 35, 51);
+    --main-scene-button-width: 150px;
+    --main-scene-sing-button-width: 310px;
+}

@@ -5,6 +5,6 @@
             <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1;" />
             <ui:Toggle name="enabledToggle" />
         </ui:VisualElement>
-        <ItemPicker name="voiceChooser" noPreviousButton="true" wrapAround="true" class="smallControl smallFont" style="width: 90%;" />
+        <ItemPicker name="voiceChooser" no-previous-button="true" wrap-around="true" class="smallControl smallFont" style="width: 90%;" />
     </ui:VisualElement>
 </ui:UXML>
