@@ -30,6 +30,7 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+        ApplicationUtils.SetUsePortAudio(settings.AudioSettings.PreferPortAudio);
     }
 
     private void Update()
