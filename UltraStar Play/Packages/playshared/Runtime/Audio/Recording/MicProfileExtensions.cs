@@ -22,14 +22,21 @@ public static class MicProfileExtensions
             return "";
         }
 
-        if (!micProfile.IsInputFromConnectedClient
-            && MicrophoneAdapter.Devices.Contains(micProfile.Name))
+        if (!micProfile.IsInputFromConnectedClient)
         {
-            // Add channel to mic profile name, if the device has more than one channel.
-            MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
-            if (channelCount > 1)
+            if (micProfile.ChannelIndex > 0)
             {
                 return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
+            }
+
+            // Add channel to mic profile name only if the device is connected and has more than one channel.
+            if (MicrophoneAdapter.Devices.Contains(micProfile.Name))
+            {
+                MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
+                if (channelCount > 1)
+                {
+                    return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
+                }
             }
         }
 

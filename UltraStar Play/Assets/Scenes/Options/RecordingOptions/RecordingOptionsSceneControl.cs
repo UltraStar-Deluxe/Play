@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortAudioForUnity;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -117,7 +118,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private void Start()
     {
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
-        devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
+        devicePickerControl.GetLabelTextFunction = micProfile => micProfile.GetDisplayNameWithChannel();
         if (!TryReSelectLastMicProfile())
         {
             devicePickerControl.Selection.Value = devicePickerControl.Items[0];
@@ -376,11 +377,19 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
         {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.Name == connectedMicName && !it.IsInputFromConnectedClient);
-            if (!alreadyInList)
+            MicrophoneAdapter.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
+
+            for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
             {
-                MicProfile micProfile = new(connectedMicName);
-                micProfiles.Add(micProfile);
+                bool alreadyInList = micProfiles.AnyMatch(it =>
+                    it.Name == connectedMicName
+                    && it.ChannelIndex == channelIndex
+                    && !it.IsInputFromConnectedClient);
+                if (!alreadyInList)
+                {
+                    MicProfile micProfile = new(connectedMicName, channelIndex);
+                    micProfiles.Add(micProfile);
+                }
             }
         }
 
@@ -390,7 +399,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
             if (!alreadyInList)
             {
-                MicProfile micProfile = new(connectedClientHandler.ClientName, connectedClientHandler.ClientId);
+                MicProfile micProfile = new(connectedClientHandler.ClientName, 0, connectedClientHandler.ClientId);
                 micProfiles.Add(micProfile);
             }
         }
