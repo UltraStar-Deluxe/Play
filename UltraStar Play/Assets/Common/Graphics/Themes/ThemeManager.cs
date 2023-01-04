@@ -158,22 +158,6 @@ public class ThemeManager : MonoBehaviour
         StartCoroutine(ApplyTheme(themeMeta));
     }
 
-    private Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
-    {
-        byte[] imageBytes = File.ReadAllBytes(fullPath);
-        Texture2D texture = new (2, 2, alpha ? TextureFormat.RGBA32 : TextureFormat.RGB24, mipMaps)
-        {
-            alphaIsTransparency = true,
-            wrapMode = wrapMode,
-            filterMode = FilterMode.Bilinear
-        };
-        texture.LoadImage(imageBytes, true);
-
-        dynamicTextures.Add(texture);
-
-        return texture;
-    }
-
     private void DestroyDynamicTextures()
     {
         foreach (Texture2D texture2D in dynamicTextures)
@@ -207,8 +191,14 @@ public class ThemeManager : MonoBehaviour
             string gradientPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.gradientRampFile);
             if (File.Exists(gradientPath))
             {
-                Texture2D gradientTexture = LoadPng(gradientPath, false, background.gradientScrollingSpeed > 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp, false);
-                backgroundMaterial.SetTexture("_ColorRampTex", gradientTexture);
+                TextureWrapMode textureWrapMode = background.gradientScrollingSpeed > 0
+                    ? TextureWrapMode.Repeat
+                    : TextureWrapMode.Clamp;
+                ImageManager.LoadSpriteFromUri(gradientPath, gradientSprite =>
+                {
+                    gradientSprite.texture.wrapMode = textureWrapMode;
+                    backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
+                });
             }
             else
             {
@@ -231,8 +221,12 @@ public class ThemeManager : MonoBehaviour
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.patternFile);
             if (File.Exists(patternPath))
             {
-                Texture2D patternTexture = LoadPng(patternPath, true, TextureWrapMode.Repeat, true);
-                backgroundMaterial.SetTexture("_PatternTex", patternTexture);
+                ImageManager.LoadSpriteFromUri(patternPath, patternSprite =>
+                {
+                    patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
+                    backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
+                });
+
                 patternColor = background.patternColor;
             }
             else
@@ -254,9 +248,14 @@ public class ThemeManager : MonoBehaviour
         backgroundMaterial.SetFloat("_UiShadowOpacity", background.uiShadowOpacity);
         backgroundMaterial.SetVector("_UiShadowOffset", background.uiShadowOffset);
 
-        if (background.uiShadowOpacity > 0) backgroundMaterial.EnableKeyword("_UI_SHADOW");
+        if (background.uiShadowOpacity > 0)
+        {
+            backgroundMaterial.EnableKeyword("_UI_SHADOW");
+        }
         else
+        {
             backgroundMaterial.DisableKeyword("_UI_SHADOW");
+        }
 
         // Particles
         if (!string.IsNullOrEmpty(background.particleFile))
@@ -264,8 +263,11 @@ public class ThemeManager : MonoBehaviour
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.particleFile);
             if (File.Exists(particlePath))
             {
-                Texture2D particleTexture = LoadPng(particlePath, true, TextureWrapMode.Clamp, true);
-                particleMaterial.mainTexture = particleTexture;
+                ImageManager.LoadSpriteFromUri(particlePath, particleSprite =>
+                {
+                    particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
+                    particleMaterial.mainTexture = particleSprite.texture;
+                });
             }
             else
             {
