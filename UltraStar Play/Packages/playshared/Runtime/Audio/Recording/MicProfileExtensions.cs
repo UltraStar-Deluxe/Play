@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using PortAudioForUnity;
 using UnityEngine;
 
 public static class MicProfileExtensions
@@ -6,7 +7,7 @@ public static class MicProfileExtensions
     public static bool IsConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
     {
         return (micProfile.IsInputFromConnectedClient && serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler _))
-               || (!micProfile.IsInputFromConnectedClient && Microphone.devices.Contains(micProfile.Name));
+               || (!micProfile.IsInputFromConnectedClient && MicrophoneAdapter.Devices.Contains(micProfile.Name));
     }
 
     public static bool IsEnabledAndConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
