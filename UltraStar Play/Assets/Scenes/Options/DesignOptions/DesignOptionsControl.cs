@@ -20,6 +20,9 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private TranslationManager translationManager;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -77,13 +80,12 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
                 newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
 
         // Load available themes:
-        string[] jsonThemes = System.Array.ConvertAll(Directory.GetFiles($"{Application.dataPath}/../themes/", "*.json", SearchOption.AllDirectories), Path.GetFileNameWithoutExtension);
-        Dictionary<string, string> beautifiedToFilename = jsonThemes.ToDictionary(UIUtils.BeautifyString);
-
-        LabeledItemPickerControl<string> themePickerControl = new(themeContainer.Q<ItemPicker>(), beautifiedToFilename.Keys.ToList());
-        themePickerControl.Bind(() => UIUtils.BeautifyString(settings.GraphicSettings.CurrentThemeName),
-            newValue => settings.GraphicSettings.CurrentThemeName = !beautifiedToFilename.ContainsKey(newValue) ? ThemeManager.DEFAULT_THEME : beautifiedToFilename[newValue]
-        );
+        List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
+        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themeContainer.Q<ItemPicker>(), themeMetas);
+        themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
+        themePickerControl.Bind(
+            () => themeManager.GetCurrentTheme(),
+            newValue => themeManager.SetCurrentTheme(newValue));
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

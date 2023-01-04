@@ -5,20 +5,6 @@ using UnityEngine.UIElements;
 
 public static class UIUtils
 {
-    // Returns a nicely readable string from a filename, e.g. "theme_blue" will become "Theme Blue"
-    public static string BeautifyString(string input)
-    {
-        input = input.Replace("_", " ").Replace("-", " ");
-        char[] chars = input.ToCharArray();
-        bool lastWasSpace = true;
-        for (int c = 0; c < chars.Length; c++)
-        {
-            if (lastWasSpace) chars[c] = char.ToUpperInvariant(input[c]);
-            lastWasSpace = char.IsWhiteSpace(chars[c]);
-        }
-        return new string(chars);
-    }
-
     public static void ForEachElementWithClass(VisualElement root, Action<VisualElement> callback, params string[] classNames)
     {
         foreach (string className in classNames)

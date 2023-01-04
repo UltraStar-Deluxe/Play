@@ -69,6 +69,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     private Settings settings;
 
     [Inject]
+    private ThemeManager themeManager;
+
+    [Inject]
     private UiManager uiManager;
 
     [Inject]
@@ -107,10 +110,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
         new BoolPickerControl(disableDynamicThemesContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.disableDynamicThemes,
-                newValue =>
+                disableDynamicThemes =>
                 {
-                    if (newValue) settings.GraphicSettings.CurrentThemeName = "default_blue";
-                    settings.DeveloperSettings.disableDynamicThemes = newValue;
+                    if (disableDynamicThemes)
+                    {
+                        themeManager.SetCurrentTheme(themeManager.GetDefaultTheme());
+                    }
+                    settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
 
         ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,

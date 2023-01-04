@@ -37,6 +37,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     private void Start()
     {
         UpdatePlayerProfileList();
@@ -81,7 +84,7 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             index++;
         });
 
-        StyleSheetControl.Instance.UpdateThemeSpecificStyleSheets();
+        themeManager.UpdateThemeSpecificStyleSheets();
     }
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)

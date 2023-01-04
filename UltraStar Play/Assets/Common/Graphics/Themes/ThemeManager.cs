@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UniInject;
 using UnityEngine;
@@ -14,18 +15,34 @@ using UnityEngine.UIElements;
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
 
-public class ThemeManager : MonoBehaviour, INeedInjection
+public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     // the theme to load by default (filename without json extension)
-    public const string DEFAULT_THEME = "default_blue";
+    public const string DEFAULT_THEME_NAME = "default_blue";
+    public const string THEME_FOLDER_NAME = "Themes";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        Instance = null;
+        instance = null;
     }
 
-    public static ThemeManager Instance { get; private set; }
+    private static ThemeManager instance;
+    public static ThemeManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                ThemeManager instanceInScene = GameObjectUtils.FindComponentWithTag<ThemeManager>("ThemeManager");
+                if (instanceInScene != null)
+                {
+                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
+                }
+            }
+            return instance;
+        }
+    }
 
     // ----------------------------------------------------------------
 
@@ -58,9 +75,9 @@ public class ThemeManager : MonoBehaviour, INeedInjection
             return theme;
         }
 
-        public bool GetRatingIconFor(SongRating.ESongRating songRating, out Sprite sprite)
+        public bool GetRatingIconFor(ThemeMeta themeMeta, SongRating.ESongRating songRating, out Sprite sprite)
         {
-            sprite = songRatingIcons?.GetSpriteForRating(songRating);
+            sprite = songRatingIcons?.GetSpriteForRating(themeMeta, songRating);
             return sprite != null;
         }
 
@@ -126,24 +143,24 @@ public class ThemeManager : MonoBehaviour, INeedInjection
 
         Dictionary<string, Sprite> loadedSprites = new Dictionary<string, Sprite>();
 
-        public Sprite GetSpriteForRating(SongRating.ESongRating songRating)
+        public Sprite GetSpriteForRating(ThemeMeta themeMeta, SongRating.ESongRating songRating)
         {
             switch (songRating)
             {
-                case SongRating.ESongRating.ToneDeaf: return GetSprite(toneDeaf);
-                case SongRating.ESongRating.Amateur: return GetSprite(amateur);
-                case SongRating.ESongRating.Wannabe: return GetSprite(wannabe);
-                case SongRating.ESongRating.Hopeful: return GetSprite(hopeful);
-                case SongRating.ESongRating.RisingStar: return GetSprite(risingStar);
-                case SongRating.ESongRating.LeadSinger: return GetSprite(leadSinger);
-                case SongRating.ESongRating.Superstar: return GetSprite(superstar);
-                case SongRating.ESongRating.Ultrastar: return GetSprite(ultrastar);
+                case SongRating.ESongRating.ToneDeaf: return GetSprite(themeMeta, toneDeaf);
+                case SongRating.ESongRating.Amateur: return GetSprite(themeMeta, amateur);
+                case SongRating.ESongRating.Wannabe: return GetSprite(themeMeta, wannabe);
+                case SongRating.ESongRating.Hopeful: return GetSprite(themeMeta, hopeful);
+                case SongRating.ESongRating.RisingStar: return GetSprite(themeMeta, risingStar);
+                case SongRating.ESongRating.LeadSinger: return GetSprite(themeMeta, leadSinger);
+                case SongRating.ESongRating.Superstar: return GetSprite(themeMeta, superstar);
+                case SongRating.ESongRating.Ultrastar: return GetSprite(themeMeta, ultrastar);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(songRating), songRating, null);
             }
         }
 
-        private Sprite GetSprite(string filePath)
+        private Sprite GetSprite(ThemeMeta themeMeta, string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
             {
@@ -155,7 +172,7 @@ public class ThemeManager : MonoBehaviour, INeedInjection
                 return loadedSprites[filePath];
             }
 
-            string fullPath = $"{Application.dataPath}/../themes/{filePath}";
+            string fullPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, filePath);
             if (!File.Exists(fullPath))
             {
                 Debug.LogError($"[THEME] Couldn't load image at path: '{fullPath}'");
@@ -173,7 +190,7 @@ public class ThemeManager : MonoBehaviour, INeedInjection
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         }
 
-        internal void CleanupLoadedSprites()
+        internal void DestroyLoadedSprites()
         {
             foreach (KeyValuePair<string,Sprite> loadedSprite in loadedSprites)
             {
@@ -219,26 +236,31 @@ public class ThemeManager : MonoBehaviour, INeedInjection
 
     // ----------------------------------------------------------------
 
-    public void LoadTheme(string filename)
+    public void LoadTheme(ThemeMeta themeMeta)
     {
-        string originalName = filename;
+        // if (settings.DeveloperSettings.disableDynamicThemes)
+        // {
+        //     return;
+        // }
+        //
+        // EScene currentScene = ESceneUtils.GetCurrentScene();
+        // if (currentScene == EScene.SongEditorScene)
+        // {
+        //     // Song editor is out of scope for theming.
+        //     return;
+        // }
 
-        if (!filename.EndsWith(".json")) filename += ".json";
-        string fullPath = $"{Application.dataPath}/../themes/{filename}";
-        if (!File.Exists(fullPath))
+        if (themeMeta == null)
         {
-            Debug.LogWarning($"[THEME] Couldn't load theme at path: '{fullPath}'");
-            if (originalName != DEFAULT_THEME)
-            {
-                LoadTheme(DEFAULT_THEME);
-            }
+            Debug.Log($"Cannot load theme. Theme is null.");
             return;
         }
 
-        string jsonTheme = File.ReadAllText(fullPath);
-        this.currentTheme = ThemeSettings.LoadFromJson(jsonTheme);
+        Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
+        string jsonTheme = File.ReadAllText(themeMeta.AbsoluteFilePath);
+        currentThemeSettings = ThemeSettings.LoadFromJson(jsonTheme);
 
-        this.StartCoroutine(Apply(this.currentTheme));
+        StartCoroutine(Apply(themeMeta, currentThemeSettings));
     }
 
     // ----------------------------------------------------------------
@@ -246,56 +268,41 @@ public class ThemeManager : MonoBehaviour, INeedInjection
     public Material backgroundMaterial;
     public Material particleMaterial;
     public ParticleSystem backgroundParticleSystem;
+    public ThemeSettings currentThemeSettings;
 
-    public ThemeSettings currentTheme;
+    [Inject]
+    private UIDocument uiDocument;
 
-    Material originalBackgroundMaterial;
-    Material originalParticleMaterial;
-    readonly List<Texture2D> dynamicTextures = new();
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    public BackgroundImageControl backgroundImageControl { get; private set; }
 
-    public PanelSettings panelSettings;
-    RenderTexture renderTextureUserInterface;
+    private readonly List<Texture2D> dynamicTextures = new();
+    private Material backgroundMaterialCopy;
+    private Material particleMaterialCopy;
+    private RenderTexture userInterfaceRenderTexture;
 
-    void Awake()
+    public void OnInjectionFinished()
     {
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        renderTextureUserInterface = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-        panelSettings.targetTexture = renderTextureUserInterface;
-        this.GetComponentInChildren<BackgroundImageEffect>().SetUiRenderTextures(
-            renderTextureUserInterface,
-            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture
-            );
+        userInterfaceRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+        uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
+        backgroundImageControl.SetUiRenderTextures(
+            userInterfaceRenderTexture,
+            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
+
+        backgroundMaterialCopy = new Material(backgroundMaterial);
+        particleMaterialCopy = new Material(particleMaterial);
     }
 
     void Start()
     {
-        if (Instance != null)
+        if (Instance != this)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
             return;
         }
 
-        Instance = this;
-        GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(this.gameObject);
-
-        // Load default theme
-        this.LoadTheme(settings.GraphicSettings.themeName);
-    }
-
-    void OnEnable()
-    {
-        // Create a copy of the original materials for restoration
-        originalBackgroundMaterial = new Material(backgroundMaterial);
-        originalParticleMaterial = new Material(particleMaterial);
-    }
-
-    void OnApplicationQuit()
-    {
-        // Reset original materials
-        backgroundMaterial.CopyPropertiesFromMaterial(originalBackgroundMaterial);
-        particleMaterial.CopyPropertiesFromMaterial(originalParticleMaterial);
-        CleanupDynamicTextures();
-        this.currentTheme?.songRatingIcons?.CleanupLoadedSprites();
+        LoadTheme(GetCurrentTheme());
     }
 
     Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
@@ -314,16 +321,19 @@ public class ThemeManager : MonoBehaviour, INeedInjection
         return texture;
     }
 
-    void CleanupDynamicTextures()
+    private void DestroyDynamicTextures()
     {
-        foreach (Texture2D texture2D in dynamicTextures) Destroy(texture2D);
+        foreach (Texture2D texture2D in dynamicTextures)
+        {
+            Destroy(texture2D);
+        }
         dynamicTextures.Clear();
     }
 
     // Updating background colors might be called multiple times
     internal static readonly HashSet<VisualElement> AlreadyProcessedElements = new ();
 
-    IEnumerator Apply(ThemeSettings data)
+    private IEnumerator Apply(ThemeMeta themeMeta, ThemeSettings themeSettings)
     {
         AlreadyProcessedElements.Clear();
 
@@ -331,17 +341,17 @@ public class ThemeManager : MonoBehaviour, INeedInjection
         // we wait so the background changes at the same frame
         yield return null;
 
-        this.currentTheme?.songRatingIcons?.CleanupLoadedSprites();
-        CleanupDynamicTextures();
+        this.currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
+        DestroyDynamicTextures();
 
         #region Dynamic background
 
-        DynamicBackground background = data.dynamicBackground;
+        DynamicBackground background = themeSettings.dynamicBackground;
 
         // Material
         if (!string.IsNullOrEmpty(background.gradientRampFile))
         {
-            string gradientPath = $"{Application.dataPath}/../themes/{background.gradientRampFile}";
+            string gradientPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.gradientRampFile);
             if (File.Exists(gradientPath))
             {
                 Texture2D gradientTexture = LoadPng(gradientPath, false, background.gradientScrollingSpeed > 0 ? TextureWrapMode.Repeat : TextureWrapMode.Clamp, false);
@@ -365,7 +375,7 @@ public class ThemeManager : MonoBehaviour, INeedInjection
         Color patternColor = Color.clear; // default to clear to hide pattern if no file specified or found
         if (!string.IsNullOrEmpty(background.patternFile))
         {
-            string patternPath = $"{Application.dataPath}/../themes/{background.patternFile}";
+            string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.patternFile);
             if (File.Exists(patternPath))
             {
                 Texture2D patternTexture = LoadPng(patternPath, true, TextureWrapMode.Repeat, true);
@@ -398,7 +408,7 @@ public class ThemeManager : MonoBehaviour, INeedInjection
         // Particles
         if (!string.IsNullOrEmpty(background.particleFile))
         {
-            string particlePath = $"{Application.dataPath}/../themes/{background.particleFile}";
+            string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.particleFile);
             if (File.Exists(particlePath))
             {
                 Texture2D particleTexture = LoadPng(particlePath, true, TextureWrapMode.Clamp, true);
@@ -424,5 +434,167 @@ public class ThemeManager : MonoBehaviour, INeedInjection
     {
         // Use that in shaders instead of _Time so that value doesn't reset on each scene change
         Shader.SetGlobalFloat(_TimeApplication, Time.time);
+    }
+
+    private void OnDestroy()
+    {
+        // Destroy all instantiated assets
+        Destroy(userInterfaceRenderTexture);
+
+        backgroundMaterial.CopyPropertiesFromMaterial(backgroundMaterialCopy);
+        particleMaterial.CopyPropertiesFromMaterial(particleMaterialCopy);
+        Destroy(backgroundMaterialCopy);
+        Destroy(particleMaterialCopy);
+
+        DestroyDynamicTextures();
+        currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
+    }
+
+    public void SetCurrentTheme(ThemeMeta themeMeta)
+    {
+        settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
+        LoadTheme(GetCurrentTheme());
+    }
+
+    public ThemeMeta GetCurrentTheme()
+    {
+        return GetThemeByName(settings.GraphicSettings.themeName);
+    }
+
+    public ThemeMeta GetThemeByName(string themeName)
+    {
+        ThemeMeta themeMeta = GetThemeMetas()
+            .FirstOrDefault(themeMeta => themeMeta.FileNameWithoutExtension == themeName);
+        if (themeMeta == null)
+        {
+            Debug.Log($"No theme found with name {themeName}. Using default theme instead.");
+            return GetDefaultTheme();
+        }
+
+        return themeMeta;
+    }
+
+    public ThemeMeta GetDefaultTheme()
+    {
+        ThemeMeta defaultThemeMeta = GetThemeMetas()
+            .FirstOrDefault(themeMeta => themeMeta.FileNameWithoutExtension == DEFAULT_THEME_NAME);
+
+        if (defaultThemeMeta == null)
+        {
+            string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+            Debug.LogError($"Default theme '{DEFAULT_THEME_NAME}' not found. Available themes: {availableThemeMetasCsv}");
+        }
+
+        return defaultThemeMeta;
+    }
+
+    private readonly List<ThemeMeta> themeMetas = new();
+
+    public List<ThemeMeta> GetThemeMetas()
+    {
+        if (!themeMetas.IsNullOrEmpty())
+        {
+            return themeMetas;
+        }
+
+        List<string> themeFolders = new List<string>
+        {
+            $"{Application.persistentDataPath}/{THEME_FOLDER_NAME}",
+            $"{Application.streamingAssetsPath}/{THEME_FOLDER_NAME}",
+        };
+
+        themeFolders.ForEach(themeFolder =>
+        {
+            if (Directory.Exists(themeFolder))
+            {
+                string[] themeFilesInFolder = Directory.GetFiles(themeFolder, "*.json", SearchOption.AllDirectories);
+                List<ThemeMeta> themeMetasInFolder = themeFilesInFolder
+                    .Select(absoluteThemeFilePath => new ThemeMeta(absoluteThemeFilePath))
+                    .ToList();
+                themeMetas.AddRange(themeMetasInFolder);
+            }
+        });
+
+        Debug.Log($"Found {themeMetas.Count} themes.");
+
+        return themeMetas;
+    }
+
+
+    public void UpdateThemeSpecificStyleSheets()
+    {
+        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        {
+            return;
+        }
+
+        if (uiDocument == null)
+        {
+            return;
+        }
+
+        VisualElement root = uiDocument.rootVisualElement;
+
+        Color backgroundButtonColor = currentThemeSettings.buttonMainColor;
+        Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
+        Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
+
+        Color fontColorAll = currentThemeSettings.fontColor;
+        bool useGlobalFontColor = fontColorAll != Color.clear;
+
+        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeSettings.fontColorButtons;
+        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeSettings.fontColorLabels;
+
+        // Change color of UXML elements:
+        root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
+            .ForEach(el => el.style.color = backgroundButtonColor);
+
+        root.Query<Button>().ForEach(button =>
+        {
+            foreach (string excludedNameOrClass in new []{"transparentBackgroundColor", "hiddenContinueButton"})
+            {
+                if (button.ClassListContains(excludedNameOrClass) || button.name == excludedNameOrClass)
+                {
+                    return;
+                }
+            }
+
+            if (ThemeManager.AlreadyProcessedElements.Contains(button))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(button);
+
+            UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+
+            VisualElement image = button.Q("image");
+            if (image != null) image.style.unityBackgroundImageTintColor = fontColorButtons;
+            VisualElement backImage = button.Q("backImage");
+            if (backImage != null) backImage.style.unityBackgroundImageTintColor = fontColorButtons;
+        });
+        root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
+        {
+            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(entry);
+            UIUtils.SetBackgroundStyleWithHover(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+        });
+        root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
+        {
+            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            {
+                return;
+            }
+            ThemeManager.AlreadyProcessedElements.Add(entry);
+            UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+        });
+
+        UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);
+        UIUtils.ApplyFontColorForElements(root, new []{"itemLabel"}, null, fontColorButtons);
+
+        root.Query(null, "itemPickerItemLabel").ForEach(label => label.style.backgroundColor = itemPickerBackgroundColor);
+        root.Query("titleImage").ForEach(image => image.style.unityBackgroundImageTintColor = fontColorLabels);
     }
 }

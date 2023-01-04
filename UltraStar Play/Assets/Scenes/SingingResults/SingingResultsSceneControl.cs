@@ -52,6 +52,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -254,7 +257,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         if (!settings.DeveloperSettings.disableDynamicThemes)
         {
-            if (ThemeManager.Instance.currentTheme.GetRatingIconFor(songRatingEnumValue, out Sprite sprite))
+            if (themeManager.currentThemeSettings.GetRatingIconFor(themeManager.GetCurrentTheme(), songRatingEnumValue, out Sprite sprite))
             {
                 return sprite;
             }
