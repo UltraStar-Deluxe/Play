@@ -54,21 +54,21 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
     {
         // Find existing or create new MicProfile for the newly connected device
-        MicProfile micProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
-        if (micProfile == null)
+        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
+        if (connectedMicProfile == null)
         {
-            micProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, connectionEvent.ConnectedClientHandler.ClientId);
-            settings.MicProfiles.Add(micProfile);
+            connectedMicProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, 0, connectionEvent.ConnectedClientHandler.ClientId);
+            settings.MicProfiles.Add(connectedMicProfile);
         }
 
         SongSelectMicEntryControl matchingEntryControl = listEntryControls.FirstOrDefault(listEntry =>
                listEntry.MicProfile != null
             && listEntry.MicProfile.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId
             && listEntry.MicProfile.IsEnabled);
-        if (connectionEvent.IsConnected && matchingEntryControl == null && micProfile.IsEnabled)
+        if (connectionEvent.IsConnected && matchingEntryControl == null && connectedMicProfile.IsEnabled)
         {
             // Add to UI
-            CreateListEntry(micProfile);
+            CreateListEntry(connectedMicProfile);
             noMicsFoundLabel.HideByDisplay();
         }
         else if (!connectionEvent.IsConnected && matchingEntryControl != null)
