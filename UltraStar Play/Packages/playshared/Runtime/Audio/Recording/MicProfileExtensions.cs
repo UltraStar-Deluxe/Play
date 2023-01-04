@@ -14,4 +14,25 @@ public static class MicProfileExtensions
     {
         return micProfile.IsEnabled && micProfile.IsConnected(serverSideConnectRequestManager);
     }
+
+    public static string GetDisplayNameWithChannel(this MicProfile micProfile)
+    {
+        if (micProfile == null)
+        {
+            return "";
+        }
+
+        if (!micProfile.IsInputFromConnectedClient
+            && MicrophoneAdapter.Devices.Contains(micProfile.Name))
+        {
+            // Add channel to mic profile name, if the device has more than one channel.
+            MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
+            if (channelCount > 1)
+            {
+                return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
+            }
+        }
+
+        return micProfile.Name;
+    }
 }

@@ -110,18 +110,21 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
 
-        // TODO: Is the busy waiting needed in the first place?
-        System.Diagnostics.Stopwatch stopwatch = new();
-        stopwatch.Start();
-        while (MicrophoneAdapter.GetPosition(MicProfile.Name) <= 0)
+        if (!MicrophoneAdapter.UsePortAudio)
         {
-            // <Busy waiting>
-            // Emergency exit
-            if (stopwatch.ElapsedMilliseconds > 1000)
+            // TODO: Is the busy waiting needed in the first place?
+            System.Diagnostics.Stopwatch stopwatch = new();
+            stopwatch.Start();
+            while (MicrophoneAdapter.GetPosition(MicProfile.Name) <= 0)
             {
-                IsRecording.Value = false;
-                Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
-                return;
+                // <Busy waiting>
+                // Emergency exit
+                if (stopwatch.ElapsedMilliseconds > 1000)
+                {
+                    IsRecording.Value = false;
+                    Debug.LogError("Microphone did not provide any samples. Took emergency exit out of busy waiting.");
+                    return;
+                }
             }
         }
 
@@ -141,7 +144,8 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
 
         Debug.Log($"Stopping recording with '{MicProfile.Name}'");
-        if (!MicProfile.IsInputFromConnectedClient)
+        if (!MicProfile.IsInputFromConnectedClient
+            && MicrophoneAdapter.Devices.Contains(MicProfile.Name))
         {
             MicrophoneAdapter.End(MicProfile.Name);
         }
@@ -179,7 +183,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
         NotifyListeners(newSamplesCount);
-        
+
         lastSamplePosition = currentSamplePosition;
     }
 
@@ -235,6 +239,10 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
 
         // Use best available sample rate
+        if (!MicrophoneAdapter.Devices.Contains(deviceName))
+        {
+            return DefaultSampleRate;
+        }
         MicrophoneAdapter.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate, out int channelCount);
         return GetMaxSampleRate(maxSampleRate);
     }

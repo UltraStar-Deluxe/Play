@@ -28,15 +28,17 @@ public class MicProfile
     {
     }
 
-    public MicProfile(string name, string connectedClientId = null)
+    public MicProfile(string name, int channelIndex = 0, string connectedClientId = null)
     {
         this.Name = name;
+        this.ChannelIndex = channelIndex;
         this.ConnectedClientId = connectedClientId;
     }
 
     public MicProfile(MicProfile other)
     {
         Name = other.Name;
+        ChannelIndex = other.ChannelIndex;
         Color = other.Color;
         Amplification = other.Amplification;
         NoiseSuppression = other.NoiseSuppression;
