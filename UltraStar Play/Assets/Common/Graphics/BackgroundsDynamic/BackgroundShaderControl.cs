@@ -1,21 +1,27 @@
 using UnityEngine;
 
-// [ExecuteInEditMode]
 // This script must be placed next to a Camera component. Otherwise OnRenderImage is not called by Unity.
-public class BackgroundImageControl : MonoBehaviour
+public class BackgroundShaderControl : MonoBehaviour
 {
-    [SerializeField]
-    private Material material;
     private static readonly int _UiTex = Shader.PropertyToID("_UiTex");
     private static readonly int _TransitionTex = Shader.PropertyToID("_TransitionTex");
     private static readonly int _TransitionTime = Shader.PropertyToID("_TransitionTime");
+    private static readonly int _TimeApplication = Shader.PropertyToID("_TimeApplication");
 
-    private void OnEnable()
+    public Material material;
+
+    private void Awake()
     {
         if (material == null)
         {
-            this.enabled = false;
+            enabled = false;
         }
+    }
+
+    private void Update()
+    {
+        // Use that in shaders instead of _Time so that value doesn't reset on each scene change
+        Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 
     /**
@@ -33,13 +39,19 @@ public class BackgroundImageControl : MonoBehaviour
         material.SetTexture(_TransitionTex, transitionRenderTexture);
     }
 
-    public void EnableTransition(bool enable)
+    public void SetTransitionAnimationEnabled(bool enable)
     {
-        if (enable) material.EnableKeyword("_UI_TRANSITION_ANIM");
-        else material.DisableKeyword("_UI_TRANSITION_ANIM");
+        if (enable)
+        {
+            material.EnableKeyword("_UI_TRANSITION_ANIM");
+        }
+        else
+        {
+            material.DisableKeyword("_UI_TRANSITION_ANIM");
+        }
     }
 
-    public void SetTransitionTime(float time)
+    public void SetTransitionAnimationTime(float time)
     {
         material.SetFloat(_TransitionTime, time);
     }
