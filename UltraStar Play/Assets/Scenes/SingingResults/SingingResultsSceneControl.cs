@@ -252,19 +252,4 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
     }
-
-    public Sprite GetSongRatingSprite(SongRating.ESongRating songRatingEnumValue)
-    {
-        if (!settings.DeveloperSettings.disableDynamicThemes)
-        {
-            if (themeManager.currentThemeMeta.ThemeSettings.GetRatingIconFor(themeManager.GetCurrentTheme(), songRatingEnumValue, out Sprite sprite))
-            {
-                return sprite;
-            }
-        }
-
-        SongRatingImageReference songRatingImageReference = songRatingImageReferences
-            .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        return songRatingImageReference?.sprite;
-    }
 }
