@@ -14,8 +14,6 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 {
     private const int DefaultSampleRate = 44100;
 
-    public bool playRecordedAudio;
-
     private MicProfile micProfile;
     public MicProfile MicProfile
     {
@@ -51,6 +49,25 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
     public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(0);
     // The MicSamples array has one float value per sample.
     public float[] MicSamples { get; private set; } = new float[DefaultSampleRate];
+
+    private bool playRecordedAudio;
+    public bool PlayRecordedAudio
+    {
+        get
+        {
+            return playRecordedAudio;
+        }
+        set
+        {
+            bool wasRecording = IsRecording.Value;
+            playRecordedAudio = value;
+            if (wasRecording)
+            {
+                StopRecording();
+                StartRecording();
+            }
+        }
+    }
 
     private readonly Subject<RecordingEvent> recordingEventStream = new();
     public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
@@ -108,11 +125,11 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
         // Code for low-latency Unity microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
+        DestroyAudioClips();
         micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
 
         if (!MicrophoneAdapter.UsePortAudio)
         {
-            // TODO: Is the busy waiting needed in the first place?
             System.Diagnostics.Stopwatch stopwatch = new();
             stopwatch.Start();
             while (MicrophoneAdapter.GetPosition(MicProfile.Name) <= 0)
@@ -129,7 +146,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
 
         // Configure audio playback
-        if (!MicrophoneAdapter.UsePortAudio)
+        if (micAudioClip != null)
         {
             audioSource.clip = micAudioClip;
             audioSource.loop = true;
@@ -143,7 +160,16 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
+        IsRecording.Value = false;
+
         Debug.Log($"Stopping recording with '{MicProfile.Name}'");
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
+        }
+        DestroyAudioClips();
+
         if (!MicProfile.IsInputFromConnectedClient
             && MicrophoneAdapter.Devices.Contains(MicProfile.Name))
         {
@@ -154,8 +180,6 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         {
             MicSamples[i] = 0;
         }
-        
-        IsRecording.Value = false;
     }
 
     private void UpdateRecording()
@@ -207,7 +231,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (playRecordedAudio && !audioSource.isPlaying)
+        if (playRecordedAudio && !audioSource.isPlaying && audioSource.clip != null)
         {
             audioSource.Play();
         }
@@ -245,6 +269,25 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         MicrophoneAdapter.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate, out int channelCount);
         return GetMaxSampleRate(maxSampleRate);
+    }
+
+    private void OnDestroy()
+    {
+        DestroyAudioClips();
+    }
+
+    private void DestroyAudioClips()
+    {
+        if (micAudioClip != null)
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+            Destroy(micAudioClip);
+            micAudioClip = null;
+        }
     }
 
     private static int GetMaxSampleRate(int maxSampleRate)

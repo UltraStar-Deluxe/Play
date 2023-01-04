@@ -9,6 +9,8 @@ public class AudioSettings
     public int VolumePercent { get; set; } = 100;
     public int BackgroundMusicVolumePercent { get; set; } = 50;
     public int VocalsAudioVolumePercent { get; set; } = 100;
+    public bool PreferPortAudio { get; set; } = true;
+    public bool PlayRecordedAudio { get; set; } = true;
 
     public int SceneChangeSoundVolumePercent { get; set; } = 50;
 

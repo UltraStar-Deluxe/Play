@@ -261,10 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5312f631956e3bc4b82156ae5066a7b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
-    type: 3}
-  accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
-    type: 3}
 --- !u!1 &459287942
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,7 +601,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playRecordedAudio: 0
 --- !u!1001 &1925591116
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -673,11 +668,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8402877255699612646, guid: 526f667f64d4f6949a1aa2bbba7ef376,
-        type: 3}
-      propertyPath: m_TagString
-      value: StyleSheetControl
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

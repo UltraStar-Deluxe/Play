@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PortAudioForUnity;
 using UnityEngine;
 
 public static class ApplicationUtils
@@ -133,5 +134,16 @@ public static class ApplicationUtils
         // Audio separation creates files called "vocals.ogg" and "instrumental.ogg"
         return Path.GetFileName(audioFile) == "vocals"
                || Path.GetFileName(audioFile) == "instrumental";
+    }
+
+    public static void SetUsePortAudio(bool preferPortAudio)
+    {
+        MicrophoneAdapter.UsePortAudio = preferPortAudio && CanUsePortAudio();
+    }
+
+    public static bool CanUsePortAudio()
+    {
+        // TODO: Build PortAudio for Linux and macOS and include the compiled libs in PortAudioForUnity.
+        return PlatformUtils.IsWindows();
     }
 }
