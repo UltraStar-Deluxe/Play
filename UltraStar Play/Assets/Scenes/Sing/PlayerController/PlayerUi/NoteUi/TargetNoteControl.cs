@@ -39,14 +39,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
 
-    protected VisualElement effectsContainer;
+    [Inject(UxmlName = R.UxmlNames.effectsContainer)]
+    private VisualElement effectsContainer;
 
     private readonly List<StarParticleControl> starControls = new();
-
-    public TargetNoteControl(VisualElement effectsContainer)
-    {
-        this.effectsContainer = effectsContainer;
-    }
 
     public void OnInjectionFinished()
     {
@@ -125,6 +121,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         Vector2 startScale = Vector2.zero;
         starControl.SetScale(startScale);
 
+        // Rotate a little bit
+        starControl.RotationVelocityInDegreesPerSecond = 60;
+
         // Animate to full size, stay there a while, then remove.
         LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one * Random.Range(0.25f, 0.5f), Random.Range(0.5f, 1f))
             .setOnUpdate((Vector2 s) => starControl.SetScale(s))
@@ -163,8 +162,12 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         Vector2 startScale = Vector2.zero;
         Vector2 endScale = Vector2.one * 0.8f;
         starControl.SetScale(startScale);
-        float animationTime = 1.5f;
+
+        // Rotate a little bit
+        starControl.RotationVelocityInDegreesPerSecond = 60;
+
         // Animate to full size, then animate to zero size, then remove.
+        float animationTime = 1.5f;
         LeanTween.value(singSceneControl.gameObject, startScale, endScale, animationTime / 2f)
             .setEaseOutSine()
             .setOnUpdate((Vector2 s) => starControl.SetScale(s))

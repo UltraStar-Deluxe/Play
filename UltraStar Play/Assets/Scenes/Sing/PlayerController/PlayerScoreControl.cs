@@ -22,7 +22,15 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         get
         {
-            return NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
+            int calculatedTotalScore = NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
+            if (calculatedTotalScore > maxScore)
+            {
+                Debug.LogWarning($"Total score is {calculatedTotalScore}, returning max score of {maxScore} instead. "
+                                 + $"(NormalNotesTotalScore: {NormalNotesTotalScore}, GoldenNotesTotalScore: {GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {PerfectSentenceBonusTotalScore})");
+                return maxScore;
+            }
+
+            return calculatedTotalScore;
         }
     }
 

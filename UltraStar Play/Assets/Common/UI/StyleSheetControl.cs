@@ -40,7 +40,7 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
         if (printScreenSize)
         {
             printScreenSize = false;
-            Debug.Log($"Screen size (inches): {GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
+            Debug.Log($"Screen size (inches): {ApplicationUtils.GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
         }
         AddScreenSpecificStyleSheets();
         UpdateThemeSpecificStyleSheets();
@@ -141,20 +141,9 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             // Unlikely DPI value. Do nothing.
         }
 
-        float physicalDiagonalScreenSizeInInches = GetPhysicalDiagonalScreenSizeInInches();
-        if (physicalDiagonalScreenSizeInInches > 10)
+        if (ApplicationUtils.IsLargeScreen())
         {
             uiDocument.rootVisualElement.styleSheets.Add(largeScreenStyleSheet);
         }
-    }
-
-    private float GetPhysicalDiagonalScreenSizeInInches()
-    {
-        // Get diagonal of right-angled triangle via Pythagoras theorem
-        float widthInPixels = Screen.width * Screen.width;
-        float heightInPixels = Screen.height * Screen.height;
-        float diagonalInPixels = Mathf.Sqrt(widthInPixels + heightInPixels);
-        float diagonalInInches = diagonalInPixels / Screen.dpi;
-        return diagonalInInches;
     }
 }

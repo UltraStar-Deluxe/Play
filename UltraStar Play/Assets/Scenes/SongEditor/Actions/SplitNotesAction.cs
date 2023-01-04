@@ -9,6 +9,9 @@ public class SplitNotesAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
+    [Inject]
+    private SongEditorLayerManager layerManager;
+
     public bool CanExecute(IReadOnlyCollection<Note> selectedNotes)
     {
         return selectedNotes.AnyMatch(it => it.Length > 1);
@@ -35,6 +38,12 @@ public class SplitNotesAction : INeedInjection
                 int splitBeat = note.StartBeat + (note.Length / 2);
                 Note newNote = new(note.Type, splitBeat, note.EndBeat - splitBeat, note.TxtPitch, newNoteText);
                 newNote.SetSentence(note.Sentence);
+
+                if (layerManager.TryGetLayer(note, out SongEditorLayer songEditorLayer))
+                {
+                    layerManager.AddNoteToLayer(songEditorLayer.LayerEnum, newNote);
+                }
+
                 note.SetEndBeat(splitBeat);
             }
         }

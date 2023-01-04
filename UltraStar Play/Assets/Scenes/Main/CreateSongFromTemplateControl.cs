@@ -126,7 +126,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         uiManager.CreateNotificationVisualElement(message);
 
         // Reload songs, now with the newly added song.
-        List<SongMeta> newSongMetas = songMetaManager.LoadNewSongMetasFromFolder(newSongFolderAbsolutePath);
+        songMetaManager.TryLoadAndAddSongMetasFromFolder(newSongFolderAbsolutePath, out List<SongMeta> newSongMetas, out List<SongIssue> _);
         SongMeta newSongMeta = newSongMetas.FirstOrDefault();
         if (newSongMeta != null)
         {

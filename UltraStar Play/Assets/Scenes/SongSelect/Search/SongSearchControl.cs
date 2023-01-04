@@ -75,9 +75,12 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
-            searchTextFieldHint.SetVisibleByDisplay(GetRawSearchText().IsNullOrEmpty());
+            UpdateSearchTextFieldHint();
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
+        searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
+        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint());
+        UpdateSearchTextFieldHint();
 
         searchErrorIcon.HideByDisplay();
         searchErrorIconTooltipControl = injector
@@ -111,6 +114,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             .Subscribe(evt => UpdateTextFieldHint());
 
         UpdateTextFieldHint();
+    }
+
+    private void UpdateSearchTextFieldHint()
+    {
+        searchTextFieldHint.SetVisibleByDisplay(
+            GetRawSearchText().IsNullOrEmpty()
+            && searchTextField.focusController.focusedElement != searchTextField);
     }
 
     private void UpdateTextFieldHint()

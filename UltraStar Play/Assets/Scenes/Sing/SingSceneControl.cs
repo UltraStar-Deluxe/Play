@@ -50,6 +50,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset goldenNoteStarUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset goldenNoteHitStarUi;
+
     [Inject(UxmlName = R.UxmlNames.background)]
     public VisualElement background;
 
@@ -167,10 +170,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                                      || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                          && SceneData.SelectedPlayerProfiles.Count <= 1);
 
+    private float startTimeInSeconds;
+    private bool hasRecordedSongStartedStatistics;
+
     private void Start()
     {
         string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
+
+        startTimeInSeconds = Time.time;
 
         pauseOverlay.HideByDisplay();
         new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
@@ -237,10 +245,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         // Associate LyricsDisplayer with one of the (duett) players
         InitSingingLyricsControls();
-
-        //Save information about the song being started into stats
-        Statistics stats = StatsManager.Instance.Statistics;
-        stats.RecordSongStarted(SongMeta);
 
         StartCoroutine(StartMusicAndVideo());
 
@@ -336,16 +340,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void InitSingingLyricsControls()
     {
-        if (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.ScrollingNoteStream)
+        if (PlayerControls.IsNullOrEmpty()
+            || !settings.GraphicSettings.showStaticLyrics)
         {
-            // Lyrics are shown in each PlayerUi
             topLyricsContainer.HideByDisplay();
             bottomLyricsContainer.HideByDisplay();
-            return;
-        }
-
-        if (PlayerControls.IsNullOrEmpty())
-        {
             return;
         }
 
@@ -456,6 +455,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
+
+        if (!hasRecordedSongStartedStatistics)
+        {
+            // Save information that the song has been started after some seconds or half of the song.
+            float songSingingDuration = Time.time - startTimeInSeconds;
+            float songDurationInSeconds = (float)songAudioPlayer.DurationOfSongInMillis / 1000;
+            if (songSingingDuration >= 30
+                || (songDurationInSeconds > 0
+                    && songSingingDuration >= songDurationInSeconds / 2))
+            {
+                hasRecordedSongStartedStatistics = true;
+                statistics.RecordSongStarted(SongMeta);
+            }
+        }
     }
 
     public void SkipToNextSingableNote()
@@ -756,6 +769,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
         bb.Bind(nameof(perfectEffectStarUi)).ToExistingInstance(perfectEffectStarUi);
         bb.Bind(nameof(goldenNoteStarUi)).ToExistingInstance(goldenNoteStarUi);
+        bb.Bind(nameof(goldenNoteHitStarUi)).ToExistingInstance(goldenNoteHitStarUi);
         return bb.GetBindings();
     }
 
@@ -778,6 +792,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void UpdateInputLegend()
     {
         inputLegend.Query<Label>()
+            .Where(label => label is not FontIcon)
             .ForEach(label => label.RemoveFromHierarchy());
 
         InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,

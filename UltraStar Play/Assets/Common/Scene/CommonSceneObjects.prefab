@@ -233,9 +233,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -325,6 +333,10 @@ MonoBehaviour:
   notificationOverlayVisualTreeAsset: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0,
     type: 3}
   notificationVisualTreeAsset: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59,
+    type: 3}
+  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+    type: 3}
+  accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
     type: 3}
   showFpsPrefab: {fileID: 7200366228149695045, guid: 50d02acac4813a94490c57776dc5e4ee,
     type: 3}
@@ -626,12 +638,6 @@ MonoBehaviour:
   useDontDestroyOnLoad: 0
   logInfoInEditMode: 0
   logInfoInPlayMode: 1
-  gamepadIcon: {fileID: 7388822144124034973, guid: 4d46d47bdcb4baa4b819010bbc44f270,
-    type: 3}
-  keyboardAndMouseIcon: {fileID: 7388822144124034973, guid: 3595fdd3d728cc2418a169be1d969e46,
-    type: 3}
-  touchIcon: {fileID: 7388822144124034973, guid: bfd9917501282de4aa4f198862a7ad72,
-    type: 3}
 --- !u!1 &869438174622240845
 GameObject:
   m_ObjectHideFlags: 0
@@ -6978,6 +6984,7 @@ MonoBehaviour:
     type: 3}
   m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!1 &7551809489314000595
 GameObject:
   m_ObjectHideFlags: 0

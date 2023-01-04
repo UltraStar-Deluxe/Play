@@ -73,6 +73,11 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     private void ShowSentenceRating(SentenceRating sentenceRating)
     {
+        if (sentenceRating == SentenceRating.bad)
+        {
+            return;
+        }
+
         PlayerControl playerControl = singSceneControl.PlayerControls.FirstOrDefault();
         VisualElement sentenceRatingVisualElement = playerControl.PlayerUiControl.ShowSentenceRating(sentenceRating, commonScoreSentenceRatingContainer);
         if (sentenceRatingVisualElement != null)
