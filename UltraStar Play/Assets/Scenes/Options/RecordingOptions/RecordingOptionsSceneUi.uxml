@@ -44,6 +44,15 @@
                     <ui:Label text="Sample Rate" name="Label" class="controlLabel" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
+                <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
+                <ui:VisualElement name="playRecordedAudioContainer" style="width: 100%; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 5px;">
+                    <ui:Label text="Play recorded audio" display-tooltip-when-elided="true" name="playRecordedAudioLabel" style="margin-right: 20px;" />
+                    <ui:Toggle name="playRecordedAudioToggle" style="-unity-text-align: upper-center;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="usePortAudioContainer" style="width: 100%; flex-direction: row; justify-content: flex-end; align-items: center; margin-bottom: 5px;">
+                    <ui:Label text="Use PortAudio for multi-channel support" display-tooltip-when-elided="true" name="usePortAudioLabel" style="margin-right: 20px;" />
+                    <ui:Toggle name="usePortAudioToggle" style="-unity-text-align: upper-center;" />
+                </ui:VisualElement>
             </ui:ScrollView>
             <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
                 <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">

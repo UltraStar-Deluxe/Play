@@ -48,6 +48,9 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private ApplicationManager applicationManager;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -71,6 +74,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     private Toggle enabledToggle;
+
+    [Inject(UxmlName = R.UxmlNames.usePortAudioToggle)]
+    private Toggle usePortAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
 
     [Inject(UxmlName = R.UxmlNames.enabledLabel)]
     private Label enabledLabel;
@@ -204,6 +213,66 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
+
+        // Play recorded audio
+        micPitchTracker.MicSampleRecorder.PlayRecordedAudio = settings.AudioSettings.PlayRecordedAudio;
+        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
+            () => settings.AudioSettings.PlayRecordedAudio,
+            newValue =>
+            {
+                settings.AudioSettings.PlayRecordedAudio = newValue;
+                micPitchTracker.MicSampleRecorder.PlayRecordedAudio = newValue;
+            });
+
+        // Use PortAudio
+        if (ApplicationUtils.CanUsePortAudio())
+        {
+            FieldBindingUtils.Bind(gameObject, usePortAudioToggle,
+                () => settings.AudioSettings.PreferPortAudio,
+                preferPortAudio =>
+                {
+                    micPitchTracker.MicSampleRecorder.StopRecording();
+
+                    settings.AudioSettings.PreferPortAudio = preferPortAudio;
+                    ApplicationUtils.SetUsePortAudio(preferPortAudio);
+
+                    Debug.Log($"UsePortAudio: {MicrophoneAdapter.UsePortAudio}");
+
+                    UpdateRecordingDevices();
+                });
+        }
+        else
+        {
+            usePortAudioToggle.HideByDisplay();
+        }
+    }
+
+    private void UpdateRecordingDevices()
+    {
+        micPitchTracker.MicSampleRecorder.StopRecording();
+
+        MicProfile lastMicProfile = SelectedMicProfile;
+        devicePickerControl.Items = CreateMicProfiles();
+        Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
+        if (devicePickerControl.Items.Count > 0)
+        {
+            MicProfile nextSelectedMicProfile = devicePickerControl.Items[0];
+
+            // Try to restore selection
+            if (lastMicProfile != null)
+            {
+                MicProfile matchingMicProfile = devicePickerControl.Items.FirstOrDefault(micProfile => micProfile.Name == lastMicProfile.Name);
+                if (matchingMicProfile != null)
+                {
+                    nextSelectedMicProfile = matchingMicProfile;
+                }
+            }
+
+            devicePickerControl.Selection.Value = nextSelectedMicProfile;
+            devicePickerControl.UpdateLabelText();
+
+            OnRecordingDeviceSelected(nextSelectedMicProfile);
+        }
     }
 
     private void OnBack()
@@ -337,11 +406,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         if (!SelectedMicProfile.IsConnected(serverSideConnectRequestManager))
         {
             settings.MicProfiles.Remove(SelectedMicProfile);
-            devicePickerControl.Items = CreateMicProfiles();
-            if (devicePickerControl.Items.Count > 0)
-            {
-                devicePickerControl.Selection.Value = devicePickerControl.Items[0];
-            }
+            UpdateRecordingDevices();
         }
     }
 
@@ -369,6 +434,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         // Create list of connected and loaded microphones without duplicates.
         // A loaded microphone might have been created with hardware that is not connected now.
+
+        // PortAudio returns too many recording devices. Thus, explicitly use the Unity API here to get available recording device names.
         List<string> connectedMicNames = Microphone.devices.ToList();
         List<MicProfile> loadedMicProfiles = settings.MicProfiles;
         List<MicProfile> micProfiles = new(loadedMicProfiles);

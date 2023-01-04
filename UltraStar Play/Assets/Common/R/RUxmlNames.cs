@@ -12,8 +12,6 @@ public static partial class R
         public const string addButton = "addButton";
         public const string addIcon = "addIcon";
         public const string addSongFolderButton = "addSongFolderButton";
-        public const string adjustFollowingNotesContainer = "adjustFollowingNotesContainer";
-        public const string adjustFollowingNotesLabel = "adjustFollowingNotesLabel";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
         public const string adminRightsContainer = "adminRightsContainer";
         public const string allCharactersContainer = "allCharactersContainer";
@@ -36,7 +34,6 @@ public static partial class R
         public const string audioSeparationGroup = "audioSeparationGroup";
         public const string audioSeparationTitle = "audioSeparationTitle";
         public const string audioWaveForm = "audioWaveForm";
-        public const string autoSaveContainer = "autoSaveContainer";
         public const string autoSaveToggle = "autoSaveToggle";
         public const string avatarPicker = "avatarPicker";
         public const string b = "b";
@@ -153,7 +150,6 @@ public static partial class R
         public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
-        public const string editingTitle = "editingTitle";
         public const string editionPropertyContainer = "editionPropertyContainer";
         public const string editLyricsPopup = "editLyricsPopup";
         public const string editLyricsPopupTextField = "editLyricsPopupTextField";
@@ -179,6 +175,7 @@ public static partial class R
         public const string gameOptionsButton = "gameOptionsButton";
         public const string genreLabel = "genreLabel";
         public const string genrePropertyContainer = "genrePropertyContainer";
+        public const string globalSettingsLabel = "globalSettingsLabel";
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
         public const string goToIssueButton = "goToIssueButton";
@@ -450,6 +447,9 @@ public static partial class R
         public const string playlistChooserDropdownScrollView = "playlistChooserDropdownScrollView";
         public const string playlistChooserDropdownTitle = "playlistChooserDropdownTitle";
         public const string playlistNameTextField = "playlistNameTextField";
+        public const string playRecordedAudioContainer = "playRecordedAudioContainer";
+        public const string playRecordedAudioLabel = "playRecordedAudioLabel";
+        public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewVolumeChooser = "previewVolumeChooser";
@@ -647,7 +647,6 @@ public static partial class R
         public const string statusLabel = "statusLabel";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";
-        public const string syncLyricsAreaContainer = "syncLyricsAreaContainer";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string targetNote = "targetNote";
         public const string targetNoteEntryContainer = "targetNoteEntryContainer";
@@ -705,6 +704,9 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
+        public const string usePortAudioContainer = "usePortAudioContainer";
+        public const string usePortAudioLabel = "usePortAudioLabel";
+        public const string usePortAudioToggle = "usePortAudioToggle";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
