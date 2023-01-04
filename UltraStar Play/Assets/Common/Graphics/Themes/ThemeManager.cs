@@ -1,31 +1,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using UniInject;
+using PrimeInputActions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
-
-public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class ThemeManager : MonoBehaviour
 {
-    // the theme to load by default (filename without json extension)
-    public const string DEFAULT_THEME_NAME = "default_blue";
-    public const string THEME_FOLDER_NAME = "Themes";
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
         instance = null;
     }
+
+    /**
+     * Filename without extension of the theme that should be loaded by default
+     */
+    public const string DefaultThemeName = "default_blue";
+
+    private const string ThemeFolderName = "Themes";
 
     private static ThemeManager instance;
     public static ThemeManager Instance
@@ -44,211 +42,110 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         }
     }
 
-    // ----------------------------------------------------------------
+    public Material backgroundMaterial;
+    public Material particleMaterial;
+    public ParticleSystem backgroundParticleSystem;
+    public ThemeSettings currentThemeSettings;
 
-    [Inject]
-    private Settings settings;
-
-    [Serializable]
-    public class ThemeSettings
+    private BackgroundShaderControl backgroundShaderControl;
+    public BackgroundShaderControl BackgroundShaderControl
     {
-        // These correspond to the possible JSON properties defined in a theme file.
-        // Eventually a theme builder UI can be considered, but meanwhile this will
-        // have to be written manually with a text editor.
-        // See the files in the "themes" folder at the root of the project/build.
-
-        public DynamicBackground dynamicBackground;
-        public SongRatingIcons songRatingIcons;
-        public Color buttonMainColor;
-        public Color fontColorButtons;
-        public Color fontColorLabels;
-        public Color fontColor;
-
-        public static ThemeSettings LoadFromJson(string json)
+        get
         {
-            json = PreprocessJson(json);
-            ThemeSettings theme = JsonUtility.FromJson<ThemeSettings>(json);
-            if (theme == null)
+            if (backgroundShaderControl == null)
             {
-                throw new Exception("Couldn't parse supplied JSON as ThemeSettings data.");
+                backgroundShaderControl = GetComponentInChildren<BackgroundShaderControl>();
             }
-            return theme;
-        }
-
-        public bool GetRatingIconFor(ThemeMeta themeMeta, SongRating.ESongRating songRating, out Sprite sprite)
-        {
-            sprite = songRatingIcons?.GetSpriteForRating(themeMeta, songRating);
-            return sprite != null;
-        }
-
-        // Process JSON to parse certain values, e.g. allow hex colors and convert
-        // them to proper color struct notation
-        static string PreprocessJson(string input)
-        {
-            // Convert hex colors to proper JSON color struct
-            Regex hexRgbaDouble = new Regex(@"""#([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])""");
-            Regex hexRgbDouble = new Regex(@"""#([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f])""");
-            Regex hexRgba = new Regex(@"""#([0-9A-Fa-f])([0-9A-Fa-f])([0-9A-Fa-f])([0-9A-Fa-f])""");
-            Regex hexRgb = new Regex(@"""#([0-9A-Fa-f])([0-9A-Fa-f])([0-9A-Fa-f])""");
-
-            int offset = 0;
-            hexRgbaDouble.Matches(input).ForEach(match =>
-            {
-                string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value)}, \"g\":{HexToFloatStr(match.Groups[2].Value)}, \"b\":{HexToFloatStr(match.Groups[3].Value)}, \"a\":{HexToFloatStr(match.Groups[4].Value)} }}";
-                input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
-                offset += replacement.Length - match.Length;
-            });
-            offset = 0;
-            hexRgbDouble.Matches(input).ForEach(match =>
-            {
-                string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value)}, \"g\":{HexToFloatStr(match.Groups[2].Value)}, \"b\":{HexToFloatStr(match.Groups[3].Value)}, \"a\":1.0 }}";
-                input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
-                offset += replacement.Length - match.Length;
-            });
-            offset = 0;
-            hexRgba.Matches(input).ForEach(match =>
-            {
-                string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value, true)}, \"g\":{HexToFloatStr(match.Groups[2].Value, true)}, \"b\":{HexToFloatStr(match.Groups[3].Value, true)}, \"a\":{HexToFloatStr(match.Groups[4].Value, true)} }}";
-                input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
-                offset += replacement.Length - match.Length;
-            });
-            offset = 0;
-            hexRgb.Matches(input).ForEach(match =>
-            {
-                string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value, true)}, \"g\":{HexToFloatStr(match.Groups[2].Value, true)}, \"b\":{HexToFloatStr(match.Groups[3].Value, true)}, \"a\":1.0 }}";
-                input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
-                offset += replacement.Length - match.Length;
-            });
-
-            return input;
-        }
-
-        static string HexToFloatStr(string hex, bool singleDigit = false)
-        {
-            return (Convert.ToInt32(singleDigit ? $"{hex}{hex}" : hex, 16)/255.0f).ToString(CultureInfo.InvariantCulture);
+            return backgroundShaderControl;
         }
     }
 
-    [Serializable]
-    public class SongRatingIcons
+    private Material backgroundMaterialCopy;
+    private Material particleMaterialCopy;
+    private RenderTexture userInterfaceRenderTexture;
+
+    private readonly List<ThemeMeta> themeMetas = new();
+    private readonly List<Texture2D> dynamicTextures = new();
+
+    private readonly HashSet<VisualElement> alreadyProcessedVisualElements = new();
+
+    private bool anyThemeLoaded;
+
+    void Awake()
     {
-        public string toneDeaf;
-        public string amateur;
-        public string wannabe;
-        public string hopeful;
-        public string risingStar;
-        public string leadSinger;
-        public string superstar;
-        public string ultrastar;
-
-        Dictionary<string, Sprite> loadedSprites = new Dictionary<string, Sprite>();
-
-        public Sprite GetSpriteForRating(ThemeMeta themeMeta, SongRating.ESongRating songRating)
+        if (this != Instance)
         {
-            switch (songRating)
-            {
-                case SongRating.ESongRating.ToneDeaf: return GetSprite(themeMeta, toneDeaf);
-                case SongRating.ESongRating.Amateur: return GetSprite(themeMeta, amateur);
-                case SongRating.ESongRating.Wannabe: return GetSprite(themeMeta, wannabe);
-                case SongRating.ESongRating.Hopeful: return GetSprite(themeMeta, hopeful);
-                case SongRating.ESongRating.RisingStar: return GetSprite(themeMeta, risingStar);
-                case SongRating.ESongRating.LeadSinger: return GetSprite(themeMeta, leadSinger);
-                case SongRating.ESongRating.Superstar: return GetSprite(themeMeta, superstar);
-                case SongRating.ESongRating.Ultrastar: return GetSprite(themeMeta, ultrastar);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(songRating), songRating, null);
-            }
-        }
-
-        private Sprite GetSprite(ThemeMeta themeMeta, string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-            {
-                return null;
-            }
-
-            if (loadedSprites.ContainsKey(filePath))
-            {
-                return loadedSprites[filePath];
-            }
-
-            string fullPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, filePath);
-            if (!File.Exists(fullPath))
-            {
-                Debug.LogError($"[THEME] Couldn't load image at path: '{fullPath}'");
-                return null;
-            }
-
-            byte[] imageBytes = File.ReadAllBytes(fullPath);
-            Texture2D texture = new(2, 2, TextureFormat.RGBA32, true)
-            {
-                alphaIsTransparency = true,
-                wrapMode = TextureWrapMode.Clamp,
-                filterMode = FilterMode.Bilinear
-            };
-            texture.LoadImage(imageBytes, true);
-            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        }
-
-        internal void DestroyLoadedSprites()
-        {
-            foreach (KeyValuePair<string,Sprite> loadedSprite in loadedSprites)
-            {
-                Destroy(loadedSprite.Value);
-            }
-            loadedSprites.Clear();
+            Destroy(gameObject);
         }
     }
 
-    [Serializable]
-    public class DynamicBackground
+    void OnEnable()
     {
-        public enum GradientType
+        if (this != Instance)
         {
-            Radial = 0,
-            RadialRepeated = 1,
-            Linear = 2,
-            Reflected = 3,
-            Repeated = 4
+            return;
         }
 
-        // Material
-        public string gradientRampFile = null;
-        public string gradientType = "Radial";
-        public float gradientScrollingSpeed = 0;
-        public float gradientScale = 1.0f;
-        public float gradientSmoothness = 1.0f;
-        public float gradientAngle = 0.0f;
-        public bool gradientAnimation = false;
-        public float gradientAnimSpeed = 1.0f;
-        public float gradientAnimAmplitude = 0.1f;
-        public string patternFile;
-        public Color patternColor = Color.white;
-        public Vector2 patternScale = Vector2.one;
-        public Vector2 patternScrolling = Vector2.zero;
-        public float uiShadowOpacity = 0;
-        public Vector2 uiShadowOffset;
-        // Particles
-        public string particleFile = null;
-        public float particleOpacity = 0f;
-        // TODO particle movement pattern, based on an enum that will correspond to different prefabs
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    // ----------------------------------------------------------------
-
-    public void LoadTheme(ThemeMeta themeMeta)
+    void OnDisable()
     {
-        // if (settings.DeveloperSettings.disableDynamicThemes)
-        // {
-        //     return;
-        // }
-        //
-        // EScene currentScene = ESceneUtils.GetCurrentScene();
-        // if (currentScene == EScene.SongEditorScene)
-        // {
-        //     // Song editor is out of scope for theming.
-        //     return;
-        // }
+        if (this != Instance)
+        {
+            return;
+        }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if (Instance != this)
+        {
+            return;
+        }
+
+        if (backgroundMaterialCopy == null)
+        {
+            backgroundMaterialCopy = new Material(backgroundMaterial);
+        }
+
+        if (particleMaterialCopy == null)
+        {
+            particleMaterialCopy = new Material(particleMaterial);
+        }
+
+        // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
+        if (userInterfaceRenderTexture == null)
+        {
+            userInterfaceRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+        }
+        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
+        uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
+        BackgroundShaderControl.SetUiRenderTextures(
+            userInterfaceRenderTexture,
+            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
+
+        if (!anyThemeLoaded)
+        {
+            LoadTheme(GetCurrentTheme());
+        }
+    }
+
+    private void LoadTheme(ThemeMeta themeMeta)
+    {
+        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        {
+            return;
+        }
+
+        EScene currentScene = ESceneUtils.GetCurrentScene();
+        if (currentScene == EScene.SongEditorScene)
+        {
+            // Song editor is out of scope for theming.
+            return;
+        }
 
         if (themeMeta == null)
         {
@@ -260,52 +157,12 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         string jsonTheme = File.ReadAllText(themeMeta.AbsoluteFilePath);
         currentThemeSettings = ThemeSettings.LoadFromJson(jsonTheme);
 
-        StartCoroutine(Apply(themeMeta, currentThemeSettings));
+        anyThemeLoaded = true;
+
+        StartCoroutine(ApplyTheme(themeMeta, currentThemeSettings));
     }
 
-    // ----------------------------------------------------------------
-
-    public Material backgroundMaterial;
-    public Material particleMaterial;
-    public ParticleSystem backgroundParticleSystem;
-    public ThemeSettings currentThemeSettings;
-
-    [Inject]
-    private UIDocument uiDocument;
-
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    public BackgroundImageControl backgroundImageControl { get; private set; }
-
-    private readonly List<Texture2D> dynamicTextures = new();
-    private Material backgroundMaterialCopy;
-    private Material particleMaterialCopy;
-    private RenderTexture userInterfaceRenderTexture;
-
-    public void OnInjectionFinished()
-    {
-        // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        userInterfaceRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-        uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
-        backgroundImageControl.SetUiRenderTextures(
-            userInterfaceRenderTexture,
-            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
-
-        backgroundMaterialCopy = new Material(backgroundMaterial);
-        particleMaterialCopy = new Material(particleMaterial);
-    }
-
-    void Start()
-    {
-        if (Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        LoadTheme(GetCurrentTheme());
-    }
-
-    Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
+    private Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
     {
         byte[] imageBytes = File.ReadAllBytes(fullPath);
         Texture2D texture = new (2, 2, alpha ? TextureFormat.RGBA32 : TextureFormat.RGB24, mipMaps)
@@ -330,12 +187,9 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         dynamicTextures.Clear();
     }
 
-    // Updating background colors might be called multiple times
-    internal static readonly HashSet<VisualElement> AlreadyProcessedElements = new ();
-
-    private IEnumerator Apply(ThemeMeta themeMeta, ThemeSettings themeSettings)
+    private IEnumerator ApplyTheme(ThemeMeta themeMeta, ThemeSettings themeSettings)
     {
-        AlreadyProcessedElements.Clear();
+        alreadyProcessedVisualElements.Clear();
 
         // UIToolkit takes one frame to apply the style changes,
         // we wait so the background changes at the same frame
@@ -344,8 +198,11 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         this.currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
         DestroyDynamicTextures();
 
-        #region Dynamic background
+        ApplyThemeDynamicBackground(themeMeta, themeSettings);
+    }
 
+    private void ApplyThemeDynamicBackground(ThemeMeta themeMeta, ThemeSettings themeSettings)
+    {
         DynamicBackground background = themeSettings.dynamicBackground;
 
         // Material
@@ -425,26 +282,29 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
-
-        #endregion
-    }
-
-    static readonly int _TimeApplication = Shader.PropertyToID("_TimeApplication");
-    void Update()
-    {
-        // Use that in shaders instead of _Time so that value doesn't reset on each scene change
-        Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 
     private void OnDestroy()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         // Destroy all instantiated assets
         Destroy(userInterfaceRenderTexture);
 
-        backgroundMaterial.CopyPropertiesFromMaterial(backgroundMaterialCopy);
-        particleMaterial.CopyPropertiesFromMaterial(particleMaterialCopy);
-        Destroy(backgroundMaterialCopy);
-        Destroy(particleMaterialCopy);
+        if (backgroundMaterialCopy != null)
+        {
+            backgroundMaterial.CopyPropertiesFromMaterial(backgroundMaterialCopy);
+            Destroy(backgroundMaterialCopy);
+        }
+
+        if (particleMaterialCopy != null)
+        {
+            particleMaterial.CopyPropertiesFromMaterial(particleMaterialCopy);
+            Destroy(particleMaterialCopy);
+        }
 
         DestroyDynamicTextures();
         currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
@@ -452,13 +312,13 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
-        settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
+        SettingsManager.Instance.Settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
         LoadTheme(GetCurrentTheme());
     }
 
     public ThemeMeta GetCurrentTheme()
     {
-        return GetThemeByName(settings.GraphicSettings.themeName);
+        return GetThemeByName(SettingsManager.Instance.Settings.GraphicSettings.themeName);
     }
 
     public ThemeMeta GetThemeByName(string themeName)
@@ -477,18 +337,16 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
     public ThemeMeta GetDefaultTheme()
     {
         ThemeMeta defaultThemeMeta = GetThemeMetas()
-            .FirstOrDefault(themeMeta => themeMeta.FileNameWithoutExtension == DEFAULT_THEME_NAME);
+            .FirstOrDefault(themeMeta => themeMeta.FileNameWithoutExtension == DefaultThemeName);
 
         if (defaultThemeMeta == null)
         {
             string availableThemeMetasCsv = GetThemeMetas().Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
-            Debug.LogError($"Default theme '{DEFAULT_THEME_NAME}' not found. Available themes: {availableThemeMetasCsv}");
+            Debug.LogError($"Default theme '{DefaultThemeName}' not found. Available themes: {availableThemeMetasCsv}");
         }
 
         return defaultThemeMeta;
     }
-
-    private readonly List<ThemeMeta> themeMetas = new();
 
     public List<ThemeMeta> GetThemeMetas()
     {
@@ -499,8 +357,8 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
 
         List<string> themeFolders = new List<string>
         {
-            $"{Application.persistentDataPath}/{THEME_FOLDER_NAME}",
-            $"{Application.streamingAssetsPath}/{THEME_FOLDER_NAME}",
+            $"{Application.persistentDataPath}/{ThemeFolderName}",
+            $"{Application.streamingAssetsPath}/{ThemeFolderName}",
         };
 
         themeFolders.ForEach(themeFolder =>
@@ -520,7 +378,6 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         return themeMetas;
     }
 
-
     public void UpdateThemeSpecificStyleSheets()
     {
         if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
@@ -528,6 +385,7 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
             return;
         }
 
+        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
         if (uiDocument == null)
         {
             return;
@@ -559,11 +417,11 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
                 }
             }
 
-            if (ThemeManager.AlreadyProcessedElements.Contains(button))
+            if (alreadyProcessedVisualElements.Contains(button))
             {
                 return;
             }
-            ThemeManager.AlreadyProcessedElements.Add(button);
+            alreadyProcessedVisualElements.Add(button);
 
             UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
 
@@ -574,20 +432,20 @@ public class ThemeManager : MonoBehaviour, INeedInjection, IInjectionFinishedLis
         });
         root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
         {
-            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            if (alreadyProcessedVisualElements.Contains(entry))
             {
                 return;
             }
-            ThemeManager.AlreadyProcessedElements.Add(entry);
+            alreadyProcessedVisualElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHover(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
         });
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
-            if (ThemeManager.AlreadyProcessedElements.Contains(entry))
+            if (alreadyProcessedVisualElements.Contains(entry))
             {
                 return;
             }
-            ThemeManager.AlreadyProcessedElements.Add(entry);
+            alreadyProcessedVisualElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
         });
 

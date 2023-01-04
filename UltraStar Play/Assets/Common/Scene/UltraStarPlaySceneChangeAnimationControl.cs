@@ -123,23 +123,22 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
             PlaySceneChangeAnimationSound();
         }
 
-        BackgroundImageControl backgroundImageControl = ThemeManager.Instance.backgroundImageControl;
         LeanTween.value(gameObject, 0, 1, 0.3f)
             .setOnStart(() =>
             {
-                backgroundImageControl.EnableTransition(true);
+                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
             .setOnUpdate(animTimePercent =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                backgroundImageControl.SetTransitionTime(animTimePercent);
+                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                backgroundImageControl.EnableTransition(false);
+                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
             });
     }
 
