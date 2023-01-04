@@ -198,7 +198,10 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(titleToContentMap, CloseHelp);
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
     }
 
     private void CloseHelp()
@@ -366,7 +369,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
-            noSongsFoundLabel.AddToClassList("noSongsFoundLabel");
+            noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
+            noSongsFoundLabel.style.marginTop = 10;
             songList.Add(noSongsFoundLabel);
         }
         else
