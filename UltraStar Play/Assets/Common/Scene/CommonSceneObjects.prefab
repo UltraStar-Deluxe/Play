@@ -398,9 +398,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82708d27bccb8fa4d888d6518e9bb9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelSettings: {fileID: 11400000, guid: 776f2ba8ed604be4bb58a6d9622e1131, type: 2}
-  setMainCameraClearFlags: 1
-  visualElementPickingMode: 1
 --- !u!82 &461665969244419356
 AudioSource:
   m_ObjectHideFlags: 0
@@ -995,9 +992,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2908706229116457632}
   - component: {fileID: 2908706229116457634}
-  - component: {fileID: 2908706229116457635}
+  - component: {fileID: 6120457534204932585}
   m_Layer: 0
-  m_Name: Camera Background
+  m_Name: BackgroundCameraWithBackgroundImageControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1014,8 +1011,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2908706229821383300}
+  m_Children: []
   m_Father: {fileID: 2908706230957184142}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1033,9 +1029,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1062,7 +1066,7 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &2908706229116457635
+--- !u!114 &6120457534204932585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1100,13 +1104,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2908706229821383299}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -1.3, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2908706229116457632}
-  m_RootOrder: 0
+  m_Father: {fileID: 2908706230957184142}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &2908706229821383298
 ParticleSystem:
@@ -1326,6 +1330,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -1355,6 +1360,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     startSize:
@@ -1676,6 +1682,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0.5
+    gravitySource: 0
     maxNumParticles: 1000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
@@ -2405,6 +2412,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -2434,6 +2442,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
   UVModule:
@@ -4654,6 +4663,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -4683,6 +4693,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
@@ -5060,6 +5071,7 @@ ParticleSystem:
         m_RotationOrder: 4
     minVertexDistance: 0.2
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     ribbonCount: 1
     shadowBias: 0.5
     worldSpace: 0
@@ -5102,6 +5114,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -5131,6 +5144,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     widthOverTrail:
@@ -5218,6 +5232,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -5247,6 +5262,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
   CustomDataModule:
@@ -5285,6 +5301,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -5314,6 +5331,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     colorLabel0: Color
@@ -5567,6 +5585,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
       minGradient:
@@ -5596,6 +5615,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
+        m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
     colorLabel1: Color
@@ -5898,7 +5918,7 @@ GameObject:
   - component: {fileID: 2908706230957184142}
   - component: {fileID: 2908706230957184143}
   m_Layer: 0
-  m_Name: ThemeManagerSingleton
+  m_Name: ThemeManager
   m_TagString: ThemeManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5917,6 +5937,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2908706229116457632}
+  - {fileID: 2908706229821383300}
   m_Father: {fileID: 8069444317427349030}
   m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5935,7 +5956,38 @@ MonoBehaviour:
   backgroundMaterial: {fileID: 2100000, guid: f7976d665216032408a77e0afc13b55f, type: 2}
   particleMaterial: {fileID: 2100000, guid: 8c900c152afa98e47b70ef388519dadd, type: 2}
   backgroundParticleSystem: {fileID: 2908706229821383298}
-  panelSettings: {fileID: 11400000, guid: 3fb3f80ff074a3b44af3c330bd91143e, type: 2}
+  currentThemeSettings:
+    dynamicBackground:
+      gradientRampFile: 
+      gradientType: Radial
+      gradientScrollingSpeed: 0
+      gradientScale: 1
+      gradientSmoothness: 1
+      gradientAngle: 0
+      gradientAnimation: 0
+      gradientAnimSpeed: 1
+      gradientAnimAmplitude: 0.1
+      patternFile: 
+      patternColor: {r: 1, g: 1, b: 1, a: 1}
+      patternScale: {x: 1, y: 1}
+      patternScrolling: {x: 0, y: 0}
+      uiShadowOpacity: 0
+      uiShadowOffset: {x: 0, y: 0}
+      particleFile: 
+      particleOpacity: 0
+    songRatingIcons:
+      toneDeaf: 
+      amateur: 
+      wannabe: 
+      hopeful: 
+      risingStar: 
+      leadSinger: 
+      superstar: 
+      ultrastar: 
+    buttonMainColor: {r: 0, g: 0, b: 0, a: 0}
+    fontColorButtons: {r: 0, g: 0, b: 0, a: 0}
+    fontColorLabels: {r: 0, g: 0, b: 0, a: 0}
+    fontColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2981502673358573187
 GameObject:
   m_ObjectHideFlags: 0

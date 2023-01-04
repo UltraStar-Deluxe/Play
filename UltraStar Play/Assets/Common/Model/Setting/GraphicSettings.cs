@@ -15,20 +15,6 @@ public class GraphicSettings
     public bool showLyricsOnNotes;
     public bool showStaticLyrics = true;
     public bool analyzeBeatsWithoutTargetNote = true;
-    public string themeName = ThemeManager.DEFAULT_THEME;
+    public string themeName = ThemeManager.DEFAULT_THEME_NAME;
     public bool AnimateSceneChange { get; set; } = true;
-
-    public string CurrentThemeName
-    {
-        get => themeName;
-        set
-        {
-            themeName = value;
-
-            if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
-                return;
-
-            ThemeManager.Instance.LoadTheme(themeName);
-        }
-    }
 }
