@@ -19,7 +19,6 @@ public static class SongMetaBuilder
 
         Dictionary<string, string> requiredFields = new()
         {
-            {"artist", null},
             {"bpm", null},
             {"mp3", null},
             {"title", null}
@@ -141,11 +140,17 @@ public static class SongMetaBuilder
 
         try
         {
+            otherFields.TryGetValue("artist", out string artist);
+            if (artist == null)
+            {
+                artist = "";
+            }
+
             SongMeta songMeta = new(
                 directory,
                 filename,
                 songHash,
-                requiredFields["artist"],
+                artist,
                 ConvertToFloat(requiredFields["bpm"]),
                 requiredFields["mp3"],
                 requiredFields["title"],
@@ -194,12 +199,6 @@ public static class SongMetaBuilder
                         break;
                     case "year":
                         songMeta.Year = ConvertToUInt32(item.Value);
-                        break;
-                    case "vocalsaudio":
-                        songMeta.VocalsAudio = item.Value;
-                        break;
-                    case "instrumentalaudio":
-                        songMeta.InstrumentalAudio = item.Value;
                         break;
                     default:
                         songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
