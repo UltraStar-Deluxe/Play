@@ -13,7 +13,7 @@
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px; display: none;">
                 <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]main.png?fileID=21300000&amp;guid=6adbf210ab0cbf143ba6e02835bb9c43&amp;type=3#[icon]main&apos;);" />
+                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;);" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Credits" name="sceneTitle" class="titleText" />
                             <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
@@ -35,8 +35,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
-                <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" />
-                <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" />
+                <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="controlMinWidth" />
+                <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

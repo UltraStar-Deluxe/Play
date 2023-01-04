@@ -1,0 +1,10 @@
+[
+  {
+    "Url": "https://github.com/UltraStar-Deluxe/songs-stream/archive/refs/heads/main.zip",
+    "Description": "Few Creative Commons licensed songs. Media files (audio, video, etc.) are streamed. Smaller initial download size but requires an internet connection to play."
+  },
+  {
+    "Url": "https://github.com/UltraStar-Deluxe/songs/archive/refs/heads/master.zip",
+    "Description": "Several Creative Commons licensed songs. Media files (audio, video, etc.) are included. Larger initial download size but can be played offline after initial download."
+  }
+]

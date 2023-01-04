@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -16,6 +19,18 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 {
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryAsset;
+
+    [InjectedInInspector]
+    public VisualTreeAsset dialogUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset songIssueSongEntryUi;
+
+    [Inject]
+    private UIDocument uiDocument;
+
+    [Inject]
+    private UiManager uiManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -41,6 +56,9 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
     private VisualElement androidSongFolderHintContainer;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
     private Label androidSongFolderHintLabel;
 
@@ -53,18 +71,42 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private FocusableNavigator focusableNavigator;
 
+    [Inject(UxmlName = R.UxmlNames.songIssueButton)]
+    private Button songIssueButton;
+
+    [Inject(UxmlName = R.UxmlNames.songIssueIcon)]
+    private VisualElement songIssueIcon;
+
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
+
+    private MessageDialogControl helpDialogControl;
+    private MessageDialogControl songIssueDialogControl;
+    private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
+
     private void Start()
     {
+        if (SongMetaManager.IsSongScanFinished)
+        {
+            UpdateSongIssues();
+        }
+        songMetaManager.ScanFilesIfNotDoneYet();
+        songMetaManager.SongScanFinishedEventStream
+            .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
+
         settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {
-            settings.GameSettings.songDirs.Add("./Songs");
+            settings.GameSettings.songDirs.Add("");
             UpdateSongFolderList();
 
             RequestExternalStoragePermissionIfNeeded();
@@ -72,14 +114,19 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
         downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+            .Subscribe(_ => OnBack());
 
         // Custom navigation targets
-        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, downloadSceneButton, true);
+        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, helpButton, true);
+        focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, songIssueButton, true);
+        focusableNavigator.AddCustomNavigationTarget(songIssueButton, Vector2.left, downloadSceneButton, true);
+
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+        songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -102,6 +149,173 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 #endif
     }
 
+    private void UpdateSongIssues()
+    {
+        // Update icon
+        songIssueIcon.RemoveFromClassList("error");
+        songIssueIcon.RemoveFromClassList("warning");
+        if (songMetaManager.GetSongErrors().Count > 0)
+        {
+            songIssueIcon.AddToClassList("error");
+        }
+        else if (songMetaManager.GetSongWarnings().Count > 0)
+        {
+            songIssueIcon.AddToClassList("warning");
+        }
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else if (songIssueDialogControl != null)
+        {
+            CloseSongIssues();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
+    }
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
+    }
+
+    private void CloseHelp()
+    {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
+        helpDialogControl.CloseDialog();
+        helpDialogControl = null;
+        helpButton.Focus();
+    }
+
+    private void ShowSongIssues()
+    {
+        if (songIssueDialogControl != null)
+        {
+            return;
+        }
+
+        void FillWithSongIssues(AccordionItemControl accordionItemControl, IReadOnlyList<SongIssue> songIssues)
+        {
+            if (songIssues.IsNullOrEmpty())
+            {
+                accordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
+                return;
+            }
+
+            List<SongIssue> sortedSongIssues = songIssues.ToList();
+            sortedSongIssues.Sort(SongIssue.compareBySongMetaArtistAndTitle);
+
+            string lastSongMetaPath = "";
+            sortedSongIssues.ForEach(songIssue =>
+            {
+                string songMetaArtistAndTitle = songIssue.SongMeta != null
+                    ? songIssue.SongMeta.Artist + " - " + songIssue.SongMeta.Title
+                    : "";
+                string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaPath(songIssue.SongMeta);
+                if (lastSongMetaPath != songMetaPath)
+                {
+                    if (!lastSongMetaPath.IsNullOrEmpty())
+                    {
+                        // Add empty line
+                        accordionItemControl.AddVisualElement(new Label(""));
+                    }
+                    // Add label for song
+                    VisualElement visualElement = songIssueSongEntryUi.CloneTree().Children().First();
+                    visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
+                    Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
+                    if (PlatformUtils.IsStandalone
+                        && !songIssue.SongMeta.Directory.IsNullOrEmpty()
+                        && Directory.Exists(songIssue.SongMeta.Directory))
+                    {
+                        openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+                    }
+                    else
+                    {
+                        openFolderButtonOfSongMeta.HideByDisplay();
+                    }
+                    accordionItemControl.AddVisualElement(visualElement);
+                }
+
+                Label songIssueLabel = new($"• {songIssue.Message}");
+                songIssueLabel.AddToClassList("songIssueMessage");
+                accordionItemControl.AddVisualElement(songIssueLabel);
+                lastSongMetaPath = songMetaPath;
+            });
+        }
+
+        VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialog);
+
+        songIssueDialogControl = injector
+            .WithRootVisualElement(dialog)
+            .CreateAndInject<MessageDialogControl>();
+        songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
+
+        AccordionItemControl errorsAccordionItemControl = uiManager.CreateAccordionItemControl();
+        errorsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors);
+        songIssueDialogControl.AddVisualElement(errorsAccordionItemControl.VisualElement);
+        FillWithSongIssues(errorsAccordionItemControl, songMetaManager.GetSongErrors());
+
+        AccordionItemControl warningsAccordionItemControl = uiManager.CreateAccordionItemControl();
+        warningsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings);
+        songIssueDialogControl.AddVisualElement(warningsAccordionItemControl.VisualElement);
+        FillWithSongIssues(warningsAccordionItemControl, songMetaManager.GetSongWarnings());
+
+        if (songMetaManager.GetSongErrors().Count > 0)
+        {
+            errorsAccordionItemControl.ShowAccordionContent();
+        }
+        else if (songMetaManager.GetSongWarnings().Count > 0)
+        {
+            warningsAccordionItemControl.ShowAccordionContent();
+        }
+
+        songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>
+        {
+            songMetaManager.ReloadSongMetas();
+            CloseSongIssues();
+        });
+        Button closeDialogButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            () => CloseSongIssues());
+        closeDialogButton.Focus();
+    }
+
+    private void CloseSongIssues()
+    {
+        songIssueDialogControl.CloseDialog();
+        songIssueDialogControl = null;
+        songIssueButton.Focus();
+    }
+
+    // This method is only used on Android
     private void AddSongFolderIfNotContains(string basePath)
     {
         settings.GameSettings.songDirs.AddIfNotContains(basePath + "/Songs");
@@ -151,61 +365,58 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void UpdateSongFolderList()
     {
         songList.Clear();
-        int index = 0;
-        settings.GameSettings.songDirs.ForEach(songDir =>
+        songFolderListEntryControls.Clear();
+        if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
-            songList.Add(CreateSongFolderEntry(songDir, index));
-            index++;
-        });
+            Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
+            noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
+            noSongsFoundLabel.style.marginTop = 10;
+            songList.Add(noSongsFoundLabel);
+        }
+        else
+        {
+            int index = 0;
+            settings.GameSettings.songDirs.ForEach(songDir =>
+            {
+                CreateSongFolderEntryControl(songDir, index);
+                index++;
+            });
+        }
+
         UpdateAddAndroidSongFoldersButtons();
     }
 
-    private VisualElement CreateSongFolderEntry(string songDir, int indexInList)
+    private void CreateSongFolderEntryControl(string path, int indexInList)
     {
-        VisualElement result = songFolderListEntryAsset.CloneTree();
-        VisualElement warningContainer = result.Q<VisualElement>(R.UxmlNames.warningContainer);
-        Label warningLabel = warningContainer.Q<Label>(R.UxmlNames.warningLabel);
+        VisualElement visualElement = songFolderListEntryAsset.CloneTree();
+        SongFolderListEntryControl songFolderListEntryControl = new(path);
+        injector
+            .WithRootVisualElement(visualElement)
+            .Inject(songFolderListEntryControl);
 
-        void CheckFolderExists(string path)
+        songFolderListEntryControl.TextField.RegisterValueChangedCallback(evt =>
         {
-            if (Directory.Exists(path))
-            {
-                warningContainer.HideByDisplay();
-            }
-            else if (File.Exists(path))
-            {
-                warningContainer.ShowByDisplay();
-                warningLabel.text = "Not a folder.";
-            }
-            else
-            {
-                warningContainer.ShowByDisplay();
-                warningLabel.text = "File does not exist.";
-            }
-        }
+            settings.GameSettings.songDirs[indexInList] = evt.newValue;
+            UpdateAddAndroidSongFoldersButtons();
 
-        TextField textField = result.Q<TextField>(R.UxmlNames.pathTextField);
-        textField.value = songDir;
-        PathTextFieldControl pathTextFieldControl = new(textField);
-        pathTextFieldControl.ValueChangedEventStream
-            .Subscribe(newValueUnescaped =>
-            {
-                settings.GameSettings.songDirs[indexInList] = newValueUnescaped;
-                CheckFolderExists(newValueUnescaped);
-                UpdateAddAndroidSongFoldersButtons();
-            });
+            songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
+        });
+        songFolderListEntryControl.DeleteButton.RegisterCallbackButtonTriggered(() =>
+        {
+            settings.GameSettings.songDirs.RemoveAt(indexInList);
+            UpdateSongFolderList();
+            backButton.Focus();
+        });
 
-        Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        deleteButton.RegisterCallbackButtonTriggered(() =>
-            {
-                settings.GameSettings.songDirs.RemoveAt(indexInList);
-                UpdateSongFolderList();
-                backButton.Focus();
-            });
+        songFolderListEntryControls.Add(songFolderListEntryControl);
+        songList.Add(visualElement);
+    }
 
-        CheckFolderExists(songDir);
-
-        return result;
+    private void OnDestroy()
+    {
+        // Remove duplicate song folders
+        settings.GameSettings.songDirs = settings.GameSettings.songDirs
+            .Distinct()
+            .ToList();
     }
 }

@@ -526,7 +526,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
         startSampleBufferIndex = NumberUtils.Limit(startSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
         endSampleBufferIndex = NumberUtils.Limit(endSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile.AmplificationMultiplier, micProfile.NoiseSuppression);
         return pitchEvent;
     }
 

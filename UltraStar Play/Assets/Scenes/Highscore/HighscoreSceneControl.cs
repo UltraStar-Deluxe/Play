@@ -18,8 +18,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
 
-    [Inject(UxmlName = R.UxmlNames.nextItemButton)]
-    private Button nextItemButton;
+    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
+    private Button nextDifficultyButton;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -50,7 +50,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
         sceneData = sceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
-        nextItemButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
+        nextDifficultyButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
         ShowHighscores(sceneData.SongMeta, sceneData.Difficulty);
 
         // Click through to hiddenContinueButton
@@ -129,8 +129,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.highscoreScene_title);
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
 
-        EDifficulty nextDifficulty = GetNextDifficulty(currentDifficulty, 1);
-        nextItemButton.Q<Label>().text = nextDifficulty.GetTranslatedName();
+        nextDifficultyButton.Q<Label>().text = currentDifficulty.GetTranslatedName();
     }
 
     private EDifficulty GetNextDifficulty(EDifficulty difficulty, int direction)

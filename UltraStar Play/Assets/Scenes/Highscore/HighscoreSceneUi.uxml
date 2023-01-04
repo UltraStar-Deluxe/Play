@@ -6,7 +6,7 @@
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
                 <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
                     <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                        <ui:VisualElement name="titleImage" picking-mode="Ignore" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]score.png?fileID=21300000&amp;guid=732d97cddf664894185e48ebccc0e6e1&amp;type=3#[icon]score&apos;);" />
+                        <MaterialIcon name="titleImage" icon="auto_awesome" />
                         <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
                             <ui:Label text="Highscores" name="sceneTitle" class="titleText" />
                             <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
@@ -23,11 +23,11 @@
                 <ui:Instance template="HighscoreEntry" name="highscoreEntry" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
-                <ui:Button name="nextItemButton" value="This is the about text on multiple lines." class="wideControl" style="flex-direction: row;">
+                <ui:Button name="nextDifficultyButton" value="This is the about text on multiple lines." class="controlMinWidth" style="flex-direction: row;">
                     <ui:Label text="Next" display-tooltip-when-elided="true" name="nextItemLabel" style="flex-grow: 1;" />
-                    <ui:VisualElement name="nextItemIcon" class="iconImageTextSized" style="position: relative; right: 0; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/navigate_next_white_24dp.svg?fileID=7388822144124034973&amp;guid=a18bfb4f3168ff741bd72aa12e1e7a4d&amp;type=3#navigate_next_white_24dp&apos;); flex-grow: 0;" />
+                    <MaterialIcon name="nextItemIcon" icon="arrow_right" style="position: absolute; right: 0;" />
                 </ui:Button>
-                <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" />
+                <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

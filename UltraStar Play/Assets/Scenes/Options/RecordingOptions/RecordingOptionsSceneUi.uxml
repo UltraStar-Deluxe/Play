@@ -4,14 +4,14 @@
             <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
                     <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/[icon]options.png?fileID=21300000&amp;guid=921e129a3d6748c4aae38b416fbd8a4f&amp;type=3#[icon]options&apos;);" />
+                        <MaterialIcon name="titleImage" icon="mic" />
                         <ui:VisualElement name="titleAndDescription">
                             <ui:Label text="Recording Device" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="deviceContainer" class="optionsLabelAndItemPicker">
-                    <ItemPicker wrapAround="false" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" class="multiline" style="width: 100%;" />
+                    <ItemPicker wrap-around="false" min-value="0" max-value="100" step-value="10" name="ItemPicker" class="multiline" style="width: 100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="micVisualizationContainer" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 100%; min-height: 10%; flex-grow: 1; margin-bottom: 5px; align-items: flex-start; justify-content: center; flex-direction: row; flex-shrink: 1; height: 10%;">
@@ -25,33 +25,39 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="colorContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Color" name="Label" class="controlLabel" />
-                    <ItemPicker wrapAround="false" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                    <ItemPicker wrap-around="false" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="delayContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Delay" name="Label" class="controlLabel" style="width: 100px;" />
-                    <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" style="width: 200px;" />
-                    <ItemPicker wrapAround="true" minValue="0" maxValue="1000" stepValue="10" name="ItemPicker" />
+                    <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis" style="width: 200px; flex-shrink: 1;" />
+                    <ItemPicker wrap-around="true" min-value="0" max-value="1000" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="amplificationContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Amplification" name="Label" class="controlLabel" />
-                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="noiseSuppressionContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Noise Suppression" name="Label" class="controlLabel" />
-                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="sampleRateContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
                     <ui:Label text="Sample Rate" name="Label" class="controlLabel" />
-                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
             </ui:ScrollView>
-            <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row-reverse;">
-                <ui:Button text="Back" name="backButton" />
-                <ui:VisualElement name="notConnectedContainer" style="width: 300px; flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="warningIcon" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); width: 32px; height: 32px; -unity-background-image-tint-color: rgb(219, 214, 20); margin-right: 20px;" />
-                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" />
+            <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
+                <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
+                    <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
+                    <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
                 </ui:VisualElement>
-                <ui:Button text="Delete" name="deleteButton" style="visibility: visible; display: flex;" />
+                <ui:Button text="Delete" name="deleteButton" class="controlMinWidth" style="visibility: visible; display: flex;" />
+                <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                    <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
+                        <MaterialIcon name="helpIcon" icon="help_outline" />
+                    </ui:Button>
+                    <ui:Button text="Back" name="backButton" class="controlMinWidth" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

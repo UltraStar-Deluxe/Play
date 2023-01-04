@@ -4,15 +4,17 @@
             <ItemPicker name="avatarPicker" style="width: 100%; height: 100%;" />
         </ui:VisualElement>
         <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; margin-right: 20px; justify-content: space-around;">
-            <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="flex-shrink: 1; width: 100%;" />
+            <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="flex-shrink: 1; width: 100%; margin-bottom: 5px;" />
             <ItemPicker name="difficultyPicker" style="width: 100%;" />
         </ui:VisualElement>
-        <ui:VisualElement name="column" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around;">
-            <ui:VisualElement name="enabledContainer" style="flex-direction: row; width: 100%;">
+        <ui:VisualElement name="row" style="width: auto; align-items: center; flex-grow: 1; justify-content: space-around; flex-direction: row;">
+            <ui:VisualElement name="enabledContainer" style="flex-direction: row; margin-right: 5px;">
                 <ui:Label text="Enabled" name="enabledLabel" class="middleCenterText" style="margin-right: 20px;" />
                 <ui:Toggle name="enabledToggle" />
             </ui:VisualElement>
-            <ui:Button name="deleteButton" text="Delete" style="width: 100%;" />
+            <ui:Button name="deleteButton" class="dangerButton squareButton">
+                <MaterialIcon name="deleteIcon" icon="delete" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

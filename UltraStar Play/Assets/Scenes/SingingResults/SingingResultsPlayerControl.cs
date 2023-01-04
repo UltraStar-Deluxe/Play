@@ -69,7 +69,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             // Bouncy size animation
             LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
                 .setEaseSpring()
-                .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))));
+                .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
         }
         ratingLabel.text = songRating.Text;
 

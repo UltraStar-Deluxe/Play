@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -25,6 +27,12 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
+    public VisualTreeAsset dialogUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset accordionUi;
+
+    [InjectedInInspector]
     public ShowFps showFpsPrefab;
 
     [InjectedInInspector]
@@ -40,7 +48,7 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private void Awake()
     {
-        LeanTween.init(800);
+        LeanTween.init(10000);
     }
 
     private void Start()
@@ -145,5 +153,42 @@ public class UiManager : MonoBehaviour, INeedInjection
         AvatarImageReference avatarImageReference = avatarImageReferences
             .FirstOrDefault(it => it.avatar == avatar);
         return avatarImageReference?.sprite;
+    }
+
+    public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
+    {
+        VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(helpDialog);
+        helpDialog.AddToClassList("wordWrap");
+
+        MessageDialogControl helpDialogControl = injector
+            .WithRootVisualElement(helpDialog)
+            .CreateAndInject<MessageDialogControl>();
+        helpDialogControl.Title = dialogTitle;
+
+        void AddChapter(string title, string content)
+        {
+            AccordionItemControl accordionItemControl = CreateAccordionItemControl();
+            accordionItemControl.Title = title;
+            accordionItemControl.AddVisualElement(new Label(content));
+            helpDialogControl.AddVisualElement(accordionItemControl.VisualElement);
+        }
+
+        titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
+
+        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            onCloseHelp);
+        closeDialogButton.Focus();
+
+        return helpDialogControl;
+    }
+
+    public AccordionItemControl CreateAccordionItemControl()
+    {
+        VisualElement accordionItem = accordionUi.CloneTree().Children().FirstOrDefault();
+        AccordionItemControl accordionItemControl = injector
+            .WithRootVisualElement(accordionItem)
+            .CreateAndInject<AccordionItemControl>();
+        return accordionItemControl;
     }
 }

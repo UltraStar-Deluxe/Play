@@ -98,8 +98,44 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songMeta = value;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
+            UpdateFontSize();
             UpdateIcons();
             UpdateCover(songMeta);
+        }
+    }
+
+    private void UpdateFontSize()
+    {
+        songArtist.RemoveFromClassList("smallFont");
+        songArtist.RemoveFromClassList("smallerFont");
+        songArtist.RemoveFromClassList("tinyFont");
+        if (songArtist.text.Length >= 20)
+        {
+            songArtist.AddToClassList("tinyFont");
+        }
+        else if (songArtist.text.Length >= 12)
+        {
+            songArtist.AddToClassList("smallerFont");
+        }
+        else
+        {
+            songArtist.AddToClassList("smallFont");
+        }
+
+        songTitle.RemoveFromClassList("smallFont");
+        songTitle.RemoveFromClassList("smallerFont");
+        songTitle.RemoveFromClassList("tinyFont");
+        if (songTitle.text.Length >= 60)
+        {
+            songTitle.AddToClassList("tinyFont");
+        }
+        else if (songTitle.text.Length >= 40)
+        {
+            songTitle.AddToClassList("smallerFont");
+        }
+        else
+        {
+            songTitle.AddToClassList("smallFont");
         }
     }
 
@@ -195,12 +231,6 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             {
                 return;
             }
-        }
-
-        if (!WebRequestUtils.ResourceExists(coverUri))
-        {
-            Debug.Log("Cover image resource does not exist: " + coverUri);
-            return;
         }
 
         ImageManager.LoadSpriteFromUri(coverUri, loadedSprite =>

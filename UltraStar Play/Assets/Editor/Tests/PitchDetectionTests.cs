@@ -34,14 +34,14 @@ public class PitchDetectionTests
         foreach (KeyValuePair<string, string> pathAndNoteName in pathToExpectedMidiNoteNameMap)
         {
             // Load the audio clip
-            string uri = "file://" + pathAndNoteName.Key;
+            string uri = pathAndNoteName.Key;
             AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, false);
             float[] samples = new float[audioClip.samples];
             audioClip.GetData(samples, 0);
 
             // Analyze the samples
             IAudioSamplesAnalyzer audioSamplesAnalyzer = audioSamplesAnalyzerProvider(audioClip.frequency);
-            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, 0, samples.Length - 1, micProfile);
+            PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samples, 0, samples.Length - 1, micProfile.AmplificationMultiplier, micProfile.NoiseSuppression);
 
             // Check result
             Assert.NotNull(pitchEvent, $"No pitch detected when analyzing audio resource {uri}");
