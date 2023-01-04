@@ -132,6 +132,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 lengthInBeats,
                 CreateSpeechRecognizerParameters(),
                 settings.SongEditorSettings.MidiNoteForSpeechRecognition)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogError(ex);
+                uiManager.CreateNotificationVisualElement(ex.Message);
+            })
             .Subscribe(createdNotes =>
             {
                 createdNotes.ForEach(createdNote =>

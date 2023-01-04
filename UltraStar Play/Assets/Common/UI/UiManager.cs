@@ -153,7 +153,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         return avatarImageReference?.sprite;
     }
 
-    public MessageDialogControl CreateHelpDialogControl(Dictionary<string, string> titleToContentMap, Action onCloseHelp)
+    public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
     {
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(helpDialog);
@@ -162,7 +162,7 @@ public class UiManager : MonoBehaviour, INeedInjection
         MessageDialogControl helpDialogControl = injector
             .WithRootVisualElement(helpDialog)
             .CreateAndInject<MessageDialogControl>();
-        helpDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title);
+        helpDialogControl.Title = dialogTitle;
 
         void AddChapter(string title, string content)
         {
