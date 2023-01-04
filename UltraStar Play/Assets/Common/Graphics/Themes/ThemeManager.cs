@@ -175,7 +175,6 @@ public class ThemeManager : MonoBehaviour
         // we wait so the background changes at the same frame
         yield return null;
 
-        themeMeta.ThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
         DestroyDynamicTextures();
 
         ApplyThemeDynamicBackground(themeMeta);
@@ -305,7 +304,6 @@ public class ThemeManager : MonoBehaviour
         }
 
         DestroyDynamicTextures();
-        currentThemeMeta?.ThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
     }
 
     public void SetCurrentTheme(ThemeMeta themeMeta)

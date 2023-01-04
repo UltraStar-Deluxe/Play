@@ -29,12 +29,6 @@ public class ThemeSettings
         return theme;
     }
 
-    public bool GetRatingIconFor(ThemeMeta themeMeta, SongRating.ESongRating songRating, out Sprite sprite)
-    {
-        sprite = songRatingIcons?.GetSpriteForRating(themeMeta, songRating);
-        return sprite != null;
-    }
-
     // Process JSON to parse certain values, e.g. allow hex colors and convert
     // them to proper color struct notation
     static string PreprocessJson(string input)
