@@ -10,6 +10,7 @@ public class MicProfile
         (micProfile1, micProfile2) => string.Compare(micProfile1.Name, micProfile2.Name, StringComparison.InvariantCulture);
 
     public string Name { get; set; }
+    public int ChannelIndex { get; set; }
     public Color32 Color { get; set; } = Colors.crimson;
     public int Amplification { get; set; }
     public int NoiseSuppression { get; set; } = 5;

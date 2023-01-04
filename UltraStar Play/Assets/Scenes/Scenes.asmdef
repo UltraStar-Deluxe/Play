@@ -10,6 +10,7 @@
         "com.achimmihca.protrans",
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.primeinputactions",
+        "com.achimmihca.portaudioforunity",
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",

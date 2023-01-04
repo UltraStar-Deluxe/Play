@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PortAudioForUnity;
 using UniInject;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
+    public bool usePortAudio = true;
     public List<string> simulatedCommandLineArguments = new();
 
     [Range(-1, 60)]
@@ -30,6 +32,11 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+    }
+
+    private void Start()
+    {
+        MicrophoneAdapter.UsePortAudio = usePortAudio && PlatformUtils.IsWindows();
     }
 
     private void Update()
