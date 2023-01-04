@@ -400,17 +400,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     private void Bind<T>(BaseField<T> baseField, Func<T> valueGetter, Action<T> valueSetter, bool observeValueGetter = true)
     {
-        baseField.value = valueGetter();
-        baseField.RegisterValueChangedCallback(evt => valueSetter(evt.newValue));
-
-        // Update field when settings change.
-        if (observeValueGetter)
-        {
-            this.ObserveEveryValueChanged(_ => valueGetter())
-                .Where(newValue => !object.Equals(baseField.value, newValue))
-                .Subscribe(newValue => baseField.value = newValue)
-                .AddTo(gameObject);
-        }
+        FieldBindingUtils.Bind(gameObject, baseField, valueGetter, valueSetter, observeValueGetter);
     }
 
     public enum ERecordNotesOrAudio

@@ -55,22 +55,22 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
     {
         // Find existing or create new MicProfile for the newly connected device
-        MicProfile micProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
-        if (micProfile == null)
+        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
+        if (connectedMicProfile == null)
         {
-            micProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, connectionEvent.ConnectedClientHandler.ClientId);
-            settings.MicProfiles.Add(micProfile);
+            connectedMicProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, 0, connectionEvent.ConnectedClientHandler.ClientId);
+            settings.MicProfiles.Add(connectedMicProfile);
         }
-        
+
         if (connectionEvent.IsConnected)
         {
             // Assign to player if needed
-            UseMicProfileWhereNeeded(micProfile);
+            UseMicProfileWhereNeeded(connectedMicProfile);
         }
         else if (!connectionEvent.IsConnected)
         {
             // Remove from players where already assigned
-            RemoveMicProfileFromListEntries(micProfile);
+            RemoveMicProfileFromListEntries(connectedMicProfile);
         }
     }
     
