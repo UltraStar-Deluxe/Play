@@ -45,7 +45,7 @@ public class ThemeManager : MonoBehaviour
     public Material backgroundMaterial;
     public Material particleMaterial;
     public ParticleSystem backgroundParticleSystem;
-    public ThemeSettings currentThemeSettings;
+    public ThemeMeta currentThemeMeta;
 
     private BackgroundShaderControl backgroundShaderControl;
     public BackgroundShaderControl BackgroundShaderControl
@@ -153,13 +153,9 @@ public class ThemeManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
-        string jsonTheme = File.ReadAllText(themeMeta.AbsoluteFilePath);
-        currentThemeSettings = ThemeSettings.LoadFromJson(jsonTheme);
-
         anyThemeLoaded = true;
 
-        StartCoroutine(ApplyTheme(themeMeta, currentThemeSettings));
+        StartCoroutine(ApplyTheme(themeMeta));
     }
 
     private Texture2D LoadPng(string fullPath, bool alpha = true, TextureWrapMode wrapMode = TextureWrapMode.Clamp, bool mipMaps = true)
@@ -187,7 +183,7 @@ public class ThemeManager : MonoBehaviour
         dynamicTextures.Clear();
     }
 
-    private IEnumerator ApplyTheme(ThemeMeta themeMeta, ThemeSettings themeSettings)
+    private IEnumerator ApplyTheme(ThemeMeta themeMeta)
     {
         alreadyProcessedVisualElements.Clear();
 
@@ -195,15 +191,15 @@ public class ThemeManager : MonoBehaviour
         // we wait so the background changes at the same frame
         yield return null;
 
-        this.currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
+        themeMeta.ThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
         DestroyDynamicTextures();
 
-        ApplyThemeDynamicBackground(themeMeta, themeSettings);
+        ApplyThemeDynamicBackground(themeMeta);
     }
 
-    private void ApplyThemeDynamicBackground(ThemeMeta themeMeta, ThemeSettings themeSettings)
+    private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
-        DynamicBackground background = themeSettings.dynamicBackground;
+        DynamicBackground background = themeMeta.ThemeSettings?.dynamicBackground;
 
         // Material
         if (!string.IsNullOrEmpty(background.gradientRampFile))
@@ -307,7 +303,7 @@ public class ThemeManager : MonoBehaviour
         }
 
         DestroyDynamicTextures();
-        currentThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
+        currentThemeMeta?.ThemeSettings?.songRatingIcons?.DestroyLoadedSprites();
     }
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
@@ -380,7 +376,9 @@ public class ThemeManager : MonoBehaviour
 
     public void UpdateThemeSpecificStyleSheets()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes
+            || currentThemeMeta == null
+            || currentThemeMeta.ThemeSettings == null)
         {
             return;
         }
@@ -393,15 +391,15 @@ public class ThemeManager : MonoBehaviour
 
         VisualElement root = uiDocument.rootVisualElement;
 
-        Color backgroundButtonColor = currentThemeSettings.buttonMainColor;
+        Color backgroundButtonColor = currentThemeMeta.ThemeSettings.buttonMainColor;
         Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
 
-        Color fontColorAll = currentThemeSettings.fontColor;
+        Color fontColorAll = currentThemeMeta.ThemeSettings.fontColor;
         bool useGlobalFontColor = fontColorAll != Color.clear;
 
-        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeSettings.fontColorButtons;
-        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeSettings.fontColorLabels;
+        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeSettings.fontColorButtons;
+        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeSettings.fontColorLabels;
 
         // Change color of UXML elements:
         root.Query(null, "currentNoteLyrics", "previousNoteLyrics")

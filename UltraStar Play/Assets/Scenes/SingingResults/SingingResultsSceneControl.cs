@@ -257,7 +257,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         if (!settings.DeveloperSettings.disableDynamicThemes)
         {
-            if (themeManager.currentThemeSettings.GetRatingIconFor(themeManager.GetCurrentTheme(), songRatingEnumValue, out Sprite sprite))
+            if (themeManager.currentThemeMeta.ThemeSettings.GetRatingIconFor(themeManager.GetCurrentTheme(), songRatingEnumValue, out Sprite sprite))
             {
                 return sprite;
             }
