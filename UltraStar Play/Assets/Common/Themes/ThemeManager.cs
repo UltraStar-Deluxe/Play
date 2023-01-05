@@ -67,6 +67,8 @@ public class ThemeManager : MonoBehaviour
 
     private readonly HashSet<VisualElement> alreadyProcessedVisualElements = new();
 
+    private readonly HashSet<string> failedToLoadThemeNames = new();
+
     private bool anyThemeLoaded;
 
     void Awake()
@@ -323,11 +325,18 @@ public class ThemeManager : MonoBehaviour
 
     public ThemeMeta GetThemeByName(string themeName)
     {
+        if (failedToLoadThemeNames.Contains(themeName))
+        {
+            // This theme is already known to fail. Do not try again.
+            return GetDefaultTheme();
+        }
+
         ThemeMeta themeMeta = GetThemeMetas()
             .FirstOrDefault(themeMeta => themeMeta.FileNameWithoutExtension == themeName);
         if (themeMeta == null)
         {
-            Debug.Log($"No theme found with name {themeName}. Using default theme instead.");
+            failedToLoadThemeNames.Add(themeName);
+            Debug.LogWarning($"No theme found with name {themeName}. Using default theme instead.");
             return GetDefaultTheme();
         }
 
