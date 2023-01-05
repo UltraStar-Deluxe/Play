@@ -190,6 +190,9 @@ public static partial class R
         public static readonly string options_useForSinging = "options_useForSinging";
         public static readonly string options_useImageAsCursor = "options_useImageAsCursor";
         public static readonly string options_volume = "options_volume";
+        public static readonly string options_webcam_button = "options_webcam_button";
+        public static readonly string options_webcam_device = "options_webcam_device";
+        public static readonly string options_webcam_title = "options_webcam_title";
         public static readonly string order = "order";
         public static readonly string order_Artist = "order_Artist";
         public static readonly string order_CountCanceled = "order_CountCanceled";

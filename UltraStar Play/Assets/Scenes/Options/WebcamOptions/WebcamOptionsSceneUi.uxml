@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="background" class="backgroundImage">
+        <ui:VisualElement class="optionsSceneMainContainer">
+            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
+                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
+                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
+                        <MaterialIcon name="titleImage" icon="videocam" />
+                        <ui:VisualElement name="titleAndDescription">
+                            <ui:Label text="Webcam Options" name="sceneTitle" class="titleText" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="deviceContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Webcam" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end; height: 262px;">
+                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; right: auto; left: auto; bottom: auto; top: auto; height: 100%;">
+                    <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); -unity-background-image-tint-color: rgb(0, 0, 0); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
+                </ui:VisualElement>
+                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

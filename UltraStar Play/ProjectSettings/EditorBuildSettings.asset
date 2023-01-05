@@ -71,6 +71,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Credits/CreditsScene.unity
     guid: abcc8b3cf45b71840970d2d07bd15cac
+  - enabled: 1
+    path: Assets/Scenes/Options/WebcamOptions/WebcamOptionsScene.unity
+    guid: 2eb5d7822501fa14c8d3a6fea4149df4
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}
+  m_UseUCBPForAssetBundles: 0

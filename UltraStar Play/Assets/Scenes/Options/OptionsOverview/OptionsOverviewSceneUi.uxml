@@ -61,6 +61,10 @@
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
+                    <ui:Button name="webcamOptionsButton" class="optionsOverviewButton">
+                        <MaterialIcon icon="videocam" name="image" />
+                        <ui:Label text="Webcam" name="label" />
+                    </ui:Button>
                     <ui:Button name="appOptionsButton" class="optionsOverviewButton">
                         <MaterialIcon icon="phonelink_setup" name="image" />
                         <ui:Label text="Apps" name="label" />
@@ -73,7 +77,6 @@
                         <MaterialIcon icon="arrow_back" name="image" />
                         <ui:Label text="Back" name="label" />
                     </ui:Button>
-                    <ui:Button name="dummyButton" class="optionsOverviewButton" style="visibility: hidden;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
