@@ -17,10 +17,7 @@ public class Color32Converter : fsConverter
             throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected serialization type");
         }
 
-        string hexColor = color.a == 255
-            ? ColorUtility.ToHtmlStringRGB(color)
-            : ColorUtility.ToHtmlStringRGBA(color);
-        serialized = new fsData($"#{hexColor}");
+        serialized = new fsData($"#{Colors.ToHexColor(color)}");
         return fsResult.Success;
     }
 
