@@ -53,15 +53,20 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // Wait for Theme and I18N resources
         TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
 
-        // Ask for microphone permissions on Android
+        // Ask for microphone and webcam permissions on Android
 #if  UNITY_ANDROID
-        AndroidRuntimePermissions.Permission checkPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
-        if (checkPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+        AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
+        if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
         {
             AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
         }
-#endif
 
+        AndroidRuntimePermissions.Permission checkCameraPermission = AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
+        if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+        {
+            AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
+        }
+#endif
         FinishScene();
     }
 
