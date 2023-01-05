@@ -9,7 +9,7 @@ public static class ThemeMetaUtils
             return "";
         }
 
-        return StringUtils.SnakeCaseToDisplayName(themeMeta.FileNameWithoutExtension);
+        return StringUtils.ToTitleCase(themeMeta.FileNameWithoutExtension);
     }
 
     public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string themeRelativePath)
