@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -63,7 +64,6 @@ public class ThemeManager : MonoBehaviour
     private RenderTexture userInterfaceRenderTexture;
 
     private readonly List<ThemeMeta> themeMetas = new();
-    private readonly List<Texture2D> dynamicTextures = new();
 
     private readonly HashSet<VisualElement> alreadyProcessedVisualElements = new();
 
@@ -133,11 +133,11 @@ public class ThemeManager : MonoBehaviour
         }
         else
         {
-            LoadTheme(GetCurrentTheme());
+            LoadCurrentTheme();
         }
     }
 
-    private void LoadTheme(ThemeMeta themeMeta)
+    public void LoadCurrentTheme()
     {
         if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
         {
@@ -151,39 +151,21 @@ public class ThemeManager : MonoBehaviour
             return;
         }
 
+        ThemeMeta themeMeta = GetCurrentTheme();
         if (themeMeta == null)
         {
             Debug.Log($"Cannot load theme. Theme is null.");
             return;
         }
 
-        anyThemeLoaded = true;
-
-        StartCoroutine(ApplyTheme(themeMeta));
-    }
-
-    private void DestroyDynamicTextures()
-    {
-        foreach (Texture2D texture2D in dynamicTextures)
+        Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
-            Destroy(texture2D);
-        }
-        dynamicTextures.Clear();
-    }
-
-    private IEnumerator ApplyTheme(ThemeMeta themeMeta)
-    {
-        alreadyProcessedVisualElements.Clear();
-
-        // UIToolkit takes one frame to apply the style changes,
-        // we wait so the background changes at the same frame
-        yield return null;
-
-        DestroyDynamicTextures();
-
-        ApplyThemeDynamicBackground(themeMeta);
-
-        ApplyThemeSpecificStylesToVisualElementsInScene();
+            alreadyProcessedVisualElements.Clear();
+            ApplyThemeDynamicBackground(themeMeta);
+            ApplyThemeSpecificStylesToVisualElementsInScene();
+            anyThemeLoaded = true;
+        }));
     }
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
@@ -313,14 +295,12 @@ public class ThemeManager : MonoBehaviour
             particleMaterial.CopyPropertiesFromMaterial(particleMaterialCopy);
             Destroy(particleMaterialCopy);
         }
-
-        DestroyDynamicTextures();
     }
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
         SettingsManager.Instance.Settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
-        LoadTheme(GetCurrentTheme());
+        LoadCurrentTheme();
     }
 
     public ThemeMeta GetCurrentTheme()
@@ -372,7 +352,7 @@ public class ThemeManager : MonoBehaviour
         List<string> themeFolders = new List<string>
         {
             $"{Application.persistentDataPath}/{ThemeFolderName}",
-            $"{Application.streamingAssetsPath}/{ThemeFolderName}",
+            ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName),
         };
 
         themeFolders.ForEach(themeFolder =>
@@ -387,7 +367,8 @@ public class ThemeManager : MonoBehaviour
             }
         });
 
-        Debug.Log($"Found {themeMetas.Count} themes.");
+        string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
+        Debug.Log($"Found {themeMetas.Count} themes: {themeNamesCsv}");
 
         return themeMetas;
     }
