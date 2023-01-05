@@ -4,35 +4,15 @@
 // When files are linked, PNG and JPG formats are accepted.
 {
     // The color of the main texts displayed over buttons.
-    "fontColorButtons": {
-        "r": 229,
-        "g": 229,
-        "b": 229,
-        "a": 255
-    },
+    "fontColorButtons": "#E5E5E5",
     // The color of the main texts displayed over the background.
-    "fontColorLabels": {
-        "r": 229,
-        "g": 229,
-        "b": 229,
-        "a": 255
-    },
+    "fontColorLabels": "#E5E5E5",
     // The color of all the texts, over buttons and backgrounds.
     // If set, the values defined for "fontColorLabels" and "fontColorButtons"
     // will be ignored.
-    "fontColor": {
-        "r": 229,
-        "g": 229,
-        "b": 229,
-        "a": 255
-    },
+    "fontColor": "#E5E5E5",
     // The main color of the buttons, e.g. the buttons in the main menu
-    "buttonMainColor": {
-       "r": 51,
-       "g": 153,
-       "b": 216,
-        "a": 255
-    },
+    "buttonMainColor": "#3399D8",
     // This group defines the dynamic background parameters.
     "dynamicBackground": {
         // A single-pixel high image that defines the color gradient to use.
@@ -72,12 +52,7 @@
         "patternScrolling": { "x": 0.02, "y": 0.04 },
         // The tint color of the pattern. Leave white to get the image's default
         // colors. You can also just change the alpha to change the opacity.
-        "patternColor": {
-            "r": 255
-            "g": 255,
-            "b": 255,
-            "a": 255
-        },
+        "patternColor": "#FFFFFF",
         // The opacity of the user interface drop shadow effect.
         // Set to 0 to disable.
         "uiShadowOpacity": 0.33,

@@ -1,16 +1,6 @@
 {
-    "fontColor": {
-        "r": 229,
-        "g": 229,
-        "b": 229,
-        "a": 255
-    },
-    "buttonMainColor": {
-        "r": 51,
-        "g": 153,
-        "b": 216,
-        "a": 255
-    },
+    "fontColor": "#E5E5E5",
+    "buttonMainColor": "#3399D8",
     "dynamicBackground": {
         "gradientRampFile": "gradients/blue.png",
         "gradientType": "Radial",
