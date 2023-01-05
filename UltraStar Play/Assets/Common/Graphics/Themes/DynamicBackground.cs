@@ -4,15 +4,6 @@ using UnityEngine;
 [Serializable]
 public class DynamicBackground
 {
-    public enum GradientType
-    {
-        Radial = 0,
-        RadialRepeated = 1,
-        Linear = 2,
-        Reflected = 3,
-        Repeated = 4
-    }
-
     // Material
     public string gradientRampFile = null;
     public string gradientType = "Radial";
