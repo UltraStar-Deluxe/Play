@@ -30,7 +30,7 @@
         "patternFile": "patterns/pumpkins.png",
         "patternScale": { "x": 2.0, "y": 2.0 },
         "patternScrolling": { "x": 0.02, "y": 0.04 },
-        "patternColor": { "r": 0.0, "g": 0.0, "b": 0.0, "a": 0.5 },
+        "patternColor": { "r": 0, "g": 0, "b": 0, "a": 127 },
         "uiShadowOpacity": 0.33,
         "uiShadowOffset": { "x": -16, "y": 10 }
     },

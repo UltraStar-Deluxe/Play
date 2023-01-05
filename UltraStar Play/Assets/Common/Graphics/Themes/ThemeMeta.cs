@@ -13,7 +13,7 @@ public class ThemeMeta
             if (themeJson == null)
             {
                 string json = File.ReadAllText(AbsoluteFilePath);
-                themeJson = ThemeJson.LoadFromJson(json);
+                themeJson = JsonConverter.FromJson<ThemeJson>(json);
             }
 
             return themeJson;
