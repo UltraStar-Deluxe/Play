@@ -398,6 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82708d27bccb8fa4d888d6518e9bb9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneChangeAnimationTime: 0.2
 --- !u!82 &461665969244419356
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5956,38 +5957,6 @@ MonoBehaviour:
   backgroundMaterial: {fileID: 2100000, guid: f7976d665216032408a77e0afc13b55f, type: 2}
   particleMaterial: {fileID: 2100000, guid: 8c900c152afa98e47b70ef388519dadd, type: 2}
   backgroundParticleSystem: {fileID: 2908706229821383298}
-  currentThemeSettings:
-    dynamicBackground:
-      gradientRampFile: 
-      gradientType: Radial
-      gradientScrollingSpeed: 0
-      gradientScale: 1
-      gradientSmoothness: 1
-      gradientAngle: 0
-      gradientAnimation: 0
-      gradientAnimSpeed: 1
-      gradientAnimAmplitude: 0.1
-      patternFile: 
-      patternColor: {r: 1, g: 1, b: 1, a: 1}
-      patternScale: {x: 1, y: 1}
-      patternScrolling: {x: 0, y: 0}
-      uiShadowOpacity: 0
-      uiShadowOffset: {x: 0, y: 0}
-      particleFile: 
-      particleOpacity: 0
-    songRatingIcons:
-      toneDeaf: 
-      amateur: 
-      wannabe: 
-      hopeful: 
-      risingStar: 
-      leadSinger: 
-      superstar: 
-      ultrastar: 
-    buttonMainColor: {r: 0, g: 0, b: 0, a: 0}
-    fontColorButtons: {r: 0, g: 0, b: 0, a: 0}
-    fontColorLabels: {r: 0, g: 0, b: 0, a: 0}
-    fontColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &2981502673358573187
 GameObject:
   m_ObjectHideFlags: 0
