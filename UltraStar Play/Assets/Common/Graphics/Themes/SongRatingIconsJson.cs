@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using UnityEngine;
 
 [Serializable]
-public class SongRatingIcons
+public class SongRatingIconsJson
 {
     public string toneDeaf;
     public string amateur;

@@ -182,15 +182,15 @@ public class ThemeManager : MonoBehaviour
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
-        DynamicBackground background = themeMeta.ThemeSettings?.dynamicBackground;
+        DynamicBackgroundJson backgroundJson = themeMeta.ThemeJson?.dynamicBackground;
 
         // Material
-        if (!string.IsNullOrEmpty(background.gradientRampFile))
+        if (!string.IsNullOrEmpty(backgroundJson.gradientRampFile))
         {
-            string gradientPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.gradientRampFile);
+            string gradientPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.gradientRampFile);
             if (File.Exists(gradientPath))
             {
-                TextureWrapMode textureWrapMode = background.gradientScrollingSpeed > 0
+                TextureWrapMode textureWrapMode = backgroundJson.gradientScrollingSpeed > 0
                     ? TextureWrapMode.Repeat
                     : TextureWrapMode.Clamp;
                 ImageManager.LoadSpriteFromUri(gradientPath, gradientSprite =>
@@ -201,23 +201,23 @@ public class ThemeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[THEME] Gradient Ramp file can't be opened at path: {background.gradientRampFile}");
+                Debug.LogError($"[THEME] Gradient Ramp file can't be opened at path: {backgroundJson.gradientRampFile}");
             }
         }
 
-        if (!string.IsNullOrEmpty(background.gradientType))
+        if (!string.IsNullOrEmpty(backgroundJson.gradientType))
         {
             EDynamicBackgroundGradientType result;
-            if (Enum.TryParse(background.gradientType, true, out result))
+            if (Enum.TryParse(backgroundJson.gradientType, true, out result))
             {
                 backgroundMaterial.SetFloat("_Gradient", (int)result);
             }
         }
 
         Color patternColor = Color.clear; // default to clear to hide pattern if no file specified or found
-        if (!string.IsNullOrEmpty(background.patternFile))
+        if (!string.IsNullOrEmpty(backgroundJson.patternFile))
         {
-            string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.patternFile);
+            string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
             {
                 ImageManager.LoadSpriteFromUri(patternPath, patternSprite =>
@@ -226,28 +226,28 @@ public class ThemeManager : MonoBehaviour
                     backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
                 });
 
-                patternColor = background.patternColor;
+                patternColor = backgroundJson.patternColor;
             }
             else
             {
-                Debug.LogError($"[THEME] Pattern file can't be opened at path: {background.patternFile}");
+                Debug.LogError($"[THEME] Pattern file can't be opened at path: {backgroundJson.patternFile}");
             }
         }
 
         float screenRatio = Screen.width / (float)Screen.height;
-        backgroundMaterial.SetVector("_PatternTex_ST", new Vector4(background.patternScale.x * screenRatio, background.patternScale.y, background.patternScrolling.x, background.patternScrolling.y));
+        backgroundMaterial.SetVector("_PatternTex_ST", new Vector4(backgroundJson.patternScale.x * screenRatio, backgroundJson.patternScale.y, backgroundJson.patternScrolling.x, backgroundJson.patternScrolling.y));
         backgroundMaterial.SetColor("_PatternColor", patternColor);
-        backgroundMaterial.SetFloat("_Scale", background.gradientScale);
-        backgroundMaterial.SetFloat("_Smoothness", background.gradientSmoothness);
-        backgroundMaterial.SetFloat("_Angle", background.gradientAngle);
-        backgroundMaterial.SetFloat("_EnableGradientAnimation", background.gradientAnimation ? 1 : 0);
-        backgroundMaterial.SetFloat("_GradientAnimSpeed", background.gradientAnimSpeed);
-        backgroundMaterial.SetFloat("_GradientAnimAmp", background.gradientAnimAmplitude);
-        backgroundMaterial.SetFloat("_ColorRampScrolling", background.gradientScrollingSpeed);
-        backgroundMaterial.SetFloat("_UiShadowOpacity", background.uiShadowOpacity);
-        backgroundMaterial.SetVector("_UiShadowOffset", background.uiShadowOffset);
+        backgroundMaterial.SetFloat("_Scale", backgroundJson.gradientScale);
+        backgroundMaterial.SetFloat("_Smoothness", backgroundJson.gradientSmoothness);
+        backgroundMaterial.SetFloat("_Angle", backgroundJson.gradientAngle);
+        backgroundMaterial.SetFloat("_EnableGradientAnimation", backgroundJson.gradientAnimation ? 1 : 0);
+        backgroundMaterial.SetFloat("_GradientAnimSpeed", backgroundJson.gradientAnimSpeed);
+        backgroundMaterial.SetFloat("_GradientAnimAmp", backgroundJson.gradientAnimAmplitude);
+        backgroundMaterial.SetFloat("_ColorRampScrolling", backgroundJson.gradientScrollingSpeed);
+        backgroundMaterial.SetFloat("_UiShadowOpacity", backgroundJson.uiShadowOpacity);
+        backgroundMaterial.SetVector("_UiShadowOffset", backgroundJson.uiShadowOffset);
 
-        if (background.uiShadowOpacity > 0)
+        if (backgroundJson.uiShadowOpacity > 0)
         {
             backgroundMaterial.EnableKeyword("_UI_SHADOW");
         }
@@ -257,9 +257,9 @@ public class ThemeManager : MonoBehaviour
         }
 
         // Particles
-        if (!string.IsNullOrEmpty(background.particleFile))
+        if (!string.IsNullOrEmpty(backgroundJson.particleFile))
         {
-            string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, background.particleFile);
+            string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
                 ImageManager.LoadSpriteFromUri(particlePath, particleSprite =>
@@ -270,12 +270,12 @@ public class ThemeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[THEME] Particle file can't be opened at path: {background.particleFile}");
+                Debug.LogError($"[THEME] Particle file can't be opened at path: {backgroundJson.particleFile}");
             }
         }
 
         ParticleSystem.MainModule main = backgroundParticleSystem.main;
-        main.startColor = new Color(1, 1, 1, background.particleOpacity);
+        main.startColor = new Color(1, 1, 1, backgroundJson.particleOpacity);
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
@@ -383,7 +383,7 @@ public class ThemeManager : MonoBehaviour
 
         ThemeMeta currentThemeMeta = GetCurrentTheme();
         if(currentThemeMeta == null
-           || currentThemeMeta.ThemeSettings == null)
+           || currentThemeMeta.ThemeJson == null)
         {
             Debug.LogWarning("Not applying theme styles because current theme is null");
             return;
@@ -397,15 +397,15 @@ public class ThemeManager : MonoBehaviour
 
         VisualElement root = uiDocument.rootVisualElement;
 
-        Color backgroundButtonColor = currentThemeMeta.ThemeSettings.buttonMainColor;
+        Color backgroundButtonColor = currentThemeMeta.ThemeJson.buttonMainColor;
         Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
 
-        Color fontColorAll = currentThemeMeta.ThemeSettings.fontColor;
+        Color fontColorAll = currentThemeMeta.ThemeJson.fontColor;
         bool useGlobalFontColor = fontColorAll != Color.clear;
 
-        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeSettings.fontColorButtons;
-        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeSettings.fontColorLabels;
+        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorButtons;
+        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorLabels;
 
         // Change color of UXML elements:
         root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
