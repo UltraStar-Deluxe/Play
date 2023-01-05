@@ -265,6 +265,7 @@ public class ThemeManager : MonoBehaviour
         // Particles
         if (!string.IsNullOrEmpty(backgroundJson.particleFile))
         {
+            backgroundParticleSystem.gameObject.SetActive(true);
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
@@ -278,6 +279,10 @@ public class ThemeManager : MonoBehaviour
             {
                 Debug.LogError($"[THEME] Particle file can't be opened at path: {backgroundJson.particleFile}");
             }
+        }
+        else
+        {
+            backgroundParticleSystem.gameObject.SetActive(false);
         }
 
         ParticleSystem.MainModule main = backgroundParticleSystem.main;
