@@ -154,15 +154,32 @@ public static class Colors
     public static readonly Color32 yellow = CreateColor("#FFFF00");
     public static readonly Color32 yellowGreen = CreateColor("#9ACD32");
 
+    public static bool TryParseHexColor(string hexColor, out Color32 color, byte alpha = 255)
+    {
+        try
+        {
+            color = CreateColor(hexColor, alpha);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            color = white;
+            return false;
+        }
+    }
+
+    /**
+     * ColorUtility.TryParseHtmlString cannot be called during serialization.
+     * But this function can.
+     */
     public static Color32 CreateColor(string hexColor, byte alpha = 255)
     {
+        string originalHexColor = hexColor;
         if (hexColor.StartsWith("#"))
         {
             hexColor = hexColor.Substring(1);
         }
 
-        // ColorUtility.TryParseHtmlString cannot be called during serialization.
-        // But this function can...
         try
         {
             string hexR = hexColor.Substring(0, 2);
@@ -188,8 +205,7 @@ public static class Colors
         }
         catch (Exception e)
         {
-            Debug.Log($"Cannot create Color32 for {hexColor}: " + e);
+            throw new ArgumentException($"Cannot create Color32 for {originalHexColor}", e);
         }
-        return new Color32(255, 255, 255, 255);
     }
 }
