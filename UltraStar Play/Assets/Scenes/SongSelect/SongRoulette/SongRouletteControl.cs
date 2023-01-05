@@ -245,7 +245,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         // Update style sheet
         if (uiModified)
         {
-            themeManager.UpdateThemeSpecificStyleSheets();
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
     }
 
