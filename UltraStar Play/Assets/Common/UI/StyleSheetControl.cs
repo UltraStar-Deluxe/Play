@@ -35,9 +35,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    [Inject]
-    private ThemeManager themeManager;
-
     void Start()
     {
         if (printScreenSize)
@@ -46,11 +43,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             Debug.Log($"Screen size (inches): {ApplicationUtils.GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
         }
         AddScreenSpecificStyleSheets();
-        themeManager.UpdateThemeSpecificStyleSheets();
-
-        settings.GraphicSettings.ObserveEveryValueChanged(graphicSettings => graphicSettings.themeName)
-            .Subscribe(_ => themeManager.UpdateThemeSpecificStyleSheets())
-            .AddTo(gameObject);
     }
 
     private void AddScreenSpecificStyleSheets()

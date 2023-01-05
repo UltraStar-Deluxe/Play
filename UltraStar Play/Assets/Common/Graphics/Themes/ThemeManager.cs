@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PrimeInputActions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -45,7 +44,6 @@ public class ThemeManager : MonoBehaviour
     public Material backgroundMaterial;
     public Material particleMaterial;
     public ParticleSystem backgroundParticleSystem;
-    public ThemeMeta currentThemeMeta;
 
     private BackgroundShaderControl backgroundShaderControl;
     public BackgroundShaderControl BackgroundShaderControl
@@ -178,6 +176,8 @@ public class ThemeManager : MonoBehaviour
         DestroyDynamicTextures();
 
         ApplyThemeDynamicBackground(themeMeta);
+
+        UpdateThemeSpecificStyleSheets();
     }
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
@@ -207,7 +207,7 @@ public class ThemeManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(background.gradientType))
         {
-            DynamicBackground.GradientType result;
+            EDynamicBackgroundGradientType result;
             if (Enum.TryParse(background.gradientType, true, out result))
             {
                 backgroundMaterial.SetFloat("_Gradient", (int)result);
@@ -376,10 +376,16 @@ public class ThemeManager : MonoBehaviour
 
     public void UpdateThemeSpecificStyleSheets()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes
-            || currentThemeMeta == null
-            || currentThemeMeta.ThemeSettings == null)
+        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
         {
+            return;
+        }
+
+        ThemeMeta currentThemeMeta = GetCurrentTheme();
+        if(currentThemeMeta == null
+           || currentThemeMeta.ThemeSettings == null)
+        {
+            Debug.LogWarning("Not applying theme styles because current theme is null");
             return;
         }
 
