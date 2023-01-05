@@ -1,21 +1,21 @@
 {
     "fontColorLabels": {
-        "r": 0.3,
-        "g": 0.1,
-        "b": 0.2,
-        "a": 1.0
+        "r": 76,
+        "g": 25,
+        "b": 51,
+        "a": 255
     },
     "fontColorButtons": {
-        "r": 0.95,
-        "g": 0.85,
-        "b": 0.8,
-        "a": 1.0
+        "r": 242,
+        "g": 216,
+        "b": 216,
+        "a": 255
     },
     "buttonMainColor": {
-        "r": 0.859,
-        "g": 0.365,
-        "b": 0.467,
-        "a": 1.0
+        "r": 219,
+        "g": 93,
+        "b": 119,
+        "a": 255
     },
     "dynamicBackground": {
         "gradientRampFile": "gradients/yellow pink.png",

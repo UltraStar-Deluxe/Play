@@ -1,21 +1,21 @@
 {
     "fontColorButtons": {
-        "r": 0.2,
-        "g": 0.2,
-        "b": 0.5,
-        "a": 1.0
+        "r": 51,
+        "g": 51,
+        "b": 127,
+        "a": 255
     },
     "fontColor": {
-        "r": 0.2,
-        "g": 0.2,
-        "b": 0.5,
-        "a": 1.0
+        "r": 51,
+        "g": 51,
+        "b": 127,
+        "a": 255
     },
     "buttonMainColor": {
-        "r": 0.3,
-        "g": 0.6,
-        "b": 1.0,
-        "a": 1.0
+        "r": 76,
+        "g": 153,
+        "b": 255,
+        "a": 255
     },
     "dynamicBackground": {
         "gradientRampFile": "gradients/ocean.png",

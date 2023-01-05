@@ -5,18 +5,18 @@ public class ThemeMeta
     public string AbsoluteFilePath { get; private set; }
     public string FileNameWithoutExtension => Path.GetFileNameWithoutExtension(AbsoluteFilePath);
 
-    private ThemeSettings themeSettings;
-    public ThemeSettings ThemeSettings
+    private ThemeJson themeJson;
+    public ThemeJson ThemeJson
     {
         get
         {
-            if (themeSettings == null)
+            if (themeJson == null)
             {
                 string json = File.ReadAllText(AbsoluteFilePath);
-                themeSettings = ThemeSettings.LoadFromJson(json);
+                themeJson = ThemeJson.LoadFromJson(json);
             }
 
-            return themeSettings;
+            return themeJson;
         }
     }
 

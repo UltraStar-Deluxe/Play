@@ -1,21 +1,21 @@
 {
     "fontColorLabels": {
-        "r": 0.7,
-        "g": 0.6,
-        "b": 0.9,
-        "a": 1.0
+        "r": 178,
+        "g": 153,
+        "b": 229,
+        "a": 255
     },
     "fontColorButtons": {
-        "r": 1,
-        "g": 1,
-        "b": 1,
-        "a": 0.9
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 229
     },
     "buttonMainColor": {
-        "r": 0.8,
-        "g": 0.4,
-        "b": 0.2,
-        "a": 1.0
+        "r": 204,
+        "g": 102,
+        "b": 51,
+        "a": 255
     },
     "dynamicBackground": {
         "gradientRampFile": "gradients/pumpkin repeat.png",

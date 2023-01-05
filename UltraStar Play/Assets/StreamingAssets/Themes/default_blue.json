@@ -1,15 +1,15 @@
 {
     "fontColor": {
-        "r": 0.9,
-        "g": 0.9,
-        "b": 0.9,
-        "a": 1.0
+        "r": 229,
+        "g": 229,
+        "b": 229,
+        "a": 255
     },
     "buttonMainColor": {
-        "r": 0.2,
-        "g": 0.6,
-        "b": 0.85,
-        "a": 1.0
+        "r": 51,
+        "g": 153,
+        "b": 216,
+        "a": 255
     },
     "dynamicBackground": {
         "gradientRampFile": "gradients/blue.png",

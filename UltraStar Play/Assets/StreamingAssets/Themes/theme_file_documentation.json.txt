@@ -5,33 +5,33 @@
 {
     // The color of the main texts displayed over buttons.
     "fontColorButtons": {
-        "r": 0.2,
-        "g": 0.2,
-        "b": 0.2,
-        "a": 1.0
+        "r": 229,
+        "g": 229,
+        "b": 229,
+        "a": 255
     },
     // The color of the main texts displayed over the background.
     "fontColorLabels": {
-        "r": 0.9,
-        "g": 0.9,
-        "b": 0.9,
-        "a": 1.0
+        "r": 229,
+        "g": 229,
+        "b": 229,
+        "a": 255
     },
     // The color of all the texts, over buttons and backgrounds.
     // If set, the values defined for "fontColorLabels" and "fontColorButtons"
     // will be ignored.
     "fontColor": {
-        "r": 0.9,
-        "g": 0.9,
-        "b": 0.9,
-        "a": 1.0
+        "r": 229,
+        "g": 229,
+        "b": 229,
+        "a": 255
     },
     // The main color of the buttons, e.g. the buttons in the main menu
     "buttonMainColor": {
-        "r": 0.2,
-        "g": 0.6,
-        "b": 0.85,
-        "a": 1.0
+       "r": 51,
+       "g": 153,
+       "b": 216,
+        "a": 255
     },
     // This group defines the dynamic background parameters.
     "dynamicBackground": {
@@ -73,10 +73,10 @@
         // The tint color of the pattern. Leave white to get the image's default
         // colors. You can also just change the alpha to change the opacity.
         "patternColor": {
-            "r": 1.0,
-            "g": 1.0,
-            "b": 1.0,
-            "a": 1.0
+            "r": 255
+            "g": 255,
+            "b": 255,
+            "a": 255
         },
         // The opacity of the user interface drop shadow effect.
         // Set to 0 to disable.

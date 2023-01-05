@@ -113,7 +113,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
 
         ThemeMeta themeMeta = ThemeManager.Instance.GetCurrentTheme();
-        string valueForSongRating = themeMeta.ThemeSettings.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
+        string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
         string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
         ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
     }

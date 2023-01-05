@@ -3,25 +3,24 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+/**
+ * Data structure for theme files.
+ * The fields correspond to the possible properties defined in a JSON theme file.
+ */
 [Serializable]
-public class ThemeSettings
+public class ThemeJson
 {
-    // These correspond to the possible JSON properties defined in a theme file.
-    // Eventually a theme builder UI can be considered, but meanwhile this will
-    // have to be written manually with a text editor.
-    // See the files in the "themes" folder at the root of the project/build.
+    public DynamicBackgroundJson dynamicBackground;
+    public SongRatingIconsJson songRatingIcons;
+    public Color32 buttonMainColor;
+    public Color32 fontColorButtons;
+    public Color32 fontColorLabels;
+    public Color32 fontColor;
 
-    public DynamicBackground dynamicBackground;
-    public SongRatingIcons songRatingIcons;
-    public Color buttonMainColor;
-    public Color fontColorButtons;
-    public Color fontColorLabels;
-    public Color fontColor;
-
-    public static ThemeSettings LoadFromJson(string json)
+    public static ThemeJson LoadFromJson(string json)
     {
         json = PreprocessJson(json);
-        ThemeSettings theme = JsonUtility.FromJson<ThemeSettings>(json);
+        ThemeJson theme = JsonUtility.FromJson<ThemeJson>(json);
         if (theme == null)
         {
             throw new Exception("Couldn't parse supplied JSON as ThemeSettings data.");
@@ -42,28 +41,28 @@ public class ThemeSettings
         int offset = 0;
         hexRgbaDouble.Matches(input).ForEach(match =>
         {
-            string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value)}, \"g\":{HexToFloatStr(match.Groups[2].Value)}, \"b\":{HexToFloatStr(match.Groups[3].Value)}, \"a\":{HexToFloatStr(match.Groups[4].Value)} }}";
+            string replacement = $"{{ \"r\":{HexToInt(match.Groups[1].Value)}, \"g\":{HexToInt(match.Groups[2].Value)}, \"b\":{HexToInt(match.Groups[3].Value)}, \"a\":{HexToInt(match.Groups[4].Value)} }}";
             input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
             offset += replacement.Length - match.Length;
         });
         offset = 0;
         hexRgbDouble.Matches(input).ForEach(match =>
         {
-            string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value)}, \"g\":{HexToFloatStr(match.Groups[2].Value)}, \"b\":{HexToFloatStr(match.Groups[3].Value)}, \"a\":1.0 }}";
+            string replacement = $"{{ \"r\":{HexToInt(match.Groups[1].Value)}, \"g\":{HexToInt(match.Groups[2].Value)}, \"b\":{HexToInt(match.Groups[3].Value)}, \"a\":255 }}";
             input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
             offset += replacement.Length - match.Length;
         });
         offset = 0;
         hexRgba.Matches(input).ForEach(match =>
         {
-            string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value, true)}, \"g\":{HexToFloatStr(match.Groups[2].Value, true)}, \"b\":{HexToFloatStr(match.Groups[3].Value, true)}, \"a\":{HexToFloatStr(match.Groups[4].Value, true)} }}";
+            string replacement = $"{{ \"r\":{HexToInt(match.Groups[1].Value, true)}, \"g\":{HexToInt(match.Groups[2].Value, true)}, \"b\":{HexToInt(match.Groups[3].Value, true)}, \"a\":{HexToInt(match.Groups[4].Value, true)} }}";
             input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
             offset += replacement.Length - match.Length;
         });
         offset = 0;
         hexRgb.Matches(input).ForEach(match =>
         {
-            string replacement = $"{{ \"r\":{HexToFloatStr(match.Groups[1].Value, true)}, \"g\":{HexToFloatStr(match.Groups[2].Value, true)}, \"b\":{HexToFloatStr(match.Groups[3].Value, true)}, \"a\":1.0 }}";
+            string replacement = $"{{ \"r\":{HexToInt(match.Groups[1].Value, true)}, \"g\":{HexToInt(match.Groups[2].Value, true)}, \"b\":{HexToInt(match.Groups[3].Value, true)}, \"a\":255 }}";
             input = input.Remove(match.Index + offset, match.Length).Insert(match.Index + offset, replacement);
             offset += replacement.Length - match.Length;
         });
@@ -71,8 +70,8 @@ public class ThemeSettings
         return input;
     }
 
-    static string HexToFloatStr(string hex, bool singleDigit = false)
+    static int HexToInt(string hex, bool singleDigit = false)
     {
-        return (Convert.ToInt32(singleDigit ? $"{hex}{hex}" : hex, 16)/255.0f).ToString(CultureInfo.InvariantCulture);
+        return Convert.ToInt32(singleDigit ? $"{hex}{hex}" : hex, 16);
     }
 }
