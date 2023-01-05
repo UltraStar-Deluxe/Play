@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 
 public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInjection
 {
+    private const float SceneChangeAnimationTime = 0.25f;
+
     private static UltraStarPlaySceneChangeAnimationControl instance;
     public static UltraStarPlaySceneChangeAnimationControl Instance
     {
@@ -123,12 +125,12 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
             PlaySceneChangeAnimationSound();
         }
 
-        LeanTween.value(gameObject, 0, 1, 0.3f)
+        LeanTween.value(gameObject, 0, 1, SceneChangeAnimationTime)
             .setOnStart(() =>
             {
                 ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
-            .setOnUpdate(animTimePercent =>
+            .setOnUpdate((float animTimePercent) =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
