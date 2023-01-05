@@ -1,6 +1,7 @@
 {
     "fontColor": "#E5E5E5",
     "buttonMainColor": "#3399D8",
+    "sceneTransitionAnimationTime": "250ms",
     "dynamicBackground": {
         "gradientRampFile": "gradients/blue.png",
         "gradientType": "Radial",
