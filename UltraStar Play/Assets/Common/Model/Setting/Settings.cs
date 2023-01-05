@@ -13,6 +13,7 @@ public class Settings : ISettings
     public List<MicProfile> MicProfiles { get; set; } = new();
     public string LastMicProfileNameInRecordingOptionsScene { get; set; }
     public string LastWebcamNameInWebcamOptionsScene { get; set; }
+    public bool LastGameWebcamActivated { get; set; }
 
     public SongEditorSettings SongEditorSettings { get; set; } = new();
     public SongSelectSettings SongSelectSettings { get; set; } = new();

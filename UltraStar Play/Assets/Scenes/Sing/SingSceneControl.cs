@@ -8,6 +8,7 @@ using UniInject;
 using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -98,8 +99,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
+    private Image webcamRenderContainer;
+
+    [Inject(UxmlName = R.UxmlNames.webcamIconActivated)]
+    private MaterialIcon webcamIconActivated;
+
+    [Inject(UxmlName = R.UxmlNames.webcamIconDeactivated)]
+    private MaterialIcon webcamIconDeactivated;
+
+    [Inject(UxmlName = R.UxmlNames.webcamToggleButton)]
+    private Button webcamToggleButton;
+
     [Inject]
     private UIDocument uiDocument;
+
+    public WebCamTexture webcampTexture;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
@@ -241,6 +256,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             okButton.Focus();
         }
 
+        InitWebcam();
+
         // Associate LyricsDisplayer with one of the (duett) players
         InitSingingLyricsControls();
 
@@ -278,6 +295,46 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+    }
+
+    public void OnDestroy()
+    {
+        webcampTexture.Stop();
+    }
+
+    private void InitWebcam()
+    {
+        webcampTexture = new WebCamTexture(settings.LastWebcamNameInWebcamOptionsScene);
+        webcamRenderContainer.image = webcampTexture;
+
+        webcamToggleButton.RegisterCallbackButtonTriggered(() =>
+        {
+            bool displayWebcam = webcamIconDeactivated.IsVisibleByDisplay();
+            if (displayWebcam)
+            {
+                Log.Logger.Debug("Webcam activated: {webcamname}", webcampTexture.deviceName);
+                webcampTexture.Play();
+            }
+            else
+            {
+                Log.Logger.Debug("Webcam deactivated: {webcamname}", webcampTexture.deviceName);
+                webcampTexture.Stop();
+            }
+
+            webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
+            settings.LastGameWebcamActivated = displayWebcam;
+            webcamIconActivated.SetVisibleByDisplay(displayWebcam);
+            webcamIconDeactivated.SetVisibleByDisplay(!displayWebcam);
+        });
+
+        if (settings.LastGameWebcamActivated)
+        {
+            webcampTexture.Play();
+        }
+
+        webcamRenderContainer.SetVisibleByDisplay(settings.LastGameWebcamActivated);
+        webcamIconActivated.SetVisibleByDisplay(settings.LastGameWebcamActivated);
+        webcamIconDeactivated.SetVisibleByDisplay(!settings.LastGameWebcamActivated);
     }
 
     private void InitDummySingers()
