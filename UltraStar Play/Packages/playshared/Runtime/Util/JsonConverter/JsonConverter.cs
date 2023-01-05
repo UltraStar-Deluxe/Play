@@ -12,12 +12,15 @@ public static class JsonConverter
     private static fsSerializer CreateSerializer()
     {
         fsSerializer newSerializer = new();
+        newSerializer.AddConverter(new Color32Converter());
         return newSerializer;
     }
 
     public static string ToJson<T>(T obj, bool prettyPrint = false)
     {
-        CreateSerializer().TrySerialize(typeof(T), obj, out fsData data).AssertSuccessWithoutWarnings();
+        CreateSerializer()
+            .TrySerialize(typeof(T), obj, out fsData data)
+            .AssertSuccessWithoutWarnings();
         string json = fsJsonPrinter.CompressedJson(data);
         if (prettyPrint)
         {
@@ -30,7 +33,9 @@ public static class JsonConverter
     {
         fsData data = fsJsonParser.Parse(json);
         T deserialized = new();
-        CreateSerializer().TryDeserialize<T>(data, ref deserialized).AssertSuccessWithoutWarnings();
+        CreateSerializer()
+            .TryDeserialize<T>(data, ref deserialized)
+            .AssertSuccessWithoutWarnings();
         return deserialized;
     }
 
