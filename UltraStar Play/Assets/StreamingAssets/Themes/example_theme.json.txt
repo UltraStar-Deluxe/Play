@@ -11,8 +11,10 @@
     // If set, the values defined for "fontColorLabels" and "fontColorButtons"
     // will be ignored.
     "fontColor": "#E5E5E5",
+
     // The main color of the buttons, e.g. the buttons in the main menu
     "buttonMainColor": "#3399D8",
+
     // This group defines the dynamic background parameters.
     "dynamicBackground": {
         // A single-pixel high image that defines the color gradient to use.
@@ -59,6 +61,7 @@
         // The offset coordinates for the drop shadow effect.
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
+
     // Defines the paths to custom icons for the song rating emojis.
     // If not set, default icons will be used.
     "songRatingIcons": {
