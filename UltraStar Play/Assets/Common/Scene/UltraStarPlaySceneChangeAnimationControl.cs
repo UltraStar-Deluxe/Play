@@ -9,8 +9,6 @@ using UnityEngine.SceneManagement;
 
 public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInjection
 {
-    private const float SceneChangeAnimationTime = 0.25f;
-
     private static UltraStarPlaySceneChangeAnimationControl instance;
     public static UltraStarPlaySceneChangeAnimationControl Instance
     {
@@ -125,7 +123,13 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
             PlaySceneChangeAnimationSound();
         }
 
-        LeanTween.value(gameObject, 0, 1, SceneChangeAnimationTime)
+        float sceneChangeAnimationTimeInSeconds = ThemeManager.Instance.GetSceneChangeAnimationTimeInSeconds();
+        if (sceneChangeAnimationTimeInSeconds <= 0)
+        {
+            return;
+        }
+
+        LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
             .setOnStart(() =>
             {
                 ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(true);

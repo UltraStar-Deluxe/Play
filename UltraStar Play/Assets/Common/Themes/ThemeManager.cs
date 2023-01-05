@@ -21,8 +21,8 @@ public class ThemeManager : MonoBehaviour
      * Filename without extension of the theme that should be loaded by default
      */
     public const string DefaultThemeName = "default_blue";
-
     private const string ThemeFolderName = "Themes";
+    private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
 
     private static ThemeManager instance;
     public static ThemeManager Instance
@@ -471,5 +471,17 @@ public class ThemeManager : MonoBehaviour
 
         root.Query(null, "itemPickerItemLabel").ForEach(label => label.style.backgroundColor = itemPickerBackgroundColor);
         root.Query("titleImage").ForEach(image => image.style.unityBackgroundImageTintColor = fontColorLabels);
+    }
+
+    public float GetSceneChangeAnimationTimeInSeconds()
+    {
+        string sceneChangeAnimationTimeString = GetCurrentTheme().ThemeJson.sceneTransitionAnimationTime;
+        if (!sceneChangeAnimationTimeString.IsNullOrEmpty()
+            && TimeUtils.TryParseDuration(sceneChangeAnimationTimeString, out long parsedDurationInMilliseconds))
+        {
+            return parsedDurationInMilliseconds / 1000f;
+        }
+
+        return DefaultSceneChangeAnimationTimeInSeconds;
     }
 }
