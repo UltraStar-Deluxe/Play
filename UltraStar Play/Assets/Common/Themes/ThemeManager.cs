@@ -125,7 +125,11 @@ public class ThemeManager : MonoBehaviour
             userInterfaceRenderTexture,
             UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
 
-        if (!anyThemeLoaded)
+        if (anyThemeLoaded)
+        {
+            ApplyThemeSpecificStylesToVisualElementsInScene();
+        }
+        else
         {
             LoadTheme(GetCurrentTheme());
         }
@@ -177,7 +181,7 @@ public class ThemeManager : MonoBehaviour
 
         ApplyThemeDynamicBackground(themeMeta);
 
-        UpdateThemeSpecificStyleSheets();
+        ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
@@ -374,7 +378,7 @@ public class ThemeManager : MonoBehaviour
         return themeMetas;
     }
 
-    public void UpdateThemeSpecificStyleSheets()
+    public void ApplyThemeSpecificStylesToVisualElementsInScene()
     {
         if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
         {

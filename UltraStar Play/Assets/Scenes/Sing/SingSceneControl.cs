@@ -243,7 +243,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
 
-            themeManager.UpdateThemeSpecificStyleSheets();
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
         // Associate LyricsDisplayer with one of the (duett) players

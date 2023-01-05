@@ -84,7 +84,7 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             index++;
         });
 
-        themeManager.UpdateThemeSpecificStyleSheets();
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
