@@ -11,7 +11,7 @@
         "gradientAnimation": true,
         "gradientAnimSpeed": 1.0,
         "gradientAnimAmplitude": 0.2,
-        "particleFile": "",
+        "particleFile": "particles/star.png",
         "particleOpacity": 0.3
     }
 }
