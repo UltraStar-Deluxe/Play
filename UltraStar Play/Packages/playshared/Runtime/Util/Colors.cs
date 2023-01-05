@@ -154,6 +154,13 @@ public static class Colors
     public static readonly Color32 yellow = CreateColor("#FFFF00");
     public static readonly Color32 yellowGreen = CreateColor("#9ACD32");
 
+    public static string ToHexColor(Color32 color)
+    {
+        return color.a == 255
+            ? ColorUtility.ToHtmlStringRGB(color)
+            : ColorUtility.ToHtmlStringRGBA(color);
+    }
+
     public static bool TryParseHexColor(string hexColor, out Color32 color, byte alpha = 255)
     {
         try
