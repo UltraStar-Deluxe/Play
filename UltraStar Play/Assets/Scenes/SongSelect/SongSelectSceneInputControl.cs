@@ -72,7 +72,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(OnSubmit);
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneControl.CheckAudioAndStartSingScene());
+            .Subscribe(_ => songSelectSceneControl.CheckAudioAndShowPlayerSelectOverlay());
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()

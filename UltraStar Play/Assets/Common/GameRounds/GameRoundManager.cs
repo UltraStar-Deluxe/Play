@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 
@@ -28,18 +26,64 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
         }
     }
 
-    public void AddGameRound(GameRoundData gameRoundData)
+    public bool HasGameRounds => !GetGameRounds().IsNullOrEmpty();
+
+    private readonly Subject<GameRoundsChangedEvent> gameRoundsChangedEventStream = new();
+    public IObservable<GameRoundsChangedEvent> GameRoundsChangedEventStream => gameRoundsChangedEventStream;
+
+    [Inject]
+    private UiManager uiManager;
+
+    public void AddGameRound(GameRoundData gameRound)
     {
-        gameRoundDatas.Add(gameRoundData);
+        gameRoundDatas.Add(gameRound);
+        gameRoundsChangedEventStream.OnNext(new GameRoundsChangedEvent(gameRound));
     }
 
-    public void RemoveGameRound(GameRoundData gameRoundData)
+    public void RemoveGameRound(GameRoundData gameRound)
     {
-        gameRoundDatas.Remove(gameRoundData);
+        gameRoundDatas.Remove(gameRound);
+        gameRoundsChangedEventStream.OnNext(new GameRoundsChangedEvent(gameRound));
     }
 
-    public IReadOnlyList<GameRoundData> GetGameRoundDatas()
+    public IReadOnlyList<GameRoundData> GetGameRounds()
     {
         return gameRoundDatas;
+    }
+
+    public void DeleteNewestSongFromGameRound(GameRoundData gameRound)
+    {
+        if (gameRound.SongMetas.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        gameRound.SongMetas.RemoveAt(gameRound.SongMetas.Count - 1);
+        if (gameRound.SongMetas.IsNullOrEmpty())
+        {
+            // Remove the game round completely
+            RemoveGameRound(gameRound);
+            return;
+        }
+
+        gameRoundsChangedEventStream.OnNext(new GameRoundsChangedEvent(gameRound));
+    }
+
+    public void AddSongToLastGameRound(SongMeta songMeta)
+    {
+        GameRoundData lastGameRound = gameRoundDatas.LastOrDefault();
+        if (lastGameRound == null)
+        {
+            return;
+        }
+
+        if (lastGameRound.SongMetas.Contains(songMeta))
+        {
+            uiManager.CreateNotificationVisualElement("Song is already in list");
+            return;
+        }
+
+        lastGameRound.SongMetas.Add(songMeta);
+        gameRoundsChangedEventStream.OnNext(new GameRoundsChangedEvent(lastGameRound));
     }
 }

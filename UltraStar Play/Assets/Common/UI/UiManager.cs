@@ -153,6 +153,19 @@ public class UiManager : MonoBehaviour, INeedInjection
         return avatarImageReference?.sprite;
     }
 
+    public MessageDialogControl CreateMessageDialog(string dialogTitle)
+    {
+        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+
+        MessageDialogControl messageDialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
+            .CreateAndInject<MessageDialogControl>();
+        messageDialogControl.Title = dialogTitle;
+
+        return messageDialogControl;
+    }
+
     public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
     {
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();

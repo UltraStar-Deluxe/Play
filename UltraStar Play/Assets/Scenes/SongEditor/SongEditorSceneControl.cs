@@ -109,7 +109,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         get
         {
-            return SceneData.SelectedSongMeta;
+            return SceneData.SongMeta;
         }
     }
 
@@ -132,7 +132,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void Awake()
     {
-        Debug.Log($"Start editing of '{SceneData.SelectedSongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
+        Debug.Log($"Start editing of '{SceneData.SongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
 
         songAudioPlayer.Init(SongMeta);
         songVideoPlayer.SongMeta = SongMeta;
@@ -313,7 +313,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         else
         {
             singSceneData = new SingSceneData();
-            singSceneData.SelectedSongMeta = sceneData.SelectedSongMeta;
+            singSceneData.SongMetas = new List<SongMeta> { sceneData.SongMeta };
             singSceneData.SingScenePlayerData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
             singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
@@ -332,7 +332,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             songSelectSceneData = new SongSelectSceneData();
         }
-        songSelectSceneData.SongMeta = sceneData.SelectedSongMeta;
+        songSelectSceneData.SongMeta = sceneData.SongMeta;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 

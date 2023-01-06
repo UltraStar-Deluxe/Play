@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [Serializable]
 public class SingSceneData : SceneData
 {
-    public SongMeta SelectedSongMeta { get; set; }
+    public List<SongMeta> SongMetas { get; set; }
     public SingScenePlayerData SingScenePlayerData { get; set; } = new();
 
     public double PositionInSongInMillis { get; set; }
