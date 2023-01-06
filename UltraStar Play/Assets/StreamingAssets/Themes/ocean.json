@@ -1,0 +1,17 @@
+{
+    "fontColorButtons": "#33337F",
+    "fontColor": "#33337F",
+    "buttonMainColor": "#4C99FF",
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/ocean.png",
+        "gradientType": "Linear",
+        "gradientScale": 2.0,
+        "gradientSmoothness": 0.8,
+        "gradientAngle": 100,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.0,
+        "gradientAnimAmplitude": 0.5,
+        "particleFile": "particles/bubble.png",
+        "particleOpacity": 0.3
+    }
+}

@@ -37,6 +37,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     private void Start()
     {
         UpdatePlayerProfileList();
@@ -48,6 +51,10 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         {
             settings.PlayerProfiles.Add(new PlayerProfile());
             UpdatePlayerProfileList();
+
+            // Focus on the name of the newly added player to directly allow changing its name
+            TextField nameTextField = profileList[profileList.childCount-1].Q<TextField>("nameTextField");
+            nameTextField.Focus();
         });
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -76,6 +83,8 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             profileList.Add(CreatePlayerProfileEntry(playerProfile, index));
             index++;
         });
+
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
