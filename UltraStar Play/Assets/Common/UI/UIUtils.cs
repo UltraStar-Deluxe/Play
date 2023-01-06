@@ -13,14 +13,14 @@ public static class UIUtils
         }
     }
 
-    static readonly Dictionary<VisualElement, Tuple<Color, Color>> ElementsBgColorsDict = new ();
+    private static readonly Dictionary<VisualElement, BackgroundColorConfig> elementsBgColorsDict = new();
 
-    public static void SetBackgroundStyleWithHover(VisualElement root, Color backgroundColor, Color hoverBackgroundColor, Color fontColor)
+    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor, Color fontColor)
     {
-        SetBackgroundStyleWithHover(root, root, backgroundColor, hoverBackgroundColor, fontColor);
+        SetBackgroundStyleWithHoverAndFocus(root, root, backgroundColor, hoverBackgroundColor, focusBackgroundColor, fontColor);
     }
 
-    public static void SetBackgroundStyleWithHover(VisualElement root, VisualElement hoverRoot, Color backgroundColor, Color hoverBackgroundColor, Color fontColor)
+    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, VisualElement hoverRoot, Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor, Color fontColor)
     {
         if (root == null)
         {
@@ -31,26 +31,39 @@ public static class UIUtils
         root.style.backgroundColor = backgroundColor;
 
         // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them
-        if (!ElementsBgColorsDict.ContainsKey(hoverRoot))
+        if (!elementsBgColorsDict.ContainsKey(hoverRoot))
         {
-            ElementsBgColorsDict.Add(hoverRoot, new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor));
+            elementsBgColorsDict.Add(hoverRoot, new BackgroundColorConfig(backgroundColor, hoverBackgroundColor, focusBackgroundColor));
 
             hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
             {
-                Color color = ElementsBgColorsDict[hoverRoot].Item2;
+                Color color = elementsBgColorsDict[hoverRoot].hoverBackgroundColor;
                 color.a = root.resolvedStyle.backgroundColor.a;
                 root.style.backgroundColor = color;
             });
             hoverRoot.RegisterCallback<PointerLeaveEvent>(evt =>
             {
-                Color color = ElementsBgColorsDict[hoverRoot].Item1;
+                Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
+                color.a = root.resolvedStyle.backgroundColor.a;
+                root.style.backgroundColor = color;
+            });
+
+            hoverRoot.RegisterCallback<FocusEvent>(evt =>
+            {
+                Color color = elementsBgColorsDict[hoverRoot].focusBackgroundColor;
+                color.a = root.resolvedStyle.backgroundColor.a;
+                root.style.backgroundColor = color;
+            });
+            hoverRoot.RegisterCallback<BlurEvent>(evt =>
+            {
+                Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
                 color.a = root.resolvedStyle.backgroundColor.a;
                 root.style.backgroundColor = color;
             });
         }
         else
         {
-            ElementsBgColorsDict[hoverRoot] = new Tuple<Color, Color>(backgroundColor, hoverBackgroundColor);
+            elementsBgColorsDict[hoverRoot] = new BackgroundColorConfig(backgroundColor, hoverBackgroundColor, focusBackgroundColor);
         }
     }
 
@@ -76,5 +89,19 @@ public static class UIUtils
         s += saturationOffset;
         v += valueOffset;
         return Color.HSVToRGB(h, s, v);
+    }
+
+    public class BackgroundColorConfig
+    {
+        public Color backgroundColor;
+        public Color hoverBackgroundColor;
+        public Color focusBackgroundColor;
+
+        public BackgroundColorConfig(Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor)
+        {
+            this.backgroundColor = backgroundColor;
+            this.hoverBackgroundColor = hoverBackgroundColor;
+            this.focusBackgroundColor = focusBackgroundColor;
+        }
     }
 }

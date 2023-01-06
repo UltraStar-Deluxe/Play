@@ -170,22 +170,22 @@
     padding: 0;
 }
 
-.unity-toggle VisualElement {
+.unity-toggle .unity-toggle__input {
     background-color: var(--control-color);
     align-items: center;
     align-content: center;
     justify-content: center;
 }
 
-.unity-toggle:hover VisualElement {
+.unity-toggle:hover .unity-toggle__input {
     background-color: var(--control-color-accent1);
 }
 
-.unity-toggle:focus VisualElement {
+.unity-toggle:focus .unity-toggle__input {
     background-color: var(--control-color-accent1);
 }
 
-.unity-toggle:active VisualElement {
+.unity-toggle:active .unity-toggle__input {
     background-color: var(--control-color-accent2);
 }
 
@@ -197,6 +197,7 @@
 .unity-toggle__checkmark {
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;
+    background-color: rgba(0, 0, 0, 0);
     width: 100%;
     height: 100%;
 }
