@@ -21,6 +21,7 @@ public static partial class R
         public static readonly string action_toggleFavorites = "action_toggleFavorites";
         public static readonly string action_togglePause = "action_togglePause";
         public static readonly string action_togglePlayers = "action_togglePlayers";
+        public static readonly string action_webcamOnOff = "action_webcamOnOff";
         public static readonly string active = "active";
         public static readonly string add = "add";
         public static readonly string back = "back";
@@ -193,6 +194,7 @@ public static partial class R
         public static readonly string options_webcam_button = "options_webcam_button";
         public static readonly string options_webcam_device = "options_webcam_device";
         public static readonly string options_webcam_title = "options_webcam_title";
+        public static readonly string options_webcam_useAsBackGroundInSingingScene = "options_webcam_useAsBackGroundInSingingScene";
         public static readonly string order = "order";
         public static readonly string order_Artist = "order_Artist";
         public static readonly string order_CountCanceled = "order_CountCanceled";
