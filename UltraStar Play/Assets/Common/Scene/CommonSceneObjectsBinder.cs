@@ -32,6 +32,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);
         bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
+        bb.BindExistingInstance(ThemeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.Bind(typeof(IServerSideConnectRequestManager)).ToExistingInstance(ServerSideConnectRequestManager.Instance);
