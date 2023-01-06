@@ -74,20 +74,31 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         {
             devicePickerControl.Selection.Value = devicePickerControl.Items[0];
         }
-        devicePickerControl.Selection
-            .Subscribe(device =>
-            {
-                settings.WebcamSettings.CurrentDeviceName = device.name;
-                if (webcamTexture != null && webcamTexture.isPlaying)
+        if (devicePickerControl.Items.Count > 0)
+        {
+            devicePickerControl.Selection
+                .Subscribe(device =>
                 {
-                    webcamTexture.Stop();
-                }
-                webcamTexture = new WebCamTexture(device.name);
-                Log.Logger.Information("Setting current webcam to '{webcamname}'", webcamTexture.deviceName);
-                webcamTexture.Play();
+                    settings.WebcamSettings.CurrentDeviceName = device.name;
+                    if (webcamTexture != null && webcamTexture.isPlaying)
+                    {
+                        webcamTexture.Stop();
+                    }
 
-                webcamRenderContainer.image = webcamTexture;
-            });
+                    webcamTexture = new WebCamTexture(device.name);
+                    Log.Logger.Information("Setting current webcam to '{webcamname}'", webcamTexture.deviceName);
+                    webcamTexture.Play();
+
+                    webcamRenderContainer.image = webcamTexture;
+                });
+        }
+        else
+        {
+            Log.Logger.Information("No webcam found");
+            devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
+            devicePickerControl.Items.Add(new WebCamDevice());
+            useWebcamContainer.SetEnabled(false);
+        }
     }
 
     private void NavigateBack()
