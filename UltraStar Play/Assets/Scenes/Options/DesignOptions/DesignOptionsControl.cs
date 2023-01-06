@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http.Headers;
 using PrimeInputActions;
 using ProTrans;
@@ -16,6 +19,9 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject]
     private TranslationManager translationManager;
+
+    [Inject]
+    private ThemeManager themeManager;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -72,6 +78,14 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         new BoolPickerControl(animateSceneChangeContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.AnimateSceneChange,
                 newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
+
+        // Load available themes:
+        List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
+        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themeContainer.Q<ItemPicker>(), themeMetas);
+        themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
+        themePickerControl.Bind(
+            () => themeManager.GetCurrentTheme(),
+            newValue => themeManager.SetCurrentTheme(newValue));
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

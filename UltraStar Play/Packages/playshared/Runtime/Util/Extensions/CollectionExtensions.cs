@@ -225,4 +225,9 @@ public static class CollectionExtensions
         }
         return result;
     }
+
+    public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> enumerable)
+    {
+        enumerable.ForEach(item => hashSet.Add(item));
+    }
 }

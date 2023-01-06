@@ -444,7 +444,10 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
                 TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(titleToContentMap, CloseHelp);
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
     }
 
     private void CloseHelp()

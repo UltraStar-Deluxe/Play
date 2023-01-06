@@ -1,0 +1,32 @@
+{
+    "fontColorLabels": "#B299E5",
+    "fontColorButtons": "#E1E1E1E5",
+    "buttonMainColor": "#CC6633",
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/pumpkin repeat.png",
+        "gradientType": "Repeated",
+        "gradientScale": 4.0,
+        "gradientSmoothness": 1.0,
+        "gradientAngle": 160,
+        "gradientScrollingSpeed": 0.4,
+        "gradientAnimation": false,
+        "particleFile": "",
+        "particleOpacity": 0,
+        "patternFile": "patterns/pumpkins.png",
+        "patternScale": { "x": 2.0, "y": 2.0 },
+        "patternScrolling": { "x": 0.02, "y": 0.04 },
+        "patternColor": "#0000007F",
+        "uiShadowOpacity": 0.33,
+        "uiShadowOffset": { "x": -16, "y": 10 }
+    },
+    "songRatingIcons": {
+        "toneDeaf": "icons/pumpkins/rating_0.png",
+        "amateur": "icons/pumpkins/rating_1.png",
+        "wannabe": "icons/pumpkins/rating_2.png",
+        "hopeful": "icons/pumpkins/rating_3.png",
+        "risingStar": "icons/pumpkins/rating_4.png",
+        "leadSinger": "icons/pumpkins/rating_5.png",
+        "superstar": "icons/pumpkins/rating_6.png",
+        "ultrastar": "icons/pumpkins/rating_7.png"
+    }
+}

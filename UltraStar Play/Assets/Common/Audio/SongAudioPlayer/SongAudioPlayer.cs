@@ -189,8 +189,14 @@ public class SongAudioPlayer : MonoBehaviour
             return;
         }
 
-        this.SongMeta = songMeta;
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+        if (!SongMetaUtils.AudioResourceExists(songMeta))
+        {
+            Debug.Log($"Audio file resource does not exist {songMeta.Mp3}");
+            return;
+        }
+
+        this.SongMeta = songMeta;
         AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(audioUri);
         if (audioClip != null)
         {

@@ -10,37 +10,29 @@ public static class AudioUtils
     // Use the cached version of the AudioManager for the normal game logic.
     public static AudioClip GetAudioClipUncached(string uri, bool streamAudio)
     {
-        if (!WebRequestUtils.ResourceExists(uri))
-        {
-            Debug.LogWarning($"Audio file resource does not exist: {uri}");
-            return null;
-        }
-
         return LoadAudio(uri, streamAudio);
     }
 
     private static AudioClip LoadAudio(string uri, bool streamAudio)
     {
-        using (UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.UNKNOWN))
+        using UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(new Uri(uri), AudioType.UNKNOWN);
+        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+        downloadHandler.streamAudio = streamAudio;
+
+        webRequest.SendWebRequest();
+        if (webRequest.result
+            is UnityWebRequest.Result.ConnectionError
+            or UnityWebRequest.Result.ProtocolError)
         {
-            DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
-            downloadHandler.streamAudio = streamAudio;
-
-            webRequest.SendWebRequest();
-            if (webRequest.result
-                is UnityWebRequest.Result.ConnectionError
-                or UnityWebRequest.Result.ProtocolError)
-            {
-                Debug.LogError("Error Loading Audio: " + uri);
-                Debug.LogError(webRequest.error);
-                return null;
-            }
-
-            while (!webRequest.isDone)
-            {
-                Task.Delay(30);
-            }
-            return downloadHandler.audioClip;
+            Debug.LogError("Error Loading Audio: " + uri);
+            Debug.LogError(webRequest.error);
+            return null;
         }
+
+        while (!webRequest.isDone)
+        {
+            Task.Delay(30);
+        }
+        return downloadHandler.audioClip;
     }
 }

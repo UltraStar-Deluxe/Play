@@ -19,10 +19,12 @@ public class NumberPickerControl : ComputedItemPickerControl<double>
         }
     }
 
-    public bool WrapAround => ItemPicker.wrapAround;
-    public double MinValue => ItemPicker.minValue;
-    public double MaxValue => ItemPicker.maxValue;
-    public double StepValue => ItemPicker.stepValue;
+    public bool WrapAround => ItemPicker.WrapAround
+                              || ItemPicker.NoPreviousButton
+                              || ItemPicker.NoNextButton;
+    public double MinValue => ItemPicker.MinValue;
+    public double MaxValue => ItemPicker.MaxValue;
+    public double StepValue => ItemPicker.StepValue;
 
     public NumberPickerControl(ItemPicker itemPicker, double initialValue=0)
         : base(itemPicker, initialValue)

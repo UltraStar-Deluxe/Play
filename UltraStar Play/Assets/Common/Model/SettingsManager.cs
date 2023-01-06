@@ -75,7 +75,7 @@ public class SettingsManager : MonoBehaviour
             if (!File.Exists(loadedSettingsPath))
             {
                 UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
-                settings = new Settings();
+                settings = CreateDefaultSettings();
                 Save();
                 return;
             }
@@ -84,6 +84,24 @@ public class SettingsManager : MonoBehaviour
             nonStaticSettings = settings;
             OverwriteSettingsWithCommandLineArguments();
         }
+    }
+
+    private Settings CreateDefaultSettings()
+    {
+        Settings defaultSettings = new Settings();
+#if UNITY_ANDROID
+        if (!Application.isEditor)
+        {
+            // Create internal song folder on Android and add it to the settings.
+            string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
+            if (!Directory.Exists(internalSongFolder))
+            {
+                Directory.CreateDirectory(internalSongFolder);
+            }
+            defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
+        }
+#endif
+        return defaultSettings;
     }
 
     private void OverwriteSettingsWithCommandLineArguments()
