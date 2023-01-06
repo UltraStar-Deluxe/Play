@@ -49,6 +49,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private ThemeManager themeManager;
+
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -245,12 +251,5 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
-    }
-
-    public Sprite GetSongRatingSprite(SongRating.ESongRating songRatingEnumValue)
-    {
-        SongRatingImageReference songRatingImageReference = songRatingImageReferences
-            .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        return songRatingImageReference?.sprite;
     }
 }

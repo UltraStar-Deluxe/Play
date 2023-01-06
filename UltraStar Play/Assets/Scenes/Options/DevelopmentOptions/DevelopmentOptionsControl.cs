@@ -35,6 +35,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteContainer)]
     private VisualElement analyzeBeatsWithoutTargetNoteContainer;
 
+    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesContainer)]
+    private VisualElement disableDynamicThemesContainer;
+
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
 
@@ -64,6 +67,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private ThemeManager themeManager;
 
     [Inject]
     private UiManager uiManager;
@@ -101,6 +107,17 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         new BoolPickerControl(analyzeBeatsWithoutTargetNoteContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.analyzeBeatsWithoutTargetNote,
                 newValue => settings.GraphicSettings.analyzeBeatsWithoutTargetNote = newValue);
+
+        new BoolPickerControl(disableDynamicThemesContainer.Q<ItemPicker>())
+            .Bind(() => settings.DeveloperSettings.disableDynamicThemes,
+                disableDynamicThemes =>
+                {
+                    if (disableDynamicThemes)
+                    {
+                        themeManager.SetCurrentTheme(themeManager.GetDefaultTheme());
+                    }
+                    settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
+                });
 
         ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,
             "value", HttpServer.Instance.host);

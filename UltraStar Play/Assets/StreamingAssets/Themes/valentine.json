@@ -1,0 +1,17 @@
+{
+    "fontColorLabels": "#4C1933",
+    "fontColorButtons": "#F2D8D8",
+    "buttonMainColor": "#DB5D77",
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/yellow pink.png",
+        "gradientType": "Linear",
+        "gradientScale": 2.5,
+        "gradientSmoothness": 0.0,
+        "gradientAngle": 70.0,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.5,
+        "gradientAnimAmplitude": 0.3,
+        "particleFile": "particles/heart.png",
+        "particleOpacity": 1.0
+	}
+}
