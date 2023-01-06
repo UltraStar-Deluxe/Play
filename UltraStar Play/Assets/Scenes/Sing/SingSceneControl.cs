@@ -174,18 +174,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private CommonScoreControl commonScoreControl;
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
-                                 && SceneData.SelectedPlayerProfiles.Count >= 2;
+                                 && SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
 
     public bool IsIndividualScore => settings.GameSettings.ScoreMode == EScoreMode.Individual
                                      || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
-                                         && SceneData.SelectedPlayerProfiles.Count <= 1);
+                                         && SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count <= 1);
 
     private float startTimeInSeconds;
     private bool hasRecordedSongStartedStatistics;
 
     private void Start()
     {
-        string playerProfilesCsv = SceneData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
+        string playerProfilesCsv = SceneData.SingScenePlayerData.SelectedPlayerProfiles.Select(it => it.Name).ToCsv();
         Debug.Log($"{playerProfilesCsv} start (or continue) singing of {SongMeta.Title} at {SceneData.PositionInSongInMillis} ms.");
 
         startTimeInSeconds = Time.time;
@@ -199,10 +199,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         // Create PlayerControl (and PlayerUi) for each player
         List<PlayerProfile> playerProfilesWithoutMic = new();
-        for (int i = 0; i < SceneData.SelectedPlayerProfiles.Count; i++)
+        for (int i = 0; i < SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count; i++)
         {
-            PlayerProfile playerProfile = SceneData.SelectedPlayerProfiles[i];
-            SceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            PlayerProfile playerProfile = SceneData.SingScenePlayerData.SelectedPlayerProfiles[i];
+            SceneData.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             if (micProfile == null)
             {
                 playerProfilesWithoutMic.Add(playerProfile);
@@ -215,7 +215,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             }
 
             // Update leading player icon
-            if (SceneData.SelectedPlayerProfiles.Count > 1)
+            if (SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1)
             {
                 playerControl.PlayerScoreControl.SentenceScoreEventStream
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
@@ -320,7 +320,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void PreparePlayerUiLayout()
     {
-        int playerCount = SceneData.SelectedPlayerProfiles.Count;
+        int playerCount = SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count;
         playerUiContainer.Children()
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
@@ -546,8 +546,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             PreviousScene = EScene.SingScene,
             PositionInSongInMillis = PositionInSongInMillis,
             SelectedSongMeta = SongMeta,
-            PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap,
-            SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles,
+            PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap,
+            SelectedPlayerProfiles = sceneData.SingScenePlayerData.SelectedPlayerProfiles,
         };
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
@@ -586,7 +586,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         if (IsIndividualScore)
         {
             // Add and record score for each player individually.
-            singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+            singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
             PlayerControls.ForEach(playerControl =>
             {
                 singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerControl.PlayerScoreControl.ScoreData);
@@ -690,7 +690,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void AddPlayerUi(VisualElement visualElement, int playerIndex)
     {
-        int playerCount = SceneData.SelectedPlayerProfiles.Count;
+        int playerCount = SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count;
         if (playerCount <= 3)
         {
             playerUiContainer.Add(visualElement);
@@ -711,17 +711,17 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             return Voice.soloVoiceName;
         }
 
-        if (sceneData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
         {
             return voiceName;
         }
 
-        if (SceneData.SelectedPlayerProfiles.Count == 1)
+        if (SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)
         {
             return Voice.soloVoiceName;
         }
 
-        int voiceIndex = SceneData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
+        int voiceIndex = SceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
         return voiceNames[voiceIndex];
     }
 

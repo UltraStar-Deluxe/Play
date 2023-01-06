@@ -19,8 +19,8 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
         defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
 
         PlayerProfile playerProfile = GetDefaultPlayerProfile();
-        defaultSceneData.SelectedPlayerProfiles.Add(playerProfile);
-        defaultSceneData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
+        defaultSceneData.SingScenePlayerData.SelectedPlayerProfiles.Add(playerProfile);
+        defaultSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap[playerProfile] = GetDefaultMicProfile();
 
         return defaultSceneData;
     }

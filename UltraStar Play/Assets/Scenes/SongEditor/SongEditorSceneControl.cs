@@ -314,8 +314,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         {
             singSceneData = new SingSceneData();
             singSceneData.SelectedSongMeta = sceneData.SelectedSongMeta;
-            singSceneData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
-            singSceneData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
+            singSceneData.SingScenePlayerData.SelectedPlayerProfiles = sceneData.SelectedPlayerProfiles;
+            singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
         singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
         sceneNavigator.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);

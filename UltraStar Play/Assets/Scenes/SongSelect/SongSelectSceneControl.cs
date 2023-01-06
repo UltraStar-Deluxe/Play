@@ -697,10 +697,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             uiManager.CreateNotificationVisualElement(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
-        singSceneData.SelectedPlayerProfiles = selectedPlayerProfiles;
+        singSceneData.SingScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
 
-        singSceneData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singSceneData.PlayerProfileToVoiceNameMap = playerListControl.GetSelectedPlayerProfileToVoiceNameMap();
+        singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
+        singSceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap = playerListControl.GetSelectedPlayerProfileToVoiceNameMap();
         return singSceneData;
     }
 
@@ -733,8 +733,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SingSceneData singSceneData = CreateSingSceneData(songMeta);
         if (singSceneData != null)
         {
-            editorSceneData.PlayerProfileToMicProfileMap = singSceneData.PlayerProfileToMicProfileMap;
-            editorSceneData.SelectedPlayerProfiles = singSceneData.SelectedPlayerProfiles;
+            editorSceneData.PlayerProfileToMicProfileMap = singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
+            editorSceneData.SelectedPlayerProfiles = singSceneData.SingScenePlayerData.SelectedPlayerProfiles;
         }
         editorSceneData.PreviousSceneData = sceneData;
         editorSceneData.PreviousScene = EScene.SongSelectScene;
