@@ -142,7 +142,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ChangeLayoutByPlayerCount()
     {
-        if (singSceneControl.SceneData.SelectedPlayerProfiles.Count >= 5)
+        if (singSceneControl.SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
         {
             RootVisualElement.AddToClassList("singScenePlayerUiSmall");
         }

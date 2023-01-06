@@ -34,6 +34,7 @@ TagManager:
   - SpeechRecognitionManager
   - AudioSeparationManager
   - JobManager
+  - GameRoundManager
   layers:
   - Default
   - TransparentFX
