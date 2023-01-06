@@ -193,6 +193,7 @@ public static partial class R
         public static readonly string options_volume = "options_volume";
         public static readonly string options_webcam_button = "options_webcam_button";
         public static readonly string options_webcam_device = "options_webcam_device";
+        public static readonly string options_webcam_noWebcamsAvailable = "options_webcam_noWebcamsAvailable";
         public static readonly string options_webcam_title = "options_webcam_title";
         public static readonly string options_webcam_useAsBackGroundInSingingScene = "options_webcam_useAsBackGroundInSingingScene";
         public static readonly string order = "order";
