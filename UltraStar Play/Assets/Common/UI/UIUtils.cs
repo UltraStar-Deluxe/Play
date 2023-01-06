@@ -22,7 +22,10 @@ public static class UIUtils
 
     public static void SetBackgroundStyleWithHover(VisualElement root, VisualElement hoverRoot, Color backgroundColor, Color hoverBackgroundColor, Color fontColor)
     {
-        if (root == null) return;
+        if (root == null)
+        {
+            return;
+        }
 
         root.style.color = fontColor;
         root.style.backgroundColor = backgroundColor;

@@ -72,7 +72,7 @@ public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedLi
 
     private bool IsOnlyWhitespace(string newText)
     {
-        return string.IsNullOrEmpty(newText) || whitespaceRegex.IsMatch(newText);
+        return newText.IsNullOrEmpty() || whitespaceRegex.IsMatch(newText);
     }
 
     private void RegisterEvents()

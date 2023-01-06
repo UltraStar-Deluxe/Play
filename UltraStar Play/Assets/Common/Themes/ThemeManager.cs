@@ -171,9 +171,13 @@ public class ThemeManager : MonoBehaviour
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
         DynamicBackgroundJson backgroundJson = themeMeta.ThemeJson?.dynamicBackground;
+        if (backgroundJson == null)
+        {
+            backgroundJson = new();
+        }
 
         // Material
-        if (!string.IsNullOrEmpty(backgroundJson.gradientRampFile))
+        if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
         {
             string gradientPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.gradientRampFile);
             if (File.Exists(gradientPath))
@@ -193,7 +197,7 @@ public class ThemeManager : MonoBehaviour
             }
         }
 
-        if (!string.IsNullOrEmpty(backgroundJson.gradientType))
+        if (!backgroundJson.gradientType.IsNullOrEmpty())
         {
             EDynamicBackgroundGradientType result;
             if (Enum.TryParse(backgroundJson.gradientType, true, out result))
@@ -203,7 +207,7 @@ public class ThemeManager : MonoBehaviour
         }
 
         Color patternColor = Color.clear; // default to clear to hide pattern if no file specified or found
-        if (!string.IsNullOrEmpty(backgroundJson.patternFile))
+        if (!backgroundJson.patternFile.IsNullOrEmpty())
         {
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
@@ -245,7 +249,7 @@ public class ThemeManager : MonoBehaviour
         }
 
         // Particles
-        if (!string.IsNullOrEmpty(backgroundJson.particleFile))
+        if (!backgroundJson.particleFile.IsNullOrEmpty())
         {
             backgroundParticleSystem.gameObject.SetActive(true);
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
@@ -429,9 +433,16 @@ public class ThemeManager : MonoBehaviour
             UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
 
             VisualElement image = button.Q("image");
-            if (image != null) image.style.unityBackgroundImageTintColor = fontColorButtons;
+            if (image != null)
+            {
+                image.style.unityBackgroundImageTintColor = fontColorButtons;
+            }
+
             VisualElement backImage = button.Q("backImage");
-            if (backImage != null) backImage.style.unityBackgroundImageTintColor = fontColorButtons;
+            if (backImage != null)
+            {
+                backImage.style.unityBackgroundImageTintColor = fontColorButtons;
+            }
         });
         root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
         {
