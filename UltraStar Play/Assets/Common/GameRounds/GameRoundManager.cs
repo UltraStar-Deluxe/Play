@@ -34,6 +34,9 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     public void AddGameRound(GameRoundData gameRound)
     {
         gameRoundDatas.Add(gameRound);
@@ -85,5 +88,29 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
 
         lastGameRound.SongMetas.Add(songMeta);
         gameRoundsChangedEventStream.OnNext(new GameRoundsChangedEvent(lastGameRound));
+    }
+
+    public void StartNextGameRound()
+    {
+        GameRoundData nextGameRound = gameRoundDatas.FirstOrDefault();
+        RemoveGameRound(nextGameRound);
+
+        SingSceneData singSceneData = new();
+        singSceneData.SongMetas = nextGameRound.SongMetas;
+        singSceneData.SingScenePlayerData = nextGameRound.SingScenePlayerData;
+
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+    }
+
+    public GameRoundData GetNextGameRound()
+    {
+        if (HasGameRounds)
+        {
+            return GetGameRounds()[0];
+        }
+        else
+        {
+            return null;
+        }
     }
 }

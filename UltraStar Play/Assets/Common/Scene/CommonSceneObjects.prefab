@@ -338,6 +338,10 @@ MonoBehaviour:
     type: 3}
   accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
     type: 3}
+  nextGameRoundInfoUi: {fileID: 9197481963319205126, guid: 4b0fc95be5bd7c84abec348087a5d4af,
+    type: 3}
+  nextGameRoundInfoPlayerEntryUi: {fileID: 9197481963319205126, guid: 1c1764560ee144247ab75c166154b2a3,
+    type: 3}
   showFpsPrefab: {fileID: 7200366228149695045, guid: 50d02acac4813a94490c57776dc5e4ee,
     type: 3}
   avatarImageReferences:

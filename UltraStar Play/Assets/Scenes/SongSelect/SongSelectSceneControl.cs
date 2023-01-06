@@ -490,7 +490,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         UpdateTranslation();
     }
 
-    private void CreateGameRoundUi(GameRoundData gameRoundData)
+    private void CreateGameRoundUi(GameRoundData gameRound)
     {
         VisualElement gameRoundVisualElement = gameRoundUi.CloneTree().Children().FirstOrDefault();
         gameRoundsScrollView.Add(gameRoundVisualElement);
@@ -499,11 +499,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Delete button
         Button deleteButton = gameRoundVisualElement.Q<Button>(R.UxmlNames.deleteGameRoundButton);
-        deleteButton.RegisterCallbackButtonTriggered(() => gameRoundManager.DeleteNewestSongFromGameRound(gameRoundData));
+        deleteButton.RegisterCallbackButtonTriggered(() => gameRoundManager.DeleteNewestSongFromGameRound(gameRound));
 
         // Add song entries
-        songEntryListContent.Query<TemplateContainer>().ToList().ForEach(it => it.RemoveFromHierarchy());
-        gameRoundData.SongMetas.ForEach(songMeta =>
+        songEntryListContent.RemoveTemplateContainers();
+        gameRound.SongMetas.ForEach(songMeta =>
         {
             VisualElement songEntryVisualElement = gameRoundSongEntryUi.CloneTree().Children().FirstOrDefault();
             songEntryListContent.Add(songEntryVisualElement);
@@ -519,14 +519,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
 
         // Add player entries
-        playerEntryList.Query<TemplateContainer>().ToList().ForEach(it => it.RemoveFromHierarchy());
-        gameRoundData.SingScenePlayerData.SelectedPlayerProfiles.ForEach(playerProfile =>
+        playerEntryList.RemoveTemplateContainers();
+        gameRound.SingScenePlayerData.SelectedPlayerProfiles.ForEach(playerProfile =>
         {
             VisualElement playerEntryVisualElement = gameRoundPlayerEntryUi.CloneTree().Children().FirstOrDefault();
             playerEntryList.Add(playerEntryVisualElement);
             playerEntryVisualElement.Q<Label>().text = playerProfile.Name;
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.micImage);
-            if (gameRoundData.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile))
+            if (gameRound.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile))
             {
                 micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             }
@@ -842,16 +842,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithNextGameRound()
     {
-        GameRoundData gameRound = gameRoundManager.GetGameRounds().FirstOrDefault();
-
-        SingSceneData singSceneData = new();
-        singSceneData.SongMetas = gameRound.SongMetas;
-        singSceneData.SingScenePlayerData = gameRound.SingScenePlayerData;
-
-        // Do not play this round again.
-        gameRoundManager.RemoveGameRound(gameRound);
-
-        SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
+        gameRoundManager.StartNextGameRound();
     }
 
     private void StartSingSceneWithSelectedSongAndSettings()

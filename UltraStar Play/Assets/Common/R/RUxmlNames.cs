@@ -351,9 +351,17 @@ public static partial class R
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextDifficultyButton = "nextDifficultyButton";
+        public const string nextGameRoundInfoPlayerEntryUiRoot = "nextGameRoundInfoPlayerEntryUiRoot";
+        public const string nextGameRoundInfoUiRoot = "nextGameRoundInfoUiRoot";
+        public const string nextGameRoundPlayerEntryLabel = "nextGameRoundPlayerEntryLabel";
+        public const string nextGameRoundPlayerEntryList = "nextGameRoundPlayerEntryList";
+        public const string nextGameRoundPlayerEntryMicImage = "nextGameRoundPlayerEntryMicImage";
+        public const string nextGameRoundSongInfoLabel = "nextGameRoundSongInfoLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
+        public const string NextRoundInfoPlayerEntryUi = "NextRoundInfoPlayerEntryUi";
+        public const string NextRoundInfoUi = "NextRoundInfoUi";
         public const string nextSentenceContainer = "nextSentenceContainer";
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nextSongButton = "nextSongButton";

@@ -460,4 +460,21 @@ public static class SongMetaUtils
 
         return noteDistanceInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
     }
+
+    public static string GetMedleyName(List<SongMeta> songMetas)
+    {
+        if (songMetas.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        if (songMetas.Count == 1)
+        {
+            return GetArtistDashTitle(songMetas[0]);
+        }
+
+        return songMetas
+            .Select(songMeta => songMeta.Title)
+            .JoinWith(", ");
+    }
 }
