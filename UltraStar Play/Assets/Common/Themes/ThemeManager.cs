@@ -1,16 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
-public class ThemeManager : MonoBehaviour
+public class ThemeManager : MonoBehaviour, ISpriteHolder
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -69,9 +67,11 @@ public class ThemeManager : MonoBehaviour
 
     private readonly HashSet<string> failedToLoadThemeNames = new();
 
+    private readonly List<Sprite> loadedSprites = new();
+
     private bool anyThemeLoaded;
 
-    void Awake()
+    private void Awake()
     {
         if (this != Instance)
         {
@@ -79,7 +79,7 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         if (this != Instance)
         {
@@ -89,7 +89,7 @@ public class ThemeManager : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         if (this != Instance)
         {
@@ -97,6 +97,14 @@ public class ThemeManager : MonoBehaviour
         }
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void Start()
+    {
+        if (Instance == this)
+        {
+            ImageManager.AddSpriteHolder(this);
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
@@ -159,6 +167,7 @@ public class ThemeManager : MonoBehaviour
         }
 
         Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
+        loadedSprites.Clear();
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
             alreadyProcessedVisualElements.Clear();
@@ -185,8 +194,9 @@ public class ThemeManager : MonoBehaviour
                 TextureWrapMode textureWrapMode = backgroundJson.gradientScrollingSpeed > 0
                     ? TextureWrapMode.Repeat
                     : TextureWrapMode.Clamp;
-                ImageManager.LoadSpriteFromUri(gradientPath, gradientSprite =>
+                ImageManager.LoadSpriteFromFile(gradientPath, gradientSprite =>
                 {
+                    loadedSprites.Add(gradientSprite);
                     gradientSprite.texture.wrapMode = textureWrapMode;
                     backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
                 });
@@ -212,8 +222,9 @@ public class ThemeManager : MonoBehaviour
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
             {
-                ImageManager.LoadSpriteFromUri(patternPath, patternSprite =>
+                ImageManager.LoadSpriteFromFile(patternPath, patternSprite =>
                 {
+                    loadedSprites.Add(patternSprite);
                     patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
                     backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
                 });
@@ -255,8 +266,9 @@ public class ThemeManager : MonoBehaviour
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
-                ImageManager.LoadSpriteFromUri(particlePath, particleSprite =>
+                ImageManager.LoadSpriteFromFile(particlePath, particleSprite =>
                 {
+                    loadedSprites.Add(particleSprite);
                     particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
                     particleMaterial.mainTexture = particleSprite.texture;
                 });
@@ -480,5 +492,10 @@ public class ThemeManager : MonoBehaviour
         }
 
         return DefaultSceneChangeAnimationTimeInSeconds;
+    }
+
+    public IReadOnlyCollection<Sprite> GetSprites()
+    {
+        return loadedSprites;
     }
 }
