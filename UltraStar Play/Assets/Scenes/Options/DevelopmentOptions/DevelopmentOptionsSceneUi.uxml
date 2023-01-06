@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" class="backgroundImage">
+    <ui:VisualElement name="background">
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -23,6 +23,10 @@
                 <ui:VisualElement name="analyzeBeatsWithoutTargetNoteContainer" class="optionsLabelAndItemPicker">
                     <ui:Label text="Analyze Beats Without Target Note" name="Label" class="controlLabel" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+                </ui:VisualElement>
+                <ui:VisualElement name="disableDynamicThemesContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Disable Dynamic Themes" name="Label" class="controlLabel" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
                 <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />

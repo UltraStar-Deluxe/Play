@@ -148,7 +148,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         videoPlayer.url = GetVideoPlayerUri(uri);
         // The url is empty if loading the video failed.
-        HasLoadedVideo = !string.IsNullOrEmpty(videoPlayer.url);
+        HasLoadedVideo = !videoPlayer.url.IsNullOrEmpty();
         // For now, only load the video. Starting it is done from the outside.
         if (!HasLoadedVideo)
         {

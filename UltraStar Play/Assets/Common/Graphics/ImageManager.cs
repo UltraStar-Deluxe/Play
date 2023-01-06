@@ -11,8 +11,11 @@ public static class ImageManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
+        spriteHolders.Clear();
         ClearCache();
     }
+
+    private static readonly HashSet<ISpriteHolder> spriteHolders = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
@@ -20,6 +23,16 @@ public static class ImageManager
     private static readonly Dictionary<string, CachedSprite> spriteCache = new();
 
     private static CoroutineManager coroutineManager;
+
+    public static void AddSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        spriteHolders.Add(spriteHolder);
+    }
+
+    public static void RemoveSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        spriteHolders.Remove(spriteHolder);
+    }
 
     public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
@@ -101,6 +114,9 @@ public static class ImageManager
     private static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new();
+        // Remember the sprites of all registered ISpriteHolder as still in use.
+        spriteHolders.ForEach(spriteHolder => usedSprites.AddRange(spriteHolder.GetSprites()));
+
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
         UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
         if (uiDocument != null)

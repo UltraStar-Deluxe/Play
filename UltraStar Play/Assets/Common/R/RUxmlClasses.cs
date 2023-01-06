@@ -3,7 +3,6 @@ public static partial class R
 {
     public static class UxmlClasses
     {
-        public const string backgroundImage = "backgroundImage";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string comboBoxButton = "comboBoxButton";
