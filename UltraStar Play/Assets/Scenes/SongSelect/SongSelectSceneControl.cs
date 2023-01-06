@@ -262,12 +262,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.gameRoundsScrollView)]
     private VisualElement gameRoundsScrollView;
 
+    [Inject(UxmlName = R.UxmlNames.toggleGameRoundsOverlayButton)]
+    private Button toggleGameRoundsOverlayButton;
+
     public PlaylistChooserControl PlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
     public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
     public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
+    public bool IsAddAsSongOrMedleyDialogVisible => addAsSongOrMedleyDialogControl != null
+                                                    && addAsSongOrMedleyDialogControl.DialogRootVisualElement.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -300,6 +305,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     }
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
+    private MessageDialogControl addAsSongOrMedleyDialogControl;
 
     private void Start()
     {
@@ -439,6 +445,30 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             AddGameRoundWithCurrentSettings();
             HidePlayerSelectOverlay();
         });
+
+        toggleGameRoundsOverlayButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (gameRoundsOverlay.ClassListContains("hidden"))
+            {
+                ShowGameRoundsOverlay();
+            }
+            else
+            {
+                HideGameRoundsOverlay();
+            }
+        });
+    }
+
+    private void ShowGameRoundsOverlay()
+    {
+        gameRoundsOverlay.RemoveFromClassList("hidden");
+        gameRoundsOverlay.style.left = 0;
+    }
+
+    private void HideGameRoundsOverlay()
+    {
+        gameRoundsOverlay.AddToClassList("hidden");
+        gameRoundsOverlay.style.left = -gameRoundsOverlay.contentRect.width;
     }
 
     private void AddGameRoundWithCurrentSettings()
@@ -450,25 +480,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Ask if the song should be added as medley entry or as new song.
-        MessageDialogControl messageDialogControl = uiManager.CreateMessageDialog("Add Song");
-        messageDialogControl.Message = "Add song as part of medley or new song?";
+        addAsSongOrMedleyDialogControl = uiManager.CreateMessageDialog("Add Song");
+        addAsSongOrMedleyDialogControl.Message = "Add song as part of medley or new song?";
 
-        Button addAsSongButton = messageDialogControl.AddButton("Add as new song", () =>
+        Button addAsSongButton = addAsSongOrMedleyDialogControl.AddButton("Add as new song", () =>
         {
-            messageDialogControl.CloseDialog();
+            CloseAddAsSongOrMedleyDialogControl();
             AddNewGameRoundWithCurrentSettings();
         });
-        messageDialogControl.AddButton("Add as medley", () =>
+        addAsSongOrMedleyDialogControl.AddButton("Add as medley", () =>
         {
-            messageDialogControl.CloseDialog();
+            CloseAddAsSongOrMedleyDialogControl();
             gameRoundManager.AddSongToLastGameRound(SelectedSong);
         });
-        messageDialogControl.AddButton("Cancel", () =>
+        addAsSongOrMedleyDialogControl.AddButton("Cancel", () =>
         {
-            messageDialogControl.CloseDialog();
+            CloseAddAsSongOrMedleyDialogControl();
         });
 
         addAsSongButton.Focus();
+    }
+
+    public void CloseAddAsSongOrMedleyDialogControl()
+    {
+        addAsSongOrMedleyDialogControl.CloseDialog();
+        addAsSongOrMedleyDialogControl = null;
     }
 
     private void AddNewGameRoundWithCurrentSettings()
