@@ -105,7 +105,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UIDocument uiDocument;
 
-    public WebCamTexture webcampTexture;
+    [Inject]
+    private ThemeManager themeManager;
+
+	public WebCamTexture webcampTexture;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
@@ -245,6 +248,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
+
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
         InitWebcam();

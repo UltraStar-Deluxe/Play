@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -28,9 +29,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public StyleSheet largeScreenStyleSheet;
 
-    [InjectedInInspector]
-    public StyleSheet redThemeStyleSheet;
-
     [Inject(Optional = true)]
     private UIDocument uiDocument;
 
@@ -45,39 +43,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
             Debug.Log($"Screen size (inches): {ApplicationUtils.GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
         }
         AddScreenSpecificStyleSheets();
-        UpdateThemeSpecificStyleSheets();
-
-        settings.GraphicSettings.ObserveEveryValueChanged(graphicSettings => graphicSettings.themeName)
-            .Subscribe(_ => UpdateThemeSpecificStyleSheets())
-            .AddTo(gameObject);
-    }
-
-    private void UpdateThemeSpecificStyleSheets()
-    {
-        if (uiDocument == null)
-        {
-            return;
-        }
-
-        Dictionary<string, StyleSheet> themeNameToStyleSheet = new();
-        themeNameToStyleSheet.Add("RedTheme", redThemeStyleSheet);
-
-        themeNameToStyleSheet.ForEach(entry =>
-        {
-            string themeName = entry.Key;
-            StyleSheet styleSheet = entry.Value;
-            if (settings.GraphicSettings.themeName == themeName)
-            {
-                if (!uiDocument.rootVisualElement.styleSheets.Contains(styleSheet))
-                {
-                    uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
-                }
-            }
-            else
-            {
-                uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
-            }
-        });
     }
 
     private void AddScreenSpecificStyleSheets()
