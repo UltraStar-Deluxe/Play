@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" class="backgroundImage">
+    <ui:VisualElement name="background">
         <ui:VisualElement name="logo" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); position: absolute; width: 100%; -unity-background-scale-mode: scale-to-fit; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2022_09.png?fileID=2800000&amp;guid=031fb3adf3099b840887ff7dc60c7ad2&amp;type=3#UltraStarPlayLogo_2022_09&apos;); height: 20%; top: 10px;" />
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
             <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">

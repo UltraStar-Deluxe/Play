@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using PrimeInputActions;
 using ProTrans;
@@ -90,6 +91,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     [Inject]
     private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private ThemeManager themeManager;
 
     private MessageDialogControl kickstarterDialogControl;
     private MessageDialogControl quitGameDialogControl;
@@ -270,6 +274,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
         Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
+
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     public void OpenNewSongDialog()
@@ -281,6 +287,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         VisualElement visualElement = newSongDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(visualElement);
+        // TODO would be nice to find a way to automatize calling this method when a new dialog/visual element/etc. is spawned
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
 
         newSongDialogControl = injector
             .WithRootVisualElement(visualElement)
@@ -292,6 +300,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
                 newSongDialogControl = null;
                 createSongButton.Focus();
             });
+
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     public void CloseNewSongDialog()

@@ -561,7 +561,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
+        bool hasVideo = !selectedSong.Video.IsNullOrEmpty();
         videoIndicator.SetVisibleByVisibility(hasVideo);
 
         bool isDuet = selectedSong.VoiceNames.Count > 1;
@@ -889,7 +889,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         UpdateFilteredSongs();
-        if (string.IsNullOrEmpty(songSearchControl.GetSearchText()))
+        if (songSearchControl.GetSearchText().IsNullOrEmpty())
         {
             if (lastSelectedSong != null)
             {
