@@ -27,6 +27,9 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
 
+    [Inject(UxmlName = R.UxmlNames.useWebcamContainer)]
+    private VisualElement useWebcamContainer;
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
@@ -40,10 +43,10 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     {
         InitWebcamPicker();
 
-        backButton.RegisterCallbackButtonTriggered(navigateBack);
+        backButton.RegisterCallbackButtonTriggered(NavigateBack);
         backButton.Focus();
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5).Subscribe(_ => navigateBack());
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5).Subscribe(_ => NavigateBack());
     }
 
     public void UpdateTranslation()
@@ -52,6 +55,12 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         {
             SceneInjectionManager.Instance.DoInjection();
         }
+        useWebcamContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
+        useWebcamContainer.Q<Toggle>().value = settings.WebcamSettings.UseAsBackgroundInSingScene;
+        useWebcamContainer.Q<Toggle>().RegisterValueChangedCallback(
+            (changeEvent) => 
+                settings.WebcamSettings.UseAsBackgroundInSingScene = changeEvent.newValue
+            );
         deviceContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_webcam_title);
@@ -68,7 +77,7 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         devicePickerControl.Selection
             .Subscribe(device =>
             {
-                settings.LastWebcamNameInWebcamOptionsScene = device.name;
+                settings.WebcamSettings.CurrentDeviceName = device.name;
                 if (webcamTexture != null && webcamTexture.isPlaying)
                 {
                     webcamTexture.Stop();
@@ -81,7 +90,7 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             });
     }
 
-    private void navigateBack()
+    private void NavigateBack()
     {
         if (webcamTexture != null && webcamTexture.isPlaying)
         {
@@ -92,13 +101,13 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private bool TryReSelectLastWebcam()
     {
-        if (settings.LastWebcamNameInWebcamOptionsScene.IsNullOrEmpty())
+        if (settings.WebcamSettings.CurrentDeviceName.IsNullOrEmpty())
         {
             return false;
         }
 
         WebCamDevice lastDevice = devicePickerControl.Items
-            .FirstOrDefault(device => device.name == settings.LastWebcamNameInWebcamOptionsScene);
+            .FirstOrDefault(device => device.name == settings.WebcamSettings.CurrentDeviceName);
 
         devicePickerControl.SelectItem(lastDevice);
         return true;

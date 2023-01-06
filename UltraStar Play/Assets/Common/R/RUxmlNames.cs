@@ -633,6 +633,7 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
+        public const string useWebcamContainer = "useWebcamContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
@@ -654,11 +655,8 @@ public static partial class R
         public const string warningContainer = "warningContainer";
         public const string warningIcon = "warningIcon";
         public const string warningLabel = "warningLabel";
-        public const string webcamIconActivated = "webcamIconActivated";
-        public const string webcamIconDeactivated = "webcamIconDeactivated";
         public const string webcamOptionsButton = "webcamOptionsButton";
         public const string webcamRenderContainer = "webcamRenderContainer";
-        public const string webcamToggleButton = "webcamToggleButton";
         public const string wideIcon = "wideIcon";
         public const string yearLabel = "yearLabel";
         public const string yearPropertyContainer = "yearPropertyContainer";

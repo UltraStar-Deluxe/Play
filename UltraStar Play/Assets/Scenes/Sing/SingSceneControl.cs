@@ -102,15 +102,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
 
-    [Inject(UxmlName = R.UxmlNames.webcamIconActivated)]
-    private MaterialIcon webcamIconActivated;
-
-    [Inject(UxmlName = R.UxmlNames.webcamIconDeactivated)]
-    private MaterialIcon webcamIconDeactivated;
-
-    [Inject(UxmlName = R.UxmlNames.webcamToggleButton)]
-    private Button webcamToggleButton;
-
     [Inject]
     private UIDocument uiDocument;
 
@@ -304,37 +295,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void InitWebcam()
     {
-        webcampTexture = new WebCamTexture(settings.LastWebcamNameInWebcamOptionsScene);
+        webcampTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
         webcamRenderContainer.image = webcampTexture;
 
-        webcamToggleButton.RegisterCallbackButtonTriggered(() =>
-        {
-            bool displayWebcam = webcamIconDeactivated.IsVisibleByDisplay();
-            if (displayWebcam)
-            {
-                Log.Logger.Debug("Webcam activated: {webcamname}", webcampTexture.deviceName);
-                webcampTexture.Play();
-            }
-            else
-            {
-                Log.Logger.Debug("Webcam deactivated: {webcamname}", webcampTexture.deviceName);
-                webcampTexture.Stop();
-            }
-
-            webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
-            settings.LastGameWebcamActivated = displayWebcam;
-            webcamIconActivated.SetVisibleByDisplay(displayWebcam);
-            webcamIconDeactivated.SetVisibleByDisplay(!displayWebcam);
-        });
-
-        if (settings.LastGameWebcamActivated)
+        if (settings.WebcamSettings.UseAsBackgroundInSingScene)
         {
             webcampTexture.Play();
         }
 
-        webcamRenderContainer.SetVisibleByDisplay(settings.LastGameWebcamActivated);
-        webcamIconActivated.SetVisibleByDisplay(settings.LastGameWebcamActivated);
-        webcamIconDeactivated.SetVisibleByDisplay(!settings.LastGameWebcamActivated);
+        webcamRenderContainer.SetVisibleByDisplay(settings.WebcamSettings.UseAsBackgroundInSingScene);
     }
 
     private void InitDummySingers()
@@ -892,6 +861,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
             () => TogglePlayPause());
+
+        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff), 
+            () => 
+            {
+                bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
+                if (displayWebcam)
+                {
+                    Log.Logger.Information("Webcam activated: {webcamname}", webcampTexture.deviceName);
+                    webcampTexture.Play();
+                }
+                else
+                {
+                    Log.Logger.Information("Webcam deactivated: {webcamname}", webcampTexture.deviceName);
+                    webcampTexture.Stop();
+                }
+
+                webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
+                settings.WebcamSettings.UseAsBackgroundInSingScene = displayWebcam;
+            });
+
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => Restart());
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
