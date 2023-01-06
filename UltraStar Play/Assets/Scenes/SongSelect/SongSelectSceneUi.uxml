@@ -149,7 +149,7 @@
                 <ui:TextField picking-mode="Ignore" text="Playlist Name" name="playlistNameTextField" style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0;" />
                 <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-around; margin-top: 10px;">
                     <ui:Button text="Delete" display-tooltip-when-elided="true" name="deletePlaylistButton" class="controlMinWidth" />
-                    <ui:Button text="Confirm Delete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="wideControl controlMinWidth" style="display: none;" />
+                    <ui:Button text="Confirm Delete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
                     <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
                     <ui:Button text="Continue" display-tooltip-when-elided="true" name="submitEditPlaylistButton" class="controlMinWidth" />
                 </ui:VisualElement>

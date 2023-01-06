@@ -11,7 +11,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
+public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset nPlayerUi;
@@ -55,9 +55,18 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private ThemeManager themeManager;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private GameRoundManager gameRoundManager;
+
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
+    private NextGameRoundUiControl nextGameRoundUiControl = new();
+
+    private bool ShowHighScoresNext => statistics.HasHighscore(sceneData.SongMeta);
 
     public static SingingResultsSceneControl Instance
     {
@@ -67,7 +76,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
-    void Start()
+    public void OnInjectionFinished()
+    {
+        injector.Inject(nextGameRoundUiControl);
+
+        if (ShowHighScoresNext)
+        {
+            nextGameRoundUiControl.HideNextGameRoundUi();
+        }
+    }
+
+    private void Start()
     {
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
@@ -207,20 +226,25 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void FinishScene()
     {
-        if (statistics.HasHighscore(sceneData.SongMeta))
+        if (ShowHighScoresNext)
         {
             // Go to highscore scene
             HighscoreSceneData highscoreSceneData = new();
             highscoreSceneData.SongMeta = sceneData.SongMeta;
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
-            SceneNavigator.Instance.LoadScene(EScene.HighscoreScene, highscoreSceneData);
+            sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
+        }
+        else if (gameRoundManager.HasGameRounds)
+        {
+            // Start next game round
+            gameRoundManager.StartNextGameRound();
         }
         else
         {
-            // No highscores to show, thus go to song select scene
+            // Go to song select scene
             SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.SongMeta = sceneData.SongMeta;
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
     }
 

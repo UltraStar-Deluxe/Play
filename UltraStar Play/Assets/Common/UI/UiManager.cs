@@ -7,11 +7,12 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : MonoBehaviour, INeedInjection
+public class UiManager : MonoBehaviour, INeedInjection, IBinder
 {
     public static UiManager Instance
     {
@@ -32,6 +33,12 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public VisualTreeAsset accordionUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset nextGameRoundInfoUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset nextGameRoundInfoPlayerEntryUi;
 
     [InjectedInInspector]
     public ShowFps showFpsPrefab;
@@ -211,5 +218,13 @@ public class UiManager : MonoBehaviour, INeedInjection
             return uiDocGameObject.GetComponent<UIDocument>();
         }
         return null;
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
+        bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
+        return bb.GetBindings();
     }
 }
