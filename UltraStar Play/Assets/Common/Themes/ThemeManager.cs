@@ -414,6 +414,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
         Color backgroundButtonColor = currentThemeMeta.ThemeJson.buttonMainColor;
         Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
+        Color backgroundButtonColorFocus = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
 
         Color fontColorAll = currentThemeMeta.ThemeJson.fontColor;
@@ -442,7 +443,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
             }
             alreadyProcessedVisualElements.Add(button);
 
-            UIUtils.SetBackgroundStyleWithHover(button, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(button, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
 
             VisualElement image = button.Q("image");
             if (image != null)
@@ -456,14 +457,14 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
                 backImage.style.unityBackgroundImageTintColor = fontColorButtons;
             }
         });
-        root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
+        root.Query<VisualElement>(null, "unity-toggle__input").ForEach(entry =>
         {
             if (alreadyProcessedVisualElements.Contains(entry))
             {
                 return;
             }
             alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHover(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
         });
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
@@ -472,7 +473,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
                 return;
             }
             alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHover(entry, backgroundButtonColor, backgroundButtonColorHover, fontColorButtons);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
         });
 
         UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);

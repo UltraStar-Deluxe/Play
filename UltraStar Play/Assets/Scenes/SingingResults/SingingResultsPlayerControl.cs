@@ -104,18 +104,42 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
-        if (settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.DeveloperSettings.disableDynamicThemes
+            || ThemeManager.Instance.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
-                .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-            onSuccess(songRatingImageReference?.sprite);
+            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
             return;
         }
+        LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
+    }
 
-        ThemeMeta themeMeta = ThemeManager.Instance.GetCurrentTheme();
-        string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
-        string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
-        ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+    private void LoadSongRatingSpriteFromTheme(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    {
+        try
+        {
+            ThemeMeta themeMeta = ThemeManager.Instance.GetCurrentTheme();
+            string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
+            if (valueForSongRating.IsNullOrEmpty())
+            {
+                LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+                return;
+            }
+
+            string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
+            ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+        }
+    }
+
+    private void LoadDefaultSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    {
+        SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
+            .FirstOrDefault(it => it.songRating == songRatingEnumValue);
+        onSuccess(songRatingImageReference?.sprite);
     }
 
     public void UpdateTranslation()
