@@ -457,7 +457,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
                 backImage.style.unityBackgroundImageTintColor = fontColorButtons;
             }
         });
-        root.Query<VisualElement>(null, "unity-toggle__checkmark").ForEach(entry =>
+        root.Query<VisualElement>(null, "unity-toggle__input").ForEach(entry =>
         {
             if (alreadyProcessedVisualElements.Contains(entry))
             {
