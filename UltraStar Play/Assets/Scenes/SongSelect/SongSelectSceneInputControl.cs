@@ -166,6 +166,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.ResetPlaylistSelection();
         }
+        else if (songSelectSceneControl.IsAddAsSongOrMedleyDialogVisible)
+        {
+            songSelectSceneControl.CloseAddAsSongOrMedleyDialogControl();
+        }
         else
         {
             sceneNavigator.LoadScene(EScene.MainScene);

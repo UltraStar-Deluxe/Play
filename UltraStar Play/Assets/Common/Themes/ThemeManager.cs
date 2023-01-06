@@ -436,7 +436,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
         root.Query<Button>().ForEach(button =>
         {
-            foreach (string excludedNameOrClass in new []{"transparentBackgroundColor", "hiddenContinueButton"})
+            foreach (string excludedNameOrClass in new []{"transparentBackgroundColor", "hiddenContinueButton", "overlayBackground"})
             {
                 if (button.ClassListContains(excludedNameOrClass) || button.name == excludedNameOrClass)
                 {
