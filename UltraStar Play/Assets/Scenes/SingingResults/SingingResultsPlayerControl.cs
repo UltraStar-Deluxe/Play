@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -52,6 +53,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private Settings settings;
+
     private readonly float animationTimeInSeconds = 1f;
 
     public void OnInjectionFinished()
@@ -62,15 +66,19 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .CreateAndInject<AvatarImageControl>();
 
         // Song rating
-        Sprite songRatingSprite = singingResultsSceneControl.GetSongRatingSprite(songRating.EnumValue);
-        if (songRatingSprite != null)
+        LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
         {
+            if (songRatingSprite == null)
+            {
+                return;
+            }
+
             ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-            // Bouncy size animation
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
-                .setEaseSpring()
-                .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
-        }
+                // Bouncy size animation
+                LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
+                    .setEaseSpring()
+                    .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+        });
         ratingLabel.text = songRating.Text;
 
         // Score texts (animated)
@@ -92,6 +100,46 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setEaseOutSine();
 
         UpdateTranslation();
+    }
+
+    private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    {
+        if (settings.DeveloperSettings.disableDynamicThemes
+            || ThemeManager.Instance.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
+        {
+            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+            return;
+        }
+        LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
+    }
+
+    private void LoadSongRatingSpriteFromTheme(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    {
+        try
+        {
+            ThemeMeta themeMeta = ThemeManager.Instance.GetCurrentTheme();
+            string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
+            if (valueForSongRating.IsNullOrEmpty())
+            {
+                LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+                return;
+            }
+
+            string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
+            ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+        }
+    }
+
+    private void LoadDefaultSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    {
+        SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
+            .FirstOrDefault(it => it.songRating == songRatingEnumValue);
+        onSuccess(songRatingImageReference?.sprite);
     }
 
     public void UpdateTranslation()

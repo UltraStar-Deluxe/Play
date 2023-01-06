@@ -73,6 +73,8 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
         starParticleControls.ForEach(starParticleControl => starParticleControl.Update());
 
         if (EndBeat < TargetEndBeat
+            && RecordedNote != null
+            && RecordedNote.TargetNote != null
             && MidiNote == RecordedNote.TargetNote.MidiNote
             && RecordedNote.TargetNote.IsGolden)
         {

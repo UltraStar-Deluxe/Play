@@ -59,7 +59,10 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
             songMeta,
             beat,
             songAudioPlayer.PositionInSongInMillis,
-            MicSampleRecorder.MicProfile,
+            MicSampleRecorder.FinalSampleRate.Value,
+            MicSampleRecorder.MicProfile.DelayInMillis,
+            MicSampleRecorder.MicProfile.AmplificationMultiplier,
+            MicSampleRecorder.MicProfile.NoiseSuppression,
             MicSampleRecorder.MicSamples,
             AudioSamplesAnalyzer);
 

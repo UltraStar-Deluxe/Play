@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
@@ -7,7 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
-public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
+public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private static readonly Vector2 popupOffset = new(2, 2);
 
@@ -31,6 +32,8 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
     private bool isPointerDown;
     private Vector2 pointerDownPosition;
 
+    private readonly List<IDisposable> disposables = new();
+
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
@@ -38,9 +41,9 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(evt => OnPointerMove(evt), TrickleDown.TrickleDown);
         uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(evt => OnPointerUp(), TrickleDown.TrickleDown);
 
-        InputManager.GetInputAction("usplay/openContextMenu").PerformedAsObservable()
+        disposables.Add(InputManager.GetInputAction("usplay/openContextMenu").PerformedAsObservable()
             .Subscribe(CheckOpenContextMenuFromInputAction)
-            .AddTo(gameObject);
+            .AddTo(gameObject));
     }
 
     private void OnPointerDown(IPointerEvent evt)
@@ -85,7 +88,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-
+        Debug.Log($"OpenContextMenu {GetType().Name} {Time.frameCount}");
         OpenContextMenu(pointerPosition + popupOffset);
     }
 
@@ -99,5 +102,10 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener
         ContextMenuPopupControl contextMenuPopup = new(gameObject, position);
         injector.Inject(contextMenuPopup);
         FillContextMenuAction(contextMenuPopup);
+    }
+
+    public void Dispose()
+    {
+        disposables.ForEach(disposable => disposable.Dispose());
     }
 }

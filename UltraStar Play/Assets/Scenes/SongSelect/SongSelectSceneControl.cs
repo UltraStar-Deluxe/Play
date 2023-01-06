@@ -523,7 +523,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        bool hasVideo = !string.IsNullOrEmpty(selectedSong.Video);
+        bool hasVideo = !selectedSong.Video.IsNullOrEmpty();
         videoIndicator.SetVisibleByVisibility(hasVideo);
 
         bool isDuet = selectedSong.VoiceNames.Count > 1;
@@ -744,7 +744,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
             {
                 string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
-                if (!WebRequestUtils.ResourceExists(audioUri))
+                if (!SongMetaUtils.AudioResourceExists(SelectedSong))
                 {
                     string message = "Audio file resource does not exist: " + audioUri;
                     Debug.Log(message);
@@ -830,7 +830,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         UpdateFilteredSongs();
-        if (string.IsNullOrEmpty(songSearchControl.GetSearchText()))
+        if (songSearchControl.GetSearchText().IsNullOrEmpty())
         {
             if (lastSelectedSong != null)
             {

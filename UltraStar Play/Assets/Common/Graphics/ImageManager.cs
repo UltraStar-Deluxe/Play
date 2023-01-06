@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -10,8 +11,11 @@ public static class ImageManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
+        spriteHolders.Clear();
         ClearCache();
     }
+
+    private static readonly HashSet<ISpriteHolder> spriteHolders = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
@@ -20,9 +24,25 @@ public static class ImageManager
 
     private static CoroutineManager coroutineManager;
 
+    public static void AddSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        spriteHolders.Add(spriteHolder);
+    }
+
+    public static void RemoveSpriteHolder(ISpriteHolder spriteHolder)
+    {
+        spriteHolders.Remove(spriteHolder);
+    }
+
     public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
     {
-        LoadSpriteFromUri("file://" + path, onSuccess, onFailure);
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Image file does not exist: " + path);
+            return;
+        }
+
+        LoadSpriteFromUri(path, onSuccess, onFailure);
     }
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
@@ -51,12 +71,6 @@ public static class ImageManager
             && cachedSprite.Sprite != null)
         {
             onSuccess(cachedSprite.Sprite);
-            return;
-        }
-
-        if (!WebRequestUtils.ResourceExists(uri))
-        {
-            Debug.LogError("Image resource does not exist: " + uri);
             return;
         }
 
@@ -100,6 +114,9 @@ public static class ImageManager
     private static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new();
+        // Remember the sprites of all registered ISpriteHolder as still in use.
+        spriteHolders.ForEach(spriteHolder => usedSprites.AddRange(spriteHolder.GetSprites()));
+
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
         UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
         if (uiDocument != null)

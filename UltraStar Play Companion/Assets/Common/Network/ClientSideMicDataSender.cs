@@ -154,7 +154,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             recordingEvent.MicSamples,
             recordingEvent.NewSamplesStartIndex,
             recordingEvent.NewSamplesEndIndex,
-            GetMicProfileWithFinalSampleRate());
+            settings.MicProfile.AmplificationMultiplier,
+            settings.MicProfile.NoiseSuppression);
 
         int midiNote = pitchEvent != null
             ? pitchEvent.MidiNote
@@ -188,19 +189,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             songMeta,
             beat,
             positionInSongInMillis,
-            GetMicProfileWithFinalSampleRate(),
+            micSampleRecorder.FinalSampleRate.Value,
+            settings.MicProfile.DelayInMillis,
+            settings.MicProfile.AmplificationMultiplier,
+            settings.MicProfile.NoiseSuppression,
             recordingEvent.MicSamples,
             audioSamplesAnalyzer);
         return pitchEvent;
-    }
-
-    private MicProfile GetMicProfileWithFinalSampleRate()
-    {
-        // The MicProfile in the settings may use a SampleRate of 0 for "best available".
-        // The pitch detection algorithm needs the proper value.
-        MicProfile micProfile = new(settings.MicProfile);
-        micProfile.SampleRate = micSampleRecorder.FinalSampleRate.Value;
-        return micProfile;
     }
 
     private void HandleMicProfileMessage(MicProfileMessageDto micProfileMessageDto)

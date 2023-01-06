@@ -101,6 +101,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -239,6 +242,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
+
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
         // Associate LyricsDisplayer with one of the (duett) players

@@ -43,12 +43,12 @@ public static class NumberUtils
         return result;
     }
 
-    public static double Median(IEnumerable<double> enumerable)
+    public static T Median<T>(IEnumerable<T> enumerable)
     {
-        List<double> list = enumerable.ToList();
+        List<T> list = enumerable.ToList();
         if (list.IsNullOrEmpty())
         {
-            return 0;
+            return default(T);
         }
 
         list.Sort();

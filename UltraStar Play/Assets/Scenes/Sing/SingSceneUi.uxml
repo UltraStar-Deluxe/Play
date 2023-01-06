@@ -3,7 +3,7 @@
     <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
     <ui:Template name="SentenceRatingUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/SentenceRatingUi.uxml?fileID=9197481963319205126&amp;guid=fc5ccc90fb3478b49bea1f39b1e6bcce&amp;type=3#SentenceRatingUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
-    <ui:VisualElement name="background" class="backgroundImage">
+    <ui:VisualElement name="background">
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
         <ui:Instance template="SingingLyricsUi" name="topLyricsContainer" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; overflow: hidden;" />

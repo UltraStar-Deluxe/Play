@@ -60,17 +60,24 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        micPitchTracker.MicProfile = settings.SongEditorSettings.MicProfile;
+        micPitchTracker.MicProfile = CreateSongEditorSpecificMicProfile();
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(newValue =>
             {
-                micPitchTracker.MicProfile = newValue;
+                micPitchTracker.MicProfile = CreateSongEditorSpecificMicProfile();
                 StartOrStopRecording();
             })
             .AddTo(gameObject);
         settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.MicDelayInMillis)
+            .Subscribe(newValue =>
+            {
+                micPitchTracker.MicProfile = CreateSongEditorSpecificMicProfile();
+                StartOrStopRecording();
+            })
+            .AddTo(gameObject);settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.RecordingSource)
             .Subscribe(_ => StartOrStopRecording())
             .AddTo(gameObject);
@@ -84,6 +91,19 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
 
         micPitchTracker.PitchEventStream.Subscribe(pitchEvent => OnPitchDetected(pitchEvent));
+    }
+
+    private MicProfile CreateSongEditorSpecificMicProfile()
+    {
+        if (settings.SongEditorSettings.MicProfile == null)
+        {
+            return null;
+        }
+
+        // Copy mic profile with song editor specific sample rate.
+        MicProfile micProfile = new MicProfile(settings.SongEditorSettings.MicProfile);
+        micProfile.DelayInMillis = settings.SongEditorSettings.MicDelayInMillis;
+        return micProfile;
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)

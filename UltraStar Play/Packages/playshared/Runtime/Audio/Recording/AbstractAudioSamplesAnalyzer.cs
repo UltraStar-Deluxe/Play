@@ -4,9 +4,14 @@ public abstract class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 {
     public bool ModifySamplesInPlace { get; set; } = true;
 
-    public abstract PitchEvent ProcessAudioSamples(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, MicProfile mic);
+    public abstract PitchEvent ProcessAudioSamples(
+        float[] sampleBuffer,
+        int startIndexInclusive,
+        int endIndexExclusive,
+        int amplificationFactor,
+        int noiseSuppressionFactor);
 
-    public static void ApplyAmplification(float[] sampleBuffer, int fromIndexInclusive, int toIndexExclusive, float amplificationFactor)
+    public static void ApplyAmplification(float[] sampleBuffer, int fromIndexInclusive, int toIndexExclusive, int amplificationFactor)
     {
         if (amplificationFactor == 1)
         {
@@ -19,14 +24,14 @@ public abstract class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
         }
     }
 
-    public static bool IsAboveNoiseSuppressionThreshold(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, float noiseSuppression)
+    public static bool IsAboveNoiseSuppressionThreshold(float[] sampleBuffer, int startIndexInclusive, int endIndexExclusive, int noiseSuppressionPercent)
     {
-        if (noiseSuppression == 0)
+        if (noiseSuppressionPercent == 0)
         {
             return true;
         }
 
-        float minThreshold = noiseSuppression / 100f;
+        float minThreshold = noiseSuppressionPercent / 100f;
         for (int index = startIndexInclusive; index < endIndexExclusive; index++)
         {
             if (Math.Abs(sampleBuffer[index]) >= minThreshold)
