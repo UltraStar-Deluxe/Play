@@ -40,7 +40,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     {
         if (GetFocusableNavigatorRootVisualElement() == null)
         {
-            songSelectSceneControl.CheckAudioAndStartSingScene();
+            songSelectSceneControl.CheckAudioAndShowPlayerSelectOverlay();
         }
     }
 

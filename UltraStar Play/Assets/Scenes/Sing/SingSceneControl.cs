@@ -134,7 +134,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         get
         {
-            return SceneData.SelectedSongMeta;
+            return SceneData.SongMetas.FirstOrDefault();
         }
     }
 
@@ -545,7 +545,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             PreviousSceneData = SceneData,
             PreviousScene = EScene.SingScene,
             PositionInSongInMillis = PositionInSongInMillis,
-            SelectedSongMeta = SongMeta,
+            SongMeta = SongMeta,
             PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap,
             SelectedPlayerProfiles = sceneData.SingScenePlayerData.SelectedPlayerProfiles,
         };
@@ -795,7 +795,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Voice GetVoice(PlayerProfile playerProfile)
     {
         string voiceName = GetVoiceName(playerProfile);
-        IReadOnlyCollection<Voice> voices = sceneData.SelectedSongMeta.GetVoices();
+        IReadOnlyCollection<Voice> voices = SongMeta.GetVoices();
         Voice matchingVoice = voices.FirstOrDefault(it => it.VoiceNameEquals(voiceName));
         if (matchingVoice != null)
         {

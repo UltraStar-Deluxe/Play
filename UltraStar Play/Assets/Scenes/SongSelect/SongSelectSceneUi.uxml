@@ -1,9 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSongEntryUi" />
-    <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
-    <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
-    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
+    <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSceneSongEntryUi" />
     <ui:Template name="SongSelectScenePlayerSelectUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerSelectUi.uxml?fileID=9197481963319205126&amp;guid=203783e05a7f81543812dd249b0e1372&amp;type=3#SongSelectScenePlayerSelectUi" />
+    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
+    <ui:Template name="SongSelectGameRoundUi" src="project://database/Assets/Scenes/SongSelect/SongSelectGameRoundUi.uxml?fileID=9197481963319205126&amp;guid=82a6470c46626074998301d3d1e10698&amp;type=3#SongSelectGameRoundUi" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
@@ -221,6 +220,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none;" />
+        <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none; min-width: 10%;" />
+        <ui:VisualElement name="gameRoundsOverlay" class="overlay overlayBackground" style="width: auto; min-width: 10%; justify-content: flex-start; max-width: 30%;">
+            <ui:Label tabindex="-1" text="Next Rounds" display-tooltip-when-elided="true" name="gameRoundsTitle" style="margin-right: 20px; margin-left: 20px; -unity-font-style: bold; margin-bottom: 10px;" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="gameRoundsScrollView">
+                <ui:Instance template="SongSelectGameRoundUi" name="SongSelectGameRoundUi" style="width: 100%;" />
+            </ui:ScrollView>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

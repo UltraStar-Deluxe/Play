@@ -16,7 +16,7 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     public SceneData GetDefaultSceneData()
     {
         SingSceneData defaultSceneData = new();
-        defaultSceneData.SelectedSongMeta = GetDefaultSongMeta();
+        defaultSceneData.SongMetas = new List<SongMeta> { GetDefaultSongMeta() };
 
         PlayerProfile playerProfile = GetDefaultPlayerProfile();
         defaultSceneData.SingScenePlayerData.SelectedPlayerProfiles.Add(playerProfile);

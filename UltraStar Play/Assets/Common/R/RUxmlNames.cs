@@ -10,6 +10,7 @@ public static partial class R
         public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
         public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
         public const string addButton = "addButton";
+        public const string addGameRoundIcon = "addGameRoundIcon";
         public const string addIcon = "addIcon";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
@@ -116,6 +117,7 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
+        public const string deleteGameRoundButton = "deleteGameRoundButton";
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
@@ -173,6 +175,11 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameLogo = "gameLogo";
         public const string gameOptionsButton = "gameOptionsButton";
+        public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
+        public const string gameRoundsOverlay = "gameRoundsOverlay";
+        public const string gameRoundsScrollView = "gameRoundsScrollView";
+        public const string gameRoundsTitle = "gameRoundsTitle";
+        public const string gameRoundUiRoot = "gameRoundUiRoot";
         public const string genreLabel = "genreLabel";
         public const string genrePropertyContainer = "genrePropertyContainer";
         public const string globalSettingsLabel = "globalSettingsLabel";
@@ -307,6 +314,7 @@ public static partial class R
         public const string micDisconnectedLabel = "micDisconnectedLabel";
         public const string micEntry = "micEntry";
         public const string micIcon = "micIcon";
+        public const string micImage = "micImage";
         public const string micListOverlay = "micListOverlay";
         public const string micOctaveOffsetContainer = "micOctaveOffsetContainer";
         public const string micOctaveOffsetTextField = "micOctaveOffsetTextField";
@@ -422,6 +430,7 @@ public static partial class R
         public const string playbackAudioPicker = "playbackAudioPicker";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
+        public const string playerEntryList = "playerEntryList";
         public const string playerImage = "playerImage";
         public const string playerInfoContainer = "playerInfoContainer";
         public const string playerNameContainer = "playerNameContainer";
@@ -430,6 +439,7 @@ public static partial class R
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
+        public const string playerSelectAddGameRoundButton = "playerSelectAddGameRoundButton";
         public const string playerSelectCreateSongButton = "playerSelectCreateSongButton";
         public const string playerSelectOpenSongEditorButton = "playerSelectOpenSongEditorButton";
         public const string playerSelectOverlay = "playerSelectOverlay";
@@ -578,6 +588,7 @@ public static partial class R
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
+        public const string songConverAndInfoRow = "songConverAndInfoRow";
         public const string songCoverImage = "songCoverImage";
         public const string songCoverLabel = "songCoverLabel";
         public const string songDetailOverlay = "songDetailOverlay";
@@ -587,6 +598,8 @@ public static partial class R
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
+        public const string songEntryList = "songEntryList";
+        public const string songEntryListContent = "songEntryListContent";
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songEntryUiRoot = "songEntryUiRoot";
@@ -614,6 +627,9 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
+        public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
+        public const string SongSelectGameRoundSongEntryUi = "SongSelectGameRoundSongEntryUi";
+        public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
