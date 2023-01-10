@@ -191,4 +191,10 @@ public static class VisualElementExtensions
             .ToList()
             .ForEach(templateContainer => templateContainer.RemoveFromHierarchy());
     }
+
+    public static void AddAsFirstChild(this VisualElement visualElement, VisualElement otherVisualElement)
+    {
+        visualElement.Add(otherVisualElement);
+        otherVisualElement.SendToBack();
+    }
 }

@@ -27,9 +27,6 @@
                     <MaterialIcon name="settingsIcon" icon="settings" style="position: absolute;" />
                     <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
                 </ui:Button>
-                <ui:Button display-tooltip-when-elided="true" name="playerSelectAddGameRoundButton" class="squareButton" style="margin-left: 5px;">
-                    <MaterialIcon name="addGameRoundIcon" icon="playlist_add" style="position: absolute;" />
-                </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="playerSelectOpenSongEditorButton" class="squareButton" style="margin-left: 5px;">
                     <MaterialIcon name="openSongEditorIcon" icon="edit" style="position: absolute;" />
                 </ui:Button>
