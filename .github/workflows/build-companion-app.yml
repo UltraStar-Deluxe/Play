@@ -47,7 +47,7 @@ jobs:
         run: sh setup.sh
 
       # Build Executables.
-      - uses: game-ci/unity-builder@v2
+      - uses: game-ci/unity-builder@v2.1.2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
