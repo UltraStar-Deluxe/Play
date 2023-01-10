@@ -258,28 +258,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         // Create warning about missing microphones
-        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
-        if (!playerProfilesWithoutMic.IsNullOrEmpty())
+        if (!sceneData.IsMedley || sceneData.MedleySongIndex == 0)
         {
-            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
-            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
-                "playerNameCsv", playerNameCsv);
-
-            VisualElement visualElement = dialogUi.CloneTree();
-            visualElement.AddToClassList("overlay");
-            background.Add(visualElement);
-
-            dialogControl = injector
-                .WithRootVisualElement(visualElement)
-                .CreateAndInject<MessageDialogControl>();
-            dialogControl.Title = title;
-            dialogControl.Message = message;
-            dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
-            Button okButton = dialogControl.AddButton("OK", CloseDialog);
-            okButton.Focus();
-
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            CreateWarningAboutMissingMicrophonesIfNeeded(playerProfilesWithoutMic);
         }
 
         webcamControl.InitWebcam();
@@ -333,12 +314,39 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
+    private void CreateWarningAboutMissingMicrophonesIfNeeded(List<PlayerProfile> playerProfilesWithoutMic)
+    {
+        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
+        if (!playerProfilesWithoutMic.IsNullOrEmpty())
+        {
+            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
+            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+                "playerNameCsv", playerNameCsv);
+
+            VisualElement visualElement = dialogUi.CloneTree();
+            visualElement.AddToClassList("overlay");
+            background.Add(visualElement);
+
+            dialogControl = injector
+                .WithRootVisualElement(visualElement)
+                .CreateAndInject<MessageDialogControl>();
+            dialogControl.Title = title;
+            dialogControl.Message = message;
+            dialogControl.DialogTitleImage.ShowByDisplay();
+            dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
+            Button okButton = dialogControl.AddButton("OK", CloseDialog);
+            okButton.Focus();
+
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        }
+    }
+
     public void OnDestroy()
     {
         webcamControl.Stop();
         audioFadeInControl.Dispose();
     }
-
+    
     private void InitDummySingers()
     {
         bool includeInactive = false;
