@@ -63,10 +63,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private SingingResultsSceneData sceneData;
 
-    private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
-    private NextGameRoundUiControl nextGameRoundUiControl = new();
+    private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
+    private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
 
-    private bool ShowHighScoresNext => statistics.HasHighscore(sceneData.SongMeta);
+    private bool ShowHighScoresNext => !sceneData.IsMedley
+        && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault());
 
     public static SingingResultsSceneControl Instance
     {
@@ -105,10 +106,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void FillLayout()
     {
-        SongMeta songMeta = sceneData.SongMeta;
-        string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
-        string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
-        songLabel.text = titleText + artistText;
+        if (sceneData.IsMedley)
+        {
+            songLabel.text = TranslationManager.GetTranslation(R.Messages.score_total);
+        }
+        else
+        {
+            SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+            string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
+            string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
+            songLabel.text = titleText + artistText;
+        }
 
         VisualElement selectedLayout = GetSelectedLayout();
         if (selectedLayout == nPlayerLayout)
@@ -120,7 +128,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUi)
             .ToList();
 
-        singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
+        singingResultsPlayerUiControls.Clear();
         int i = 0;
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
@@ -230,7 +238,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             // Go to highscore scene
             HighscoreSceneData highscoreSceneData = new();
-            highscoreSceneData.SongMeta = sceneData.SongMeta;
+            highscoreSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
             sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
         }
@@ -243,7 +251,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             // Go to song select scene
             SongSelectSceneData songSelectSceneData = new();
-            songSelectSceneData.SongMeta = sceneData.SongMeta;
+            songSelectSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
             sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
     }

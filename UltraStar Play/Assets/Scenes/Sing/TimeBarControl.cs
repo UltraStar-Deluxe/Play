@@ -18,6 +18,9 @@ public class TimeBarControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
 
+    [Inject]
+    private SingSceneMedleyControl medleyControl;
+
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {
         if (positionInSongInMillis < 0
@@ -63,6 +66,11 @@ public class TimeBarControl : INeedInjection
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
         {
+            if (!medleyControl.IsSentenceInMedleyRange(sentence))
+            {
+                continue;
+            }
+
             double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
             double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
             if (playerCount <= 3)

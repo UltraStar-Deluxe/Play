@@ -33,8 +33,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         currentSentence = sentence;
         RemoveAllDisplayedNotes();
         if (sentence == null
-            || !medleyControl.IsBeatInMedleyRange(sentence.MinBeat)
-            || !medleyControl.IsBeatInMedleyRange(sentence.MaxBeat))
+            || !medleyControl.IsSentenceInMedleyRange(sentence))
         {
             return;
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
 
@@ -7,7 +8,7 @@ using UniInject;
 
 public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
 {
-    private const int CountDownTimeInSeconds = 9;
+    private const int CountDownTimeInSeconds = 5;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -64,7 +65,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         else if (isSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;
-            if (durationAfterSongFinishedInSeconds >= 2)
+            if (durationAfterSongFinishedInSeconds >= 3)
             {
                 FinishMedleySong();
             }
@@ -92,7 +93,18 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
         else
         {
+            // Create scene data to sing next medley song
             SingSceneData newSingSceneData = new(sceneData);
+            // Add player scores of this song
+            foreach (PlayerControl playerControl in singSceneControl.PlayerControls)
+            {
+                if (!newSingSceneData.PlayerProfileToScoreDataMap.ContainsKey(playerControl.PlayerProfile))
+                {
+                    newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<PlayerScoreControlData>());
+                }
+                newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.ScoreData);
+            }
+            // Continue with next medley song
             newSingSceneData.MedleySongIndex++;
             sceneNavigator.LoadScene(EScene.SingScene, newSingSceneData, true);
         }
@@ -153,6 +165,16 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
 
         return SongMetaUtils.GetMedleyEndBeat(singSceneControl.SongMeta);
+    }
+
+    public bool IsNoteInMedleyRange(Note note)
+    {
+        return IsBeatInMedleyRange(note.StartBeat) && IsBeatInMedleyRange(note.EndBeat);
+    }
+
+    public bool IsSentenceInMedleyRange(Sentence sentence)
+    {
+        return IsBeatInMedleyRange(sentence.MinBeat) && IsBeatInMedleyRange(sentence.MaxBeat);
     }
 
     public bool IsBeatInMedleyRange(int beat)

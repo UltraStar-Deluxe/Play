@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 [Serializable]
 public class SingSceneData : SceneData
@@ -13,7 +12,7 @@ public class SingSceneData : SceneData
     public double PositionInSongInMillis { get; set; }
     public bool IsRestart { get; set; }
     public int NextBeatToScore { get; set; }
-    public Dictionary<PlayerProfile, PlayerScoreControlData> PlayerProfileToScoreDataMap { get; set; } = new();
+    public Dictionary<PlayerProfile, List<PlayerScoreControlData>> PlayerProfileToScoreDataMap { get; set; } = new();
 
     public SingSceneData()
     {
