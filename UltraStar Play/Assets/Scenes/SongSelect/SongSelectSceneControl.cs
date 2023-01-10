@@ -1201,17 +1201,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
         addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
-        if (gameRoundManager.HasGameRounds)
-        {
-            playerSelectStartSongButton.text = "Start\nRounds";
-            playerSelectStartSongButton.AddToClassList("smallFont");
-        }
-        else
-        {
-            playerSelectStartSongButton.text = "Sing";
-            playerSelectStartSongButton.RemoveFromClassList("smallFont");
-        }
-
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
 
