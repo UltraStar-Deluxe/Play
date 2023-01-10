@@ -17,7 +17,6 @@ public static partial class R
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
-        public const string disableDynamicThemesContainer = "disableDynamicThemesContainer";
         public const string androidSongFolderHintContainer = "androidSongFolderHintContainer";
         public const string androidSongFolderHintLabel = "androidSongFolderHintLabel";
         public const string animateSceneChangeContainer = "animateSceneChangeContainer";
@@ -139,6 +138,7 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
+        public const string disableDynamicThemesContainer = "disableDynamicThemesContainer";
         public const string doubleClickToTogglePauseElement = "doubleClickToTogglePauseElement";
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
@@ -148,7 +148,6 @@ public static partial class R
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
-        public const string dummyButton = "dummyButton";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editionPropertyContainer = "editionPropertyContainer";
@@ -708,6 +707,7 @@ public static partial class R
         public const string usePortAudioContainer = "usePortAudioContainer";
         public const string usePortAudioLabel = "usePortAudioLabel";
         public const string usePortAudioToggle = "usePortAudioToggle";
+        public const string useWebcamContainer = "useWebcamContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
@@ -732,6 +732,8 @@ public static partial class R
         public const string warningContainer = "warningContainer";
         public const string warningIcon = "warningIcon";
         public const string warningLabel = "warningLabel";
+        public const string webcamOptionsButton = "webcamOptionsButton";
+        public const string webcamRenderContainer = "webcamRenderContainer";
         public const string wideIcon = "wideIcon";
         public const string yearLabel = "yearLabel";
         public const string yearPropertyContainer = "yearPropertyContainer";

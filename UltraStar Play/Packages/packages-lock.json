@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.achimmihca.portaudioforunity": {
+      "version": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#472d7de6024274f3865f572399dc4c420fe70507",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "472d7de6024274f3865f572399dc4c420fe70507"
+    },
     "com.achimmihca.primeinputactions": {
       "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
       "depth": 0,
