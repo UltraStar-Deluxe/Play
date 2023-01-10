@@ -54,9 +54,10 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
         return gameRoundDatas;
     }
 
-    public void DeleteNewestSongFromGameRound(GameRoundData gameRound)
+    public void RemoveNewestSongFromGameRound(GameRoundData gameRound)
     {
-        if (gameRound.SongMetas.IsNullOrEmpty())
+        if (gameRound == null
+            || gameRound.SongMetas.IsNullOrEmpty())
         {
             return;
         }

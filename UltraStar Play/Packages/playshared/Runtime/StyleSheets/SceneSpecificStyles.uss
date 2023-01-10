@@ -31,12 +31,9 @@
 /**************************************************/
 
 #gameRoundsOverlay {
-    position: absolute;
     left: 0;
     top: 0;
     height: 100%;
-    min-width: 20px;
-    max-width: 30%;
     flex-shrink: 0;
     flex-grow: 0;
     transition: left 0.5s;

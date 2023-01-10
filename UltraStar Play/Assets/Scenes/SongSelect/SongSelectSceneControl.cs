@@ -125,8 +125,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.closePlayerSelectOverlayButton)]
     private Button closePlayerSelectOverlayButton;
 
-    [Inject(UxmlName = R.UxmlNames.playerSelectAddGameRoundButton)]
-    private Button playerSelectAddGameRoundButton;
+    [Inject(UxmlName = R.UxmlNames.addAsMedleyButton)]
+    private Button addAsMedleyButton;
 
     [Inject(UxmlName = R.UxmlNames.leftLyricsOverlay)]
     private VisualElement leftLyricsOverlay;
@@ -265,14 +265,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.toggleGameRoundsOverlayButton)]
     private Button toggleGameRoundsOverlayButton;
 
+    [Inject(UxmlName = R.UxmlNames.deleteGameRoundButton)]
+    private Button deleteGameRoundButton;
+
     public PlaylistChooserControl PlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
     public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
     public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
-    public bool IsAddAsSongOrMedleyDialogVisible => addAsSongOrMedleyDialogControl != null
-                                                    && addAsSongOrMedleyDialogControl.DialogRootVisualElement.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -305,7 +306,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     }
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
-    private MessageDialogControl addAsSongOrMedleyDialogControl;
 
     private void Start()
     {
@@ -438,17 +438,29 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             }
         });
 
-        UpdateGameRoundsUi();
         gameRoundManager.GameRoundsChangedEventStream.Subscribe(_ => UpdateGameRoundsUi());
-        playerSelectAddGameRoundButton.RegisterCallbackButtonTriggered(() =>
-        {
-            AddGameRoundWithCurrentSettings();
-            HidePlayerSelectOverlay();
-        });
 
         toggleGameRoundsOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
             if (gameRoundsOverlay.ClassListContains("hidden"))
+            {
+                ShowGameRoundsOverlay();
+            }
+            else
+            {
+                HideGameRoundsOverlay();
+            }
+        });
+        addAsMedleyButton.RegisterCallbackButtonTriggered(() => AddCurrentSongAsMedley());
+        deleteGameRoundButton.RegisterCallbackButtonTriggered(() =>
+        {
+            GameRoundData gameRound = gameRoundManager.GetGameRounds().LastOrDefault();
+            gameRoundManager.RemoveNewestSongFromGameRound(gameRound);
+        });
+        UpdateGameRoundsUi();
+        gameRoundsOverlay.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            if (gameRoundManager.HasGameRounds)
             {
                 ShowGameRoundsOverlay();
             }
@@ -471,57 +483,39 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         gameRoundsOverlay.style.left = -gameRoundsOverlay.contentRect.width;
     }
 
-    private void AddGameRoundWithCurrentSettings()
+    private void AddCurrentSongAsMedley()
     {
         if (!gameRoundManager.HasGameRounds)
         {
-            AddNewGameRoundWithCurrentSettings();
+            AddNewMedleyWithCurrentSettings();
             return;
         }
 
-        // Ask if the song should be added as medley entry or as new song.
-        addAsSongOrMedleyDialogControl = uiManager.CreateMessageDialog("Add Song");
-        addAsSongOrMedleyDialogControl.Message = "Add song as part of medley or new song?";
-
-        Button addAsSongButton = addAsSongOrMedleyDialogControl.AddButton("Add as new song", () =>
-        {
-            CloseAddAsSongOrMedleyDialogControl();
-            AddNewGameRoundWithCurrentSettings();
-        });
-        addAsSongOrMedleyDialogControl.AddButton("Add as medley", () =>
-        {
-            CloseAddAsSongOrMedleyDialogControl();
-            gameRoundManager.AddSongToLastGameRound(SelectedSong);
-        });
-        addAsSongOrMedleyDialogControl.AddButton("Cancel", () =>
-        {
-            CloseAddAsSongOrMedleyDialogControl();
-        });
-
-        addAsSongButton.Focus();
+        gameRoundManager.AddSongToLastGameRound(SelectedSong);
     }
 
-    public void CloseAddAsSongOrMedleyDialogControl()
-    {
-        addAsSongOrMedleyDialogControl.CloseDialog();
-        addAsSongOrMedleyDialogControl = null;
-    }
-
-    private void AddNewGameRoundWithCurrentSettings()
+    private void AddNewMedleyWithCurrentSettings()
     {
         GameRoundData gameRoundData = new();
         gameRoundData.SongMetas = new List<SongMeta> { SelectedSong };
         gameRoundData.SingScenePlayerData = CreateSingScenePlayerData();
+        gameRoundData.IsMedley = true;
+
         gameRoundManager.AddGameRound(gameRoundData);
     }
 
     private void UpdateGameRoundsUi()
     {
         IReadOnlyList<GameRoundData> gameRoundDatas = gameRoundManager.GetGameRounds();
-        gameRoundsOverlay.SetVisibleByDisplay(!gameRoundDatas.IsNullOrEmpty());
 
-        gameRoundsScrollView.Clear();
+        gameRoundsScrollView
+            .Query<VisualElement>(R.UxmlNames.gameRoundUiRoot)
+            .ToList()
+            .ForEach(visualElement => visualElement.RemoveFromHierarchy());
         gameRoundDatas.ForEach(gameRoundData => CreateGameRoundUi(gameRoundData));
+
+        // Keep the buttons at the bottom
+        gameRoundsOverlay.Q<VisualElement>(R.UxmlNames.buttonRow).BringToFront();
 
         UpdateTranslation();
     }
@@ -533,9 +527,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         VisualElement songEntryListContent = gameRoundVisualElement.Q<VisualElement>(R.UxmlNames.songEntryListContent);
         VisualElement playerEntryList = gameRoundVisualElement.Q<VisualElement>(R.UxmlNames.playerEntryList);
 
-        // Delete button
-        Button deleteButton = gameRoundVisualElement.Q<Button>(R.UxmlNames.deleteGameRoundButton);
-        deleteButton.RegisterCallbackButtonTriggered(() => gameRoundManager.DeleteNewestSongFromGameRound(gameRound));
+        // Is medley label
+        Label isMedleyLabel = gameRoundVisualElement.Q<Label>(R.UxmlNames.isMedleyLabel);
+        isMedleyLabel.SetVisibleByDisplay(gameRound.IsMedley);
 
         // Add song entries
         songEntryListContent.RemoveTemplateContainers();

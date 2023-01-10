@@ -9,8 +9,8 @@ public static partial class R
         public const string aboutText = "aboutText";
         public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
         public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
+        public const string addAsMedleyButton = "addAsMedleyButton";
         public const string addButton = "addButton";
-        public const string addGameRoundIcon = "addGameRoundIcon";
         public const string addIcon = "addIcon";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
@@ -231,6 +231,7 @@ public static partial class R
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
+        public const string isMedleyLabel = "isMedleyLabel";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
         public const string issueMessageLabel = "issueMessageLabel";
@@ -450,7 +451,6 @@ public static partial class R
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
-        public const string playerSelectAddGameRoundButton = "playerSelectAddGameRoundButton";
         public const string playerSelectCreateSongButton = "playerSelectCreateSongButton";
         public const string playerSelectOpenSongEditorButton = "playerSelectOpenSongEditorButton";
         public const string playerSelectOverlay = "playerSelectOverlay";
@@ -638,6 +638,8 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
+        public const string songSelectGameRoundOverlayUi = "songSelectGameRoundOverlayUi";
+        public const string SongSelectGameRoundOverlayUi = "SongSelectGameRoundOverlayUi";
         public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
         public const string SongSelectGameRoundSongEntryUi = "SongSelectGameRoundSongEntryUi";
         public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
