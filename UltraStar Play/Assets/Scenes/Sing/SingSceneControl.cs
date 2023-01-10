@@ -8,6 +8,7 @@ using UniInject;
 using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -61,6 +62,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public SongVideoPlayer songVideoPlayer;
+
+    [InjectedInInspector]
+    public SingSceneWebcamControl webcamControl;
 
     [Inject]
     private Injector injector;
@@ -246,6 +250,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
+        webcamControl.InitWebcam();
+
         // Associate LyricsDisplayer with one of the (duett) players
         InitSingingLyricsControls();
 
@@ -283,6 +289,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+    }
+
+    public void OnDestroy()
+    {
+        webcamControl.Stop();
     }
 
     private void InitDummySingers()
@@ -840,6 +851,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
             () => TogglePlayPause());
+
+        webcamControl.AddToContextMenu(contextMenuPopup);
+        
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => Restart());
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
