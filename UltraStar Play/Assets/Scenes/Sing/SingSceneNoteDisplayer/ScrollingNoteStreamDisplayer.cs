@@ -46,6 +46,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
         upcomingNotes = voice.Sentences
             .SelectMany(sentence => sentence.Notes)
+            .Where(note => medleyControl.IsBeatInMedleyRange(note.StartBeat) && medleyControl.IsBeatInMedleyRange(note.EndBeat))
             .ToList();
         upcomingNotes.Sort(Note.comparerByStartBeat);
         upcomingSentences = voice.Sentences.ToList();
@@ -209,7 +210,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 continue;
             }
 
-            if (displayAreaMinBeat <= sentence.MinBeat && sentence.ExtendedMaxBeat <= displayAreaMaxBeat)
+            if (displayAreaMinBeat <= sentence.MinBeat && sentence.ExtendedMaxBeat <= displayAreaMaxBeat
+                && medleyControl.IsBeatInMedleyRange(sentence.MinBeat)
+                && medleyControl.IsBeatInMedleyRange(sentence.MaxBeat))
             {
                 VisualElement separator = CreateSentenceSeparator(sentence);
                 UpdateSeparatorPosition(separator, sentence);

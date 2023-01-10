@@ -292,11 +292,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Update TimeBar every second
         if (sceneData.IsMedley)
         {
-            double medleyStartWithCountdownInMillis = medleyControl.GetMedleyStartWithCountdownInMillis();
-            double medleyDurationWithCountdownInMillis = medleyControl.GetMedleyDurationWithCountdownInMillis();
             StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
             {
-                timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis - medleyStartWithCountdownInMillis, medleyDurationWithCountdownInMillis);
+                timeBarControl?.UpdateTimeValueLabel(
+                    songAudioPlayer.PositionInSongInMillis - medleyControl.MedleyStartWithCountdownInMillis,
+                    medleyControl.MedleyDurationWithCountdownInMillis);
             }));
         }
         else
@@ -849,6 +849,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Binding happens before the injection finished. Thus, no fields can be used here that have been injected.
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(SceneData);
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);

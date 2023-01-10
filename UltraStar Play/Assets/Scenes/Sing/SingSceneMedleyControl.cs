@@ -1,16 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
-using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingSceneMedleyControl : INeedInjection
+public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
 {
     private const int CountDownTimeInSeconds = 9;
 
@@ -29,13 +24,40 @@ public class SingSceneMedleyControl : INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject]
+    private SingSceneData sceneData;
+
     private bool isSongFinished;
     private float durationAfterSongFinishedInSeconds;
 
+    public int MedleyStartBeat {get; private set;}
+    public int MedleyEndBeat {get; private set;}
+    public double MedleyStartWithCountdownInMillis {get; private set;}
+    public double MedleyStartWithoutCountdownInMillis {get; private set;}
+    public double MedleyEndInMillis {get; private set;}
+    public double MedleyDurationWithCountdownInMillis {get; private set;}
+
+    private bool IsMedley => sceneData.IsMedley;
+
+    public void OnInjectionFinished()
+    {
+        MedleyStartBeat = CalculateMedleyStartBeat();
+        MedleyEndBeat = CalculateMedleyEndBeat();
+        MedleyStartWithoutCountdownInMillis = CalculateMedleyStartWithoutCountdownInMillis();
+        MedleyStartWithCountdownInMillis = CalculateMedleyStartWithCountdownInMillis();
+        MedleyEndInMillis = CalculateMedleyEndInMillis();
+        MedleyDurationWithCountdownInMillis = CalculateMedleyDurationWithCountdownInMillis();
+    }
+
     public void Update()
     {
+        if (!IsMedley)
+        {
+            return;
+        }
+
         if (!isSongFinished
-            && Math.Abs(songAudioPlayer.PositionInSongInMillis - GetMedleyEndInMillis()) < 1000)
+            && Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
         {
             isSongFinished = true;
         }
@@ -49,60 +71,96 @@ public class SingSceneMedleyControl : INeedInjection
         }
     }
 
+    public void StartCurrentMedleySong()
+    {
+        if (!IsMedley)
+        {
+            return;
+        }
+
+        Debug.Log($"Starting current medley song '{SongMetaUtils.GetArtistDashTitle(singSceneControl.SongMeta)}'");
+        singSceneControl.SkipToPositionInSong(CalculateMedleyStartWithCountdownInMillis());
+        countdownControl.StartCountdown(CountDownTimeInSeconds);
+        audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds / 2);
+    }
+
     private void FinishMedleySong()
     {
-        SingSceneData singSceneData = GetSingSceneData();
-        if (singSceneData.MedleySongIndex >= singSceneData.SongMetas.Count - 1)
+        if (sceneData.MedleySongIndex >= sceneData.SongMetas.Count - 1)
         {
             singSceneControl.FinishScene(false);
         }
         else
         {
-            SingSceneData newSingSceneData = new(singSceneData);
+            SingSceneData newSingSceneData = new(sceneData);
             newSingSceneData.MedleySongIndex++;
             sceneNavigator.LoadScene(EScene.SingScene, newSingSceneData, true);
         }
     }
 
-    public void StartCurrentMedleySong()
+    private double CalculateMedleyStartWithCountdownInMillis()
     {
-        Debug.Log($"Starting current medley song '{SongMetaUtils.GetArtistDashTitle(GetCurrentMedleySongMeta())}'");
-        singSceneControl.SkipToPositionInSong(GetMedleyStartWithCountdownInMillis());
-        countdownControl.StartCountdown(CountDownTimeInSeconds);
-        audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds / 2);
+        if (!IsMedley)
+        {
+            return 0;
+        }
+        return NumberUtils.Limit(CalculateMedleyStartWithoutCountdownInMillis() - CountDownTimeInSeconds * 1000, 0, double.MaxValue);
     }
 
-    public double GetMedleyStartWithCountdownInMillis()
+    private double CalculateMedleyStartWithoutCountdownInMillis()
     {
-        return NumberUtils.Limit(GetMedleyStartWithoutCountdownInMillis() - CountDownTimeInSeconds * 1000, 0, double.MaxValue);
-    }
-
-    public double GetMedleyStartWithoutCountdownInMillis()
-    {
-        SongMeta songMeta = GetCurrentMedleySongMeta();
+        if (!IsMedley)
+        {
+            return 0;
+        }
+        SongMeta songMeta = singSceneControl.SongMeta;
         int medleyStartBeat = SongMetaUtils.GetMedleyStartBeat(songMeta);
-        return NumberUtils.Limit(BpmUtils.BeatToMillisecondsInSong(songMeta, medleyStartBeat), 0, songAudioPlayer.DurationOfSongInMillis);
+        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyStartBeat);
     }
 
-    public double GetMedleyEndInMillis()
+    private double CalculateMedleyEndInMillis()
     {
-        SongMeta songMeta = GetCurrentMedleySongMeta();
+        if (!IsMedley)
+        {
+            return songAudioPlayer.DurationOfSongInMillis;
+        }
+        SongMeta songMeta = singSceneControl.SongMeta;
         int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta);
-        return NumberUtils.Limit(BpmUtils.BeatToMillisecondsInSong(songMeta, medleyEndBeat), 0, songAudioPlayer.DurationOfSongInMillis);
+        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyEndBeat);
     }
 
-    public double GetMedleyDurationWithCountdownInMillis()
+    private double CalculateMedleyDurationWithCountdownInMillis()
     {
-        return GetMedleyEndInMillis() - GetMedleyStartWithCountdownInMillis();
+        return CalculateMedleyEndInMillis() - CalculateMedleyStartWithCountdownInMillis();
     }
 
-    private SongMeta GetCurrentMedleySongMeta()
+
+    private int CalculateMedleyStartBeat()
     {
-        return GetSingSceneData().SongMetas[GetSingSceneData().MedleySongIndex];
+        if (!IsMedley)
+        {
+            return 0;
+        }
+
+        return SongMetaUtils.GetMedleyStartBeat(singSceneControl.SongMeta);
     }
 
-    private SingSceneData GetSingSceneData()
+    private int CalculateMedleyEndBeat()
     {
-        return singSceneControl.SceneData;
+        if (!IsMedley)
+        {
+            return SongMetaUtils.MaxBeat(SongMetaUtils.GetAllNotes(singSceneControl.SongMeta));
+        }
+
+        return SongMetaUtils.GetMedleyEndBeat(singSceneControl.SongMeta);
+    }
+
+    public bool IsBeatInMedleyRange(int beat)
+    {
+        if (!IsMedley)
+        {
+            return true;
+        }
+        return MedleyStartBeat <= beat && beat <= MedleyEndBeat;
     }
 }
