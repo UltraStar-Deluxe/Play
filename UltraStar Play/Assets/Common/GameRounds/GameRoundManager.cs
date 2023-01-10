@@ -99,6 +99,10 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = nextGameRound.SongMetas;
         singSceneData.SingScenePlayerData = nextGameRound.SingScenePlayerData;
+        if (nextGameRound.IsMedley)
+        {
+            singSceneData.MedleySongIndex = 0;
+        }
 
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }

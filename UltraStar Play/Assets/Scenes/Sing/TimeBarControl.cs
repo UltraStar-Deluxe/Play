@@ -20,7 +20,21 @@ public class TimeBarControl : INeedInjection
 
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {
+        if (positionInSongInMillis < 0
+            || durationOfSongInMillis <= 0)
+        {
+            timeValueLabel.HideByVisibility();
+            return;
+        }
+        timeValueLabel.ShowByVisibility();
+
         double remainingTimeInSeconds = (durationOfSongInMillis - positionInSongInMillis) / 1000;
+        if (remainingTimeInSeconds < 0)
+        {
+            timeValueLabel.text = "00:00";
+            return;
+        }
+
         int mins = (int)Math.Floor(remainingTimeInSeconds / 60);
         string minsPadding = (mins < 10) ? "0" : "";
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
