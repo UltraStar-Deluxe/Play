@@ -63,6 +63,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public SongVideoPlayer songVideoPlayer;
 
+    [InjectedInInspector]
+    public SingSceneWebcamControl webcamControl;
+
     [Inject]
     private Injector injector;
 
@@ -99,16 +102,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
-    [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
-    private Image webcamRenderContainer;
-
     [Inject]
     private UIDocument uiDocument;
 
     [Inject]
     private ThemeManager themeManager;
-
-	public WebCamTexture webcampTexture;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
@@ -252,7 +250,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
-        InitWebcam();
+        webcamControl.InitWebcam();
 
         // Associate LyricsDisplayer with one of the (duett) players
         InitSingingLyricsControls();
@@ -295,22 +293,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void OnDestroy()
     {
-        webcampTexture.Stop();
-    }
-
-    private void InitWebcam()
-    {
-        webcampTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
-        webcamRenderContainer.image = webcampTexture;
-        if (WebcamsAvailable())
-        {
-            if (settings.WebcamSettings.UseAsBackgroundInSingScene)
-            {
-                webcampTexture.Play();
-            }
-
-            webcamRenderContainer.SetVisibleByDisplay(settings.WebcamSettings.UseAsBackgroundInSingScene);
-        }
+        webcamControl.Stop();
     }
 
     private void InitDummySingers()
@@ -869,27 +852,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
             () => TogglePlayPause());
 
-        if (WebcamsAvailable())
-        {
-            contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff),
-                () =>
-                {
-                    bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
-                    if (displayWebcam)
-                    {
-                        Log.Logger.Information("Webcam activated: {webcamname}", webcampTexture.deviceName);
-                        webcampTexture.Play();
-                    }
-                    else
-                    {
-                        Log.Logger.Information("Webcam deactivated: {webcamname}", webcampTexture.deviceName);
-                        webcampTexture.Stop();
-                    }
-
-                    webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
-                    settings.WebcamSettings.UseAsBackgroundInSingScene = displayWebcam;
-                });
-        }
+        webcamControl.AddToContextMenu(contextMenuPopup);
+        
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => Restart());
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
@@ -898,10 +862,5 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             () => FinishScene(false));
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => OpenSongInEditor());
-    }
-
-    private bool WebcamsAvailable()
-    {
-        return WebCamTexture.devices.Length > 0;
     }
 }
