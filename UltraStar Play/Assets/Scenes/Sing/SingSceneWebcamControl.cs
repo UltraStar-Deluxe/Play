@@ -19,17 +19,17 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
 
-    private WebCamTexture webcampTexture;
+    private WebCamTexture webcamTexture;
 
     public void InitWebcam()
     {
-        webcampTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
-        webcamRenderContainer.image = webcampTexture;
+        webcamTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
+        webcamRenderContainer.image = webcamTexture;
         if (WebcamsAvailable())
         {
             if (settings.WebcamSettings.UseAsBackgroundInSingScene)
             {
-                webcampTexture.Play();
+                webcamTexture.Play();
             }
 
             webcamRenderContainer.SetVisibleByDisplay(settings.WebcamSettings.UseAsBackgroundInSingScene);
@@ -38,17 +38,17 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
 
     public void Play()
     {
-        webcampTexture.Play();
+        webcamTexture.Play();
     }
 
     public void Stop()
     {
-        webcampTexture.Stop();
+        webcamTexture.Stop();
     }
 
     public string CurrentDeviceName()
     {
-        return webcampTexture.deviceName;
+        return webcamTexture.deviceName;
     }
 
     public bool WebcamsAvailable()
@@ -66,12 +66,12 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
                     bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
                     if (displayWebcam)
                     {
-                        Log.Logger.Information("Webcam activated: {webcamname}", webcampTexture.deviceName);
+                        Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
                         Play();
                     }
                     else
                     {
-                        Log.Logger.Information("Webcam deactivated: {webcamname}", webcampTexture.deviceName);
+                        Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
                         Stop();
                     }
 
