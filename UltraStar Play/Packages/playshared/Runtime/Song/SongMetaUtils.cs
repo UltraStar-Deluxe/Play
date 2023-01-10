@@ -523,8 +523,8 @@ public static class SongMetaUtils
 
     private static int GetDefaultMedleyEndBeat(SongMeta songMeta)
     {
-        // End the medley approx. 20 seconds afterward the start.
-        int targetDurationInMillis = 20000;
+        // End the medley approx. 30 seconds afterward the start.
+        int targetDurationInMillis = 30000;
         int medleyStartBeta = GetMedleyStartBeat(songMeta);
         int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInMillis);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
