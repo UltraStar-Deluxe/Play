@@ -24,6 +24,7 @@
     DevelopmentOptionsScene = 18,
     CompanionAppOptionsScene = 19,
     SongLibraryOptionsScene = 20,
+    WebcamOptionsSecene = 22,
 
     // sing
     SingScene = 11,

@@ -1,4 +1,4 @@
-using PrimeInputActions;
+﻿using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -46,6 +46,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.developerOptionsButton)]
     private Button developerOptionsButton;
 
+    [Inject(UxmlName = R.UxmlNames.webcamOptionsButton)]
+    private Button webcamOptionsButton;
+
     [Inject(UxmlName = R.UxmlNames.languageChooser)]
     private ItemPicker languageChooser;
 
@@ -91,6 +94,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         internetOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.NetworkOptionsScene));
         appOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CompanionAppOptionsScene));
         developerOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene));
+        webcamOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.WebcamOptionsSecene));
 
         InitSettingsProblemHints();
         InitLanguageChooser();
@@ -145,6 +149,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         internetOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_internet_button);
         appOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_companionApp_button);
         developerOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_development_button);
+        webcamOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_webcam_button);
     }
 
     private void SetLanguage(SystemLanguage newValue)
