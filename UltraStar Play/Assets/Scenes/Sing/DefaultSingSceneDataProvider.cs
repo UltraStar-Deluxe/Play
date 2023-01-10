@@ -7,6 +7,8 @@ using UnityEngine;
 // when starting the SingScene from within the Unity editor.
 public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider, INeedInjection
 {
+    public bool isMedley;
+
     public string defaultSongName;
 
     [TextArea(10, 20)]
@@ -17,6 +19,7 @@ public class DefaultSingSceneDataProvider : MonoBehaviour, IDefaultSceneDataProv
     {
         SingSceneData defaultSceneData = new();
         defaultSceneData.SongMetas = new List<SongMeta> { GetDefaultSongMeta() };
+        defaultSceneData.MedleySongIndex = isMedley ? 0 : -1;
 
         PlayerProfile playerProfile = GetDefaultPlayerProfile();
         defaultSceneData.SingScenePlayerData.SelectedPlayerProfiles.Add(playerProfile);

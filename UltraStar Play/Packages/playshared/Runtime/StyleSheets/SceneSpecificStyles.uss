@@ -115,6 +115,16 @@
 /* SING SCENE */
 /**************************************************/
 
+#countdownLabel
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    font-size: 120;
+    color: var(--control-color);
+}
+
 .singingLyrics {
     -unity-font-style: bold;
     -unity-text-outline-width: 1px;

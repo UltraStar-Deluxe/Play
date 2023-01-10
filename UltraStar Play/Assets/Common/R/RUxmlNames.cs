@@ -98,6 +98,7 @@ public static partial class R
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
+        public const string countdownLabel = "countdownLabel";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
         public const string createBackgroundLabel = "createBackgroundLabel";
         public const string createBackgroundToggle = "createBackgroundToggle";

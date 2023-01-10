@@ -15,7 +15,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
+public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
     private static SingSceneControl instance;
     public static SingSceneControl Instance
@@ -134,6 +134,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         get
         {
+            if (SceneData.IsMedley)
+            {
+                if (sceneData.MedleySongIndex >= sceneData.SongMetas.Count)
+                {
+                    Debug.LogWarning($"Cannot start medley song at index {sceneData.MedleySongIndex} because there are only {sceneData.SongMetas.Count} songs selected for the medley. Exiting SingScene.");
+                    FinishScene(false);
+                    return null;
+                }
+
+                return sceneData.SongMetas[sceneData.MedleySongIndex];
+            }
+
             return SceneData.SongMetas.FirstOrDefault();
         }
     }
@@ -170,8 +182,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private MessageDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
 
-    private ContextMenuControl contextMenuControl;
-    private CommonScoreControl commonScoreControl;
+    private readonly ContextMenuControl contextMenuControl = new();
+    private readonly CommonScoreControl commonScoreControl = new();
+    private readonly SingSceneCountdownControl countdownControl = new();
+    private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
+    private readonly SingSceneMedleyControl medleyControl = new();
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                  && SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
@@ -182,6 +197,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private float startTimeInSeconds;
     private bool hasRecordedSongStartedStatistics;
+
+    public void OnInjectionFinished()
+    {
+        injector.Inject(commonScoreControl);
+        injector.Inject(countdownControl);
+        injector.Inject(medleyControl);
+        injector.Inject(audioFadeInControl);
+
+        // Register ContextMenu
+        injector
+            .WithRootVisualElement(doubleClickToTogglePauseElement)
+            .Inject(contextMenuControl);
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
+    }
 
     private void Start()
     {
@@ -264,20 +293,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
-        // Register ContextMenu
-        contextMenuControl = injector
-            .WithRootVisualElement(doubleClickToTogglePauseElement)
-            .CreateAndInject<ContextMenuControl>();
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
-
         // Automatically start recording on companion apps
         PlayerControls.ForEach(playerControl =>
         {
             playerControl.PlayerMicPitchTracker.SendMicProfileToConnectedClient();
             playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
         });
-
-        commonScoreControl = injector.CreateAndInject<CommonScoreControl>();
 
         // Skip beginning of song via #START tag of txt file
         if (SceneData.PositionInSongInMillis <= 0
@@ -288,15 +309,34 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
 
         // Update TimeBar every second
-        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
+        if (sceneData.IsMedley)
         {
-            timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
-        }));
+            double medleyStartWithCountdownInMillis = medleyControl.GetMedleyStartWithCountdownInMillis();
+            double medleyDurationWithCountdownInMillis = medleyControl.GetMedleyDurationWithCountdownInMillis();
+            StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
+            {
+                timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis - medleyStartWithCountdownInMillis, medleyDurationWithCountdownInMillis);
+            }));
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
+            {
+                timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+            }));
+        }
+
+        // Start medley if needed
+        if (sceneData.IsMedley)
+        {
+            medleyControl.StartCurrentMedleySong();
+        }
     }
 
     public void OnDestroy()
     {
         webcamControl.Stop();
+        audioFadeInControl.Dispose();
     }
 
     private void InitDummySingers()
@@ -486,10 +526,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 statistics.RecordSongStarted(SongMeta);
             }
         }
+
+        if (sceneData.IsMedley)
+        {
+            medleyControl.Update();
+        }
     }
 
     public void SkipToNextSingableNote()
     {
+        if (sceneData.IsMedley)
+        {
+            // Skipping is not allowed in a medley.
+            return;
+        }
+
         IEnumerable<int> nextSingableNotes = PlayerControls
             .Select(it => it.GetNextSingableNote(CurrentBeat))
             .Where(nextSingableNote => nextSingableNote != null)
@@ -529,6 +580,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void OpenSongInEditor()
     {
+        if (sceneData.IsMedley)
+        {
+            UiManager.Instance.CreateNotificationVisualElement("Song editor not supported for medley");
+            return;
+        }
+
         int maxBeatToScore = PlayerControls
             .Select(playerController => playerController.PlayerScoreControl.NextBeatToScore)
             .Max();
@@ -665,6 +722,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private void UpdateSongFinishedStats(List<SongStatistic> songStatistics)
     {
+        if (sceneData.IsMedley)
+        {
+            // Medleys are not recorded
+            return;
+        }
         statistics.RecordSongFinished(SongMeta, songStatistics);
     }
 
@@ -783,6 +845,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(countdownControl);
+        bb.BindExistingInstance(medleyControl);
+        bb.BindExistingInstance(audioFadeInControl);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);

@@ -477,4 +477,89 @@ public static class SongMetaUtils
             .Select(songMeta => songMeta.Title)
             .JoinWith(", ");
     }
+
+    public static int GetMedleyStartBeat(SongMeta songMeta)
+    {
+        if (songMeta.MedleyStartBeat >= 0)
+        {
+            return songMeta.MedleyStartBeat;
+        }
+        else
+        {
+            return GetDefaultMedleyStartBeat(songMeta);
+        }
+    }
+
+    public static int GetMedleyEndBeat(SongMeta songMeta)
+    {
+        if (songMeta.MedleyEndBeat >= 0)
+        {
+            return songMeta.MedleyEndBeat;
+        }
+        else
+        {
+            return GetDefaultMedleyEndBeat(songMeta);
+        }
+    }
+
+    private static int GetDefaultMedleyStartBeat(SongMeta songMeta)
+    {
+        // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
+        int middleBeat = GetMiddleBeat(songMeta);
+        List<Sentence> sentencesBeforeMiddleBeat = songMeta.GetVoice(Voice.firstVoiceName)
+            .Sentences
+            .Where(sentence => sentence.ExtendedMaxBeat < middleBeat)
+            .ToList();
+        if (sentencesBeforeMiddleBeat.IsNullOrEmpty())
+        {
+            // Should not happen, this is a weird song.
+            Debug.LogWarning("Could not calculate a nice medley start beat. Using the middle of the song instead.");
+            return middleBeat;
+        }
+
+        sentencesBeforeMiddleBeat.Sort(Sentence.comparerByStartBeat);
+        return sentencesBeforeMiddleBeat.LastOrDefault().MinBeat;
+    }
+
+    private static int GetDefaultMedleyEndBeat(SongMeta songMeta)
+    {
+        // End the medley approx. 20 seconds afterward the start.
+        int targetDurationInMillis = 20000;
+        int medleyStartBeta = GetMedleyStartBeat(songMeta);
+        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInMillis);
+        int targetEndBeat = medleyStartBeta + targetDurationInBeats;
+
+        List<Sentence> sentencesAfterMedleyStart = songMeta.GetVoice(Voice.firstVoiceName)
+            .Sentences
+            .Where(sentence => sentence.MinBeat > medleyStartBeta)
+            .ToList();
+
+        if (sentencesAfterMedleyStart.IsNullOrEmpty())
+        {
+            // Should not happen, this is a weird song.
+            Debug.LogWarning("Could not calculate a nice medley end beat. Using some beats after medley start instead.");
+            return medleyStartBeta + targetDurationInBeats;
+        }
+
+        Sentence sentence = sentencesAfterMedleyStart.FindMinElement(sentence =>
+        {
+            // Use sentence which best approximates the target distance.
+            float distanceToTargetBeat = Math.Abs(sentence.ExtendedMaxBeat - targetEndBeat);
+            return distanceToTargetBeat;
+        });
+        if (sentence == null)
+        {
+            return medleyStartBeta + 1;
+        }
+        return sentence.ExtendedMaxBeat;
+    }
+
+    private static int GetMiddleBeat(SongMeta songMeta)
+    {
+        // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
+        List<Note> allNotes = GetAllNotes(songMeta);
+        int minBeat = MinBeat(allNotes);
+        int maxBeat = MaxBeat(allNotes);
+        return minBeat + ((maxBeat - minBeat) / 2);
+    }
 }
