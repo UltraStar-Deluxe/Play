@@ -60,7 +60,7 @@ public class SingSceneMedleyControl : INeedInjection
         {
             SingSceneData newSingSceneData = new(singSceneData);
             newSingSceneData.MedleySongIndex++;
-            sceneNavigator.LoadScene(EScene.SingScene, newSingSceneData);
+            sceneNavigator.LoadScene(EScene.SingScene, newSingSceneData, true);
         }
     }
 

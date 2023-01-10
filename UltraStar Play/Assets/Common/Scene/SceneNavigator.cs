@@ -44,19 +44,21 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
         LoadScene(holder.scene);
     }
 
-    public void LoadScene(EScene scene)
+    public void LoadScene(EScene scene, bool skipAnimation=false)
     {
         EScene currentScene = ESceneUtils.GetCurrentScene();
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
         void DoChangeScene() => SceneManager.LoadScene((int)scene);
-        if (settings.GraphicSettings.AnimateSceneChange)
+        if (!skipAnimation
+            && settings.GraphicSettings.AnimateSceneChange)
         {
             sceneChangeAnimationControl.AnimateChangeToScene(DoChangeScene, () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
         }
         else
         {
+            sceneChangeAnimationControl.ClearAnimation();
             DoChangeScene();
         }
     }
@@ -66,14 +68,14 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
         staticSceneDatas[sceneData.GetType()] = sceneData;
     }
 
-    public void LoadScene(EScene scene, SceneData sceneData)
+    public void LoadScene(EScene scene, SceneData sceneData, bool skipAnimation=false)
     {
         if (sceneData == null)
         {
             throw new Exception("SceneData cannot be null. Use LoadScene(EScene) if no SceneData is required.");
         }
         AddSceneData(sceneData);
-        LoadScene(scene);
+        LoadScene(scene, skipAnimation);
     }
 
     public T GetSceneDataOrThrow<T>() where T : SceneData

@@ -114,6 +114,11 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         doLoadSceneAction();
     }
 
+    public void ClearAnimation()
+    {
+        animateAction = null;
+    }
+
     public void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
     {
         bool skipSceneChangeAnimationSound = nextScene == EScene.SingScene
