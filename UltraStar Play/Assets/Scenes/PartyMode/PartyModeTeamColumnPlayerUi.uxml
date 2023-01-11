@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="teamColumnPlayerUiRoot" style="justify-content: flex-start; align-items: center; flex-grow: 1; flex-direction: row; margin-top: 5px; margin-bottom: 5px;">
+        <ui:Button display-tooltip-when-elided="true" name="moveToLeftTeamButton" class="squareButton">
+            <MaterialIcon tabindex="-1" icon="chevron_left" name="leftArrow" />
+        </ui:Button>
+        <ui:Label tabindex="-1" text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" style="min-width: 150px; -unity-text-align: middle-center;" />
+        <ui:TextField picking-mode="Ignore" value="Guest 01" name="guestNameTextField" style="min-width: 150px; display: none;" />
+        <ui:Button display-tooltip-when-elided="true" name="moveToRightTeamButton" class="squareButton">
+            <MaterialIcon tabindex="-1" icon="chevron_right" name="rightArrow" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

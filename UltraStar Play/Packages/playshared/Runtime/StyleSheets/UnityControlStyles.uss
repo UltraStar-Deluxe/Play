@@ -194,6 +194,7 @@
 .unity-toggle__label {
     white-space: normal;
     flex-shrink: 1;
+    margin-right: auto;
 }
 
 .unity-toggle__input {
