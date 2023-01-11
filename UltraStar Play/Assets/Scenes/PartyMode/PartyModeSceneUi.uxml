@@ -1,4 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="PartyModeTeamConfigUi" src="project://database/Assets/Scenes/PartyMode/PartyModeTeamConfigUi.uxml?fileID=9197481963319205126&amp;guid=4248ab757501d664bb769d0ad950cb4d&amp;type=3#PartyModeTeamConfigUi" />
+    <ui:Template name="PartyModeRoundConfigUi" src="project://database/Assets/Scenes/PartyMode/PartyModeRoundConfigUi.uxml?fileID=9197481963319205126&amp;guid=8bf7a1b118fe0634f9b4ad1d8a1e64cd&amp;type=3#PartyModeRoundConfigUi" />
     <ui:VisualElement name="background" class="optionsSceneMainContainer">
         <ui:VisualElement name="topRow" class="optionsSceneTopRow">
             <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -9,6 +11,12 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Instance template="PartyModeTeamConfigUi" name="partyModeTeamConfigUi" style="flex-grow: 1; width: 100%; display: flex;" />
+        <ui:Instance template="PartyModeRoundConfigUi" name="partyModeRoundConfigUi" style="flex-grow: 1; width: 100%; display: none;" />
+        <ui:VisualElement name="bottomRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-end; width: 100%; margin-top: 5px; align-items: center;">
+            <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="controlMinWidth" style="margin-right: 5px;" />
+            <ui:Button text="Continue" display-tooltip-when-elided="true" name="continueButton" class="controlMinWidth" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
