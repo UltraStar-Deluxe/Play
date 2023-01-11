@@ -106,11 +106,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void Start()
     {
-        startButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
-        settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
-        aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
-        creditsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.CreditsScene));
+        settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        aboutButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.AboutScene));
+        creditsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CreditsScene));
+        partyButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.PartyModeScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
@@ -120,7 +121,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         InitButtonDescription(creditsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_credits_description));
         InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
         InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
-        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
+        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_party_description));
 
         UpdateVersionInfoText();
 
