@@ -29,7 +29,7 @@ public static partial class R
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string invertedVisibility = "invertedVisibility";
-        public const string itemPickerWithLabelHorizontal = "itemPickerWithLabelHorizontal";
+        public const string controlWithLabelHorizontal = "controlWithLabelHorizontal";
         public const string largeFont = "largeFont";
         public const string largestFont = "largestFont";
         public const string leftSideBar = "leftSideBar";

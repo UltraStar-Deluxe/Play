@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="songSelectionUi">
-        <ItemPicker name="songSelectionItemPicker" label="Song Selection" class="itemPickerWithLabelHorizontal" style="align-items: center; margin-bottom: 5px;" />
-        <ItemPicker name="songSelectionPlaylistItemPicker" label="Playlist" class="itemPickerWithLabelHorizontal" style="margin-bottom: 5px;" />
-        <ItemPicker name="songSelectionJokerCountItemPicker" label="Jokers" class="itemPickerWithLabelHorizontal" style="margin-bottom: 5px;" />
+        <ItemPicker name="songSelectionItemPicker" label="Song Selection" class="controlWithLabelHorizontal" style="align-items: center; margin-bottom: 5px;" />
+        <ItemPicker name="songSelectionPlaylistItemPicker" label="Playlist" class="controlWithLabelHorizontal" style="margin-bottom: 5px;" />
+        <ItemPicker name="songSelectionJokerCountItemPicker" label="Jokers" class="controlWithLabelHorizontal" style="margin-bottom: 5px;" />
     </ui:VisualElement>
 </ui:UXML>

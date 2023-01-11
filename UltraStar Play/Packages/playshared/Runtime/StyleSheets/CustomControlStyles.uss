@@ -5,6 +5,8 @@
 ItemPicker {
     height: var(--control-height);
     min-width: var(--control-height-small);
+    flex-direction: row;
+    align-items: center;
 }
 
 .itemPickerContent {
@@ -13,12 +15,7 @@ ItemPicker {
     height: 100%;
 }
 
-.itemPickerWithLabelHorizontal
-{
-    flex-direction: row;
-}
-
-.itemPickerWithLabelHorizontal .itemPickerLabel {
+.controlWithLabelHorizontal .controlLabel {
     margin-right: auto;
     width: 50%;
 }
@@ -65,14 +62,45 @@ ItemPicker {
     border-bottom-left-radius: 0;
 }
 
-.itemPickerWithLabelFullWith .itemPickerContent
-{
-    max-width: 45%;
+/**************************************************/
+/* CHIPS COMBO */
+/**************************************************/
+ChipsCombo {
+    flex-direction: row;
+    align-items: center;
 }
 
-.itemPickerWithLabelFullWith .itemPickerLabel
-{
-    margin-right: auto;
+.chipsComboContent {
+    background-color: var(--control-color-accent2);
+    flex-direction: row;
+    border-radius: 5px;
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.chipsComboChipsList {
+    flex-grow: 1;
+}
+
+.chipsComboButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 60px;
+}
+
+.chipsComboEntryRoot {
+    flex-direction: row;
+    align-items: center;
+    border-radius: 20px;
+    background-color: var(--control-color);
+}
+
+.chipsComboEntryLabel {
+    padding: 5px;
+}
+
+.chipsComboEntryButton {
+    margin-left: 10px;
 }
 
 /**************************************************/
