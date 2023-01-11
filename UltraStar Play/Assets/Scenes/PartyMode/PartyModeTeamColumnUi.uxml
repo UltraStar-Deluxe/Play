@@ -1,11 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="teamColumnUiRoot" style="justify-content: flex-start; align-items: flex-start; flex-grow: 1; border-left-color: rgba(255, 255, 255, 0.5); border-right-color: rgba(255, 255, 255, 0.5); border-top-color: rgba(255, 255, 255, 0.5); border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 5px; padding-right: 5px;">
-        <ui:VisualElement name="topContent" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-            <ui:TextField picking-mode="Ignore" value="Team 01" name="teamNameTextField" style="min-width: 200px;" />
+    <ui:Template name="PartyModeTeamColumnPlayerUi" src="project://database/Assets/Scenes/PartyMode/PartyModeTeamColumnPlayerUi.uxml?fileID=9197481963319205126&amp;guid=2b8c5e1f85d2b1d4390343734d5b3ffc&amp;type=3#PartyModeTeamColumnPlayerUi" />
+    <ui:VisualElement name="teamColumnUiRoot" style="justify-content: flex-start; align-items: stretch; flex-grow: 1; border-left-color: rgba(255, 255, 255, 0.5); border-right-color: rgba(255, 255, 255, 0.5); border-top-color: rgba(255, 255, 255, 0.5); border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 5px; padding-right: 5px; min-width: 200px;">
+        <ui:VisualElement name="topContent" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-bottom: 10px;">
+            <ui:TextField picking-mode="Ignore" value="Team 01" name="teamNameTextField" style="min-width: 200px; flex-grow: 1;" />
             <ui:Button display-tooltip-when-elided="true" name="deleteTeamButton" class="squareButton" style="margin-left: 5px;">
                 <MaterialIcon tabindex="-1" icon="delete" name="deleteIcon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:VisualElement name="contentContainer" content-container="true" style="background-color: rgba(0, 0, 0, 0);" />
+        <ui:VisualElement name="contentContainer" content-container="true" style="background-color: rgba(0, 0, 0, 0);">
+            <ui:Instance template="PartyModeTeamColumnPlayerUi" name="PartyModeTeamColumnPlayerUi" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
