@@ -342,7 +342,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
-        backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        backToMainMenuButton.RegisterCallbackButtonTriggered(() => GoBack());
 
         toggleSongDetailOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -469,6 +469,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 HideGameRoundsOverlay();
             }
         });
+    }
+
+    public void GoBack()
+    {
+        if (sceneData.PartyModeSettings != null)
+        {
+            PartyModeSceneData partyModeSceneData = new();
+            partyModeSceneData.PartyModeSettings = sceneData.PartyModeSettings;
+            sceneNavigator.LoadScene(EScene.PartyModeScene, partyModeSceneData);
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.MainScene);
+        }
     }
 
     private void ShowGameRoundsOverlay()

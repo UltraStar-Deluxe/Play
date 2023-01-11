@@ -168,7 +168,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            sceneNavigator.LoadScene(EScene.MainScene);
+            songSelectSceneControl.GoBack();
         }
     }
 
