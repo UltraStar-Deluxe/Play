@@ -338,6 +338,10 @@ MonoBehaviour:
     type: 3}
   accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
     type: 3}
+  nextGameRoundInfoUi: {fileID: 9197481963319205126, guid: 4b0fc95be5bd7c84abec348087a5d4af,
+    type: 3}
+  nextGameRoundInfoPlayerEntryUi: {fileID: 9197481963319205126, guid: 1c1764560ee144247ab75c166154b2a3,
+    type: 3}
   showFpsPrefab: {fileID: 7200366228149695045, guid: 50d02acac4813a94490c57776dc5e4ee,
     type: 3}
   avatarImageReferences:
@@ -398,7 +402,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82708d27bccb8fa4d888d6518e9bb9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneChangeAnimationTime: 0.2
 --- !u!82 &461665969244419356
 AudioSource:
   m_ObjectHideFlags: 0
@@ -838,6 +841,7 @@ Transform:
   - {fileID: 8570025457633197298}
   - {fileID: 9143355034012100345}
   - {fileID: 2908706230957184142}
+  - {fileID: 1683549351183688449}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6090,6 +6094,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24627b3d72d8c974cbbad3a55d72cb44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &3009989693900452139
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1683549351183688449}
+  - component: {fileID: 6156392334929519767}
+  m_Layer: 0
+  m_Name: GameRoundManager
+  m_TagString: GameRoundManager
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1683549351183688449
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009989693900452139}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8069444317427349030}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6156392334929519767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009989693900452139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d75683dc1896f46a318154d9ca5e07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3287780989700900258

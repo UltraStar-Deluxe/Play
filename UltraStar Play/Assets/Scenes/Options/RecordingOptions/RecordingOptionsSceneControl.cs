@@ -444,19 +444,26 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
         {
-            MicrophoneAdapter.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
-
-            for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
+            try
             {
-                bool alreadyInList = micProfiles.AnyMatch(it =>
-                    it.Name == connectedMicName
-                    && it.ChannelIndex == channelIndex
-                    && !it.IsInputFromConnectedClient);
-                if (!alreadyInList)
+                MicrophoneAdapter.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
+                for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
                 {
-                    MicProfile micProfile = new(connectedMicName, channelIndex);
-                    micProfiles.Add(micProfile);
+                    bool alreadyInList = micProfiles.AnyMatch(it =>
+                        it.Name == connectedMicName
+                        && it.ChannelIndex == channelIndex
+                        && !it.IsInputFromConnectedClient);
+                    if (!alreadyInList)
+                    {
+                        MicProfile micProfile = new(connectedMicName, channelIndex);
+                        micProfiles.Add(micProfile);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+                continue;
             }
         }
 

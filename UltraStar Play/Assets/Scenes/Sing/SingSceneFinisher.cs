@@ -1,5 +1,9 @@
 using System;
+using UniInject;
 using UnityEngine;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
 
 // Handles automatically finishing the SingScene.
 // The Unity AudioPlayer changes the playback position back to zero when the AudioClip has finished.
@@ -7,22 +11,28 @@ using UnityEngine;
 // and will finish the scene with a small delay afterwards.
 // To prevent premature ending the scene, it is only watched for the falling flank in the playback position
 // when the song has been near its end already.
-public class SingSceneFinisher : MonoBehaviour
+public class SingSceneFinisher : MonoBehaviour, INeedInjection
 {
     private bool hasBeenNearEndOfSong;
     private bool isSongFinished;
     private float durationAfterSongFinishedInSeconds;
 
+    [Inject]
     private SingSceneControl singSceneControl;
 
     private double positionInSongInMillisOld;
 
-    void Awake()
+    private void Start()
     {
-        singSceneControl = FindObjectOfType<SingSceneControl>();
+        if (singSceneControl.SceneData.IsMedley)
+        {
+            // The dedicated medley control will finish the song.
+            gameObject.SetActive(false);
+            return;
+        }
     }
 
-    void Update()
+    private void Update()
     {
         double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
         if (durationOfSongInMillis <= 0)

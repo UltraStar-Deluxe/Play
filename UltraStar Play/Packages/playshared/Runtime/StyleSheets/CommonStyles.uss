@@ -37,6 +37,10 @@
     justify-content: center;
 }
 
+.overlayBackground {
+    background-color: rgba(32, 32, 32, 0.8);
+}
+
 .roundButton {
     width: var(--round-button-size);
     height: var(--round-button-size);
@@ -125,12 +129,12 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
-.wideControl {
-    width: var(--control-width-large);
+.controlMinWidth {
+    min-width: var(--control-width);
 }
 
-.wideControl {
-    width: var(--control-width-large);
+.largeControlMinWidth {
+    min-width: var(--control-width-large);
 }
 
 .noBackground TextInput {

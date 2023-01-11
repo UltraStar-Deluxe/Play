@@ -10,7 +10,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator
+public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
@@ -37,15 +37,28 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
     private SceneNavigator sceneNavigator;
 
     [Inject]
+    private GameRoundManager gameRoundManager;
+
+    [Inject]
     private Statistics statistics;
 
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
+    private Injector injector;
+
     private HighscoreSceneData sceneData;
     private EDifficulty currentDifficulty;
 
-    void Start()
+    private NextGameRoundUiControl nextGameRoundUiControl = new();
+
+    public void OnInjectionFinished()
+    {
+        injector.Inject(nextGameRoundUiControl);
+    }
+
+    private void Start()
     {
         sceneData = sceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
@@ -65,9 +78,18 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
 
     public void FinishScene()
     {
-        SongSelectSceneData songSelectSceneData = new();
-        songSelectSceneData.SongMeta = sceneData.SongMeta;
-        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+        if (gameRoundManager.HasGameRounds)
+        {
+            // Start next game round
+            gameRoundManager.StartNextGameRound();
+        }
+        else
+        {
+            // Go to song select
+            SongSelectSceneData songSelectSceneData = new();
+            songSelectSceneData.SongMeta = sceneData.SongMeta;
+            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+        }
     }
 
     public void ShowNextDifficulty(int direction)

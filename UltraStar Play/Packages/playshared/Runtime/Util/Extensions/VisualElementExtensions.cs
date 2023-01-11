@@ -182,4 +182,19 @@ public static class VisualElementExtensions
         }
         return ancestors;
     }
+
+    public static void RemoveTemplateContainers(this VisualElement visualElement)
+    {
+        visualElement
+            .Query<TemplateContainer>()
+            // Copy list to avoid modification while iterating
+            .ToList()
+            .ForEach(templateContainer => templateContainer.RemoveFromHierarchy());
+    }
+
+    public static void AddAsFirstChild(this VisualElement visualElement, VisualElement otherVisualElement)
+    {
+        visualElement.Add(otherVisualElement);
+        otherVisualElement.SendToBack();
+    }
 }

@@ -18,9 +18,26 @@ public class TimeBarControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
 
+    [Inject]
+    private SingSceneMedleyControl medleyControl;
+
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {
+        if (positionInSongInMillis < 0
+            || durationOfSongInMillis <= 0)
+        {
+            timeValueLabel.HideByVisibility();
+            return;
+        }
+        timeValueLabel.ShowByVisibility();
+
         double remainingTimeInSeconds = (durationOfSongInMillis - positionInSongInMillis) / 1000;
+        if (remainingTimeInSeconds < 0)
+        {
+            timeValueLabel.text = "00:00";
+            return;
+        }
+
         int mins = (int)Math.Floor(remainingTimeInSeconds / 60);
         string minsPadding = (mins < 10) ? "0" : "";
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
@@ -49,6 +66,11 @@ public class TimeBarControl : INeedInjection
     {
         foreach (Sentence sentence in playerControl.Voice.Sentences)
         {
+            if (!medleyControl.IsSentenceInMedleyRange(sentence))
+            {
+                continue;
+            }
+
             double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
             double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
             if (playerCount <= 3)

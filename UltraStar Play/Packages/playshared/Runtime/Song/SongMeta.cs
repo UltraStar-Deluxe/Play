@@ -157,6 +157,18 @@ public class SongMeta
      */
     public float End { get; set; }
 
+    /**
+     * First beat to sing when the song was started as medley.
+     * A countdown is shown before this beat.
+     */
+    public int MedleyStartBeat { get; set; } = -1;
+
+    /**
+     * Last beat to sing when the song was started as medley.
+     * Afterwards, the next medley song will be started.
+     */
+    public int MedleyEndBeat { get; set; } = -1;
+
     private List<Voice> voices = new();
 
     public bool FailedToLoadVoices { get; private set; }

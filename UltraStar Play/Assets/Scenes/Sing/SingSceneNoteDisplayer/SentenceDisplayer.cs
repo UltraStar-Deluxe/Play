@@ -32,7 +32,8 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     {
         currentSentence = sentence;
         RemoveAllDisplayedNotes();
-        if (sentence == null)
+        if (sentence == null
+            || !medleyControl.IsSentenceInMedleyRange(sentence))
         {
             return;
         }

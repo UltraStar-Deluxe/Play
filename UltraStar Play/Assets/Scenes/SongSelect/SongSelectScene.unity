@@ -295,10 +295,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7399b3bf3bdbac04483cae7688035fcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  favoriteImageAsset: {fileID: 7388822144124034973, guid: 5fd6f255d5637614eae7dfe140b680d7,
-    type: 3}
-  noFavoriteImageAsset: {fileID: 7388822144124034973, guid: c9d8ab3f7c05d4d41817ee5602bc9f1c,
-    type: 3}
   songSelectSceneInputControl: {fileID: 1490683137}
   songAudioPlayer: {fileID: 1830530624}
   songVideoPlayer: {fileID: 1740431085}
@@ -308,6 +304,12 @@ MonoBehaviour:
   songPreviewControl: {fileID: 974432510}
   playerListControl: {fileID: 922159446}
   micListControl: {fileID: 1127310616}
+  gameRoundUi: {fileID: 9197481963319205126, guid: 82a6470c46626074998301d3d1e10698,
+    type: 3}
+  gameRoundPlayerEntryUi: {fileID: 9197481963319205126, guid: ccb6fef294a278444a611bf2cff48729,
+    type: 3}
+  gameRoundSongEntryUi: {fileID: 9197481963319205126, guid: fb881350f700eba4b80febd82795eb70,
+    type: 3}
 --- !u!4 &620408750
 Transform:
   m_ObjectHideFlags: 0

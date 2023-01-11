@@ -91,6 +91,9 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private Voice voice;
 
+    [Inject]
+    private SingSceneMedleyControl medleyControl;
+
     private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new();
     public IObservable<SentenceScoreEvent> SentenceScoreEventStream
     {
@@ -125,6 +128,11 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
+        if (!medleyControl.IsBeatInMedleyRange(beatAnalyzedEvent.Beat))
+        {
+            return;
+        }
+
         // Check if pitch was detected where a note is expected in the song
         if (beatAnalyzedEvent.PitchEvent == null
             || beatAnalyzedEvent.NoteAtBeat == null)
@@ -184,7 +192,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnNoteAnalyzed(NoteAnalyzedEvent noteAnalyzedEvent)
     {
-        if (noteAnalyzedEvent.Note.EndBeat < NextBeatToScore)
+        if (noteAnalyzedEvent.Note.EndBeat < NextBeatToScore
+            || !medleyControl.IsNoteInMedleyRange(noteAnalyzedEvent.Note))
         {
             return;
         }
@@ -202,7 +211,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnSentenceAnalyzed(SentenceAnalyzedEvent sentenceAnalyzedEvent)
     {
-        if (sentenceAnalyzedEvent.Sentence.MaxBeat < NextBeatToScore)
+        if (sentenceAnalyzedEvent.Sentence.MaxBeat < NextBeatToScore
+            || !medleyControl.IsSentenceInMedleyRange(sentenceAnalyzedEvent.Sentence))
         {
             return;
         }
@@ -295,12 +305,18 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private int GetNormalNoteLength(Sentence sentence)
     {
-        return sentence.Notes.Where(note => note.IsNormal).Select(note => (int)note.Length).Sum();
+        return sentence.Notes
+            .Where(note => note.IsNormal && medleyControl.IsNoteInMedleyRange(note))
+            .Select(note => note.Length)
+            .Sum();
     }
 
     private int GetGoldenNoteLength(Sentence sentence)
     {
-        return sentence.Notes.Where(note => note.IsGolden).Select(note => (int)note.Length).Sum();
+        return sentence.Notes
+            .Where(note => note.IsGolden && medleyControl.IsNoteInMedleyRange(note))
+            .Select(note => note.Length)
+            .Sum();
     }
 
     private SentenceScore CreateSentenceScore(Sentence sentence)

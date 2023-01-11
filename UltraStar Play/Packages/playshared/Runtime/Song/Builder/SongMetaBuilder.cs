@@ -200,6 +200,12 @@ public static class SongMetaBuilder
                     case "year":
                         songMeta.Year = ConvertToUInt32(item.Value);
                         break;
+                    case "medleystartbeat":
+                        songMeta.MedleyStartBeat = ConvertToInt32(item.Value);
+                        break;
+                    case "medleyendbeat":
+                        songMeta.MedleyEndBeat = ConvertToInt32(item.Value);
+                        break;
                     default:
                         songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
                         break;
@@ -251,7 +257,24 @@ public static class SongMetaBuilder
         }
         catch (FormatException e)
         {
-            throw new SongMetaBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message);
+            throw new SongMetaBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message, e);
+        }
+    }
+
+    private static int ConvertToInt32(string s)
+    {
+        if (s.IsNullOrEmpty())
+        {
+            return 0;
+        }
+
+        try
+        {
+            return Convert.ToInt32(s, 10);
+        }
+        catch (FormatException e)
+        {
+            throw new SongMetaBuilderException("Could not convert " + s + " to an int. Reason: " + e.Message, e);
         }
     }
 }
