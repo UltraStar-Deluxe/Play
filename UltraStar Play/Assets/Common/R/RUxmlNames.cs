@@ -9,6 +9,7 @@ public static partial class R
         public const string aboutText = "aboutText";
         public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
         public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
+        public const string addAsMedleyButton = "addAsMedleyButton";
         public const string addButton = "addButton";
         public const string addIcon = "addIcon";
         public const string addSongFolderButton = "addSongFolderButton";
@@ -97,6 +98,7 @@ public static partial class R
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
+        public const string countdownLabel = "countdownLabel";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
         public const string createBackgroundLabel = "createBackgroundLabel";
         public const string createBackgroundToggle = "createBackgroundToggle";
@@ -116,6 +118,7 @@ public static partial class R
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
+        public const string deleteGameRoundButton = "deleteGameRoundButton";
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string designOptionsButton = "designOptionsButton";
@@ -173,6 +176,11 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameLogo = "gameLogo";
         public const string gameOptionsButton = "gameOptionsButton";
+        public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
+        public const string gameRoundsOverlay = "gameRoundsOverlay";
+        public const string gameRoundsScrollView = "gameRoundsScrollView";
+        public const string gameRoundsTitle = "gameRoundsTitle";
+        public const string gameRoundUiRoot = "gameRoundUiRoot";
         public const string genreLabel = "genreLabel";
         public const string genrePropertyContainer = "genrePropertyContainer";
         public const string globalSettingsLabel = "globalSettingsLabel";
@@ -224,6 +232,7 @@ public static partial class R
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
+        public const string isMedleyLabel = "isMedleyLabel";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
         public const string issueMessageLabel = "issueMessageLabel";
@@ -307,6 +316,7 @@ public static partial class R
         public const string micDisconnectedLabel = "micDisconnectedLabel";
         public const string micEntry = "micEntry";
         public const string micIcon = "micIcon";
+        public const string micImage = "micImage";
         public const string micListOverlay = "micListOverlay";
         public const string micOctaveOffsetContainer = "micOctaveOffsetContainer";
         public const string micOctaveOffsetTextField = "micOctaveOffsetTextField";
@@ -343,9 +353,20 @@ public static partial class R
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
         public const string nextDifficultyButton = "nextDifficultyButton";
+        public const string nextGameRoundInfoPlayerEntryUiRoot = "nextGameRoundInfoPlayerEntryUiRoot";
+        public const string NextGameRoundInfoUi = "NextGameRoundInfoUi";
+        public const string nextGameRoundInfoUiRoot = "nextGameRoundInfoUiRoot";
+        public const string nextGameRoundPlayerEntryLabel = "nextGameRoundPlayerEntryLabel";
+        public const string nextGameRoundPlayerEntryList = "nextGameRoundPlayerEntryList";
+        public const string nextGameRoundPlayerEntryMicImage = "nextGameRoundPlayerEntryMicImage";
+        public const string nextGameRoundSongInfoContainer = "nextGameRoundSongInfoContainer";
+        public const string nextGameRoundSongInfoLabel = "nextGameRoundSongInfoLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
+        public const string nextLabel = "nextLabel";
+        public const string NextRoundInfoPlayerEntryUi = "NextRoundInfoPlayerEntryUi";
+        public const string NextRoundInfoUi = "NextRoundInfoUi";
         public const string nextSentenceContainer = "nextSentenceContainer";
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nextSongButton = "nextSongButton";
@@ -422,6 +443,7 @@ public static partial class R
         public const string playbackAudioPicker = "playbackAudioPicker";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
+        public const string playerEntryList = "playerEntryList";
         public const string playerImage = "playerImage";
         public const string playerInfoContainer = "playerInfoContainer";
         public const string playerNameContainer = "playerNameContainer";
@@ -578,6 +600,7 @@ public static partial class R
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
+        public const string songConverAndInfoRow = "songConverAndInfoRow";
         public const string songCoverImage = "songCoverImage";
         public const string songCoverLabel = "songCoverLabel";
         public const string songDetailOverlay = "songDetailOverlay";
@@ -587,6 +610,8 @@ public static partial class R
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
+        public const string songEntryList = "songEntryList";
+        public const string songEntryListContent = "songEntryListContent";
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryPlaceholder = "songEntryPlaceholder";
         public const string songEntryUiRoot = "songEntryUiRoot";
@@ -614,6 +639,11 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
+        public const string songSelectGameRoundOverlayUi = "songSelectGameRoundOverlayUi";
+        public const string SongSelectGameRoundOverlayUi = "SongSelectGameRoundOverlayUi";
+        public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
+        public const string SongSelectGameRoundSongEntryUi = "SongSelectGameRoundSongEntryUi";
+        public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
@@ -674,6 +704,8 @@ public static partial class R
         public const string titleTextField = "titleTextField";
         public const string toggle = "toggle";
         public const string toggleFavoriteButton = "toggleFavoriteButton";
+        public const string toggleGameRoundsOverlayButton = "toggleGameRoundsOverlayButton";
+        public const string toggleGameRoundsOverlayIcon = "toggleGameRoundsOverlayIcon";
         public const string toggleHelpButton = "toggleHelpButton";
         public const string toggleIssuesButton = "toggleIssuesButton";
         public const string toggleJobListButton = "toggleJobListButton";

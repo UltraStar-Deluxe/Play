@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -11,7 +12,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         SingingResultsSceneData data = new();
 
         SongMetaManager.Instance.WaitUntilSongScanFinished();
-        data.SongMeta = SongMetaManager.Instance.GetFirstSongMeta();
+        data.SongMetas = new List<SongMeta> { SongMetaManager.Instance.GetFirstSongMeta() };
         data.SongDurationInMillis = 120 * 1000;
 
         PlayerScoreControlData playerScoreData = new();

@@ -42,6 +42,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     [Inject]
     protected Injector injector;
 
+    [Inject]
+    protected SingSceneMedleyControl medleyControl;
+
     [Inject(Optional = true)]
     protected MicProfile micProfile;
 

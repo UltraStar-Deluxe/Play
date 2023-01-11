@@ -41,7 +41,10 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-    
+
+    [Inject]
+    private SingSceneMedleyControl medleyControl;
+
     // The rounding distance of the PlayerProfile
     private int roundingDistance;
 

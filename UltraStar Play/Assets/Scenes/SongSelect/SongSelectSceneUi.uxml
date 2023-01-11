@@ -1,9 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSongEntryUi" />
-    <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
-    <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
-    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
+    <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSceneSongEntryUi" />
     <ui:Template name="SongSelectScenePlayerSelectUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerSelectUi.uxml?fileID=9197481963319205126&amp;guid=203783e05a7f81543812dd249b0e1372&amp;type=3#SongSelectScenePlayerSelectUi" />
+    <ui:Template name="SongSelectGameRoundOverlayUi" src="project://database/Assets/Scenes/SongSelect/SongSelectGameRoundOverlayUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongSelectGameRoundOverlayUi" />
+    <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
@@ -106,6 +105,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="SongSelectScenePlayerSelectUi" name="songSelectPlayerSelectUi" style="position: absolute; width: 100%; height: 100%; display: none;" />
+        <ui:Instance template="SongSelectGameRoundOverlayUi" name="songSelectGameRoundOverlayUi" picking-mode="Ignore" style="width: auto; height: 100%; position: absolute; max-width: 30%;" />
         <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); display: flex; flex-wrap: wrap;">
             <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
@@ -150,7 +150,7 @@
                 <ui:TextField picking-mode="Ignore" text="Playlist Name" name="playlistNameTextField" style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0;" />
                 <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-around; margin-top: 10px;">
                     <ui:Button text="Delete" display-tooltip-when-elided="true" name="deletePlaylistButton" class="controlMinWidth" />
-                    <ui:Button text="Confirm Delete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="wideControl controlMinWidth" style="display: none;" />
+                    <ui:Button text="Confirm Delete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
                     <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
                     <ui:Button text="Continue" display-tooltip-when-elided="true" name="submitEditPlaylistButton" class="controlMinWidth" />
                 </ui:VisualElement>
@@ -221,6 +221,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none;" />
+        <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none; min-width: 10%;" />
     </ui:VisualElement>
 </ui:UXML>

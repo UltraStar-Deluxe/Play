@@ -139,7 +139,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         sceneNavigator.LoadScene(EScene.SongEditorScene, new SongEditorSceneData
         {
             PreviousScene = EScene.MainScene,
-            SelectedSongMeta = songMeta,
+            SongMeta = songMeta,
         });
     }
 

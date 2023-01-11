@@ -52,11 +52,13 @@ public static partial class R
         public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
+        public const string overlayBackground = "overlayBackground";
         public const string panel = "panel";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
         public const string rounded = "rounded";
+        public const string roundedCorners = "roundedCorners";
         public const string scoreRow = "scoreRow";
         public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondarySideBarPanel = "secondarySideBarPanel";
@@ -82,7 +84,6 @@ public static partial class R
         public const string titleText = "titleText";
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string warning = "warning";
-        public const string wideControl = "wideControl";
         public const string xxlFont = "xxlFont";
     }
 }
