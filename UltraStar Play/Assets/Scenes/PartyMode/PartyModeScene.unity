@@ -168,6 +168,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0765e1ad962d9a42abe8545c780de91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  teamColumnUi: {fileID: 9197481963319205126, guid: 1372ae0a2e4e4904d907d6afc58462ff,
+    type: 3}
+  teamColumnPlayerUi: {fileID: 9197481963319205126, guid: 2b8c5e1f85d2b1d4390343734d5b3ffc,
+    type: 3}
+  roundUi: {fileID: 9197481963319205126, guid: f26838f73618ff842b8ee24e797eb4bb, type: 3}
 --- !u!1 &1203774096
 GameObject:
   m_ObjectHideFlags: 0
