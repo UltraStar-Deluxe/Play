@@ -95,6 +95,12 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         // First, add the regular player profiles. Afterwards, add the guest profiles.
         AddPlayerProfilesToTeams(false);
         AddPlayerProfilesToTeams(true);
+
+        // Add at least one round
+        if (partyModeSettings.RoundsSettings.GameRoundSettings.IsNullOrEmpty())
+        {
+            partyModeSettings.RoundsSettings.GameRoundSettings.Add(new GameRoundSettings());
+        }
     }
 
     private void UpdateConfigPart()
@@ -170,6 +176,13 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         }
         else if (configPart.Value == EPartyModeConfigPart.Rounds)
         {
+            string errorMessage = GetRoundsConfigErrorMessage();
+            if (!errorMessage.IsNullOrEmpty())
+            {
+                uiManager.CreateNotificationVisualElement(errorMessage);
+                return;
+            }
+
             // All config done, start the first party round
             SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.PartyModeSettings = partyModeSettings;
@@ -199,6 +212,16 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             .AnyMatch(team => team.PlayerProfiles.IsNullOrEmpty() && team.GuestPlayerProfiles.IsNullOrEmpty()))
         {
             return "Each team must have at least one player";
+        }
+
+        return "";
+    }
+
+    private string GetRoundsConfigErrorMessage()
+    {
+        if (partyModeSettings.RoundsSettings.GameRoundSettings.Count <= 0)
+        {
+            return "Must play at least one round";
         }
 
         return "";

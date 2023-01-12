@@ -409,3 +409,19 @@
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+#toggleRoundFoldedIcon {
+    transition: rotate 0.5s;
+}
+
+#roundUiRoot.folded #toggleRoundFoldedIcon {
+    rotate: -180deg;
+}
+
+#roundUiRoot #centerContent {
+    display: flex;
+}
+
+#roundUiRoot.folded #centerContent {
+    display: none;
+}

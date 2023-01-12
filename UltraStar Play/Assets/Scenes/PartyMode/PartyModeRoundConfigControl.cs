@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using Unity.Android.Types;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -21,6 +22,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private GameRoundSettings gameRoundSettings;
+
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
 
     [Inject(UxmlName = R.UxmlNames.roundTitleLabel)]
     private Label roundTitleLabel;
@@ -43,6 +47,11 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.deleteRoundButton)]
     public Button DeleteRoundButton { get; private set; }
 
+    [Inject(UxmlName = R.UxmlNames.toggleRoundExpandedButton)]
+    private Button toggleRoundExpandedButton;
+
+    private bool IsFolded => visualElement.ClassListContains("folded");
+
     private LabeledItemPickerControl<int> modifierConditionFromNumberPickerControl;
     private LabeledItemPickerControl<int> modifierConditionUntilNumberPickerControl;
 
@@ -50,6 +59,8 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     {
         int roundIndex = partyModeSettings.RoundsSettings.GameRoundSettings.IndexOf(gameRoundSettings);
         roundTitleLabel.text = StringUtils.AddLeadingZeros(roundIndex + 1, 2);
+
+        toggleRoundExpandedButton.RegisterCallbackButtonTriggered(() => ToggleFold());
 
         LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl = new(finishConditionPicker, EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
         LabeledItemPickerControl<int> finishConditionPointsPickerControl = new(finishConditionPointsPicker, NumberUtils.CreateIntList(1000, 9000, 1000));
@@ -137,34 +148,78 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         UpdateControls();
     }
 
+    private void ToggleFold()
+    {
+        if (IsFolded)
+        {
+            Unfold();
+        }
+        else
+        {
+            Fold();
+        }
+    }
+
+    private void Fold()
+    {
+        if (IsFolded)
+        {
+            return;
+        }
+
+        visualElement.AddToClassList("folded");
+    }
+
+    private void Unfold()
+    {
+        if (!IsFolded)
+        {
+            return;
+        }
+
+        visualElement.RemoveFromClassList("folded");
+    }
+
     private void UpdateControls()
     {
-        bool pointsPickerVisible = gameRoundSettings.FinishConditionSettings.Condition != EGameRoundFinishCondition.ReachEndOfSong;
-        finishConditionPointsPicker.SetVisibleByDisplay(pointsPickerVisible);
+        bool finishConditionPointsPickerVisible = gameRoundSettings.FinishConditionSettings.Condition != EGameRoundFinishCondition.ReachEndOfSong;
+        finishConditionPointsPicker.SetVisibleByDisplay(finishConditionPointsPickerVisible);
 
-        bool showRangePicker = gameRoundSettings.ModifierConditionSettings.Condition
+        bool modifierConditionPickersVisible = gameRoundSettings.ModifierConditionSettings.Condition
             is EGameRoundModifierCondition.ScoreRange
             or EGameRoundModifierCondition.TimeRange;
-        modifierConditionFromNumberPickerControl.ItemPicker.SetVisibleByDisplay(showRangePicker);
-        modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(showRangePicker);
+        modifierConditionFromNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionPickersVisible
+            || gameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.PlayerAdvance);
+        modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionPickersVisible);
 
-        List<int> modifierConditionValues = null;
-        if (gameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.ScoreRange)
-        {
-            modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
-        }
-        else if (gameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+        List<int> modifierConditionValues;
+        if (gameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
         {
             modifierConditionValues = NumberUtils.CreateIntList(0, 100, 10);
+            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
+            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
+        }
+        else
+        {
+            modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
+            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
+            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
         }
 
         if (!modifierConditionValues.IsNullOrEmpty())
         {
             modifierConditionFromNumberPickerControl.Items = modifierConditionValues;
-            modifierConditionFromNumberPickerControl.SelectItem(modifierConditionValues.FirstOrDefault());
+            if (!modifierConditionValues.Contains(modifierConditionFromNumberPickerControl.SelectedItem))
+            {
+                modifierConditionFromNumberPickerControl.SelectItem(modifierConditionValues.FirstOrDefault());
+            }
 
             modifierConditionUntilNumberPickerControl.Items = modifierConditionValues;
-            modifierConditionUntilNumberPickerControl.SelectItem(modifierConditionValues.LastOrDefault());
+            if (!modifierConditionValues.Contains(modifierConditionUntilNumberPickerControl.SelectedItem)
+                || modifierConditionUntilNumberPickerControl.SelectedItem == modifierConditionFromNumberPickerControl.SelectedItem)
+            {
+                modifierConditionUntilNumberPickerControl.SelectItem(modifierConditionValues.LastOrDefault());
+            }
         }
     }
 }

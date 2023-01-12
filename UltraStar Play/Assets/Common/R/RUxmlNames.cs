@@ -547,7 +547,7 @@ public static partial class R
         public const string roundConfigUiRoot = "roundConfigUiRoot";
         public const string roundsContainer = "roundsContainer";
         public const string roundTitleLabel = "roundTitleLabel";
-        public const string roundUi = "roundUi";
+        public const string roundUiRoot = "roundUiRoot";
         public const string row = "row";
         public const string sampleRateContainer = "sampleRateContainer";
         public const string saveButton = "saveButton";
@@ -761,7 +761,7 @@ public static partial class R
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRoundExpandedButton = "toggleRoundExpandedButton";
-        public const string toggleRoundExpandedIcon = "toggleRoundExpandedIcon";
+        public const string toggleRoundFoldedIcon = "toggleRoundFoldedIcon";
         public const string toggleSettingsButton = "toggleSettingsButton";
         public const string toggleSideBarSizeButton = "toggleSideBarSizeButton";
         public const string toggleSingingOptionsButton = "toggleSingingOptionsButton";
