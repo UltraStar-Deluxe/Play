@@ -135,4 +135,19 @@ public static class NumberUtils
     {
         return zeroToHundred / 100f;
     }
+
+    public static List<int> CreateIntList(int startValueInclusive, int endValueInclusive, int stepValue = 1)
+    {
+        if (stepValue <= 0)
+        {
+            throw new ArgumentException("Step value must be positive");
+        }
+
+        List<int> result = new();
+        for (int i = startValueInclusive; i <= endValueInclusive; i += stepValue)
+        {
+            result.Add(i);
+        }
+        return result;
+    }
 }

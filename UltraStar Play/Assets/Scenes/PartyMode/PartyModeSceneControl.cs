@@ -249,6 +249,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(partyModeSettings);
+        bb.BindExistingInstance(teamConfigControl);
+        bb.BindExistingInstance(songSelectionConfigControl);
+        bb.BindExistingInstance(roundsConfigControl);
         bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
         bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);
         bb.Bind(nameof(roundUi)).ToExistingInstance(roundUi);

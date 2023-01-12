@@ -4,12 +4,11 @@
         <ui:VisualElement name="buttonContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; margin-bottom: 5px;">
             <ui:Button text="Add Round" display-tooltip-when-elided="true" name="addRoundButton" />
         </ui:VisualElement>
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="centerContent" style="width: 100%; flex-grow: 1; align-items: flex-start;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="centerContent" style="flex-grow: 1; align-items: flex-start;">
             <ui:VisualElement name="roundsContainer" class="roundCorners" style="min-height: 50px; background-color: rgba(32, 32, 32, 0.25);">
                 <ui:Instance template="PartyModeRoundUi" name="PartyModeRoundUi" />
                 <ui:Instance template="PartyModeRoundUi" name="PartyModeRoundUi" />
             </ui:VisualElement>
         </ui:ScrollView>
-        <ui:VisualElement name="bottomContent" style="background-color: rgba(0, 0, 0, 0); margin-left: auto; flex-shrink: 0;" />
     </ui:VisualElement>
 </ui:UXML>
