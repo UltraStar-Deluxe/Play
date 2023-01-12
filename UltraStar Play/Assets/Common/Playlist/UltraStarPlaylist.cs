@@ -5,6 +5,7 @@ public class UltraStarPlaylist
 {
     private readonly List<UltraStartPlaylistLineEntry> lineEntries = new();
     private readonly HashSet<string> songHashes = new();
+    public virtual bool IsEmpty => songHashes.Count == 0;
 
     public string[] GetLines()
     {

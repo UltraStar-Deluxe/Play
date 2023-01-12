@@ -34,6 +34,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private Settings settings;
 
     [Inject]
+    private UiManager uiManager;
+
+    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.partyModeTeamConfigUi)]
@@ -58,6 +61,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
+    private readonly PartyModeRoundsConfigControl roundsConfigControl = new();
 
     public void OnInjectionFinished()
     {
@@ -74,6 +78,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         // Inject child controls
         injector.Inject(teamConfigControl);
         injector.Inject(songSelectionConfigControl);
+        injector.Inject(roundsConfigControl);
     }
 
     private void InitPartyModeSettings()
@@ -143,10 +148,24 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     {
         if (configPart.Value == EPartyModeConfigPart.Teams)
         {
+            string errorMessage = GetTeamsConfigErrorMessage();
+            if (!errorMessage.IsNullOrEmpty())
+            {
+                uiManager.CreateNotificationVisualElement(errorMessage);
+                return;
+            }
+
             configPart.Value = EPartyModeConfigPart.SongSelection;
         }
         else if (configPart.Value == EPartyModeConfigPart.SongSelection)
         {
+            string errorMessage = GetSongSelectionConfigErrorMessage();
+            if (!errorMessage.IsNullOrEmpty())
+            {
+                uiManager.CreateNotificationVisualElement(errorMessage);
+                return;
+            }
+
             configPart.Value = EPartyModeConfigPart.Rounds;
         }
         else if (configPart.Value == EPartyModeConfigPart.Rounds)
@@ -156,6 +175,33 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             songSelectSceneData.PartyModeSettings = partyModeSettings;
             sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
+    }
+
+    private string GetSongSelectionConfigErrorMessage()
+    {
+        if (partyModeSettings.SongSelectionSettings.SongPoolPlaylist == null
+            || partyModeSettings.SongSelectionSettings.SongPoolPlaylist.IsEmpty)
+        {
+            return "Select a playlist that is not empty";
+        }
+
+        return "";
+    }
+
+    private string GetTeamsConfigErrorMessage()
+    {
+        if (partyModeSettings.TeamSettings.Teams.Count < 2)
+        {
+            return "Must use at least two teams";
+        }
+
+        if (partyModeSettings.TeamSettings.Teams
+            .AnyMatch(team => team.PlayerProfiles.IsNullOrEmpty() && team.GuestPlayerProfiles.IsNullOrEmpty()))
+        {
+            return "Each team must have at least one player";
+        }
+
+        return "";
     }
 
     private void AddPlayerProfilesToTeams(bool guests)
