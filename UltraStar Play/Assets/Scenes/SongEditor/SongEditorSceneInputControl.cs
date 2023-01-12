@@ -246,7 +246,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             // Scroll horizontal in NoteArea with no modifier
             if (modifier == EKeyboardModifier.None)
             {
-                noteAreaControl.ScrollHorizontal(scrollDirection);
+                noteAreaControl.ScrollHorizontal(-scrollDirection);
             }
 
             // Zoom horizontal in NoteArea with Ctrl
