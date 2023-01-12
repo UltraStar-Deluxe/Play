@@ -33,6 +33,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private PlaylistManager playlistManager;
+
     [Inject(UxmlName = R.UxmlNames.partyModeTeamConfigUi)]
     private VisualElement partyModeTeamConfigUi;
 
@@ -54,6 +57,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private readonly PartyModeSettings partyModeSettings = new();
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
+    private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
 
     public void OnInjectionFinished()
     {
@@ -69,6 +73,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
         // Inject child controls
         injector.Inject(teamConfigControl);
+        injector.Inject(songSelectionConfigControl);
     }
 
     private void InitPartyModeSettings()
