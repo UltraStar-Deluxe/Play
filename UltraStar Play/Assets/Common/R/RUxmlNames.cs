@@ -126,6 +126,7 @@ public static partial class R
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string deletePresetButton = "deletePresetButton";
+        public const string deleteRoundButton = "deleteRoundButton";
         public const string deleteTeamButton = "deleteTeamButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string detectBpmButton = "detectBpmButton";
@@ -352,8 +353,9 @@ public static partial class R
         public const string midiVelocitySlider = "midiVelocitySlider";
         public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
         public const string modifierChipsCombo = "modifierChipsCombo";
-        public const string modifierConditionNumberPicker = "modifierConditionNumberPicker";
+        public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
+        public const string modifierConditionUntilNumberPicker = "modifierConditionUntilNumberPicker";
         public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
         public const string musicGroup = "musicGroup";
         public const string musicPlaybackSpeedContainer = "musicPlaybackSpeedContainer";
@@ -512,6 +514,8 @@ public static partial class R
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
+        public const string randomizeButton = "randomizeButton";
+        public const string randomizeIcon = "randomizeIcon";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
         public const string recordedNote = "recordedNote";
