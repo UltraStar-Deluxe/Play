@@ -110,10 +110,8 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
-                .Children()
-                .First();
-            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
+            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree().Children().First();
+            uiDocument.rootVisualElement.Add(notificationOverlay);
         }
 
         TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
