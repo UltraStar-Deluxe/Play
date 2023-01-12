@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ProTrans;
 using UniRx;
 using UnityEngine;
 
@@ -10,8 +11,8 @@ public class PlaylistManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        playlistToFilePathMap.Clear();
-        playlists.Clear();
+        playlistToFilePathMap = new();
+        playlists = new();
         favoritesPlaylist = new UltraStarPlaylist();
     }
 
@@ -132,10 +133,19 @@ public class PlaylistManager : MonoBehaviour
 
     public string GetPlaylistName(UltraStarPlaylist playlist)
     {
-        if (playlist == null
-            || playlist is UltraStarAllSongsPlaylist)
+        if (playlist == null)
         {
             return "";
+        }
+
+        if (playlist == UltraStarAllSongsPlaylist.Instance)
+        {
+            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
+        }
+
+        if (playlist == FavoritesPlaylist)
+        {
+            return TranslationManager.GetTranslation(R.Messages.playlistName_favorites);
         }
 
         string filePath = playlistToFilePathMap[playlist];
@@ -326,5 +336,22 @@ public class PlaylistManager : MonoBehaviour
     public bool HasSongEntry(UltraStarPlaylist playlist, SongMeta songMeta)
     {
         return playlist.HasSongEntry(songMeta.Artist, songMeta.Title);
+    }
+
+    public List<UltraStarPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)
+    {
+        List<UltraStarPlaylist> result = new();
+        if (includeFavoritesPlaylist)
+        {
+            result.Add(UltraStarAllSongsPlaylist.Instance);
+        }
+
+        result.AddRange(Playlists);
+
+        if (!includeFavoritesPlaylist)
+        {
+            result.Remove(FavoritesPlaylist);
+        }
+        return result;
     }
 }

@@ -43,7 +43,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
 
         // Show playlist name in button
-        Selection.Subscribe(playlist => playlistChooserButton.text = GetDisplayString(playlist));
+        Selection.Subscribe(playlist => playlistChooserButton.text = playlistManager.GetPlaylistName(playlist));
 
         HidePlaylistChooserDropdownOverlay();
         playlistChooserButton.RegisterCallbackButtonTriggered(() =>
@@ -66,32 +66,15 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     private void InitItems()
     {
         items = new List<UltraStarPlaylist>();
-        items.Add(new UltraStarAllSongsPlaylist());
+        items.Add(UltraStarAllSongsPlaylist.Instance);
         items.Add(playlistManager.FavoritesPlaylist);
         items.AddRange(playlistManager.Playlists.Where(playlist => playlist != playlistManager.FavoritesPlaylist));
 
         // Initial selection
         UltraStarPlaylist newSelection = items
-            .FirstOrDefault(playlist => GetDisplayString(playlist) == settings.SongSelectSettings.playlistName)
+            .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
             .OrIfNull(items[0]);
         Selection.SetValueAndForceNotify(newSelection);
-    }
-
-    private string GetDisplayString(UltraStarPlaylist playlist)
-    {
-        if (playlist == null
-            || playlist is UltraStarAllSongsPlaylist)
-        {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
-        }
-        else if (playlist == playlistManager.FavoritesPlaylist)
-        {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_favorites);
-        }
-        else
-        {
-            return playlistManager.GetPlaylistName(playlist);
-        }
     }
 
     public void ToggleFavoritePlaylist()
@@ -138,7 +121,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     private Button CreatePlaylistButton(UltraStarPlaylist item)
     {
         Button button = new();
-        button.text = GetDisplayString(item);
+        button.text = playlistManager.GetPlaylistName(item);
         button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
 
         button.RegisterCallbackButtonTriggered(() =>
@@ -151,6 +134,6 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void UpdateTranslation()
     {
-        playlistChooserButton.text = GetDisplayString(Selection.Value);
+        playlistChooserButton.text = playlistManager.GetPlaylistName(Selection.Value);
     }
 }
