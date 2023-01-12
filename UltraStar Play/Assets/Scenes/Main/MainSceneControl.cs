@@ -106,7 +106,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void Start()
     {
-        startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(() => OpenSongSelectScene());
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.AboutScene));
@@ -137,10 +137,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             injector);
     }
 
+    private void OpenSongSelectScene()
+    {
+        SongSelectSceneData songSelectSceneData = sceneNavigator.GetSceneData(new SongSelectSceneData());
+        songSelectSceneData.PartyModeSettings = null;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+    }
+
     private void InitInputActions()
     {
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongSelectScene));
+            .Subscribe(_ => OpenSongSelectScene());
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => OnBack());

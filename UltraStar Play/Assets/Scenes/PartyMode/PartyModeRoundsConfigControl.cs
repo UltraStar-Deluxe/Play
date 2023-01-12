@@ -64,12 +64,19 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
             .CreateAndInject<PartyModeRoundConfigControl>();
 
         roundConfigControl.DeleteRoundButton.RegisterCallbackButtonTriggered(() => DeleteRound(roundSettings));
+        roundConfigControl.DeleteRoundButton.SetEnabled(partyModeSettings.RoundsSettings.GameRoundSettings.Count > 1);
 
         roundConfigControls.Add(roundConfigControl);
     }
 
     private void DeleteRound(GameRoundSettings roundSettings)
     {
+        if (partyModeSettings.RoundsSettings.GameRoundSettings.Count <= 1)
+        {
+            // Must play at least one round
+            return;
+        }
+
         partyModeSettings.RoundsSettings.GameRoundSettings.Remove(roundSettings);
         UpdateRoundsUi();
     }
