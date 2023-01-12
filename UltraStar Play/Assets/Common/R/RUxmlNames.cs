@@ -100,7 +100,6 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
-        public const string contentContainer = "contentContainer";
         public const string continueButton = "continueButton";
         public const string countdownLabel = "countdownLabel";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
@@ -123,6 +122,7 @@ public static partial class R
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
         public const string deleteGameRoundButton = "deleteGameRoundButton";
+        public const string deleteGuestButton = "deleteGuestButton";
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string deletePresetButton = "deletePresetButton";
@@ -287,6 +287,7 @@ public static partial class R
         public const string layoutTitle = "layoutTitle";
         public const string leadingPlayerIcon = "leadingPlayerIcon";
         public const string leftArrow = "leftArrow";
+        public const string leftButton = "leftButton";
         public const string leftHandle = "leftHandle";
         public const string leftLyricsOverlay = "leftLyricsOverlay";
         public const string leftSideBar = "leftSideBar";
@@ -350,11 +351,10 @@ public static partial class R
         public const string midiVelocityLabel = "midiVelocityLabel";
         public const string midiVelocitySlider = "midiVelocitySlider";
         public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
+        public const string modifierChipsCombo = "modifierChipsCombo";
         public const string modifierConditionNumberPicker = "modifierConditionNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
         public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
-        public const string moveToLeftTeamButton = "moveToLeftTeamButton";
-        public const string moveToRightTeamButton = "moveToRightTeamButton";
         public const string musicGroup = "musicGroup";
         public const string musicPlaybackSpeedContainer = "musicPlaybackSpeedContainer";
         public const string musicPlaybackSpeedLabel = "musicPlaybackSpeedLabel";
@@ -447,7 +447,6 @@ public static partial class R
         public const string PartyModeRoundUi = "PartyModeRoundUi";
         public const string partyModeSongSelectionConfigUi = "partyModeSongSelectionConfigUi";
         public const string PartyModeSongSelectionRoundUi = "PartyModeSongSelectionRoundUi";
-        public const string PartyModeTeamColumnPlayerUi = "PartyModeTeamColumnPlayerUi";
         public const string PartyModeTeamColumnUi = "PartyModeTeamColumnUi";
         public const string partyModeTeamConfigUi = "partyModeTeamConfigUi";
         public const string PartyModeTeamConfigUi = "PartyModeTeamConfigUi";
@@ -474,6 +473,7 @@ public static partial class R
         public const string playerNameContainer = "playerNameContainer";
         public const string playerNameLabel = "playerNameLabel";
         public const string playerProfileSettingsProblemHintIcon = "playerProfileSettingsProblemHintIcon";
+        public const string playersContainer = "playersContainer";
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string playerScrollView = "playerScrollView";
@@ -534,6 +534,7 @@ public static partial class R
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionContainer = "resolutionContainer";
         public const string rightArrow = "rightArrow";
+        public const string rightButton = "rightButton";
         public const string rightHandle = "rightHandle";
         public const string rightLyricsOverlay = "rightLyricsOverlay";
         public const string rightSide = "rightSide";

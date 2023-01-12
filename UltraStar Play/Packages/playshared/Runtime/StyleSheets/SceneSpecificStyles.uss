@@ -403,3 +403,9 @@
 /**************************************************/
 /* PARTY MODE SCENES */
 /**************************************************/
+
+.playerProfilePlaceholder {
+    height: var(--control-height);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

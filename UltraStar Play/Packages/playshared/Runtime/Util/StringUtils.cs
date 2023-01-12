@@ -44,4 +44,9 @@ public static class StringUtils
         string inputWithSpaces = Regex.Replace(withFirstLetterUppercase, @"([A-Z])", " $1");
         return inputWithSpaces.Trim();
     }
+
+    public static string AddLeadingZeros(int number, int targetLength)
+    {
+        return string.Format($"{{0:D{targetLength}}}", number);
+    }
 }

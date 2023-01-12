@@ -10,6 +10,7 @@ public class Settings : ISettings
     public GraphicSettings GraphicSettings { get; set; } = new();
     public AudioSettings AudioSettings { get; set; } = new();
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
+    public List<PlayerProfile> GuestPlayerProfiles { get; set; } = new();
     public List<MicProfile> MicProfiles { get; set; } = new();
     public string LastMicProfileNameInRecordingOptionsScene { get; set; }
     public WebcamSettings WebcamSettings { get; set; } = new();

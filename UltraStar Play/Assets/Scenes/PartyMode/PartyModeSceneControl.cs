@@ -7,15 +7,31 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine.PlayerLoop;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder
+public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
+    [InjectedInInspector]
+    public VisualTreeAsset teamColumnUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset teamColumnPlayerUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset roundUi;
+
     [Inject]
     private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.partyModeTeamConfigUi)]
     private VisualElement partyModeTeamConfigUi;
@@ -36,11 +52,12 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Label sceneTitle;
 
     private readonly PartyModeSettings partyModeSettings = new();
-    private readonly PartyModeSettingsChangeEventStream partyModeSettingsChangeEventStream = new();
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
+    private readonly PartyModeTeamConfigControl teamConfigControl = new();
 
-	private void Start()
+    public void OnInjectionFinished()
     {
+        InitPartyModeSettings();
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
 
@@ -49,6 +66,25 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         configPart.Subscribe(_ => UpdateConfigPart());
         UpdateConfigPart();
+
+        // Inject child controls
+        injector.Inject(teamConfigControl);
+    }
+
+    private void InitPartyModeSettings()
+    {
+        // Add at least two teams
+        for (int i = partyModeSettings.TeamSettings.Teams.Count; i < 2; i++)
+        {
+            PartyModeTeamSettings newTeam = new();
+            newTeam.Name = PartyModeTeamConfigControl.GetDefaultTeamName(newTeam, partyModeSettings);
+            partyModeSettings.TeamSettings.Teams.Add(newTeam);
+        }
+
+        // Add all players that are selected for singing to the teams.
+        // First, add the regular player profiles. Afterwards, add the guest profiles.
+        AddPlayerProfilesToTeams(false);
+        AddPlayerProfilesToTeams(true);
     }
 
     private void UpdateConfigPart()
@@ -117,13 +153,54 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
     }
 
+    private void AddPlayerProfilesToTeams(bool guests)
+    {
+        partyModeSettings.TeamSettings.Teams.ForEach(teamList =>
+        {
+            if (guests)
+            {
+                teamList.GuestPlayerProfiles.Clear();
+            }
+            else
+            {
+                teamList.PlayerProfiles.Clear();
+            }
+        });
+
+        List<PlayerProfile> allPlayerProfiles = settings.PlayerProfiles.Union(settings.GuestPlayerProfiles).ToList();
+        List<PlayerProfile> playerProfiles = guests
+            ? settings.GuestPlayerProfiles
+            : settings.PlayerProfiles;
+        List<PlayerProfile> relevantPlayerProfiles = playerProfiles
+            .Where(playerProfile => playerProfile.IsEnabled)
+            .ToList();
+        List<PlayerProfile> assignedPlayerProfiles = partyModeSettings.TeamSettings.Teams
+            .SelectMany(team => team.GuestPlayerProfiles.Union(team.PlayerProfiles))
+            .ToList();
+        List<PlayerProfile> relevantUnassignedPlayerProfiles = relevantPlayerProfiles
+            .Where(playerProfile => !assignedPlayerProfiles.Contains(playerProfile))
+            .ToList();
+        foreach (PlayerProfile playerProfile in relevantUnassignedPlayerProfiles)
+        {
+            int playerProfileIndex = allPlayerProfiles.IndexOf(playerProfile);
+            int teamIndex = playerProfileIndex < Math.Ceiling((double)allPlayerProfiles.Count / 2)
+                ? 0
+                : 1;
+            PartyModeTeamSettings team = partyModeSettings.TeamSettings.Teams[teamIndex];
+            List<PlayerProfile> targetList = guests ? team.GuestPlayerProfiles : team.PlayerProfiles;
+            targetList.Add(playerProfile);
+        }
+    }
+
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
-        bb.BindExistingInstance(partyModeSettingsChangeEventStream);
         bb.BindExistingInstance(partyModeSettings);
+        bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
+        bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);
+        bb.Bind(nameof(roundUi)).ToExistingInstance(roundUi);
         return bb.GetBindings();
     }
 }
