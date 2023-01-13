@@ -36,7 +36,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
     private readonly List<PartyModeRoundConfigControl> roundConfigControls = new();
 
-    private int expandedRoundUiIndex;
+    private int unfoldedRoundUiIndex;
 
     public void OnInjectionFinished()
     {
@@ -51,6 +51,18 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
         roundConfigControls.Clear();
 
         partyModeSettings.RoundsSettings.GameRoundSettings.ForEach(roundSettings => CreateRoundSettingsUi(roundSettings));
+
+        for (int i = 0; i < roundConfigControls.Count; i++)
+        {
+            if (i == unfoldedRoundUiIndex)
+            {
+                roundConfigControls[i].Unfold(false);
+            }
+            else
+            {
+                roundConfigControls[i].Fold(false);
+            }
+        }
     }
 
     private void CreateRoundSettingsUi(GameRoundSettings roundSettings)
@@ -63,13 +75,26 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
             .WithBindingForInstance(roundSettings)
             .CreateAndInject<PartyModeRoundConfigControl>();
 
-        roundConfigControl.DeleteRoundButton.RegisterCallbackButtonTriggered(() => DeleteRound(roundSettings));
-        roundConfigControl.DeleteRoundButton.SetEnabled(partyModeSettings.RoundsSettings.GameRoundSettings.Count > 1);
+        roundConfigControl.DeletedEventStream.Subscribe(gameRoundSettings => OnGameRoundDeleted(gameRoundSettings));
+        roundConfigControl.UnfoldEventStream.Subscribe(gameRoundSettings => OnGameRoundUnfolded(gameRoundSettings));
 
         roundConfigControls.Add(roundConfigControl);
     }
 
-    private void DeleteRound(GameRoundSettings roundSettings)
+    private void OnGameRoundUnfolded(GameRoundSettings gameRoundSettings)
+    {
+        // Fold all others
+        roundConfigControls.ForEach(it =>
+        {
+            if (it.GameRoundSettings != gameRoundSettings)
+            {
+                it.Fold(false);
+            }
+        });
+        unfoldedRoundUiIndex = partyModeSettings.RoundsSettings.GameRoundSettings.IndexOf(gameRoundSettings);
+    }
+
+    private void OnGameRoundDeleted(GameRoundSettings roundSettings)
     {
         if (partyModeSettings.RoundsSettings.GameRoundSettings.Count <= 1)
         {
