@@ -238,13 +238,28 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             return "Must play at least one round";
         }
 
-        int playerCount = partyModeSettings.TeamSettings.Teams
-            .Select(team => team.PlayerProfiles.Count + team.GuestPlayerProfiles.Count)
-            .Sum();
-        if (partyModeSettings.TeamSettings.IsKnockOutTournament
-            && partyModeSettings.RoundsSettings.GameRoundSettings.Count >= playerCount)
+        if (partyModeSettings.TeamSettings.IsKnockOutTournament)
         {
-            return "Too many rounds for knock-out tournament";
+            if (partyModeSettings.TeamSettings.IsFreeForAll)
+            {
+                // N players => at most (N - 1) rounds to play, until there is a single winning player.
+                int playerCount = partyModeSettings.TeamSettings.Teams
+                    .Select(team => team.PlayerProfiles.Count + team.GuestPlayerProfiles.Count)
+                    .Sum();
+                if (partyModeSettings.RoundsSettings.GameRoundSettings.Count >= playerCount)
+                {
+                    return "Too many rounds for knock-out tournament";
+                }
+            }
+            else
+            {
+                // N teams => at most (N - 1) rounds to play, until there is a single winning team.
+                int teamCount = partyModeSettings.TeamSettings.Teams.Count;
+                if (partyModeSettings.RoundsSettings.GameRoundSettings.Count >= teamCount)
+                {
+                    return "Too many rounds for knock-out tournament";
+                }
+            }
         }
 
         return "";
@@ -264,7 +279,21 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             }
         });
 
-        List<PlayerProfile> allPlayerProfiles = settings.PlayerProfiles.Union(partyModeSettings.GuestPlayerProfiles).ToList();
+        List<PlayerProfile> allRelevantPlayerProfiles = settings.PlayerProfiles
+            .Where(playerProfile => playerProfile.IsEnabled)
+            .Union(partyModeSettings.GuestPlayerProfiles)
+            .ToList();
+        if (allRelevantPlayerProfiles.IsNullOrEmpty())
+        {
+            partyModeSettings.TeamSettings.Teams.ForEach(team =>
+            {
+                // No players to assign
+                team.PlayerProfiles.Clear();
+                team.GuestPlayerProfiles.Clear();
+            });
+            return;
+        }
+
         List<PlayerProfile> playerProfiles = guests
             ? partyModeSettings.GuestPlayerProfiles
             : settings.PlayerProfiles;
@@ -272,17 +301,17 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             .Where(playerProfile => playerProfile.IsEnabled)
             .ToList();
         List<PlayerProfile> assignedPlayerProfiles = partyModeSettings.TeamSettings.Teams
-            .SelectMany(team => team.GuestPlayerProfiles.Union(team.PlayerProfiles))
+            .SelectMany(team => team.PlayerProfiles.Union(team.GuestPlayerProfiles))
             .ToList();
         List<PlayerProfile> relevantUnassignedPlayerProfiles = relevantPlayerProfiles
             .Where(playerProfile => !assignedPlayerProfiles.Contains(playerProfile))
             .ToList();
         foreach (PlayerProfile playerProfile in relevantUnassignedPlayerProfiles)
         {
-            int playerProfileIndex = allPlayerProfiles.IndexOf(playerProfile);
-            int teamIndex = playerProfileIndex < Math.Ceiling((double)allPlayerProfiles.Count / 2)
-                ? 0
-                : 1;
+            int playerProfileIndex = allRelevantPlayerProfiles.IndexOf(playerProfile);
+            double playerProfilePercent = playerProfileIndex / (double)(allRelevantPlayerProfiles.Count - 1);
+            int teamIndex = (int)Math.Round(playerProfilePercent * (partyModeSettings.TeamSettings.Teams.Count - 1));
+            teamIndex = NumberUtils.Limit(teamIndex, 0, partyModeSettings.TeamSettings.Teams.Count - 1);
             PartyModeTeamSettings team = partyModeSettings.TeamSettings.Teams[teamIndex];
             List<PlayerProfile> targetList = guests ? team.GuestPlayerProfiles : team.PlayerProfiles;
             targetList.Add(playerProfile);
