@@ -1,7 +1,9 @@
 ﻿using System;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UIElements.Button;
 
 public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
@@ -94,8 +96,9 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
         okButton.RegisterCallbackButtonTriggered(() => TrySubmitValue(textField.value));
         cancelButton.RegisterCallbackButtonTriggered(() => CloseDialog());
         textField.RegisterValueChangedCallback(evt => ValidateValue(evt.newValue, true));
+        textField.RegisterCallback<NavigationSubmitEvent>(evt => TrySubmitValue(textField.value));
+        textField.Focus();
 
-        cancelButton.Focus();
         InitialValue = "";
         ValidateValue(InitialValue, false);
     }

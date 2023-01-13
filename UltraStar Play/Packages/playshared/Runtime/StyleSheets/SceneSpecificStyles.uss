@@ -425,3 +425,7 @@
 #roundUiRoot.folded #centerContent {
     display: none;
 }
+
+#presetItemPicker #itemLabel {
+    min-width: var(--control-width);
+}

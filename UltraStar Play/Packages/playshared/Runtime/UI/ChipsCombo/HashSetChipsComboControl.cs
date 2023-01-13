@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class HashSetChipsComboControl<T> : MonoBehaviour
+public class HashSetChipsComboControl<T>
 {
     public ChipsCombo ChipsCombo { get; private set; }
     public ReactiveProperty<HashSet<T>> Selection { get; private set; }

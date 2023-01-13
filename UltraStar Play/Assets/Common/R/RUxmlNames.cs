@@ -138,6 +138,7 @@ public static partial class R
         public const string deviceContainer = "deviceContainer";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
+        public const string dialogContainer = "dialogContainer";
         public const string dialogContent = "dialogContent";
         public const string dialogContentContainer = "dialogContentContainer";
         public const string dialogMessage = "dialogMessage";

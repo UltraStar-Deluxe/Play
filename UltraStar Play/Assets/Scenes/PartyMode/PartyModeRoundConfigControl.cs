@@ -14,8 +14,19 @@ using Unity.Android.Types;
 
 public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedListener
 {
+    private const string FoldedClassName = "folded";
+
+    [Inject(Key = nameof(valueInputDialogUi))]
+    private VisualTreeAsset valueInputDialogUi;
+
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
+    private VisualElement dialogContainer;
 
     [Inject]
     private PartyModeSettings partyModeSettings;
@@ -53,37 +64,70 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.toggleRoundExpandedButton)]
     private Button toggleRoundExpandedButton;
 
-    private bool IsFolded => visualElement.ClassListContains("folded");
+    [Inject(UxmlName = R.UxmlNames.randomizeButton)]
+    private Button randomizeButton;
+
+    [Inject(UxmlName = R.UxmlNames.savePresetButton)]
+    private Button savePresetButton;
+
+    [Inject(UxmlName = R.UxmlNames.deletePresetButton)]
+    private Button deletePresetButton;
+
+    [Inject(UxmlName = R.UxmlNames.presetItemPicker)]
+    private ItemPicker presetItemPicker;
+
+    private bool IsFolded => visualElement.ClassListContains(FoldedClassName);
 
     private LabeledItemPickerControl<int> modifierConditionFromNumberPickerControl;
     private LabeledItemPickerControl<int> modifierConditionUntilNumberPickerControl;
+    private LabeledItemPickerControl<PartyModeRoundSettingsPreset> presetPickerControl;
 
-    private Subject<GameRoundSettings> deletedEventStream = new();
+    private readonly Subject<GameRoundSettings> deletedEventStream = new();
     public IObservable<GameRoundSettings> DeletedEventStream => deletedEventStream;
 
-    private Subject<GameRoundSettings> foldEventStream = new();
+    private readonly Subject<GameRoundSettings> foldEventStream = new();
     public IObservable<GameRoundSettings> FoldEventStream => foldEventStream;
 
-    private Subject<GameRoundSettings> unfoldEventStream = new();
+    private readonly Subject<GameRoundSettings> unfoldEventStream = new();
     public IObservable<GameRoundSettings> UnfoldEventStream => unfoldEventStream;
+
+    private readonly Subject<PartyModeRoundSettingsPreset> presetsChangedEventStream = new();
+    public IObservable<PartyModeRoundSettingsPreset> PresetsChangedEventStream => presetsChangedEventStream;
+
+    private readonly Subject<PartyModeRoundSettingsPreset> appliedPresetEventStream = new();
+    public IObservable<PartyModeRoundSettingsPreset> AppliedPresetEventStream => appliedPresetEventStream;
 
     public void OnInjectionFinished()
     {
         int roundIndex = partyModeSettings.RoundsSettings.GameRoundSettings.IndexOf(GameRoundSettings);
         roundTitleLabel.text = StringUtils.AddLeadingZeros(roundIndex + 1, 2);
 
+        // Top buttons
         toggleRoundExpandedButton.RegisterCallbackButtonTriggered(() => ToggleFold());
+        deleteRoundButton.RegisterCallbackButtonTriggered(() => DeleteRound());
+        deleteRoundButton.SetEnabled(partyModeSettings.RoundsSettings.GameRoundSettings.Count > 1);
+        randomizeButton.RegisterCallbackButtonTriggered(() => RandomizeRound());
 
+        // Presets
+        savePresetButton.RegisterCallbackButtonTriggered(() => OpenSavePresetDialog());
+        deletePresetButton.RegisterCallbackButtonTriggered(() => DeleteSelectedPreset());
+
+        presetPickerControl = new(presetItemPicker, GetSelectablePresets());
+        presetPickerControl.GetLabelTextFunction = preset => preset == null ? "No preset" : preset.Name;
+        presetPickerControl.Selection.Subscribe(preset =>
+        {
+            Unfold(true);
+            ApplyPreset(preset);
+            UpdatePresetPickerSaveDeleteButtons();
+        });
+
+        // Finish condition
         LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl = new(finishConditionPicker, EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
         LabeledItemPickerControl<int> finishConditionPointsPickerControl = new(finishConditionPointsPicker, NumberUtils.CreateIntList(1000, 9000, 1000));
 
         LabeledItemPickerControl<EGameRoundModifierCondition> modifierConditionPickerControl = new(modifierConditionPicker, EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
         modifierConditionFromNumberPickerControl = new(modifierConditionFromNumberPicker, new List<int> { 0 });
         modifierConditionUntilNumberPickerControl = new(modifierConditionUntilNumberPicker, new List<int> { 0 });
-
-        // Delete button
-        deleteRoundButton.RegisterCallbackButtonTriggered(() => DeleteRound());
-        deleteRoundButton.SetEnabled(partyModeSettings.RoundsSettings.GameRoundSettings.Count > 1);
 
         // Finish condition
         finishConditionPickerControl.Bind(
@@ -168,6 +212,97 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             });
 
         UpdateControls();
+        UpdatePresetPicker();
+        UpdatePresetPickerSaveDeleteButtons();
+    }
+
+    private void UpdatePresetPicker()
+    {
+        presetPickerControl.Items = GetSelectablePresets();
+        presetPickerControl.SelectItem(GetMatchingPreset());
+    }
+
+    private void UpdatePresetPickerSaveDeleteButtons()
+    {
+        savePresetButton.SetVisibleByDisplay(presetPickerControl.SelectedItem == null);
+        deletePresetButton.SetVisibleByDisplay(presetPickerControl.SelectedItem != null);
+    }
+
+    private PartyModeRoundSettingsPreset GetMatchingPreset()
+    {
+        PartyModeRoundSettingsPreset matchingPreset = partyModeSettings.RoundSettingsPresets.FirstOrDefault(preset =>
+            preset.GameRoundSettings.EqualsOther(GameRoundSettings));
+        return matchingPreset;
+    }
+
+    private void OpenSavePresetDialog()
+    {
+        VisualElement dialogVisualElement = valueInputDialogUi.CloneTreeAndGetFirstChild();
+        dialogContainer.Add(dialogVisualElement);
+        dialogVisualElement.AddToClassList("overlay");
+
+        TextInputDialogControl dialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
+            .CreateAndInject<TextInputDialogControl>();
+        dialogControl.Title = "Save preset";
+        dialogControl.Message = "Enter preset name";
+
+        dialogControl.SubmitValueEventStream
+            .Subscribe(presetName => SavePreset(presetName));
+    }
+
+    private void SavePreset(string presetName)
+    {
+        GameRoundSettings gameRoundSettingsCopy = GameRoundSettings.Clone();
+        PartyModeRoundSettingsPreset newPreset = new(presetName, gameRoundSettingsCopy);
+
+        PartyModeRoundSettingsPreset existingPreset = partyModeSettings.RoundSettingsPresets
+            .FirstOrDefault(preset => string.Equals(preset.Name, presetName, StringComparison.InvariantCultureIgnoreCase));
+        if (existingPreset != null)
+        {
+            partyModeSettings.RoundSettingsPresets.Replace(existingPreset, newPreset);
+        }
+        else
+        {
+            partyModeSettings.RoundSettingsPresets.Add(newPreset);
+        }
+
+        Debug.Log($"Added or updated game round preset '{presetName}'");
+        presetsChangedEventStream.OnNext(newPreset);
+    }
+
+    private void DeleteSelectedPreset()
+    {
+        PartyModeRoundSettingsPreset preset = presetPickerControl.SelectedItem;
+        if (preset == null)
+        {
+            return;
+        }
+
+        partyModeSettings.RoundSettingsPresets.Remove(preset);
+
+        Debug.Log($"Deleted game round preset '{preset.Name}'");
+        presetsChangedEventStream.OnNext(preset);
+    }
+
+    private void ApplyPreset(PartyModeRoundSettingsPreset preset)
+    {
+        if (preset == null
+            || preset.GameRoundSettings.EqualsOther(GameRoundSettings))
+        {
+            return;
+        }
+
+        GameRoundSettings presetGameRoundSettingsCopy = preset.GameRoundSettings.Clone();
+        partyModeSettings.RoundsSettings.GameRoundSettings.Replace(GameRoundSettings, presetGameRoundSettingsCopy);
+
+        Debug.Log($"Applied preset '{preset.Name}'");
+        appliedPresetEventStream.OnNext(preset);
+    }
+
+    private void RandomizeRound()
+    {
+        // TODO: Implement
     }
 
     private void DeleteRound()
@@ -195,7 +330,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        visualElement.AddToClassList("folded");
+        visualElement.AddToClassList(FoldedClassName);
 
         if (notify)
         {
@@ -210,7 +345,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        visualElement.RemoveFromClassList("folded");
+        visualElement.RemoveFromClassList(FoldedClassName);
 
         if (notify)
         {
@@ -259,5 +394,12 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
                 modifierConditionUntilNumberPickerControl.SelectItem(modifierConditionValues.LastOrDefault());
             }
         }
+    }
+
+    private List<PartyModeRoundSettingsPreset> GetSelectablePresets()
+    {
+        return new List<PartyModeRoundSettingsPreset> { null }
+            .Union(settings.PartyModeSettings.RoundSettingsPresets)
+            .ToList();
     }
 }

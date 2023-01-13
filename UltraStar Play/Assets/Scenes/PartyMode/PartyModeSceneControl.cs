@@ -16,6 +16,9 @@ using IBinding = UniInject.IBinding;
 public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjectionFinishedListener
 {
     [InjectedInInspector]
+    public VisualTreeAsset valueInputDialogUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset teamColumnUi;
 
     [InjectedInInspector]
@@ -34,7 +37,13 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private Settings settings;
 
     [Inject]
+    private PartyModeSettings partyModeSettings;
+
+    [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -57,7 +66,6 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    private readonly PartyModeSettings partyModeSettings = new();
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
@@ -65,7 +73,10 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     public void OnInjectionFinished()
     {
+        songMetaManager.ScanFilesIfNotDoneYet();
+
         InitPartyModeSettings();
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
 
@@ -101,6 +112,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         {
             partyModeSettings.RoundsSettings.GameRoundSettings.Add(new GameRoundSettings());
         }
+
+        // Select the "all songs" playlist
+        partyModeSettings.SongSelectionSettings.SongPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
     }
 
     private void UpdateConfigPart()
@@ -241,9 +255,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             }
         });
 
-        List<PlayerProfile> allPlayerProfiles = settings.PlayerProfiles.Union(settings.GuestPlayerProfiles).ToList();
+        List<PlayerProfile> allPlayerProfiles = settings.PlayerProfiles.Union(partyModeSettings.GuestPlayerProfiles).ToList();
         List<PlayerProfile> playerProfiles = guests
-            ? settings.GuestPlayerProfiles
+            ? partyModeSettings.GuestPlayerProfiles
             : settings.PlayerProfiles;
         List<PlayerProfile> relevantPlayerProfiles = playerProfiles
             .Where(playerProfile => playerProfile.IsEnabled)
@@ -271,10 +285,10 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         BindingBuilder bb = new();
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
-        bb.BindExistingInstance(partyModeSettings);
         bb.BindExistingInstance(teamConfigControl);
         bb.BindExistingInstance(songSelectionConfigControl);
         bb.BindExistingInstance(roundsConfigControl);
+        bb.Bind(nameof(valueInputDialogUi)).ToExistingInstance(valueInputDialogUi);
         bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
         bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);
         bb.Bind(nameof(roundUi)).ToExistingInstance(roundUi);
