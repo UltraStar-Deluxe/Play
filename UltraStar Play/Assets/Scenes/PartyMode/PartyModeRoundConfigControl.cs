@@ -203,15 +203,18 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             },
             newValue =>
             {
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.ScoreRange)
+                if (GameRoundSettings.ModifierConditionSettings.Condition
+                    is EGameRoundModifierCondition.ScoreRange
+                    or EGameRoundModifierCondition.PlayerAdvance)
                 {
                     GameRoundSettings.ModifierConditionSettings.ScoreUntil = newValue;
+                    UpdateControls();
                 }
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+                else if (GameRoundSettings.ModifierConditionSettings.Condition is EGameRoundModifierCondition.TimeRange)
                 {
                     GameRoundSettings.ModifierConditionSettings.TimeUntil = newValue;
+                    UpdateControls();
                 }
-                UpdateControls();
             });
 
         UpdateControls();
@@ -415,7 +418,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
                 && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()));
         modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
 
-        List<int> modifierConditionValues;
+        List<int> modifierConditionValues = new();
         if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
         {
             modifierConditionValues = NumberUtils.CreateIntList(0, 100, 10);
@@ -424,7 +427,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
             modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
         }
-        else
+        else if (GameRoundSettings.ModifierConditionSettings.Condition
+            is EGameRoundModifierCondition.ScoreRange
+            or EGameRoundModifierCondition.PlayerAdvance)
         {
             modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
             modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.ScoreFrom);
