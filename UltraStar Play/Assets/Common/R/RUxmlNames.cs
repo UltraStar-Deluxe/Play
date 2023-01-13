@@ -126,6 +126,7 @@ public static partial class R
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string deletePresetButton = "deletePresetButton";
+        public const string deletePresetIcon = "deletePresetIcon";
         public const string deleteRoundButton = "deleteRoundButton";
         public const string deleteTeamButton = "deleteTeamButton";
         public const string designOptionsButton = "designOptionsButton";
@@ -136,6 +137,7 @@ public static partial class R
         public const string detectSpeechAfterRecordingToggle = "detectSpeechAfterRecordingToggle";
         public const string developerOptionsButton = "developerOptionsButton";
         public const string deviceContainer = "deviceContainer";
+        public const string deviceItemPicker = "deviceItemPicker";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogCloseButton = "dialogCloseButton";
         public const string dialogContainer = "dialogContainer";
@@ -553,6 +555,7 @@ public static partial class R
         public const string sampleRateContainer = "sampleRateContainer";
         public const string saveButton = "saveButton";
         public const string savePresetButton = "savePresetButton";
+        public const string savePresetIcon = "savePresetIcon";
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string scoreBar = "scoreBar";

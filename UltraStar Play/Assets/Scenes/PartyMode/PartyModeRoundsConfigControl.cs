@@ -77,8 +77,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
         roundConfigControl.DeletedEventStream.Subscribe(gameRoundSettings => OnGameRoundDeleted(gameRoundSettings));
         roundConfigControl.UnfoldEventStream.Subscribe(gameRoundSettings => OnGameRoundUnfolded(gameRoundSettings));
-        roundConfigControl.PresetsChangedEventStream.Subscribe(_ => UpdateRoundsUi());
-        roundConfigControl.AppliedPresetEventStream.Subscribe(_ => UpdateRoundsUi());
+        roundConfigControl.PresetsChangedEventStream.Subscribe(_ => roundConfigControls.ForEach(it => it.UpdatePresetPicker()));
 
         roundConfigControls.Add(roundConfigControl);
     }

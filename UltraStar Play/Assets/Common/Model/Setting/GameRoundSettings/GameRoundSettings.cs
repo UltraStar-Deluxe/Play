@@ -4,18 +4,14 @@ using System.Collections.Generic;
 public class GameRoundSettings
 {
     public GameRoundFinishConditionSettings FinishConditionSettings { get; set; } = new();
-    public HashSet<EGameRoundModifier> ModifierSettings { get; set; } = new();
+    public HashSet<EGameRoundModifier> Modifiers { get; set; } = new();
     public GameRoundModifierConditionSettings ModifierConditionSettings { get; set; } = new();
 
-    public GameRoundSettings()
+    public void CopyValues(GameRoundSettings other)
     {
-    }
-
-    public GameRoundSettings(GameRoundSettings other)
-    {
-        FinishConditionSettings = new(other.FinishConditionSettings);
-        ModifierSettings = new(other.ModifierSettings);
-        ModifierConditionSettings = new(other.ModifierConditionSettings);
+        FinishConditionSettings.CopyValues(other.FinishConditionSettings);
+        Modifiers = new(other.Modifiers);
+        ModifierConditionSettings.CopyValues(other.ModifierConditionSettings);
     }
 
     public bool EqualsOther(GameRoundSettings other)
@@ -31,12 +27,7 @@ public class GameRoundSettings
         }
 
         return FinishConditionSettings.EqualsOther(other.FinishConditionSettings)
-               && ModifierSettings.SetEquals(other.ModifierSettings)
+               && Modifiers.SetEquals(other.Modifiers)
                && ModifierConditionSettings.EqualsOther(other.ModifierConditionSettings);
-    }
-
-    public GameRoundSettings Clone()
-    {
-        return new(this);
     }
 }
