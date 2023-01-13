@@ -3,7 +3,7 @@
     HideNotes,
     HideLyrics,
     HideScore,
-    MuteAudio,
+    ReduceAudio,
     ShortSong,
     PassTheMic,
 }

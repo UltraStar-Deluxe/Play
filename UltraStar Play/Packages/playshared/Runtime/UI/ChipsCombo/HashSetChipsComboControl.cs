@@ -131,4 +131,15 @@ public class HashSetChipsComboControl<T>
         chipsComboDialog.RemoveFromHierarchy();
         chipsComboDialog = null;
     }
+
+    public void SelectItem(HashSet<T> modifiers)
+    {
+        if (modifiers == null
+            || modifiers.SetEquals(Selection.Value))
+        {
+            return;
+        }
+
+        Selection.Value = modifiers;
+    }
 }
