@@ -6,5 +6,4 @@
     MuteAudio,
     ShortSong,
     PassTheMic,
-    Duel,
 }

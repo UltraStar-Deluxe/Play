@@ -44,6 +44,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.modifierConditionUntilNumberPicker)]
     private ItemPicker modifierConditionUntilNumberPicker;
 
+    [Inject(UxmlName = R.UxmlNames.modifierChipsCombo)]
+    private ChipsCombo modifierChipsCombo;
+
     [Inject(UxmlName = R.UxmlNames.deleteRoundButton)]
     private Button deleteRoundButton;
 
@@ -94,6 +97,12 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         finishConditionPointsPickerControl.Bind(
             () => GameRoundSettings.FinishConditionSettings.Points,
             newValue => GameRoundSettings.FinishConditionSettings.Points = newValue);
+
+        // Modifiers
+        HashSetChipsComboControl<EGameRoundModifier> modifierChipsComboControl = new(modifierChipsCombo, EnumUtils.GetValuesAsList<EGameRoundModifier>());
+        modifierChipsComboControl.Bind(
+            () => GameRoundSettings.ModifierSettings,
+            newValue => GameRoundSettings.ModifierSettings = newValue);
 
         // Modifier condition
         modifierConditionPickerControl.Bind(
