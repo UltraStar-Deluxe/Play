@@ -10,7 +10,6 @@ public class Settings : ISettings
     public GraphicSettings GraphicSettings { get; set; } = new();
     public AudioSettings AudioSettings { get; set; } = new();
     public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
-    public List<PlayerProfile> GuestPlayerProfiles { get; set; } = new();
     public List<MicProfile> MicProfiles { get; set; } = new();
     public string LastMicProfileNameInRecordingOptionsScene { get; set; }
     public WebcamSettings WebcamSettings { get; set; } = new();
@@ -19,6 +18,8 @@ public class Settings : ISettings
     public SongSelectSettings SongSelectSettings { get; set; } = new();
 
     public DeveloperSettings DeveloperSettings { get; set; } = new();
+
+    public PartyModeSettings PartyModeSettings { get; set; } = new();
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.

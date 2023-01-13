@@ -21,4 +21,5 @@
         <ui:Instance template="PartyModeRoundConfigUi" name="partyModeRoundConfigUi" style="flex-grow: 1; width: 100%; display: flex;" />
         <ui:VisualElement name="bottomRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-end; width: 100%; margin-top: auto; align-items: center;" />
     </ui:VisualElement>
+    <ui:VisualElement name="dialogContainer" picking-mode="Ignore" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
 </ui:UXML>

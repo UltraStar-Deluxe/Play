@@ -148,9 +148,14 @@ public class PlaylistManager : MonoBehaviour
             return TranslationManager.GetTranslation(R.Messages.playlistName_favorites);
         }
 
-        string filePath = playlistToFilePathMap[playlist];
-        string fileName = Path.GetFileNameWithoutExtension(filePath);
-        return fileName;
+        if (playlistToFilePathMap.TryGetValue(playlist, out string filePath))
+        {
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            return fileName;
+        }
+
+        Debug.LogWarning($"Cannot determine name of playlist: {playlist}");
+        return "";
     }
 
     public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)

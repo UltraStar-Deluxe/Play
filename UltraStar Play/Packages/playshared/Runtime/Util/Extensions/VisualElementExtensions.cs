@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -196,5 +197,10 @@ public static class VisualElementExtensions
     {
         visualElement.Add(otherVisualElement);
         otherVisualElement.SendToBack();
+    }
+
+    public static VisualElement CloneTreeAndGetFirstChild(this VisualTreeAsset visualTreeAsset)
+    {
+        return visualTreeAsset.CloneTree().Children().FirstOrDefault();
     }
 }

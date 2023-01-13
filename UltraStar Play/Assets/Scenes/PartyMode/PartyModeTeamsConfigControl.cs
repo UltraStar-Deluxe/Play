@@ -92,7 +92,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         string newGuestProfileName = GetDefaultGuestProfileName(newGuestProfile, partyModeSettings);
         newGuestProfile.Name = newGuestProfileName;
         partyModeSettings.TeamSettings.Teams.FirstOrDefault().GuestPlayerProfiles.Add(newGuestProfile);
-        settings.GuestPlayerProfiles.Add(newGuestProfile);
+        partyModeSettings.GuestPlayerProfiles.Add(newGuestProfile);
 
         UpdateTeams();
     }
@@ -245,14 +245,14 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     {
         playerVisualElement.RemoveFromHierarchy();
         playerToVisualElement.Remove(playerProfile);
-        settings.GuestPlayerProfiles.Remove(playerProfile);
+        partyModeSettings.GuestPlayerProfiles.Remove(playerProfile);
     }
 
     private List<PlayerProfile> GetAllPlayerProfiles()
     {
         return settings.PlayerProfiles
             .Where(playerProfile => playerProfile.IsEnabled)
-            .Union(settings.GuestPlayerProfiles).ToList();
+            .Union(partyModeSettings.GuestPlayerProfiles).ToList();
     }
 
     public static string GetDefaultTeamName(PartyModeTeamSettings team, PartyModeSettings partyModeSettings)

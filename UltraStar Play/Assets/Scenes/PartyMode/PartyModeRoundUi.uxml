@@ -5,16 +5,20 @@
                 <MaterialIcon tabindex="-1" name="toggleRoundFoldedIcon" icon="expand_less" picking-mode="Ignore" />
             </ui:Button>
             <ui:Label tabindex="-1" text="01" display-tooltip-when-elided="true" name="roundTitleLabel" style="-unity-font-style: bold; -unity-text-align: middle-left; margin-right: 10px; font-size: 20px;" />
-            <ui:Button display-tooltip-when-elided="true" name="deleteRoundButton" class="squareButton">
+            <ui:Button display-tooltip-when-elided="true" name="deleteRoundButton" class="squareButton" style="margin-right: 5px;">
                 <MaterialIcon tabindex="-1" icon="delete" name="deleteIcon" />
             </ui:Button>
-            <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             <ui:Button name="randomizeButton" class="squareButton" style="margin-right: 5px;">
                 <MaterialIcon tabindex="-1" name="randomizeIcon" icon="casino" />
             </ui:Button>
-            <ui:Button text="Save Preset" name="savePresetButton" />
-            <ui:Button text="Delete Preset" name="deletePresetButton" />
-            <ItemPicker name="presetItemPicker" style="margin-left: 5px;" />
+            <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+            <ui:Button name="savePresetButton" class="squareButton" style="margin-right: 5px;">
+                <MaterialIcon tabindex="-1" name="savePresetIcon" icon="save" />
+            </ui:Button>
+            <ui:Button name="deletePresetButton" class="squareButton" style="margin-right: 5px;">
+                <MaterialIcon tabindex="-1" name="deletePresetIcon" icon="delete" />
+            </ui:Button>
+            <ItemPicker name="presetItemPicker" />
         </ui:VisualElement>
         <ui:VisualElement name="centerContent" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: auto; margin-right: auto; align-items: stretch; width: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ItemPicker name="finishConditionPicker" label="Finish Condition" class="controlWithLabelHorizontal" style="flex-direction: row; align-items: center; margin-bottom: 5px; width: 100%;" />

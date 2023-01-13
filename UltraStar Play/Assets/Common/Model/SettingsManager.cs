@@ -82,7 +82,16 @@ public class SettingsManager : MonoBehaviour
             string fileContent = File.ReadAllText(loadedSettingsPath);
             settings = JsonConverter.FromJson<Settings>(fileContent);
             nonStaticSettings = settings;
+            SanitizeSettings();
             OverwriteSettingsWithCommandLineArguments();
+        }
+    }
+
+    private void SanitizeSettings()
+    {
+        if (settings.PartyModeSettings == null)
+        {
+            settings.PartyModeSettings = new();
         }
     }
 

@@ -50,7 +50,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
         roundsContainer.Clear();
         roundConfigControls.Clear();
 
-        partyModeSettings.RoundsSettings.GameRoundSettings.ForEach(roundSettings => CreateRoundSettingsUi(roundSettings));
+        partyModeSettings.RoundsSettings.GameRoundSettings.ToList().ForEach(roundSettings => CreateRoundSettingsUi(roundSettings));
 
         for (int i = 0; i < roundConfigControls.Count; i++)
         {
@@ -77,6 +77,8 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
         roundConfigControl.DeletedEventStream.Subscribe(gameRoundSettings => OnGameRoundDeleted(gameRoundSettings));
         roundConfigControl.UnfoldEventStream.Subscribe(gameRoundSettings => OnGameRoundUnfolded(gameRoundSettings));
+        roundConfigControl.PresetsChangedEventStream.Subscribe(_ => UpdateRoundsUi());
+        roundConfigControl.AppliedPresetEventStream.Subscribe(_ => UpdateRoundsUi());
 
         roundConfigControls.Add(roundConfigControl);
     }
@@ -112,5 +114,8 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
         partyModeSettings.RoundsSettings.GameRoundSettings.Add(newRound);
 
         UpdateRoundsUi();
+
+        PartyModeRoundConfigControl newRoundControl = roundConfigControls.FirstOrDefault(roundControl => ReferenceEquals(roundControl.GameRoundSettings, newRound));
+        newRoundControl?.Unfold(true);
     }
 }

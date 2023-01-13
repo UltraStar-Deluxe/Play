@@ -40,8 +40,8 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         LabeledItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl =
             new(songSelectionItemPicker, EnumUtils.GetValuesAsList<EPartyModeSongSelectionMode>());
         songSelectionItemPickerControl.Bind(
-            () => partyModeSettings.SongSelectionSettings.SongSelectionModeMode,
-            newValue => partyModeSettings.SongSelectionSettings.SongSelectionModeMode = newValue);
+            () => partyModeSettings.SongSelectionSettings.SongSelectionMode,
+            newValue => partyModeSettings.SongSelectionSettings.SongSelectionMode = newValue);
 
         // Playlist
         List<UltraStarPlaylist> playlists = playlistManager.GetPlaylists(true, true);
@@ -58,5 +58,15 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         jokerCountItemPickerControl.Bind(
             () => partyModeSettings.SongSelectionSettings.JokerCount,
             newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);
+
+        // Only show the joker count for random song selection
+        UpdateJokerCountItemPickerVisibility();
+        partyModeSettings.ObserveEveryValueChanged(it => it.SongSelectionSettings.SongSelectionMode)
+            .Subscribe(_ => UpdateJokerCountItemPickerVisibility());
+    }
+
+    private void UpdateJokerCountItemPickerVisibility()
+    {
+        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
     }
 }
