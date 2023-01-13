@@ -123,7 +123,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         // Delete team
         Button deleteTeamButton = teamVisualElement.Q<Button>(R.UxmlNames.deleteTeamButton);
         deleteTeamButton.RegisterCallbackButtonTriggered(() => DeleteTeam(team));
-        deleteTeamButton.SetEnabled(partyModeSettings.TeamSettings.Teams.Count > 2);
+        deleteTeamButton.SetEnabled(partyModeSettings.TeamSettings.Teams.Count > 1);
 
         // Sort player profiles
         SortPlayerProfiles(team);
@@ -145,9 +145,9 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     private void DeleteTeam(PartyModeTeamSettings team)
     {
-        if (partyModeSettings.TeamSettings.Teams.Count <= 2)
+        if (partyModeSettings.TeamSettings.Teams.Count <= 1)
         {
-            // There should be at least two teams
+            // There should be at least one team
             return;
         }
 

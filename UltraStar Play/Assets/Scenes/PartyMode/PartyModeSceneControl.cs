@@ -94,8 +94,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void InitPartyModeSettings()
     {
-        // Add at least two teams
-        for (int i = partyModeSettings.TeamSettings.Teams.Count; i < 2; i++)
+        // Add at least one team
+        for (int i = partyModeSettings.TeamSettings.Teams.Count; i < 1; i++)
         {
             PartyModeTeamSettings newTeam = new();
             newTeam.Name = PartyModeTeamConfigControl.GetDefaultTeamName(newTeam, partyModeSettings);
@@ -217,9 +217,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private string GetTeamsConfigErrorMessage()
     {
-        if (partyModeSettings.TeamSettings.Teams.Count < 2)
+        if (partyModeSettings.TeamSettings.Teams.Count < 1)
         {
-            return "Must use at least two teams";
+            return "Must use at least one teams";
         }
 
         if (partyModeSettings.TeamSettings.Teams
@@ -236,6 +236,15 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         if (partyModeSettings.RoundsSettings.GameRoundSettings.Count <= 0)
         {
             return "Must play at least one round";
+        }
+
+        int playerCount = partyModeSettings.TeamSettings.Teams
+            .Select(team => team.PlayerProfiles.Count + team.GuestPlayerProfiles.Count)
+            .Sum();
+        if (partyModeSettings.TeamSettings.IsKnockOutTournament
+            && partyModeSettings.RoundsSettings.GameRoundSettings.Count >= playerCount)
+        {
+            return "Too many rounds for knock-out tournament";
         }
 
         return "";
