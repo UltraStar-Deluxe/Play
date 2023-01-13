@@ -40,6 +40,8 @@ public class ChipsCombo : VisualElement
         }
     }
 
+    public Button ComboButton { get; private set; }
+    public VisualElement ChipsList { get; private set; }
     private Label LabelElement { get; set; }
 
     private object control;
@@ -57,6 +59,8 @@ public class ChipsCombo : VisualElement
         visualTreeAsset.CloneTree(this);
 
         LabelElement = this.Q<Label>("chipsComboLabel");
+        ComboButton = this.Q<Button>("chipsComboButton");
+        ChipsList = this.Q<VisualElement>("chipsComboChipsList");
     }
 
     public virtual void InitControl(object newControl)

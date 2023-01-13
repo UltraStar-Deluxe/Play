@@ -79,13 +79,22 @@ ChipsCombo {
 }
 
 .chipsComboChipsList {
+    flex-direction: row;
     flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .chipsComboButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     width: 60px;
+    height: 100%;
+    min-height: var(--control-height);
+    padding: 0;
 }
 
 .chipsComboEntryRoot {
@@ -93,14 +102,24 @@ ChipsCombo {
     align-items: center;
     border-radius: 20px;
     background-color: var(--control-color);
+    margin-bottom: 5px;
+    margin-right: 5px;
 }
 
 .chipsComboEntryLabel {
-    padding: 5px;
+    padding-left: 15px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    flex-grow: 0;
 }
 
 .chipsComboEntryButton {
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+.chipsDialogToggle {
+    margin-bottom: 5px;
 }
 
 /**************************************************/
