@@ -11,4 +11,16 @@
 #endif
         }
     }
+
+    public static bool IsAndroid
+    {
+        get
+        {
+#if UNITY_ANDROID
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
 }

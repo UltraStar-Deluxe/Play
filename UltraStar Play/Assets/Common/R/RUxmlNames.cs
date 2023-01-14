@@ -629,6 +629,7 @@ public static partial class R
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
+        public const string unexpectedErrorLabel = "unexpectedErrorLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlChooserComboContainer = "urlChooserComboContainer";
         public const string urlContainer = "urlContainer";
