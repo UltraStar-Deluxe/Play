@@ -73,6 +73,7 @@ public static partial class R
         public static readonly string language = "language";
         public static readonly string load = "load";
         public static readonly string loading = "loading";
+        public static readonly string loadingScene_unexpectedErrorMessage = "loadingScene_unexpectedErrorMessage";
         public static readonly string mainScene_button_about_description = "mainScene_button_about_description";
         public static readonly string mainScene_button_about_label = "mainScene_button_about_label";
         public static readonly string mainScene_button_credits_description = "mainScene_button_credits_description";
