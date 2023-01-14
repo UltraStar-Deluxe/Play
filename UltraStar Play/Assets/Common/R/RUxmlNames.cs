@@ -108,6 +108,7 @@ public static partial class R
         public const string creditsIcon = "creditsIcon";
         public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentSentenceContainer = "currentSentenceContainer";
+        public const string customEventSystemOptInOnAndroidContainer = "customEventSystemOptInOnAndroidContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";

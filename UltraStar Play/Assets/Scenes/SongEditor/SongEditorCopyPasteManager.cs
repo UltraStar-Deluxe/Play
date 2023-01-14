@@ -30,7 +30,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    [Inject]
+    [Inject(Optional = true)]
     private EventSystem eventSystem;
 
     [Inject]
