@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 
 public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 {
-    [Inject]
+    [Inject(Optional = true)]
     private EventSystem eventSystem;
 
     [Inject]

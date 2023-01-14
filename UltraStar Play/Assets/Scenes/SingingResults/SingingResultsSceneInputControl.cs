@@ -12,13 +12,16 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SingingResultsSceneControl singingResultsSceneControl;
     
-    [Inject]
+    [Inject(Optional = true)]
     private EventSystem eventSystem;
     
     private void Start()
     {
         // Custom navigation implementation in this scene
-        eventSystem.sendNavigationEvents = false;
+        if (eventSystem != null)
+        {
+            eventSystem.sendNavigationEvents = false;
+        }
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => singingResultsSceneControl.FinishScene());

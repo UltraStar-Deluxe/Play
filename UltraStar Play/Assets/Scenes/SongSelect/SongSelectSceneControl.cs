@@ -198,7 +198,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private Statistics statistics;
 
-    [Inject]
+    [Inject(Optional = true)]
     private EventSystem eventSystem;
 
     [Inject]
