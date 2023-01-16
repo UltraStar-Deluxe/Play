@@ -139,7 +139,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public static string NormalizeVoiceName(string voiceName)
     {
-        return voiceName == soloVoiceName
+        return voiceName.IsNullOrEmpty() || voiceName == soloVoiceName
             ? firstVoiceName
             : voiceName;
     }
