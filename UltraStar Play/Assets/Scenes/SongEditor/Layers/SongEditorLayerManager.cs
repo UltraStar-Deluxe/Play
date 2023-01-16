@@ -196,10 +196,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA", 200);
         result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 200);
         result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799", 200);
-        result[ESongEditorLayer.PitchDetection].Color = Colors.CreateColor("#ADBBE0", 200);
 
         result[ESongEditorLayer.CopyPaste].IsEditable = false;
-        result[ESongEditorLayer.PitchDetection].IsEditable = false;
 
         return result;
     }
