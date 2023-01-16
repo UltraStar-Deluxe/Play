@@ -171,3 +171,12 @@ The following packages were updated:
   com.unity.ide.rider from version 3.0.15 to 3.0.16
   com.unity.purchasing from version 4.4.1 to 4.5.0
   com.unity.timeline from version 1.7.1 to 1.7.2
+
+=== Mon Jan 16 11:32:18 2023
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.ide.rider from version 3.0.16 to 3.0.17
+  com.unity.ide.visualstudio from version 2.0.16 to 2.0.17
