@@ -239,11 +239,11 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         // Y-Coordinate
         if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
         {
-            scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
+            scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
         }
         else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
         {
-            scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
+            scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
         }
         else
         {
