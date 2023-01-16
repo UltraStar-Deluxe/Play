@@ -38,6 +38,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.disableDynamicThemesContainer)]
     private VisualElement disableDynamicThemesContainer;
 
+    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidContainer)]
+    private VisualElement customEventSystemOptInOnAndroidContainer;
+
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
 
@@ -119,6 +122,17 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                     settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
 
+        new BoolPickerControl(customEventSystemOptInOnAndroidContainer.Q<ItemPicker>())
+            .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
+                newValue =>
+                {
+                    if (newValue != settings.DeveloperSettings.enableEventSystemOnAndroid)
+                    {
+                        settings.DeveloperSettings.enableEventSystemOnAndroid = newValue;
+                        RestartScene();
+                    }
+                });
+
         ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,
             "value", HttpServer.Instance.host);
 
@@ -160,6 +174,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
+    }
+
+    private void RestartScene()
+    {
+        sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
     }
 
     private void HideLogOverlay()

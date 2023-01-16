@@ -7,7 +7,7 @@ using UnityEngine;
 public static class Log
 {
     public static readonly string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
-    private static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
+    public static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
 
     public static Serilog.ILogger Logger { get; private set; }

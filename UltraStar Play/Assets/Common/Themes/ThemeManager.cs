@@ -396,6 +396,13 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
             return;
         }
 
+        EScene currentScene = ESceneUtils.GetCurrentScene();
+        if (currentScene == EScene.SongEditorScene)
+        {
+            // Song editor is out of scope for theming.
+            return;
+        }
+
         ThemeMeta currentThemeMeta = GetCurrentTheme();
         if(currentThemeMeta == null
            || currentThemeMeta.ThemeJson == null)
