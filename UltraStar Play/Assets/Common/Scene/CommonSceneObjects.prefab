@@ -398,7 +398,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82708d27bccb8fa4d888d6518e9bb9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneChangeAnimationTime: 0.2
 --- !u!82 &461665969244419356
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6928,6 +6927,7 @@ GameObject:
   - component: {fileID: 7070348881094510559}
   - component: {fileID: 7070348881094510552}
   - component: {fileID: 34267887}
+  - component: {fileID: 3456710840388979930}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: EventSystem
@@ -7006,6 +7006,18 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!114 &3456710840388979930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7070348881094510554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f471e6e030b523468547a744aa155be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7551809489314000595
 GameObject:
   m_ObjectHideFlags: 0

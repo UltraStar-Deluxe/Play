@@ -1,21 +1,38 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
-    [Inject]
-    private Settings settings;
+    [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
+    private Label unexpectedErrorLabel;
 
-    void Start()
+    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
+    private Button hiddenContinueButton;
+
+    private void Awake()
     {
+        // Show general error message after short pause.
+        // Normally, the next scene should start before the error message is shown.
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => ShowGeneralErrorMessage()));
+    }
+
+    private void Start()
+    {
+        // The settings are loaded on access.
+        Settings settings = SettingsManager.Instance.Settings;
+        string jsonSettings = JsonConverter.ToJson(settings, false);
+        Log.Logger.Information("loaded settings:" + jsonSettings);
+
         // Init song folders if none yet
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
@@ -35,13 +52,11 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
         InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
             .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
+        hiddenContinueButton.RegisterCallbackButtonTriggered(() => StartCoroutine(FinishAfterDelay()));
         
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        // The settings are loaded on access.
-        string jsonSettings = JsonConverter.ToJson(SettingsManager.Instance.Settings, false);
-        Log.Logger.Information("loaded settings:" + jsonSettings);
 
         // The SongMetas are loaded on access.
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
@@ -54,20 +69,30 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         TranslationManager.Instance.ReloadTranslationsAndUpdateScene();
 
         // Ask for microphone and webcam permissions on Android
-#if  UNITY_ANDROID
-        AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
-        if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+        if (PlatformUtils.IsAndroid)
         {
-            AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
+            AndroidRuntimePermissions.Permission checkAudioPermission = AndroidRuntimePermissions.CheckPermission("android.permission.RECORD_AUDIO");
+            if (checkAudioPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+            {
+                AndroidRuntimePermissions.RequestPermission("android.permission.RECORD_AUDIO");
+            }
+
+            AndroidRuntimePermissions.Permission checkCameraPermission = AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
+            if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
+            {
+                AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
+            }
         }
 
-        AndroidRuntimePermissions.Permission checkCameraPermission = AndroidRuntimePermissions.CheckPermission("android.permission.CAMERA");
-        if (checkCameraPermission == AndroidRuntimePermissions.Permission.ShouldAsk)
-        {
-            AndroidRuntimePermissions.RequestPermission("android.permission.CAMERA");
-        }
-#endif
         FinishScene();
+    }
+
+    private void ShowGeneralErrorMessage()
+    {
+        Debug.LogWarning("Showing general error message in loading scene. Probably something went wrong.");
+        unexpectedErrorLabel.ShowByDisplay();
+        unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
+            "path", Log.logFileFolder);
     }
 
     private void FinishScene()
@@ -79,7 +104,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private IEnumerator FinishAfterDelay()
     {
         // Wait delay in case loading just didn't finish yet.
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         FinishScene();
     }
 
