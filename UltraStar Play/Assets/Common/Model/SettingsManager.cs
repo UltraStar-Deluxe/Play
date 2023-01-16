@@ -94,20 +94,37 @@ public class SettingsManager : MonoBehaviour
         if (!Application.isEditor)
         {
             // Create internal song folder on Android and add it to the settings.
-            string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
-            if (!Directory.Exists(internalSongFolder))
+            try
             {
-                Directory.CreateDirectory(internalSongFolder);
+                string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
+                if (!Directory.Exists(internalSongFolder))
+                {
+                    Directory.CreateDirectory(internalSongFolder);
+                }
+
+                defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
             }
-            defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
+            catch (Exception ex)
+            {
+                Debug.LogError("Failed to create initial song folder.");
+                Debug.LogError(ex);
+            }
         }
 #endif
 
         // Try to select the first mic for singing.
-        MicProfile defaultMicProfile = CreateDefaultMicProfile();
-        if (defaultMicProfile != null)
+        try
         {
-            settings.MicProfiles.Add(defaultMicProfile);
+            MicProfile defaultMicProfile = CreateDefaultMicProfile();
+            if (defaultMicProfile != null)
+            {
+                settings.MicProfiles.Add(defaultMicProfile);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to create initial recording device profile.");
+            Debug.LogError(ex);
         }
 
         return defaultSettings;
