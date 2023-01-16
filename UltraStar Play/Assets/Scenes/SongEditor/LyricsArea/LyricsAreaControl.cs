@@ -164,7 +164,10 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 is LyricsChangedEvent
                 or LoadedMementoEvent
                 or MovedNotesToVoiceEvent
-                or NotesSplitEvent)
+                or NotesSplitEvent
+                or NotesDeletedEvent
+                or SentencesDeletedEvent
+                or NotesPastedEvent)
         {
             UpdateLyrics();
         }
