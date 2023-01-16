@@ -99,7 +99,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
         foreach (Note note in CopiedNotes)
         {
+            note.IsEditable = true;
             note.MoveHorizontal(distanceInBeats);
+            note.IsEditable = false;
         }
 
         editorNoteDisplayer.UpdateNotes();
@@ -135,6 +137,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
             copiedNotesFromLayer.ForEach(copiedNote =>
             {
+                copiedNote.IsEditable = true;
                 layerManager.RemoveNoteFromAllEnumLayers(copiedNote);
                 layerManager.AddNoteToEnumLayer(layer.LayerEnum, copiedNote);
                 pastedNotes.Add(copiedNote);
@@ -148,13 +151,28 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalEnumLayer == null
                                      && copiedNoteToOriginalDataMap[copiedNote].OriginalVoice == voice)
                 .ToList();
-            copiedNotesFromVoice.ForEach(copiedNote => layerManager.RemoveNoteFromAllEnumLayers(copiedNote));
+            copiedNotesFromVoice.ForEach(copiedNote =>
+            {
+                copiedNote.IsEditable = true;
+                layerManager.RemoveNoteFromAllEnumLayers(copiedNote);
+            });
             moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, copiedNotesFromVoice, voice.Name);
             pastedNotes.AddRange(copiedNotesFromVoice);
         });
 
         // Make editable again
-        pastedNotes.ForEach(note => note.IsEditable = true);
+        pastedNotes.ForEach(note =>
+        {
+            if (layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer enumLayer))
+            {
+                note.IsEditable = layerManager.IsEnumLayerEditable(enumLayer.LayerEnum);
+            }
+            else
+            {
+                string voiceName = note?.Sentence?.Voice?.Name;
+                note.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
+            }
+        });
 
         // All done, nothing to copy anymore.
         ClearCopiedNotes();
