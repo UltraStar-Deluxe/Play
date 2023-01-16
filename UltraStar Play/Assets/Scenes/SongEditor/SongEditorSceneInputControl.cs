@@ -49,7 +49,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
-    [Inject]
+    [Inject(Optional = true)]
     private EventSystem eventSystem;
 
     [Inject]
@@ -76,7 +76,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
-        eventSystem.sendNavigationEvents = false;
+        if (eventSystem != null)
+        {
+            eventSystem.sendNavigationEvents = false;
+        }
 
         // Jump to start / end of song
         InputManager.GetInputAction(R.InputActions.songEditor_jumpToStartOfSong).PerformedAsObservable()
@@ -226,7 +229,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         else if (AnyInputFieldHasFocus())
         {
             // Deselect TextArea
-            eventSystem.SetSelectedGameObject(null);
+            if (eventSystem != null)
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
         }
         else if (!inputFieldHasFocusOld)
         {
@@ -251,7 +257,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             // Scroll horizontal in NoteArea with no modifier
             if (modifier == EKeyboardModifier.None)
             {
-                noteAreaControl.ScrollHorizontal(scrollDirection);
+                noteAreaControl.ScrollHorizontal(-scrollDirection);
             }
 
             // Zoom horizontal in NoteArea with Ctrl

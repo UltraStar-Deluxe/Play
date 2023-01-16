@@ -26,7 +26,11 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="disableDynamicThemesContainer" class="optionsLabelAndItemPicker">
                     <ui:Label text="Disable Dynamic Themes" name="Label" class="controlLabel" />
-                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" wrap-around="true" />
+                </ui:VisualElement>
+                <ui:VisualElement name="customEventSystemOptInOnAndroidContainer" class="optionsLabelAndItemPicker">
+                    <ui:Label text="Use custom event system for input actions.&#10;This enables keyboard and gamepad control but can cause issues on Android" name="Label" class="controlLabel" style="white-space: normal;" />
+                    <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" wrap-around="true" />
                 </ui:VisualElement>
                 <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
                 <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
