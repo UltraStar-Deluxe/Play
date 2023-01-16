@@ -175,6 +175,8 @@ public static partial class R
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
         public static readonly string options_songLibrary_helpDialog_addSongInfo = "options_songLibrary_helpDialog_addSongInfo";
         public static readonly string options_songLibrary_helpDialog_addSongInfo_title = "options_songLibrary_helpDialog_addSongInfo_title";
+        public static readonly string options_songLibrary_helpDialog_androidSongFolders = "options_songLibrary_helpDialog_androidSongFolders";
+        public static readonly string options_songLibrary_helpDialog_androidSongFolders_title = "options_songLibrary_helpDialog_androidSongFolders_title";
         public static readonly string options_songLibrary_helpDialog_createSongInfo = "options_songLibrary_helpDialog_createSongInfo";
         public static readonly string options_songLibrary_helpDialog_createSongInfo_title = "options_songLibrary_helpDialog_createSongInfo_title";
         public static readonly string options_songLibrary_helpDialog_downloadSongInfo = "options_songLibrary_helpDialog_downloadSongInfo";

@@ -7,8 +7,6 @@ public static partial class R
         public const string aboutButton = "aboutButton";
         public const string aboutIcon = "aboutIcon";
         public const string aboutText = "aboutText";
-        public const string addAndroidInternalSongFolderButton = "addAndroidInternalSongFolderButton";
-        public const string addAndroidSdCardSongFolderButton = "addAndroidSdCardSongFolderButton";
         public const string addButton = "addButton";
         public const string addIcon = "addIcon";
         public const string addSongFolderButton = "addSongFolderButton";
