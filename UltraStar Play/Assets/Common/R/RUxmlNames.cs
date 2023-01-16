@@ -136,6 +136,7 @@ public static partial class R
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
         public const string downloadSongsButton = "downloadSongsButton";
+        public const string driveButton = "driveButton";
         public const string dropDownIcon = "dropDownIcon";
         public const string duetIcon = "duetIcon";
         public const string duetLegend = "duetLegend";

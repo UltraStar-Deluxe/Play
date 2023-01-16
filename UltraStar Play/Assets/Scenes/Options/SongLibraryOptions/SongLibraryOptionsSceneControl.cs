@@ -398,19 +398,19 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     private void CreateSongFolderEntryControl(string path, int indexInList)
     {
         VisualElement visualElement = songFolderListEntryAsset.CloneTree();
-        SongFolderListEntryControl songFolderListEntryControl = new(path);
-        injector
+        SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
-            .Inject(songFolderListEntryControl);
+            .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
+            .CreateAndInject<SongFolderListEntryControl>();
 
-        songFolderListEntryControl.TextField.RegisterValueChangedCallback(evt =>
+        songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue =>
         {
-            settings.GameSettings.songDirs[indexInList] = evt.newValue;
+            settings.GameSettings.songDirs[indexInList] = newValue;
             UpdateAddAndroidSongFoldersButtons();
 
             songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
         });
-        songFolderListEntryControl.DeleteButton.RegisterCallbackButtonTriggered(() =>
+        songFolderListEntryControl.DeleteEventStream.Subscribe(_ =>
         {
             settings.GameSettings.songDirs.RemoveAt(indexInList);
             UpdateSongFolderList();
