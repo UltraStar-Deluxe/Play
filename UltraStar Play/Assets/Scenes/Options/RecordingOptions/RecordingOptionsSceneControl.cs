@@ -448,6 +448,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
             titleToContentMap,
             CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
     }
 
     private void CloseHelp()

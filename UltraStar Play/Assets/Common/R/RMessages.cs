@@ -45,6 +45,13 @@ public static partial class R
         public static readonly string companionApp_visualizeMicInput = "companionApp_visualizeMicInput";
         public static readonly string contentDownloadScene_archiveUrlLabel = "contentDownloadScene_archiveUrlLabel";
         public static readonly string contentDownloadScene_cancelDownloadButton = "contentDownloadScene_cancelDownloadButton";
+        public static readonly string contentDownloadScene_helpDialog_archiveDownload = "contentDownloadScene_helpDialog_archiveDownload";
+        public static readonly string contentDownloadScene_helpDialog_archiveDownload_title = "contentDownloadScene_helpDialog_archiveDownload_title";
+        public static readonly string contentDownloadScene_helpDialog_demoSongPackage = "contentDownloadScene_helpDialog_demoSongPackage";
+        public static readonly string contentDownloadScene_helpDialog_demoSongPackage_title = "contentDownloadScene_helpDialog_demoSongPackage_title";
+        public static readonly string contentDownloadScene_helpDialog_thirdPartyDownloads = "contentDownloadScene_helpDialog_thirdPartyDownloads";
+        public static readonly string contentDownloadScene_helpDialog_thirdPartyDownloads_title = "contentDownloadScene_helpDialog_thirdPartyDownloads_title";
+        public static readonly string contentDownloadScene_helpDialog_title = "contentDownloadScene_helpDialog_title";
         public static readonly string contentDownloadScene_startDownloadButton = "contentDownloadScene_startDownloadButton";
         public static readonly string contentDownloadScene_status_canceled = "contentDownloadScene_status_canceled";
         public static readonly string contentDownloadScene_status_failed = "contentDownloadScene_status_failed";
@@ -282,7 +289,11 @@ public static partial class R
         public static readonly string start = "start";
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";
+        public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
+        public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
+        public static readonly string uri_howToDownloadSongs = "uri_howToDownloadSongs";
         public static readonly string version = "version";
+        public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
         public static readonly string yes = "yes";
     }
