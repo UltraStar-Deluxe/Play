@@ -169,6 +169,9 @@ public static partial class R
         public static readonly string options_songLibrary_addInternalSongFolder = "options_songLibrary_addInternalSongFolder";
         public static readonly string options_songLibrary_addSdCardSongFolder = "options_songLibrary_addSdCardSongFolder";
         public static readonly string options_songLibrary_androidFolderHint = "options_songLibrary_androidFolderHint";
+        public static readonly string options_songLibrary_androidInternalStorage = "options_songLibrary_androidInternalStorage";
+        public static readonly string options_songLibrary_androidOtherStorage = "options_songLibrary_androidOtherStorage";
+        public static readonly string options_songLibrary_androidSdCardStorage = "options_songLibrary_androidSdCardStorage";
         public static readonly string options_songLibrary_button = "options_songLibrary_button";
         public static readonly string options_songLibrary_helpDialog_addSongInfo = "options_songLibrary_helpDialog_addSongInfo";
         public static readonly string options_songLibrary_helpDialog_addSongInfo_title = "options_songLibrary_helpDialog_addSongInfo_title";
