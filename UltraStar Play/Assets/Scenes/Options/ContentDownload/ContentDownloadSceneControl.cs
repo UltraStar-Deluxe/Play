@@ -66,6 +66,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
     [Inject]
     private SettingsManager settingsManager;
     
@@ -78,6 +81,9 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private UiManager uiManager;
+
     private MessageDialogControl urlChooserDialogControl;
 
     private string DownloadUrl => downloadPath.value.Trim();
@@ -89,6 +95,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     // The Ui log may only be filled from the main thread.
     // This string caches new log lines for other threads.
     private string newLogText;
+
+    private MessageDialogControl helpDialogControl;
 
     private int extractedEntryCount;
 
@@ -107,13 +115,27 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             FetchFileSize();
         }
 
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
         backButton.Focus();
 
         urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+            .Subscribe(_ => OnBack());
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene);
+        }
     }
 
     private void ShowUrlChooserDialog()
@@ -553,5 +575,41 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         {
             downloadRequest.Dispose();
         }
+    }
+
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage) },
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload) },
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
+    }
+
+    private void CloseHelp()
+    {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
+        helpDialogControl.CloseDialog();
+        helpDialogControl = null;
+        helpButton.Focus();
     }
 }

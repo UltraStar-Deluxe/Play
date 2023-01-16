@@ -202,6 +202,8 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
             titleToContentMap,
             CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
     }
 
     private void CloseHelp()
@@ -368,10 +370,17 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         songFolderListEntryControls.Clear();
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
-            Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
+            Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
             noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
             noSongsFoundLabel.style.marginTop = 10;
+            noSongsFoundLabel.style.marginBottom = 5;
             songList.Add(noSongsFoundLabel);
+
+            Button viewMoreButton = new();
+            viewMoreButton.AddToClassList("centerHorizontalByMargin");
+            viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
+            viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+            songList.Add(viewMoreButton);
         }
         else
         {
