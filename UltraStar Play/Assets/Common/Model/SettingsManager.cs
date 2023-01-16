@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class SettingsManager : MonoBehaviour
@@ -101,7 +102,27 @@ public class SettingsManager : MonoBehaviour
             defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
         }
 #endif
+
+        // Try to select the first mic for singing.
+        MicProfile defaultMicProfile = CreateDefaultMicProfile();
+        if (defaultMicProfile != null)
+        {
+            settings.MicProfiles.Add(defaultMicProfile);
+        }
+
         return defaultSettings;
+    }
+
+    private MicProfile CreateDefaultMicProfile()
+    {
+        if (Microphone.devices.Length <= 0)
+        {
+            return null;
+        }
+
+        MicProfile result = new(Microphone.devices.FirstOrDefault());
+        result.IsEnabled = true;
+        return result;
     }
 
     private void OverwriteSettingsWithCommandLineArguments()
