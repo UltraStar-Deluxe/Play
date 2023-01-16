@@ -12,6 +12,18 @@
         }
     }
 
+    public static bool IsAndroid
+    {
+        get
+        {
+#if UNITY_ANDROID
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
     public static bool IsWindows()
     {
 #if UNITY_STANDALONE_WIN
