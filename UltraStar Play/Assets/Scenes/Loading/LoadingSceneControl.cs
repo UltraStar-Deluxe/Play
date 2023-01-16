@@ -16,18 +16,22 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
 
+    [Inject(UxmlName = R.UxmlNames.unexpectedErrorContainer)]
+    private VisualElement unexpectedErrorContainer;
+
+    [Inject(UxmlName = R.UxmlNames.viewMoreButton)]
+    private Button viewMoreButton;
+
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
 
-    private void Awake()
+    private void Start()
     {
         // Show general error message after short pause.
         // Normally, the next scene should start before the error message is shown.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => ShowGeneralErrorMessage()));
-    }
+        unexpectedErrorContainer.HideByDisplay();
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(8, () => ShowGeneralErrorMessage()));
 
-    private void Start()
-    {
         // The settings are loaded on access.
         Settings settings = SettingsManager.Instance.Settings;
         string jsonSettings = JsonConverter.ToJson(settings, false);
@@ -90,9 +94,11 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private void ShowGeneralErrorMessage()
     {
         Debug.LogWarning("Showing general error message in loading scene. Probably something went wrong.");
-        unexpectedErrorLabel.ShowByDisplay();
+        unexpectedErrorContainer.ShowByDisplay();
         unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
             "path", Log.logFileFolder);
+        viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
+        viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
     }
 
     private void FinishScene()
