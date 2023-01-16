@@ -630,6 +630,7 @@ public static partial class R
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
+        public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlChooserComboContainer = "urlChooserComboContainer";
@@ -648,6 +649,7 @@ public static partial class R
         public const string videoLegend = "videoLegend";
         public const string videoLegendIcon = "videoLegendIcon";
         public const string videoLegendLabel = "videoLegendLabel";
+        public const string viewMoreButton = "viewMoreButton";
         public const string virtualPiano = "virtualPiano";
         public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceChooser = "voiceChooser";

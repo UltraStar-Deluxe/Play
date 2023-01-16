@@ -290,6 +290,7 @@ public static partial class R
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToDownloadSongs = "uri_howToDownloadSongs";
+        public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string version = "version";
         public static readonly string viewMore = "viewMore";
         public static readonly string warning = "warning";
