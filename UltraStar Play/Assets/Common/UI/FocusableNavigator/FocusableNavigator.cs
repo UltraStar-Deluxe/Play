@@ -20,7 +20,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
     [Inject]
     protected UIDocument uiDocument;
 
-    [Inject]
+    [Inject(Optional = true)]
     protected EventSystem eventSystem;
 
     public bool focusLastElementIfNothingFocused;
@@ -45,7 +45,10 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
-        eventSystem.sendNavigationEvents = false;
+        if (eventSystem != null)
+        {
+            eventSystem.sendNavigationEvents = false;
+        }
 
         if (focusLastElementIfNothingFocused)
         {
