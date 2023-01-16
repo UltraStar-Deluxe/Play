@@ -115,6 +115,7 @@ public static partial class R
         public const string creditsIcon = "creditsIcon";
         public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentSentenceContainer = "currentSentenceContainer";
+        public const string customEventSystemOptInOnAndroidContainer = "customEventSystemOptInOnAndroidContainer";
         public const string dateLabel = "dateLabel";
         public const string delayContainer = "delayContainer";
         public const string deleteButton = "deleteButton";
@@ -731,6 +732,7 @@ public static partial class R
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
+        public const string unexpectedErrorLabel = "unexpectedErrorLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlChooserComboContainer = "urlChooserComboContainer";
         public const string urlContainer = "urlContainer";
