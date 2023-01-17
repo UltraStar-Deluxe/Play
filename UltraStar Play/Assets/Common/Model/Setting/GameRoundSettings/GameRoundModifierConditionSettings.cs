@@ -1,10 +1,29 @@
-﻿public class GameRoundModifierConditionSettings
+﻿using System;
+
+[Serializable]
+public class GameRoundModifierConditionSettings
 {
-    public EGameRoundModifierCondition Condition { get; set; } = EGameRoundModifierCondition.Always;
-    public int TimeFrom { get; set; }
-    public int TimeUntil { get; set; } = 100;
-    public int ScoreFrom { get; set; }
-    public int ScoreUntil { get; set; } = 10000;
+    public EGameRoundModifierCondition condition = EGameRoundModifierCondition.Always;
+
+    /**
+     * Time from in percent (0 to 100)
+     */
+    public int timeFrom;
+
+    /**
+     * Time until in percent (0 to 100)
+     */
+    public int timeUntil = 100;
+
+    /**
+     * Score from (0 to 10000)
+     */
+    public int scoreFrom;
+
+    /**
+     * Score until (0 to 10000)
+     */
+    public int scoreUntil = 10000;
 
     public bool EqualsOther(GameRoundModifierConditionSettings other)
     {
@@ -18,19 +37,19 @@
             return true;
         }
 
-        return Condition == other.Condition
-               && TimeFrom == other.TimeFrom
-               && TimeUntil == other.TimeUntil
-               && ScoreFrom == other.ScoreFrom
-               && ScoreUntil == other.ScoreUntil;
+        return condition == other.condition
+               && timeFrom == other.timeFrom
+               && timeUntil == other.timeUntil
+               && scoreFrom == other.scoreFrom
+               && scoreUntil == other.scoreUntil;
     }
 
     public void CopyValues(GameRoundModifierConditionSettings other)
     {
-        Condition = other.Condition;
-        TimeFrom = other.TimeFrom;
-        TimeUntil = other.TimeUntil;
-        ScoreFrom = other.ScoreFrom;
-        ScoreUntil = other.ScoreUntil;
+        condition = other.condition;
+        timeFrom = other.timeFrom;
+        timeUntil = other.timeUntil;
+        scoreFrom = other.scoreFrom;
+        scoreUntil = other.scoreUntil;
     }
 }

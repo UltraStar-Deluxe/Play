@@ -1,9 +1,10 @@
 ﻿using System;
 
+[Serializable]
 public class GameRoundFinishConditionSettings
 {
-    public EGameRoundFinishCondition Condition { get; set; } = EGameRoundFinishCondition.ReachEndOfSong;
-    public int Points { get; set; } = 3000;
+    public EGameRoundFinishCondition condition = EGameRoundFinishCondition.ReachEndOfSong;
+    public int points = 3000;
 
     public bool EqualsOther(GameRoundFinishConditionSettings other)
     {
@@ -17,13 +18,13 @@ public class GameRoundFinishConditionSettings
             return true;
         }
 
-        return Condition == other.Condition
-               && Points == other.Points;
+        return condition == other.condition
+               && points == other.points;
     }
 
     public void CopyValues(GameRoundFinishConditionSettings other)
     {
-        Condition = other.Condition;
-        Points = other.Points;
+        condition = other.condition;
+        points = other.points;
     }
 }

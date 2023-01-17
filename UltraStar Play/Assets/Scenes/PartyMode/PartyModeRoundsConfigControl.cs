@@ -50,7 +50,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
         roundsContainer.Clear();
         roundConfigControls.Clear();
 
-        partyModeSettings.RoundsSettings.GameRoundSettings.ToList().ForEach(roundSettings => CreateRoundSettingsUi(roundSettings));
+        partyModeSettings.roundsSettings.gameRoundSettings.ToList().ForEach(roundSettings => CreateRoundSettingsUi(roundSettings));
 
         for (int i = 0; i < roundConfigControls.Count; i++)
         {
@@ -92,25 +92,25 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
                 it.Fold(false);
             }
         });
-        unfoldedRoundUiIndex = partyModeSettings.RoundsSettings.GameRoundSettings.IndexOf(gameRoundSettings);
+        unfoldedRoundUiIndex = partyModeSettings.roundsSettings.gameRoundSettings.IndexOf(gameRoundSettings);
     }
 
     private void OnGameRoundDeleted(GameRoundSettings roundSettings)
     {
-        if (partyModeSettings.RoundsSettings.GameRoundSettings.Count <= 1)
+        if (partyModeSettings.roundsSettings.gameRoundSettings.Count <= 1)
         {
             // Must play at least one round
             return;
         }
 
-        partyModeSettings.RoundsSettings.GameRoundSettings.Remove(roundSettings);
+        partyModeSettings.roundsSettings.gameRoundSettings.Remove(roundSettings);
         UpdateRoundsUi();
     }
 
     private void AddRound()
     {
         GameRoundSettings newRound = new();
-        partyModeSettings.RoundsSettings.GameRoundSettings.Add(newRound);
+        partyModeSettings.roundsSettings.gameRoundSettings.Add(newRound);
 
         UpdateRoundsUi();
 

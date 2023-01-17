@@ -339,7 +339,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         singThisSongButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
-            songSelectSceneControl.CheckAudioAndShowPlayerSelectOverlay();
+            songSelectSceneControl.AttemptStartSong();
         });
         closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
         {

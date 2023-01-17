@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+[Serializable]
 public class PartyModeTeamsSettings
 {
-    public List<PartyModeTeamSettings> Teams { get; set; } = new();
-    public bool IsFreeForAll { get; set; }
-    public bool IsKnockOutTournament { get; set; }
+    public List<PartyModeTeamSettings> teams = new();
+    public bool isFreeForAll;
+    public bool isKnockOutTournament;
 }
