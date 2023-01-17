@@ -169,7 +169,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             }
             else
             {
-                string voiceName = note?.Sentence?.Voice?.Name;
+                string voiceName = note.Sentence?.Voice?.Name;
                 note.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
             }
         });

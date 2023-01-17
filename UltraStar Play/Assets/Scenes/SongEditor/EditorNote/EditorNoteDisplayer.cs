@@ -560,7 +560,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
-            DisposableStopwatch stopwatchA = new("");
             VisualElement noteVisualElement = editorNoteUi.CloneTree().Children().First();
             editorNoteControl = injector
                 .WithRootVisualElement(noteVisualElement)
