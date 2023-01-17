@@ -159,15 +159,15 @@ MonoBehaviour:
     songSelectionMode: 1
     jokerCount: 5
   finishConditionSettings:
-    condition: 0
+    condition: 2
     points: 3000
   modifiers: 0200000001000000
   modifierConditionSettings:
-    condition: 0
+    condition: 2
     timeFrom: 0
-    timeUntil: 100
+    timeUntil: 90
     scoreFrom: 0
-    scoreUntil: 10000
+    scoreUntil: 9000
 --- !u!4 &79690708
 Transform:
   m_ObjectHideFlags: 0

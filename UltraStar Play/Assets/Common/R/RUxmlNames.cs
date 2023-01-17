@@ -360,10 +360,10 @@ public static partial class R
         public const string midiVelocitySlider = "midiVelocitySlider";
         public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
         public const string modifierChipsCombo = "modifierChipsCombo";
+        public const string modifierConditionContainer = "modifierConditionContainer";
         public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
         public const string modifierConditionUntilNumberPicker = "modifierConditionUntilNumberPicker";
-        public const string modifierContainer = "modifierContainer";
         public const string modifierDescription = "modifierDescription";
         public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
         public const string musicGroup = "musicGroup";
@@ -525,7 +525,6 @@ public static partial class R
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
-        public const string randomIcon = "randomIcon";
         public const string randomizeButton = "randomizeButton";
         public const string randomizeIcon = "randomizeIcon";
         public const string ratingImage = "ratingImage";

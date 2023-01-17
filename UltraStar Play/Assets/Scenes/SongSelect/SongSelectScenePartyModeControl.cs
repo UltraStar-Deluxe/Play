@@ -45,6 +45,12 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.partySettingsContainer)]
     private VisualElement partySettingsContainer;
 
+    [Inject(UxmlName = R.UxmlNames.finishConditionContainer)]
+    private VisualElement finishConditionContainer;
+
+    [Inject(UxmlName = R.UxmlNames.modifierConditionContainer)]
+    private VisualElement modifierConditionContainer;
+
     [Inject(UxmlName = R.UxmlNames.finishConditionDescription)]
     private Label finishConditionDescription;
 
@@ -151,7 +157,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
         }
 
         finishConditionDescription.text = GetFinishConditionDescription();
+        finishConditionContainer.SetVisibleByDisplay(!finishConditionDescription.text.IsNullOrEmpty());
         modifierDescription.text = GetModifierDescription();
+        modifierConditionContainer.SetVisibleByDisplay(!modifierDescription.text.IsNullOrEmpty());
     }
 
     public void SelectRandomSong()

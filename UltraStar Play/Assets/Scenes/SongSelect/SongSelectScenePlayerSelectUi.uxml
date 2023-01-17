@@ -39,7 +39,7 @@
                         <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
                         <ui:Label tabindex="-1" text="Reach end of song" display-tooltip-when-elided="true" name="finishConditionDescription" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="modifierContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                    <ui:VisualElement name="modifierConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
                         <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
                         <ui:Label tabindex="-1" text="&apos;Hide lyrics&apos; when score is between 1000 and 9000" display-tooltip-when-elided="true" name="modifierDescription" style="margin-top: auto; white-space: normal;" />
                     </ui:VisualElement>
