@@ -37,7 +37,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
     private readonly string androidSdCardPath;
     private readonly string androidInternalStoragePath;
-    private ReactiveProperty<string> androidDrivePath = new("");
+    private readonly ReactiveProperty<string> androidDrivePath = new("");
     private string FullPath => androidDrivePath.Value.IsNullOrEmpty()
         ? textField.value
         : PathUtils.CombinePaths(androidDrivePath.Value, textField.value);

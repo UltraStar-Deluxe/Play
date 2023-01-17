@@ -55,7 +55,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         if (notesAfterSplit.Count > 1)
         {
             // Note has been split
-            songMetaChangeEventStream.OnNext(new NotesSplitEvent() { Undoable = undoable});
+            songMetaChangeEventStream.OnNext(new NotesSplitEvent { Undoable = undoable});
         }
         else
         {
