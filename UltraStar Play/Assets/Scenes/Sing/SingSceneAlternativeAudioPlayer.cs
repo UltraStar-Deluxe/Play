@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.PlayerLoop;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -35,6 +33,12 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SingScenePartyModeControl partyModeControl;
+
+    [Inject]
+    private SingSceneAudioFadeInControl audioFadeInControl;
+
     private bool hasLoadedInstrumentalAndVocalsAudio;
 
     private bool isInitialized;
@@ -51,13 +55,16 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
+        partyModeControl.ModifiedVolumePercent.Subscribe(_ => UpdateAudioSources());
+        audioFadeInControl.FadeInVolumePercent.Subscribe(_ => UpdateAudioSources());
+
         Init();
     }
 
     private void Init()
     {
         if (isInitialized
-            || !CanPlayAudio(out string errorMessage))
+            || !CanPlayInstrumentalAndVocalsAudio(out string errorMessage))
         {
             return;
         }
@@ -111,9 +118,10 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         vocalsAudioSource.time = songAudioPlayerTimeInSeconds;
     }
 
-    private void UpdateAudioSources()
+    public void UpdateAudioSources()
     {
-        if (settings.AudioSettings.VocalsAudioVolumePercent >= 100)
+        if (settings.AudioSettings.VocalsAudioVolumePercent >= 100
+            || !CanPlayInstrumentalAndVocalsAudio(out string errorMessage))
         {
             UseOriginalSongAudio();
         }
@@ -125,7 +133,9 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void UseOriginalSongAudio()
     {
-        songAudioPlayer.audioPlayer.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+        songAudioPlayer.audioPlayer.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
+                                             * NumberUtils.PercentToFactor(partyModeControl.ModifiedVolumePercent.Value)
+                                             * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = 0;
         instrumentalAudioSource.volume = 0;
 
@@ -142,9 +152,13 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         songAudioPlayer.audioPlayer.volume = 0;
-        instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+        instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
+                                         * NumberUtils.PercentToFactor(partyModeControl.ModifiedVolumePercent.Value)
+                                         * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
-                                   * NumberUtils.PercentToFactor(settings.AudioSettings.VocalsAudioVolumePercent);
+                                   * NumberUtils.PercentToFactor(settings.AudioSettings.VocalsAudioVolumePercent)
+                                   * NumberUtils.PercentToFactor(partyModeControl.ModifiedVolumePercent.Value)
+                                   * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
 
         if (songAudioPlayer.IsPlaying)
         {
@@ -152,7 +166,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private bool CanPlayAudio(out string errorMessage)
+    private bool CanPlayInstrumentalAndVocalsAudio(out string errorMessage)
     {
         if (songMeta.VocalsAudio.IsNullOrEmpty())
         {

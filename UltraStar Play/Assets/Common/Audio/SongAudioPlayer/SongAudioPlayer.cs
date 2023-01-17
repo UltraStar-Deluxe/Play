@@ -107,6 +107,9 @@ public class SongAudioPlayer : MonoBehaviour
 
     public double DurationOfSongInMillis { get; private set; }
 
+    /**
+     * Position in the song from 0 (start of song) to 1 (end of song).
+     */
     public double PositionInSongInPercent
     {
         get

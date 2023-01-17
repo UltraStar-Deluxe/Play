@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ICSharpCode.SharpZipLib;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -891,6 +892,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
+        singSceneData.partyModeSettings = PartyModeSettings;
+        if (HasPartyModeSettings &&
+            PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+        {
+            // Set as medley song to play shortened version
+            singSceneData.MedleySongIndex = 0;
+        }
         return singSceneData;
     }
 
@@ -912,7 +920,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene()
     {
-        if (gameRoundManager.HasGameRounds)
+        if (gameRoundManager.HasGameRounds
+            && !HasPartyModeSettings)
         {
             StartSingSceneWithNextGameRound();
         }

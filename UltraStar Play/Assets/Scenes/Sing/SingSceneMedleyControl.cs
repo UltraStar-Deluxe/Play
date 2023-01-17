@@ -28,8 +28,8 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneData sceneData;
 
-    private bool isSongFinished;
-    private float durationAfterSongFinishedInSeconds;
+    [Inject]
+    private SingSceneFinisher singSceneFinisher;
 
     public int MedleyStartBeat {get; private set;}
     public int MedleyEndBeat {get; private set;}
@@ -57,18 +57,9 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        if (!isSongFinished
-            && Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
+        if (Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
         {
-            isSongFinished = true;
-        }
-        else if (isSongFinished)
-        {
-            durationAfterSongFinishedInSeconds += Time.deltaTime;
-            if (durationAfterSongFinishedInSeconds >= 3)
-            {
-                FinishMedleySong();
-            }
+            singSceneFinisher.TriggerEarlySongFinish();
         }
     }
 
@@ -82,32 +73,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         Debug.Log($"Starting current medley song '{SongMetaUtils.GetArtistDashTitle(singSceneControl.SongMeta)}'");
         singSceneControl.SkipToPositionInSong(CalculateMedleyStartWithCountdownInMillis());
         countdownControl.StartCountdown(CountDownTimeInSeconds);
-        audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds / 2);
-    }
-
-    private void FinishMedleySong()
-    {
-        if (sceneData.MedleySongIndex >= sceneData.SongMetas.Count - 1)
-        {
-            singSceneControl.FinishScene(false);
-        }
-        else
-        {
-            // Create scene data to sing next medley song
-            SingSceneData newSingSceneData = new(sceneData);
-            // Add player scores of this song
-            foreach (PlayerControl playerControl in singSceneControl.PlayerControls)
-            {
-                if (!newSingSceneData.PlayerProfileToScoreDataMap.ContainsKey(playerControl.PlayerProfile))
-                {
-                    newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<PlayerScoreControlData>());
-                }
-                newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.ScoreData);
-            }
-            // Continue with next medley song
-            newSingSceneData.MedleySongIndex++;
-            sceneNavigator.LoadScene(EScene.SingScene, newSingSceneData, true);
-        }
+        audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);
     }
 
     private double CalculateMedleyStartWithCountdownInMillis()

@@ -9,7 +9,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingSceneAudioFadeInControl : INeedInjection, IDisposable, IInjectionFinishedListener
+public class SingSceneAudioFadeInControl : INeedInjection, IDisposable
 {
     [Inject]
     private GameObject gameObject;
@@ -19,12 +19,7 @@ public class SingSceneAudioFadeInControl : INeedInjection, IDisposable, IInjecti
 
     private readonly List<int> leanTweenAnimationIds = new();
 
-    private int originalVolume;
-
-    public void OnInjectionFinished()
-    {
-        originalVolume = settings.AudioSettings.VolumePercent;
-    }
+    public ReactiveProperty<int> FadeInVolumePercent { get; private set; } = new(100);
 
     public void StartAudioFadeIn(int timeInSeconds)
     {
@@ -36,11 +31,10 @@ public class SingSceneAudioFadeInControl : INeedInjection, IDisposable, IInjecti
         CancelAudioFadeIn();
 
         Debug.Log($"Starting audio fade in during {timeInSeconds} seconds");
-        settings.AudioSettings.VolumePercent = 0;
-        AudioListener.volume = 0;
+        FadeInVolumePercent.Value = 0;
 
-        int animationId = LeanTween.value(gameObject, 0, 1, timeInSeconds)
-            .setOnUpdate(interpolatedValue => settings.AudioSettings.VolumePercent = (int)(originalVolume * interpolatedValue))
+        int animationId = LeanTween.value(gameObject, 0, 100, timeInSeconds)
+            .setOnUpdate(interpolatedValue => FadeInVolumePercent.Value = (int)interpolatedValue)
             .setOnComplete(() => ResetVolume())
             .id;
         leanTweenAnimationIds.Add(animationId);
@@ -48,7 +42,7 @@ public class SingSceneAudioFadeInControl : INeedInjection, IDisposable, IInjecti
 
     private void ResetVolume()
     {
-        settings.AudioSettings.VolumePercent = originalVolume;
+        FadeInVolumePercent.Value = 100;
     }
 
     public void CancelAudioFadeIn()
