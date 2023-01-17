@@ -154,7 +154,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.ultrastar.UltraStarPlay
-    Standalone: com.Karaoke.UltraStar-Play
+    Standalone: com.ultrastar.UltraStar-Play
   buildNumber:
     Standalone: 0
     iPhone: 0
@@ -545,10 +545,10 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: 
+  cameraUsageDescription: UltraStar Play uses webcams for custom player images and
+    live backgrounds.
   locationUsageDescription: 
-  microphoneUsageDescription: UltraStar Play needs to access microphones in order
-    to score the singing.
+  microphoneUsageDescription: UltraStar Play uses microphones to score the singing.
   bluetoothUsageDescription: 
   macOSTargetOSVersion: 10.13.0
   switchNMETAOverride: 
@@ -815,7 +815,7 @@ PlayerSettings:
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
   useDeterministicCompilation: 0
-  selectedPlatform: 1
+  selectedPlatform: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 0
