@@ -36,6 +36,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
     private Injector injector;
 
     [Inject]
@@ -81,8 +84,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.Clear();
 
         // Create new entries
-        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
-        List<PlayerProfile> enabledPlayerProfiles = playerProfiles.Where(it => it.IsEnabled).ToList();
+        List<PlayerProfile> enabledPlayerProfiles = songSelectSceneControl.GetEnabledPlayerProfiles();
         foreach (PlayerProfile playerProfile in enabledPlayerProfiles)
         {
             CreateListEntry(playerProfile);
@@ -96,10 +98,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
+            .WithBindingForInstance(playerProfile)
+            .WithBindingForInstance(songSelectSceneControl.GetTeam(playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
-        listEntryControl.Init(playerProfile);
 
-        listEntryControl.EnabledToggle.RegisterValueChangedCallback(evt => OnSelectionStatusChanged(listEntryControl, evt.newValue));
+        listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
         listEntryControl.SetSelected(playerProfile.IsSelected);
 
         playerEntryControls.Add(listEntryControl);

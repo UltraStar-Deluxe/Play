@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine.UIElements;
 
 public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
@@ -14,13 +16,19 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.nameLabel)]
     private Label nameLabel;
 
+    [Inject(UxmlName = R.UxmlNames.teamLabel)]
+    private Label teamLabel;
+
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
-    public Toggle EnabledToggle { get; private set; }
+    private Toggle enabledToggle;
+
+    [Inject]
+    public PlayerProfile PlayerProfile { get; private set; }
+
+    [Inject(Optional = true)]
+    private PartyModeTeamSettings partyModeTeamSettings;
 
     private LabeledItemPickerControl<Voice> voiceChooserControl;
-
-    // The PlayerProfile is set in Init and must not be null.
-    public PlayerProfile PlayerProfile { get; private set; }
 
     // The MicProfile can be null to indicate that this player does not have a mic (yet).
     private MicProfile micProfile;
@@ -53,9 +61,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     {
         get
         {
-            return EnabledToggle.value;
+            return PlayerProfile.IsSelected;
         }
     }
+
+    private Subject<bool> selectedChangedEventStream = new();
+    public IObservable<bool> SelectedChangedEventStream => selectedChangedEventStream;
 
     public void OnInjectionFinished()
     {
@@ -63,18 +74,40 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         voiceChooserControl.GetLabelTextFunction = voice => voice != null
             ? voice.Name
             : "";
-    }
 
-    public void SetSelected(bool newIsSelected)
-    {
-        EnabledToggle.value = newIsSelected;
-    }
-
-    public void Init(PlayerProfile playerProfile)
-    {
-        this.PlayerProfile = playerProfile;
-        nameLabel.text = playerProfile.Name;
+        UpdateEnabledToggle();
         MicProfile = null;
+
+        nameLabel.text = PlayerProfile.Name;
+        if (partyModeTeamSettings != null)
+        {
+            teamLabel.ShowByDisplay();
+            teamLabel.text = partyModeTeamSettings.name;
+            enabledToggle.HideByDisplay();
+            SetSelected(true);
+        }
+        else
+        {
+            teamLabel.HideByDisplay();
+        }
+    }
+
+    public void SetSelected(bool newValue)
+    {
+        if (partyModeTeamSettings != null
+            && !newValue)
+        {
+            // In party mode, there is always one player selected per team. And these players have been chosen already.
+            return;
+        }
+        PlayerProfile.IsSelected = newValue;
+        UpdateEnabledToggle();
+        selectedChangedEventStream.OnNext(newValue);
+    }
+
+    private void UpdateEnabledToggle()
+    {
+        enabledToggle.value = PlayerProfile.IsSelected;
     }
 
     public void HideVoiceSelection()
