@@ -1,0 +1,82 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
+using UniInject;
+using UniRx;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
+{
+    public bool partyMode;
+    public bool isFreeForAll;
+    public bool isKnockOutTournament;
+    public PartyModeSongSelectionSettings songSelectionSettings;
+    public GameRoundFinishConditionSettings finishConditionSettings;
+    public List<EGameRoundModifier> modifiers;
+    public GameRoundModifierConditionSettings modifierConditionSettings;
+
+    public SceneData GetDefaultSceneData()
+    {
+        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
+        SongMetaManager.Instance.WaitUntilSongScanFinished();
+
+        SongSelectSceneData songSelectSceneData = new();
+        if (partyMode)
+        {
+            songSelectSceneData.PartyModeSettings = CreatePartyModeSettings();
+        }
+        return songSelectSceneData;
+    }
+
+    private PartyModeSettings CreatePartyModeSettings()
+    {
+        Settings settings = SettingsManager.Instance.Settings;
+        PartyModeSettings partyModeSettings = new();
+
+        void FillTeams()
+        {
+            partyModeSettings.teamSettings.isFreeForAll = isFreeForAll;
+            partyModeSettings.teamSettings.isKnockOutTournament = isKnockOutTournament;
+
+            PartyModeTeamSettings firstTeam = new();
+            firstTeam.name = "Team 01";
+            firstTeam.playerProfiles = new List<PlayerProfile> { settings.PlayerProfiles.FirstOrDefault() };
+
+            PartyModeTeamSettings secondTeam = new();
+            secondTeam.name = "Team 02";
+            secondTeam.guestPlayerProfiles = new List<PlayerProfile> { settings.PartyModeSettings.guestPlayerProfiles.FirstOrDefault() };
+
+            partyModeSettings.teamSettings.teams = new List<PartyModeTeamSettings> { firstTeam, secondTeam };
+        }
+
+        void FillSongSelection()
+        {
+            partyModeSettings.songSelectionSettings = songSelectionSettings;
+        }
+
+        void FillRounds()
+        {
+            GameRoundSettings firstRound = new();
+            firstRound.modifiers = modifiers.ToHashSet();
+            firstRound.finishConditionSettings = finishConditionSettings;
+            firstRound.modifierConditionSettings = modifierConditionSettings;
+
+            GameRoundSettings secondRound = new();
+            firstRound.modifiers = new HashSet<EGameRoundModifier> { EGameRoundModifier.HideLyrics, EGameRoundModifier.HideScore };
+            firstRound.finishConditionSettings = finishConditionSettings;
+            firstRound.modifierConditionSettings = modifierConditionSettings;
+
+            partyModeSettings.roundsSettings.gameRoundSettings = new List<GameRoundSettings> { firstRound, secondRound };
+        }
+
+        FillTeams();
+        FillSongSelection();
+        FillRounds();
+        return partyModeSettings;
+    }
+}

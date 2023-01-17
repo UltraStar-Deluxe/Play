@@ -58,7 +58,7 @@ public class CharacterQuickJumpListControl : MonoBehaviour, INeedInjection
         // Update outdated song metas on main thread
         songMetaManager.SongScanFinishedEventStream
             .Subscribe(_ => needsRefresh = true);
-        songSelectSceneControl.PlaylistChooserControl.Selection
+        songSelectSceneControl.SongSelectionPlaylistChooserControl.Selection
             .Subscribe(_ => needsRefresh = true);
 
         UpdateNextAndPreviousCharacterButtonLabels();

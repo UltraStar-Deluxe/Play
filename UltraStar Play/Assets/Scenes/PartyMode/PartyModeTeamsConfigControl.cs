@@ -52,14 +52,14 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     public void OnInjectionFinished()
     {
         FieldBindingUtils.Bind(gameObject, freeForAllToggle,
-            () => partyModeSettings.TeamSettings.IsFreeForAll,
-            newValue => partyModeSettings.TeamSettings.IsFreeForAll = newValue);
+            () => partyModeSettings.teamSettings.isFreeForAll,
+            newValue => partyModeSettings.teamSettings.isFreeForAll = newValue);
 
         FieldBindingUtils.Bind(gameObject, knockOutTournamentToggle,
-            () => partyModeSettings.TeamSettings.IsKnockOutTournament,
-            newValue => partyModeSettings.TeamSettings.IsKnockOutTournament = newValue);
+            () => partyModeSettings.teamSettings.isKnockOutTournament,
+            newValue => partyModeSettings.teamSettings.isKnockOutTournament = newValue);
 
-        partyModeSettings.ObserveEveryValueChanged(it => it.TeamSettings.IsFreeForAll)
+        partyModeSettings.ObserveEveryValueChanged(it => it.teamSettings.isFreeForAll)
             .Subscribe(_ => UpdateTeams());
 
         addTeamButton.RegisterCallbackButtonTriggered(() => AddTeam());
@@ -69,21 +69,21 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     private void AddTeam()
     {
-        if (partyModeSettings.TeamSettings.Teams.IsNullOrEmpty())
+        if (partyModeSettings.teamSettings.teams.IsNullOrEmpty())
         {
-            partyModeSettings.TeamSettings.Teams = new();
+            partyModeSettings.teamSettings.teams = new();
         }
 
         PartyModeTeamSettings newTeam = new();
 
-        partyModeSettings.TeamSettings.Teams.Add(newTeam);
-        newTeam.Name = GetDefaultTeamName(newTeam, partyModeSettings);
+        partyModeSettings.teamSettings.teams.Add(newTeam);
+        newTeam.name = GetDefaultTeamName(newTeam, partyModeSettings);
         UpdateTeams();
     }
 
     private void AddGuest()
     {
-        if (partyModeSettings.TeamSettings.Teams.IsNullOrEmpty())
+        if (partyModeSettings.teamSettings.teams.IsNullOrEmpty())
         {
             AddTeam();
         }
@@ -91,20 +91,20 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         PlayerProfile newGuestProfile = new("", EDifficulty.Medium, EAvatar.GenericPlayer01);
         string newGuestProfileName = GetDefaultGuestProfileName(newGuestProfile, partyModeSettings);
         newGuestProfile.Name = newGuestProfileName;
-        partyModeSettings.TeamSettings.Teams.FirstOrDefault().GuestPlayerProfiles.Add(newGuestProfile);
-        partyModeSettings.GuestPlayerProfiles.Add(newGuestProfile);
+        partyModeSettings.teamSettings.teams.FirstOrDefault().guestPlayerProfiles.Add(newGuestProfile);
+        partyModeSettings.guestPlayerProfiles.Add(newGuestProfile);
 
         UpdateTeams();
     }
 
     private void UpdateTeams()
     {
-        teamsScrollView.SetVisibleByDisplay(!partyModeSettings.TeamSettings.IsFreeForAll);
+        teamsScrollView.SetVisibleByDisplay(!partyModeSettings.teamSettings.isFreeForAll);
         teamColumnsContainer.Clear();
         teamToVisualElement.Clear();
         playerToVisualElement.Clear();
 
-        partyModeSettings.TeamSettings.Teams.ForEach(team => CreateTeamUi(team));
+        partyModeSettings.teamSettings.teams.ForEach(team => CreateTeamUi(team));
     }
 
     private void CreateTeamUi(PartyModeTeamSettings team)
@@ -116,14 +116,14 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         // Edit team name
         TextField teamNameTextField = teamVisualElement.Q<TextField>(R.UxmlNames.teamNameTextField);
         FieldBindingUtils.Bind(gameObject, teamNameTextField,
-            () => team.Name,
-            newValue => team.Name = newValue);
+            () => team.name,
+            newValue => team.name = newValue);
         FieldBindingUtils.ResetValueOnBlurIfEmpty(teamNameTextField);
 
         // Delete team
         Button deleteTeamButton = teamVisualElement.Q<Button>(R.UxmlNames.deleteTeamButton);
         deleteTeamButton.RegisterCallbackButtonTriggered(() => DeleteTeam(team));
-        deleteTeamButton.SetEnabled(partyModeSettings.TeamSettings.Teams.Count > 1);
+        deleteTeamButton.SetEnabled(partyModeSettings.teamSettings.teams.Count > 1);
 
         // Sort player profiles
         SortPlayerProfiles(team);
@@ -131,36 +131,36 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         // Add players to team
         VisualElement playersContainer = teamVisualElement.Q<VisualElement>(R.UxmlNames.playersContainer);
         playersContainer.Clear();
-        team.PlayerProfiles.ForEach(playerProfile => CreateTeamPlayerUi(team, playerProfile, false));
-        team.GuestPlayerProfiles.ForEach(playerProfile => CreateTeamPlayerUi(team, playerProfile, true));
+        team.playerProfiles.ForEach(playerProfile => CreateTeamPlayerUi(team, playerProfile, false));
+        team.guestPlayerProfiles.ForEach(playerProfile => CreateTeamPlayerUi(team, playerProfile, true));
     }
 
     private void SortPlayerProfiles(PartyModeTeamSettings team)
     {
         List<PlayerProfile> allPlayerProfiles = GetAllPlayerProfiles();
         Comparison<PlayerProfile> comparerByIndexInAllPlayerProfiles = new Comparison<PlayerProfile>((a, b) => allPlayerProfiles.IndexOf(a).CompareTo(allPlayerProfiles.IndexOf(b)));
-        team.PlayerProfiles.Sort(comparerByIndexInAllPlayerProfiles);
-        team.GuestPlayerProfiles.Sort(comparerByIndexInAllPlayerProfiles);
+        team.playerProfiles.Sort(comparerByIndexInAllPlayerProfiles);
+        team.guestPlayerProfiles.Sort(comparerByIndexInAllPlayerProfiles);
     }
 
     private void DeleteTeam(PartyModeTeamSettings team)
     {
-        if (partyModeSettings.TeamSettings.Teams.Count <= 1)
+        if (partyModeSettings.teamSettings.teams.Count <= 1)
         {
             // There should be at least one team
             return;
         }
 
         // Move players to other team
-        PartyModeTeamSettings otherTeam = partyModeSettings.TeamSettings.Teams.GetElementBefore(team, false);
+        PartyModeTeamSettings otherTeam = partyModeSettings.teamSettings.teams.GetElementBefore(team, false);
         if (otherTeam == null)
         {
-            otherTeam = partyModeSettings.TeamSettings.Teams.GetElementAfter(team, false);
+            otherTeam = partyModeSettings.teamSettings.teams.GetElementAfter(team, false);
         }
-        otherTeam.PlayerProfiles.AddRange(team.PlayerProfiles);
-        otherTeam.GuestPlayerProfiles.AddRange(team.GuestPlayerProfiles);
+        otherTeam.playerProfiles.AddRange(team.playerProfiles);
+        otherTeam.guestPlayerProfiles.AddRange(team.guestPlayerProfiles);
 
-        partyModeSettings.TeamSettings.Teams.Remove(team);
+        partyModeSettings.teamSettings.teams.Remove(team);
         UpdateTeams();
     }
 
@@ -206,7 +206,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     private void MovePlayerToRightTeam(PartyModeTeamSettings team, PlayerProfile playerProfile, bool isGuest)
     {
-        PartyModeTeamSettings rightTeam = partyModeSettings.TeamSettings.Teams.GetElementAfter(team, false);
+        PartyModeTeamSettings rightTeam = partyModeSettings.teamSettings.teams.GetElementAfter(team, false);
         if (rightTeam != null)
         {
             GetPlayerProfileList(team, isGuest).Remove(playerProfile);
@@ -217,7 +217,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     private void MovePlayerToLeftTeam(PartyModeTeamSettings team, PlayerProfile playerProfile, bool isGuest)
     {
-        PartyModeTeamSettings leftTeam = partyModeSettings.TeamSettings.Teams.GetElementBefore(team, false);
+        PartyModeTeamSettings leftTeam = partyModeSettings.teamSettings.teams.GetElementBefore(team, false);
         if (leftTeam != null)
         {
             GetPlayerProfileList(team, isGuest).Remove(playerProfile);
@@ -245,22 +245,22 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     {
         playerVisualElement.RemoveFromHierarchy();
         playerToVisualElement.Remove(playerProfile);
-        partyModeSettings.GuestPlayerProfiles.Remove(playerProfile);
+        partyModeSettings.guestPlayerProfiles.Remove(playerProfile);
     }
 
     private List<PlayerProfile> GetAllPlayerProfiles()
     {
         return settings.PlayerProfiles
             .Where(playerProfile => playerProfile.IsEnabled)
-            .Union(partyModeSettings.GuestPlayerProfiles).ToList();
+            .Union(partyModeSettings.guestPlayerProfiles).ToList();
     }
 
     public static string GetDefaultTeamName(PartyModeTeamSettings team, PartyModeSettings partyModeSettings)
     {
-        int teamIndex = partyModeSettings.TeamSettings.Teams.IndexOf(team);
+        int teamIndex = partyModeSettings.teamSettings.teams.IndexOf(team);
         if (teamIndex < 0)
         {
-            teamIndex = partyModeSettings.TeamSettings.Teams.Count;
+            teamIndex = partyModeSettings.teamSettings.teams.Count;
         }
         string newTeamNumber = StringUtils.AddLeadingZeros(teamIndex + 1, 2);
         return $"Team {newTeamNumber}";
@@ -269,8 +269,8 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     private static string GetDefaultGuestProfileName(PlayerProfile playerProfile, PartyModeSettings partyModeSettings)
     {
         List<PlayerProfile> allGuestProfiles =
-            partyModeSettings.TeamSettings.Teams
-                .SelectMany(team => team.GuestPlayerProfiles)
+            partyModeSettings.teamSettings.teams
+                .SelectMany(team => team.guestPlayerProfiles)
                 .ToList();
         int guestIndex = allGuestProfiles.IndexOf(playerProfile);
         if (guestIndex < 0)
@@ -284,7 +284,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     private static List<PlayerProfile> GetPlayerProfileList(PartyModeTeamSettings team, bool isGuest)
     {
         return isGuest
-            ? team.GuestPlayerProfiles
-            : team.PlayerProfiles;
+            ? team.guestPlayerProfiles
+            : team.playerProfiles;
     }
 }

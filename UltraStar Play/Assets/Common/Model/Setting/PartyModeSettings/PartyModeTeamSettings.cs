@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+[Serializable]
 public class PartyModeTeamSettings
 {
-    public string Name { get; set; } = "";
-    public List<PlayerProfile> PlayerProfiles { get; set; } = new();
-    public List<PlayerProfile> GuestPlayerProfiles { get; set; } = new();
+    public string name = "";
+    public List<PlayerProfile> playerProfiles = new();
+    public List<PlayerProfile> guestPlayerProfiles = new();
 }

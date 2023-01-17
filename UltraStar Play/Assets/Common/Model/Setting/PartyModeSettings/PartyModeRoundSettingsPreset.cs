@@ -1,11 +1,14 @@
+using System;
+
+[Serializable]
 public class PartyModeRoundSettingsPreset
 {
-    public string Name { get; set; }
-    public GameRoundSettings GameRoundSettings { get; set; }
+    public string name;
+    public GameRoundSettings gameRoundSettings;
 
     public PartyModeRoundSettingsPreset(string name, GameRoundSettings gameRoundSettings)
     {
-        Name = name;
-        GameRoundSettings = gameRoundSettings;
+        this.name = name;
+        this.gameRoundSettings = gameRoundSettings;
     }
 }

@@ -15,7 +15,12 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" class="controlMinWidth" />
+                <ui:VisualElement name="topRightContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                    <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton" style="margin-right: 5px;">
+                        <MaterialIcon tabindex="-1" name="randomIcon" icon="casino" />
+                    </ui:Button>
+                    <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" class="controlMinWidth" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="topControlBar" style="flex-direction: row; justify-content: space-between; margin-left: 5px; margin-right: 5px; margin-top: 5px; height: 30px;">
                 <ui:VisualElement name="characterQuickJumpContainer" class="outline roundCorners" style="width: 30%; flex-direction: row; height: 100%;">

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ProTrans;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class PlaylistManager : MonoBehaviour
+public class PlaylistManager : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -56,6 +57,9 @@ public class PlaylistManager : MonoBehaviour
             return favoritesPlaylist;
         }
     }
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
@@ -341,6 +345,12 @@ public class PlaylistManager : MonoBehaviour
     public bool HasSongEntry(UltraStarPlaylist playlist, SongMeta songMeta)
     {
         return playlist.HasSongEntry(songMeta.Artist, songMeta.Title);
+    }
+
+    public List<SongMeta> GetSongMetas(UltraStarPlaylist playlist)
+    {
+        IReadOnlyCollection<SongMeta> allSongMetas = songMetaManager.GetSongMetas();
+        return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
     }
 
     public List<UltraStarPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)

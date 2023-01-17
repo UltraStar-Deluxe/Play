@@ -40,33 +40,38 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         LabeledItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl =
             new(songSelectionItemPicker, EnumUtils.GetValuesAsList<EPartyModeSongSelectionMode>());
         songSelectionItemPickerControl.Bind(
-            () => partyModeSettings.SongSelectionSettings.SongSelectionMode,
-            newValue => partyModeSettings.SongSelectionSettings.SongSelectionMode = newValue);
+            () => partyModeSettings.songSelectionSettings.songSelectionMode,
+            newValue =>
+            {
+                UpdateControlsVisibility();
+                partyModeSettings.songSelectionSettings.songSelectionMode = newValue;
+            });
 
         // Playlist
         List<UltraStarPlaylist> playlists = playlistManager.GetPlaylists(true, true);
         LabeledItemPickerControl<UltraStarPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists);
         playlistItemPickerControl.GetLabelTextFunction = newValue => playlistManager.GetPlaylistName(newValue);
         playlistItemPickerControl.Bind(
-            () => partyModeSettings.SongSelectionSettings.SongPoolPlaylist,
-            newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylist = newValue);
+            () => partyModeSettings.songSelectionSettings.songPoolPlaylist,
+            newValue => partyModeSettings.songSelectionSettings.songPoolPlaylist = newValue);
 
         // Joker count
         LabeledItemPickerControl<int> jokerCountItemPickerControl =
             new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
         jokerCountItemPickerControl.GetLabelTextFunction = newValue => newValue >= 0 ? newValue.ToString() : "Unlimited";
         jokerCountItemPickerControl.Bind(
-            () => partyModeSettings.SongSelectionSettings.JokerCount,
-            newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);
+            () => partyModeSettings.songSelectionSettings.jokerCount,
+            newValue => partyModeSettings.songSelectionSettings.jokerCount = newValue);
 
         // Only show the joker count for random song selection
-        UpdateJokerCountItemPickerVisibility();
-        partyModeSettings.ObserveEveryValueChanged(it => it.SongSelectionSettings.SongSelectionMode)
-            .Subscribe(_ => UpdateJokerCountItemPickerVisibility());
+        UpdateControlsVisibility();
+        partyModeSettings.ObserveEveryValueChanged(it => it.songSelectionSettings.songSelectionMode)
+            .Subscribe(_ => UpdateControlsVisibility());
     }
 
-    private void UpdateJokerCountItemPickerVisibility()
+    private void UpdateControlsVisibility()
     {
-        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionPlaylistItemPicker.SetVisibleByDisplay(partyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random);
     }
 }

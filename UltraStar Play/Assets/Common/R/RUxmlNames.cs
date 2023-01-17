@@ -518,6 +518,7 @@ public static partial class R
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
+        public const string randomIcon = "randomIcon";
         public const string randomizeButton = "randomizeButton";
         public const string randomizeIcon = "randomizeIcon";
         public const string ratingImage = "ratingImage";
@@ -589,6 +590,7 @@ public static partial class R
         public const string selectAllNotesIcon = "selectAllNotesIcon";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
         public const string selectionIndicator = "selectionIndicator";
+        public const string selectRandomSongButton = "selectRandomSongButton";
         public const string semanticVersionText = "semanticVersionText";
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
@@ -775,6 +777,7 @@ public static partial class R
         public const string topContent = "topContent";
         public const string topControlBar = "topControlBar";
         public const string topLyricsContainer = "topLyricsContainer";
+        public const string topRightContainer = "topRightContainer";
         public const string topRow = "topRow";
         public const string totalScore = "totalScore";
         public const string twoPlayerLayout = "twoPlayerLayout";

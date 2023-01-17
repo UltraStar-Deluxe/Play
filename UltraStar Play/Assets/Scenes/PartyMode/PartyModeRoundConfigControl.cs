@@ -104,13 +104,13 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         CreateControlObjects();
 
         // Title label
-        int roundIndex = partyModeSettings.RoundsSettings.GameRoundSettings.IndexOf(GameRoundSettings);
+        int roundIndex = partyModeSettings.roundsSettings.gameRoundSettings.IndexOf(GameRoundSettings);
         roundTitleLabel.text = StringUtils.AddLeadingZeros(roundIndex + 1, 2);
 
         // Top buttons
         toggleRoundExpandedButton.RegisterCallbackButtonTriggered(() => ToggleFold());
         deleteRoundButton.RegisterCallbackButtonTriggered(() => DeleteRound());
-        deleteRoundButton.SetEnabled(partyModeSettings.RoundsSettings.GameRoundSettings.Count > 1);
+        deleteRoundButton.SetEnabled(partyModeSettings.roundsSettings.gameRoundSettings.Count > 1);
         randomizeButton.RegisterCallbackButtonTriggered(() => RandomizeRound());
 
         // Presets
@@ -125,36 +125,36 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
         // Finish condition
         finishConditionPickerControl.Bind(
-            () => GameRoundSettings.FinishConditionSettings.Condition,
+            () => GameRoundSettings.finishConditionSettings.condition,
             newValue =>
             {
-                GameRoundSettings.FinishConditionSettings.Condition = newValue;
+                GameRoundSettings.finishConditionSettings.condition = newValue;
                 UpdateControls();
             });
 
         finishConditionPointsPickerControl.Bind(
-            () => GameRoundSettings.FinishConditionSettings.Points,
+            () => GameRoundSettings.finishConditionSettings.points,
             newValue =>
             {
-                GameRoundSettings.FinishConditionSettings.Points = newValue;
+                GameRoundSettings.finishConditionSettings.points = newValue;
                 UpdateControls();
             });
 
         // Modifiers
         modifierChipsComboControl.Bind(
-            () => GameRoundSettings.Modifiers,
+            () => GameRoundSettings.modifiers,
             newValue =>
             {
-                GameRoundSettings.Modifiers = newValue;
+                GameRoundSettings.modifiers = newValue;
                 UpdateControls();
             });
 
         // Modifier condition
         modifierConditionPickerControl.Bind(
-            () => GameRoundSettings.ModifierConditionSettings.Condition,
+            () => GameRoundSettings.modifierConditionSettings.condition,
             newValue =>
             {
-                GameRoundSettings.ModifierConditionSettings.Condition = newValue;
+                GameRoundSettings.modifierConditionSettings.condition = newValue;
                 UpdateControls();
             });
 
@@ -162,26 +162,26 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         modifierConditionFromNumberPickerControl.Bind(
             () =>
             {
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.ScoreRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
                 {
-                    return GameRoundSettings.ModifierConditionSettings.ScoreFrom;
+                    return GameRoundSettings.modifierConditionSettings.scoreFrom;
                 }
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
                 {
-                    return GameRoundSettings.ModifierConditionSettings.TimeFrom;
+                    return GameRoundSettings.modifierConditionSettings.timeFrom;
                 }
 
                 return 0;
             },
             newValue =>
             {
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.ScoreRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
                 {
-                    GameRoundSettings.ModifierConditionSettings.ScoreFrom = newValue;
+                    GameRoundSettings.modifierConditionSettings.scoreFrom = newValue;
                 }
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
                 {
-                    GameRoundSettings.ModifierConditionSettings.TimeFrom = newValue;
+                    GameRoundSettings.modifierConditionSettings.timeFrom = newValue;
                 }
                 UpdateControls();
             });
@@ -190,29 +190,29 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         modifierConditionUntilNumberPickerControl.Bind(
             () =>
             {
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.ScoreRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
                 {
-                    return GameRoundSettings.ModifierConditionSettings.ScoreUntil;
+                    return GameRoundSettings.modifierConditionSettings.scoreUntil;
                 }
-                if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
                 {
-                    return GameRoundSettings.ModifierConditionSettings.TimeUntil;
+                    return GameRoundSettings.modifierConditionSettings.timeUntil;
                 }
 
                 return 0;
             },
             newValue =>
             {
-                if (GameRoundSettings.ModifierConditionSettings.Condition
+                if (GameRoundSettings.modifierConditionSettings.condition
                     is EGameRoundModifierCondition.ScoreRange
                     or EGameRoundModifierCondition.PlayerAdvance)
                 {
-                    GameRoundSettings.ModifierConditionSettings.ScoreUntil = newValue;
+                    GameRoundSettings.modifierConditionSettings.scoreUntil = newValue;
                     UpdateControls();
                 }
-                else if (GameRoundSettings.ModifierConditionSettings.Condition is EGameRoundModifierCondition.TimeRange)
+                else if (GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange)
                 {
-                    GameRoundSettings.ModifierConditionSettings.TimeUntil = newValue;
+                    GameRoundSettings.modifierConditionSettings.timeUntil = newValue;
                     UpdateControls();
                 }
             });
@@ -224,7 +224,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     {
         // Presets
         presetPickerControl = new(presetItemPicker, GetSelectablePresets());
-        presetPickerControl.GetLabelTextFunction = preset => preset == null ? "No preset" : preset.Name;
+        presetPickerControl.GetLabelTextFunction = preset => preset == null ? "No preset" : preset.name;
 
         // Finish condition
         finishConditionPickerControl = new(finishConditionPicker, EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
@@ -251,8 +251,8 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     private PartyModeRoundSettingsPreset GetMatchingPreset()
     {
-        PartyModeRoundSettingsPreset matchingPreset = partyModeSettings.RoundSettingsPresets.FirstOrDefault(preset =>
-            preset.GameRoundSettings.EqualsOther(GameRoundSettings));
+        PartyModeRoundSettingsPreset matchingPreset = partyModeSettings.roundSettingsPresets.FirstOrDefault(preset =>
+            preset.gameRoundSettings.EqualsOther(GameRoundSettings));
         return matchingPreset;
     }
 
@@ -278,15 +278,15 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         gameRoundSettingsCopy.CopyValues(GameRoundSettings);
         PartyModeRoundSettingsPreset newPreset = new(presetName, gameRoundSettingsCopy);
 
-        PartyModeRoundSettingsPreset existingPreset = partyModeSettings.RoundSettingsPresets
-            .FirstOrDefault(preset => string.Equals(preset.Name, presetName, StringComparison.InvariantCultureIgnoreCase));
+        PartyModeRoundSettingsPreset existingPreset = partyModeSettings.roundSettingsPresets
+            .FirstOrDefault(preset => string.Equals(preset.name, presetName, StringComparison.InvariantCultureIgnoreCase));
         if (existingPreset != null)
         {
-            partyModeSettings.RoundSettingsPresets.Replace(existingPreset, newPreset);
+            partyModeSettings.roundSettingsPresets.Replace(existingPreset, newPreset);
         }
         else
         {
-            partyModeSettings.RoundSettingsPresets.Add(newPreset);
+            partyModeSettings.roundSettingsPresets.Add(newPreset);
         }
 
         Debug.Log($"Added or updated game round preset '{presetName}'");
@@ -301,46 +301,46 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        partyModeSettings.RoundSettingsPresets.Remove(preset);
+        partyModeSettings.roundSettingsPresets.Remove(preset);
 
-        Debug.Log($"Deleted game round preset '{preset.Name}'");
+        Debug.Log($"Deleted game round preset '{preset.name}'");
         presetsChangedEventStream.OnNext(preset);
     }
 
     private void ApplyPreset(PartyModeRoundSettingsPreset preset)
     {
         if (preset == null
-            || preset.GameRoundSettings.EqualsOther(GameRoundSettings))
+            || preset.gameRoundSettings.EqualsOther(GameRoundSettings))
         {
             return;
         }
 
-        GameRoundSettings.CopyValues(preset.GameRoundSettings);
+        GameRoundSettings.CopyValues(preset.gameRoundSettings);
         UpdateControls();
     }
 
     private void RandomizeRound()
     {
-        GameRoundSettings.FinishConditionSettings.Condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
-        GameRoundSettings.FinishConditionSettings.Points = RandomUtils.RandomOf(NumberUtils.CreateIntList(1000, 9000, 1000));
+        GameRoundSettings.finishConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
+        GameRoundSettings.finishConditionSettings.points = RandomUtils.RandomOf(NumberUtils.CreateIntList(1000, 9000, 1000));
 
-        GameRoundSettings.Modifiers = RandomUtils.RandomHashSetOf(EnumUtils.GetValuesAsList<EGameRoundModifier>());
-        GameRoundSettings.ModifierConditionSettings.Condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
+        GameRoundSettings.modifiers = RandomUtils.RandomHashSetOf(EnumUtils.GetValuesAsList<EGameRoundModifier>());
+        GameRoundSettings.modifierConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
 
-        GameRoundSettings.ModifierConditionSettings.ScoreFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
-        GameRoundSettings.ModifierConditionSettings.ScoreUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
-        if (GameRoundSettings.ModifierConditionSettings.ScoreFrom > GameRoundSettings.ModifierConditionSettings.ScoreUntil)
+        GameRoundSettings.modifierConditionSettings.scoreFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
+        GameRoundSettings.modifierConditionSettings.scoreUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
+        if (GameRoundSettings.modifierConditionSettings.scoreFrom > GameRoundSettings.modifierConditionSettings.scoreUntil)
         {
             // Swap values via deconstruction
-            (GameRoundSettings.ModifierConditionSettings.ScoreFrom, GameRoundSettings.ModifierConditionSettings.ScoreUntil) = (GameRoundSettings.ModifierConditionSettings.ScoreUntil, GameRoundSettings.ModifierConditionSettings.ScoreFrom);
+            (GameRoundSettings.modifierConditionSettings.scoreFrom, GameRoundSettings.modifierConditionSettings.scoreUntil) = (GameRoundSettings.modifierConditionSettings.scoreUntil, GameRoundSettings.modifierConditionSettings.scoreFrom);
         }
 
-        GameRoundSettings.ModifierConditionSettings.TimeFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
-        GameRoundSettings.ModifierConditionSettings.TimeUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
-        if (GameRoundSettings.ModifierConditionSettings.TimeFrom > GameRoundSettings.ModifierConditionSettings.TimeUntil)
+        GameRoundSettings.modifierConditionSettings.timeFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
+        GameRoundSettings.modifierConditionSettings.timeUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
+        if (GameRoundSettings.modifierConditionSettings.timeFrom > GameRoundSettings.modifierConditionSettings.timeUntil)
         {
             // Swap values via deconstruction
-            (GameRoundSettings.ModifierConditionSettings.TimeFrom, GameRoundSettings.ModifierConditionSettings.TimeUntil) = (GameRoundSettings.ModifierConditionSettings.TimeUntil, GameRoundSettings.ModifierConditionSettings.TimeFrom);
+            (GameRoundSettings.modifierConditionSettings.timeFrom, GameRoundSettings.modifierConditionSettings.timeUntil) = (GameRoundSettings.modifierConditionSettings.timeUntil, GameRoundSettings.modifierConditionSettings.timeFrom);
         }
 
         UpdateControls();
@@ -397,43 +397,43 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     public void UpdateControls()
     {
         // Finish condition
-        finishConditionPickerControl.SelectItem(GameRoundSettings.FinishConditionSettings.Condition);
-        finishConditionPointsPickerControl.SelectItem(GameRoundSettings.FinishConditionSettings.Points);
-        finishConditionPointsPickerControl.ItemPicker.SetVisibleByDisplay(GameRoundSettings.FinishConditionSettings.Condition != EGameRoundFinishCondition.ReachEndOfSong);
+        finishConditionPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.condition);
+        finishConditionPointsPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.points);
+        finishConditionPointsPickerControl.ItemPicker.SetVisibleByDisplay(GameRoundSettings.finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong);
 
         // Modifiers
-        modifierChipsComboControl.SelectItem(GameRoundSettings.Modifiers);
+        modifierChipsComboControl.SelectItem(GameRoundSettings.modifiers);
 
         // Modifier condition
-        modifierConditionPickerControl.ItemPicker.SetVisibleByDisplay(!GameRoundSettings.Modifiers.IsNullOrEmpty());
-        modifierConditionPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.Condition);
+        modifierConditionPickerControl.ItemPicker.SetVisibleByDisplay(!GameRoundSettings.modifiers.IsNullOrEmpty());
+        modifierConditionPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.condition);
 
         // Modifier condition from/until
         bool modifierConditionNumberPickersVisible = modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()
-            && GameRoundSettings.ModifierConditionSettings.Condition
+            && GameRoundSettings.modifierConditionSettings.condition
                 is EGameRoundModifierCondition.ScoreRange
                 or EGameRoundModifierCondition.TimeRange;
         modifierConditionFromNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible
-            || (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.PlayerAdvance
+            || (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance
                 && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()));
         modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
 
         List<int> modifierConditionValues = new();
-        if (GameRoundSettings.ModifierConditionSettings.Condition == EGameRoundModifierCondition.TimeRange)
+        if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
         {
             modifierConditionValues = NumberUtils.CreateIntList(0, 100, 10);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.TimeFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.TimeUntil);
+            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeFrom);
+            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeUntil);
             modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
             modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
         }
-        else if (GameRoundSettings.ModifierConditionSettings.Condition
+        else if (GameRoundSettings.modifierConditionSettings.condition
             is EGameRoundModifierCondition.ScoreRange
             or EGameRoundModifierCondition.PlayerAdvance)
         {
             modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.ScoreFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.ModifierConditionSettings.ScoreUntil);
+            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreFrom);
+            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreUntil);
             modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
             modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
         }
@@ -461,7 +461,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     private List<PartyModeRoundSettingsPreset> GetSelectablePresets()
     {
         return new List<PartyModeRoundSettingsPreset> { null }
-            .Union(settings.PartyModeSettings.RoundSettingsPresets)
+            .Union(settings.PartyModeSettings.roundSettingsPresets)
             .ToList();
     }
 }
