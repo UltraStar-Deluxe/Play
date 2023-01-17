@@ -16,9 +16,6 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="topRightContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-                    <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton" style="margin-right: 5px;">
-                        <MaterialIcon tabindex="-1" name="randomIcon" icon="casino" />
-                    </ui:Button>
                     <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" class="controlMinWidth" />
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -125,6 +122,7 @@
                     <ui:Button text="Create Playlist" display-tooltip-when-elided="true" name="createPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Edit Playlist" display-tooltip-when-elided="true" name="editPlaylistButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                     <ui:Button text="Song Details" display-tooltip-when-elided="true" name="toggleSongDetailOverlayButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
+                    <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" text="Random Song" style="margin-bottom: 5px;" />
                     <ui:Button text="Main Menu" display-tooltip-when-elided="true" name="backToMainMenuButton" class="marginBottomSmaller" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0;" />
                 </ui:ScrollView>
                 <ui:VisualElement name="legendContainer" class="roundCorners" style="width: 100%; max-height: 33%;">

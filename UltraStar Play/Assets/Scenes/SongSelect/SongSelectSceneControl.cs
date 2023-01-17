@@ -1424,4 +1424,39 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         uiManager.CreateNotificationVisualElement("No jokers left to change the song");
     }
+
+    public List<PlayerProfile> GetEnabledPlayerProfiles()
+    {
+        if (!HasPartyModeSettings)
+        {
+            return settings.PlayerProfiles
+                .Where(playerProfile => playerProfile.IsEnabled)
+                .ToList();
+        }
+        else
+        {
+            // Select random player of each team
+            List<PlayerProfile> result = new();
+            PartyModeSettings.teamSettings.teams.ForEach(team =>
+            {
+                List<PlayerProfile> allTeamPlayerProfiles = team.playerProfiles.Union(team.guestPlayerProfiles).ToList();
+                PlayerProfile playerProfile = RandomUtils.RandomOf(allTeamPlayerProfiles);
+                result.Add(playerProfile);
+            });
+            return result
+                .Where(playerProfile => playerProfile != null)
+                .ToList();
+        }
+    }
+
+    public PartyModeTeamSettings GetTeam(PlayerProfile playerProfile)
+    {
+        if (!HasPartyModeSettings)
+        {
+            return null;
+        }
+
+        return PartyModeSettings.teamSettings.teams.FirstOrDefault(team
+            => team.playerProfiles.Contains(playerProfile) || team.guestPlayerProfiles.Contains(playerProfile));
+    }
 }

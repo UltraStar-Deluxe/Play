@@ -741,6 +741,7 @@ public static partial class R
         public const string teamColumnsContainer = "teamColumnsContainer";
         public const string teamColumnUiRoot = "teamColumnUiRoot";
         public const string teamConfigUiRoot = "teamConfigUiRoot";
+        public const string teamLabel = "teamLabel";
         public const string teamNameTextField = "teamNameTextField";
         public const string teamsScrollView = "teamsScrollView";
         public const string text = "text";
