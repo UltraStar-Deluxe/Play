@@ -2,7 +2,7 @@
     <ui:VisualElement name="overlay" class="overlay modalDialogContainer">
         <ui:VisualElement name="dialogContent" class="focusableNavigatorRoot" style="background-color: rgb(14, 28, 42); border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 500px; height: auto; justify-content: flex-start; align-items: center; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; max-height: 380px;">
             <ui:VisualElement name="dialogTitleImageAndTextContainer" style="width: 100%; flex-direction: row; justify-content: flex-start; align-items: center; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; flex-shrink: 0; margin-bottom: 5px;">
-                <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage warning" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/MaterialDesignIcons/warning_white_24dp.svg?fileID=7388822144124034973&amp;guid=ff7f961fda7782740882d5a7ed473056&amp;type=3#warning_white_24dp&apos;); display: none;" />
+                <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage warning" style="display: none;" />
                 <ui:Label text="Create New Song" name="dialogTitle" class="dialogTitle" style="flex-grow: 1;" />
             </ui:VisualElement>
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="dialogContentContainer" horizontal-scroller-visibility="Hidden" style="flex-grow: 1; width: 100%; padding-left: 10px; padding-right: 10px;">
