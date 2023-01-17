@@ -77,7 +77,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void UpdateListEntries()
     {
         // Remove old entries
-        playerScrollView.Clear();
+        playerScrollView.RemoveTemplateContainers();
         playerEntryControls.Clear();
 
         // Create new entries

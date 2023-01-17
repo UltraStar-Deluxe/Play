@@ -33,8 +33,19 @@
             </ui:VisualElement>
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 100%; flex-grow: 1;">
                 <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
+                <ui:VisualElement name="partySettingsContainer" class="smallerFont" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; margin-bottom: 5px; margin-top: 5px;">
+                    <ui:Label tabindex="-1" text="Party Settings" display-tooltip-when-elided="true" name="partySettingsTitleLabel" style="margin-left: auto; margin-right: auto;" />
+                    <ui:VisualElement name="finishConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                        <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
+                        <ui:Label tabindex="-1" text="Reach end of song" display-tooltip-when-elided="true" name="finishConditionDescription" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="modifierContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                        <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
+                        <ui:Label tabindex="-1" text="&apos;Hide lyrics&apos; when score is between 1000 and 9000" display-tooltip-when-elided="true" name="modifierDescription" style="margin-top: auto; white-space: normal;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:ScrollView>
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 100%; flex-grow: 1;">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 100%; flex-grow: 1; display: none;">
                 <ui:VisualElement name="scoreModeContainer">
                     <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
                     <ItemPicker noPreviousButton="true" name="scoreModePicker" wrapAround="true" class="smallControl" style="width: auto;" />

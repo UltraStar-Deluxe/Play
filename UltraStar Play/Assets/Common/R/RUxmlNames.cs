@@ -153,6 +153,7 @@ public static partial class R
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
         public const string disableDynamicThemesContainer = "disableDynamicThemesContainer";
+        public const string dot = "dot";
         public const string doubleClickToTogglePauseElement = "doubleClickToTogglePauseElement";
         public const string downloadControlsContainer = "downloadControlsContainer";
         public const string downloadSceneButton = "downloadSceneButton";
@@ -181,6 +182,8 @@ public static partial class R
         public const string exitSceneButton = "exitSceneButton";
         public const string favoriteIcon = "favoriteIcon";
         public const string filledScoreBar = "filledScoreBar";
+        public const string finishConditionContainer = "finishConditionContainer";
+        public const string finishConditionDescription = "finishConditionDescription";
         public const string finishConditionPicker = "finishConditionPicker";
         public const string finishConditionPointsPicker = "finishConditionPointsPicker";
         public const string first = "first";
@@ -360,6 +363,8 @@ public static partial class R
         public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
         public const string modifierConditionUntilNumberPicker = "modifierConditionUntilNumberPicker";
+        public const string modifierContainer = "modifierContainer";
+        public const string modifierDescription = "modifierDescription";
         public const string modifyPlaylistButtonContainer = "modifyPlaylistButtonContainer";
         public const string musicGroup = "musicGroup";
         public const string musicPlaybackSpeedContainer = "musicPlaybackSpeedContainer";
@@ -456,6 +461,8 @@ public static partial class R
         public const string PartyModeTeamColumnUi = "PartyModeTeamColumnUi";
         public const string partyModeTeamConfigUi = "partyModeTeamConfigUi";
         public const string PartyModeTeamConfigUi = "PartyModeTeamConfigUi";
+        public const string partySettingsContainer = "partySettingsContainer";
+        public const string partySettingsTitleLabel = "partySettingsTitleLabel";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
