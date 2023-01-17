@@ -29,6 +29,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerProfile playerProfile;
 
+    [Inject(UxmlName = R.UxmlNames.noteContainer)]
+    private VisualElement noteContainer;
+
     [Inject(UxmlName = R.UxmlNames.playerScoreContainer)]
     private VisualElement playerScoreContainer;
 
@@ -274,7 +277,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Enable and initialize the selected note displayer
-        injector.Inject(noteDisplayer);
+        injector
+            .WithRootVisualElement(noteContainer)
+            .Inject(noteDisplayer);
         noteDisplayer.SetLineCount(localLineCount);
     }
 
@@ -309,5 +314,25 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void HideLeadingPlayerIcon()
     {
         leadingPlayerIcon.HideByVisibility();
+    }
+
+    public void HideNotesByVisibility()
+    {
+        noteDisplayer.HideByVisibility();
+    }
+
+    public void ShowNotesByVisibility()
+    {
+        noteDisplayer.ShowByVisibility();
+    }
+
+    public void HideScoreByVisibility()
+    {
+        playerScoreContainer.HideByVisibility();
+    }
+
+    public void ShowScoreByVisibility()
+    {
+        playerScoreContainer.ShowByVisibility();
     }
 }

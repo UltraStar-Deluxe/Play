@@ -13,24 +13,16 @@ using UnityEngine;
 // when the song has been near its end already.
 public class SingSceneFinisher : MonoBehaviour, INeedInjection
 {
+    public bool IsSongFinished { get; private set; }
+
     private bool hasBeenNearEndOfSong;
-    private bool isSongFinished;
+    private bool isEarlyFinish;
     private float durationAfterSongFinishedInSeconds;
 
     [Inject]
     private SingSceneControl singSceneControl;
 
     private double positionInSongInMillisOld;
-
-    private void Start()
-    {
-        if (singSceneControl.SceneData.IsMedley)
-        {
-            // The dedicated medley control will finish the song.
-            gameObject.SetActive(false);
-            return;
-        }
-    }
 
     private void Update()
     {
@@ -40,12 +32,12 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (isSongFinished)
+        if (IsSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;
             if (durationAfterSongFinishedInSeconds >= 1)
             {
-                singSceneControl.FinishScene(true);
+                singSceneControl.FinishScene(!isEarlyFinish, true);
             }
         }
         else
@@ -56,7 +48,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             // This only works when the position is not reset to zero when the AudioClip finishes.
             if (Math.Abs(durationOfSongInMillis - positionInSongInMillis) <= 1)
             {
-                isSongFinished = true;
+                IsSongFinished = true;
             }
 
             // Detect end of the song by looking for a falling flank in the playback position.
@@ -65,7 +57,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 // The position is back to the start.
                 if (positionInSongInMillis < 1000 && positionInSongInMillis < positionInSongInMillisOld)
                 {
-                    isSongFinished = true;
+                    IsSongFinished = true;
                 }
                 positionInSongInMillisOld = positionInSongInMillis;
             }
@@ -85,8 +77,14 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 // #END tag is in milliseconds (but #START is in seconds)
                 && positionInSongInMillis > singSceneControl.SongMeta.End)
             {
-                isSongFinished = true;
+                IsSongFinished = true;
             }
         }
+    }
+
+    public void TriggerEarlySongFinish()
+    {
+        IsSongFinished = true;
+        isEarlyFinish = true;
     }
 }

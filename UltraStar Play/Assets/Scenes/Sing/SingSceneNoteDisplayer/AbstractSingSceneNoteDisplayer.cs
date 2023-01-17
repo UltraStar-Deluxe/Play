@@ -12,6 +12,9 @@ using UnityEngine.UIElements;
 
 public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement rootVisualElement;
+
     [Inject(Key = nameof(perfectEffectStarUi))]
     protected VisualTreeAsset perfectEffectStarUi;
 
@@ -449,5 +452,15 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             .ToList()
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => RemoveRecordedNote(recordedNoteControl)));
+    }
+
+    public void HideByVisibility()
+    {
+        rootVisualElement.HideByVisibility();
+    }
+
+    public void ShowByVisibility()
+    {
+        rootVisualElement.ShowByVisibility();
     }
 }

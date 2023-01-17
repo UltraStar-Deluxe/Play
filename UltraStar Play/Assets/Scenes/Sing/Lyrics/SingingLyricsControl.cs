@@ -15,6 +15,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new();
 
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement rootVisualElement;
+
     [Inject(UxmlName = R.UxmlNames.currentSentenceContainer)]
     private VisualElement currentSentenceContainer;
 
@@ -35,6 +38,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private Sentence previousSentence;
     private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
+
+    public Voice Voice => playerControl.Voice;
 
     public void OnInjectionFinished()
     {
@@ -238,5 +243,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             default:
                 return false;
         }
+    }
+
+    public void HideByVisibility()
+    {
+        rootVisualElement.HideByVisibility();
+    }
+
+    public void ShowByVisibility()
+    {
+        rootVisualElement.ShowByVisibility();
     }
 }

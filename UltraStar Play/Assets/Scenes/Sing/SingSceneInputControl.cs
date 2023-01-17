@@ -47,7 +47,7 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            singSceneControl.FinishScene(false);
+            singSceneControl.FinishScene(false, false);
         }
     }
 }

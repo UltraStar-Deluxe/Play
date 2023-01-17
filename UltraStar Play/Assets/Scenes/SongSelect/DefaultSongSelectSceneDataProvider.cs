@@ -61,17 +61,20 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
 
         void FillRounds()
         {
-            GameRoundSettings firstRound = new();
-            firstRound.modifiers = modifiers.ToHashSet();
-            firstRound.finishConditionSettings = finishConditionSettings;
-            firstRound.modifierConditionSettings = modifierConditionSettings;
+            GameRoundSettings CreateGameRoundSettings()
+            {
+                GameRoundSettings round = new();
+                round.modifiers = modifiers.ToHashSet();
+                round.finishConditionSettings = finishConditionSettings;
+                round.modifierConditionSettings = modifierConditionSettings;
+                return round;
+            }
 
-            GameRoundSettings secondRound = new();
-            firstRound.modifiers = new HashSet<EGameRoundModifier> { EGameRoundModifier.HideLyrics, EGameRoundModifier.HideScore };
-            firstRound.finishConditionSettings = finishConditionSettings;
-            firstRound.modifierConditionSettings = modifierConditionSettings;
-
-            partyModeSettings.roundsSettings.gameRoundSettings = new List<GameRoundSettings> { firstRound, secondRound };
+            partyModeSettings.roundsSettings.gameRoundSettings = new List<GameRoundSettings>
+            {
+                CreateGameRoundSettings(),
+                CreateGameRoundSettings(),
+            };
         }
 
         FillTeams();

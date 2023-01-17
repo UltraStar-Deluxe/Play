@@ -84,9 +84,10 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        GameRoundFinishConditionSettings finishConditionSettings = songSelectSceneControl.PartyModeSettings.CurrentRoundSettings.finishConditionSettings;
-        HashSet<EGameRoundModifier> modifiers = songSelectSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
-        GameRoundModifierConditionSettings modifierConditionSettings = songSelectSceneControl.PartyModeSettings.CurrentRoundSettings.modifierConditionSettings;
+        GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSettings.CurrentRoundSettings;
+        GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
+        HashSet<EGameRoundModifier> modifiers = currentRoundSettings.modifiers;
+        GameRoundModifierConditionSettings modifierConditionSettings = currentRoundSettings.modifierConditionSettings;
 
         string GetFinishConditionDescription()
         {
