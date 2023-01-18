@@ -552,6 +552,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         partyModeControl.Update();
+
+        if (songAudioPlayer.IsPlaying)
+        {
+            countdownControl.Update(Time.deltaTime);
+        }
     }
 
     public void SkipToNextSingableNote()
