@@ -161,7 +161,7 @@ MonoBehaviour:
   finishConditionSettings:
     condition: 2
     points: 3000
-  modifiers: 00000000
+  modifiers: 02000000
   modifierConditionSettings:
     condition: 1
     timeFrom: 2

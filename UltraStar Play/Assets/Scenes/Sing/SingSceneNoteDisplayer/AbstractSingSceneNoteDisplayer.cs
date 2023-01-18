@@ -43,6 +43,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected SingSceneControl singSceneControl;
 
     [Inject]
+    protected GameObject gameObject;
+
+    [Inject]
     protected Injector injector;
 
     [Inject]
@@ -73,6 +76,8 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     // Only for debugging
     private bool displayRoundedAndActualRecordedNotes;
     private bool showPitchOfNotes;
+
+    private int fadeOutAnimationId;
 
     protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
 
@@ -454,13 +459,15 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
                 .ForEach(recordedNoteControl => RemoveRecordedNote(recordedNoteControl)));
     }
 
-    public void HideByVisibility()
+    public void FadeOut(float animTimeInSeconds)
     {
-        rootVisualElement.HideByVisibility();
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 
-    public void ShowByVisibility()
+    public void FadeIn(float animTimeInSeconds)
     {
-        rootVisualElement.ShowByVisibility();
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 }

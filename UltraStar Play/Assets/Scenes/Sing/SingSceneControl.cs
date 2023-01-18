@@ -1040,33 +1040,33 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    public void HideLyricsByVisibility(Voice voice)
+    public void FadeOutLyrics(Voice voice, float animTimeInSeconds)
     {
         if (topSingingLyricsControl != null
             && topSingingLyricsControl.Voice == voice)
         {
-            topLyricsContainer.HideByVisibility();
+            topSingingLyricsControl.FadeOut(animTimeInSeconds);
         }
 
         if (bottomSingingLyricsControl != null
             && bottomSingingLyricsControl.Voice == voice)
         {
-            bottomSingingLyricsControl.HideByVisibility();
+            bottomSingingLyricsControl.FadeOut(animTimeInSeconds);
         }
     }
 
-    public void ShowLyricsByVisibility(Voice voice)
+    public void FadeInLyrics(Voice voice, float animTimeInSeconds)
     {
         if (topSingingLyricsControl != null
             && topSingingLyricsControl.Voice == voice)
         {
-            topSingingLyricsControl.ShowByVisibility();
+            topSingingLyricsControl.FadeIn(animTimeInSeconds);
         }
 
         if (bottomSingingLyricsControl != null
             && bottomSingingLyricsControl.Voice == voice)
         {
-            bottomSingingLyricsControl.ShowByVisibility();
+            bottomSingingLyricsControl.FadeIn(animTimeInSeconds);
         }
     }
 }
