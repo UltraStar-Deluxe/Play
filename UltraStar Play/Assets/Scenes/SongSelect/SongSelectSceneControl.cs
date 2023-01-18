@@ -162,8 +162,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songDetailOverlayScrollView)]
     private VisualElement songDetailOverlayScrollView;
 
-    [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
-    private Button backToMainMenuButton;
+    [Inject(UxmlName = R.UxmlNames.quitSongSelectButton)]
+    private Button quitSongSelectButton;
 
     [Inject(UxmlName = R.UxmlNames.nextSongButton)]
     private Button nextSongButton;
@@ -373,7 +373,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
-        backToMainMenuButton.RegisterCallbackButtonTriggered(() => GoBack());
+        quitSongSelectButton.RegisterCallbackButtonTriggered(() => QuitSongSelect());
 
         toggleSongDetailOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -502,7 +502,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
     }
 
-    public void GoBack()
+    public void QuitSongSelect()
     {
         if (HasPartyModeSettings)
         {
@@ -1287,7 +1287,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
         closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        backToMainMenuButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
+        quitSongSelectButton.text = TranslationManager.GetTranslation(R.Messages.quit);
         toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
         duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
         videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);

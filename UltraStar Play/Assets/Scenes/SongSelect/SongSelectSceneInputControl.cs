@@ -168,7 +168,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            songSelectSceneControl.GoBack();
+            songSelectSceneControl.QuitSongSelect();
         }
     }
 
