@@ -272,6 +272,8 @@ public static partial class R
         public const string jobProgressBar = "jobProgressBar";
         public const string jobRunningIcon = "jobRunningIcon";
         public const string jobStatusIconContainer = "jobStatusIconContainer";
+        public const string knockOutLabel = "knockOutLabel";
+        public const string knockOutLabelOverlay = "knockOutLabelOverlay";
         public const string knockOutTournamentToggle = "knockOutTournamentToggle";
         public const string label = "label";
         public const string Label = "Label";

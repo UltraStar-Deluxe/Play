@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
@@ -68,7 +69,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private Subject<bool> selectedChangedEventStream = new();
+    private readonly Subject<bool> selectedChangedEventStream = new();
     public IObservable<bool> SelectedChangedEventStream => selectedChangedEventStream;
 
     public void OnInjectionFinished()
@@ -91,7 +92,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             }
 
             enabledToggle.HideByDisplay();
-            SetSelected(true);
         }
         else
         {
@@ -99,14 +99,16 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    public void SetSelected(bool newValue)
+    public void SetSelected(bool newValue, bool force)
     {
         if (partyModeTeamSettings != null
-            && !newValue)
+            && !force)
         {
             // In party mode, there is always one player selected per team. And these players have been chosen already.
             return;
         }
+
+        Debug.Log($"Select player profile '{PlayerProfile.Name}': {newValue}");
         PlayerProfile.IsSelected = newValue;
         UpdateEnabledToggle();
         selectedChangedEventStream.OnNext(newValue);

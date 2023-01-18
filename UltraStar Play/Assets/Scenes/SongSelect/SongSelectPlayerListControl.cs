@@ -53,6 +53,19 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(HandleClientConnectedEvent)
             .AddTo(gameObject);
+
+        if (songSelectSceneControl.HasPartyModeSettings)
+        {
+            SelectMicsForPartyMode();
+        }
+    }
+
+    private void SelectMicsForPartyMode()
+    {
+        // Assign mics by re-selecting every player profile of this round.
+        // TODO: Prefer same mic of the team from last round
+        PlayerEntryControlControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(false, true));
+        PlayerEntryControlControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -103,7 +116,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .CreateAndInject<SongSelectPlayerEntryControl>();
 
         listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
-        listEntryControl.SetSelected(playerProfile.IsSelected);
+        listEntryControl.SetSelected(playerProfile.IsSelected, false);
 
         playerEntryControls.Add(listEntryControl);
     }
@@ -221,7 +234,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             if (entry.IsSelected)
             {
-                entry.SetSelected(false);
+                entry.SetSelected(false, false);
             }
             else
             {
@@ -232,7 +245,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         // Because others have been deselected, they will be assigned free mics if any.
         foreach (SongSelectPlayerEntryControl entry in deselectedEntries)
         {
-            entry.SetSelected(true);
+            entry.SetSelected(true, false);
         }
     }
 

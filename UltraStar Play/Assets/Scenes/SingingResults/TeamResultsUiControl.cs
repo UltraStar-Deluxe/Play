@@ -36,7 +36,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Find top three and remaining teams
-        List<PartyModeTeamSettings> unusedTeams = singingResultsSceneControl.PartyModeSettings.teamSettings.teams.ToList();
+        List<PartyModeTeamSettings> unusedTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSettings);
 
         List<PartyModeTeamSettings> firstTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSettings, unusedTeams);
         firstTeams.ForEach(usedTeam => unusedTeams.Remove(usedTeam));
