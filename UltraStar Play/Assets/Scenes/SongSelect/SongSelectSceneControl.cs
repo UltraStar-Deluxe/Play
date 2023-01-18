@@ -1452,6 +1452,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .Where(playerProfile => playerProfile.IsEnabled)
                 .ToList();
         }
+        else if (PartyModeSettings.teamSettings.isFreeForAll)
+        {
+            // Select all players of all teams
+            List<PlayerProfile> result = new();
+            PartyModeSettings.teamSettings.teams
+                .ForEach(team =>
+                {
+                    result.AddRange(team.playerProfiles);
+                    result.AddRange(team.guestPlayerProfiles);
+                });
+            return result
+                .Where(playerProfile => playerProfile != null)
+                .Distinct()
+                .ToList();
+        }
         else
         {
             // Select random player of each team
@@ -1464,6 +1479,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             });
             return result
                 .Where(playerProfile => playerProfile != null)
+                .Distinct()
                 .ToList();
         }
     }
