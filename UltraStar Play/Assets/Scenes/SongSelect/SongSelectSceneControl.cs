@@ -1455,15 +1455,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         else if (PartyModeSettings.teamSettings.isFreeForAll)
         {
             // Select all players of all teams
-            List<PlayerProfile> result = new();
-            PartyModeSettings.teamSettings.teams
-                .ForEach(team =>
-                {
-                    result.AddRange(team.playerProfiles);
-                    result.AddRange(team.guestPlayerProfiles);
-                });
-            return result
-                .Where(playerProfile => playerProfile != null)
+            List<PlayerProfile> allPlayerProfiles = PartyModeUtils.GetAllPlayerProfiles(PartyModeSettings);
+            return allPlayerProfiles
+                .Where(playerProfile => playerProfile != null
+                                        && !PartyModeUtils.GetTeam(PartyModeSettings, playerProfile).isKnockedOut)
                 .Distinct()
                 .ToList();
         }
@@ -1471,12 +1466,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             // Select random player of each team
             List<PlayerProfile> result = new();
-            PartyModeSettings.teamSettings.teams.ForEach(team =>
-            {
-                List<PlayerProfile> allTeamPlayerProfiles = team.playerProfiles.Union(team.guestPlayerProfiles).ToList();
-                PlayerProfile playerProfile = RandomUtils.RandomOf(allTeamPlayerProfiles);
-                result.Add(playerProfile);
-            });
+            PartyModeSettings.teamSettings.teams
+                .Where(team => !team.isKnockedOut)
+                .ForEach(team =>
+                {
+                    List<PlayerProfile> allTeamPlayerProfiles = team.playerProfiles.Union(team.guestPlayerProfiles).ToList();
+                    PlayerProfile playerProfile = RandomUtils.RandomOf(allTeamPlayerProfiles);
+                    result.Add(playerProfile);
+                });
             return result
                 .Where(playerProfile => playerProfile != null)
                 .Distinct()

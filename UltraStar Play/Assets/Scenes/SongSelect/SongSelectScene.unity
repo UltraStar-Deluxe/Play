@@ -153,15 +153,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   partyMode: 1
-  isFreeForAll: 0
-  isKnockOutTournament: 0
+  isFreeForAll: 1
+  isKnockOutTournament: 1
   songSelectionSettings:
     songSelectionMode: 1
     jokerCount: 5
   finishConditionSettings:
     condition: 0
     points: 500
-  modifiers: 05000000
+  modifiers: 01000000
   modifierConditionSettings:
     condition: 3
     timeFrom: 2

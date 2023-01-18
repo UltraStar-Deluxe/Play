@@ -12,7 +12,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private SingingResultsSceneControl singingResultsSceneControl;
 
     [Inject]
-    private PlayerProfile playerProfile;
+    public PlayerProfile PlayerProfile { get; private set; }
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
@@ -47,6 +47,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject(UxmlName = R.UxmlNames.filledScoreBar)]
     private VisualElement filledScoreBar;
 
+    [Inject(UxmlName = R.UxmlNames.knockOutLabelOverlay)]
+    private VisualElement knockOutLabelOverlay;
+
     [Inject]
     private SongRating songRating;
 
@@ -63,7 +66,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // Player name and image
         playerNameLabel.text = ShouldShowTeamName()
             ? GetTeamName()
-            : playerProfile.Name;
+            : PlayerProfile.Name;
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<AvatarImageControl>();
 
@@ -98,12 +101,14 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => filledScoreBar.style.height = new StyleLength(new Length(interpolatedValue, LengthUnit.Percent)))
             .setEaseOutSine();
 
+        knockOutLabelOverlay.HideByDisplay();
+
         UpdateTranslation();
     }
 
     private string GetTeamName()
     {
-        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, playerProfile);
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
         return teamSettings.name;
     }
 
@@ -114,7 +119,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             return false;
         }
-        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, playerProfile);
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
         return teamSettings != null;
     }
 
@@ -169,5 +174,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private void SetScoreLabelText(VisualElement container, float interpolatedValue)
     {
         container.Q<Label>(R.UxmlNames.scoreValue).text = interpolatedValue.ToString("0", CultureInfo.InvariantCulture);
+    }
+
+    public void ShowKnockedOutLabel()
+    {
+        knockOutLabelOverlay.ShowByDisplay();
     }
 }

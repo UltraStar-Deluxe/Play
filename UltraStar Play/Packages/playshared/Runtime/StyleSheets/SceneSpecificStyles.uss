@@ -286,6 +286,13 @@
     border-bottom-width: 0;
 }
 
+#knockOutLabel {
+    font-size: 62px;
+    rotate: 30deg;
+    color: crimson;
+    -unity-font-style: bold;
+}
+
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/

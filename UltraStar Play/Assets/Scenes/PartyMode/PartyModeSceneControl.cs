@@ -198,10 +198,22 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             }
 
             // All config done, start the first party round
-            SongSelectSceneData songSelectSceneData = new();
-            songSelectSceneData.PartyModeSettings = partyModeSettings;
-            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+            FinishScene();
         }
+    }
+
+    private void FinishScene()
+    {
+        // Reset some fields in party mode settings
+        partyModeSettings.teamSettings.teams.ForEach(team => team.isKnockedOut = false);
+        partyModeSettings.teamSettings.freeForAllPlayerToTeam.Clear();
+        partyModeSettings.teamToScoreMap.Clear();
+        partyModeSettings.currentRoundIndex = 0;
+
+        // Start next scene
+        SongSelectSceneData songSelectSceneData = new();
+        songSelectSceneData.PartyModeSettings = partyModeSettings;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
     private string GetSongSelectionConfigErrorMessage()

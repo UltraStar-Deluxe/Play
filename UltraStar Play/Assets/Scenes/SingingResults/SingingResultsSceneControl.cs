@@ -124,6 +124,30 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         ActivateLayout();
         FillLayout();
+
+        KnockOutPartyTeams();
+    }
+
+    private void KnockOutPartyTeams()
+    {
+        if (!HasPartyModeSettings
+            || !PartyModeSettings.teamSettings.isKnockOutTournament)
+        {
+            return;
+        }
+
+        PartyModeTeamSettings knockedOutTeam = GetKnockedOutTeam(SceneData.PlayerProfileToMicProfileMap.Keys.ToList());
+
+        // Mark team as knocked out
+        knockedOutTeam.isKnockedOut = true;
+
+        // Show knock out in UI
+        PlayerProfile knockedOutPlayerProfile = GetPlayerProfileOfThisRound(knockedOutTeam);
+        SingingResultsPlayerControl singingResultsPlayerControl = singingResultsPlayerUiControls.FirstOrDefault(playerUiControl => playerUiControl.PlayerProfile == knockedOutPlayerProfile);
+        if (singingResultsPlayerControl != null)
+        {
+            singingResultsPlayerControl.ShowKnockedOutLabel();
+        }
     }
 
     private void InitClickThoughToHiddenContinueButton()
@@ -366,10 +390,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         // Determine first best and second best players of this round
         List<PlayerProfile> unusedPlayerProfiles = SceneData.PlayerProfiles.ToList();
-        List<PlayerProfile> firstPlayers = GetLeadingPlayers(unusedPlayerProfiles);
+        List<PlayerProfile> firstPlayers = GetTopPlayers(unusedPlayerProfiles);
         firstPlayers.ForEach(playerProfile => unusedPlayerProfiles.Remove(playerProfile));
 
-        List<PlayerProfile> secondPlayers = GetLeadingPlayers(unusedPlayerProfiles);
+        List<PlayerProfile> secondPlayers = GetTopPlayers(unusedPlayerProfiles);
         secondPlayers.ForEach(playerProfile => unusedPlayerProfiles.Remove(playerProfile));
 
         // Find corresponding teams of first and second best players
@@ -385,7 +409,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         secondTeams.ForEach(team => PartyModeSettings.teamToScoreMap[team] = PartyModeUtils.GetTeamScore(PartyModeSettings, team) + 1);
     }
 
-    private List<PlayerProfile> GetLeadingPlayers(List<PlayerProfile> playerProfiles)
+    private List<PlayerProfile> GetTopPlayers(List<PlayerProfile> playerProfiles)
     {
         if (playerProfiles.IsNullOrEmpty())
         {
@@ -398,5 +422,53 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         return playerProfiles
             .Where(playerProfile => SceneData.GetPlayerScores(playerProfile).TotalScore == highestScore)
             .ToList();
+    }
+
+    private PartyModeTeamSettings GetKnockedOutTeam(List<PlayerProfile> playerProfiles)
+    {
+        if (playerProfiles.IsNullOrEmpty())
+        {
+            return new();
+        }
+
+        List<PartyModeTeamSettings> teams = playerProfiles
+            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .ToList();
+        if (teams.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        int lowestTeamScore = teams.Select(team => PartyModeUtils.GetTeamScore(PartyModeSettings, team))
+            .Min();
+        List<PartyModeTeamSettings> lowestTeams = teams
+            .Where(team => PartyModeUtils.GetTeamScore(PartyModeSettings, team) == lowestTeamScore)
+            .ToList();
+        if (lowestTeams.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        lowestTeams.Sort((a, b) => GetCurrentRoundPoints(a).CompareTo(GetCurrentRoundPoints(b)));
+        PartyModeTeamSettings lowestTeam = lowestTeams.FirstOrDefault();
+        return lowestTeam;
+    }
+
+    private PlayerProfile GetPlayerProfileOfThisRound(PartyModeTeamSettings team)
+    {
+        List<PlayerProfile> playerProfiles = SceneData.PlayerProfileToMicProfileMap.Keys.ToList();
+        PlayerProfile playerProfileOfTeam = playerProfiles.FirstOrDefault(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile) == team);
+        return playerProfileOfTeam;
+    }
+
+    private int GetCurrentRoundPoints(PartyModeTeamSettings team)
+    {
+        PlayerProfile playerProfileOfTeam = GetPlayerProfileOfThisRound(team);
+        if (playerProfileOfTeam == null)
+        {
+            return 0;
+        }
+
+        return SceneData.GetPlayerScores(playerProfileOfTeam).TotalScore;
     }
 }
