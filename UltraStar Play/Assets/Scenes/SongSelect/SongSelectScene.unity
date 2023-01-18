@@ -161,12 +161,12 @@ MonoBehaviour:
   finishConditionSettings:
     condition: 0
     points: 500
-  modifiers: 01000000
+  modifiers: 00000000
   modifierConditionSettings:
-    condition: 1
+    condition: 3
     timeFrom: 2
     timeUntil: 7
-    scoreFrom: 50
+    scoreFrom: 200
     scoreUntil: 200
 --- !u!4 &79690708
 Transform:
