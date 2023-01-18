@@ -24,14 +24,14 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
         }
         
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.Continue());
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.Continue());
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.Continue());
             
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneControl.FinishScene());
+            .Subscribe(_ => singingResultsSceneControl.Continue());
 
     }
 }

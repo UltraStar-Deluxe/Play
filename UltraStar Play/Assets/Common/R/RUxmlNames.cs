@@ -186,6 +186,7 @@ public static partial class R
         public const string finishConditionPicker = "finishConditionPicker";
         public const string finishConditionPointsPicker = "finishConditionPointsPicker";
         public const string first = "first";
+        public const string firstTeamUi = "firstTeamUi";
         public const string fpsContainer = "fpsContainer";
         public const string freeForAllToggle = "freeForAllToggle";
         public const string fullscreenContainer = "fullscreenContainer";
@@ -437,6 +438,7 @@ public static partial class R
         public const string openSongEditorButton = "openSongEditorButton";
         public const string openSongEditorIcon = "openSongEditorIcon";
         public const string openSongFolderButton = "openSongFolderButton";
+        public const string otherTeamsScrollView = "otherTeamsScrollView";
         public const string outputTextField = "outputTextField";
         public const string overlay = "overlay";
         public const string overviewArea = "overviewArea";
@@ -487,6 +489,7 @@ public static partial class R
         public const string playerNameContainer = "playerNameContainer";
         public const string playerNameLabel = "playerNameLabel";
         public const string playerProfileSettingsProblemHintIcon = "playerProfileSettingsProblemHintIcon";
+        public const string playerResultsContainer = "playerResultsContainer";
         public const string playersContainer = "playersContainer";
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
@@ -595,6 +598,7 @@ public static partial class R
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string second = "second";
         public const string secondBackground = "secondBackground";
+        public const string secondTeamUi = "secondTeamUi";
         public const string selectAllNotesIcon = "selectAllNotesIcon";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
         public const string selectionIndicator = "selectionIndicator";
@@ -743,12 +747,21 @@ public static partial class R
         public const string teamColumnUiRoot = "teamColumnUiRoot";
         public const string teamConfigUiRoot = "teamConfigUiRoot";
         public const string teamLabel = "teamLabel";
+        public const string teamNameLabel = "teamNameLabel";
         public const string teamNameTextField = "teamNameTextField";
+        public const string TeamResultsTeamUi = "TeamResultsTeamUi";
+        public const string teamResultsUi = "teamResultsUi";
+        public const string TeamResultsUi = "TeamResultsUi";
+        public const string teamResultsUiRoot = "teamResultsUiRoot";
+        public const string TeamResultTeamUi = "TeamResultTeamUi";
+        public const string teamScoreLabel = "teamScoreLabel";
         public const string teamsScrollView = "teamsScrollView";
+        public const string teamUiRoot = "teamUiRoot";
         public const string text = "text";
         public const string textFieldContainer = "textFieldContainer";
         public const string themeContainer = "themeContainer";
         public const string third = "third";
+        public const string thirdTeamUi = "thirdTeamUi";
         public const string timeBar = "timeBar";
         public const string timeBarPositionIndicator = "timeBarPositionIndicator";
         public const string timeLabel = "timeLabel";
@@ -788,7 +801,9 @@ public static partial class R
         public const string topLyricsContainer = "topLyricsContainer";
         public const string topRightContainer = "topRightContainer";
         public const string topRow = "topRow";
+        public const string topThreeContainer = "topThreeContainer";
         public const string totalScore = "totalScore";
+        public const string trophyIcon = "trophyIcon";
         public const string twoPlayerLayout = "twoPlayerLayout";
         public const string udpPortOnClientContainer = "udpPortOnClientContainer";
         public const string udpPortOnClientLabel = "udpPortOnClientLabel";

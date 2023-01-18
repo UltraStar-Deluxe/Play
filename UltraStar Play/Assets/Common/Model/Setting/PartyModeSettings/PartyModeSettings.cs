@@ -13,4 +13,6 @@ public class PartyModeSettings
     public List<PartyModeRoundSettingsPreset> roundSettingsPresets = new();
 
     public GameRoundSettings CurrentRoundSettings => roundsSettings.gameRoundSettings[currentRoundIndex];
+
+    public Dictionary<PartyModeTeamSettings, int> teamToScoreMap = new();
 }
