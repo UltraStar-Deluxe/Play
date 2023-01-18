@@ -35,7 +35,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
         if (IsSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;
-            if (durationAfterSongFinishedInSeconds >= 1)
+            if (durationAfterSongFinishedInSeconds >= 1.5f)
             {
                 singSceneControl.FinishScene(!isEarlyFinish, true);
             }
@@ -84,6 +84,12 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
     public void TriggerEarlySongFinish()
     {
+        if (IsSongFinished)
+        {
+            return;
+        }
+
+        Debug.Log("Trigger early song finish");
         IsSongFinished = true;
         isEarlyFinish = true;
     }

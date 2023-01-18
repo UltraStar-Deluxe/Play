@@ -644,7 +644,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public void FinishScene(bool isAfterEndOfSong, bool continueWithNextMedleySong)
     {
         if (continueWithNextMedleySong
-            && sceneData.MedleySongIndex < sceneData.SongMetas.Count - 1)
+            && sceneData.MedleySongIndex >= 0
+            && sceneData.MedleySongIndex < sceneData.SongMetas.Count - 1
+            && !HasPartyModeSettings)
         {
             StartNextMedleySong();
             return;
