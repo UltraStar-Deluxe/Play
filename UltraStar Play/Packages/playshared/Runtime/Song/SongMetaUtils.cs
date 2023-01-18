@@ -433,11 +433,19 @@ public static class SongMetaUtils
 
     public static int MinBeat(List<Note> notes)
     {
+        if (notes.IsNullOrEmpty())
+        {
+            return 0;
+        }
         return notes.Select(note => note.StartBeat).Min();
     }
 
     public static int MaxBeat(List<Note> notes)
     {
+        if (notes.IsNullOrEmpty())
+        {
+            return 0;
+        }
         return notes.Select(note => note.EndBeat).Max();
     }
 
