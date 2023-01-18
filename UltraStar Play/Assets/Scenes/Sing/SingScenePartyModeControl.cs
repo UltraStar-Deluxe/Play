@@ -10,7 +10,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingScenePartyModeControl : INeedInjection
+public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListener
 {
     private const float AnimTimeInSeconds = 1.5f;
 
@@ -27,6 +27,15 @@ public class SingScenePartyModeControl : INeedInjection
 
     private readonly HashSet<EGameRoundModifier> activeModifiers = new();
 
+    public void OnInjectionFinished()
+    {
+        // Check for finish when any score changes after a sentence is complete
+        singSceneControl.PlayerControls
+            .Select(playerControl => playerControl.PlayerScoreControl.SentenceScoreEventStream)
+            .Merge()
+            .Subscribe(_ => UpdateFinishCondition());
+    }
+
     public void Update()
     {
         if (!singSceneControl.HasPartyModeSettings)
@@ -34,14 +43,15 @@ public class SingScenePartyModeControl : INeedInjection
             return;
         }
 
-        UpdateFinishCondition();
         UpdateModifiers();
     }
 
     private void UpdateFinishCondition()
     {
-        if (IsFinishConditionTriggered())
+        if (!singSceneFinisher.IsSongFinished
+            && IsFinishConditionTriggered())
         {
+            Debug.Log($"Trigger party mode song finish");
             singSceneFinisher.TriggerEarlySongFinish();
         }
     }

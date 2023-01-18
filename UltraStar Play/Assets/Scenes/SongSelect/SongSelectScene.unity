@@ -159,9 +159,9 @@ MonoBehaviour:
     songSelectionMode: 1
     jokerCount: 5
   finishConditionSettings:
-    condition: 2
-    points: 3000
-  modifiers: 04000000
+    condition: 0
+    points: 500
+  modifiers: 01000000
   modifierConditionSettings:
     condition: 1
     timeFrom: 2
