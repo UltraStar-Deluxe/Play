@@ -167,6 +167,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         RandomlySelectedSong = GetRandomSong();
         songRouletteControl.SelectSong(RandomlySelectedSong);
+        songSelectSceneControl.SceneData.SongMeta = RandomlySelectedSong;
         Debug.Log($"Selected random song: {RandomlySelectedSong}");
     }
 

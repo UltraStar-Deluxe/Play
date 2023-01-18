@@ -689,6 +689,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Open song select without recording scores
         SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
+        songSelectSceneData.PartyModeSettings = PartyModeSettings;
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
@@ -697,8 +698,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         // Open the singing results scene.
         SingingResultsSceneData singingResultsSceneData = new();
-        singingResultsSceneData.SongMetas = sceneData.SongMetas;
-        singingResultsSceneData.IsMedley = sceneData.IsMedley;
+        singingResultsSceneData.SongMetas = SceneData.SongMetas;
+        singingResultsSceneData.IsMedley = SceneData.IsMedley;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
         singingResultsSceneData.partyModeSettings = SceneData.partyModeSettings;
 
@@ -707,7 +708,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (IsIndividualScore)
         {
             // Add and record score for each player individually.
-            singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
+            singingResultsSceneData.PlayerProfileToMicProfileMap = SceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
             PlayerControls.ForEach(playerControl =>
             {
                 PlayerScoreControlData playerScoreControlData = GetPlayerScoreDataForSingingResultsScene(playerControl);

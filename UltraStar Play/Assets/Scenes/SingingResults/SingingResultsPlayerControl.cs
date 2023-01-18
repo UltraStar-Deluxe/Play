@@ -61,7 +61,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     public void OnInjectionFinished()
     {
         // Player name and image
-        playerNameLabel.text = playerProfile.Name;
+        playerNameLabel.text = ShouldShowTeamName()
+            ? GetTeamName()
+            : playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<AvatarImageControl>();
 
@@ -97,6 +99,23 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setEaseOutSine();
 
         UpdateTranslation();
+    }
+
+    private string GetTeamName()
+    {
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, playerProfile);
+        return teamSettings.name;
+    }
+
+    private bool ShouldShowTeamName()
+    {
+        if (singingResultsSceneControl.HasPartyModeSettings
+            && singingResultsSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+        {
+            return false;
+        }
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, playerProfile);
+        return teamSettings != null;
     }
 
     private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
