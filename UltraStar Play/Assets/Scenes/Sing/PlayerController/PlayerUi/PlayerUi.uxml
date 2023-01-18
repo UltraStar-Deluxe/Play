@@ -9,6 +9,7 @@
                         <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&amp;guid=8f8cd0bf8e4776546b467068aacdf098&amp;type=3#LeadingPlayerCrown&apos;); -unity-background-scale-mode: scale-to-fit; margin-top: -5px; margin-bottom: -5px; flex-shrink: 2;" />
                         <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" class="textOutline largeFont" style="-unity-text-align: middle-left; flex-shrink: 1;" />
                     </ui:VisualElement>
+                    <ui:Label text="Next Player: Long Name" display-tooltip-when-elided="true" name="nextPlayerNameLabel" class="smallFont" style="position: absolute; top: 100%; margin-top: 5px; left: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="spacer" style="flex-grow: 1;" />
                 <ui:VisualElement name="micDisconnectedContainer" style="flex-direction: row; align-items: flex-end; width: auto; height: 100%;">

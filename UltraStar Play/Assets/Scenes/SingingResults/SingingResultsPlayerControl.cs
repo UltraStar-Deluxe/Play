@@ -74,10 +74,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             }
 
             ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-                // Bouncy size animation
-                LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
-                    .setEaseSpring()
-                    .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+            AnimationUtils.BounceVisualElementSize(singingResultsSceneControl.gameObject, ratingImage, animationTimeInSeconds);
         });
         ratingLabel.text = songRating.Text;
 

@@ -99,7 +99,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
             .WithBindingForInstance(playerProfile)
-            .WithBindingForInstance(songSelectSceneControl.GetTeam(playerProfile))
+            .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSettings, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
 
         listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));

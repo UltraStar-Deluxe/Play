@@ -18,4 +18,12 @@ public static class AnimationUtils
             .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
             .id;
     }
+
+    public static int BounceVisualElementSize(GameObject gameObject, VisualElement visualElement, float animTimeInSeconds)
+    {
+        return LeanTween.value(gameObject, Vector3.one * 0.75f, Vector3.one, animTimeInSeconds)
+            .setEaseSpring()
+            .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
+            .id;
+    }
 }
