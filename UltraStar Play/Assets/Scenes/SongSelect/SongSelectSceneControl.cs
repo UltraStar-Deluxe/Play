@@ -1483,15 +1483,4 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .ToList();
         }
     }
-
-    public PartyModeTeamSettings GetTeam(PlayerProfile playerProfile)
-    {
-        if (!HasPartyModeSettings)
-        {
-            return null;
-        }
-
-        return PartyModeSettings.teamSettings.teams.FirstOrDefault(team
-            => team.playerProfiles.Contains(playerProfile) || team.guestPlayerProfiles.Contains(playerProfile));
-    }
 }

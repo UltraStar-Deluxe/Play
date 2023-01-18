@@ -23,6 +23,11 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
+    [Inject]
+    private Injector injector;
+
+    private readonly SingScenePassTheMicControl passTheMicControl = new();
+
     public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
 
     private readonly Dictionary<PlayerControl, HashSet<EGameRoundModifier>> playerControlToActiveModifiers = new();
@@ -30,6 +35,12 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     public void OnInjectionFinished()
     {
+        injector.Inject(passTheMicControl);
+
+        if (!singSceneControl.HasPartyModeSettings)
+        {
+            return;
+        }
         // Check for finish when any score changes after a sentence is complete
         singSceneControl.PlayerControls
             .Select(playerControl => playerControl.PlayerScoreControl.SentenceScoreEventStream)
@@ -113,9 +124,9 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
             }
         });
 
-        if (modifiers.Contains(EGameRoundModifier.PassTheMic))
+        if (!singSceneControl.IsPaused)
         {
-            UpdatePassTheMic();
+            passTheMicControl.Update(Time.deltaTime);
         }
     }
 
@@ -143,11 +154,6 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
     private void ReduceAudio()
     {
         ModifiedVolumePercent.Value = 3;
-    }
-
-    private void UpdatePassTheMic()
-    {
-
     }
 
     private void UpdatePlayerSpecificModifiers(PlayerControl playerControl)

@@ -391,6 +391,7 @@ public static partial class R
         public const string nextItemIcon = "nextItemIcon";
         public const string nextItemLabel = "nextItemLabel";
         public const string nextLabel = "nextLabel";
+        public const string nextPlayerNameLabel = "nextPlayerNameLabel";
         public const string NextRoundInfoPlayerEntryUi = "NextRoundInfoPlayerEntryUi";
         public const string NextRoundInfoUi = "NextRoundInfoUi";
         public const string nextSentenceContainer = "nextSentenceContainer";
@@ -462,6 +463,7 @@ public static partial class R
         public const string PartyModeTeamConfigUi = "PartyModeTeamConfigUi";
         public const string partySettingsContainer = "partySettingsContainer";
         public const string partySettingsTitleLabel = "partySettingsTitleLabel";
+        public const string passTheMicProgressBar = "passTheMicProgressBar";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
@@ -831,6 +833,7 @@ public static partial class R
         public const string warningLabel = "warningLabel";
         public const string webcamOptionsButton = "webcamOptionsButton";
         public const string webcamRenderContainer = "webcamRenderContainer";
+        public const string webcamRenderContainerContainer = "webcamRenderContainerContainer";
         public const string wideIcon = "wideIcon";
         public const string yearLabel = "yearLabel";
         public const string yearPropertyContainer = "yearPropertyContainer";

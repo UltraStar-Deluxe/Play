@@ -123,6 +123,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private VisualElement[] playerUiColumns;
 
+    public bool IsPaused => !songAudioPlayer.IsPlaying;
+
     private SingSceneData sceneData;
     public SingSceneData SceneData
     {
@@ -182,6 +184,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public PartyModeSettings PartyModeSettings => SceneData.partyModeSettings;
     public bool HasPartyModeSettings => PartyModeSettings != null;
+    public bool IsPassTheMic => HasPartyModeSettings &&
+                                PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
 
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
@@ -522,7 +526,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         PlayerControls.ForEach(playerControl =>
         {
-            if (songAudioPlayer.IsPlaying)
+            if (!IsPaused)
             {
                 playerControl.SetCurrentBeat(CurrentBeat);
                 playerControl.UpdateUi();
@@ -553,7 +557,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         partyModeControl.Update();
 
-        if (songAudioPlayer.IsPlaying)
+        if (!IsPaused)
         {
             countdownControl.Update(Time.deltaTime);
         }

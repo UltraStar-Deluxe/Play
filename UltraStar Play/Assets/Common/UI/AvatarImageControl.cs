@@ -9,10 +9,34 @@ using UnityEngine.UIElements;
 public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject(Optional = true)]
-    private MicProfile micProfile;
+    private PlayerProfile playerProfile;
+    public PlayerProfile PlayerProfile
+    {
+        get
+        {
+            return playerProfile;
+        }
+        set
+        {
+            playerProfile = value;
+            UpdatePlayerImage();
+        }
+    }
 
     [Inject(Optional = true)]
-    private PlayerProfile playerProfile;
+    private MicProfile micProfile;
+    public MicProfile MicProfile
+    {
+        get
+        {
+            return micProfile;
+        }
+        set
+        {
+            micProfile = value;
+            UpdatePlayerImage();
+        }
+    }
 
     [Inject]
     private UiManager uiManager;
@@ -21,6 +45,11 @@ public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
     private VisualElement image;
 
     public void OnInjectionFinished()
+    {
+        UpdatePlayerImage();
+    }
+
+    private void UpdatePlayerImage()
     {
         if (playerProfile == null)
         {

@@ -42,16 +42,23 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         {
             partyModeSettings.teamSettings.isFreeForAll = isFreeForAll;
             partyModeSettings.teamSettings.isKnockOutTournament = isKnockOutTournament;
+            partyModeSettings.teamSettings.teams = new();
 
+            // Add first team with normal player profiles
             PartyModeTeamSettings firstTeam = new();
             firstTeam.name = "Team 01";
-            firstTeam.playerProfiles = new List<PlayerProfile> { settings.PlayerProfiles.FirstOrDefault() };
+            firstTeam.playerProfiles = settings.PlayerProfiles.ToList();
+            partyModeSettings.teamSettings.teams.Add(firstTeam);
 
-            PartyModeTeamSettings secondTeam = new();
-            secondTeam.name = "Team 02";
-            secondTeam.guestPlayerProfiles = new List<PlayerProfile> { settings.PartyModeSettings.guestPlayerProfiles.FirstOrDefault() };
-
-            partyModeSettings.teamSettings.teams = new List<PartyModeTeamSettings> { firstTeam, secondTeam };
+            // Add second team with guest player profile
+            PlayerProfile guestPlayerProfile = settings.PartyModeSettings.guestPlayerProfiles.FirstOrDefault();
+            if (guestPlayerProfile != null)
+            {
+                PartyModeTeamSettings secondTeam = new();
+                secondTeam.name = "Team 02";
+                secondTeam.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
+                partyModeSettings.teamSettings.teams.Add(secondTeam);
+            }
         }
 
         void FillSongSelection()
