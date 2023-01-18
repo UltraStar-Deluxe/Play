@@ -1012,8 +1012,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             () => SkipToNextSingableNote());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => FinishScene(false, false));
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+        if (!HasPartyModeSettings)
+        {
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => OpenSongInEditor());
+        }
 
         contextMenuPopup.AddSeparator();
 

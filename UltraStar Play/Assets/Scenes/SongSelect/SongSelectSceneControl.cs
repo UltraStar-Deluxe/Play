@@ -366,6 +366,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => AttemptStartSong());
         playerSelectCreateSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
         playerSelectOpenSongEditorButton.RegisterCallbackButtonTriggered(() => StartSongEditorScene());
+        if (HasPartyModeSettings)
+        {
+            playerSelectOpenSongEditorButton.SetEnabled(false);
+        }
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
@@ -953,6 +957,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSongEditorScene(SongMeta songMeta)
     {
+        if (HasPartyModeSettings)
+        {
+            uiManager.CreateNotificationVisualElement("Song editor not available in party mode");
+            return;
+        }
+
         if (songMeta.FailedToLoadVoices)
         {
             uiManager.CreateNotificationVisualElement("Failed to load song. Check log for details.");
