@@ -25,7 +25,8 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
 
-    private readonly HashSet<EGameRoundModifier> activeModifiers = new();
+    private readonly Dictionary<PlayerControl, HashSet<EGameRoundModifier>> playerControlToActiveModifiers = new();
+    private readonly HashSet<EGameRoundModifier> playerIndependentActiveModifiers = new();
 
     public void OnInjectionFinished()
     {
@@ -92,24 +93,45 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
         HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
         bool isModifierConditionTriggered = singSceneControl.PlayerControls
             .AnyMatch(playerControl => IsModifierConditionTriggered(playerControl));
-        if (isModifierConditionTriggered)
+        modifiers.ForEach(modifier =>
         {
-            if (modifiers.Contains(EGameRoundModifier.ReduceAudio))
+            if (isModifierConditionTriggered)
             {
-                ReduceAudio();
+                if (!playerIndependentActiveModifiers.Contains(modifier))
+                {
+                    playerIndependentActiveModifiers.Add(modifier);
+                    ActivatePlayerIndependentModifier(modifier);
+                }
             }
-        }
-        else
-        {
-            if (modifiers.Contains(EGameRoundModifier.ReduceAudio))
+            else
             {
-                NormalizeAudio();
+                if (playerIndependentActiveModifiers.Contains(modifier))
+                {
+                    playerIndependentActiveModifiers.Remove(modifier);
+                    DeactivatePlayerIndependentModifier(modifier);
+                }
             }
-        }
+        });
 
         if (modifiers.Contains(EGameRoundModifier.PassTheMic))
         {
             UpdatePassTheMic();
+        }
+    }
+
+    private void ActivatePlayerIndependentModifier(EGameRoundModifier modifier)
+    {
+        if (modifier == EGameRoundModifier.ReduceAudio)
+        {
+            ReduceAudio();
+        }
+    }
+
+    private void DeactivatePlayerIndependentModifier(EGameRoundModifier modifier)
+    {
+        if (modifier == EGameRoundModifier.ReduceAudio)
+        {
+            NormalizeAudio();
         }
     }
 
@@ -130,6 +152,12 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private void UpdatePlayerSpecificModifiers(PlayerControl playerControl)
     {
+        if (!playerControlToActiveModifiers.TryGetValue(playerControl, out HashSet<EGameRoundModifier> activeModifiers))
+        {
+            activeModifiers = new HashSet<EGameRoundModifier>();
+            playerControlToActiveModifiers.Add(playerControl, activeModifiers);
+        }
+
         HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
         bool isModifierConditionTriggered = IsModifierConditionTriggered(playerControl);
         modifiers.ForEach(modifier =>
@@ -208,7 +236,12 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
         if (modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance)
         {
-            return GetFirstPlayerScoreDistanceToSecondPlayer() >= modifierConditionSettings.scoreFrom;
+            // Only the first player should be affected when the condition is "player advance"
+            PlayerControl firstPlayerControl = GetFirstPlayerControl();
+            if (playerControl == firstPlayerControl)
+            {
+                return GetFirstPlayerScoreDistanceToSecondPlayer() >= modifierConditionSettings.scoreFrom;
+            }
         }
 
         return false;
@@ -216,11 +249,33 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private int GetFirstPlayerScoreDistanceToSecondPlayer()
     {
+        PlayerControl firstPlayerControl = GetFirstPlayerControl();
+        if (firstPlayerControl == null)
+        {
+            return 0;
+        }
+
+        PlayerControl secondPlayerControl = GetSecondPlayerControl(firstPlayerControl);
+        if (secondPlayerControl == null)
+        {
+            return 0;
+        }
+
+        return Math.Abs(firstPlayerControl.PlayerScoreControl.TotalScore - secondPlayerControl.PlayerScoreControl.TotalScore);
+    }
+
+    private PlayerControl GetFirstPlayerControl()
+    {
         PlayerControl firstPlayerControl = singSceneControl.PlayerControls
             .FindMaxElement(playerControl => playerControl.PlayerScoreControl.TotalScore);
+        return firstPlayerControl;
+    }
+
+    private PlayerControl GetSecondPlayerControl(PlayerControl firstPlayerControl)
+    {
         PlayerControl secondPlayerControl = singSceneControl.PlayerControls
             .Except(new List<PlayerControl> { firstPlayerControl })
             .FindMaxElement(playerControl => playerControl.PlayerScoreControl.TotalScore);
-        return Math.Abs(firstPlayerControl.PlayerScoreControl.TotalScore - secondPlayerControl.PlayerScoreControl.TotalScore);
+        return secondPlayerControl;
     }
 }
