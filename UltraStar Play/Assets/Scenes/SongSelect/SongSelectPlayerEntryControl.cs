@@ -28,6 +28,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(Optional = true)]
     private PartyModeTeamSettings partyModeTeamSettings;
 
+    [Inject(Optional = true)]
+    private SongSelectSceneControl songSelectSceneControl;
+
     private LabeledItemPickerControl<Voice> voiceChooserControl;
 
     // The MicProfile can be null to indicate that this player does not have a mic (yet).
@@ -81,8 +84,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         nameLabel.text = PlayerProfile.Name;
         if (partyModeTeamSettings != null)
         {
-            teamLabel.ShowByDisplay();
-            teamLabel.text = partyModeTeamSettings.name;
+            if (!songSelectSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+            {
+                teamLabel.ShowByDisplay();
+                teamLabel.text = partyModeTeamSettings.name;
+            }
+
             enabledToggle.HideByDisplay();
             SetSelected(true);
         }
