@@ -341,12 +341,19 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             HideSongMenuOverlay();
             songSelectSceneControl.AttemptStartSong();
         });
+
         closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
             HideSongMenuOverlay();
             InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
         });
+
         openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneControl.StartSongEditorScene());
+        if (songSelectSceneControl.HasPartyModeSettings)
+        {
+            openSongEditorButton.SetEnabled(false);
+        }
+
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
