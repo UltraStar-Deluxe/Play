@@ -12,6 +12,8 @@ using UniRx;
 
 public class SingScenePartyModeControl : INeedInjection
 {
+    private const float AnimTimeInSeconds = 1.5f;
+
     [Inject]
     private SingSceneControl singSceneControl;
 
@@ -22,6 +24,8 @@ public class SingScenePartyModeControl : INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
+
+    private readonly HashSet<EGameRoundModifier> activeModifiers = new();
 
     public void Update()
     {
@@ -118,35 +122,56 @@ public class SingScenePartyModeControl : INeedInjection
     {
         HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
         bool isModifierConditionTriggered = IsModifierConditionTriggered(playerControl);
-        if (isModifierConditionTriggered)
+        modifiers.ForEach(modifier =>
         {
-            if (modifiers.Contains(EGameRoundModifier.HideLyrics))
+            if (isModifierConditionTriggered)
             {
-                singSceneControl.HideLyricsByVisibility(playerControl.Voice);
+                if (!activeModifiers.Contains(modifier))
+                {
+                    activeModifiers.Add(modifier);
+                    ActivateModifier(playerControl, modifier);
+                }
             }
-            if (modifiers.Contains(EGameRoundModifier.HideNotes))
+            else
             {
-                playerControl.PlayerUiControl.HideNotesByVisibility();
+                if (activeModifiers.Contains(modifier))
+                {
+                    activeModifiers.Remove(modifier);
+                    DeactivateModifier(playerControl, modifier);
+                }
             }
-            if (modifiers.Contains(EGameRoundModifier.HideScore))
-            {
-                playerControl.PlayerUiControl.HideScoreByVisibility();
-            }
+        });
+    }
+
+    private void ActivateModifier(PlayerControl playerControl, EGameRoundModifier modifier)
+    {
+        if (modifier == EGameRoundModifier.HideLyrics)
+        {
+            singSceneControl.FadeOutLyrics(playerControl.Voice, AnimTimeInSeconds);
         }
-        else
+        else if (modifier == EGameRoundModifier.HideNotes)
         {
-            if (modifiers.Contains(EGameRoundModifier.HideLyrics))
-            {
-                singSceneControl.ShowLyricsByVisibility(playerControl.Voice);
-            }
-            if (modifiers.Contains(EGameRoundModifier.HideNotes))
-            {
-                playerControl.PlayerUiControl.ShowNotesByVisibility();
-            }
-            if (modifiers.Contains(EGameRoundModifier.HideScore))
-            {
-                playerControl.PlayerUiControl.ShowScoreByVisibility();
-            }
+            playerControl.PlayerUiControl.FadeOutNotes(AnimTimeInSeconds);
+        }
+        else if (modifier == EGameRoundModifier.HideScore)
+        {
+            playerControl.PlayerUiControl.FadeOut(AnimTimeInSeconds);
+        }
+    }
+
+    private void DeactivateModifier(PlayerControl playerControl, EGameRoundModifier modifier)
+    {
+        if (modifier == EGameRoundModifier.HideLyrics)
+        {
+            singSceneControl.FadeInLyrics(playerControl.Voice, AnimTimeInSeconds);
+        }
+        else if (modifier == EGameRoundModifier.HideNotes)
+        {
+            playerControl.PlayerUiControl.FadeInNotes(AnimTimeInSeconds);
+        }
+        else if (modifier == EGameRoundModifier.HideScore)
+        {
+            playerControl.PlayerUiControl.FadeIn(AnimTimeInSeconds);
         }
     }
 

@@ -67,6 +67,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
+    private int fadeOutAnimationId;
 
     public void OnInjectionFinished()
     {
@@ -316,23 +317,25 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         leadingPlayerIcon.HideByVisibility();
     }
 
-    public void HideNotesByVisibility()
+    public void FadeOutNotes(float animTimeInSeconds)
     {
-        noteDisplayer.HideByVisibility();
+        noteDisplayer.FadeOut(animTimeInSeconds);
     }
 
-    public void ShowNotesByVisibility()
+    public void FadeInNotes(float animTimeInSeconds)
     {
-        noteDisplayer.ShowByVisibility();
+        noteDisplayer.FadeIn(animTimeInSeconds);
     }
 
-    public void HideScoreByVisibility()
+    public void FadeOut(float animTimeInSeconds)
     {
-        playerScoreContainer.HideByVisibility();
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
     }
 
-    public void ShowScoreByVisibility()
+    public void FadeIn(float animTimeInSeconds)
     {
-        playerScoreContainer.ShowByVisibility();
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeInVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
     }
 }

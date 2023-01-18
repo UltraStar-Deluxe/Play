@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -31,6 +32,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private Settings settings;
 
     [Inject]
+    private GameObject gameObject;
+
+    [Inject]
     private PlayerControl playerControl;
 
     [Inject]
@@ -40,6 +44,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
 
     public Voice Voice => playerControl.Voice;
+
+    private int hideByOpacityAnimationId;
 
     public void OnInjectionFinished()
     {
@@ -245,13 +251,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    public void HideByVisibility()
+    public void FadeOut(float animTimeInSeconds)
     {
-        rootVisualElement.HideByVisibility();
+        LeanTween.cancel(hideByOpacityAnimationId);
+        hideByOpacityAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 
-    public void ShowByVisibility()
+    public void FadeIn(float animTimeInSeconds)
     {
-        rootVisualElement.ShowByVisibility();
+        LeanTween.cancel(hideByOpacityAnimationId);
+        hideByOpacityAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 }
