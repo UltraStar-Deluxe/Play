@@ -48,7 +48,6 @@ public static partial class R
         public const string backgroundMusicVolumeContainer = "backgroundMusicVolumeContainer";
         public const string backgroundMusicVolumeLabel = "backgroundMusicVolumeLabel";
         public const string backIcon = "backIcon";
-        public const string backToMainMenuButton = "backToMainMenuButton";
         public const string banner = "banner";
         public const string bonusLabel = "bonusLabel";
         public const string bottomButtonRow = "bottomButtonRow";
@@ -525,6 +524,7 @@ public static partial class R
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
+        public const string quitSongSelectButton = "quitSongSelectButton";
         public const string randomizeButton = "randomizeButton";
         public const string randomizeIcon = "randomizeIcon";
         public const string ratingImage = "ratingImage";
