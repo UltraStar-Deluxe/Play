@@ -61,6 +61,9 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     private SongEditorSceneControl songEditorSceneControl;
 
     [Inject]
+    private SongEditorLayerManager songEditorLayerManager;
+
+    [Inject]
     private CursorManager cursorManager;
 
     [Inject]
@@ -98,6 +101,13 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         UpdateHandles();
+        InitNoteEditing();
+
+        SyncWithNote();
+    }
+
+    private void InitNoteEditing()
+    {
         disposables.Add(InputManager.GetInputAction(R.InputActions.songEditor_anyKeyboardKey).PerformedAsObservable()
             .Subscribe(_ => UpdateHandles()));
 
@@ -112,8 +122,6 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
             .WithBindingForInstance(this)
             .CreateAndInject<EditorNoteContextMenuControl>();
         disposables.Add(contextMenuControl);
-
-        SyncWithNote();
     }
 
     public void SyncWithNote()
@@ -125,13 +133,18 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorSceneControl.GetColorForVoice(Note.Sentence.Voice);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Name);
             SetColor(color);
         }
     }
 
     private void OnPointerMove(IPointerEvent evt)
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         Vector2 localPoint = evt.localPosition;
         float width = VisualElement.worldBound.width;
         double xPercent = localPoint.x / width;
@@ -192,6 +205,13 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateHandles()
     {
+        if (!Note.IsEditable)
+        {
+            leftHandle.HideByDisplay();
+            rightHandle.HideByDisplay();
+            return;
+        }
+
         bool isSelected = (selectionControl != null) && selectionControl.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
             || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));
@@ -240,7 +260,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         lastClickTime = Time.time;
         if (isDoubleClick)
         {
-            StartEditingNoteText();
+            StartEditingLyrics();
             songAudioPlayer.PauseAudio();
             return;
         }
@@ -296,7 +316,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         selectionIndicator.SetVisibleByDisplay(isSelected);
     }
 
-    public void StartEditingNoteText()
+    public void StartEditingLyrics()
     {
         // Position TextField
         float margin = 5;
@@ -315,12 +335,22 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerEnter()
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         IsPointerOver = true;
         statusBarControl.OnPointerOverNoteControl(this);
     }
 
     private void OnPointerExit()
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         IsPointerOver = false;
         IsPointerOverCenter = false;
         IsPointerOverLeftHandle = false;
@@ -332,6 +362,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerDown(IPointerEvent eventData)
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         pointerDownPosition = eventData.position;
         // Play midi sound via Ctrl
         if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed())
@@ -343,6 +378,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerUp(IPointerEvent eventData)
     {
+        if (!Note.IsEditable)
+        {
+            return;
+        }
+
         if (isPlayingMidiSound)
         {
             midiManager.StopMidiNote(Note.MidiNote);
@@ -377,15 +417,23 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         lyricsInputControl.SubmitAndCloseLyricsDialog();
     }
 
-    public void HideLabels()
-    {
-        lyricsLabel.HideByDisplay();
-        pitchLabel.HideByDisplay();
-    }
-
-    public void ShowLabels()
+    public void ShowLyricsLabel()
     {
         lyricsLabel.ShowByDisplay();
+    }
+
+    public void HideLyricsLabel()
+    {
+        lyricsLabel.HideByDisplay();
+    }
+
+    public void ShowPitchLabel()
+    {
         pitchLabel.ShowByDisplay();
+    }
+
+    public void HidePitchLabel()
+    {
+        pitchLabel.HideByDisplay();
     }
 }

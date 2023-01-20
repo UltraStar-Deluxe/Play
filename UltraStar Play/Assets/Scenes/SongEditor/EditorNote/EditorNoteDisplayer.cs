@@ -12,7 +12,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public static readonly Color sentenceStartLineColor = Colors.CreateColor("#8F6A4E");
     public static readonly Color sentenceEndLineColor = Colors.CreateColor("#4F878F");
 
-    private const int HideElementThresholdInMillis = 60 * 1000;
+    private const int HideElementThresholdInMillis = 40 * 1000;
 
     [InjectedInInspector]
     public VisualTreeAsset editorNoteUi;
@@ -22,6 +22,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.noteAreaNotes)]
     private VisualElement noteAreaNotes;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaNotesBackground)]
+    private VisualElement noteAreaNotesBackground;
+
+    [Inject(UxmlName = R.UxmlNames.noteAreaNotesForeground)]
+    private VisualElement noteAreaNotesForeground;
 
     [Inject(UxmlName = R.UxmlNames.sentenceLines)]
     private VisualElement sentenceLines;
@@ -54,8 +60,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new();
 
-    private readonly List<ESongEditorLayer> songEditorLayerKeys = EnumUtils.GetValuesAsList<ESongEditorLayer>();
-
     private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new();
     public IReadOnlyCollection<EditorNoteControl> EditorNoteControls => noteToControlMap.Values;
 
@@ -66,14 +70,23 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private int lastViewportWidthInMillis;
 
+    private readonly Dictionary<ESongEditorLayer, VisualElement> songEditorLayerToParentElement = new();
+
     private void Start()
     {
+        noteAreaNotesBackground.Clear();
         noteAreaNotes.Clear();
+        noteAreaNotesForeground.Clear();
         noteToControlMap.Clear();
         noteAreaSentences.Clear();
         sentenceToControlMap.Clear();
 
         ReloadSentences();
+
+        songEditorLayerToParentElement.Add(ESongEditorLayer.ButtonRecording, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.MicRecording, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.MidiFile, noteAreaNotesBackground);
+        songEditorLayerToParentElement.Add(ESongEditorLayer.CopyPaste, noteAreaNotesForeground);
 
         UpdateNotesAndSentences();
         noteAreaControl.ViewportEventStream
@@ -88,7 +101,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             if (evt is LoadedMementoEvent)
             {
                 // The object instances have changed. All maps must be cleared.
+                noteAreaNotesBackground.Clear();
                 noteAreaNotes.Clear();
+                noteAreaNotesForeground.Clear();
                 noteToControlMap.Clear();
                 noteAreaSentences.Clear();
                 sentenceToControlMap.Clear();
@@ -119,15 +134,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         EnumUtils.GetValuesAsList<ESongEditorLayer>().ForEach(layer =>
         {
             songEditorLayerManager
-                .ObserveEveryValueChanged(it => it.IsLayerEnabled(layer))
+                .ObserveEveryValueChanged(it => it.IsEnumLayerVisible(layer))
                 .Subscribe(_ => UpdateNotes())
                 .AddTo(gameObject);
         });
-
-        settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.HideVoices.Count)
-            .Subscribe(_ => OnHideVoicesChanged())
-            .AddTo(gameObject);
 
         settings.SongEditorSettings
             .ObserveEveryValueChanged(it => it.SentenceLineSizeInDevicePixels)
@@ -144,8 +154,23 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        songEditorLayerManager.LayerChangedEventStream
+        settings.SongEditorSettings
+            .ObserveEveryValueChanged(it => it.ShowNotePitchLabel)
             .Subscribe(_ => UpdateNotesAndSentences())
+            .AddTo(gameObject);
+
+        songEditorLayerManager.LayerChangedEventStream
+            .Subscribe(evt =>
+            {
+                if (evt.IsVoiceLayerEvent)
+                {
+                    OnVoiceLayerChanged();
+                }
+                else
+                {
+                    UpdateNotesAndSentences();
+                }
+            })
             .AddTo(gameObject);
     }
 
@@ -163,17 +188,17 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void OnHideVoicesChanged()
+    private void OnVoiceLayerChanged()
     {
         // Remove notes of hidden voices
         List<Note> notVisibleNotes = noteToControlMap.Keys
-            .Where(note => !songEditorLayerManager.IsVoiceVisible(note.Sentence?.Voice))
+            .Where(note => !songEditorLayerManager.IsVoiceLayerVisible(note.Sentence?.Voice.Name))
             .ToList();
         notVisibleNotes.ForEach(note => RemoveNoteControl(note));
 
         // Remove sentences of hidden voices
         List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
-            .Where(sentence => !songEditorLayerManager.IsVoiceVisible(sentence.Voice))
+            .Where(sentence => !songEditorLayerManager.IsVoiceLayerVisible(sentence.Voice.Name))
             .ToList();
         notVisibleSentences.ForEach(sentence => RemoveSentence(sentence));
 
@@ -183,7 +208,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     public void ClearNoteControls()
     {
+        noteAreaNotesBackground.Clear();
         noteAreaNotes.Clear();
+        noteAreaNotesForeground.Clear();
         noteToControlMap.Values.ForEach(editorNoteControl => editorNoteControl.Dispose());
         noteToControlMap.Clear();
     }
@@ -220,7 +247,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private void UpdateSentenceControls()
     {
         List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
             .ToList();
 
         visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
@@ -256,7 +283,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
 
         List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
             .ToList();
 
         sentenceLinesDynamicTexture.ClearTexture();
@@ -264,9 +291,19 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         sentenceLinesDynamicTexture.ApplyTexture();
     }
 
+    private List<Sentence> GetSortedSentencesForVoice(Voice voice)
+    {
+        if (voiceToSortedSentencesMap.TryGetValue(voice, out List<Sentence> sortedSentences))
+        {
+            return sortedSentences;
+        }
+
+        return new();
+    }
+
     private void CreateSentenceControlForVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         int sentenceIndex = 0;
         sortedSentencesOfVoice.ForEach(sentence =>
         {
@@ -299,8 +336,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         HideNoteControlsOutsideOfViewport();
 
+        DrawNotesInLayers(EnumUtils.GetValuesAsList<ESongEditorLayer>());
         DrawNotesInSongFile();
-        DrawNotesInLayers();
     }
 
     public EditorNoteControl GetNoteControl(Note note)
@@ -354,11 +391,11 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         editorNoteControl.VisualElement.ShowByDisplay();
     }
 
-    private void DrawNotesInLayers()
+    private void DrawNotesInLayers(List<ESongEditorLayer> layerEnums)
     {
-        foreach (ESongEditorLayer layerKey in songEditorLayerKeys)
+        foreach (ESongEditorLayer layerKey in layerEnums)
         {
-            if (songEditorLayerManager.IsLayerEnabled(layerKey))
+            if (songEditorLayerManager.IsEnumLayerVisible(layerKey))
             {
                 DrawNotesInLayer(layerKey);
             }
@@ -371,7 +408,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     public void ClearNotesInLayer(ESongEditorLayer layerKey)
     {
-        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
+        List<Note> notesInLayer = songEditorLayerManager.GetEnumLayerNotes(layerKey)
             .Where(note => note.Sentence == null).ToList();
         notesInLayer.ForEach(note =>
         {
@@ -394,18 +431,18 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             editorSentenceControl.VisualElement.worldBound.Contains(pos));
     }
 
-    private void DrawNotesInLayer(ESongEditorLayer layerKey)
+    private void DrawNotesInLayer(ESongEditorLayer layerEnum)
     {
-        List<Note> notesInLayer = songEditorLayerManager.GetNotes(layerKey)
-            .Where(note => note.Sentence == null).ToList();
-        List<Note> notesInViewport = notesInLayer
-            .Where(note => noteAreaControl.IsInViewport(note))
-            .ToList();
+        IEnumerable<Note> notesInLayer = songEditorLayerManager.GetEnumLayerNotes(layerEnum)
+            .Where(note => note.Sentence == null);
+        IEnumerable<Note> notesInViewport = notesInLayer
+            .Where(note => noteAreaControl.IsInViewport(note));
 
-        Color layerColor = songEditorLayerManager.GetColor(layerKey);
+        Color layerColor = songEditorLayerManager.GetEnumLayerColor(layerEnum);
+        SongEditorEnumLayer layer = songEditorLayerManager.GetEnumLayer(layerEnum);
         foreach (Note note in notesInViewport)
         {
-            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note);
+            EditorNoteControl noteControl = UpdateOrCreateNoteControl(note, layer);
             if (noteControl != null)
             {
                 noteControl.SetColor(layerColor);
@@ -416,14 +453,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private void DrawNotesInSongFile()
     {
         IEnumerable<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceVisible(voice))
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
             .ToList();
         visibleVoices.ForEach(voice => DrawNotesInVoice(voice));
     }
 
     private void DrawNotesInVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         List<Sentence> sentencesInViewport = sortedSentencesOfVoice
             .Where(sentence => noteAreaControl.IsInViewport(sentence))
             .ToList();
@@ -435,7 +472,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         foreach (Note note in notesInViewport)
         {
-            UpdateOrCreateNoteControl(note);
+            UpdateOrCreateNoteControl(note, null);
         }
     }
 
@@ -458,14 +495,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         // Update color
         if (sentence.Voice != null)
         {
-            Color color = songEditorSceneControl.GetColorForVoice(sentence.Voice);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name);
             editorSentenceControl.SetColor(color);
 
             // Make sentence rectangles alternating light/dark
             bool isDark = (sentenceIndex % 2) == 0;
             if (isDark)
             {
-                Color darkColor = songEditorSceneControl.GetColorForVoice(sentence.Voice).Multiply(0.66f);
+                Color darkColor = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name).Multiply(0.66f);
                 editorSentenceControl.SetColor(darkColor);
             }
         }
@@ -483,7 +520,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawSentenceMarkerLineForVoice(Voice voice)
     {
-        List<Sentence> sortedSentencesOfVoice = voiceToSortedSentencesMap[voice];
+        List<Sentence> sortedSentencesOfVoice = GetSortedSentencesForVoice(voice);
         sortedSentencesOfVoice.ForEach(sentence =>
         {
             float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.MinBeat);
@@ -519,7 +556,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private EditorNoteControl UpdateOrCreateNoteControl(Note note)
+    private EditorNoteControl UpdateOrCreateNoteControl(Note note, SongEditorEnumLayer layer)
     {
         if (!noteToControlMap.TryGetValue(note, out EditorNoteControl editorNoteControl))
         {
@@ -529,31 +566,55 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
             noteToControlMap.Add(note, editorNoteControl);
-            noteAreaNotes.Add(noteVisualElement);
+            VisualElement parentElement = layer != null
+                ? songEditorLayerToParentElement[layer.LayerEnum]
+                : noteAreaNotes;
+            parentElement.Add(noteVisualElement);
         }
         else
         {
             editorNoteControl.SyncWithNote();
         }
 
-        PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        float heightFactor = layer != null
+            ? 0.66f
+            : 1f;
+        PositionNoteControl(editorNoteControl.VisualElement, note.MidiNote, note.StartBeat, note.EndBeat, heightFactor);
         ShowNoteControl(editorNoteControl);
 
-        if (noteAreaControl.ViewportWidth > HideElementThresholdInMillis)
+        if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            editorNoteControl.HideLabels();
+            if (settings.SongEditorSettings.ShowNotePitchLabel)
+            {
+                editorNoteControl.ShowPitchLabel();
+            }
+            else
+            {
+                editorNoteControl.HidePitchLabel();
+            }
+            editorNoteControl.ShowLyricsLabel();
         }
         else
         {
-            editorNoteControl.ShowLabels();
+            editorNoteControl.HidePitchLabel();
+            editorNoteControl.HideLyricsLabel();
+        }
+
+        if (note.IsEditable)
+        {
+            editorNoteControl.VisualElement.pickingMode = PickingMode.Position;
+        }
+        else
+        {
+            editorNoteControl.VisualElement.pickingMode = PickingMode.Ignore;
         }
 
         return editorNoteControl;
     }
 
-    private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat)
+    private void PositionNoteControl(VisualElement visualElement, int midiNote, int startBeat, int endBeat, float heightFactor)
     {
-        float heightPercent = noteAreaControl.HeightForSingleNote;
+        float heightPercent = noteAreaControl.HeightForSingleNote * heightFactor;
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote) - heightPercent / 2;
         float xStartPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(startBeat);
         float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(endBeat);

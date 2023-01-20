@@ -62,12 +62,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
     private Label androidSongFolderHintLabel;
 
-    [Inject(UxmlName = R.UxmlNames.addAndroidSdCardSongFolderButton)]
-    private Button addAndroidSdCardSongFolderButton;
-
-    [Inject(UxmlName = R.UxmlNames.addAndroidInternalSongFolderButton)]
-    private Button addAndroidInternalSongFolderButton;
-
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private FocusableNavigator focusableNavigator;
 
@@ -104,13 +98,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
 
-        addButton.RegisterCallbackButtonTriggered(() =>
-        {
-            settings.GameSettings.songDirs.Add("");
-            UpdateSongFolderList();
-
-            RequestExternalStoragePermissionIfNeeded();
-        });
+        addButton.RegisterCallbackButtonTriggered(() => AddNewSongFolder());
 
         downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
 
@@ -138,15 +126,23 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         else
         {
             androidSongFolderHintContainer.ShowByDisplay();
-            addAndroidInternalSongFolderButton.RegisterCallbackButtonTriggered(() =>
-                AddSongFolderIfNotContains(AndroidUtils.GetAppSpecificStorageAbsolutePath(false)));
-            addAndroidSdCardSongFolderButton.RegisterCallbackButtonTriggered(() =>
-                AddSongFolderIfNotContains(AndroidUtils.GetAppSpecificStorageAbsolutePath(true)));
         }
-        UpdateAddAndroidSongFoldersButtons();
 #else
         androidSongFolderHintContainer.HideByDisplay();
 #endif
+    }
+
+    private void AddNewSongFolder()
+    {
+        string path = "";
+        if (PlatformUtils.IsAndroid)
+        {
+            path = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
+        }
+        settings.GameSettings.songDirs.Add(path);
+        UpdateSongFolderList();
+
+        RequestExternalStoragePermissionIfNeeded();
     }
 
     private void UpdateSongIssues()
@@ -198,10 +194,19 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
         };
+        if (PlatformUtils.IsAndroid)
+        {
+            titleToContentMap.Add(
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_androidSongFolders_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_androidSongFolders,
+                    "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false)));
+        }
         helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
             titleToContentMap,
             CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
     }
 
     private void CloseHelp()
@@ -315,25 +320,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         songIssueButton.Focus();
     }
 
-    // This method is only used on Android
-    private void AddSongFolderIfNotContains(string basePath)
-    {
-        settings.GameSettings.songDirs.AddIfNotContains(basePath + "/Songs");
-        UpdateSongFolderList();
-    }
-
-    private void UpdateAddAndroidSongFoldersButtons()
-    {
-        string sdCardSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(true);
-        string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false);
-        bool anySongDirInSdCardSongFolder = settings.GameSettings.songDirs
-            .AnyMatch(songDir => songDir.StartsWith(sdCardSongFolder));
-        bool anySongDirInInternalSongFolder = settings.GameSettings.songDirs
-            .AnyMatch(songDir => songDir.StartsWith(internalSongFolder));
-        addAndroidSdCardSongFolderButton.SetVisibleByDisplay(!sdCardSongFolder.IsNullOrEmpty() && !anySongDirInSdCardSongFolder);
-        addAndroidInternalSongFolderButton.SetVisibleByDisplay(!internalSongFolder.IsNullOrEmpty() && !anySongDirInInternalSongFolder);
-    }
-
     private static void RequestExternalStoragePermissionIfNeeded()
     {
 #if UNITY_ANDROID
@@ -358,8 +344,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         androidSongFolderHintLabel.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidFolderHint,
             // AppSpecificStorageRelativePath is the same for internal memory and sd card.
             "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false));
-        addAndroidSdCardSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_addSdCardSongFolder);
-        addAndroidInternalSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_addInternalSongFolder);
     }
 
     private void UpdateSongFolderList()
@@ -368,10 +352,17 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
         songFolderListEntryControls.Clear();
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
-            Label noSongsFoundLabel = new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
+            Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
             noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
             noSongsFoundLabel.style.marginTop = 10;
+            noSongsFoundLabel.style.marginBottom = 5;
             songList.Add(noSongsFoundLabel);
+
+            Button viewMoreButton = new();
+            viewMoreButton.AddToClassList("centerHorizontalByMargin");
+            viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
+            viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+            songList.Add(viewMoreButton);
         }
         else
         {
@@ -382,26 +373,23 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                 index++;
             });
         }
-
-        UpdateAddAndroidSongFoldersButtons();
     }
 
     private void CreateSongFolderEntryControl(string path, int indexInList)
     {
         VisualElement visualElement = songFolderListEntryAsset.CloneTree();
-        SongFolderListEntryControl songFolderListEntryControl = new(path);
-        injector
+        SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
-            .Inject(songFolderListEntryControl);
+            .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
+            .CreateAndInject<SongFolderListEntryControl>();
 
-        songFolderListEntryControl.TextField.RegisterValueChangedCallback(evt =>
+        songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue =>
         {
-            settings.GameSettings.songDirs[indexInList] = evt.newValue;
-            UpdateAddAndroidSongFoldersButtons();
+            settings.GameSettings.songDirs[indexInList] = newValue;
 
             songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
         });
-        songFolderListEntryControl.DeleteButton.RegisterCallbackButtonTriggered(() =>
+        songFolderListEntryControl.DeleteEventStream.Subscribe(_ =>
         {
             settings.GameSettings.songDirs.RemoveAt(indexInList);
             UpdateSongFolderList();

@@ -239,11 +239,11 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         // Y-Coordinate
         if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
         {
-            scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
+            scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
         }
         else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
         {
-            scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
+            scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
         }
         else
         {
@@ -262,7 +262,7 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             && lastScrollVerticalTime + 0.1f < Time.time)
         {
             lastScrollVerticalTime = Time.time;
-            noteAreaControl.SetViewportY(noteAreaControl.ViewportY + (int)(scrollAmount.y));
+            noteAreaControl.SetViewportY(noteAreaControl.ViewportY - (int)(scrollAmount.y));
         }
 
         if (scrollAmount.x != 0

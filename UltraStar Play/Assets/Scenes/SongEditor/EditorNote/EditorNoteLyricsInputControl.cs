@@ -1,107 +1,154 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UniInject;
-using UnityEngine.UIElements;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditorNoteLyricsInputControl : INeedInjection, IInjectionFinishedListener
+public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 {
-    [Inject]
-    private SongMetaChangeEventStream songMetaChangeEventStream;
-
-    [Inject]
-    private SongEditorSceneControl songEditorSceneControl;
-
     [Inject]
     private EditorNoteControl editorNoteControl;
 
-    [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
-    private VisualElement editLyricsPopup;
+    [Inject]
+    private SongEditorLayerManager layerManager;
 
-    [Inject(UxmlName = R.UxmlNames.editLyricsPopupTextField)]
-    private TextField textField;
-
-    private bool isActive;
-
-    private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    public void OnInjectionFinished()
+    protected override string GetInitialText()
     {
-        textField.value = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
-        textField.Focus();
-        RegisterEvents();
+        return ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
     }
 
-    private void OnTextFieldValueChanged(string newInputFieldText)
+    protected override void PreviewNewText(string newText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
-        if (textField.value != visibleWhitespaceText)
+        // Immediately apply changed lyrics to notes, but do not record it in the history.
+        string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newText);
+        editorNoteControl.Note.SetText(visibleWhiteSpaceText);
+        editorNoteControl.SetLyrics(visibleWhiteSpaceText);
+        songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
+    }
+
+    protected override void ApplyNewText(string newText)
+    {
+        ApplyEditModeText(newText, true);
+    }
+
+    private void ApplyEditModeText(string newText, bool undoable)
+    {
+        string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
+
+        if (LyricsUtils.IsOnlyWhitespace(newText))
         {
-            textField.value = visibleWhitespaceText;
+            return;
         }
-    }
-
-    public void SubmitAndCloseLyricsDialog()
-    {
-        string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
 
         // Replace multiple control characters with a single character
-        newText = Regex.Replace(newText, @"\s+", " ");
-        newText = Regex.Replace(newText, @";+", ";");
+        viewModeText = Regex.Replace(viewModeText, @"\s+", " ");
+        viewModeText = Regex.Replace(viewModeText, @";+", ";");
 
-        // Replace any text after control characters.
+        // Split note to apply space and semicolon control characters.
         // Otherwise the text would mess up following notes when using the LyricsArea.
-        newText = Regex.Replace(newText, @" .+", " ");
-        newText = Regex.Replace(newText, @";.+", ";");
+        List<Note> notesAfterSplit = SplitNoteForNewText(editorNoteControl.Note, viewModeText);
 
-        if (!IsOnlyWhitespace(newText))
+        if (notesAfterSplit.Count > 1)
         {
-            editorNoteControl.Note.SetText(newText);
-            editorNoteControl.SetLyrics(newText);
-            songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+            // Note has been split
+            songMetaChangeEventStream.OnNext(new NotesSplitEvent { Undoable = undoable});
         }
-
-        UnregisterEvents();
-        songEditorSceneControl.HideEditLyricsPopup();
-        if (textField.focusController.focusedElement == textField)
+        else
         {
-            textField.Blur();
+            viewModeText = viewModeText.Replace(";", "");
+            editorNoteControl.Note.SetText(viewModeText);
+            editorNoteControl.SyncWithNote();
+            songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
     }
 
-    private bool IsOnlyWhitespace(string newText)
+    public List<Note> SplitNoteForNewText(Note note, string newText)
     {
-        return newText.IsNullOrEmpty() || whitespaceRegex.IsMatch(newText);
+        List<Note> notesAfterSplit = new List<Note> { note };
+        if (note.Length <= 1
+            || LyricsUtils.IsOnlyWhitespace(newText))
+        {
+            return notesAfterSplit;
+        }
+
+        List<int> splitIndexes = AllIndexesOfCharacterBeforeTextEnd(newText, ' ')
+            .ToList()
+            .Union(AllIndexesOfCharacterBeforeTextEnd(newText, ';').ToList())
+            .Distinct()
+            .ToList();
+        splitIndexes.Sort();
+        if (splitIndexes.IsNullOrEmpty())
+        {
+            // Nothing to split
+            return notesAfterSplit;
+        }
+
+        splitIndexes = splitIndexes
+            .Select(index => index + 1)
+            .ToList();
+
+        if (!splitIndexes.Contains(newText.Length))
+        {
+            splitIndexes.Add(newText.Length);
+        }
+
+        List<int> splitBeats = splitIndexes
+            .Select(index => (int)Math.Floor(note.StartBeat + note.Length * ((double)index / newText.Length)))
+            .ToList();
+
+        // Change original note
+        note.SetEndBeat(splitBeats[0]);
+        note.SetText(newText.Substring(0, splitIndexes[0]));
+
+        int lastSplitIndex = splitIndexes[0];
+        int lastSplitBeat = note.EndBeat;
+
+        // Start from 1 because original note was changed already above
+        for (int i = 1; i < splitIndexes.Count; i++)
+        {
+            int splitIndex = splitIndexes[i];
+            int splitBeat = splitBeats[i];
+
+            int newNoteStartBeat = lastSplitBeat;
+            int newNoteEndBeat = splitBeat;
+            int length = splitIndex - lastSplitIndex;
+            string newNoteText = newText.Substring(lastSplitIndex, length);
+
+            Note newNote = new(note.Type, newNoteStartBeat, newNoteEndBeat - newNoteStartBeat, note.TxtPitch, newNoteText);
+            notesAfterSplit.Add(newNote);
+            newNote.SetSentence(note.Sentence);
+            if (layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer songEditorLayer))
+            {
+                layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote);
+            }
+
+            lastSplitIndex = splitIndex;
+            lastSplitBeat = splitBeat;
+        }
+
+        // Remove semicolon from lyrics. These are only used to separate notes in the song editor.
+        notesAfterSplit.ForEach(currentNote =>
+            currentNote.SetText(currentNote.Text.Replace(";", "")));
+
+        return notesAfterSplit;
     }
 
-    private void RegisterEvents()
+    private static List<int> AllIndexesOfCharacterBeforeTextEnd(string text, char searchChar)
     {
-        textField.RegisterValueChangedCallback(ValueChangedCallback);
-        textField.RegisterCallback<BlurEvent>(OnBlur);
-        isActive = true;
-    }
+        List<int> result = new();
+        for (int i = 0; i < text.Length - 1; i++)
+        {
+            char c = text[i];
+            if (c == searchChar)
+            {
+                result.Add(i);
+            }
+        }
 
-    private void UnregisterEvents()
-    {
-        textField.UnregisterValueChangedCallback(ValueChangedCallback);
-        textField.UnregisterCallback<BlurEvent>(OnBlur);
-        isActive = false;
-    }
-
-    private void ValueChangedCallback(ChangeEvent<string> evt)
-    {
-        OnTextFieldValueChanged(evt.newValue);
-    }
-
-    private void OnBlur(BlurEvent evt)
-    {
-        SubmitAndCloseLyricsDialog();
-        UnregisterEvents();
-    }
-
-    public bool IsActive()
-    {
-        return isActive;
+        return result;
     }
 }

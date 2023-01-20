@@ -7,12 +7,15 @@ public class ShowWhiteSpaceText : MonoBehaviour
     public static readonly string spaceReplacement = "•";
     // Unicode DOWNWARDS ARROW WITH CORNER LEFTWARDS (U+21B5)
     public static readonly string newlineReplacement = "↵\n";
+    public static readonly string newlineVisibleWhiteSpaceCharacter = "↵";
 
     public static string ReplaceVisibleCharactersWithWhiteSpace(string text)
     {
         return text.Replace(spaceReplacement, " ")
-            .Replace("↵\n", "\n")
-            .Replace("↵", "\n");
+            // Remove line break characters that do not have a corresponding replacement character anymore.
+            .Replace(newlineReplacement, "⌇")
+            .Replace("\n", "")
+            .Replace("⌇", "\n");
     }
 
     public static string ReplaceWhiteSpaceWithVisibleCharacters(string text)

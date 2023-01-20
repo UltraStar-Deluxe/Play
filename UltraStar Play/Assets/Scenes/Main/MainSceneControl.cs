@@ -15,14 +15,6 @@ using IBinding = UniInject.IBinding;
 
 public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
-    private static bool wasKickstarterDialogVisible;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        wasKickstarterDialogVisible = false;
-    }
-
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -95,14 +87,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject]
     private ThemeManager themeManager;
 
-    private MessageDialogControl kickstarterDialogControl;
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
 
     private bool IsNewSongDialogOpen => newSongDialogControl != null;
     private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
-    private bool IsKickstarterDialogOpen => kickstarterDialogControl != null;
-    private bool IsAnyDialogOpen => IsNewSongDialogOpen || IsQuitGameDialogOpen || IsKickstarterDialogOpen || newVersionChecker.IsNewVersionAvailableDialogOpen;
+    private bool IsAnyDialogOpen => IsNewSongDialogOpen || IsQuitGameDialogOpen || newVersionChecker.IsNewVersionAvailableDialogOpen;
 
     private void Start()
     {
@@ -143,56 +133,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => OnBack());
-    }
-
-    private void Update()
-    {
-        DateTime kickstarterEnd = new(2022, 12, 31);
-        if (!wasKickstarterDialogVisible
-            && !IsAnyDialogOpen
-            && DateTime.Compare(DateTime.Now, kickstarterEnd) < 0)
-        {
-            wasKickstarterDialogVisible = true;
-            OpenKickstarterDialog();
-        }
-    }
-
-    private void OpenKickstarterDialog()
-    {
-        if (kickstarterDialogControl != null)
-        {
-            return;
-        }
-
-        VisualElement visualElement = quitGameDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(visualElement);
-
-        kickstarterDialogControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<MessageDialogControl>();
-        kickstarterDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_kickstarterDialog_title);
-        kickstarterDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_kickstarterDialog_message)}\n";
-
-        Button visitWebsiteButton = kickstarterDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok), () =>
-        {
-            Application.OpenURL("https://ultrastar-play.com/kickstarter");
-        });
-        Button closeButton = kickstarterDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), () => CloseKickstarterDialog());
-        closeButton.AddToClassList("transparentBackgroundColor");
-        closeButton.AddToClassList("dialogTextButton");
-        visitWebsiteButton.Focus();
-    }
-
-    private void CloseKickstarterDialog()
-    {
-        if (kickstarterDialogControl == null)
-        {
-            return;
-        }
-
-        kickstarterDialogControl.CloseDialog();
-        kickstarterDialogControl = null;
-        startButton.Focus();
     }
 
     private void InitButtonDescription(Button button, string description)
@@ -333,10 +273,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         else if (IsQuitGameDialogOpen)
         {
             CloseQuitGameDialog();
-        }
-        else if (IsKickstarterDialogOpen)
-        {
-            CloseKickstarterDialog();
         }
         else if (newVersionChecker.IsNewVersionAvailableDialogOpen)
         {

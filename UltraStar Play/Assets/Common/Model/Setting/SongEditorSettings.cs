@@ -28,16 +28,13 @@ public class SongEditorSettings
     public int MidiPlaybackOffsetInMillis { get; set; }
     public string LastMidiFilePath { get; set; } = "";
 
-    // Option to show / hide voices.
-    // Contains the names of the voices that should be hidden.
-    public List<string> HideVoices { get; private set; } = new();
-
     public bool ShowLyricsArea { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
     public bool ShowVirtualPianoArea { get; set; } = true;
     public bool SmallLeftSideBar { get; set; }
     public bool ShowControlHints { get; set; } = true;
+    public bool ShowNotePitchLabel { get; set; } = true;
 
     public int GridSizeInDevicePixels { get; set; } = 1;
     public int SentenceLineSizeInDevicePixels { get; set; } = 2;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class SettingsManager : MonoBehaviour
@@ -93,15 +94,52 @@ public class SettingsManager : MonoBehaviour
         if (!Application.isEditor)
         {
             // Create internal song folder on Android and add it to the settings.
-            string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
-            if (!Directory.Exists(internalSongFolder))
+            try
             {
-                Directory.CreateDirectory(internalSongFolder);
+                string internalSongFolder = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
+                if (!Directory.Exists(internalSongFolder))
+                {
+                    Directory.CreateDirectory(internalSongFolder);
+                }
+
+                defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
             }
-            defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
+            catch (Exception ex)
+            {
+                Debug.LogError("Failed to create initial song folder.");
+                Debug.LogError(ex);
+            }
         }
 #endif
+
+        // Try to select the first mic for singing.
+        try
+        {
+            MicProfile defaultMicProfile = CreateDefaultMicProfile();
+            if (defaultMicProfile != null)
+            {
+                settings.MicProfiles.Add(defaultMicProfile);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to create initial recording device profile.");
+            Debug.LogError(ex);
+        }
+
         return defaultSettings;
+    }
+
+    private MicProfile CreateDefaultMicProfile()
+    {
+        if (Microphone.devices.Length <= 0)
+        {
+            return null;
+        }
+
+        MicProfile result = new(Microphone.devices.FirstOrDefault());
+        result.IsEnabled = true;
+        return result;
     }
 
     private void OverwriteSettingsWithCommandLineArguments()

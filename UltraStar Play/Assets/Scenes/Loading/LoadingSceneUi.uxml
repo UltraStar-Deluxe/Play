@@ -1,6 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background">
-        <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="unexpectedErrorLabel" style="padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px; position: absolute; top: 0; left: 0; width: 100%;" />
         <ui:VisualElement name="logoContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center;">
             <ui:VisualElement name="gameLogo" style="width: 50%; height: 50%; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2022_09.png?fileID=2800000&amp;guid=031fb3adf3099b840887ff7dc60c7ad2&amp;type=3#UltraStarPlayLogo_2022_09&apos;); -unity-background-scale-mode: scale-to-fit;" />
         </ui:VisualElement>
@@ -10,5 +9,9 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Button display-tooltip-when-elided="true" name="hiddenContinueButton" class="transparentBackgroundColor" style="position: absolute; width: 100%; height: 100%;" />
+        <ui:VisualElement name="unexpectedErrorContainer" picking-mode="Ignore" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px; position: absolute; left: 0; top: 0; align-items: flex-start; display: none;">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="unexpectedErrorLabel" text="Oops! Something went wrong. See the log file for details about the issue." picking-mode="Ignore" style="margin-bottom: 10px;" />
+            <ui:Button text="View More" display-tooltip-when-elided="true" name="viewMoreButton" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
