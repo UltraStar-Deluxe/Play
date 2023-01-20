@@ -88,7 +88,6 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         {
             return;
         }
-        Debug.Log($"OpenContextMenu {GetType().Name} {Time.frameCount}");
         OpenContextMenu(pointerPosition + popupOffset);
     }
 

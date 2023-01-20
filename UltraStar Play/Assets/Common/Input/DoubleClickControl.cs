@@ -9,10 +9,13 @@ using UnityEngine.UIElements;
 
 public class DoubleClickControl
 {
+    private const float DoubleClickMaxDistanceInPx = 5f;
+
     private readonly Subject<bool> doublePointerDownEventStream = new();
     public IObservable<bool> DoublePointerDownEventStream => doublePointerDownEventStream;
 
     private readonly Dictionary<int, float> buttonToLastPointerDownTime = new();
+    private readonly Dictionary<int, Vector3> buttonToLastPointerDownPosition = new();
 
     /**
      * List of buttons that should trigger a double click event.
@@ -20,8 +23,12 @@ public class DoubleClickControl
      */
     public List<int> ButtonFilter { get; set; } = new() { 0 };
 
+    // Remember VisualElement for debugging
+    private readonly VisualElement visualElement;
+
     public DoubleClickControl(VisualElement visualElement)
     {
+        this.visualElement = visualElement;
         visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown(evt), TrickleDown.TrickleDown);
     }
 
@@ -32,14 +39,17 @@ public class DoubleClickControl
             return;
         }
 
-        if (buttonToLastPointerDownTime.TryGetValue(evt.button, out float lastPointerDownTime))
+        if (buttonToLastPointerDownTime.TryGetValue(evt.button, out float lastPointerDownTime)
+            && buttonToLastPointerDownPosition.TryGetValue(evt.button, out Vector3 lastPointerDownPosition))
         {
             bool isDoubleClick = Time.time - lastPointerDownTime < InputUtils.DoubleClickThresholdInSeconds;
-            if (isDoubleClick)
+            bool isNearLastPosition = Vector3.Distance(evt.position, lastPointerDownPosition) < DoubleClickMaxDistanceInPx;
+            if (isDoubleClick && isNearLastPosition)
             {
                 doublePointerDownEventStream.OnNext(true);
             }
         }
         buttonToLastPointerDownTime[evt.button] = Time.time;
+        buttonToLastPointerDownPosition[evt.button] = evt.position;
     }
 }

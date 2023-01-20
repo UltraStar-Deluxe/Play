@@ -637,7 +637,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         PlayerControls.ForEach(playerControl =>
         {
             Note lastNoteInSong = playerControl.GetLastNoteInSong();
-            if (!isAfterEndOfSong && CurrentBeat < lastNoteInSong.EndBeat)
+            if (lastNoteInSong != null
+                && !isAfterEndOfSong
+                && CurrentBeat < lastNoteInSong.EndBeat)
             {
                 isAfterLastNote = false;
             }

@@ -128,11 +128,11 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void SaveLayers(SongEditorMemento memento)
     {
-        List<SongEditorLayer> layers = layerManager.GetLayers();
-        foreach (SongEditorLayer layer in layers)
+        List<SongEditorEnumLayer> layers = layerManager.GetEnumLayers();
+        foreach (SongEditorEnumLayer layer in layers)
         {
-            SongEditorLayer layerCopy = layer.CloneDeep();
-            memento.Layers.Add(layerCopy);
+            SongEditorEnumLayer enumLayerCopy = layer.CloneDeep();
+            memento.Layers.Add(enumLayerCopy);
         }
     }
 
@@ -212,12 +212,12 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void LoadLayers(SongEditorMemento undoState)
     {
-        foreach (SongEditorLayer layer in undoState.Layers)
+        foreach (SongEditorEnumLayer layer in undoState.Layers)
         {
-            layerManager.ClearLayer(layer.LayerEnum);
+            layerManager.ClearEnumLayer(layer.LayerEnum);
             foreach (Note note in layer.GetNotes())
             {
-                layerManager.AddNoteToLayer(layer.LayerEnum, note);
+                layerManager.AddNoteToEnumLayer(layer.LayerEnum, note);
             }
         }
     }

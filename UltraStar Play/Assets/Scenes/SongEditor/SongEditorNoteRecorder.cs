@@ -219,7 +219,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     private void CreateNewRecordedNote(int midiNote, int currentBeat, ESongEditorLayer targetLayer)
     {
         lastRecordedNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, "");
-        songEditorLayerManager.AddNoteToLayer(targetLayer, lastRecordedNote);
+        songEditorLayerManager.AddNoteToEnumLayer(targetLayer, lastRecordedNote);
 
         // EndBeat of new note is currentBeat + 1. Overwrite notes that start before this beat.
         OverwriteExistingNotes(currentBeat + 1, targetLayer);
@@ -278,7 +278,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
             }
             else
             {
-                songEditorLayerManager.RemoveNoteFromAllLayers(note);
+                songEditorLayerManager.RemoveNoteFromAllEnumLayers(note);
                 editorNoteDisplayer.RemoveNoteControl(note);
             }
         }
@@ -288,7 +288,7 @@ public class SongEditorNoteRecorder : MonoBehaviour, INeedInjection
     {
         int currentBeat = GetBeat(songAudioPlayer.PositionInSongInMillis - settings.SongEditorSettings.MicDelayInMillis);
         ESongEditorLayer targetLayer = GetRecordingTargetLayer();
-        List<Note> result = songEditorLayerManager.GetNotes(targetLayer).Where(note => (note.StartBeat >= currentBeat)).ToList();
+        List<Note> result = songEditorLayerManager.GetEnumLayerNotes(targetLayer).Where(note => (note.StartBeat >= currentBeat)).ToList();
         result.Sort(Note.comparerByStartBeat);
         return result;
     }

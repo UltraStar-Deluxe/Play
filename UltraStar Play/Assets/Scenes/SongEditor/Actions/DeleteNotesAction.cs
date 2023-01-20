@@ -34,7 +34,7 @@ public class DeleteNotesAction : INeedInjection
                 affectedSentences.Add(note.Sentence);
             }
             note.SetSentence(null);
-            songEditorLayerManager.RemoveNoteFromAllLayers(note);
+            songEditorLayerManager.RemoveNoteFromAllEnumLayers(note);
             editorNoteDisplayer.RemoveNoteControl(note);
         }
 

@@ -136,4 +136,11 @@ public class Voice : ISerializationCallbackReceiver
                || (otherVoiceName.IsNullOrEmpty() && Name.IsNullOrEmpty())
                || (otherVoiceName == firstVoiceName && Name == soloVoiceName);
     }
+
+    public static string NormalizeVoiceName(string voiceName)
+    {
+        return voiceName.IsNullOrEmpty() || voiceName == soloVoiceName
+            ? firstVoiceName
+            : voiceName;
+    }
 }

@@ -154,6 +154,10 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     public Note GetLastNoteInSong()
     {
+        if (SortedSentences.IsNullOrEmpty())
+        {
+            return null;
+        }
         return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
     }
 

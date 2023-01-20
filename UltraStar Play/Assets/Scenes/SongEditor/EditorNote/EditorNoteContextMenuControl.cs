@@ -53,6 +53,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
     {
+        if (!noteControl.Note.IsEditable)
+        {
+            return;
+        }
+
         if (!selectionControl.IsSelected(noteControl.Note))
         {
             selectionControl.SetSelection(new List<EditorNoteControl> { noteControl });
@@ -60,7 +65,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
 
-        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingNoteText());
+        contextMenu.AddItem("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
         FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);

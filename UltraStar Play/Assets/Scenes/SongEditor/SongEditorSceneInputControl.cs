@@ -68,6 +68,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     private Vector2[] zoomStartTouchPositions;
     private Vector2 zoomStartTouchDistancePerDimension;
+
+    private float startNavigateWithArrowKey;
     
     private void Start()
     {
@@ -136,7 +138,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Start editing of lyrics
         InputManager.GetInputAction(R.InputActions.songEditor_editLyrics).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => songEditorSceneControl.StartEditingNoteText());
+            .Subscribe(_ => songEditorSceneControl.StartEditingSelectedNoteText());
         
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -281,20 +283,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             Vector2 direction = context.ReadValue<Vector2>();
             EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
-            
-            // Scroll
-            if (modifier == EKeyboardModifier.None)
-            {
-                if (direction.x < 0)
-                {
-                    noteAreaControl.ScrollHorizontal(-1);
-                }
-                if (direction.x > 0)
-                {
-                    noteAreaControl.ScrollHorizontal(1);
-                }
-            }
-            
+
             List<Note> selectedNotes = selectionControl.GetSelectedNotes();
             if (selectedNotes.IsNullOrEmpty())
             {
@@ -346,32 +335,74 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        // Move playback position in small steps by holding Ctrl when no note is selected
-        if (Keyboard.current != null
-            && InputUtils.IsKeyboardControlPressed()
-            && (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
-            && selectionControl.GetSelectedNotes().IsNullOrEmpty())
-        {
-            int stepInMillis = InputUtils.IsKeyboardShiftPressed()
-                ? 1
-                : 10;
-            
-            if (Keyboard.current.leftArrowKey.isPressed)
-            {
-                songAudioPlayer.PositionInSongInMillis -= stepInMillis;
-            }
-            else if (Keyboard.current.rightArrowKey.isPressed)
-            {
-                songAudioPlayer.PositionInSongInMillis += stepInMillis;
-            }
-        }
-        
+        // Change playback position beat per beat via control
+        UpdateScrollAndChangePlaybackPosition();
+
         // Use the shortcuts that are also used in the YASS song editor.
         UpdateInputForYassShortcuts();
 
         UpdateTouchInputForZoom();
 
         inputFieldHasFocusOld = inputFieldHasFocus;
+    }
+
+    private void UpdateScrollAndChangePlaybackPosition()
+    {
+        if (Keyboard.current != null
+            && (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
+            && selectionControl.GetSelectedNotes().IsNullOrEmpty())
+        {
+            float timeFactor;
+            if (startNavigateWithArrowKey <= 0)
+            {
+                startNavigateWithArrowKey = Time.time;
+                timeFactor = 1;
+            }
+            else if (Time.time - startNavigateWithArrowKey > 0.5f)
+            {
+                timeFactor = 10 * Time.deltaTime;
+            }
+            else
+            {
+                timeFactor = 0;
+            }
+
+            int direction = 0;
+            if (Keyboard.current.leftArrowKey.isPressed)
+            {
+                direction = -1;
+            }
+            else if (Keyboard.current.rightArrowKey.isPressed)
+            {
+                direction = 1;
+            }
+
+            if (!InputUtils.IsAnyKeyboardModifierPressed())
+            {
+                if (timeFactor > 0)
+                {
+                    noteAreaControl.ScrollHorizontal(direction);
+                }
+            }
+            else if (InputUtils.IsKeyboardControlPressed())
+            {
+                int stepInMillis = (int)(BpmUtils.MillisecondsPerBeat(songMeta) * timeFactor);
+                if (Keyboard.current.leftArrowKey.isPressed)
+                {
+                    songAudioPlayer.PositionInSongInMillis -= stepInMillis;
+                }
+                else if (Keyboard.current.rightArrowKey.isPressed)
+                {
+                    songAudioPlayer.PositionInSongInMillis += stepInMillis;
+                }
+
+                songAudioPlayer.PositionInSongInMillis += stepInMillis * direction;
+            }
+        }
+        else
+        {
+            startNavigateWithArrowKey = 0;
+        }
     }
 
     private void UpdateTouchInputForZoom()

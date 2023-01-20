@@ -31,6 +31,19 @@ public static class NumberUtils
         return value;
     }
 
+    public static double Limit(double value, double min, double max)
+    {
+        if (value < min)
+        {
+            return min;
+        }
+        if (value > max)
+        {
+            return max;
+        }
+        return value;
+    }
+
     // Modulus operation that wraps negative numbers.
     // Example: Mod(-1, 3) == 2
     public static int Mod(int a, int n)
