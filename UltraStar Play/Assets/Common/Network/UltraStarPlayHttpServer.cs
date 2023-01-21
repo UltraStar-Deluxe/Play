@@ -9,9 +9,6 @@ using UnityEngine;
 
 public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
-    [Inject]
-    private Settings settings;
-
     protected override void Awake()
     {
         if (!Application.isPlaying)
@@ -34,8 +31,8 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
             return;
         }
 
-        host = !settings.OwnHost.IsNullOrEmpty()
-            ? settings.OwnHost
+        host = !SettingsManager.Instance.Settings.OwnHost.IsNullOrEmpty()
+            ? SettingsManager.Instance.Settings.OwnHost
             : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
 
         NoEndpointFoundCallback = SendNoEndpointFound;
