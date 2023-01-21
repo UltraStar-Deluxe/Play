@@ -19,6 +19,11 @@ public static class BuildUtils
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
         string executableFileInOutputFolder = !executableName.IsNullOrEmpty() ? $"/{executableName}" : "";
         string fullOutputPath = $"{outputFolderPath}{executableFileInOutputFolder}";
+        if (options.buildTarget == BuildTarget.StandaloneOSX)
+        {
+            fullOutputPath += ".app";
+        }
+
         string[] enabledScenePaths = GetEnabledScenePaths();
         Debug.Log($"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
 
