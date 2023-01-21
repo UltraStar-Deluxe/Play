@@ -31,7 +31,7 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
 
     private static void UpdateVersionFile()
     {
-        string bundleVersion = GetPlayerSettingsFileBundleVersion();
+        string bundleVersion = BuildUtils.GetPlayerSettingsFileBundleVersion();
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
         string commitShortHash = GitUtils.GetCurrentCommitShortHash();
 
@@ -62,16 +62,5 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
 
         // Unity needs a hint that this asset has changed.
         AssetDatabase.ImportAsset(versionFile);
-    }
-
-    private static string GetPlayerSettingsFileBundleVersion()
-    {
-        // Return the value from the file because the C# API (PlayerSettings.bundleVersion) returns an older value
-        // during the GitHub Actions build for whatever reason.
-        string[] projectSettingsAssetLines = File.ReadAllLines("ProjectSettings/ProjectSettings.asset");
-        string bundleVersionLine = projectSettingsAssetLines.FirstOrDefault(line => line.Contains("bundleVersion:"));
-        string bundleVersion = bundleVersionLine.Replace("bundleVersion:", "").Trim();
-        Debug.Log($"bundleVersion from ProjectSettings/ProjectSettings.asset: {bundleVersion}");
-        return bundleVersion;
     }
 }
