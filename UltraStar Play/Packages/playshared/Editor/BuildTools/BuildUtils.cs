@@ -27,6 +27,9 @@ public static class BuildUtils
         string[] enabledScenePaths = GetEnabledScenePaths();
         Debug.Log($"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
 
+        // Build Android app bundle (aab file) or apk file
+        EditorUserBuildSettings.buildAppBundle = options.buildAppBundleForGooglePlay;
+
         if (options.configureKeystoreForAndroidBuild)
         {
             ConfigureKeystoreForAndroidBuild();
