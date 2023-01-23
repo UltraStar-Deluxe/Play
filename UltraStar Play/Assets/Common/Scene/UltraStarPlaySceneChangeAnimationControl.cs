@@ -4,10 +4,7 @@ using UnityEngine.UIElements;
 using UniInject;
 using UnityEngine.SceneManagement;
 
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
-
-public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInjection
+public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
 {
     private static UltraStarPlaySceneChangeAnimationControl instance;
     public static UltraStarPlaySceneChangeAnimationControl Instance
@@ -26,8 +23,20 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         }
     }
 
-    [NonSerialized]
-    public RenderTexture uiCopyRenderTexture;
+    private RenderTexture uiCopyRenderTexture;
+    public RenderTexture UiCopyRenderTexture
+    {
+        get
+        {
+            if (uiCopyRenderTexture == null)
+            {
+                uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            }
+
+            return uiCopyRenderTexture;
+        }
+    }
+
     private Action animateAction;
 
     private AudioSource audioSource;
@@ -54,14 +63,6 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         {
             Init();
         }
-
-        UltraStarPlaySceneChangeAnimationControl self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
-
-        // Start is not called again for this DontDestroyOnLoad-object
-        DontDestroyOnLoad(gameObject);
-
-        uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
     }
 
     void OnEnable()
@@ -102,15 +103,16 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         }
 
         animateAction?.Invoke();
+
+        ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
     }
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
-        animateAction = doAnimateAction;
-
-        // Take "screenshot" of "old" scene.
         UIDocument uiDocument = FindObjectOfType<UIDocument>();
-        Graphics.CopyTexture(uiDocument.panelSettings.targetTexture, uiCopyRenderTexture);
+        // Take "screenshot" of "old" scene.
+        Graphics.CopyTexture(uiDocument.panelSettings.targetTexture, UiCopyRenderTexture);
+        animateAction = doAnimateAction;
         doLoadSceneAction();
     }
 
@@ -152,5 +154,10 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
     {
         audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent / 100f;
         audioSource.Play();
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(uiCopyRenderTexture);
     }
 }
