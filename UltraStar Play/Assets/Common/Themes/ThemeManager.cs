@@ -79,26 +79,6 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
     }
 
-    private void OnEnable()
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
     private void Start()
     {
         if (Instance == this)
@@ -107,7 +87,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    public void UpdateSceneTextures(Texture transitionTexture)
     {
         if (Instance != this)
         {
@@ -133,7 +113,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
         BackgroundShaderControl.SetUiRenderTextures(
             userInterfaceRenderTexture,
-            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
+            transitionTexture);
 
         if (anyThemeLoaded)
         {
