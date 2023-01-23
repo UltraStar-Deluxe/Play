@@ -45,9 +45,9 @@ Shader "UltraStar Play/Background Shader"
 
             #include "UnityCG.cginc"
 
-            #pragma shader_feature_fragment _ _DITHERING
-            #pragma shader_feature_fragment _ _UI_SHADOW
-            #pragma shader_feature_fragment _ _UI_TRANSITION_ANIM
+            #pragma multi_compile_fragment _ _DITHERING
+            #pragma multi_compile_fragment _ _UI_SHADOW
+            #pragma multi_compile_fragment _ _UI_TRANSITION_ANIM
 
             half _Gradient;
             half _EnableGradientAnimation;
