@@ -349,7 +349,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);

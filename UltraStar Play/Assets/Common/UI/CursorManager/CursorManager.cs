@@ -6,13 +6,7 @@ using UnityEngine;
 
 public class CursorManager : MonoBehaviour, INeedInjection
 {
-    public static CursorManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<CursorManager>("CursorManager");
-        }
-    }
+    public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
 
     private static readonly int cursorWidth = 64;
     // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
@@ -34,6 +28,11 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     private void Start()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         settingsManager.Settings.GraphicSettings
             .ObserveEveryValueChanged(it => it.useImageAsCursor)
             .Subscribe(newValue => SetDefaultCursor())

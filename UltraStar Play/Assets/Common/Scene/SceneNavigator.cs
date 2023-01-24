@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using SceneChangeAnimations;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -28,13 +25,7 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    public static SceneNavigator Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SceneNavigator>("SceneNavigator");
-        }
-    }
+    public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
 
     /// Static map to store and load SceneData instances across scenes.
     private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();

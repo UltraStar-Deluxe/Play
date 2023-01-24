@@ -45,7 +45,7 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);

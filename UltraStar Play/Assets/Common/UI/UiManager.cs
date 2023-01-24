@@ -12,13 +12,7 @@ using UnityEngine.UIElements;
 
 public class UiManager : MonoBehaviour, INeedInjection
 {
-    public static UiManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<UiManager>("UiManager");
-        }
-    }
+    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -48,11 +42,21 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private void Awake()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         LeanTween.init(10000);
     }
 
     private void Start()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         if (SettingsManager.Instance.Settings.DeveloperSettings.showFps)
         {
             CreateShowFpsInstance();

@@ -79,7 +79,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);

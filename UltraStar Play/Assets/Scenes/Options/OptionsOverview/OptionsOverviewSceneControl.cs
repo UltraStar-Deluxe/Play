@@ -134,7 +134,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
 
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);

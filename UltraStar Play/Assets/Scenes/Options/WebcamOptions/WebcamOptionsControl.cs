@@ -53,7 +53,7 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         useWebcamContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
         useWebcamContainer.Q<Toggle>().value = settings.WebcamSettings.UseAsBackgroundInSingScene;

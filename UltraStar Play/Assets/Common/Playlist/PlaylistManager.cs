@@ -15,13 +15,7 @@ public class PlaylistManager : MonoBehaviour
         favoritesPlaylist = new UltraStarPlaylist();
     }
 
-    public static PlaylistManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<PlaylistManager>("PlaylistManager");
-        }
-    }
+    public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
 
     public static readonly string favoritesPlaylistName = "Favorites";
 
@@ -65,6 +59,11 @@ public class PlaylistManager : MonoBehaviour
 
     void Awake()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         CreateFavoritePlaylistIfNotExist();
     }
 

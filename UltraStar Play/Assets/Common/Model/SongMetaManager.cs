@@ -27,13 +27,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         lastSongDirs = null;
     }
 
-    public static SongMetaManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SongMetaManager>("SongMetaManager");
-        }
-    }
+    public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
     // Static to be persisted across scenes.
     private static List<string> lastSongDirs;

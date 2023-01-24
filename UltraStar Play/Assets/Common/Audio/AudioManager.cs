@@ -17,13 +17,7 @@ public class AudioManager : MonoBehaviour
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
-    public static AudioManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<AudioManager>("AudioManager");
-        }
-    }
+    public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
     private CoroutineManager coroutineManager;
 

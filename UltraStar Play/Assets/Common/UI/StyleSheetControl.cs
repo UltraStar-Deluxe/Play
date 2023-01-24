@@ -16,14 +16,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
         printScreenSize = true;
     }
 
-    public static StyleSheetControl Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<StyleSheetControl>("StyleSheetControl");
-        }
-    }
-
     private static bool printScreenSize = true;
 
     [InjectedInInspector]

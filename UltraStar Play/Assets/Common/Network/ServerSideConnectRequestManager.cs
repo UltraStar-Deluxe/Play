@@ -18,26 +18,10 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
     {
-        instance = null;
         idToConnectedClientMap = new();
     }
 
-    private static ServerSideConnectRequestManager instance;
-    public static ServerSideConnectRequestManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                ServerSideConnectRequestManager instanceInScene = GameObjectUtils.FindComponentWithTag<ServerSideConnectRequestManager>("ServerSideConnectRequestManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static ServerSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideConnectRequestManager>();
 
     private static Dictionary<string, IConnectedClientHandler> idToConnectedClientMap = new();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
@@ -57,13 +41,11 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     
     private void Start()
     {
-        ServerSideConnectRequestManager self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
-        if (!Application.isPlaying || instance != this)
+        if (!Application.isPlaying || Instance != this)
         {
             return;
         }
-        
+
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
 
         serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
@@ -177,7 +159,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     {
         hasBeenDestroyed = true;
         serverUdpClient?.Close();
-        if (instance == this)
+        if (Instance == this)
         {
             RemoveAllConnectedClientHandlers();
         }

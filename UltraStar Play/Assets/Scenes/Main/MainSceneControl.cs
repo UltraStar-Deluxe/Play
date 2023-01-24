@@ -145,7 +145,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     {
         if (!Application.isPlaying && startButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);

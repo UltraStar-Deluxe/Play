@@ -962,7 +962,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         if (!Application.isPlaying && sceneTitle == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
 
