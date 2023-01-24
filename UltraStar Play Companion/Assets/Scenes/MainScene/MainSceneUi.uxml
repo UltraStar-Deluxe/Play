@@ -10,7 +10,6 @@
             <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                 <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
-            <ui:Label text="FPS: 30" display-tooltip-when-elided="true" name="fpsText" style="font-size: 15px; margin-left: 0; position: absolute; margin-right: 0; margin-top: 0; margin-bottom: 0; top: 0; right: 50%;" />
         </ui:VisualElement>
         <ui:VisualElement name="tabGroup" class="onlyVisibleWhenConnected" style="flex-direction: row; width: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:Button text="Microphone" display-tooltip-when-elided="true" name="showMicViewButton" style="width: 10%; margin-left: 0; margin-right: 1px; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;" />

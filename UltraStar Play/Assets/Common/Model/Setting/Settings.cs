@@ -47,4 +47,10 @@ public class Settings : ISettings
         get { return AudioSettings.pitchDetectionAlgorithm; }
         set { AudioSettings.pitchDetectionAlgorithm = value; }
     }
+
+    public bool ShowFps
+    {
+        get { return DeveloperSettings.showFps; }
+        set { DeveloperSettings.showFps = value; }
+    }
 }

@@ -5,6 +5,8 @@ public interface ISettings
     public SystemLanguage Language { get; set; }
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
 
+    public bool ShowFps { get; }
+
     /**
      * The UDP port on the server (e.g. Companion App) for initiating a connection.
      * Default value 34567.

@@ -13,7 +13,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         BindingBuilder bb = new BindingBuilder();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
-        bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(ClientSideConnectRequestManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
