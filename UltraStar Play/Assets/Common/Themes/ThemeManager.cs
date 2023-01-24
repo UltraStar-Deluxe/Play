@@ -59,7 +59,20 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
-    private RenderTexture userInterfaceRenderTexture;
+
+    private RenderTexture uiRenderTexture;
+    public RenderTexture UiRenderTexture
+    {
+        get
+        {
+            if (uiRenderTexture == null)
+            {
+                uiRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+            }
+
+            return uiRenderTexture;
+        }
+    }
 
     private readonly List<ThemeMeta> themeMetas = new();
 
@@ -105,14 +118,10 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
 
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        if (userInterfaceRenderTexture == null)
-        {
-            userInterfaceRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-        }
         UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
-        uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
+        uiDocument.panelSettings.targetTexture = UiRenderTexture;
         BackgroundShaderControl.SetUiRenderTextures(
-            userInterfaceRenderTexture,
+            UiRenderTexture,
             transitionTexture);
 
         if (anyThemeLoaded)
@@ -278,7 +287,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
 
         // Destroy all instantiated assets
-        Destroy(userInterfaceRenderTexture);
+        Destroy(uiRenderTexture);
 
         if (backgroundMaterialCopy != null)
         {
