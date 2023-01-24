@@ -85,9 +85,6 @@ public class UltraStarPlaySceneInjectionManager : MonoBehaviour
             List<IBinding> bindings = binder.GetBindings();
             foreach (IBinding binding in bindings)
             {
-                // RebindingBehavior rebindingBehavior = binder is CommonSceneObjectsBinder
-                //     ? RebindingBehavior.Ignore
-                //     : RebindingBehavior.LogWarning;
                 try
                 {
                     sceneInjector.AddBinding(binding, RebindingBehavior.Throw);

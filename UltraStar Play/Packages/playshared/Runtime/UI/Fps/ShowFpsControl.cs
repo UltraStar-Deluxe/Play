@@ -36,7 +36,6 @@ public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedL
 
     public void OnInjectionFinished()
     {
-        Debug.Log("ShowFpsControl - OnInjectionFinished");
         settings.ObserveEveryValueChanged(it => it.ShowFps)
             .Subscribe(_ => UpdateFpsLabelInstance());
         UpdateFpsLabelInstance();

@@ -189,7 +189,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
+    [Inject]
     private SongSelectSceneData sceneData;
+
     private List<SongMeta> songMetas;
     private int lastSongMetasReloadFrame = -1;
     private string lastRawSearchText;
@@ -286,7 +288,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
-        sceneData = sceneNavigator.GetSceneData(CreateDefaultSceneData());
+        sceneData = SceneNavigator.GetSceneData(CreateDefaultSceneData());
 
         InitSongMetas();
 
@@ -894,6 +896,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SongSelectSceneData>());
         bb.BindExistingInstance(songRouletteControl);
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
