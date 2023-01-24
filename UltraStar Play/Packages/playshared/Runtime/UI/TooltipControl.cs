@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,9 +22,6 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private UIDocument uiDocument;
 
-    [Inject]
-    private CoroutineManager coroutineManager;
-
     private Label label;
     private PanelHelper panelHelper;
     private IEnumerator showTooltipCoroutine;
@@ -42,7 +40,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     {
         showTooltipByPointerDown = true;
         ShowTooltip();
-        coroutineManager.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
+        uiDocument.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
         {
             showTooltipByPointerDown = false;
             CloseTooltip();
@@ -58,7 +56,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 
         if (closeTooltipCoroutine != null)
         {
-            coroutineManager.StopCoroutine(closeTooltipCoroutine);
+            uiDocument.StopCoroutine(closeTooltipCoroutine);
         }
 
         showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
@@ -69,7 +67,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
             }
             ShowTooltip();
         });
-        coroutineManager.StartCoroutine(showTooltipCoroutine);
+        uiDocument.StartCoroutine(showTooltipCoroutine);
     }
 
     private void OnPointerExit()
@@ -81,11 +79,11 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 
         if (showTooltipCoroutine != null)
         {
-            coroutineManager.StopCoroutine(showTooltipCoroutine);
+            uiDocument.StopCoroutine(showTooltipCoroutine);
         }
 
         closeTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(CloseDelayInSeconds, () => CloseTooltip());
-        coroutineManager.StartCoroutine(closeTooltipCoroutine);
+        uiDocument.StartCoroutine(closeTooltipCoroutine);
     }
 
     public void CloseTooltip()
