@@ -15,7 +15,7 @@ public static class Log
     private static LogHistorySink logHistorySink;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         logHistorySink = new();
         Logger = CreateLogger();

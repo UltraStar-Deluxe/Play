@@ -9,7 +9,7 @@ using UnityEngine;
 public class PlaylistManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         playlistToFilePathMap.Clear();
         playlists.Clear();

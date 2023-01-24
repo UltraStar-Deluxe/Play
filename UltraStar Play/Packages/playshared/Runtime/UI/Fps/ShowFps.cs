@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 public class ShowFps : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         lastFpsLabelPositionInPx = Vector2.zero;
     }
