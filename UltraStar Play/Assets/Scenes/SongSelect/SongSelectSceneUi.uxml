@@ -71,7 +71,7 @@
                         <ui:Label text="9000" display-tooltip-when-elided="true" name="second" />
                         <ui:Label text="9000" display-tooltip-when-elided="true" name="third" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="onlineHighScoreContainer" style="align-items: auto;">
+                    <ui:VisualElement name="onlineHighScoreContainer" style="align-items: auto; display: none;">
                         <ui:Label text="Online best" display-tooltip-when-elided="true" name="title" style="-unity-font-style: bold;" />
                         <ui:Label text="9000" display-tooltip-when-elided="true" name="second" />
                         <ui:Label text="9000" display-tooltip-when-elided="true" name="third" />
