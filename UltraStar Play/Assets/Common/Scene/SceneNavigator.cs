@@ -85,7 +85,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         LoadScene(scene);
     }
 
-    public T GetSceneDataOrThrow<T>() where T : SceneData
+    public static T GetSceneDataOrThrow<T>() where T : SceneData
     {
         T sceneData = GetSceneData<T>(null);
         if (sceneData == null)
@@ -95,7 +95,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         return GetSceneData<T>(null);
     }
 
-    public T GetSceneData<T>(T defaultValue) where T : SceneData
+    public static T GetSceneData<T>(T defaultValue) where T : SceneData
     {
         if (staticSceneDatas.TryGetValue(typeof(T), out SceneData sceneData))
         {
@@ -125,7 +125,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private T GetDefaultSceneDataFromProvider<T>() where T : SceneData
+    private static T GetDefaultSceneDataFromProvider<T>() where T : SceneData
     {
         IDefaultSceneDataProvider sceneDataProvider = GameObjectUtils.FindObjectOfType<IDefaultSceneDataProvider>(false);
         if (sceneDataProvider != null)

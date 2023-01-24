@@ -58,6 +58,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject]
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -229,11 +230,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public List<IBinding> GetBindings()
     {
-        sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
-
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
-        bb.BindExistingInstance(sceneData);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
         return bb.GetBindings();
     }
 
