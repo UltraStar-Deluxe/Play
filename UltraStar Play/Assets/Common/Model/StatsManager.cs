@@ -7,7 +7,7 @@ using UnityEngine;
 public class StatsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         statistics = null;
     }

@@ -21,7 +21,7 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
     private static List<SongIssue> SongWarnings => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Warning).ToList();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         ResetSongMetas();
         lastSongDirs = null;

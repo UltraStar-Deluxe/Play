@@ -6,7 +6,7 @@ using UnityEngine;
 public class SettingsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         settingsPath = null;
         settings = null;

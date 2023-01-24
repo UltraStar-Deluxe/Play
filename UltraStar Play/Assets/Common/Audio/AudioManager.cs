@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class AudioManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         ClearCache();
     }

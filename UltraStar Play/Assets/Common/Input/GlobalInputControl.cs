@@ -6,7 +6,7 @@ using UnityEngine;
 public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         volumeBeforeMute = -1;
     }

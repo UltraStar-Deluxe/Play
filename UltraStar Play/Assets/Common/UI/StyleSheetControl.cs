@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         printScreenSize = true;
     }

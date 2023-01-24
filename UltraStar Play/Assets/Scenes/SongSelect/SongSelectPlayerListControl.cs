@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         lastPlayerProfileToMicProfileMap = null;
     }

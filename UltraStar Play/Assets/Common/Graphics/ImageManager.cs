@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 public static class ImageManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         spriteHolders.Clear();
         ClearCache();
