@@ -10,14 +10,22 @@ using UnityEngine.SceneManagement;
 
 public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 {
-    private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
-    public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         staticSceneDatas.Clear();
     }
+
+    public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
+
+    /// Static map to store and load SceneData instances across scenes.
+    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
+
+    private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
+    public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
+
+    private readonly Subject<SceneChangedEvent> sceneChangedEventStream = new();
+    public IObservable<SceneChangedEvent> SceneChangedEventStream => sceneChangedEventStream;
 
     [Inject]
     private UltraStarPlaySceneChangeAnimationControl sceneChangeAnimationControl;
@@ -25,14 +33,24 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
-
-    /// Static map to store and load SceneData instances across scenes.
-    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
-
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    protected override void OnEnableSingleton()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    protected override void OnDisableSingleton()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        sceneChangedEventStream.OnNext(new SceneChangedEvent());
     }
 
     public void LoadScene(EScene scene)
