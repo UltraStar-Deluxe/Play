@@ -8,13 +8,15 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class StyleSheetControl : MonoBehaviour, INeedInjection
+public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
         printScreenSize = true;
     }
+
+    public static StyleSheetControl Instance => GameObjectUtils.FindComponentWithTag<StyleSheetControl>("StyleSheetControl");
 
     private static bool printScreenSize = true;
 
@@ -27,7 +29,12 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         if (printScreenSize)
         {

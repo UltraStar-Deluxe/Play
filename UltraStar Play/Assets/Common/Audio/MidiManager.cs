@@ -12,7 +12,7 @@ using UnityEngine;
 // An AudioSource is needed although it is not directly referenced.
 // Furthermore, the AudioSource must have "Play on Awake" set to true.
 [RequireComponent(typeof(AudioSource))]
-public class MidiManager : MonoBehaviour, INeedInjection
+public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
@@ -55,12 +55,17 @@ public class MidiManager : MonoBehaviour, INeedInjection
 
     private bool isInitialized;
 
-    void Awake()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void AwakeSingleton()
     {
         outputSampleRateHz = UnityEngine.AudioSettings.outputSampleRate;
     }
 
-    void Start()
+    protected override void StartSingleton()
     {
         // Synchronize with settings
         midiVelocity = settings.SongEditorSettings.MidiVelocity;

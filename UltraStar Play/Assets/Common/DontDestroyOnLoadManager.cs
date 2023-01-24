@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using UniInject;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DontDestroyOnLoadManager : MonoBehaviour
+public class DontDestroyOnLoadManager : AbstractSingletonBehaviour
 {
     private static DontDestroyOnLoadManager instance;
     public static DontDestroyOnLoadManager Instance
@@ -27,12 +26,9 @@ public class DontDestroyOnLoadManager : MonoBehaviour
 
     private readonly Dictionary<Type, Component> typeToComponentCache = new();
 
-    private void Awake()
+    protected override object GetInstance()
     {
-        if (this != Instance)
-        {
-            Destroy(gameObject);
-        }
+        return Instance;
     }
 
     public T FindComponentOrThrow<T>() where T : Component

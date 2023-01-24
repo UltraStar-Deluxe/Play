@@ -1,10 +1,8 @@
 using System;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UniInject;
 using UnityEngine.SceneManagement;
 
-public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
+public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
@@ -26,62 +24,30 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
 
     private AudioSource audioSource;
     private Settings settings;
-    private bool isInitialized;
 
-    private void Init()
+    protected override object GetInstance()
     {
-        // TODO: Custom initialization because OnSceneLoaded works around the current SceneInjection flow. Do SceneInjection earlier?
-        isInitialized = true;
+        return Instance;
+    }
+
+    protected override void AwakeSingleton()
+    {
         settings = FindObjectOfType<SettingsManager>().Settings;
         audioSource = GetComponentInChildren<AudioSource>();
     }
 
-    void Start()
+    protected override void OnEnableSingleton()
     {
-        if (this != Instance)
-        {
-            Destroy(this);
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Init();
-        }
-    }
-
-    void OnEnable()
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void OnDisable()
+    protected override void OnDisableSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Init();
-        }
-
         ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
 
         if (!settings.GraphicSettings.AnimateSceneChange)

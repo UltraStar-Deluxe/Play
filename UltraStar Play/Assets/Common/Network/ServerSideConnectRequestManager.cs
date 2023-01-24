@@ -13,7 +13,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IServerSideConnectRequestManager
+public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeedInjection, IServerSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
@@ -38,8 +38,13 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
 
     [Inject]
     private Settings settings;
-    
-    private void Start()
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         if (!Application.isPlaying || Instance != this)
         {

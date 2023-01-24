@@ -5,7 +5,7 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 
-public class PlaylistManager : MonoBehaviour
+public class PlaylistManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -57,13 +57,13 @@ public class PlaylistManager : MonoBehaviour
     private string FavoritesPlaylistFile => $"{PlaylistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
     private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
 
-    void Awake()
+    protected override object GetInstance()
     {
-        if (this != Instance)
-        {
-            return;
-        }
+        return Instance;
+    }
 
+    protected override void AwakeSingleton()
+    {
         CreateFavoritePlaylistIfNotExist();
     }
 

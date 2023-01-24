@@ -2,7 +2,7 @@
 using UniRx;
 using UnityEngine;
 
-public class GlobalInputControl : MonoBehaviour, INeedInjection
+public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -12,10 +12,17 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
 
     private static int volumeBeforeMute = -1;
 
+    public static GlobalInputControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GlobalInputControl>();
+
     [Inject]
     private Settings settings;
-    
-    private void Start()
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         // Toggle full-screen mode via F11
         UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
@@ -38,7 +45,6 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
                 Debug.Log("New full-screen mode " + settings.GraphicSettings.fullScreenMode);
             }));
     }
-
 
     public void ToggleMuteAudio()
     {

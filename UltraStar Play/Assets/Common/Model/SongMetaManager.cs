@@ -9,7 +9,7 @@ using UniRx;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
-public class SongMetaManager : MonoBehaviour, INeedInjection
+public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
 {
     private static readonly object scanLock = new();
 
@@ -46,7 +46,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
-    
+
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -58,13 +58,18 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         }
     }
 
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
     public void ReloadSongMetas()
     {
         ResetSongMetas();
         ScanFilesIfNotDoneYet();
     }
 
-    private void Start()
+    protected override void StartSingleton()
     {
         RescanIfSongFoldersChanged();
     }

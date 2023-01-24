@@ -4,7 +4,7 @@ using UnityEngine;
 
 //Holds all in-memory stats data
 [Serializable]
-public class StatsManager : MonoBehaviour
+public class StatsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -27,6 +27,11 @@ public class StatsManager : MonoBehaviour
     }
 
     public static StatsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatsManager>();
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 
     public void Save()
     {
@@ -62,13 +67,8 @@ public class StatsManager : MonoBehaviour
         return Path.Combine(Application.persistentDataPath, "Database.json");
     }
 
-    void OnDisable()
+    protected override void OnDisableSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
         // Save the statistics when necessary.
         if (statistics != null && statistics.IsDirty)
         {
