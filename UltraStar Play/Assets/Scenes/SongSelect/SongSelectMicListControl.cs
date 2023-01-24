@@ -133,10 +133,6 @@ public class SongSelectMicListControl : MonoBehaviour, INeedInjection, ITranslat
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && noMicsFoundLabel == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         noMicsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noMicsFound);
     }
 }

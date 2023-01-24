@@ -338,8 +338,6 @@ MonoBehaviour:
     type: 3}
   accordionUi: {fileID: 9197481963319205126, guid: edd0667e1419b48438dfec66e1a3863b,
     type: 3}
-  showFpsPrefab: {fileID: 7200366228149695045, guid: 50d02acac4813a94490c57776dc5e4ee,
-    type: 3}
   avatarImageReferences:
   - avatar: 0
     sprite: {fileID: 21300000, guid: a3752a11b653e7b478d17714e6f4ffef, type: 3}
@@ -705,7 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4190377001124415443}
-  - component: {fileID: 4353274562695227665}
+  - component: {fileID: 9022508001146490944}
   m_Layer: 0
   m_Name: TranslationManager
   m_TagString: TranslationManager
@@ -728,7 +726,7 @@ Transform:
   m_Father: {fileID: 8069444317427349030}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4353274562695227665
+--- !u!114 &9022508001146490944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -737,14 +735,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1102298807685021119}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9568d536d865a945b0c564a5a1c07c6, type: 3}
+  m_Script: {fileID: 11500000, guid: 713e7f6d00e1ea64bbf2732f88763a68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   propertiesFolderRelativeToResourcesFolder: Translations
   propertiesFileName: messages
   logInfoInEditMode: 0
   logInfoInPlayMode: 1
-  generatedConstantsFolder: Assets/Common/R
+  generatedConstantsFolder: Assets/GeneratedScripts
   generateConstantsOnResourceChange: 1
   useFallbackIfNotInCurrentLanguage: 1
   currentLanguage: 10

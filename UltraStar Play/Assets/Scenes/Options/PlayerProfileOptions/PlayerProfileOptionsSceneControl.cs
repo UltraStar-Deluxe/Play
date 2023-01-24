@@ -66,10 +66,6 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title);
     }

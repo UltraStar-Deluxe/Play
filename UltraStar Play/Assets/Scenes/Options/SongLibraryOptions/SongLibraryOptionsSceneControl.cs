@@ -334,10 +334,6 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_downloadSongs_button);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_title);

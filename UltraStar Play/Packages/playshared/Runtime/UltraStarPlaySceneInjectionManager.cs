@@ -11,6 +11,8 @@ using IBinding = UniInject.IBinding;
 
 public class UltraStarPlaySceneInjectionManager : MonoBehaviour
 {
+    public ESceneInjectionStatus SceneInjectionStatus { get; private set; } = ESceneInjectionStatus.Pending;
+
     private readonly List<IBinder> binders = new();
     private readonly List<UnityEngine.Object> scriptsThatNeedInjection = new();
 
@@ -21,15 +23,27 @@ public class UltraStarPlaySceneInjectionManager : MonoBehaviour
     [InjectedInInspector]
     public bool logTime;
 
-    public static UltraStarPlaySceneInjectionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneInjectionManager>();
+    public static UltraStarPlaySceneInjectionManager Instance => GameObjectUtils.FindComponentWithTag<UltraStarPlaySceneInjectionManager>("SceneInjectionManager");
 
     private void Awake()
     {
-        DoInjection();
+        if (SceneInjectionStatus != ESceneInjectionStatus.Pending)
+        {
+            return;
+        }
+
+        DoSceneInjection();
     }
 
-    public void DoInjection()
+    public void DoSceneInjection()
     {
+        if (SceneInjectionStatus != ESceneInjectionStatus.Pending)
+        {
+            Debug.LogWarning("Attempt to redo scene injection.");
+            return;
+        }
+        SceneInjectionStatus = ESceneInjectionStatus.Started;
+
         Stopwatch stopwatch = CreateAndStartStopwatch();
 
         sceneInjector = UniInjectUtils.CreateInjector();
@@ -49,6 +63,8 @@ public class UltraStarPlaySceneInjectionManager : MonoBehaviour
 
         // (3) Inject the bindings from the sceneInjector into the objects that need injection.
         InjectScriptsThatNeedInjection();
+
+        SceneInjectionStatus = ESceneInjectionStatus.Finished;
 
         StopAndLogTime(stopwatch, $"SceneInjectionManager - Analyzing, binding and injecting scene took <ms> ms");
 
@@ -184,5 +200,12 @@ public class UltraStarPlaySceneInjectionManager : MonoBehaviour
         {
             AnalyzeScriptsRecursively(child.gameObject);
         }
+    }
+
+    public enum ESceneInjectionStatus
+    {
+        Pending,
+        Started,
+        Finished
     }
 }

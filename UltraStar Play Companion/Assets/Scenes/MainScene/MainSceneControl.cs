@@ -284,10 +284,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && sceneTitle == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
         connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
         recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
