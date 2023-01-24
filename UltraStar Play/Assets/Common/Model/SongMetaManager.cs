@@ -158,7 +158,7 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
             FolderScanner txtScanner = new("*.txt");
 
             // Find all txt files in the song directories
-            txtFiles = ScanForTxtFiles(txtScanner);
+            txtFiles = ScanForTxtFiles(txtScanner, settings.GameSettings.songDirs);
         }
 
         // Load the txt files in a background thread
@@ -195,10 +195,9 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private static List<string> ScanForTxtFiles(FolderScanner txtScanner)
+    private static List<string> ScanForTxtFiles(FolderScanner txtScanner, List<string> songDirs)
     {
         List<string> txtFiles = new();
-        List<string> songDirs = SettingsManager.Instance.Settings.GameSettings.songDirs;
         foreach (string songDir in songDirs)
         {
             try

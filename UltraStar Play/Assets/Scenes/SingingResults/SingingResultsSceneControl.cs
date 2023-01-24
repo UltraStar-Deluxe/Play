@@ -55,6 +55,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private ThemeManager themeManager;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     private SingingResultsSceneData sceneData;
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -213,14 +216,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
             HighscoreSceneData highscoreSceneData = new();
             highscoreSceneData.SongMeta = sceneData.SongMeta;
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
-            SceneNavigator.Instance.LoadScene(EScene.HighscoreScene, highscoreSceneData);
+            sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
         }
         else
         {
             // No highscores to show, thus go to song select scene
             SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.SongMeta = sceneData.SongMeta;
-            SceneNavigator.Instance.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
     }
 

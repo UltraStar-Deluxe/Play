@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
@@ -56,6 +57,9 @@ public class PlaylistManager : AbstractSingletonBehaviour
     private readonly string playlistFileExtension = ".playlist";
     private string FavoritesPlaylistFile => $"{PlaylistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
     private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
+
+    [Inject]
+    private Settings settings;
 
     protected override object GetInstance()
     {
@@ -240,9 +244,9 @@ public class PlaylistManager : AbstractSingletonBehaviour
         playlistToFilePathMap[playlist] = newPath;
 
         // Update settings
-        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        if (settings.SongSelectSettings.playlistName == oldName)
         {
-            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = newName;
+            settings.SongSelectSettings.playlistName = newName;
         }
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
@@ -277,9 +281,9 @@ public class PlaylistManager : AbstractSingletonBehaviour
         }
 
         // Update settings
-        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        if (settings.SongSelectSettings.playlistName == oldName)
         {
-            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = "";
+            settings.SongSelectSettings.playlistName = "";
         }
 
         playlists.Remove(playlist);

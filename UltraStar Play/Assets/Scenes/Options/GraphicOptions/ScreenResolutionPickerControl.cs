@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenResolution>
 {
-    public ScreenResolutionPickerControl(ItemPicker itemPicker)
+    public ScreenResolutionPickerControl(ItemPicker itemPicker, Settings settings)
         : base(itemPicker, GetItems())
     {
         GetLabelTextFunction = item => $"{item.Width} x {item.Height} ({item.RefreshRate} Hz)";
@@ -24,7 +24,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
                 Selection.Value = GetBestMatchingScreenResolution(currentScreenResolution);
             }
         }
-        Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.resolution = newValue);
+        Selection.Subscribe(newValue => settings.GraphicSettings.resolution = newValue);
     }
 
     private ScreenResolution GetBestMatchingScreenResolution(ScreenResolution targetResolution)

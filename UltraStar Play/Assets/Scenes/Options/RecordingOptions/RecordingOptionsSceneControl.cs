@@ -199,7 +199,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 }
                 else
                 {
-                    uiManager.CreateNotificationVisualElement(
+                    UiManager.CreateNotification(
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout),
                         "error");
                 }

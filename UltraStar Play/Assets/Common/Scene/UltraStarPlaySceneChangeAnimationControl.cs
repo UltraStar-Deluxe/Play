@@ -32,6 +32,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -45,7 +48,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     private void UpdateSceneTexturesAndTransition()
     {
-        ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
+        themeManager.UpdateSceneTextures(UiCopyRenderTexture);
 
         if (settings.GraphicSettings.AnimateSceneChange)
         {
@@ -56,8 +59,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
         // Take "screenshot" of "old" scene.
-        RenderTexture uiRenderTexture = ThemeManager.Instance.UiRenderTexture;
-        if (uiRenderTexture == null)
+        if (themeManager.UiRenderTexture == null)
         {
             Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
         }
@@ -67,7 +69,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         }
         else
         {
-            Graphics.CopyTexture(uiRenderTexture, UiCopyRenderTexture);
+            Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
         }
         animateAction = doAnimateAction;
         doLoadSceneAction();
@@ -82,7 +84,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             PlaySceneChangeAnimationSound();
         }
 
-        float sceneChangeAnimationTimeInSeconds = ThemeManager.Instance.GetSceneChangeAnimationTimeInSeconds();
+        float sceneChangeAnimationTimeInSeconds = themeManager.GetSceneChangeAnimationTimeInSeconds();
         if (sceneChangeAnimationTimeInSeconds <= 0)
         {
             return;
@@ -91,19 +93,19 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
             .setOnStart(() =>
             {
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
             .setOnUpdate((float animTimePercent) =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
             });
     }
 

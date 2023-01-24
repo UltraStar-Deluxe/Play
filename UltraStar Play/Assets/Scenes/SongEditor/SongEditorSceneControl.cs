@@ -307,13 +307,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         catch (Exception e)
         {
             Debug.LogException(e);
-            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
+            UiManager.CreateNotification("Saving the file failed:\n" + e.Message);
             return;
         }
 
         if (!isAutoSave)
         {
-            uiManager.CreateNotificationVisualElement("Saved file");
+            UiManager.CreateNotification("Saved file");
         }
     }
 
@@ -427,7 +427,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             if (!File.Exists(path))
             {
                 Debug.Log($"File does not exist: {path}");
-                uiManager.CreateNotificationVisualElement($"File does not exist");
+                UiManager.CreateNotification($"File does not exist");
             }
             usePathCallback(path);
         }

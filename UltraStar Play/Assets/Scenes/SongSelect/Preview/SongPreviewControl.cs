@@ -206,7 +206,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             Debug.LogException(ex);
             string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
-            uiManager.CreateNotificationVisualElement(errorMessage);
+            UiManager.CreateNotification(errorMessage);
             return;
         }
         
@@ -220,7 +220,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
             Debug.LogError(errorMessage);
-            uiManager.CreateNotificationVisualElement(errorMessage, "error");
+            UiManager.CreateNotification(errorMessage, "error");
         }
     }
 

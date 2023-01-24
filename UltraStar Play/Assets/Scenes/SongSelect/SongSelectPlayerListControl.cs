@@ -81,7 +81,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.Clear();
 
         // Create new entries
-        List<PlayerProfile> playerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
+        List<PlayerProfile> playerProfiles = settings.PlayerProfiles;
         List<PlayerProfile> enabledPlayerProfiles = playerProfiles.Where(it => it.IsEnabled).ToList();
         foreach (PlayerProfile playerProfile in enabledPlayerProfiles)
         {
@@ -163,7 +163,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         List<MicProfile> usedMicProfiles = playerEntryControls.Where(it => it.MicProfile != null)
             .Select(it => it.MicProfile)
             .ToList();
-        List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles
+        List<MicProfile> enabledAndConnectedMicProfiles = settings.MicProfiles
             .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles
