@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -33,9 +35,29 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    public bool logSceneChangeDuration;
+
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        Stopwatch stopwatch = new();
+        BeforeSceneChangeEventStream.Subscribe(_ =>
+        {
+            stopwatch.Reset();
+            stopwatch.Start();
+        });
+        SceneChangedEventStream.Subscribe(_ =>
+        {
+            stopwatch.Stop();
+            if (logSceneChangeDuration)
+            {
+                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms");
+            }
+        });
     }
 
     protected override void OnEnableSingleton()
