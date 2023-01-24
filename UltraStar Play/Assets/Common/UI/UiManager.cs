@@ -28,9 +28,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     public VisualTreeAsset accordionUi;
 
     [InjectedInInspector]
-    public ShowFps showFpsPrefab;
-
-    [InjectedInInspector]
     public List<AvatarImageReference> avatarImageReferences;
 
     [Inject]
@@ -45,8 +42,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    private ShowFps showFpsInstance;
-
     protected override object GetInstance()
     {
         return Instance;
@@ -57,48 +52,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         LeanTween.init(10000);
     }
 
-    protected override void StartSingleton()
-    {
-        if (Instance != this)
-        {
-            return;
-        }
-
-        sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
-        {
-            if (settings.DeveloperSettings.showFps)
-            {
-                CreateShowFpsInstance();
-            }
-        });
-    }
-
     private void Update()
     {
         ContextMenuPopupControl.OpenContextMenuPopups
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
-    }
-
-    public void CreateShowFpsInstance()
-    {
-        if (showFpsInstance != null)
-        {
-            return;
-        }
-
-        showFpsInstance = Instantiate(showFpsPrefab);
-        injector.Inject(showFpsInstance);
-        // Move to front
-        showFpsInstance.transform.SetAsLastSibling();
-        showFpsInstance.transform.position = new Vector3(20, 20, 0);
-    }
-
-    public void DestroyShowFpsInstance()
-    {
-        if (showFpsInstance != null)
-        {
-            Destroy(showFpsInstance);
-        }
     }
 
     private Label DoCreateNotification(
