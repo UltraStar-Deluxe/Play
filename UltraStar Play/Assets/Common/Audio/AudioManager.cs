@@ -19,8 +19,6 @@ public class AudioManager : AbstractSingletonBehaviour
 
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
-    private CoroutineManager coroutineManager;
-
     protected override object GetInstance()
     {
         return Instance;
