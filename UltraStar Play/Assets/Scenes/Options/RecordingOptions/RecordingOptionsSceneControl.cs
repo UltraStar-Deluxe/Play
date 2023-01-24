@@ -347,10 +347,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);

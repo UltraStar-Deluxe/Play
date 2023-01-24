@@ -34,10 +34,6 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator, I
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
     }

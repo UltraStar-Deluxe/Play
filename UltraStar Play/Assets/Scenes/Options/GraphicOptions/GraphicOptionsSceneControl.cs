@@ -62,10 +62,6 @@ public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITransl
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         resolutionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_resolution);
         fpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_targetFps);
         fullscreenContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);

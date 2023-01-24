@@ -96,10 +96,6 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         themeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_theme);
         noteDisplayModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         staticLyricsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);

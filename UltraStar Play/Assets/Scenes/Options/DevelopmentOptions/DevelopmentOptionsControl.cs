@@ -229,10 +229,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
-        }
         showFpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showFps);
         pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
