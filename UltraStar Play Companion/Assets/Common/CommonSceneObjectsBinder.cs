@@ -10,7 +10,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
     public List<IBinding> GetBindings()
     {
-        BindingBuilder bb = new BindingBuilder();
+        BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(ClientSideConnectRequestManager.Instance);
@@ -19,7 +19,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(GetUiDocument());
 
         bb.BindExistingInstance(SettingsManager.Instance.Settings);
-        bb.Bind(    typeof(ISettings)).ToExistingInstance(SettingsManager.Instance.Settings);
+        bb.Bind(typeof(ISettings)).ToExistingInstance(SettingsManager.Instance.Settings);
 
         return bb.GetBindings();
     }

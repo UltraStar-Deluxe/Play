@@ -13,6 +13,7 @@ TagManager:
   - ClientSideMicrophoneDataSender
   - TranslationManager
   - InputManager
+  - DontDestroyOnLoadManager
   layers:
   - Default
   - TransparentFX

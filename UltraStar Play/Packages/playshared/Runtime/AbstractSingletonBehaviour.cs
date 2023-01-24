@@ -26,6 +26,10 @@ public abstract class AbstractSingletonBehaviour : MonoBehaviour
     {
     }
 
+    protected virtual void OnDestroySingleton()
+    {
+    }
+
     private void Awake()
     {
         if (GetInstance() != this)
@@ -65,5 +69,15 @@ public abstract class AbstractSingletonBehaviour : MonoBehaviour
         }
 
         StartSingleton();
+    }
+
+    private void OnDestroy()
+    {
+        if (GetInstance() != this)
+        {
+            return;
+        }
+
+        OnDestroySingleton();
     }
 }
