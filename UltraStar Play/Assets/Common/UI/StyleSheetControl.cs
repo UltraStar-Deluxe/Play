@@ -23,7 +23,7 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public StyleSheet largeScreenStyleSheet;
 
-    [Inject(Optional = true)]
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -46,11 +46,6 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
 
     private void AddScreenSpecificStyleSheets()
     {
-        if (uiDocument == null)
-        {
-            return;
-        }
-
         if (Screen.dpi < 20 || Screen.dpi > 1000)
         {
             // Unlikely DPI value. Do nothing.

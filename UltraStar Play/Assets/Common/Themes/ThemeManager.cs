@@ -373,11 +373,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        if (uiDocument == null)
-        {
-            return;
-        }
-
         VisualElement root = uiDocument.rootVisualElement;
 
         Color backgroundButtonColor = currentThemeMeta.ThemeJson.buttonMainColor;

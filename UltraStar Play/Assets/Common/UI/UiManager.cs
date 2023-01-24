@@ -33,7 +33,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
-    [Inject(Optional = true)]
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -62,11 +62,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         string text,
         params string[] additionalTextClasses)
     {
-        if (uiDocument == null)
-        {
-            return null;
-        }
-
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
