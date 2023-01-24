@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -38,6 +39,12 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     [Inject(Optional = true)]
     private UIDocument uiDocument;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private Settings settings;
+
     private ShowFps showFpsInstance;
 
     protected override object GetInstance()
@@ -57,10 +64,13 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        if (SettingsManager.Instance.Settings.DeveloperSettings.showFps)
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
         {
-            CreateShowFpsInstance();
-        }
+            if (settings.DeveloperSettings.showFps)
+            {
+                CreateShowFpsInstance();
+            }
+        });
     }
 
     private void Update()
@@ -91,7 +101,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public Label CreateNotificationVisualElement(
+    private Label DoCreateNotification(
         string text,
         params string[] additionalTextClasses)
     {
@@ -123,6 +133,13 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         StartCoroutine(FadeOutVisualElement(notification, 2, 1));
 
         return notificationLabel;
+    }
+
+    public static Label CreateNotification(
+        string text,
+        params string[] additionalTextClasses)
+    {
+        return Instance.DoCreateNotification(text, additionalTextClasses);
     }
 
     public static IEnumerator FadeOutVisualElement(

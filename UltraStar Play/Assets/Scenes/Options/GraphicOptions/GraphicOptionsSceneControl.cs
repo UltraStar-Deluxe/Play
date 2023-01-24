@@ -39,8 +39,8 @@ public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITransl
     {
         if (PlatformUtils.IsStandalone)
         {
-            new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>());
-            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>(), gameObject);
+            new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>(), settings);
+            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>(), settings, gameObject);
         }
         else
         {
@@ -86,8 +86,8 @@ public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITransl
             return;
         }
 
-        ScreenResolution res = SettingsManager.Instance.Settings.GraphicSettings.resolution;
-        FullScreenMode fullScreenMode = SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode;
+        ScreenResolution res = settings.GraphicSettings.resolution;
+        FullScreenMode fullScreenMode = settings.GraphicSettings.fullScreenMode;
         if (res.Width > 0
             && res.Height > 0
             && res.RefreshRate > 0)

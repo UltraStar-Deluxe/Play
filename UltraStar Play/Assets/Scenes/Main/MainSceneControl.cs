@@ -96,11 +96,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void Start()
     {
-        startButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
-        settingsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.OptionsScene));
-        aboutButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.AboutScene));
-        creditsButton.RegisterCallbackButtonTriggered(() => SceneNavigator.Instance.LoadScene(EScene.CreditsScene));
+        settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        aboutButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.AboutScene));
+        creditsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CreditsScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 

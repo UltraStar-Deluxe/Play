@@ -83,6 +83,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private HttpServer httpServer;
+
     private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
     private NetworkConfigControl networkConfigControl;
 
@@ -134,13 +137,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                 });
 
         ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,
-            "value", HttpServer.Instance.host);
+            "value", httpServer.host);
 
         if (HttpServer.IsSupported)
         {
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerPortWithExampleUri,
-                "host", HttpServer.Instance.host,
-                "port", HttpServer.Instance.port);
+                "host", httpServer.host,
+                "port", httpServer.port);
         }
         else
         {
