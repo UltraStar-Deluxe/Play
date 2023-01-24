@@ -34,11 +34,6 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     {
         return Instance;
     }
-    
-    public void LoadScene(SceneEnumHolder holder)
-    {
-        LoadScene(holder.scene);
-    }
 
     public void LoadScene(EScene scene)
     {
