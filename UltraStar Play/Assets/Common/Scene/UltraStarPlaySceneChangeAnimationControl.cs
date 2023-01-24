@@ -1,8 +1,9 @@
 using System;
+using UniInject;
+using UniRx;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour
+public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
@@ -22,40 +23,34 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     private Action animateAction;
 
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
+
+    [Inject]
     private Settings settings;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    protected override void AwakeSingleton()
+    protected override void StartSingleton()
     {
-        settings = FindObjectOfType<SettingsManager>().Settings;
-        audioSource = GetComponentInChildren<AudioSource>();
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => UpdateSceneTexturesAndTransition());
+        UpdateSceneTexturesAndTransition();
     }
 
-    protected override void OnEnableSingleton()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    protected override void OnDisableSingleton()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    private void UpdateSceneTexturesAndTransition()
     {
         ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
 
-        if (!settings.GraphicSettings.AnimateSceneChange)
+        if (settings.GraphicSettings.AnimateSceneChange)
         {
-            return;
+            animateAction?.Invoke();
         }
-
-        animateAction?.Invoke();
     }
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)

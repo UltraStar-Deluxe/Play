@@ -46,6 +46,9 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     private float lastPauseTimeInSeconds;
 
     protected override object GetInstance()
@@ -53,26 +56,12 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         return Instance;
     }
 
-    protected override void OnEnableSingleton()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    protected override void OnDisableSingleton()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
     protected override void StartSingleton()
     {
         settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
-    }
-
-    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
-    {
-        UpdateBackgroundMusic();
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => UpdateBackgroundMusic());
     }
 
     private void UpdateBackgroundMusic()

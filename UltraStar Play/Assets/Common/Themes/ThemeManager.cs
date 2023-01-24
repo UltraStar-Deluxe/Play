@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniInject;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
-public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
+public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInjection
 {
     /**
      * Filename without extension of the theme that should be loaded by default
@@ -63,6 +63,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
 
     private bool anyThemeLoaded;
 
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private UIDocument uiDocument;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -86,7 +92,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
         }
 
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         uiDocument.panelSettings.targetTexture = UiRenderTexture;
         BackgroundShaderControl.SetUiRenderTextures(
             UiRenderTexture,
@@ -104,7 +109,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
 
     private void LoadCurrentTheme()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.DeveloperSettings.disableDynamicThemes)
         {
             return;
         }
@@ -272,13 +277,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
-        SettingsManager.Instance.Settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
+        settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
         LoadCurrentTheme();
     }
 
     public ThemeMeta GetCurrentTheme()
     {
-        return GetThemeByName(SettingsManager.Instance.Settings.GraphicSettings.themeName);
+        return GetThemeByName(settings.GraphicSettings.themeName);
     }
 
     public ThemeMeta GetThemeByName(string themeName)
@@ -348,7 +353,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
 
     public void ApplyThemeSpecificStylesToVisualElementsInScene()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.DeveloperSettings.disableDynamicThemes)
         {
             return;
         }
@@ -368,7 +373,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
             return;
         }
 
-        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         if (uiDocument == null)
         {
             return;
