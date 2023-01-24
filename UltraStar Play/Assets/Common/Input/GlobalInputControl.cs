@@ -1,8 +1,9 @@
-﻿using UniInject;
+﻿using PrimeInputActions;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
+public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -12,24 +13,17 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     private static int volumeBeforeMute = -1;
 
-    public static GlobalInputControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GlobalInputControl>();
-
     [Inject]
     private Settings settings;
 
-    protected override object GetInstance()
-    {
-        return Instance;
-    }
-
-    protected override void StartSingleton()
+    protected void Start()
     {
         // Toggle full-screen mode via F11
-        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
             .Subscribe(_ => ToggleFullscreen());
 
         // Mute / unmute audio via F12
-        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => ToggleMuteAudio());
     }
 
@@ -52,13 +46,13 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         {
             settings.AudioSettings.VolumePercent = volumeBeforeMute;
             volumeBeforeMute = -1;
-            UiManager.Instance.CreateNotificationVisualElement("Unmute");
+            UiManager.CreateNotification("Unmute");
         }
         else
         {
             volumeBeforeMute = settings.AudioSettings.VolumePercent;
             settings.AudioSettings.VolumePercent = 0;
-            UiManager.Instance.CreateNotificationVisualElement("Mute");
+            UiManager.CreateNotification("Mute");
         }
     }
 }
