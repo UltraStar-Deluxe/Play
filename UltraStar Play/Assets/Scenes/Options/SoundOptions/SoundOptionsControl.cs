@@ -78,7 +78,7 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         backgroundMusicVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);

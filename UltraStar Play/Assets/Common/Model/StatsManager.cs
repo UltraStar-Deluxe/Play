@@ -26,13 +26,7 @@ public class StatsManager : MonoBehaviour
         }
     }
 
-    public static StatsManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<StatsManager>("StatsManager");
-        }
-    }
+    public static StatsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatsManager>();
 
     public void Save()
     {
@@ -70,6 +64,11 @@ public class StatsManager : MonoBehaviour
 
     void OnDisable()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         // Save the statistics when necessary.
         if (statistics != null && statistics.IsDirty)
         {

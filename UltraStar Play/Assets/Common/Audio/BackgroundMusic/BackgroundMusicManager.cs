@@ -13,22 +13,7 @@ using UnityEngine.SceneManagement;
 
 public class BackgroundMusicManager : MonoBehaviour, INeedInjection
 {
-    private static BackgroundMusicManager instance;
-    public static BackgroundMusicManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                BackgroundMusicManager instanceInScene = GameObjectUtils.FindComponentWithTag<BackgroundMusicManager>("BackgroundMusicManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundMusicManager>();
 
     private static readonly int timeInSecondsBeforeRestartingBackgroundMusic = 20;
     private static readonly List<EScene> scenesWithoutBackgroundMusic = new()
@@ -63,18 +48,28 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
 
     private float lastPauseTimeInSeconds;
 
-	private void Start()
+    private void OnEnable()
     {
-        BackgroundMusicManager self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
-        instance.UpdateBackgroundMusic();
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
-        if (!Application.isPlaying || instance != this)
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        UpdateBackgroundMusic();
+    }
+
+    private void Start()
+    {
+        if (this != Instance)
         {
+            Destroy(gameObject);
             return;
         }
-
         settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);

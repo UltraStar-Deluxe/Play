@@ -14,13 +14,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class MidiManager : MonoBehaviour, INeedInjection
 {
-    public static MidiManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<MidiManager>("MidiManager");
-        }
-    }
+    public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
     // It seems, the sound bank has been created with a specific sample rate of 44100 Hz.
     public static readonly int midiStreamSampleRateHz = 44100;

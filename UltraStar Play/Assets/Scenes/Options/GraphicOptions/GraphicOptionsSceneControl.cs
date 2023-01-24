@@ -64,7 +64,7 @@ public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITransl
     {
         if (!Application.isPlaying && backButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         resolutionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_resolution);
         fpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_targetFps);

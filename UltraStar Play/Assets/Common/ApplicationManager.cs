@@ -9,13 +9,7 @@ using UnityEngine;
 
 public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
-    public static ApplicationManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<ApplicationManager>("ApplicationManager");
-        }
-    }
+    public static ApplicationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationManager>();
 
     public List<string> simulatedCommandLineArguments = new();
 
@@ -27,6 +21,11 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public void OnInjectionFinished()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
@@ -42,11 +41,21 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
 
     void OnEnable()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         Application.logMessageReceivedThreaded += Log.HandleUnityLog;
     }
 
     void OnDisable()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 

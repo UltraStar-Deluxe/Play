@@ -177,7 +177,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (!Application.isPlaying && createPlaylistButton == null)
         {
-            SceneInjectionManager.Instance.DoInjection();
+            UltraStarPlaySceneInjectionManager.Instance.DoInjection();
         }
         playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
         editPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_editPlaylistButton);

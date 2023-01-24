@@ -6,22 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
 {
-    private static UltraStarPlaySceneChangeAnimationControl instance;
-    public static UltraStarPlaySceneChangeAnimationControl Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                UltraStarPlaySceneChangeAnimationControl instanceInScene = GameObjectUtils.FindComponentWithTag<UltraStarPlaySceneChangeAnimationControl>("SceneChangeAnimationControl");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
     private RenderTexture uiCopyRenderTexture;
     public RenderTexture UiCopyRenderTexture
@@ -97,14 +82,14 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
             Init();
         }
 
+        ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
+
         if (!settings.GraphicSettings.AnimateSceneChange)
         {
             return;
         }
 
         animateAction?.Invoke();
-
-        ThemeManager.Instance.UpdateSceneTextures(UiCopyRenderTexture);
     }
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)

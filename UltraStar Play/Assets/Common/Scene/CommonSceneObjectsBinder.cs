@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
-using SceneChangeAnimations;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;

@@ -13,13 +13,7 @@ public class SettingsManager : MonoBehaviour
         initializedResolution = false;
     }
 
-    public static SettingsManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
-        }
-    }
+    public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
 
     // The settings must be written to the same path they have been loaded from.
     // This field stores the path from where settings have been loaded / will be saved.
@@ -42,13 +36,14 @@ public class SettingsManager : MonoBehaviour
 
     private static bool initializedResolution;
 
-    // Non-static settings field for debugging of the settings in the Unity Inspector.
-    public Settings nonStaticSettings;
-
-    void Start()
+    private void Start()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         // Load reference from last scene if needed
-        nonStaticSettings = settings;
         if (!initializedResolution)
         {
             initializedResolution = true;
@@ -57,8 +52,13 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+
         Save();
     }
 
@@ -68,7 +68,7 @@ public class SettingsManager : MonoBehaviour
         File.WriteAllText(GetSettingsPath(), json);
     }
 
-    public void Reload()
+    private void Reload()
     {
         using (new DisposableStopwatch("Loading the settings took <millis> ms"))
         {
@@ -82,7 +82,6 @@ public class SettingsManager : MonoBehaviour
             }
             string fileContent = File.ReadAllText(loadedSettingsPath);
             settings = JsonConverter.FromJson<Settings>(fileContent);
-            nonStaticSettings = settings;
             OverwriteSettingsWithCommandLineArguments();
         }
     }

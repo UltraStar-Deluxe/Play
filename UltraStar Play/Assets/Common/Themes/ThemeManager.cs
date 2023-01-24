@@ -10,12 +10,6 @@ using UnityEngine.UIElements;
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
 public class ThemeManager : MonoBehaviour, ISpriteHolder
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        instance = null;
-    }
-
     /**
      * Filename without extension of the theme that should be loaded by default
      */
@@ -23,22 +17,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
     private const string ThemeFolderName = "Themes";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
 
-    private static ThemeManager instance;
-    public static ThemeManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                ThemeManager instanceInScene = GameObjectUtils.FindComponentWithTag<ThemeManager>("ThemeManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
     public Material backgroundMaterial;
     public Material particleMaterial;
@@ -84,29 +63,18 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     private bool anyThemeLoaded;
 
-    private void Awake()
-    {
-        if (this != Instance)
-        {
-            Destroy(gameObject);
-        }
-    }
-
     private void Start()
-    {
-        if (Instance == this)
-        {
-            ImageManager.AddSpriteHolder(this);
-        }
-    }
-
-    public void UpdateSceneTextures(Texture transitionTexture)
     {
         if (Instance != this)
         {
             return;
         }
 
+        ImageManager.AddSpriteHolder(this);
+    }
+
+    public void UpdateSceneTextures(Texture transitionTexture)
+    {
         if (backgroundMaterialCopy == null)
         {
             backgroundMaterialCopy = new Material(backgroundMaterial);
@@ -118,7 +86,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
 
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
+        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         uiDocument.panelSettings.targetTexture = UiRenderTexture;
         BackgroundShaderControl.SetUiRenderTextures(
             UiRenderTexture,
@@ -134,7 +102,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
     }
 
-    public void LoadCurrentTheme()
+    private void LoadCurrentTheme()
     {
         if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
         {
@@ -400,7 +368,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
             return;
         }
 
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
+        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         if (uiDocument == null)
         {
             return;
