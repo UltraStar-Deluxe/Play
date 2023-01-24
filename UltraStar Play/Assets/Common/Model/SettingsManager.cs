@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public class SettingsManager : MonoBehaviour
+public class SettingsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -36,13 +36,13 @@ public class SettingsManager : MonoBehaviour
 
     private static bool initializedResolution;
 
-    private void Start()
+    protected override object GetInstance()
     {
-        if (this != Instance)
-        {
-            return;
-        }
+        return Instance;
+    }
 
+    protected override void StartSingleton()
+    {
         // Load reference from last scene if needed
         if (!initializedResolution)
         {
@@ -52,13 +52,8 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    protected override void OnDisableSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
         Save();
     }
 

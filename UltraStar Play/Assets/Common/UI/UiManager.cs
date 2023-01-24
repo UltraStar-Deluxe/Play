@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : MonoBehaviour, INeedInjection
+public class UiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
@@ -40,17 +40,17 @@ public class UiManager : MonoBehaviour, INeedInjection
 
     private ShowFps showFpsInstance;
 
-    private void Awake()
+    protected override object GetInstance()
     {
-        if (Instance != this)
-        {
-            return;
-        }
+        return Instance;
+    }
 
+    protected override void AwakeSingleton()
+    {
         LeanTween.init(10000);
     }
 
-    private void Start()
+    protected override void StartSingleton()
     {
         if (Instance != this)
         {

@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class BackgroundMusicManager : MonoBehaviour, INeedInjection
+public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundMusicManager>();
 
@@ -48,31 +48,31 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
 
     private float lastPauseTimeInSeconds;
 
-    private void OnEnable()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void OnEnableSingleton()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void OnDisable()
+    protected override void OnDisableSingleton()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    protected override void StartSingleton()
+    {
+        settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
+            .Subscribe(_ => UpdateBackgroundMusic())
+            .AddTo(gameObject);
     }
 
     private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
         UpdateBackgroundMusic();
-    }
-
-    private void Start()
-    {
-        if (this != Instance)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
-            .Subscribe(_ => UpdateBackgroundMusic())
-            .AddTo(gameObject);
     }
 
     private void UpdateBackgroundMusic()

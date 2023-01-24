@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
-public class ThemeManager : MonoBehaviour, ISpriteHolder
+public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder
 {
     /**
      * Filename without extension of the theme that should be loaded by default
@@ -63,13 +63,13 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     private bool anyThemeLoaded;
 
-    private void Start()
+    protected override object GetInstance()
     {
-        if (Instance != this)
-        {
-            return;
-        }
+        return Instance;
+    }
 
+    protected override void StartSingleton()
+    {
         ImageManager.AddSpriteHolder(this);
     }
 

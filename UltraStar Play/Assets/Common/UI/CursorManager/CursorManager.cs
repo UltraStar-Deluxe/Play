@@ -4,7 +4,7 @@ using UnityEngine;
 
 #pragma warning disable CS0649
 
-public class CursorManager : MonoBehaviour, INeedInjection
+public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
 
@@ -26,7 +26,12 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     public ECursor CurrentCursor { get; private set; } = ECursor.Default;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         if (Instance != this)
         {

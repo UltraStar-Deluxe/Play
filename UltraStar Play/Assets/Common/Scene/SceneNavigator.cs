@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SceneNavigator : MonoBehaviour, INeedInjection
+public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 {
     private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
@@ -30,6 +30,11 @@ public class SceneNavigator : MonoBehaviour, INeedInjection
     /// Static map to store and load SceneData instances across scenes.
     private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
 
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+    
     public void LoadScene(SceneEnumHolder holder)
     {
         LoadScene(holder.scene);

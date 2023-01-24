@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 // Handles loading and caching of AudioClips.
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
-public class AudioManager : MonoBehaviour
+public class AudioManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -20,6 +20,11 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
     private CoroutineManager coroutineManager;
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
     {

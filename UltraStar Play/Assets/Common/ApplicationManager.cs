@@ -7,7 +7,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static ApplicationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationManager>();
 
@@ -19,13 +19,13 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private Settings settings;
 
-    public void OnInjectionFinished()
+    protected override object GetInstance()
     {
-        if (Instance != this)
-        {
-            return;
-        }
+        return Instance;
+    }
 
+    protected override void StartSingleton()
+    {
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
@@ -39,23 +39,13 @@ public class ApplicationManager : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    void OnEnable()
+    protected override void OnEnableSingleton()
     {
-        if (Instance != this)
-        {
-            return;
-        }
-
         Application.logMessageReceivedThreaded += Log.HandleUnityLog;
     }
 
-    void OnDisable()
+    protected override void OnDisableSingleton()
     {
-        if (Instance != this)
-        {
-            return;
-        }
-
         Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 

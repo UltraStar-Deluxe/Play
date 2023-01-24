@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class CoroutineManager : MonoBehaviour
+public class CoroutineManager : AbstractSingletonBehaviour
 {
     public static CoroutineManager Instance
     {
@@ -23,5 +23,10 @@ public class CoroutineManager : MonoBehaviour
     {
         StartCoroutine(coroutine);
         CoroutinesInProgress.Add(coroutine);
+    }
+
+    protected override object GetInstance()
+    {
+        return Instance;
     }
 }
