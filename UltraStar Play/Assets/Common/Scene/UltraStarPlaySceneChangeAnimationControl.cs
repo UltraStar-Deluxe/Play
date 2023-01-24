@@ -109,9 +109,20 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
-        UIDocument uiDocument = FindObjectOfType<UIDocument>();
         // Take "screenshot" of "old" scene.
-        Graphics.CopyTexture(uiDocument.panelSettings.targetTexture, UiCopyRenderTexture);
+        RenderTexture uiRenderTexture = ThemeManager.Instance.UiRenderTexture;
+        if (uiRenderTexture == null)
+        {
+            Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
+        }
+        else if (UiCopyRenderTexture == null)
+        {
+            Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
+        }
+        else
+        {
+            Graphics.CopyTexture(uiRenderTexture, UiCopyRenderTexture);
+        }
         animateAction = doAnimateAction;
         doLoadSceneAction();
     }
