@@ -16,7 +16,7 @@ public class UltraStarPlayTranslationManager : TranslationManager, INeedInjectio
         }
 
         UltraStarPlaySceneInjectionManager sceneInjectionManager = UltraStarPlaySceneInjectionManager.Instance;
-        if (sceneInjectionManager.SceneInjectionStatus == UltraStarPlaySceneInjectionManager.ESceneInjectionStatus.Pending)
+        if (sceneInjectionManager.SceneInjectionStatus == ESceneInjectionStatus.Pending)
         {
             sceneInjectionManager.DoSceneInjection();
         }
