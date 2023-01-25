@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
+using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -21,6 +22,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.viewMoreButton)]
     private Button viewMoreButton;
+
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
 
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
@@ -57,7 +61,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
             .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => StartCoroutine(FinishAfterDelay()));
-        
+
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -96,9 +100,14 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         Debug.LogWarning("Showing general error message in loading scene. Probably something went wrong.");
         unexpectedErrorContainer.ShowByDisplay();
         unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
-            "path", Log.logFileFolder);
+            "path", ApplicationUtils.GetLogFilePathDisplayString());
         viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
         viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
+        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            UiManager.CreateNotification("Copied log to clipboard");
+        });
     }
 
     private void FinishScene()

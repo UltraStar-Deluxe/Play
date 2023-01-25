@@ -106,4 +106,19 @@ public static class ApplicationUtils
         float diagonalInInches = diagonalInPixels / Screen.dpi;
         return diagonalInInches;
     }
+
+    public static string GetLogFilePathDisplayString()
+    {
+        string logFilePath = Log.logFilePath;
+        if (PlatformUtils.IsAndroid)
+        {
+            string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
+            string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
+            logFilePath = logFilePath
+                .Replace(internalStorageRoot, "INTERNAL-STORAGE")
+                .Replace(sdCardStorageRoot, "SD-CARD-STORAGE");
+        }
+
+        return logFilePath;
+    }
 }

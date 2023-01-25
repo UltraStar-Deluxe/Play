@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Display;
 using UnityEngine;
 
 public static class Log
 {
+    private const int LogTextMaxLengthInChars = 100000;
+
     public static readonly string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
     public static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
@@ -84,5 +88,31 @@ public static class Log
                 loggerWithContext.Information(logString);
                 break;
         }
+    }
+
+    public static string GetLogText(LogEventLevel logEventLevel)
+    {
+        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
+        List<string> logLines = GetLogHistory()
+            .Where(logEvent => (int)logEvent.Level >= (int)logEventLevel)
+            .Select(logEvent =>
+            {
+                StringWriter stringWriter = new();
+                textFormatter.Format(logEvent, stringWriter);
+                string logLine = stringWriter.ToString();
+                // Workaround for Unity TextField interpreting backslash for special characters.
+                return logLine.Replace("\\", "/");
+            })
+            .ToList();
+
+        string logText = logLines.IsNullOrEmpty()
+            ? "(no log messages)"
+            : logLines.JoinWith("");
+        if (logText.Length > LogTextMaxLengthInChars)
+        {
+            string prefix = "...\n";
+            logText = prefix + logText.Substring(logText.Length - (LogTextMaxLengthInChars - prefix.Length));
+        }
+        return logText;
     }
 }

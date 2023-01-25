@@ -17,8 +17,6 @@ using IBinding = UniInject.IBinding;
 
 public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
-    private const int CopyLogMaxLengthInChars = 100000;
-
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -138,7 +136,7 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         showLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(() =>
         {
-            ClipboardUtils.CopyToClipboard(GetLogText());
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
         });
 
@@ -175,30 +173,5 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         return bb.GetBindings();
-    }
-
-    private string GetLogText()
-    {
-        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
-        List<string> logLines = Log.GetLogHistory()
-            .Select(logEvent =>
-            {
-                StringWriter stringWriter = new();
-                textFormatter.Format(logEvent, stringWriter);
-                string logLine = stringWriter.ToString();
-                // Workaround for Unity TextField interpreting backslash for special characters.
-                return logLine.Replace("\\", "/");
-            })
-            .ToList();
-
-        string logText = logLines.IsNullOrEmpty()
-            ? "(no log messages)"
-            : logLines.JoinWith("");
-        if (logText.Length > CopyLogMaxLengthInChars)
-        {
-            string prefix = "...\n";
-            logText = prefix + logText.Substring(logText.Length - (CopyLogMaxLengthInChars - prefix.Length));
-        }
-        return logText;
     }
 }
