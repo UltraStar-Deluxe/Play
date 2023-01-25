@@ -63,19 +63,7 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
     private void AddDebugLogConsoleCommands()
     {
         DebugLogConsole.AddCommand("logs.path", "Show path to log file",
-            () =>
-            {
-                string logFilePath = Log.logFilePath;
-                if (PlatformUtils.IsAndroid)
-                {
-                    string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
-                    string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
-                    logFilePath = logFilePath
-                        .Replace(internalStorageRoot, "INTERNAL-STORAGE")
-                        .Replace(sdCardStorageRoot, "SD-CARD-STORAGE");
-                }
-                Debug.Log($"Log file path: {logFilePath}");
-            });
+            () => Debug.Log($"Log file path: {ApplicationUtils.GetLogFilePathDisplayString()}"));
     }
 
     private void Update()
