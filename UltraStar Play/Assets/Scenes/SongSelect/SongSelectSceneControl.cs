@@ -288,8 +288,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
-        sceneData = SceneNavigator.GetSceneData(CreateDefaultSceneData());
-
         InitSongMetas();
 
         HidePlayerSelectOverlay();
@@ -896,7 +894,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
-        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SongSelectSceneData>());
+        bb.BindExistingInstance(SceneNavigator.GetSceneData(CreateDefaultSceneData()));
         bb.BindExistingInstance(songRouletteControl);
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
