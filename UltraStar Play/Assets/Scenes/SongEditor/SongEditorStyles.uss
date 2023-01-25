@@ -20,6 +20,7 @@
     --control-height-large: 40px;
     --control-height-small: 20px;
     --panel-background-color: rgb(60, 63, 65);
+    --note-area-background-color: rgb(43, 43, 43);
     background-color: rgb(50, 50, 50);
 }
 
@@ -38,7 +39,7 @@
 }
 
 #noteArea {
-    background-color: rgb(43, 43, 43);
+    background-color: var(--note-area-background-color);
 }
 
 Button.recording {
@@ -212,4 +213,8 @@ ScrollView #unity-content-container {
 
 .dialogBackground {
     background-color: var(--panel-background-color);
+}
+
+.noteAreaGridLabel {
+    background-color: var(--note-area-background-color);
 }
