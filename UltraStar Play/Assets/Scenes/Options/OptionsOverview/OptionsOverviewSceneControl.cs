@@ -149,6 +149,12 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void SetLanguage(SystemLanguage newValue)
     {
+        if (settings.GameSettings.language == newValue
+            && translationManager.currentLanguage == newValue)
+        {
+            return;
+        }
+
         settings.GameSettings.language = newValue;
         translationManager.currentLanguage = settings.GameSettings.language;
         translationManager.ReloadTranslationsAndUpdateScene();
