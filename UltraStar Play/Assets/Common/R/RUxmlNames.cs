@@ -69,7 +69,6 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
-        public const string closeLogOverlayButton = "closeLogOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
@@ -254,14 +253,8 @@ public static partial class R
         public const string lo = "lo";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logLevelContainer = "logLevelContainer";
-        public const string logLevelItemPicker = "logLevelItemPicker";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
-        public const string logOverlay = "logOverlay";
-        public const string logOverlayButtonRow = "logOverlayButtonRow";
-        public const string logPathLabel = "logPathLabel";
-        public const string logTextField = "logTextField";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaTextField = "lyricsAreaTextField";

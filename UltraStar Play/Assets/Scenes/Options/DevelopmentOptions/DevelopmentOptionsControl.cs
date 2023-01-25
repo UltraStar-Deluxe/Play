@@ -50,23 +50,8 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
-    [Inject(UxmlName = R.UxmlNames.logLevelItemPicker)]
-    private ItemPicker logLevelItemPicker;
-
-    [Inject(UxmlName = R.UxmlNames.logTextField)]
-    private TextField logTextField;
-
     [Inject(UxmlName = R.UxmlNames.showLogOverlayButton)]
     private Button showLogOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeLogOverlayButton)]
-    private Button closeLogOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.logOverlay)]
-    private VisualElement logOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.logPathLabel)]
-    private Label logPathLabel;
 
     [Inject]
     private Settings settings;
@@ -86,7 +71,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private HttpServer httpServer;
 
-    private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
+
     private NetworkConfigControl networkConfigControl;
 
     private void Start()
@@ -143,22 +130,7 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             .Subscribe(_ => OnBack());
 
         // View Log
-        HideLogOverlay();
-        showLogOverlayButton.RegisterCallbackButtonTriggered(() => ShowLogOverlay());
-        closeLogOverlayButton.RegisterCallbackButtonTriggered(() => HideLogOverlay());
-        logLevelItemPickerControl = new LabeledItemPickerControl<LogEventLevel>(
-            logLevelItemPicker,
-            EnumUtils.GetValuesAsList<LogEventLevel>());
-        LogEvent eventWithHighestLogLevel = Log.GetLogHistory()
-            .FindMaxElement(logEvent =>  (int)logEvent.Level);
-        LogEventLevel highestLogLevel = eventWithHighestLogLevel != null
-            ? eventWithHighestLogLevel.Level
-            : LogEventLevel.Error;
-        logLevelItemPickerControl.SelectItem(highestLogLevel);
-        logLevelItemPickerControl.Selection.Subscribe(_ => UpdateLogTextField());
-        UpdateLogTextField();
-
-        logPathLabel.text = Log.logFilePath;
+        showLogOverlayButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
 
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
@@ -173,58 +145,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
     }
 
-    private void HideLogOverlay()
-    {
-        logOverlay.HideByDisplay();
-        showLogOverlayButton.Focus();
-    }
-
-    private void ShowLogOverlay()
-    {
-        logOverlay.ShowByDisplay();
-        closeLogOverlayButton.Focus();
-    }
-
     private void OnBack()
     {
-        if (uiDocument.rootVisualElement.focusController.focusedElement == logTextField)
-        {
-            closeLogOverlayButton.Focus();
-        }
-        else if (logOverlay.IsVisibleByDisplay())
-        {
-            HideLogOverlay();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
-    }
-
-    private void UpdateLogTextField()
-    {
-        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
-        List<string> logLines = Log.GetLogHistory()
-            .Where(logEvent => (int)logEvent.Level >= (int)logLevelItemPickerControl.SelectedItem)
-            .Select(logEvent =>
-            {
-                StringWriter stringWriter = new();
-                textFormatter.Format(logEvent, stringWriter);
-                string logLine = stringWriter.ToString();
-                // Workaround for Unity TextField interpreting backslash for special characters.
-                return logLine.Replace("\\", "/");
-            })
-            .ToList();
-
-        string logText = logLines.IsNullOrEmpty()
-            ? "(no messages for this log level)"
-            : logLines.JoinWith("");
-        if (logText.Length > VisualElementUtils.TextFieldCharacterLimit)
-        {
-            string prefix = "...\n";
-            logText = prefix + logText.Substring(logText.Length - (VisualElementUtils.TextFieldCharacterLimit - prefix.Length));
-        }
-        logTextField.value = logText;
+        sceneNavigator.LoadScene(EScene.OptionsScene);
     }
 
     public void UpdateTranslation()

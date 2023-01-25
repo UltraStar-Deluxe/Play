@@ -43,6 +43,8 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
 
     protected override void StartSingleton()
     {
+        AddDebugLogConsoleCommands();
+
         sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
         {
             // The EventSystem may be disabled afterwards because of EventSystemOptInOnAndroid. Thus, update after a frame.
@@ -56,6 +58,24 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
 
             UpdateDebugLogPopupVisible();
         });
+    }
+
+    private void AddDebugLogConsoleCommands()
+    {
+        DebugLogConsole.AddCommand("logs.path", "Show path to log file",
+            () =>
+            {
+                string logFilePath = Log.logFilePath;
+                if (PlatformUtils.IsAndroid)
+                {
+                    string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
+                    string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
+                    logFilePath = logFilePath
+                        .Replace(internalStorageRoot, "INTERNAL STORAGE")
+                        .Replace(sdCardStorageRoot, "SD-CARD STORAGE");
+                }
+                Debug.Log($"Log file path: {logFilePath}");
+            });
     }
 
     private void Update()
@@ -101,5 +121,10 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
     private void DisableInGameDebugConsoleEventSystem()
     {
         debugLogEventSystem.gameObject.SetActive(false);
+    }
+
+    public void ShowConsole()
+    {
+        debugLogManager.ShowLogWindow();
     }
 }
