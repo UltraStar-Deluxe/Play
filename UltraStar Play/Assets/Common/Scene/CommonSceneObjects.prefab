@@ -742,7 +742,7 @@ MonoBehaviour:
   propertiesFileName: messages
   logInfoInEditMode: 0
   logInfoInPlayMode: 1
-  generatedConstantsFolder: Assets/GeneratedScripts
+  generatedConstantsFolder: Assets/Common/R
   generateConstantsOnResourceChange: 1
   useFallbackIfNotInCurrentLanguage: 1
   currentLanguage: 10
