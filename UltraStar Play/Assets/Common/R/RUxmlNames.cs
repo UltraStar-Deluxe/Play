@@ -89,6 +89,7 @@ public static partial class R
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
+        public const string copyLogButton = "copyLogButton";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
         public const string createBackgroundLabel = "createBackgroundLabel";
         public const string createBackgroundToggle = "createBackgroundToggle";
@@ -501,7 +502,7 @@ public static partial class R
         public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showCoverButton = "showCoverButton";
         public const string showFpsContainer = "showFpsContainer";
-        public const string showLogOverlayButton = "showLogOverlayButton";
+        public const string showLogButton = "showLogButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
         public const string showNotePitchLabelContainer = "showNotePitchLabelContainer";

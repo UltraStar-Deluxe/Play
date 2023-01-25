@@ -71,8 +71,8 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
                     string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
                     string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
                     logFilePath = logFilePath
-                        .Replace(internalStorageRoot, "INTERNAL STORAGE")
-                        .Replace(sdCardStorageRoot, "SD-CARD STORAGE");
+                        .Replace(internalStorageRoot, "INTERNAL-STORAGE")
+                        .Replace(sdCardStorageRoot, "SD-CARD-STORAGE");
                 }
                 Debug.Log($"Log file path: {logFilePath}");
             });
