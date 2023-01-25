@@ -167,7 +167,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             {
                 if (!labelPool.TryGetFreeObject(out Label label))
                 {
-                    label = CreateLabel(verticalGridLabelContainer);
+                    label = CreateLabel();
                     labelPool.AddUsedObject(label);
                 }
 
@@ -178,14 +178,16 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         }
     }
 
-    private Label CreateLabel(VisualElement container)
+    private Label CreateLabel()
     {
         Label label = new();
+        label.AddToClassList("noteAreaGridLabel");
+        label.AddToClassList("verticalGridLabel");
         label.AddToClassList("tinyFont");
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        container.Add(label);
+        verticalGridLabelContainer.Add(label);
         return label;
     }
 
