@@ -2,6 +2,7 @@
     "name": "playshared",
     "rootNamespace": "",
     "references": [
+        "Unity.InputSystem",
         "Serilog",
         "Plugins",
         "UniRx",
@@ -9,7 +10,7 @@
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
-        "Unity.InputSystem"
+        "com.achimmihca.utfunknownunity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
