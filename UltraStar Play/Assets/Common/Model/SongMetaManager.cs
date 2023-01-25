@@ -9,7 +9,7 @@ using UniRx;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
-public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
+public class SongMetaManager : AbstractSingletonBehaviour
 {
     private static readonly object scanLock = new();
 
@@ -44,9 +44,6 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
-    [Inject]
-    private Settings settings;
-
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -76,6 +73,10 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
 
     private void RescanIfSongFoldersChanged()
     {
+        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
+        // Thus, use the static instance.
+        Settings settings = SettingsManager.Instance.Settings;
+
         if (lastSongDirs == null)
         {
             lastSongDirs = new List<string>(settings.GameSettings.songDirs);
@@ -151,6 +152,10 @@ public class SongMetaManager : AbstractSingletonBehaviour, INeedInjection
     private void ScanFilesAsynchronously()
     {
         Debug.Log("ScanFilesAsynchronously");
+
+        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
+        // Thus, use the static instance.
+        Settings settings = SettingsManager.Instance.Settings;
 
         List<string> txtFiles;
         lock (scanLock)
