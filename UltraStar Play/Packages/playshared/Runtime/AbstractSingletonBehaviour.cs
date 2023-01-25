@@ -32,52 +32,45 @@ public abstract class AbstractSingletonBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        if (GetInstance() != this)
+        if (ReferenceEquals(GetInstance(), this))
+        {
+            AwakeSingleton();
+        }
+        else
         {
             Destroy(gameObject);
-            return;
         }
-
-        AwakeSingleton();
     }
 
     private void OnEnable()
     {
-        if (GetInstance() != this)
+        if (ReferenceEquals(GetInstance(), this))
         {
-            return;
+            OnEnableSingleton();
         }
-
-        OnEnableSingleton();
     }
 
     private void OnDisable()
     {
-        if (GetInstance() != this)
+        if (ReferenceEquals(GetInstance(), this))
         {
-            return;
+            OnDisableSingleton();
         }
-
-        OnDisableSingleton();
     }
 
     private void Start()
     {
-        if (GetInstance() != this)
+        if (ReferenceEquals(GetInstance(), this))
         {
-            return;
+            StartSingleton();
         }
-
-        StartSingleton();
     }
 
     private void OnDestroy()
     {
-        if (GetInstance() != this)
+        if (ReferenceEquals(GetInstance(), this))
         {
-            return;
+            OnDestroySingleton();
         }
-
-        OnDestroySingleton();
     }
 }
