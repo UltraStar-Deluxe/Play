@@ -81,7 +81,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
-        void DoChangeScene() => SceneManager.LoadScene((int)scene);
+        void DoChangeScene() => SceneManager.LoadSceneAsync((int)scene, new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
         if (settings.GraphicSettings.AnimateSceneChange)
         {
             sceneChangeAnimationControl.AnimateChangeToScene(DoChangeScene, () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
