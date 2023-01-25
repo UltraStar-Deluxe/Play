@@ -35,6 +35,13 @@
       "dependencies": {},
       "hash": "f8c6f93dabc03137957588f7d9e572fc623272b0"
     },
+    "com.achimmihca.utfunknownunity": {
+      "version": "https://github.com/achimmihca/UTF-Unknown-Unity.git?path=UTF-Unknown-Unity/Packages/com.achimmihca.utfunknownunity#v1.0.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "31253e868265494482a8bb32269942b0b2e3d17e"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
