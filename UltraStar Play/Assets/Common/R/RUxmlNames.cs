@@ -189,6 +189,7 @@ public static partial class R
         public const string HighscoreEntry = "HighscoreEntry";
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
+        public const string horizontalGridLineContainer = "horizontalGridLineContainer";
         public const string httpServerPortLabel = "httpServerPortLabel";
         public const string icon = "icon";
         public const string iconBar = "iconBar";
@@ -483,7 +484,7 @@ public static partial class R
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
         public const string sentenceLabel = "sentenceLabel";
-        public const string sentenceLines = "sentenceLines";
+        public const string sentenceLinesContainer = "sentenceLinesContainer";
         public const string sentenceLineSizeContainer = "sentenceLineSizeContainer";
         public const string sentenceLineSizeTextField = "sentenceLineSizeTextField";
         public const string sentenceRatingContainer = "sentenceRatingContainer";
@@ -645,6 +646,7 @@ public static partial class R
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
+        public const string verticalGridLineContainer = "verticalGridLineContainer";
         public const string videoArea = "videoArea";
         public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";
