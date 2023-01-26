@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -29,8 +31,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.noteAreaNotesForeground)]
     private VisualElement noteAreaNotesForeground;
 
-    [Inject(UxmlName = R.UxmlNames.sentenceLines)]
-    private VisualElement sentenceLines;
+    [Inject(UxmlName = R.UxmlNames.sentenceLinesContainer)]
+    private VisualElement sentenceLinesContainer;
 
     [Inject(UxmlName = R.UxmlNames.noteAreaSentences)]
     public VisualElement noteAreaSentences;
@@ -56,8 +58,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
-    private DynamicTexture sentenceLinesDynamicTexture;
-
     private readonly Dictionary<Voice, List<Sentence>> voiceToSortedSentencesMap = new();
 
     private readonly Dictionary<Note, EditorNoteControl> noteToControlMap = new();
@@ -71,6 +71,34 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     private int lastViewportWidthInMillis;
 
     private readonly Dictionary<ESongEditorLayer, VisualElement> songEditorLayerToParentElement = new();
+
+    private Texture2D dashedVerticalLineTexture2D;
+    private Texture2D DashedVerticalLineTexture2D
+    {
+        get
+        {
+            if (dashedVerticalLineTexture2D == null)
+            {
+                int width = 4;
+                int height = 64;
+                dashedVerticalLineTexture2D = new Texture2D(width, height);
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        Color color = y < height / 2
+                            ? Color.clear
+                            : Color.white;
+                        dashedVerticalLineTexture2D.SetPixel(x, y, color);
+                    }
+                }
+                dashedVerticalLineTexture2D.Apply();
+            }
+
+            return dashedVerticalLineTexture2D;
+        }
+    }
 
     private void Start()
     {
@@ -122,14 +150,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             UpdateNotesAndSentences();
         }).AddTo(gameObject);
 
-        sentenceLines.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
-        {
-            if (sentenceLinesDynamicTexture == null)
-            {
-                sentenceLinesDynamicTexture = new DynamicTexture(gameObject, sentenceLines);
-                UpdateSentences();
-            }
-        });
+        sentenceLinesContainer.RegisterCallbackOneShot<GeometryChangedEvent>(evt => UpdateSentences());
 
         EnumUtils.GetValuesAsList<ESongEditorLayer>().ForEach(layer =>
         {
@@ -140,7 +161,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         });
 
         settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.SentenceLineSizeInDevicePixels)
+            .ObserveEveryValueChanged(it => it.SentenceLineSizeInPx)
             .Subscribe(newValue =>
             {
                 if (newValue <= 0)
@@ -255,19 +276,12 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void RemoveSentenceMarkerLines()
     {
-        if (sentenceLinesDynamicTexture == null)
-        {
-            return;
-        }
-
-        sentenceLinesDynamicTexture.ClearTexture();
-        sentenceLinesDynamicTexture.ApplyTexture();
+        sentenceLinesContainer.Clear();
     }
 
     private void UpdateSentenceMarkerLines()
     {
-        if (settings.SongEditorSettings.SentenceLineSizeInDevicePixels <= 0
-            || sentenceLinesDynamicTexture == null)
+        if (settings.SongEditorSettings.SentenceLineSizeInPx <= 0)
         {
             return;
         }
@@ -286,9 +300,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
             .ToList();
 
-        sentenceLinesDynamicTexture.ClearTexture();
+        sentenceLinesContainer.Clear();
         visibleVoices.ForEach(voice => DrawSentenceMarkerLineForVoice(voice));
-        sentenceLinesDynamicTexture.ApplyTexture();
     }
 
     private List<Sentence> GetSortedSentencesForVoice(Voice voice)
@@ -527,33 +540,28 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             float xEndPercent = (float)noteAreaControl.GetHorizontalPositionForBeat(sentence.ExtendedMaxBeat);
 
             DrawSentenceMarkerLine(xStartPercent, sentenceStartLineColor, 0);
-            DrawSentenceMarkerLine(xEndPercent, sentenceEndLineColor, 20);
+            DrawSentenceMarkerLine(xEndPercent, sentenceEndLineColor, DashedVerticalLineTexture2D.height / 2);
         });
     }
 
     private void DrawSentenceMarkerLine(float xPercent, Color color, int yDashOffset)
     {
+        float lineWidth = settings.SongEditorSettings.SentenceLineSizeInPx;
         if (xPercent < 0
-            || xPercent > 1)
+            || xPercent > 1
+            || lineWidth <= 0)
         {
             return;
         }
 
-        int width = settings.SongEditorSettings.SentenceLineSizeInDevicePixels;
-        int xFrom = (int)(xPercent * sentenceLinesDynamicTexture.TextureWidth);
-        int xTo = xFrom + width;
-
-        for (int x = xFrom; x < xTo && x < sentenceLinesDynamicTexture.TextureWidth; x++)
-        {
-            for (int y = 0; y < sentenceLinesDynamicTexture.TextureHeight; y++)
-            {
-                // Make it dashed
-                if (((y + yDashOffset) % 40) < 20)
-                {
-                    sentenceLinesDynamicTexture.SetPixel(x, y, color);
-                }
-            }
-        }
+        VisualElement line = new();
+        line.AddToClassList("sentenceMarkerLine");
+        line.style.backgroundImage = new StyleBackground(DashedVerticalLineTexture2D);
+        line.style.backgroundPositionY = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Top, yDashOffset));
+        line.style.unityBackgroundImageTintColor = new StyleColor(color);
+        line.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        line.style.width = new StyleLength(new Length(lineWidth, LengthUnit.Pixel));
+        sentenceLinesContainer.Add(line);
     }
 
     private EditorNoteControl UpdateOrCreateNoteControl(Note note, SongEditorEnumLayer layer)
@@ -624,5 +632,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         visualElement.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
         visualElement.style.width = new StyleLength(new Length(widthPercent * 100, LengthUnit.Percent));
         visualElement.style.height = new StyleLength(new Length(heightPercent * 100, LengthUnit.Percent));
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(dashedVerticalLineTexture2D);
     }
 }
