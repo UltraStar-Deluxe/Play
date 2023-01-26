@@ -41,6 +41,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidContainer)]
     private VisualElement customEventSystemOptInOnAndroidContainer;
 
+    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorContainer)]
+    private VisualElement useUniversalCharsetDetectorContainer;
+
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
 
@@ -103,6 +106,10 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                     }
                     settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
+
+        new BoolPickerControl(useUniversalCharsetDetectorContainer.Q<ItemPicker>())
+                    .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
+                        newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
 
         new BoolPickerControl(customEventSystemOptInOnAndroidContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,

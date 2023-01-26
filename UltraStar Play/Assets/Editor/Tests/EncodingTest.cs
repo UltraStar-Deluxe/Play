@@ -41,7 +41,7 @@ public class EncodingTest
     private void TestFile(string fileName)
     {
         string filePath = folderPath + fileName;
-        SongMeta songMeta = SongMetaBuilder.ParseFile(filePath, out List<SongIssue> _);
+        SongMeta songMeta = SongMetaBuilder.ParseFile(filePath, out List<SongIssue> _, null, true);
         Assert.AreEqual(testSongTitle, songMeta.Title);
     }
 }
