@@ -18,7 +18,7 @@ public class VoicesBuilder
     // The last beat is only relevant for relative song files. Any beat will be relative to this.
     private int lastBeat;
 
-    public VoicesBuilder(string path, Encoding encoding, bool isRelativeSongFile)
+    public VoicesBuilder(string path, Encoding encoding, bool isRelativeSongFile, bool useUniversalCharsetDetector)
     {
         this.path = path;
         this.encoding = encoding;
@@ -26,7 +26,7 @@ public class VoicesBuilder
         currentVoice = new Voice(Voice.soloVoiceName);
         voiceNameToVoiceMap.Add(Voice.soloVoiceName, currentVoice);
 
-        using (StreamReader reader = TxtReader.GetFileStreamReader(path, encoding))
+        using (StreamReader reader = TxtReader.GetFileStreamReader(path, encoding, useUniversalCharsetDetector))
         {
             ParseStreamReader(reader);
         }

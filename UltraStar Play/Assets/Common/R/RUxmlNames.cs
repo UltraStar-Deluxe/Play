@@ -642,6 +642,7 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
+        public const string useUniversalCharsetDetectorContainer = "useUniversalCharsetDetectorContainer";
         public const string useWebcamContainer = "useWebcamContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
