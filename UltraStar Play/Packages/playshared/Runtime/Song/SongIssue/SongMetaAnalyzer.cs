@@ -1,18 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public static class SongMetaAnalyzer
 {
-    public static IReadOnlyCollection<SongIssue> AnalyzeIssues(SongMeta songMeta)
+    public static IReadOnlyCollection<SongIssue> AnalyzeIssues(
+        SongMeta songMeta,
+        int maxSongIssueCountPerMessage)
     {
-        List<SongIssue> result = new();
+        Dictionary<string, List<SongIssue>> messageToIssues = new();
         foreach (Voice voice in songMeta.GetVoices())
         {
-            AnalyzeSentencesInVoice(songMeta, voice, result);
+            AnalyzeSentencesInVoice(songMeta, voice, messageToIssues, maxSongIssueCountPerMessage);
         }
-        return result;
+        return messageToIssues.Values
+            .SelectMany(songIssues => songIssues)
+            .ToList();
     }
 
-    private static void AnalyzeSentencesInVoice(SongMeta songMeta, Voice voice, List<SongIssue> result)
+    private static void AnalyzeSentencesInVoice(
+        SongMeta songMeta,
+        Voice voice,
+        Dictionary<string, List<SongIssue>> messageToIssues,
+        int maxSongIssueCountPerMessage)
     {
         // Find overlapping sentences
         List<Sentence> sortedSentences = SongMetaUtils.GetSortedSentences(voice);
@@ -22,42 +32,77 @@ public static class SongMetaAnalyzer
             if (lastSentence != null && sentence.MinBeat < lastSentence.ExtendedMaxBeat)
             {
                 SongIssue issue = SongIssue.CreateError(songMeta, "Sentences overlap", sentence.MinBeat, lastSentence.ExtendedMaxBeat);
-                result.Add(issue);
+                AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
             lastSentence = sentence;
 
-            AnalyzeNotesInSentence(songMeta, sentence, result);
+            AnalyzeNotesInSentence(songMeta, sentence, messageToIssues, maxSongIssueCountPerMessage);
         }
     }
 
-    private static void AnalyzeNotesInSentence(SongMeta songMeta, Sentence sentence, List<SongIssue> result)
+    private static void AnalyzeNotesInSentence(
+        SongMeta songMeta,
+        Sentence sentence,
+        Dictionary<string, List<SongIssue>> messageToIssues,
+        int maxSongIssueCountPerMessage)
     {
-        // Find overlapping notes
         List<Note> sortedNotes = SongMetaUtils.GetSortedNotes(sentence);
         Note lastNote = null;
         foreach (Note note in sortedNotes)
         {
+            // Find overlapping notes
             if (lastNote != null && note.StartBeat < lastNote.EndBeat)
             {
                 SongIssue issue = SongIssue.CreateError(songMeta, "Notes overlap", note.StartBeat, lastNote.EndBeat);
-                result.Add(issue);
+                AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 
             // Find pitches outside of the singable range
             if (note.MidiNote < MidiUtils.SingableNoteMin || note.MidiNote > MidiUtils.SingableNoteMax)
             {
                 SongIssue issue = SongIssue.CreateWarning(songMeta, "Unusual pitch (human range is roughly from C2 to C6).", note.StartBeat, note.EndBeat);
-                result.Add(issue);
+                AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 
             // Check that each note has lyrics
             if (note.Text.IsNullOrEmpty())
             {
                 SongIssue issue = SongIssue.CreateWarning(songMeta, "Missing lyrics on note", note.StartBeat, note.EndBeat);
-                result.Add(issue);
+                AddSongIssue(messageToIssues, issue, maxSongIssueCountPerMessage);
             }
 
             lastNote = note;
         }
+    }
+
+    private static void AddSongIssue(
+        Dictionary<string, List<SongIssue>> messageToIssues,
+        SongIssue songIssue,
+        int maxSongIssueCountPerMessage)
+    {
+        string message = songIssue.Message;
+        int songIssueCount = GetSongIssueCount(messageToIssues, message);
+        if (songIssueCount >= maxSongIssueCountPerMessage)
+        {
+            return;
+        }
+
+        if (songIssueCount <= 0)
+        {
+            messageToIssues[message] = new List<SongIssue>();
+        }
+        messageToIssues[message].Add(songIssue);
+    }
+
+    private static int GetSongIssueCount(
+        Dictionary<string, List<SongIssue>> messageToIssues,
+        string message)
+    {
+        if (messageToIssues.TryGetValue(message, out List<SongIssue> existingIssues))
+        {
+            return existingIssues.Count;
+        }
+
+        return 0;
     }
 }
