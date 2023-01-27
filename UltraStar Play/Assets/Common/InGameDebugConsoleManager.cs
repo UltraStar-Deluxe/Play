@@ -22,9 +22,6 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
     private DebugLogPopup debugLogPopup;
     private EventSystem debugLogEventSystem;
 
-    private InputSystemUIInputModule inputSystemUIInputModule;
-    private EventSystem inputSystemUIInputModuleEventSystem;
-
     private bool oldIsLogWindowVisible;
 
     protected override object GetInstance()

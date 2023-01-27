@@ -44,7 +44,7 @@ public class DontDestroyOnLoadManager : AbstractSingletonBehaviour
         T componentInChildren = GetComponentInChildren<T>();
         if (componentInChildren == null)
         {
-            throw new Exception($"Did not find Component '{typeOfT}' in {nameof(DontDestroyOnLoadManager)}");
+            throw new UltraStarPlayException($"Did not find Component '{typeOfT}' in {nameof(DontDestroyOnLoadManager)}");
         }
         typeToComponentCache[typeOfT] = componentInChildren;
         return componentInChildren;
