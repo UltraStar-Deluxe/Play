@@ -42,12 +42,13 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject]
     private HighscoreSceneData sceneData;
+
     private EDifficulty currentDifficulty;
 
     void Start()
     {
-        sceneData = sceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         nextDifficultyButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
@@ -121,6 +122,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
     {
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>());
         return bb.GetBindings();
     }
 

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ContextMenuPopupManager : MonoBehaviour
+public class ContextMenuPopupManager : AbstractSingletonBehaviour
 {
     public static ContextMenuPopupManager Instance
     {
@@ -20,4 +20,9 @@ public class ContextMenuPopupManager : MonoBehaviour
 
     [InjectedInInspector]
     public VisualTreeAsset contextMenuSeparatorUi;
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 }

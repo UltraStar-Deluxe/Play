@@ -214,7 +214,7 @@ public class SongMeta
             string path = Directory + Path.DirectorySeparatorChar + Filename;
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
-                VoicesBuilder voicesBuilder = new(path, Encoding, Relative);
+                VoicesBuilder voicesBuilder = new(path, Encoding, Relative, false);
                 voices = new List<Voice>(voicesBuilder.GetVoices());
             }
 
@@ -255,7 +255,7 @@ public class SongMeta
         string path = SongMetaUtils.GetAbsoluteSongMetaPath(this);
         try
         {
-            SongMeta other = SongMetaBuilder.ParseFile(path, out List<SongIssue> _);
+            SongMeta other = SongMetaBuilder.ParseFile(path, out List<SongIssue> _, Encoding, false);
 
             // Copy values
             Encoding = other.Encoding;

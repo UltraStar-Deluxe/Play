@@ -78,7 +78,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             if (!errorMessage.IsNullOrEmpty())
             {
                 Debug.LogError(errorMessage);
-                uiManager.CreateNotificationVisualElement(errorMessage, "error");
+                UiManager.CreateNotification(errorMessage, "error");
             }
             HideEditPlaylistDialog();
         });
@@ -168,17 +168,13 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         {
             // Show error in popup
             Debug.LogError(errorMessage);
-            uiManager.CreateNotificationVisualElement(errorMessage, "error");
+            UiManager.CreateNotification(errorMessage, "error");
         }
         editPlaylistOverlay.HideByDisplay();
     }
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && createPlaylistButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
         editPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_editPlaylistButton);
         createPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_createPlaylistButton);

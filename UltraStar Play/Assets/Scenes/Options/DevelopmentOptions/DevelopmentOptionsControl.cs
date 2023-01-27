@@ -41,6 +41,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidContainer)]
     private VisualElement customEventSystemOptInOnAndroidContainer;
 
+    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorContainer)]
+    private VisualElement useUniversalCharsetDetectorContainer;
+
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
 
@@ -50,23 +53,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
-    [Inject(UxmlName = R.UxmlNames.logLevelItemPicker)]
-    private ItemPicker logLevelItemPicker;
+    [Inject(UxmlName = R.UxmlNames.showLogButton)]
+    private Button showLogButton;
 
-    [Inject(UxmlName = R.UxmlNames.logTextField)]
-    private TextField logTextField;
-
-    [Inject(UxmlName = R.UxmlNames.showLogOverlayButton)]
-    private Button showLogOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeLogOverlayButton)]
-    private Button closeLogOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.logOverlay)]
-    private VisualElement logOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.logPathLabel)]
-    private Label logPathLabel;
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
 
     [Inject]
     private Settings settings;
@@ -83,25 +74,19 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
     [Inject]
     private Injector injector;
 
-    private LabeledItemPickerControl<LogEventLevel> logLevelItemPickerControl;
+    [Inject]
+    private HttpServer httpServer;
+
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
+
     private NetworkConfigControl networkConfigControl;
 
     private void Start()
     {
         new BoolPickerControl(showFpsContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.showFps,
-                  newValue =>
-                  {
-                      settings.DeveloperSettings.showFps = newValue;
-                      if (newValue)
-                      {
-                        uiManager.CreateShowFpsInstance();
-                      }
-                      else
-                      {
-                        uiManager.DestroyShowFpsInstance();
-                      }
-                  });
+                  newValue => settings.DeveloperSettings.showFps = newValue);
 
         new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
             .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,
@@ -122,6 +107,10 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                     settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
 
+        new BoolPickerControl(useUniversalCharsetDetectorContainer.Q<ItemPicker>())
+                    .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
+                        newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
+
         new BoolPickerControl(customEventSystemOptInOnAndroidContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
                 newValue =>
@@ -134,13 +123,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                 });
 
         ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,
-            "value", HttpServer.Instance.host);
+            "value", httpServer.host);
 
         if (HttpServer.IsSupported)
         {
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerPortWithExampleUri,
-                "host", HttpServer.Instance.host,
-                "port", HttpServer.Instance.port);
+                "host", httpServer.host,
+                "port", httpServer.port);
         }
         else
         {
@@ -150,23 +139,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => OnBack());
 
-        // View Log
-        HideLogOverlay();
-        showLogOverlayButton.RegisterCallbackButtonTriggered(() => ShowLogOverlay());
-        closeLogOverlayButton.RegisterCallbackButtonTriggered(() => HideLogOverlay());
-        logLevelItemPickerControl = new LabeledItemPickerControl<LogEventLevel>(
-            logLevelItemPicker,
-            EnumUtils.GetValuesAsList<LogEventLevel>());
-        LogEvent eventWithHighestLogLevel = Log.GetLogHistory()
-            .FindMaxElement(logEvent =>  (int)logEvent.Level);
-        LogEventLevel highestLogLevel = eventWithHighestLogLevel != null
-            ? eventWithHighestLogLevel.Level
-            : LogEventLevel.Error;
-        logLevelItemPickerControl.SelectItem(highestLogLevel);
-        logLevelItemPickerControl.Selection.Subscribe(_ => UpdateLogTextField());
-        UpdateLogTextField();
-
-        logPathLabel.text = Log.logFilePath;
+        // View and copy log
+        showLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            UiManager.CreateNotification("Copied log to clipboard");
+        });
 
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
@@ -181,66 +160,13 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
     }
 
-    private void HideLogOverlay()
-    {
-        logOverlay.HideByDisplay();
-        showLogOverlayButton.Focus();
-    }
-
-    private void ShowLogOverlay()
-    {
-        logOverlay.ShowByDisplay();
-        closeLogOverlayButton.Focus();
-    }
-
     private void OnBack()
     {
-        if (uiDocument.rootVisualElement.focusController.focusedElement == logTextField)
-        {
-            closeLogOverlayButton.Focus();
-        }
-        else if (logOverlay.IsVisibleByDisplay())
-        {
-            HideLogOverlay();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
-    }
-
-    private void UpdateLogTextField()
-    {
-        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
-        List<string> logLines = Log.GetLogHistory()
-            .Where(logEvent => (int)logEvent.Level >= (int)logLevelItemPickerControl.SelectedItem)
-            .Select(logEvent =>
-            {
-                StringWriter stringWriter = new();
-                textFormatter.Format(logEvent, stringWriter);
-                string logLine = stringWriter.ToString();
-                // Workaround for Unity TextField interpreting backslash for special characters.
-                return logLine.Replace("\\", "/");
-            })
-            .ToList();
-
-        string logText = logLines.IsNullOrEmpty()
-            ? "(no messages for this log level)"
-            : logLines.JoinWith("");
-        if (logText.Length > VisualElementUtils.TextFieldCharacterLimit)
-        {
-            string prefix = "...\n";
-            logText = prefix + logText.Substring(logText.Length - (VisualElementUtils.TextFieldCharacterLimit - prefix.Length));
-        }
-        logTextField.value = logText;
+        sceneNavigator.LoadScene(EScene.OptionsScene);
     }
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         showFpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showFps);
         pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);

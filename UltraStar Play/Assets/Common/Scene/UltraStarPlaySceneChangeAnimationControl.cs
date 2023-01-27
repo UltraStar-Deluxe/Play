@@ -1,116 +1,81 @@
 using System;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
-using UnityEngine.SceneManagement;
+using UniRx;
+using UnityEngine;
 
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
-
-public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInjection
+public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private static UltraStarPlaySceneChangeAnimationControl instance;
-    public static UltraStarPlaySceneChangeAnimationControl Instance
+    public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
+
+    private RenderTexture uiCopyRenderTexture;
+    public RenderTexture UiCopyRenderTexture
     {
         get
         {
-            if (instance == null)
+            if (uiCopyRenderTexture == null)
             {
-                UltraStarPlaySceneChangeAnimationControl instanceInScene = GameObjectUtils.FindComponentWithTag<UltraStarPlaySceneChangeAnimationControl>("SceneChangeAnimationControl");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
+                uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
             }
-            return instance;
+
+            return uiCopyRenderTexture;
         }
     }
 
-    [NonSerialized]
-    public RenderTexture uiCopyRenderTexture;
     private Action animateAction;
 
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource audioSource;
+
+    [Inject]
     private Settings settings;
-    private bool isInitialized;
 
-    private void Init()
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject]
+    private ThemeManager themeManager;
+
+    protected override object GetInstance()
     {
-        // TODO: Custom initialization because OnSceneLoaded works around the current SceneInjection flow. Do SceneInjection earlier?
-        isInitialized = true;
-        settings = FindObjectOfType<SettingsManager>().Settings;
-        audioSource = GetComponentInChildren<AudioSource>();
+        return Instance;
     }
 
-    void Start()
-    {
-        if (this != Instance)
-        {
-            Destroy(this);
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Init();
-        }
-
-        UltraStarPlaySceneChangeAnimationControl self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
-
-        // Start is not called again for this DontDestroyOnLoad-object
-        DontDestroyOnLoad(gameObject);
-
-        uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
-    }
-
-    void OnEnable()
+    public void OnSceneInjectionFinished()
     {
         if (this != Instance)
         {
             return;
         }
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        UpdateSceneTexturesAndTransition();
     }
 
-    void OnDisable()
+    private void UpdateSceneTexturesAndTransition()
     {
-        if (this != Instance)
+        themeManager.UpdateSceneTextures(UiCopyRenderTexture);
+
+        if (settings.GraphicSettings.AnimateSceneChange)
         {
-            return;
+            animateAction?.Invoke();
         }
-
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        if (!isInitialized)
-        {
-            Init();
-        }
-
-        if (!settings.GraphicSettings.AnimateSceneChange)
-        {
-            return;
-        }
-
-        animateAction?.Invoke();
     }
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
-        animateAction = doAnimateAction;
-
         // Take "screenshot" of "old" scene.
-        UIDocument uiDocument = FindObjectOfType<UIDocument>();
-        Graphics.CopyTexture(uiDocument.panelSettings.targetTexture, uiCopyRenderTexture);
+        if (themeManager.UiRenderTexture == null)
+        {
+            Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
+        }
+        else if (UiCopyRenderTexture == null)
+        {
+            Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
+        }
+        else
+        {
+            Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
+        }
+        animateAction = doAnimateAction;
         doLoadSceneAction();
     }
 
@@ -123,7 +88,7 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
             PlaySceneChangeAnimationSound();
         }
 
-        float sceneChangeAnimationTimeInSeconds = ThemeManager.Instance.GetSceneChangeAnimationTimeInSeconds();
+        float sceneChangeAnimationTimeInSeconds = themeManager.GetSceneChangeAnimationTimeInSeconds();
         if (sceneChangeAnimationTimeInSeconds <= 0)
         {
             return;
@@ -132,25 +97,33 @@ public class UltraStarPlaySceneChangeAnimationControl : MonoBehaviour, INeedInje
         LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
             .setOnStart(() =>
             {
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
             .setOnUpdate((float animTimePercent) =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                ThemeManager.Instance.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
+                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
             });
     }
 
     private void PlaySceneChangeAnimationSound()
     {
         audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent / 100f;
-        audioSource.Play();
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(uiCopyRenderTexture);
     }
 }

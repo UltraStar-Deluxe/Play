@@ -3,7 +3,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class SongAudioPlayer : MonoBehaviour
+public class SongAudioPlayer : MonoBehaviour, INeedInjection
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
@@ -174,6 +174,9 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
+    [Inject]
+    private AudioManager audioManager;
+
     private void Update()
     {
         if (IsPlaying)
@@ -197,7 +200,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
 
         this.SongMeta = songMeta;
-        AudioClip audioClip = AudioManager.Instance.LoadAudioClipFromUri(audioUri);
+        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri);
         if (audioClip != null)
         {
             audioPlayer.clip = audioClip;

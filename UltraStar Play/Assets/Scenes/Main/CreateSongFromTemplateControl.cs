@@ -123,7 +123,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
 
         string message = $"Created new song from template in: \n{newSongFolderAbsolutePath}";
         Debug.Log(message);
-        uiManager.CreateNotificationVisualElement(message);
+        UiManager.CreateNotification(message);
 
         // Reload songs, now with the newly added song.
         songMetaManager.TryLoadAndAddSongMetasFromFolder(newSongFolderAbsolutePath, out List<SongMeta> newSongMetas, out List<SongIssue> _);

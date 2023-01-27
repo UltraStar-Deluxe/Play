@@ -4,21 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : MonoBehaviour, INeedInjection
+public class UiManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static UiManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<UiManager>("UiManager");
-        }
-    }
+    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -33,30 +28,28 @@ public class UiManager : MonoBehaviour, INeedInjection
     public VisualTreeAsset accordionUi;
 
     [InjectedInInspector]
-    public ShowFps showFpsPrefab;
-
-    [InjectedInInspector]
     public List<AvatarImageReference> avatarImageReferences;
 
     [Inject]
     private Injector injector;
 
-    [Inject(Optional = true)]
+    [Inject]
     private UIDocument uiDocument;
 
-    private ShowFps showFpsInstance;
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
-    private void Awake()
+    [Inject]
+    private Settings settings;
+
+    protected override object GetInstance()
     {
-        LeanTween.init(10000);
+        return Instance;
     }
 
-    private void Start()
+    protected override void AwakeSingleton()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.showFps)
-        {
-            CreateShowFpsInstance();
-        }
+        LeanTween.init(10000);
     }
 
     private void Update()
@@ -65,37 +58,10 @@ public class UiManager : MonoBehaviour, INeedInjection
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
-    public void CreateShowFpsInstance()
-    {
-        if (showFpsInstance != null)
-        {
-            return;
-        }
-
-        showFpsInstance = Instantiate(showFpsPrefab);
-        injector.Inject(showFpsInstance);
-        // Move to front
-        showFpsInstance.transform.SetAsLastSibling();
-        showFpsInstance.transform.position = new Vector3(20, 20, 0);
-    }
-
-    public void DestroyShowFpsInstance()
-    {
-        if (showFpsInstance != null)
-        {
-            Destroy(showFpsInstance);
-        }
-    }
-
-    public Label CreateNotificationVisualElement(
+    private Label DoCreateNotification(
         string text,
         params string[] additionalTextClasses)
     {
-        if (uiDocument == null)
-        {
-            return null;
-        }
-
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
@@ -119,6 +85,13 @@ public class UiManager : MonoBehaviour, INeedInjection
         StartCoroutine(FadeOutVisualElement(notification, 2, 1));
 
         return notificationLabel;
+    }
+
+    public static Label CreateNotification(
+        string text,
+        params string[] additionalTextClasses)
+    {
+        return Instance.DoCreateNotification(text, additionalTextClasses);
     }
 
     public static IEnumerator FadeOutVisualElement(

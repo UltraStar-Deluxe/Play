@@ -36,6 +36,6 @@ public class SongEditorSettings
     public bool ShowControlHints { get; set; } = true;
     public bool ShowNotePitchLabel { get; set; } = true;
 
-    public int GridSizeInDevicePixels { get; set; } = 1;
-    public int SentenceLineSizeInDevicePixels { get; set; } = 2;
+    public float GridSizeInPx { get; set; } = 1;
+    public float SentenceLineSizeInPx { get; set; } = 2;
 }

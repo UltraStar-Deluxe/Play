@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -255,11 +256,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         // Grid size
         Bind(gridSizeTextField,
-            () => settings.SongEditorSettings.GridSizeInDevicePixels.ToString(),
-            newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.GridSizeInDevicePixels = newIntValue));
+            () => settings.SongEditorSettings.GridSizeInPx.ToString(CultureInfo.InvariantCulture),
+            newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.GridSizeInPx = newFloatValue));
         Bind(sentenceLineSizeTextField,
-            () => settings.SongEditorSettings.SentenceLineSizeInDevicePixels.ToString(),
-            newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.SentenceLineSizeInDevicePixels = newIntValue));
+            () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
+            newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
     }
 
     private void CreateImportMidiFileDialog()

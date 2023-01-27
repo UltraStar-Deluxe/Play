@@ -1,4 +1,5 @@
 using System;
+using UniInject;
 using UnityEngine;
 
 // Handles automatically finishing the SingScene.
@@ -7,20 +8,19 @@ using UnityEngine;
 // and will finish the scene with a small delay afterwards.
 // To prevent premature ending the scene, it is only watched for the falling flank in the playback position
 // when the song has been near its end already.
-public class SingSceneFinisher : MonoBehaviour
+public class SingSceneFinisher : MonoBehaviour, INeedInjection
 {
     private bool hasBeenNearEndOfSong;
     private bool isSongFinished;
     private float durationAfterSongFinishedInSeconds;
 
+    [Inject]
     private SingSceneControl singSceneControl;
 
-    private double positionInSongInMillisOld;
+    [Inject]
+    private SongMeta songMeta;
 
-    void Awake()
-    {
-        singSceneControl = FindObjectOfType<SingSceneControl>();
-    }
+    private double positionInSongInMillisOld;
 
     void Update()
     {
@@ -71,9 +71,9 @@ public class SingSceneFinisher : MonoBehaviour
 
             // Detect end of the song by #END tag of txt file.
             // This can be used to skip the ending of the audio file.
-            if (singSceneControl.SongMeta.End > 0
+            if (songMeta.End > 0
                 // #END tag is in milliseconds (but #START is in seconds)
-                && positionInSongInMillis > singSceneControl.SongMeta.End)
+                && positionInSongInMillis > songMeta.End)
             {
                 isSongFinished = true;
             }

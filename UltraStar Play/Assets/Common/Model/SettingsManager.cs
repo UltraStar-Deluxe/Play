@@ -3,23 +3,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public class SettingsManager : MonoBehaviour
+public class SettingsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         settingsPath = null;
         settings = null;
         initializedResolution = false;
     }
 
-    public static SettingsManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SettingsManager>("SettingsManager");
-        }
-    }
+    public static SettingsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SettingsManager>();
 
     // The settings must be written to the same path they have been loaded from.
     // This field stores the path from where settings have been loaded / will be saved.
@@ -42,13 +36,14 @@ public class SettingsManager : MonoBehaviour
 
     private static bool initializedResolution;
 
-    // Non-static settings field for debugging of the settings in the Unity Inspector.
-    public Settings nonStaticSettings;
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 
-    void Start()
+    protected override void StartSingleton()
     {
         // Load reference from last scene if needed
-        nonStaticSettings = settings;
         if (!initializedResolution)
         {
             initializedResolution = true;
@@ -57,7 +52,7 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    void OnDisable()
+    protected override void OnDisableSingleton()
     {
         Save();
     }
@@ -68,7 +63,7 @@ public class SettingsManager : MonoBehaviour
         File.WriteAllText(GetSettingsPath(), json);
     }
 
-    public void Reload()
+    private void Reload()
     {
         using (new DisposableStopwatch("Loading the settings took <millis> ms"))
         {
@@ -82,7 +77,6 @@ public class SettingsManager : MonoBehaviour
             }
             string fileContent = File.ReadAllText(loadedSettingsPath);
             settings = JsonConverter.FromJson<Settings>(fileContent);
-            nonStaticSettings = settings;
             OverwriteSettingsWithCommandLineArguments();
         }
     }

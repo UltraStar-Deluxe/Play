@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
-using SceneChangeAnimations;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
@@ -26,9 +25,9 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
-        bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
+        bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
