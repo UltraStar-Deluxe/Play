@@ -1,13 +1,11 @@
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
-using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer, INeedInjection
+public class UltraStarPlayHttpServer : HttpServer
 {
     protected override void Awake()
     {
@@ -31,8 +29,9 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
             return;
         }
 
-        host = !SettingsManager.Instance.Settings.OwnHost.IsNullOrEmpty()
-            ? SettingsManager.Instance.Settings.OwnHost
+        Settings settings = SettingsManager.Instance.Settings;
+        host = !settings.OwnHost.IsNullOrEmpty()
+            ? settings.OwnHost
             : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
 
         NoEndpointFoundCallback = SendNoEndpointFound;

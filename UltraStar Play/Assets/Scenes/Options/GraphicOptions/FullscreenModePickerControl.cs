@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMode>
 {
-    public FullscreenModePickerControl(ItemPicker itemPicker, GameObject gameObject)
+    public FullscreenModePickerControl(ItemPicker itemPicker, Settings settings, GameObject gameObject)
         : base(itemPicker, EnumUtils.GetValuesAsList<FullScreenMode>())
     {
         if (Application.isEditor)
@@ -17,7 +17,7 @@ public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMo
         {
             Selection.Value = Screen.fullScreenMode;
             // The full-screen mode can change, e.g., via global keyboard shortcut. Thus, synchronize with the settings.
-            SettingsManager.Instance.Settings.GraphicSettings
+            settings.GraphicSettings
                 .ObserveEveryValueChanged(it => it.fullScreenMode)
                 .Subscribe(newFullScreenMode =>
                 {
@@ -29,6 +29,6 @@ public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMo
                 })
                 .AddTo(gameObject);
         }
-        Selection.Subscribe(newValue => SettingsManager.Instance.Settings.GraphicSettings.fullScreenMode = newValue);
+        Selection.Subscribe(newValue => settings.GraphicSettings.fullScreenMode = newValue);
     }
 }

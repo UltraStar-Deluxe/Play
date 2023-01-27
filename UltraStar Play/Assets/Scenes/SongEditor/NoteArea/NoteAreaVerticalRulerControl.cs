@@ -22,13 +22,14 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.horizontalGridLabelContainer)]
     private VisualElement horizontalGridLabelContainer;
 
+    [Inject(UxmlName = R.UxmlNames.horizontalGridLineContainer)]
+    private VisualElement horizontalGridLineContainer;
+
     [Inject(UxmlName = R.UxmlNames.horizontalGrid)]
     private VisualElement horizontalGrid;
 
     [Inject]
     private GameObject gameObject;
-
-    private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
 
@@ -38,11 +39,9 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     {
         horizontalGrid.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, horizontalGrid);
-            dynamicTexture.backgroundColor = new Color(0, 0, 0, 0);
             UpdateMidiNoteLabels();
 
-            if (settings.SongEditorSettings.GridSizeInDevicePixels > 0)
+            if (settings.SongEditorSettings.GridSizeInPx > 0)
             {
                 UpdateMidiNoteLines();
             }
@@ -50,16 +49,14 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
 
-        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
-            .Where(_ => dynamicTexture != null)
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateMidiNoteLines())
             .AddTo(gameObject);
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
     {
-        if (viewportEvent == null
-            || dynamicTexture == null)
+        if (viewportEvent == null)
         {
             return;
         }
@@ -76,7 +73,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void UpdateMidiNoteLines()
     {
-        dynamicTexture.ClearTexture();
+        horizontalGridLineContainer.Clear();
 
         int minMidiNote = noteAreaControl.MinMidiNoteInCurrentViewport;
         int maxMidiNote = noteAreaControl.MaxMidiNoteInCurrentViewport;
@@ -92,8 +89,6 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
                 DrawHorizontalGridLine(midiNote, color);
             }
         }
-
-        dynamicTexture.ApplyTexture();
     }
 
     private void UpdateMidiNoteLabels()
@@ -134,6 +129,8 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     private Label CreateLabelForMidiNote(int midiNote)
     {
         Label label = new();
+        label.AddToClassList("noteAreaGridLabel");
+        label.AddToClassList("horizontalGridLabel");
         label.AddToClassList("tinyFont");
         label.enableRichText = false;
         label.style.position = new StyleEnum<Position>(Position.Absolute);
@@ -160,21 +157,19 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
 
     private void DrawHorizontalGridLine(int midiNote, Color color)
     {
-        int height = settings.SongEditorSettings.GridSizeInDevicePixels;
-        if (height <= 0)
+        float lineHeight = settings.SongEditorSettings.GridSizeInPx;
+        if (lineHeight <= 0)
         {
             return;
         }
 
         float yPercent = (float)noteAreaControl.GetVerticalPositionForMidiNote(midiNote);
-        int fromY = (int)(yPercent * dynamicTexture.TextureHeight);
-        int toY = fromY + height;
-        for (int x = 0; x < dynamicTexture.TextureWidth; x++)
-        {
-            for (int y = fromY; y < toY && y < dynamicTexture.TextureHeight; y++)
-            {
-                dynamicTexture.SetPixel(x, y, color);
-            }
-        }
+        VisualElement line = new();
+        line.AddToClassList("gridLine");
+        line.AddToClassList("horizontalGridLine");
+        line.style.backgroundColor = color;
+        line.style.top = new StyleLength(new Length(yPercent * 100, LengthUnit.Percent));
+        line.style.height = new StyleLength(new Length(lineHeight, LengthUnit.Pixel));
+        horizontalGridLineContainer.Add(line);
     }
 }

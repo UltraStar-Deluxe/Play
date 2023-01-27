@@ -12,4 +12,6 @@ public class DeveloperSettings
      * (see https://issuetracker.unity3d.com/issues/android-uitoolkit-buttons-cant-be-clicked-with-a-cursor-in-samsung-dex-when-using-eventsystem)
      */
     public bool enableEventSystemOnAndroid;
+
+    public bool useUniversalCharsetDetector = true;
 }

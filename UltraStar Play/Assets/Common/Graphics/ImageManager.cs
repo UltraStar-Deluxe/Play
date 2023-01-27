@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 public static class ImageManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         spriteHolders.Clear();
         ClearCache();
@@ -21,8 +21,6 @@ public static class ImageManager
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
     private static readonly Dictionary<string, CachedSprite> spriteCache = new();
-
-    private static CoroutineManager coroutineManager;
 
     public static void AddSpriteHolder(ISpriteHolder spriteHolder)
     {
@@ -81,11 +79,7 @@ public static class ImageManager
             onSuccess(sprite);
         }
 
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
+        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)

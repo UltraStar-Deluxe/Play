@@ -132,11 +132,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
-
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
         backButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.back);
         gameOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_game_button);
@@ -154,6 +149,12 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void SetLanguage(SystemLanguage newValue)
     {
+        if (settings.GameSettings.language == newValue
+            && translationManager.currentLanguage == newValue)
+        {
+            return;
+        }
+
         settings.GameSettings.language = newValue;
         translationManager.currentLanguage = settings.GameSettings.language;
         translationManager.ReloadTranslationsAndUpdateScene();

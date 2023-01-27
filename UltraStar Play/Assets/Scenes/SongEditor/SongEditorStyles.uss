@@ -20,6 +20,7 @@
     --control-height-large: 40px;
     --control-height-small: 20px;
     --panel-background-color: rgb(60, 63, 65);
+    --note-area-background-color: rgb(43, 43, 43);
     background-color: rgb(50, 50, 50);
 }
 
@@ -38,7 +39,7 @@
 }
 
 #noteArea {
-    background-color: rgb(43, 43, 43);
+    background-color: var(--note-area-background-color);
 }
 
 Button.recording {
@@ -130,8 +131,7 @@ Button.selected:hover {
     width: 30px;
 }
 
-#leftSideBarMainColumn MaterialIcon
-{
+#leftSideBarMainColumn MaterialIcon {
     font-size: 24px;
     width: auto;
     height: auto;
@@ -166,7 +166,7 @@ Button.selected:hover {
     width: 200px;
     height: 100%;
     padding-left: 2px;
-    padding-right: 0px;
+    padding-right: 0;
     padding-top: 2px;
     padding-bottom: 2px;
 }
@@ -212,4 +212,31 @@ ScrollView #unity-content-container {
 
 .dialogBackground {
     background-color: var(--panel-background-color);
+}
+
+.noteAreaGridLabel {
+    background-color: var(--note-area-background-color);
+}
+
+.sentenceMarkerLine {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-repeat: repeat-y;
+    background-size: 100% 64px;
+}
+
+.gridLine {
+    position: absolute;
+    opacity: 0.25;
+}
+
+.horizontalGridLine {
+    height: 1px;
+    width: 100%;
+}
+
+.verticalGridLine {
+    width: 1px;
+    height: 100%;
 }

@@ -23,6 +23,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R.UxmlNames.verticalGridLabelContainer)]
     private VisualElement verticalGridLabelContainer;
 
+    [Inject(UxmlName = R.UxmlNames.verticalGridLineContainer)]
+    private VisualElement verticalGridLineContainer;
+
     [Inject(UxmlName = R.UxmlNames.verticalGrid)]
     private VisualElement verticalGrid;
 
@@ -31,8 +34,6 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private GameObject gameObject;
-
-    private DynamicTexture dynamicTexture;
 
     private ViewportEvent lastViewportEvent;
 
@@ -44,16 +45,13 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
     {
         verticalGrid.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, verticalGrid);
-            dynamicTexture.backgroundColor = new Color(0, 0, 0, 0);
             UpdateLines();
             UpdateLabels();
         });
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
 
-        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInDevicePixels)
-            .Where(_ => dynamicTexture != null)
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
     }
@@ -72,7 +70,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         {
             lastSongMetaBpm = songMeta.Bpm;
 
-            if (settings.SongEditorSettings.GridSizeInDevicePixels > 0)
+            if (settings.SongEditorSettings.GridSizeInPx > 0)
             {
                 UpdateLines();
             }
@@ -84,12 +82,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private void UpdateLines()
     {
-        if (dynamicTexture == null)
-        {
-            return;
-        }
-
-        dynamicTexture.ClearTexture();
+        verticalGridLineContainer.Clear();
 
         int viewportStartBeat = noteAreaControl.MinBeatInViewport;
         int viewportEndBeat = noteAreaControl.MaxBeatInViewport;
@@ -132,8 +125,6 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
                 DrawVerticalGridLine(beatPosInMillis, normalLineColor);
             }
         }
-
-        dynamicTexture.ApplyTexture();
     }
 
     private void UpdateLabels()
@@ -167,7 +158,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             {
                 if (!labelPool.TryGetFreeObject(out Label label))
                 {
-                    label = CreateLabel(verticalGridLabelContainer);
+                    label = CreateLabel();
                     labelPool.AddUsedObject(label);
                 }
 
@@ -178,14 +169,16 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         }
     }
 
-    private Label CreateLabel(VisualElement container)
+    private Label CreateLabel()
     {
         Label label = new();
+        label.AddToClassList("noteAreaGridLabel");
+        label.AddToClassList("verticalGridLabel");
         label.AddToClassList("tinyFont");
         label.style.position = new StyleEnum<Position>(Position.Absolute);
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
 
-        container.Add(label);
+        verticalGridLabelContainer.Add(label);
         return label;
     }
 
@@ -199,21 +192,19 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private void DrawVerticalGridLine(double beatPosInMillis, Color color)
     {
-        int width = settings.SongEditorSettings.GridSizeInDevicePixels;
-        if (width <= 0)
+        float lineWidth = settings.SongEditorSettings.GridSizeInPx;
+        if (lineWidth <= 0)
         {
             return;
         }
 
-        double xPercent = (beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth;
-        int fromX = (int)(xPercent * dynamicTexture.TextureWidth);
-        int toX = fromX + width;
-        for (int x = fromX; x < toX && x < dynamicTexture.TextureWidth; x++)
-        {
-            for (int y = 0; y < dynamicTexture.TextureHeight; y++)
-            {
-                dynamicTexture.SetPixel(x, y, color);
-            }
-        }
+        float xPercent = (float)((beatPosInMillis - noteAreaControl.ViewportX) / noteAreaControl.ViewportWidth);
+        VisualElement line = new();
+        line.AddToClassList("gridLine");
+        line.AddToClassList("verticalGridLine");
+        line.style.backgroundColor = color;
+        line.style.left = new StyleLength(new Length(xPercent * 100, LengthUnit.Percent));
+        line.style.width = new StyleLength(new Length(lineWidth, LengthUnit.Pixel));
+        verticalGridLineContainer.Add(line);
     }
 }

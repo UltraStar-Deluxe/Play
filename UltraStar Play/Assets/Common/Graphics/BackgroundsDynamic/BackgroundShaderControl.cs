@@ -33,10 +33,10 @@ public class BackgroundShaderControl : MonoBehaviour
         Graphics.Blit(src, dest, material);
     }
 
-    public void SetUiRenderTextures(RenderTexture uiRenderTexture, RenderTexture transitionRenderTexture)
+    public void SetUiRenderTextures(RenderTexture uiRenderTexture, Texture transitionTexture)
     {
         material.SetTexture(_UiTex, uiRenderTexture);
-        material.SetTexture(_TransitionTex, transitionRenderTexture);
+        material.SetTexture(_TransitionTex, transitionTexture);
     }
 
     public void SetTransitionAnimationEnabled(bool enable)

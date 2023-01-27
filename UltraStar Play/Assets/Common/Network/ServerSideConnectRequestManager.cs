@@ -13,31 +13,15 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IServerSideConnectRequestManager
+public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeedInjection, IServerSideConnectRequestManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
     {
-        instance = null;
         idToConnectedClientMap = new();
     }
 
-    private static ServerSideConnectRequestManager instance;
-    public static ServerSideConnectRequestManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                ServerSideConnectRequestManager instanceInScene = GameObjectUtils.FindComponentWithTag<ServerSideConnectRequestManager>("ServerSideConnectRequestManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static ServerSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideConnectRequestManager>();
 
     private static Dictionary<string, IConnectedClientHandler> idToConnectedClientMap = new();
     public static int ConnectedClientCount => idToConnectedClientMap.Count;
@@ -54,16 +38,19 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
 
     [Inject]
     private Settings settings;
-    
-    private void Start()
+
+    protected override object GetInstance()
     {
-        ServerSideConnectRequestManager self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
-        if (!Application.isPlaying || instance != this)
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        if (!Application.isPlaying || Instance != this)
         {
             return;
         }
-        
+
         GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
 
         serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
@@ -177,7 +164,7 @@ public class ServerSideConnectRequestManager : MonoBehaviour, INeedInjection, IS
     {
         hasBeenDestroyed = true;
         serverUdpClient?.Close();
-        if (instance == this)
+        if (Instance == this)
         {
             RemoveAllConnectedClientHandlers();
         }

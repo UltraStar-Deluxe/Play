@@ -5,12 +5,19 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class VolumeControl : MonoBehaviour, INeedInjection
+public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
 {
+    public static VolumeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VolumeControl>();
+
     [Inject]
     private Settings settings;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         UpdateGeneralVolume();
         settings.AudioSettings

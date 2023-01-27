@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         OpenContextMenuPopups = new List<ContextMenuPopupControl>();
     }

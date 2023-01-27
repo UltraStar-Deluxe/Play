@@ -14,7 +14,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 public class UltraStarPlayInputManager : InputManager, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         inputDeviceToLastChange.Clear();
     }

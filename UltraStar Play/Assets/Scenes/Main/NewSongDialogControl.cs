@@ -60,7 +60,7 @@ public class NewSongDialogControl : AbstractDialogControl, IInjectionFinishedLis
     {
         if (!IsInputValid())
         {
-            uiManager.CreateNotificationVisualElement("Please specify the artist and title");
+            UiManager.CreateNotification("Please specify the artist and title");
             return;
         }
 

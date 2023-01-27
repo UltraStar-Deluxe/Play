@@ -33,8 +33,6 @@ public class DynamicTexture
 
     public bool IsInitialized => texture != null;
 
-    public bool initializeTextureDelayed;
-
     private readonly GameObject gameObject;
 
     public DynamicTexture(GameObject gameObject, VisualElement visualElement)
@@ -83,7 +81,7 @@ public class DynamicTexture
             throw new UnityException("Texture size missing. Call Init first and make sure the VisualElement has a size.");
         }
 
-        // create the texture and assign to the rawImage
+        // create the texture
         texture = new Texture2D(TextureWidth, TextureHeight);
 
         // release texture when GameObject is destroyed

@@ -44,7 +44,7 @@ public static class UltraStarPlayBuildTools
     public static void BuildAndRunAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
-        customBuildOptions.buildOptions = BuildOptions.AutoRunPlayer;
+        customBuildOptions.buildOptions |= BuildOptions.AutoRunPlayer;
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
@@ -52,7 +52,7 @@ public static class UltraStarPlayBuildTools
     public static void BuildAndRunSignedAndroidApk()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
-        customBuildOptions.buildOptions = BuildOptions.AutoRunPlayer;
+        customBuildOptions.buildOptions |= BuildOptions.AutoRunPlayer;
         customBuildOptions.configureKeystoreForAndroidBuild = true;
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
@@ -61,7 +61,7 @@ public static class UltraStarPlayBuildTools
     public static void BuildAndRunSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
-        customBuildOptions.buildOptions = BuildOptions.AutoRunPlayer;
+        customBuildOptions.buildOptions |= BuildOptions.AutoRunPlayer;
         customBuildOptions.configureKeystoreForAndroidBuild = true;
         customBuildOptions.buildAppBundleForGooglePlay = true;
         BuildUtils.PerformCustomBuild(customBuildOptions);

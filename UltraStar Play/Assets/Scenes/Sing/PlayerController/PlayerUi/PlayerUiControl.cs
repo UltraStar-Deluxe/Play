@@ -59,6 +59,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private SingSceneData sceneData;
+
     private AbstractSingSceneNoteDisplayer noteDisplayer;
 
     private int totalScoreAnimationId;
@@ -142,7 +145,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ChangeLayoutByPlayerCount()
     {
-        if (singSceneControl.SceneData.SelectedPlayerProfiles.Count >= 5)
+        if (sceneData.SelectedPlayerProfiles.Count >= 5)
         {
             RootVisualElement.AddToClassList("singScenePlayerUiSmall");
         }

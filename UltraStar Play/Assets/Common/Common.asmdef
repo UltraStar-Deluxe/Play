@@ -2,6 +2,7 @@
     "name": "Common",
     "rootNamespace": "",
     "references": [
+        "Unity.InputSystem",
         "Serilog",
         "Plugins",
         "UniRx",
@@ -9,9 +10,9 @@
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
-        "Unity.InputSystem",
+        "com.achimmihca.scenechangeanimations",
         "playshared",
-        "com.achimmihca.scenechangeanimations"
+        "IngameDebugConsole.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -16,13 +16,7 @@ public class BuildInfoGenerator : IPreprocessBuildWithReport
     private static readonly string commitShortHashPropertyName = "commit_hash";
     private static readonly string versionFile = "Assets/VERSION.txt";
 
-    public int callbackOrder
-    {
-        get
-        {
-            return 0;
-        }
-    }
+    public int callbackOrder => 0;
 
     public void OnPreprocessBuild(BuildReport report)
     {

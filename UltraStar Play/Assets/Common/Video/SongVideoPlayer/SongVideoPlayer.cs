@@ -12,7 +12,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private static readonly HashSet<string> ignoredVideoFiles = new();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         ignoredVideoFiles.Clear();
     }
@@ -107,7 +107,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (!videoPlayerErrorMessage.IsNullOrEmpty())
         {
             Debug.LogError(videoPlayerErrorMessage);
-            UiManager.Instance.CreateNotificationVisualElement(videoPlayerErrorMessage, "error");
+            UiManager.CreateNotification(videoPlayerErrorMessage, "error");
             videoPlayerErrorMessage = "";
             UnloadVideo();
             // Do not attempt to load the video again

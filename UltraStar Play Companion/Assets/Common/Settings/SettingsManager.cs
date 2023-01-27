@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class SettingsManager : MonoBehaviour
+public class SettingsManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         settingsPath = null;
         settings = null;
@@ -46,18 +42,23 @@ public class SettingsManager : MonoBehaviour
     // Non-static settings field for debugging of the settings in the Unity Inspector.
     public Settings nonStaticSettings;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         // Load reference from last scene if needed
         nonStaticSettings = settings;
     }
 
-    private void OnDisable()
+    protected override void OnDisableSingleton()
     {
         Save();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroySingleton()
     {
         Save();
     }

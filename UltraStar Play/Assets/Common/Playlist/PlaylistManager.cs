@@ -2,26 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class PlaylistManager : MonoBehaviour
+public class PlaylistManager : AbstractSingletonBehaviour
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         playlistToFilePathMap.Clear();
         playlists.Clear();
         favoritesPlaylist = new UltraStarPlaylist();
     }
 
-    public static PlaylistManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<PlaylistManager>("PlaylistManager");
-        }
-    }
+    public static PlaylistManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistManager>();
 
     public static readonly string favoritesPlaylistName = "Favorites";
 
@@ -63,7 +58,15 @@ public class PlaylistManager : MonoBehaviour
     private string FavoritesPlaylistFile => $"{PlaylistFolder}/{favoritesPlaylistName}{playlistFileExtension}";
     private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
 
-    void Awake()
+    [Inject]
+    private Settings settings;
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void AwakeSingleton()
     {
         CreateFavoritePlaylistIfNotExist();
     }
@@ -241,9 +244,9 @@ public class PlaylistManager : MonoBehaviour
         playlistToFilePathMap[playlist] = newPath;
 
         // Update settings
-        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        if (settings.SongSelectSettings.playlistName == oldName)
         {
-            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = newName;
+            settings.SongSelectSettings.playlistName = newName;
         }
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
@@ -278,9 +281,9 @@ public class PlaylistManager : MonoBehaviour
         }
 
         // Update settings
-        if (SettingsManager.Instance.Settings.SongSelectSettings.playlistName == oldName)
+        if (settings.SongSelectSettings.playlistName == oldName)
         {
-            SettingsManager.Instance.Settings.SongSelectSettings.playlistName = "";
+            settings.SongSelectSettings.playlistName = "";
         }
 
         playlists.Remove(playlist);

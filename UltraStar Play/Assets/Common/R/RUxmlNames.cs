@@ -69,7 +69,6 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
-        public const string closeLogOverlayButton = "closeLogOverlayButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
         public const string closePlaylistChooserDropdownButton = "closePlaylistChooserDropdownButton";
@@ -90,6 +89,7 @@ public static partial class R
         public const string connectedClientList = "connectedClientList";
         public const string container = "container";
         public const string continueButton = "continueButton";
+        public const string copyLogButton = "copyLogButton";
         public const string createBackgroundInputContainer = "createBackgroundInputContainer";
         public const string createBackgroundLabel = "createBackgroundLabel";
         public const string createBackgroundToggle = "createBackgroundToggle";
@@ -189,6 +189,7 @@ public static partial class R
         public const string HighscoreEntry = "HighscoreEntry";
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
+        public const string horizontalGridLineContainer = "horizontalGridLineContainer";
         public const string httpServerPortLabel = "httpServerPortLabel";
         public const string icon = "icon";
         public const string iconBar = "iconBar";
@@ -254,14 +255,8 @@ public static partial class R
         public const string lo = "lo";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logLevelContainer = "logLevelContainer";
-        public const string logLevelItemPicker = "logLevelItemPicker";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
-        public const string logOverlay = "logOverlay";
-        public const string logOverlayButtonRow = "logOverlayButtonRow";
-        public const string logPathLabel = "logPathLabel";
-        public const string logTextField = "logTextField";
         public const string lowerCenterContainer = "lowerCenterContainer";
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaTextField = "lyricsAreaTextField";
@@ -489,7 +484,7 @@ public static partial class R
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
         public const string sentenceLabel = "sentenceLabel";
-        public const string sentenceLines = "sentenceLines";
+        public const string sentenceLinesContainer = "sentenceLinesContainer";
         public const string sentenceLineSizeContainer = "sentenceLineSizeContainer";
         public const string sentenceLineSizeTextField = "sentenceLineSizeTextField";
         public const string sentenceRatingContainer = "sentenceRatingContainer";
@@ -508,7 +503,7 @@ public static partial class R
         public const string showControlHintsToggle = "showControlHintsToggle";
         public const string showCoverButton = "showCoverButton";
         public const string showFpsContainer = "showFpsContainer";
-        public const string showLogOverlayButton = "showLogOverlayButton";
+        public const string showLogButton = "showLogButton";
         public const string showLyricsAreaContainer = "showLyricsAreaContainer";
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
         public const string showNotePitchLabelContainer = "showNotePitchLabelContainer";
@@ -647,10 +642,12 @@ public static partial class R
         public const string urlContainer = "urlContainer";
         public const string urlLabel = "urlLabel";
         public const string urlTextField = "urlTextField";
+        public const string useUniversalCharsetDetectorContainer = "useUniversalCharsetDetectorContainer";
         public const string useWebcamContainer = "useWebcamContainer";
         public const string versionInfoContainer = "versionInfoContainer";
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
+        public const string verticalGridLineContainer = "verticalGridLineContainer";
         public const string videoArea = "videoArea";
         public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";

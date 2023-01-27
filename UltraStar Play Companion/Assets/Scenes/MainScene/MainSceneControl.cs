@@ -46,10 +46,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
-    
-    [Inject(UxmlName = R.UxmlNames.fpsText)]
-    private Label fpsText;
-    
+
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
@@ -271,7 +268,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void OnDevModeEnabledChanged(bool isEnabled)
     {
-        fpsText.SetVisibleByDisplay(isEnabled);
         recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
         connectionInfoText.SetVisibleByDisplay(isEnabled);
     }
@@ -288,10 +284,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && sceneTitle == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
         connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
         recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
@@ -378,20 +370,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             && audioWaveFormVisualization != null)
         {
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(micSampleRecorder.MicSamples);
-        }
-        UpdateFps();
-    }
-
-    private void UpdateFps()
-    {
-        frameCountTime += Time.deltaTime;
-        frameCount++;
-        if (frameCountTime > 1)
-        {
-            int fps = (int)(frameCount / frameCountTime);
-            fpsText.text = $"FPS: {fps}";
-            frameCount = 0;
-            frameCountTime = 0;
         }
     }
 

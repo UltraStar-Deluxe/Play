@@ -37,7 +37,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         if (!File.Exists(midiFilePath))
         {
             Debug.Log($"File does not exist: {midiFilePath}");
-            uiManager.CreateNotificationVisualElement("File does not exist");
+            UiManager.CreateNotification("File does not exist");
             return;
         }
 
@@ -51,12 +51,12 @@ public class SongEditorMidiFileImporter : INeedInjection
             layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
             loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.MidiFile, loadedNote));
             editorNoteDisplayer.UpdateNotes();
-            uiManager.CreateNotificationVisualElement("Loaded MIDI file successfully");
+            UiManager.CreateNotification("Loaded MIDI file successfully");
         }
         catch (Exception e)
         {
             Debug.LogError(e);
-            uiManager.CreateNotificationVisualElement($"Loading MIDI file failed: {e.Message}", "error");
+            UiManager.CreateNotification($"Loading MIDI file failed: {e.Message}", "error");
         }
     }
 

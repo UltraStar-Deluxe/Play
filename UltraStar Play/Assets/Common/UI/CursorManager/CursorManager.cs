@@ -4,15 +4,9 @@ using UnityEngine;
 
 #pragma warning disable CS0649
 
-public class CursorManager : MonoBehaviour, INeedInjection
+public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static CursorManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<CursorManager>("CursorManager");
-        }
-    }
+    public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
 
     private static readonly int cursorWidth = 64;
     // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
@@ -32,8 +26,18 @@ public class CursorManager : MonoBehaviour, INeedInjection
 
     public ECursor CurrentCursor { get; private set; } = ECursor.Default;
 
-    private void Start()
+    protected override object GetInstance()
     {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        if (Instance != this)
+        {
+            return;
+        }
+
         settingsManager.Settings.GraphicSettings
             .ObserveEveryValueChanged(it => it.useImageAsCursor)
             .Subscribe(newValue => SetDefaultCursor())
