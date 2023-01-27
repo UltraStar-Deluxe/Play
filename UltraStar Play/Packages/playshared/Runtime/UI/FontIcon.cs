@@ -33,7 +33,7 @@ public abstract class FontIcon : Label
         }
     }
 
-    public FontIcon()
+    protected FontIcon()
     {
         Icon = "";
     }

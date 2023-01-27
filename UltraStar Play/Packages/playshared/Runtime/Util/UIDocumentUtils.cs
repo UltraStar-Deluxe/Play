@@ -8,7 +8,7 @@ public static class UIDocumentUtils
         UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
         if (uiDocument == null)
         {
-            throw new Exception("No UIDocument found");
+            throw new UltraStarPlayException("No UIDocument found");
         }
 
         return uiDocument;
