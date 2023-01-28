@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
+public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject(Optional = true)]
     private MicProfile micProfile;
@@ -27,17 +27,14 @@ public class AvatarImageControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Sprite avatarSprite = uiManager.GetAvatarSprite(playerProfile.Avatar);
-        if (avatarSprite == null)
+        uiManager.LoadPlayerProfileImage(playerProfile.ImagePath, loadedSprite =>
         {
-            Debug.LogWarning("Did not find an image for the avatar: " + playerProfile.Avatar);
-            return;
-        }
+            image.style.backgroundImage = new StyleBackground(loadedSprite);
 
-        if (micProfile != null)
-        {
-            image.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
-            image.style.backgroundImage = new StyleBackground(avatarSprite);
-        }
+            if (micProfile != null)
+            {
+                image.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+            }
+        });
     }
 }
