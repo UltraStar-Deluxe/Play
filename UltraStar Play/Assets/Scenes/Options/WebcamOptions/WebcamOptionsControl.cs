@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
+﻿using System.Linq;
 using PrimeInputActions;
 using ProTrans;
-using Serilog.Core;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -36,8 +32,10 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private WebCamManager webCamManager;
+
     private LabeledItemPickerControl<WebCamDevice> devicePickerControl;
-    private WebCamTexture webcamTexture;
 
     private void Start()
     {
@@ -64,7 +62,7 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void InitWebcamPicker()
     {
-        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(deviceContainer.Q<ItemPicker>(), WebCamTexture.devices.ToList());
+        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(deviceContainer.Q<ItemPicker>(), webCamManager.GetWebCamDevices());
         devicePickerControl.GetLabelTextFunction = device => device.name;
         if (!TryReSelectLastWebcam() && devicePickerControl.Items.Count > 0)
         {
@@ -76,21 +74,13 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
                 .Subscribe(device =>
                 {
                     settings.WebcamSettings.CurrentDeviceName = device.name;
-                    if (webcamTexture != null && webcamTexture.isPlaying)
-                    {
-                        webcamTexture.Stop();
-                    }
-
-                    webcamTexture = new WebCamTexture(device.name);
-                    Log.Logger.Information("Setting current webcam to '{webcamname}'", webcamTexture.deviceName);
-                    webcamTexture.Play();
-
-                    webcamRenderContainer.image = webcamTexture;
+                    WebCamTexture webCamTexture = webCamManager.StartSelectedWebCam();
+                    webcamRenderContainer.image = webCamTexture;
                 });
         }
         else
         {
-            Log.Logger.Information("No webcam found");
+            Debug.Log("No webcam found");
             devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
             devicePickerControl.Items.Add(new WebCamDevice());
             useWebcamContainer.SetEnabled(false);
@@ -99,10 +89,7 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     private void NavigateBack()
     {
-        if (webcamTexture != null && webcamTexture.isPlaying)
-        {
-            webcamTexture.Stop();
-        }
+
         sceneNavigator.LoadScene(EScene.OptionsScene);
     }
 
@@ -113,10 +100,10 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             return false;
         }
 
-        WebCamDevice lastDevice = devicePickerControl.Items
+        WebCamDevice lastSelectedDevice = devicePickerControl.Items
             .FirstOrDefault(device => device.name == settings.WebcamSettings.CurrentDeviceName);
 
-        devicePickerControl.SelectItem(lastDevice);
+        devicePickerControl.SelectItem(lastSelectedDevice);
         return true;
     }
 }

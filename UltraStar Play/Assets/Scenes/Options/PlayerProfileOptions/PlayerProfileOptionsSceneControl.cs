@@ -38,6 +38,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     private UiManager uiManager;
 
     [Inject]
+    private WebCamManager webCamManager;
+
+    [Inject]
     private ThemeManager themeManager;
 
     private void Start()
@@ -104,7 +107,7 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
         result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
-        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), uiManager)
+        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
             .Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 

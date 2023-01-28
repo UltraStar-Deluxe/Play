@@ -4,6 +4,7 @@
 public class PlayerProfile
 {
     public const string DefaultImagePath = "Silhouette01.png";
+    public const string WebcamImagePath = "WEBCAM";
 
     public string Name { get; set; } = "New Player";
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;

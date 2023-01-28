@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 // Handles loading and caching of images.
@@ -96,7 +98,7 @@ public static class ImageManager
         spriteCache[source] = cachedSprite;
     }
 
-    public static void ClearCache()
+    private static void ClearCache()
     {
         foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
         {
@@ -105,7 +107,7 @@ public static class ImageManager
         spriteCache.Clear();
     }
 
-    private static void RemoveUnusedSpritesFromCache()
+    public static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new();
         // Remember the sprites of all registered ISpriteHolder as still in use.

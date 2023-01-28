@@ -22,8 +22,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
-    public const string PlayerProfileImageFolderName = "PlayerProfileImages";
-
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
@@ -61,7 +59,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
-        relativePlayerProfileImagePathToAbsolutePath = ScanPlayerProfileImagePaths();
+        UpdatePlayerProfileImagePaths();
     }
 
     private void Update()
@@ -97,6 +95,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         StartCoroutine(FadeOutVisualElement(notification, 2, 1));
 
         return notificationLabel;
+    }
+
+    public void UpdatePlayerProfileImagePaths()
+    {
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
     }
 
     public static Label CreateNotification(
@@ -170,42 +173,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         return accordionItemControl;
     }
 
-    private Dictionary<string, string> ScanPlayerProfileImagePaths()
-    {
-        if (!relativePlayerProfileImagePathToAbsolutePath.IsNullOrEmpty())
-        {
-            return relativePlayerProfileImagePathToAbsolutePath;
-        }
-
-        List<string> folders = new List<string>
-        {
-            ApplicationUtils.GetStreamingAssetsPath(PlayerProfileImageFolderName),
-            $"{Application.persistentDataPath}/{PlayerProfileImageFolderName}",
-        };
-
-        Dictionary<string, string> result = new();
-        folders.ForEach(folder =>
-        {
-            if (Directory.Exists(folder))
-            {
-                string[] pngFilesInFolder = Directory.GetFiles(folder, "*.png", SearchOption.AllDirectories);
-                string[] jpgFilesInFolder = Directory.GetFiles(folder, "*.jpg", SearchOption.AllDirectories);
-                List<string> imageFilesInFolder = pngFilesInFolder
-                    .Union(jpgFilesInFolder)
-                    .ToList();
-                imageFilesInFolder.ForEach(absolutePath =>
-                {
-                    string relativePath = absolutePath.Substring(folder.Length + 1);
-                    result.Add(relativePath, absolutePath);
-                });
-            }
-        });
-
-        Debug.Log($"Found {result.Count} player profile images: {JsonConverter.ToJson(result)}");
-
-        return result;
-    }
-
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
     {
         if (imagePath.IsNullOrEmpty())
@@ -235,8 +202,18 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
     }
 
-    public List<string> GetRelativePlayerProfileImagePaths()
+    public List<string> GetRelativePlayerProfileImagePaths(bool includeWebCamImages)
     {
-        return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
+        if (includeWebCamImages)
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
+        }
+        else
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys
+                .Where(relativePath => !relativePath.Contains(PlayerProfileUtils.PlayerProfileWebCamImagesFolderName))
+                .ToList();
+        }
+
     }
 }

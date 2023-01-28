@@ -31,7 +31,6 @@ public static partial class R
         public const string audioWaveForm = "audioWaveForm";
         public const string autoSaveContainer = "autoSaveContainer";
         public const string autoSaveToggle = "autoSaveToggle";
-        public const string playerProfileImagePicker = "playerProfileImagePicker";
         public const string b = "b";
         public const string backButton = "backButton";
         public const string backButtonContainer = "backButtonContainer";
@@ -390,6 +389,7 @@ public static partial class R
         public const string playerInfoContainer = "playerInfoContainer";
         public const string playerNameContainer = "playerNameContainer";
         public const string playerNameLabel = "playerNameLabel";
+        public const string playerProfileImagePicker = "playerProfileImagePicker";
         public const string playerProfileSettingsProblemHintIcon = "playerProfileSettingsProblemHintIcon";
         public const string playerScoreContainer = "playerScoreContainer";
         public const string playerScoreLabel = "playerScoreLabel";
@@ -438,6 +438,8 @@ public static partial class R
         public const string redoButton = "redoButton";
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
+        public const string removeWebCamImageButton = "removeWebCamImageButton";
+        public const string removeWebCamImageIcon = "removeWebCamImageIcon";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionContainer = "resolutionContainer";
         public const string rightHandle = "rightHandle";
@@ -586,6 +588,8 @@ public static partial class R
         public const string sum = "sum";
         public const string syncLyricsAreaContainer = "syncLyricsAreaContainer";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
+        public const string takeWebCamImageButton = "takeWebCamImageButton";
+        public const string takeWebCamImageIcon = "takeWebCamImageIcon";
         public const string targetNote = "targetNote";
         public const string targetNoteEntryContainer = "targetNoteEntryContainer";
         public const string targetNoteImage = "targetNoteImage";
