@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class UltraStarPlaylistParser
 {
-    public static readonly char separator = '-';
+    public static readonly char defaultSeparator = ':';
+    public static readonly List<char> separators = new() { '-', ':' };
+    private static readonly Regex headerLineRegex = new(@"\#(?<headerName>\w+)\s*\:\s*(?<headerValue>[\w\s]+)");
 
     public static UltraStarPlaylist ParseFile(string path)
     {
-        UltraStarPlaylist playlist = new();
+        UltraStarPlaylist playlist = new(path);
         string[] lines = File.ReadAllLines(path);
         for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
         {
@@ -37,7 +41,16 @@ public static class UltraStarPlaylistParser
         {
             if (line.Trim().StartsWith("#"))
             {
-                // This is a comment
+                Match headerLineMatch = headerLineRegex.Match(line);
+                if (headerLineMatch.Success)
+                {
+                    // This is a header comment
+                    string headerName = headerLineMatch.Groups["headerName"].Value;
+                    string headerValue = headerLineMatch.Groups["headerValue"].Value;
+                    return new UltraStartPlaylistHeaderEntry(line , headerName, headerValue);
+                }
+
+                // This is a normal comment
                 return new UltraStartPlaylistLineEntry(line);
             }
 
@@ -69,8 +82,10 @@ public static class UltraStarPlaylistParser
                         break;
                     }
                 }
-                else if (!insideQuote && c == separator
-                    && (targetToken == Token.Artist || targetToken == Token.Separator))
+                else if (!insideQuote && separators.Contains(c)
+                    && targetToken
+                        is Token.Artist
+                        or Token.Separator)
                 {
                     targetToken = Token.Title;
                 }
