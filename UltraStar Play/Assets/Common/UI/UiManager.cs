@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -13,7 +14,17 @@ using UnityEngine.UIElements;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        relativePlayerProfileImagePathToAbsolutePath = new();
+    }
+
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
+
+    public const string PlayerProfileImageFolderName = "PlayerProfileImages";
+
+    private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -28,7 +39,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     public VisualTreeAsset accordionUi;
 
     [InjectedInInspector]
-    public List<AvatarImageReference> avatarImageReferences;
+    public Sprite fallbackPlayerProfileImage;
 
     [Inject]
     private Injector injector;
@@ -50,6 +61,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
+        relativePlayerProfileImagePathToAbsolutePath = ScanPlayerProfileImagePaths();
     }
 
     private void Update()
@@ -121,13 +133,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public Sprite GetAvatarSprite(EAvatar avatar)
-    {
-        AvatarImageReference avatarImageReference = avatarImageReferences
-            .FirstOrDefault(it => it.avatar == avatar);
-        return avatarImageReference?.sprite;
-    }
-
     public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
     {
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
@@ -163,5 +168,75 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             .WithRootVisualElement(accordionItem)
             .CreateAndInject<AccordionItemControl>();
         return accordionItemControl;
+    }
+
+    private Dictionary<string, string> ScanPlayerProfileImagePaths()
+    {
+        if (!relativePlayerProfileImagePathToAbsolutePath.IsNullOrEmpty())
+        {
+            return relativePlayerProfileImagePathToAbsolutePath;
+        }
+
+        List<string> folders = new List<string>
+        {
+            ApplicationUtils.GetStreamingAssetsPath(PlayerProfileImageFolderName),
+            $"{Application.persistentDataPath}/{PlayerProfileImageFolderName}",
+        };
+
+        Dictionary<string, string> result = new();
+        folders.ForEach(folder =>
+        {
+            if (Directory.Exists(folder))
+            {
+                string[] pngFilesInFolder = Directory.GetFiles(folder, "*.png", SearchOption.AllDirectories);
+                string[] jpgFilesInFolder = Directory.GetFiles(folder, "*.jpg", SearchOption.AllDirectories);
+                List<string> imageFilesInFolder = pngFilesInFolder
+                    .Union(jpgFilesInFolder)
+                    .ToList();
+                imageFilesInFolder.ForEach(absolutePath =>
+                {
+                    string relativePath = absolutePath.Substring(folder.Length + 1);
+                    result.Add(relativePath, absolutePath);
+                });
+            }
+        });
+
+        Debug.Log($"Found {result.Count} player profile images: {JsonConverter.ToJson(result)}");
+
+        return result;
+    }
+
+    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
+    {
+        if (imagePath.IsNullOrEmpty())
+        {
+            onSuccess(fallbackPlayerProfileImage);
+            return;
+        }
+
+        string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
+        {
+            string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
+            string relativePathNormalized = PathUtils.NormalizePath(imagePath);
+            return absolutePathNormalized.EndsWith(relativePathNormalized);
+        });
+        if (matchingFullPath.IsNullOrEmpty())
+        {
+            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}', no corresponding image file found.");
+            onSuccess(fallbackPlayerProfileImage);
+            return;
+        }
+
+        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
+    }
+
+    public List<string> GetAbsolutePlayerProfileImagePaths()
+    {
+        return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
+    }
+
+    public List<string> GetRelativePlayerProfileImagePaths()
+    {
+        return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
     }
 }

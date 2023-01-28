@@ -66,7 +66,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // Player name and image
         playerNameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
+            .CreateAndInject<PlayerProfileImageControl>();
 
         // Song rating
         LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>

@@ -104,9 +104,9 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
         result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
-        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker), uiManager)
-            .Bind(() => playerProfile.Avatar,
-                newValue => playerProfile.Avatar = newValue);
+        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), uiManager)
+            .Bind(() => playerProfile.ImagePath,
+                newValue => playerProfile.ImagePath = newValue);
 
         new DifficultyPicker(result.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
             .Bind(() => playerProfile.Difficulty,
