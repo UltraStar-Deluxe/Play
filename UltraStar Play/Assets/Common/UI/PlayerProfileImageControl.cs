@@ -17,6 +17,9 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private Settings settings;
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement image;
 
@@ -24,6 +27,17 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
     {
         if (playerProfile == null)
         {
+            return;
+        }
+
+        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
+        {
+            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
+            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
+            uiManager.LoadPlayerProfileImage(webCamImagePath, loadedSprite =>
+            {
+                image.style.backgroundImage = new StyleBackground(loadedSprite);
+            });
             return;
         }
 
