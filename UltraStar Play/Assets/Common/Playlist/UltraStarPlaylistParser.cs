@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine;
 public static class UltraStarPlaylistParser
 {
     public static readonly char defaultSeparator = ':';
-    public static readonly List<char> separators = new() { '-', ':' };
+    public static readonly IReadOnlyList<char> separators = new List<char> { '-', ':' };
     private static readonly Regex headerLineRegex = new(@"\#(?<headerName>\w+)\s*\:\s*(?<headerValue>[\w\s]+)");
 
     public static UltraStarPlaylist ParseFile(string path)
