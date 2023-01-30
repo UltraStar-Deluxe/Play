@@ -311,13 +311,13 @@ public static class SongMetaUtils
         {
             if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Video)))
             {
-                songIssues.Add(SongIssue.CreateWarning(songMeta, "Unsupported video format: " + Path.GetExtension(songMeta.Video)));
+                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Unsupported video format {Path.GetExtension(songMeta.Video)}"));
                 // Do not attempt to load the video file
                 songMeta.Video = "";
             }
             else if (!VideoResourceExists(songMeta))
             {
-                songIssues.Add(SongIssue.CreateWarning(songMeta, "Video file resource does not exist: " + GetVideoUri(songMeta)));
+                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video file resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(GetVideoUri(songMeta))}'"));
                 // Do not attempt to load the video file
                 songMeta.Video = "";
             }
@@ -327,11 +327,11 @@ public static class SongMetaUtils
         // Audio is mandatory. Without working audio file, the song cannot be played.
         if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
         {
-            songIssues.Add(SongIssue.CreateError(songMeta, "Unsupported audio format: " + Path.GetExtension(songMeta.Mp3)));
+            songIssues.Add(SongIssue.CreateError(songMeta, $"Unsupported audio format {Path.GetExtension(songMeta.Mp3)}"));
         }
         else if (!AudioResourceExists(songMeta))
         {
-            songIssues.Add(SongIssue.CreateError(songMeta, "Audio file resource does not exist: " + GetAudioUri(songMeta)));
+            songIssues.Add(SongIssue.CreateError(songMeta, $"Audio file resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(GetAudioUri(songMeta))}'"));
         }
 
         // Log found issues
