@@ -365,8 +365,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         List<string> themeFolders = new List<string>
         {
-            $"{Application.persistentDataPath}/{ThemeFolderName}",
             ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName),
+            GetAbsoluteUserDefinedThemesFolder(),
         };
 
         themeFolders.ForEach(themeFolder =>
@@ -499,5 +499,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public IReadOnlyCollection<Sprite> GetSprites()
     {
         return loadedSprites;
+    }
+
+    public static string GetAbsoluteUserDefinedThemesFolder()
+    {
+        return $"{Application.persistentDataPath}/{ThemeFolderName}";
     }
 }
