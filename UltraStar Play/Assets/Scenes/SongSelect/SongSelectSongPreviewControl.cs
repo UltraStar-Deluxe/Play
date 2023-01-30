@@ -11,7 +11,12 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     [Inject]
     private SongRouletteControl songRouletteControl;
 
+    [Inject]
+    private SongSelectSceneData sceneData;
+
     private SongEntryControl currentSongEntryControl;
+
+    private int initialSongIndex;
 
     // The very first selected song should not be previewed.
     // The song is selected when opening the scene.
@@ -28,7 +33,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
                 return;
             }
             currentSongEntryControl.SongPreviewVideoImage.ShowByDisplay();
+            currentSongEntryControl.SongPreviewVideoImage.SetBackgroundImageAlpha(0);
             currentSongEntryControl.SongPreviewBackgroundImage.ShowByDisplay();
+            currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(0);
         });
         StopSongPreviewEventStream.Subscribe(_ =>
         {
@@ -53,6 +60,12 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             }
             currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(newValue);
         });
+
+        if (sceneData != null
+            && sceneData.SongMeta != null)
+        {
+            initialSongIndex = songRouletteControl.Songs.IndexOf(sceneData.SongMeta);
+        }
     }
 
     protected override void Update()
@@ -73,7 +86,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             return;
         }
 
-        if (songSelection.SongIndex != 0)
+        if (songSelection.SongIndex != initialSongIndex)
         {
             isFirstSelectedSong = false;
         }
