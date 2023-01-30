@@ -10,56 +10,54 @@ using UnityEngine;
 
 public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
-    public float previewDelayInSeconds = 1;
+    protected static readonly float previewDelayInSeconds = 1;
+    protected static readonly float audioFadeInDurationInSeconds = 5;
+    protected static readonly float videoFadeInDurationInSeconds = 2;
 
-    public float audioFadeInDurationInSeconds = 5;
-    public float videoFadeInDurationInSeconds = 2;
-    private float fadeInStartInSeconds;
-    private float videoFadeInStartInSeconds;
-
-    private bool isFadeInStarted;
-
-    [Inject]
-    private UiManager uiManager;
+    protected float fadeInStartTimeInSeconds;
+    protected float videoFadeInStartTimeInSeconds;
+    protected bool isFadeInStarted;
 
     [Inject]
-    private SongRouletteControl songRouletteControl;
+    protected SongAudioPlayer songAudioPlayer;
+
+    [Inject(Optional = true)]
+    protected SongVideoPlayer songVideoPlayer;
 
     [Inject]
-    private SongAudioPlayer songAudioPlayer;
+    protected Settings settings;
 
-    [Inject]
-    private SongVideoPlayer songVideoPlayer;
+    protected SongMeta currentPreviewSongMeta;
 
-    [Inject]
-    private Settings settings;
+    protected readonly Subject<SongMeta> startSongPreviewEventStream = new();
+    public IObservable<SongMeta> StartSongPreviewEventStream => startSongPreviewEventStream;
 
-    private SongMeta currentPreviewSongMeta;
-    private SongEntryControl currentSongEntryControl;
+    protected readonly Subject<SongMeta> stopSongPreviewEventStream = new();
+    public IObservable<SongMeta> StopSongPreviewEventStream => stopSongPreviewEventStream;
 
-    // The very first selected song should not be previewed.
-    // The song is selected when opening the scene.
-    private bool isFirstSelectedSong = true;
+    public ReactiveProperty<float> VideoFadeIn { get; private set; } = new();
+    public ReactiveProperty<float> BackgroundImageFadeIn { get; private set; } = new();
 
-    private void Start()
+    protected virtual void Start()
     {
         if (GetFinalPreviewVolume() <= 0)
         {
-            songVideoPlayer.gameObject.SetActive(false);
+            if (songVideoPlayer != null)
+            {
+                songVideoPlayer.gameObject.SetActive(false);
+            }
             songAudioPlayer.gameObject.SetActive(false);
             gameObject.SetActive(false);
-            return;
         }
-
-        songRouletteControl.Selection.Subscribe(StartSongPreview);
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         // Update fade-in of music volume and video transparency
-        if (isFadeInStarted)
+        if (isFadeInStarted
+            && songVideoPlayer != null)
         {
-            float audioPercent = (Time.time - fadeInStartInSeconds) / audioFadeInDurationInSeconds;
+            float audioPercent = (Time.time - fadeInStartTimeInSeconds) / audioFadeInDurationInSeconds;
             audioPercent = NumberUtils.Limit(audioPercent, 0, 1);
             float maxVolume = GetFinalPreviewVolume();
             songAudioPlayer.audioPlayer.volume = audioPercent * maxVolume;
@@ -68,22 +66,20 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             // As long as no frame is ready yet, the VideoPlayer.time is 0.
             if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
             {
-                videoFadeInStartInSeconds = Time.time;
+                videoFadeInStartTimeInSeconds = Time.time;
             }
-            float videoPercent = (Time.time - videoFadeInStartInSeconds) / videoFadeInDurationInSeconds;
-            videoPercent = NumberUtils.Limit(videoPercent, 0, 1);
-            if (songVideoPlayer.HasLoadedVideo
-                && currentSongEntryControl != null)
+            float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / videoFadeInDurationInSeconds;
+            videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
+            if (songVideoPlayer.HasLoadedVideo)
             {
-                currentSongEntryControl.SongPreviewVideoImage.SetBackgroundImageAlpha(videoPercent);
+                VideoFadeIn.Value = videoFadeInPercent;
             }
-            else if (songVideoPlayer.HasLoadedBackgroundImage
-                     && currentSongEntryControl != null)
+            else if (songVideoPlayer.HasLoadedBackgroundImage)
             {
-                currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(videoPercent);
+                BackgroundImageFadeIn.Value = videoFadeInPercent;
             }
 
-            if (audioPercent >= 1 && videoPercent >= 1)
+            if (audioPercent >= 1 && videoFadeInPercent >= 1)
             {
                 // Fade-in is complete
                 isFadeInStarted = false;
@@ -91,43 +87,28 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
     }
 
-    public void StartSongPreview(SongSelection songSelection)
+    public virtual void StartSongPreview(SongMeta songMeta)
     {
-        if (songRouletteControl.IsDrag
-            || songRouletteControl.IsFlickGesture
-            || !gameObject.activeInHierarchy)
+        if (!gameObject.activeInHierarchy)
         {
             return;
         }
 
         StopSongPreview();
 
-        if (songSelection.SongIndex != 0)
-        {
-            isFirstSelectedSong = false;
-        }
-
-        SongMeta songMeta = songSelection.SongMeta;
         if (songMeta == currentPreviewSongMeta)
         {
             return;
         }
 
-        if (isFirstSelectedSong)
-        {
-            return;
-        }
-
         currentPreviewSongMeta = songMeta;
-        currentSongEntryControl = songRouletteControl.SongEntryControls
-            .FirstOrDefault(it => it.SongMeta == songMeta);
         if (songMeta != null)
         {
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
         }
     }
 
-    private int GetPreviewStartInMillis(SongMeta songMeta)
+    protected virtual int GetPreviewStartInMillis(SongMeta songMeta)
     {
         if (songMeta.PreviewStart > 0)
         {
@@ -153,16 +134,15 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         return noteStartBeatInMillis;
     }
 
-    public void StopSongPreview()
+    public virtual void StopSongPreview()
     {
         StopAllCoroutines();
         songAudioPlayer.PauseAudio();
         isFadeInStarted = false;
-        songRouletteControl.SongEntryControls.ForEach(it => it.SongPreviewVideoImage.HideByDisplay());
-        songRouletteControl.SongEntryControls.ForEach(it => it.SongPreviewBackgroundImage.HideByDisplay());
+        stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
 
-    private void DoStartSongPreview(SongMeta songMeta)
+    protected virtual void DoStartSongPreview(SongMeta songMeta)
     {
         if (songMeta == null
             || currentPreviewSongMeta != songMeta)
@@ -171,32 +151,31 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        fadeInStartInSeconds = Time.time;
-        videoFadeInStartInSeconds = Time.time;
+        fadeInStartTimeInSeconds = Time.time;
+        videoFadeInStartTimeInSeconds = Time.time;
         isFadeInStarted = true;
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
         StartAudioPreview(songMeta, previewStartInMillis);
         StartVideoPreview(songMeta);
     }
 
-    private void StartVideoPreview(SongMeta songMeta)
+    protected virtual void StartVideoPreview(SongMeta songMeta)
     {
         if (songMeta.Video.IsNullOrEmpty()
-            || currentSongEntryControl == null)
+            || songVideoPlayer == null)
         {
             return;
         }
 
-        currentSongEntryControl.SongPreviewVideoImage.ShowByDisplay();
-        currentSongEntryControl.SongPreviewVideoImage.SetBackgroundImageAlpha(0);
-        currentSongEntryControl.SongPreviewBackgroundImage.ShowByDisplay();
-        currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(0);
+        VideoFadeIn.Value = 0;
+        BackgroundImageFadeIn.Value = 0;
+        startSongPreviewEventStream.OnNext(songMeta);
 
         songVideoPlayer.SongMeta = songMeta;
         songVideoPlayer.StartVideoOrShowBackgroundImage();
     }
 
-    private void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
+    protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
         try
         {
@@ -224,7 +203,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
     }
 
-    private float GetFinalPreviewVolume()
+    protected virtual float GetFinalPreviewVolume()
     {
         return settings.AudioSettings.PreviewVolumePercent / 100.0f;
     }
