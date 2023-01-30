@@ -12,8 +12,6 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
     private readonly Button takeWebCamImageButton;
     private readonly Button removeWebCamImageButton;
 
-    private WebCamTexture webCamTexture;
-
     public PlayerProfileImagePickerControl(
         ItemPicker itemPicker,
         int playerProfileIndex,
@@ -66,7 +64,7 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
                 takeWebCamImageButton.ShowByDisplay();
                 removeWebCamImageButton.HideByDisplay();
 
-                webCamTexture = webCamManager.StartSelectedWebCam();
+                WebCamTexture webCamTexture = webCamManager.StartSelectedWebCam();
                 ItemPicker.ItemImage.image = webCamTexture;
             }
             return;
