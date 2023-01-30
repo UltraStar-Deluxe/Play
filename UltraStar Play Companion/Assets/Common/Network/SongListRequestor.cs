@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongListRequestor : AbstractHttpRequestor
+public class SongListRequestor : MonoBehaviour, INeedInjection
 {
     private readonly Subject<SongListEvent> songListEventStream = new Subject<SongListEvent>();
     public IObservable<SongListEvent> SongListEventStream => songListEventStream;
@@ -19,16 +19,18 @@ public class SongListRequestor : AbstractHttpRequestor
 
     public LoadedSongsDto LoadedSongsDto { get; private set; }
 
+    [Inject]
+    private MainGameHttpClient mainGameHttpClient;
+
     public void RequestSongList()
     {
-        if (serverIPEndPoint == null
-            || httpServerPort == 0)
+        if (!mainGameHttpClient.IsConnected)
         {
             FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_notConnected));
             return;
         }
-        
-        string uri = $"http://{serverIPEndPoint.Address}:{httpServerPort}/api/rest/songs";
+
+        string uri = mainGameHttpClient.GetUri("/api/rest/songs");
         Debug.Log("GET song list from URI: " + uri);
 
         UnityWebRequest getSongListWebRequest = UnityWebRequest.Get(uri);
