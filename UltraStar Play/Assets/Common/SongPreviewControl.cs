@@ -10,9 +10,9 @@ using UnityEngine;
 
 public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
-    protected static readonly float previewDelayInSeconds = 1;
-    protected static readonly float audioFadeInDurationInSeconds = 5;
-    protected static readonly float videoFadeInDurationInSeconds = 2;
+    public float PreviewDelayInSeconds { get; set; } = 1;
+    public float AudioFadeInDurationInSeconds { get; set; } = 5;
+    public float VideoFadeInDurationInSeconds { get; set; } = 2;
 
     protected float fadeInStartTimeInSeconds;
     protected float videoFadeInStartTimeInSeconds;
@@ -54,37 +54,56 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     protected virtual void Update()
     {
         // Update fade-in of music volume and video transparency
-        if (isFadeInStarted
-            && songVideoPlayer != null)
+        if (isFadeInStarted)
         {
-            float audioPercent = (Time.time - fadeInStartTimeInSeconds) / audioFadeInDurationInSeconds;
-            audioPercent = NumberUtils.Limit(audioPercent, 0, 1);
-            float maxVolume = GetFinalPreviewVolume();
-            songAudioPlayer.audioPlayer.volume = audioPercent * maxVolume;
+            float audioFadeInPercent = UpdateAudioFadeIn();
+            float videoFadeInPercent = UpdateVideoFadeIn();
 
-            // The video has an additional delay to load.
-            // As long as no frame is ready yet, the VideoPlayer.time is 0.
-            if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
-            {
-                videoFadeInStartTimeInSeconds = Time.time;
-            }
-            float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / videoFadeInDurationInSeconds;
-            videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
-            if (songVideoPlayer.HasLoadedVideo)
-            {
-                VideoFadeIn.Value = videoFadeInPercent;
-            }
-            else if (songVideoPlayer.HasLoadedBackgroundImage)
-            {
-                BackgroundImageFadeIn.Value = videoFadeInPercent;
-            }
-
-            if (audioPercent >= 1 && videoFadeInPercent >= 1)
+            if ((audioFadeInPercent < 0 || audioFadeInPercent >= 1)
+                && (videoFadeInPercent < 0 || videoFadeInPercent >= 1))
             {
                 // Fade-in is complete
                 isFadeInStarted = false;
             }
         }
+    }
+
+    protected virtual float UpdateVideoFadeIn()
+    {
+        if (songVideoPlayer == null)
+        {
+            return -1;
+        }
+
+        // The video has an additional delay to load.
+        // As long as no frame is ready yet, the VideoPlayer.time is 0.
+        if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
+        {
+            videoFadeInStartTimeInSeconds = Time.time;
+        }
+
+        float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / VideoFadeInDurationInSeconds;
+        videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
+        if (songVideoPlayer.HasLoadedVideo)
+        {
+            VideoFadeIn.Value = videoFadeInPercent;
+        }
+        else if (songVideoPlayer.HasLoadedBackgroundImage)
+        {
+            BackgroundImageFadeIn.Value = videoFadeInPercent;
+        }
+
+        return videoFadeInPercent;
+    }
+
+    protected virtual float UpdateAudioFadeIn()
+    {
+        float audioFadeInPercent = (Time.time - fadeInStartTimeInSeconds) / AudioFadeInDurationInSeconds;
+        audioFadeInPercent = NumberUtils.Limit(audioFadeInPercent, 0, 1);
+        float maxVolume = GetFinalPreviewVolume();
+        songAudioPlayer.audioPlayer.volume = audioFadeInPercent * maxVolume;
+
+        return audioFadeInPercent;
     }
 
     public virtual void StartSongPreview(SongMeta songMeta)
@@ -104,7 +123,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         currentPreviewSongMeta = songMeta;
         if (songMeta != null)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(PreviewDelayInSeconds, () => DoStartSongPreview(songMeta)));
         }
     }
 
@@ -157,6 +176,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         int previewStartInMillis = GetPreviewStartInMillis(songMeta);
         StartAudioPreview(songMeta, previewStartInMillis);
         StartVideoPreview(songMeta);
+
+        startSongPreviewEventStream.OnNext(songMeta);
     }
 
     protected virtual void StartVideoPreview(SongMeta songMeta)
@@ -169,7 +190,6 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
-        startSongPreviewEventStream.OnNext(songMeta);
 
         songVideoPlayer.SongMeta = songMeta;
         songVideoPlayer.StartVideoOrShowBackgroundImage();
