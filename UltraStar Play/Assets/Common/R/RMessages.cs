@@ -24,6 +24,8 @@ public static partial class R
         public static readonly string action_webcamOnOff = "action_webcamOnOff";
         public static readonly string active = "active";
         public static readonly string add = "add";
+        public static readonly string androidInternalStorage = "androidInternalStorage";
+        public static readonly string androidSdCardStorage = "androidSdCardStorage";
         public static readonly string back = "back";
         public static readonly string buildTimeStamp = "buildTimeStamp";
         public static readonly string cancel = "cancel";

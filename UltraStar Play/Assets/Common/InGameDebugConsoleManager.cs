@@ -60,7 +60,7 @@ public class InGameDebugConsoleManager : AbstractSingletonBehaviour, INeedInject
     private void AddDebugLogConsoleCommands()
     {
         DebugLogConsole.AddCommand("logs.path", "Show path to log file",
-            () => Debug.Log($"Log file path: {ApplicationUtils.GetLogFilePathDisplayString()}"));
+            () => Debug.Log($"Log file path: {ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath)}"));
     }
 
     private void Update()

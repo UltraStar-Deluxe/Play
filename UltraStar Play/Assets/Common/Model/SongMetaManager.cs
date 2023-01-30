@@ -292,7 +292,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError(path);
+            Debug.LogError($"Failed to load {path}");
         }
 
         songMeta = null;

@@ -100,7 +100,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         Debug.LogWarning("Showing general error message in loading scene. Probably something went wrong.");
         unexpectedErrorContainer.ShowByDisplay();
         unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
-            "path", ApplicationUtils.GetLogFilePathDisplayString());
+            "path", ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath));
         viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
         viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
         copyLogButton.RegisterCallbackButtonTriggered(() =>
