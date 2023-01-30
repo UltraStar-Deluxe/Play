@@ -129,18 +129,18 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
             if (i < currentNoteIndex)
             {
-                label.AddToClassList(R.UxmlClasses.previousNoteLyrics);
-                label.RemoveFromClassList(R.UxmlClasses.currentNoteLyrics);
+                label.AddToClassList(R.UssClasses.previousNoteLyrics);
+                label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
             }
             else if (i == currentNoteIndex)
             {
-                label.RemoveFromClassList(R.UxmlClasses.previousNoteLyrics);
-                label.AddToClassList(R.UxmlClasses.currentNoteLyrics);
+                label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
+                label.AddToClassList(R.UssClasses.currentNoteLyrics);
             }
             else
             {
-                label.RemoveFromClassList(R.UxmlClasses.previousNoteLyrics);
-                label.RemoveFromClassList(R.UxmlClasses.currentNoteLyrics);
+                label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
+                label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
             }
         }
     }
@@ -204,15 +204,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.style.marginRight = SpaceWidthInPx;
             }
 
-            label.AddToClassList(R.UxmlClasses.singingLyrics);
+            label.AddToClassList(R.UssClasses.singingLyrics);
             if (visualElement == currentSentenceContainer)
             {
-                label.AddToClassList(R.UxmlClasses.currentLyrics);
+                label.AddToClassList(R.UssClasses.currentLyrics);
                 currentSentenceNoteToLabelMap.Add(note, label);
             }
             else if (visualElement == nextSentenceContainer)
             {
-                label.AddToClassList(R.UxmlClasses.nextLyrics);
+                label.AddToClassList(R.UssClasses.nextLyrics);
             }
 
             visualElement.Add(label);

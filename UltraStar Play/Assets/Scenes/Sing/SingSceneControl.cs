@@ -206,7 +206,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl.Title = title;
             dialogControl.Message = message;
             dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
+            dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
 
