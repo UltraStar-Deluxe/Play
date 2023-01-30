@@ -17,6 +17,7 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
     private SceneNavigator sceneNavigator;
 
     private WebCamTexture webCamTexture;
+    private WebCamDevice webCamTextureDevice;
 
     protected override object GetInstance()
     {
@@ -35,12 +36,20 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 
     public WebCamTexture StartSelectedWebCam()
     {
-        StopWebCam();
-
         WebCamDevice selectedWebCamDevice = GetSelectedWebCamDevice();
+        if (selectedWebCamDevice.name == webCamTextureDevice.name
+            && webCamTexture != null
+            && webCamTexture.isPlaying)
+        {
+            // Re-use existing webCamTexture.
+            return webCamTexture;
+        }
+
+        StopWebCam();
         Debug.Log($"Starting webcam '{selectedWebCamDevice.name}'");
         webCamTexture = new WebCamTexture(selectedWebCamDevice.name);
         webCamTexture.Play();
+        webCamTextureDevice = selectedWebCamDevice;
         return webCamTexture;
     }
 
