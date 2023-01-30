@@ -50,8 +50,16 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeContainer)]
     private VisualElement animateSceneChangeContainer;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private UiManager uiManager;
+
+    private MessageDialogControl helpDialogControl;
 
     private void Start()
     {
@@ -87,16 +95,30 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             () => themeManager.GetCurrentTheme(),
             newValue => themeManager.SetCurrentTheme(newValue));
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
+            .Subscribe(_ => OnBack());
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
     }
 
     public void UpdateTranslation()
     {
-        themeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_theme);
+        themeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_design_theme);
         noteDisplayModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         staticLyricsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
         lyricsOnNotesContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
@@ -104,5 +126,37 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_design_title);
+    }
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
+                TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
+                    "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeManager.GetAbsoluteUserDefinedThemesFolder())) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
+    }
+
+    private void CloseHelp()
+    {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
+        helpDialogControl.CloseDialog();
+        helpDialogControl = null;
+        helpButton.Focus();
     }
 }

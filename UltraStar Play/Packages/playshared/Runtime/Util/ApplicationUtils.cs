@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ProTrans;
 using UnityEngine;
 
 public static class ApplicationUtils
@@ -107,18 +108,27 @@ public static class ApplicationUtils
         return diagonalInInches;
     }
 
-    public static string GetLogFilePathDisplayString()
+    public static string ReplacePathsWithDisplayString(string text)
     {
-        string logFilePath = Log.logFilePath;
         if (PlatformUtils.IsAndroid)
         {
+            string internalStorageTranslation = "Internal Storage";
+            string sdCardStorageTranslation = "SD Card";
+            if (ThreadUtils.IsMainThread())
+            {
+                // The ProTrans TranslationManager only works on the main thread.
+                internalStorageTranslation = TranslationManager.GetTranslation("androidInternalStorage");
+                sdCardStorageTranslation = TranslationManager.GetTranslation("androidSdCardStorage");
+            }
+
             string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
+            internalStorageRoot = "F:\\";
             string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
-            logFilePath = logFilePath
-                .Replace(internalStorageRoot, "INTERNAL-STORAGE")
-                .Replace(sdCardStorageRoot, "SD-CARD-STORAGE");
+            return text
+                .Replace(internalStorageRoot, $"{internalStorageTranslation}/")
+                .Replace(sdCardStorageRoot, $"{sdCardStorageTranslation}/");
         }
 
-        return logFilePath;
+        return text;
     }
 }

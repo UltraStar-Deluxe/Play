@@ -293,7 +293,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return null;
         }
 
-        if (visualElement.ClassListContains(R.UxmlClasses.focusableNavigatorRoot))
+        if (visualElement.ClassListContains(R.UssClasses.focusableNavigatorRoot))
         {
             return visualElement;
         }
@@ -353,6 +353,6 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                && visualElement is not Focusable { focusable: false }
                && visualElement.enabledInHierarchy
                && visualElement.canGrabFocus
-               && !visualElement.ClassListContains(R.UxmlClasses.focusableNavigatorIgnore);
+               && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore);
     }
 }

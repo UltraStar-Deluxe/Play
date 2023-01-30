@@ -40,7 +40,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         InitItems();
 
         // Update settings
-        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
+        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
 
         // Show playlist name in button
         Selection.Subscribe(playlist => playlistChooserButton.text = GetDisplayString(playlist));
@@ -90,7 +90,7 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
         }
         else
         {
-            return playlistManager.GetPlaylistName(playlist);
+            return playlist.Name;
         }
     }
 

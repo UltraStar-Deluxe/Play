@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -31,11 +32,19 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+
+    private MessageDialogControl helpDialogControl;
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private WebCamManager webCamManager;
 
     [Inject]
     private ThemeManager themeManager;
@@ -57,11 +66,25 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             nameTextField.Focus();
         });
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
+            .Subscribe(_ => OnBack());
+    }
+
+    private void OnBack()
+    {
+        if (helpDialogControl != null)
+        {
+            CloseHelp();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.OptionsScene);
+        }
     }
 
     public void UpdateTranslation()
@@ -104,14 +127,50 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
         result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
 
-        new AvatarPickerControl(result.Q<ItemPicker>(R.UxmlNames.avatarPicker), uiManager)
-            .Bind(() => playerProfile.Avatar,
-                newValue => playerProfile.Avatar = newValue);
+        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
+            .Bind(() => playerProfile.ImagePath,
+                newValue => playerProfile.ImagePath = newValue);
 
         new DifficultyPicker(result.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
             .Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
         return result;
+    }
+
+    private void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
+                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
+            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty_title),
+                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty) },
+            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
+                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
+            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
+                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
+                    "path", ApplicationUtils.ReplacePathsWithDisplayString(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder())) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
+            titleToContentMap,
+            CloseHelp);
+    }
+
+    private void CloseHelp()
+    {
+        if (helpDialogControl == null)
+        {
+            return;
+        }
+        helpDialogControl.CloseDialog();
+        helpDialogControl = null;
+        helpButton.Focus();
     }
 }

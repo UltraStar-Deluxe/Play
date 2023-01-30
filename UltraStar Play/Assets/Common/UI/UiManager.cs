@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -13,7 +14,15 @@ using UnityEngine.UIElements;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        relativePlayerProfileImagePathToAbsolutePath = new();
+    }
+
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
+
+    private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -28,7 +37,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     public VisualTreeAsset accordionUi;
 
     [InjectedInInspector]
-    public List<AvatarImageReference> avatarImageReferences;
+    public Sprite fallbackPlayerProfileImage;
 
     [Inject]
     private Injector injector;
@@ -50,6 +59,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
+        UpdatePlayerProfileImagePaths();
     }
 
     private void Update()
@@ -87,6 +97,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         return notificationLabel;
     }
 
+    public void UpdatePlayerProfileImagePaths()
+    {
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
+    }
+
     public static Label CreateNotification(
         string text,
         params string[] additionalTextClasses)
@@ -119,13 +134,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         {
             visualElement.parent.Remove(visualElement);
         }
-    }
-
-    public Sprite GetAvatarSprite(EAvatar avatar)
-    {
-        AvatarImageReference avatarImageReference = avatarImageReferences
-            .FirstOrDefault(it => it.avatar == avatar);
-        return avatarImageReference?.sprite;
     }
 
     public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
@@ -163,5 +171,49 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             .WithRootVisualElement(accordionItem)
             .CreateAndInject<AccordionItemControl>();
         return accordionItemControl;
+    }
+
+    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
+    {
+        if (imagePath.IsNullOrEmpty())
+        {
+            onSuccess(fallbackPlayerProfileImage);
+            return;
+        }
+
+        string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
+        {
+            string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
+            string relativePathNormalized = PathUtils.NormalizePath(imagePath);
+            return absolutePathNormalized.EndsWith(relativePathNormalized);
+        });
+        if (matchingFullPath.IsNullOrEmpty())
+        {
+            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}', no corresponding image file found.");
+            onSuccess(fallbackPlayerProfileImage);
+            return;
+        }
+
+        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
+    }
+
+    public List<string> GetAbsolutePlayerProfileImagePaths()
+    {
+        return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
+    }
+
+    public List<string> GetRelativePlayerProfileImagePaths(bool includeWebCamImages)
+    {
+        if (includeWebCamImages)
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
+        }
+        else
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys
+                .Where(relativePath => !relativePath.Contains(PlayerProfileUtils.PlayerProfileWebCamImagesFolderName))
+                .ToList();
+        }
+
     }
 }

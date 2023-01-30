@@ -41,7 +41,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectFocusableNavigator focusableNavigator;
 
     [InjectedInInspector]
-    public SongPreviewControl songPreviewControl;
+    public SongSelectSongPreviewControl songPreviewControl;
 
     [InjectedInInspector]
     public SongSelectPlayerListControl playerListControl;
