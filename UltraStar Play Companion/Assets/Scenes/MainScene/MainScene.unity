@@ -216,7 +216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playRecordedAudio: 0
 --- !u!82 &599260816
 AudioSource:
   m_ObjectHideFlags: 0
@@ -505,8 +504,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: CommonSceneObjects
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1848418442335061490, guid: cfadc19478457fb46971b4bf44ad9bc7, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

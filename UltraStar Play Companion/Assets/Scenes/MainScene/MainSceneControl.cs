@@ -133,8 +133,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.showSongViewButton)]
     private Button showSongViewButton;
 
+    [Inject(UxmlName = R.UxmlNames.showInputSimulationButton)]
+    private Button showInputSimulationButton;
+
     [Inject(UxmlName = R.UxmlNames.songViewContainer)]
     private VisualElement songViewContainer;
+
+    [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
+    private VisualElement inputSimulationContainer;
 
     [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
     private TextField songSearchTextField;
@@ -156,8 +162,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private float frameCountTime;
     private int frameCount;
 
+    private readonly InputSimulationControl inputSimulationControl = new();
+
     public void OnInjectionFinished()
     {
+        injector.Inject(inputSimulationControl);
+
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
@@ -220,6 +230,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AllowNoContainerVisible = false;
         tabGroupControl.AddTabGroupButton(showMicViewButton, micViewContainer);
         tabGroupControl.AddTabGroupButton(showSongViewButton, songViewContainer);
+        tabGroupControl.AddTabGroupButton(showInputSimulationButton, inputSimulationContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
@@ -290,8 +301,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
         devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
         visualizeAudioLabel.text = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
-        showMicViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showMicrophone);
-        showSongViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showSongs);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
 
         recordingDevicePickerControl.UpdateLabelText();
@@ -511,6 +520,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
+        bb.BindExistingInstance(inputSimulationControl);
         return bb.GetBindings();
     }
 }
