@@ -52,6 +52,7 @@ public class ItemPicker : VisualElement
     public Button NextItemButton { get; private set; }
     public Button PreviousItemButton { get; private set; }
     public Label ItemLabel { get; private set; }
+    public Image ItemImage { get; private set; }
 
     private object control;
 
@@ -68,6 +69,7 @@ public class ItemPicker : VisualElement
         visualTreeAsset.CloneTree(this);
 
         ItemLabel = this.Q<Label>("itemLabel");
+        ItemImage = this.Q<Image>("itemImage");
         PreviousItemButton = this.Q<Button>("previousItemButton");
         NextItemButton = this.Q<Button>("nextItemButton");
     }

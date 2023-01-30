@@ -19,6 +19,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public List<SongRatingImageReference> songRatingImageReferences;
 
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+
+    [InjectedInInspector]
+    public SongPreviewControl songPreviewControl;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -83,6 +89,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
             .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
                 ? PickingMode.Position
                 : PickingMode.Ignore);
+
+        songAudioPlayer.Init(sceneData.SongMeta);
+
+        songPreviewControl.PreviewDelayInSeconds = 0;
+        songPreviewControl.AudioFadeInDurationInSeconds = 2;
+        songPreviewControl.VideoFadeInDurationInSeconds = 2;
+        songPreviewControl.StartSongPreview(sceneData.SongMeta);
 
         ActivateLayout();
         FillLayout();
@@ -234,6 +247,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
     }
 

@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" >
+    <ui:VisualElement name="background">
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -18,6 +18,9 @@
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
+                <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
+                    <MaterialIcon name="helpIcon" icon="help_outline" />
+                </ui:Button>
                 <ui:Button text="Back" name="backButton" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>

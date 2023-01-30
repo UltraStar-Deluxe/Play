@@ -12,7 +12,7 @@
                     <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
                     <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="playerImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=21300000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
+                <ui:VisualElement name="playerImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DummyPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#DummyPlayerProfileImage&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
             </ui:VisualElement>
             <ui:VisualElement name="singingResultsScoresContainer" picking-mode="Ignore">
                 <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" style="width: 100%; -unity-text-align: upper-right;" />

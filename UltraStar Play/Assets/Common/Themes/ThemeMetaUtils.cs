@@ -16,4 +16,15 @@ public static class ThemeMetaUtils
     {
         return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{themeRelativePath}";
     }
+
+    public static bool HasStaticBackground(ThemeMeta themeMeta)
+    {
+        return themeMeta.ThemeJson.staticBackground != null
+               && !themeMeta.ThemeJson.staticBackground.imagePath.IsNullOrEmpty();
+    }
+
+    public static bool HasDynamicBackground(ThemeMeta themeMeta)
+    {
+        return !HasStaticBackground(themeMeta);
+    }
 }

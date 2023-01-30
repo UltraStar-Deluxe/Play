@@ -206,7 +206,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl.Title = title;
             dialogControl.Message = message;
             dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UxmlClasses.warning);
+            dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
 
@@ -571,8 +571,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             EDifficulty easiestPlayerProfileDifficulty = PlayerControls
                 .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
                 .PlayerProfile.Difficulty;
-            EAvatar commonPlayerProfileAvatar = PlayerControls.FirstOrDefault().PlayerProfile.Avatar;
-            PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonPlayerProfileAvatar);
+            string commonPlayerProfileImagePath = PlayerControls.FirstOrDefault()
+                .PlayerProfile
+                .ImagePath;
+            PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonPlayerProfileImagePath);
             PlayerScoreControlData commonScoreData = new()
             {
                 TotalScore = (int)scoreControls.Select(scoreControl => scoreControl.TotalScore).Average(),

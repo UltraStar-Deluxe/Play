@@ -1,11 +1,14 @@
 ﻿using System;
 
 [Serializable]
-public class PlayerProfile : IEquatable<PlayerProfile>
+public class PlayerProfile
 {
+    public const string DefaultImagePath = "Silhouette01.png";
+    public const string WebcamImagePath = "WEBCAM";
+
     public string Name { get; set; } = "New Player";
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
-    public EAvatar Avatar { get; set; } = EAvatar.GenericPlayer01;
+    public string ImagePath { get; set; } = DefaultImagePath;
     public bool IsEnabled { get; set; } = true;
     public bool IsSelected { get; set; } = true;
 
@@ -13,34 +16,10 @@ public class PlayerProfile : IEquatable<PlayerProfile>
     {
     }
 
-    public PlayerProfile(string name, EDifficulty difficulty, EAvatar avatar)
+    public PlayerProfile(string name, EDifficulty difficulty, string imagePath = DefaultImagePath)
     {
         this.Name = name;
         this.Difficulty = difficulty;
-        this.Avatar = avatar;
-    }
-
-    public bool Equals(PlayerProfile other)
-    {
-        // TODO: Use EqualsBuilder or something similar for C#
-        return Name == other.Name && Difficulty == other.Difficulty && Avatar == other.Avatar && IsEnabled == other.IsEnabled;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj is PlayerProfile)
-        {
-            return Equals(obj as PlayerProfile);
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public override int GetHashCode()
-    {
-        // TODO: Use HashCodeBuilder or something similar for C#
-        return Name.GetHashCode();
+        this.ImagePath = imagePath;
     }
 }

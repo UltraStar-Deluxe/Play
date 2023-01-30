@@ -133,14 +133,50 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
             alreadyProcessedVisualElements.Clear();
-            ApplyThemeDynamicBackground(themeMeta);
+            ApplyThemeBackground(themeMeta);
             ApplyThemeSpecificStylesToVisualElementsInScene();
             anyThemeLoaded = true;
         }));
     }
 
+    private void ApplyThemeBackground(ThemeMeta themeMeta)
+    {
+        ApplyThemeStaticBackground(themeMeta);
+        ApplyThemeDynamicBackground(themeMeta);
+    }
+
+    private void ApplyThemeStaticBackground(ThemeMeta themeMeta)
+    {
+        VisualElement backgroundElement = uiDocument.rootVisualElement;
+        if (backgroundElement == null)
+        {
+            return;
+        }
+
+        if (!ThemeMetaUtils.HasStaticBackground(themeMeta))
+        {
+            backgroundElement.style.backgroundImage = new StyleBackground();
+            return;
+        }
+
+        ImageManager.LoadSpriteFromUri(themeMeta.ThemeJson.staticBackground.imagePath, loadedSprite =>
+        {
+            backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+            if (!themeMeta.ThemeJson.staticBackground.scaleMode.IsNullOrEmpty()
+                && Enum.TryParse(themeMeta.ThemeJson.staticBackground.scaleMode, out ScaleMode scaleMode))
+            {
+                backgroundElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+            }
+        });
+    }
+
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
+        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta))
+        {
+            return;
+        }
+
         DynamicBackgroundJson backgroundJson = themeMeta.ThemeJson?.dynamicBackground;
         if (backgroundJson == null)
         {
@@ -329,8 +365,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         List<string> themeFolders = new List<string>
         {
-            $"{Application.persistentDataPath}/{ThemeFolderName}",
             ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName),
+            GetAbsoluteUserDefinedThemesFolder(),
         };
 
         themeFolders.ForEach(themeFolder =>
@@ -372,6 +408,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             Debug.LogWarning("Not applying theme styles because current theme is null");
             return;
         }
+
+        ApplyThemeStaticBackground(currentThemeMeta);
 
         VisualElement root = uiDocument.rootVisualElement;
 
@@ -461,5 +499,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public IReadOnlyCollection<Sprite> GetSprites()
     {
         return loadedSprites;
+    }
+
+    public static string GetAbsoluteUserDefinedThemesFolder()
+    {
+        return $"{Application.persistentDataPath}/{ThemeFolderName}";
     }
 }

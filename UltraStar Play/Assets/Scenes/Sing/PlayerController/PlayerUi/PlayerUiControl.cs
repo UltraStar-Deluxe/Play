@@ -136,7 +136,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         playerNameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
+            .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
             playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);

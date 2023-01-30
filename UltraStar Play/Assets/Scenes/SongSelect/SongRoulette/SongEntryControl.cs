@@ -453,7 +453,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             .Where(playlist => !(playlist is UltraStarAllSongsPlaylist))
             .ForEach(playlist =>
         {
-            string playlistName = playlistManager.GetPlaylistName(playlist);
+            string playlistName = playlist.Name;
             Button button = new();
             button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             button.AddToClassList("smallFont");
