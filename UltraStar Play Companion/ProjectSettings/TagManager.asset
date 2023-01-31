@@ -14,6 +14,7 @@ TagManager:
   - TranslationManager
   - InputManager
   - DontDestroyOnLoadManager
+  - MainGameHttpClient
   layers:
   - Default
   - TransparentFX

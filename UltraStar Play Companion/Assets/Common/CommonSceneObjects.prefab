@@ -183,6 +183,7 @@ Transform:
   - {fileID: 7793846928232682641}
   - {fileID: 4190712076537908168}
   - {fileID: 5264907938372646005}
+  - {fileID: 9059284900749356658}
   m_Father: {fileID: 7793846928896407034}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -240,6 +241,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e3eb005d367f354988932948bc73960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &7533492218452213851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9059284900749356658}
+  - component: {fileID: 1770134915371172135}
+  m_Layer: 0
+  m_Name: MainGameHttpClient
+  m_TagString: MainGameHttpClient
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9059284900749356658
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7533492218452213851}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5970054433468432184}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1770134915371172135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7533492218452213851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0911cbde7f843f3865eba066ab1e0e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7793846927334274920
@@ -468,6 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 812c7e75077c84e4fa09ac870aae1c09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onlyInjectScriptsWithMarkerInterface: 0
   logTime: 0
 --- !u!1 &7793846928701339898
 GameObject:

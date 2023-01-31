@@ -31,8 +31,6 @@ public static partial class R
         public static readonly string cancel = "cancel";
         public static readonly string close = "close";
         public static readonly string commit = "commit";
-        public static readonly string companionApp_button_showMicrophone = "companionApp_button_showMicrophone";
-        public static readonly string companionApp_button_showSongs = "companionApp_button_showSongs";
         public static readonly string companionApp_connectedTo = "companionApp_connectedTo";
         public static readonly string companionApp_connecting = "companionApp_connecting";
         public static readonly string companionApp_connectingWithFailedAttempts = "companionApp_connectingWithFailedAttempts";
