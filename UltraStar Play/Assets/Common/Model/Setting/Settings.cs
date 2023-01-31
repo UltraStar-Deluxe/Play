@@ -30,8 +30,8 @@ public class Settings : ISettings
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
         List<PlayerProfile> result = new();
-        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, EAvatar.GenericPlayer01));
-        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, EAvatar.GenericPlayer02));
+        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
+        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
         return result;
     }
 
@@ -46,5 +46,11 @@ public class Settings : ISettings
     {
         get { return AudioSettings.pitchDetectionAlgorithm; }
         set { AudioSettings.pitchDetectionAlgorithm = value; }
+    }
+
+    public bool ShowFps
+    {
+        get { return DeveloperSettings.showFps; }
+        set { DeveloperSettings.showFps = value; }
     }
 }

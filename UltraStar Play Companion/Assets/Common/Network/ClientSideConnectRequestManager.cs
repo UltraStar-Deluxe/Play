@@ -11,27 +11,9 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IClientSideConnectRequestManager
+public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeedInjection, IClientSideConnectRequestManager
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void InitOnLoad()
-    {
-        instance = null;
-    }
-
-    private static ClientSideConnectRequestManager instance;
-    public static ClientSideConnectRequestManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                ClientSideConnectRequestManager instanceInScene = FindObjectOfType<ClientSideConnectRequestManager>();
-                GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-            }
-            return instance;
-        }
-    }
+    public static ClientSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ClientSideConnectRequestManager>();
 
     [Inject]
     private Settings settings;
@@ -59,17 +41,13 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
     private ConnectedServerHandler connectedServerHandler;
     public bool IsConnected => connectedServerHandler != null;
 
-    private void Start()
+    protected override object GetInstance()
     {
-        ClientSideConnectRequestManager self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
-        if (!Application.isPlaying || instance != this)
-        {
-            return;
-        }
+        return Instance;
+    }
 
-        GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
-
+    protected override void StartSingleton()
+    {
         clientUdpClient = !settings.OwnHost.IsNullOrEmpty()
             ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost), settings.UdpPortOnClient))
             : new UdpClient(settings.UdpPortOnClient);
@@ -234,7 +212,7 @@ public class ClientSideConnectRequestManager : MonoBehaviour, INeedInjection, IC
         }
     }
 
-    private void OnDestroy()
+    protected override void OnDestroySingleton()
     {
         hasBeenDestroyed = true;
         DisposeConnectedServerHandler();

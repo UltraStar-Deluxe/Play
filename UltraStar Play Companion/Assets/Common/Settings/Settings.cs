@@ -14,7 +14,7 @@ public class Settings : ISettings
     public MicProfile MicProfile { get; set; } = new MicProfile();
 
     public int TargetFps { get; set; } = 30;
-    public bool ShowFps { get; set; }
+    public bool ShowFps => IsDevModeEnabled;
     public bool ShowAudioWaveForm { get; set; } = true;
 
     public GameSettings GameSettings { get; set; } = new GameSettings();

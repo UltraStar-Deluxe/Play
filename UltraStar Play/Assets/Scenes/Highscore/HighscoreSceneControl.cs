@@ -48,7 +48,9 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject]
     private Injector injector;
 
+    [Inject]
     private HighscoreSceneData sceneData;
+
     private EDifficulty currentDifficulty;
 
     private NextGameRoundUiControl nextGameRoundUiControl = new();
@@ -60,7 +62,6 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     private void Start()
     {
-        sceneData = sceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>();
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         nextDifficultyButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
@@ -143,6 +144,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     {
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<HighscoreSceneData>());
         return bb.GetBindings();
     }
 

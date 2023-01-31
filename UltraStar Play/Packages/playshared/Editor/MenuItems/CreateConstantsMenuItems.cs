@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
 public static class CreateConstantsMenuItems
 {
+    private static readonly Regex ussClassDeclarationRegex = new Regex(@"\.(?<ussClassName>[^\d][\w\-]+)");
+
     private static readonly HashSet<string> cSharpKeywords = new()
     { "public", "protected", "private",
         "static", "void", "readonly", "const",
@@ -26,27 +29,29 @@ public static class CreateConstantsMenuItems
     {
         EditorUtils.RefreshAssetsInStreamingAssetsFolder();
 
-        CreateConstantsForUxmlNamesAndClasses();
+        CreateConstantsForUxmlNamesAndUssClasses();
         ProTrans.CreateTranslationConstantsMenuItems.CreateTranslationConstants();
         PrimeInputActions.CreateInputActionConstantsMenuItems.CreateInputActionConstants();
     }
 
     [MenuItem("Generate/Create C# constants for UXML names and classes")]
-    private static void CreateConstantsForUxmlNamesAndClasses()
+    public static void CreateConstantsForUxmlNamesAndUssClasses()
     {
         CreateConstantsForUxmlNames();
-        CreateConstantsForUxmlClasses();
+        CreateConstantsForUssClasses();
     }
 
-    private static void CreateConstantsForUxmlNames()
+    public static void CreateConstantsForUxmlNames()
     {
         string subClassName = "UxmlNames";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
-        List<string> files = GetFilesInFolder("Assets", "*.uxml");
+        List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
+            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uxml"))
+            .ToList();
 
         HashSet<string> uxmlNames = new();
-        files.ForEach(file => FindUxmlNames(file).ForEach(uxmlName => uxmlNames.Add(uxmlName)));
+        uxmlFiles.ForEach(file => FindUxmlNames(file).ForEach(uxmlName => uxmlNames.Add(uxmlName)));
         List<string> uxmlNamesList = uxmlNames.ToList();
         uxmlNamesList.Sort();
 
@@ -55,19 +60,25 @@ public static class CreateConstantsMenuItems
         Debug.Log("Generated file " + targetPath);
     }
 
-    private static void CreateConstantsForUxmlClasses()
+    public static void CreateConstantsForUssClasses()
     {
-        string subClassName = "UxmlClasses";
+        string subClassName = "UssClasses";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
-        List<string> files = GetFilesInFolder("Assets", "*.uxml");
+        List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
+            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uxml"))
+            .ToList();
+        List<string> ussFiles = GetFilesInFolder("Assets", "*.uss")
+            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uss"))
+            .ToList();
 
-        HashSet<string> uxmlClasses = new();
-        files.ForEach(file => FindUxmlClasses(file).ForEach(uxmlClass => uxmlClasses.Add(uxmlClass)));
-        List<string> uxmlClassesList = uxmlClasses.ToList();
-        uxmlClassesList.Sort();
+        HashSet<string> ussClassesHashSet = new();
+        uxmlFiles.ForEach(file => FindUssClassesInUxmlFile(file).ForEach(ussClassName => ussClassesHashSet.Add(ussClassName)));
+        ussFiles.ForEach(file => FindUssClassesInUssFile(file).ForEach(ussClassName => ussClassesHashSet.Add(ussClassName)));
+        List<string> ussClassesList = ussClassesHashSet.ToList();
+        ussClassesList.Sort();
 
-        string classCode = CreateClassCode(subClassName, uxmlClassesList, null, true);
+        string classCode = CreateClassCode(subClassName, ussClassesList, null, true);
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
         Debug.Log("Generated file " + targetPath);
     }
@@ -89,7 +100,7 @@ public static class CreateConstantsMenuItems
         return result;
     }
 
-    private static IEnumerable<string> FindUxmlClasses(string uxmlFile)
+    private static IEnumerable<string> FindUssClassesInUxmlFile(string uxmlFile)
     {
         HashSet<string> result = new();
         string content = File.ReadAllText(uxmlFile);
@@ -104,6 +115,22 @@ public static class CreateConstantsMenuItems
                     classAttributes.ForEach(classAttribute => result.Add(classAttribute.Trim()));
                 }
             });
+        return result;
+    }
+
+    private static IEnumerable<string> FindUssClassesInUssFile(string ussFile)
+    {
+        HashSet<string> result = new();
+        IEnumerable<string> lines = File.ReadLines(ussFile);
+        lines.ForEach(line =>
+        {
+            Match match = ussClassDeclarationRegex.Match(line);
+            if (match.Success)
+            {
+                string ussClassName = match.Groups["ussClassName"].Value;
+                result.Add(ussClassName);
+            }
+        });
         return result;
     }
 
@@ -138,7 +165,7 @@ public static class CreateConstantsMenuItems
         {
             string value = values[i];
             string fieldName = fieldNames == null
-                ? value.Replace(".", "_")
+                ? value.Replace(".", "_").Replace("-", "_")
                 : fieldNames[i];
             if (fieldName.Contains("/"))
             {
