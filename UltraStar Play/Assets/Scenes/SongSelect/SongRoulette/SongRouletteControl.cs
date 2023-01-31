@@ -356,11 +356,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void SelectSong(SongMeta songMeta)
     {
-        if (songMeta == null)
-        {
-            return;
-        }
-
         Selection.Value = new SongSelection(songMeta, songs.IndexOf(songMeta), songs.Count);
         ResetAnimationTimeTowardsTargetRouletteItem();
     }
@@ -415,12 +410,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
             nextIndex = SelectedSongIndex - 1;
         }
         SelectSongByIndex(nextIndex);
-    }
-
-    public void SelectRandomSong()
-    {
-        int songIndex = new System.Random().Next(0, songs.Count - 1);
-        SelectSongByIndex(songIndex);
     }
 
     public SongMeta GetSongAtIndex(int index)

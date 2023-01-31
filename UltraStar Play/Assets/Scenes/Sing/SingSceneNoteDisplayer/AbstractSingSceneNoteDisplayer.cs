@@ -12,6 +12,9 @@ using UnityEngine.UIElements;
 
 public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    protected VisualElement rootVisualElement;
+
     [Inject(Key = nameof(perfectEffectStarUi))]
     protected VisualTreeAsset perfectEffectStarUi;
 
@@ -38,6 +41,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     [Inject]
     protected SingSceneControl singSceneControl;
+
+    [Inject]
+    protected GameObject gameObject;
 
     [Inject]
     protected Injector injector;
@@ -70,6 +76,8 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     // Only for debugging
     private bool displayRoundedAndActualRecordedNotes;
     private bool showPitchOfNotes;
+
+    private int fadeOutAnimationId;
 
     protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
 
@@ -448,5 +456,17 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             .ToList()
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => RemoveRecordedNote(recordedNoteControl)));
+    }
+
+    public void FadeOut(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+    }
+
+    public void FadeIn(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 }

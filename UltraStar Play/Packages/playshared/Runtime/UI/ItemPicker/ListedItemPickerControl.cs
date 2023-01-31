@@ -42,9 +42,10 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
     {
         get
         {
-            // ValueTypes are never null, and thus always selected.
-            // Comparing with default(T) is used e.g. for structs, which are never null.
-            return typeof(T).IsValueType || !object.Equals(SelectedItem, default(T));
+            return Items.Contains(SelectedItem)
+                // ValueTypes are never null, and thus always selected.
+                // Comparing with default(T) is used e.g. for structs, which are never null.
+                || typeof(T).IsValueType || !object.Equals(SelectedItem, default(T));
         }
     }
 

@@ -55,7 +55,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
             .Where(_ => !songSelectSceneControl.IsPlayerSelectOverlayVisible)
-            .Subscribe(_ => songSelectSceneControl.OnRandomSong());
+            .Subscribe(_ => songSelectSceneControl.SelectRandomSong());
         
         // Open the song editor
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
@@ -72,7 +72,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(OnSubmit);
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneControl.CheckAudioAndShowPlayerSelectOverlay());
+            .Subscribe(_ => songSelectSceneControl.AttemptStartSong());
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
@@ -130,9 +130,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneControl.PlaylistChooserControl.IsPlaylistChooserDropdownOverlayVisible)
+        if (songSelectSceneControl.SongSelectionPlaylistChooserControl.IsPlaylistChooserDropdownOverlayVisible)
         {
-            songSelectSceneControl.PlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
+            songSelectSceneControl.SongSelectionPlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
         }
         else if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
         {
@@ -168,7 +168,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            sceneNavigator.LoadScene(EScene.MainScene);
+            songSelectSceneControl.QuitSongSelect();
         }
     }
 

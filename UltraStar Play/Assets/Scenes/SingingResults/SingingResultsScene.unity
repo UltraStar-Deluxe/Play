@@ -271,6 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCount: 2
+  partyModeTeams: 5
 --- !u!4 &1098903558
 Transform:
   m_ObjectHideFlags: 0
@@ -284,7 +285,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1438022587
 GameObject:
@@ -365,7 +366,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1446017860
 MonoBehaviour:
@@ -715,7 +716,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nPlayerUi: {fileID: 9197481963319205126, guid: 0f11bceaf8c280f499a9b5a0ee6b3b3e,
     type: 3}
-  nextGameRoundInfoPlayerEntryUi: {fileID: 9197481963319205126, guid: 1c1764560ee144247ab75c166154b2a3,
+  teamResultUi: {fileID: 9197481963319205126, guid: 714ec31c3ce3711439bf40d845ea1e51,
     type: 3}
   songRatingImageReferences:
   - songRating: 0
@@ -749,5 +750,5 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

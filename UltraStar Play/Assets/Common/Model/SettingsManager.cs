@@ -75,9 +75,30 @@ public class SettingsManager : AbstractSingletonBehaviour
                 Save();
                 return;
             }
+
             string fileContent = File.ReadAllText(loadedSettingsPath);
-            settings = JsonConverter.FromJson<Settings>(fileContent);
+            try
+            {
+                settings = JsonConverter.FromJson<Settings>(fileContent);
+            }
+            catch (Exception ex)
+            {
+                string settingsCopyPath = GetSettingsPath().Replace(".json", "_crash.json");
+                File.WriteAllText(settingsCopyPath, fileContent);
+                Debug.LogError(ex);
+                Debug.LogError($"Failed to load settings from JSON. Using new default settings instead. You can find the original settings in {settingsCopyPath}. Original settings JSON: {fileContent}");
+                settings = CreateDefaultSettings();
+            }
+            SanitizeSettings();
             OverwriteSettingsWithCommandLineArguments();
+        }
+    }
+
+    private void SanitizeSettings()
+    {
+        if (settings.PartyModeSettings == null)
+        {
+            settings.PartyModeSettings = new();
         }
     }
 

@@ -37,6 +37,10 @@ public abstract class AbstractItemPickerControl<T>
 
     public void SelectItem(T item)
     {
+        if (Equals(SelectedItem, item))
+        {
+            return;
+        }
         Selection.Value = item;
     }
 

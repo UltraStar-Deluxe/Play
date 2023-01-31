@@ -41,13 +41,13 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
         {
             singSceneControl.CloseDialog();
         }
-        else if (!songAudioPlayer.IsPlaying)
+        else if (singSceneControl.IsPaused)
         {
             singSceneControl.TogglePlayPause();
         }
         else
         {
-            singSceneControl.FinishScene(false);
+            singSceneControl.FinishScene(false, false);
         }
     }
 }

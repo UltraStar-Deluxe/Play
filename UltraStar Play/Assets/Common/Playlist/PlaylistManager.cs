@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -48,6 +49,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return favoritesPlaylist;
         }
     }
+
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
@@ -311,5 +315,43 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public bool HasSongEntry(UltraStarPlaylist playlist, SongMeta songMeta)
     {
         return playlist.HasSongEntry(songMeta.Artist, songMeta.Title);
+    }
+
+    public List<SongMeta> GetSongMetas(UltraStarPlaylist playlist)
+    {
+        IReadOnlyCollection<SongMeta> allSongMetas = songMetaManager.GetSongMetas();
+        return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
+    }
+
+    public List<UltraStarPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)
+    {
+        List<UltraStarPlaylist> result = new();
+        if (includeFavoritesPlaylist)
+        {
+            result.Add(UltraStarAllSongsPlaylist.Instance);
+        }
+
+        result.AddRange(Playlists);
+
+        if (!includeFavoritesPlaylist)
+        {
+            result.Remove(FavoritesPlaylist);
+        }
+        return result;
+    }
+
+    public string GetPlaylistName(UltraStarPlaylist playlist)
+    {
+        if (playlist == null)
+        {
+            return "";
+        }
+
+        if (playlist is UltraStarAllSongsPlaylist)
+        {
+            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
+        }
+
+        return playlist.Name;
     }
 }

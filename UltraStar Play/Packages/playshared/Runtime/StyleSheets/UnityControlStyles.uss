@@ -194,6 +194,7 @@
 .unity-toggle__label {
     white-space: normal;
     flex-shrink: 1;
+    margin-right: auto;
 }
 
 .unity-toggle__input {
@@ -261,6 +262,7 @@
 
 .unity-scroll-view #unity-content-container {
     padding-bottom: 10px;
+    /*align-items: flex-start;*/
 }
 
 .unity-scroller--vertical {

@@ -3,28 +3,39 @@
 /**************************************************/
 
 ItemPicker {
-    width: 300px;
     height: var(--control-height);
     min-width: var(--control-height-small);
+    flex-direction: row;
+    align-items: center;
 }
 
-ItemPicker Label {
-    -unity-background-scale-mode: scale-to-fit;
-    white-space: normal;
+.itemPickerContent {
+    flex-direction: row;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.controlWithLabelHorizontal .controlLabel {
+    margin-right: auto;
+    width: 50%;
 }
 
 .itemPickerItemLabel {
+    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
     background-color: var(--control-color-accent2);
     flex-grow: 1;
     flex-shrink: 1;
-    width: 100%;
     height: 100%;
     min-width: var(--control-height-small);
     min-height: var(--control-height-small);
     max-width: 100%;
     max-height: 100%;
     margin: 0;
-    padding: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0;
+    padding-bottom: 0;
     -unity-text-align: middle-center;
 }
 
@@ -41,14 +52,74 @@ ItemPicker Label {
     padding: 0;
 }
 
-ItemPicker #previousItemButton {
+.itemPickerPreviousItemButton {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-ItemPicker #nextItemButton {
+.itemPickerNextItemButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* CHIPS COMBO */
+/**************************************************/
+ChipsCombo {
+    flex-direction: row;
+    align-items: center;
+}
+
+.chipsComboContent {
+    background-color: var(--control-color-accent2);
+    flex-direction: row;
+    border-radius: 5px;
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.chipsComboChipsList {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.chipsComboButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 60px;
+    height: 100%;
+    min-height: var(--control-height);
+    padding: 0;
+}
+
+.chipsComboEntryRoot {
+    flex-direction: row;
+    align-items: center;
+    border-radius: 20px;
+    background-color: var(--control-color);
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+
+.chipsComboEntryLabel {
+    padding-left: 15px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    flex-grow: 0;
+}
+
+.chipsComboEntryButton {
+    margin-left: 5px;
+}
+
+.chipsDialogToggle {
+    margin-bottom: 5px;
 }
 
 /**************************************************/

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -14,6 +15,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new();
+
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement rootVisualElement;
 
     [Inject(UxmlName = R.UxmlNames.currentSentenceContainer)]
     private VisualElement currentSentenceContainer;
@@ -28,6 +32,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private Settings settings;
 
     [Inject]
+    private GameObject gameObject;
+
+    [Inject]
     private PlayerControl playerControl;
 
     [Inject]
@@ -35,6 +42,10 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private Sentence previousSentence;
     private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
+
+    public Voice Voice => playerControl.Voice;
+
+    private int hideByOpacityAnimationId;
 
     public void OnInjectionFinished()
     {
@@ -238,5 +249,17 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             default:
                 return false;
         }
+    }
+
+    public void FadeOut(float animTimeInSeconds)
+    {
+        LeanTween.cancel(hideByOpacityAnimationId);
+        hideByOpacityAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+    }
+
+    public void FadeIn(float animTimeInSeconds)
+    {
+        LeanTween.cancel(hideByOpacityAnimationId);
+        hideByOpacityAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
     }
 }

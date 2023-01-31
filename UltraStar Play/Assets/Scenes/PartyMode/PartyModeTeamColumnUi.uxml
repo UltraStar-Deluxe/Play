@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="teamColumnUiRoot" style="justify-content: flex-start; align-items: stretch; border-left-color: rgba(255, 255, 255, 0.5); border-right-color: rgba(255, 255, 255, 0.5); border-top-color: rgba(255, 255, 255, 0.5); border-bottom-color: rgba(255, 255, 255, 0.5); padding-left: 5px; padding-right: 5px; flex-shrink: 0; flex-grow: 1;">
+        <ui:VisualElement name="topContent" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-bottom: 10px; flex-shrink: 0;">
+            <ui:TextField picking-mode="Ignore" value="Team 01" name="teamNameTextField" style="min-width: 100px; flex-grow: 1;" />
+            <ui:Button display-tooltip-when-elided="true" name="deleteTeamButton" class="squareButton" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                <MaterialIcon tabindex="-1" icon="delete" name="deleteIcon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="playersContainer" style="background-color: rgba(0, 0, 0, 0);" />
+    </ui:VisualElement>
+</ui:UXML>

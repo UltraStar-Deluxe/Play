@@ -32,7 +32,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public VisualTreeAsset notificationVisualTreeAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
+    public VisualTreeAsset messageDialogUi;
 
     [InjectedInInspector]
     public VisualTreeAsset accordionUi;
@@ -82,10 +82,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
-                .Children()
-                .First();
-            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
+            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree().Children().First();
+            uiDocument.rootVisualElement.Add(notificationOverlay);
         }
 
         TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
@@ -141,7 +139,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     public MessageDialogControl CreateMessageDialog(string dialogTitle)
     {
-        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
 
         MessageDialogControl messageDialogControl = injector
@@ -154,7 +152,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
     {
-        VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
+        VisualElement helpDialog = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(helpDialog);
         helpDialog.AddToClassList("wordWrap");
 
@@ -236,6 +234,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
+        bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
         bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
         bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
         return bb.GetBindings();

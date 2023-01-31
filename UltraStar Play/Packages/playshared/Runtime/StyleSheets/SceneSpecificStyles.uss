@@ -30,6 +30,18 @@
 /* SONG SELECT SCENE */
 /**************************************************/
 
+.jokerList {
+    flex-direction: row;
+    padding: 5px;
+}
+
+.jokerIcon {
+    border-radius: 5px;
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+}
+
 #gameRoundsOverlay {
     left: 0;
     top: 0;
@@ -273,6 +285,13 @@
     border-bottom-width: 0;
 }
 
+#knockOutLabel {
+    font-size: 62px;
+    rotate: 30deg;
+    color: crimson;
+    -unity-font-style: bold;
+}
+
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
@@ -310,6 +329,11 @@
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
+}
+
+.optionsLabelAndItemPicker ItemPicker {
+    flex-grow: 1;
+    max-width: 45%;
 }
 
 .optionsSceneMainContainer {
@@ -393,4 +417,34 @@
     padding-right: 50px;
     padding-top: 20px;
     padding-bottom: 40px;
+}
+
+/**************************************************/
+/* PARTY MODE SCENES */
+/**************************************************/
+
+.playerProfilePlaceholder {
+    height: var(--control-height);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#toggleRoundFoldedIcon {
+    transition: rotate 0.5s;
+}
+
+#roundUiRoot.folded #toggleRoundFoldedIcon {
+    rotate: -180deg;
+}
+
+#roundUiRoot #centerContent {
+    display: flex;
+}
+
+#roundUiRoot.folded #centerContent {
+    display: none;
+}
+
+#presetItemPicker #itemLabel {
+    min-width: var(--control-width);
 }

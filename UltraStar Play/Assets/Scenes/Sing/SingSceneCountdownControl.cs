@@ -18,14 +18,12 @@ public class SingSceneCountdownControl : INeedInjection, IInjectionFinishedListe
     [Inject(UxmlName = R.UxmlNames.countdownLabel)]
     private Label countdownLabel;
 
-    private readonly List<int> leanTweenAnimationIds = new();
+    private float passedTimeInSeconds = -1;
+    private float targetTimeInSeconds = -1;
 
     public void OnInjectionFinished()
     {
-        if (leanTweenAnimationIds.IsNullOrEmpty())
-        {
-            countdownLabel.HideByDisplay();
-        }
+        countdownLabel.HideByDisplay();
     }
 
     public void StartCountdown(int timeInSeconds)
@@ -39,42 +37,40 @@ public class SingSceneCountdownControl : INeedInjection, IInjectionFinishedListe
 
         Debug.Log($"Starting counting from {timeInSeconds}");
         countdownLabel.ShowByDisplay();
-        for (int i = timeInSeconds; i > 0; i--)
-        {
-            int animationId = CreateCountdownAnimation(timeInSeconds, i);
-            leanTweenAnimationIds.Add(animationId);
-        }
+        passedTimeInSeconds = 0;
+        targetTimeInSeconds = timeInSeconds;
     }
 
-    private int CreateCountdownAnimation(int timeInSeconds, int i)
+    public void Update(float deltaTimeInSeconds)
     {
-        int animTimeInSeconds = 1;
-        LTDescr animation = LeanTween.value(gameObject, 1, 0, animTimeInSeconds)
-            .setOnStart(() => countdownLabel.text = i.ToString())
-            .setOnUpdate(interpolatedValue =>
-            {
-                Vector2 scale = new(interpolatedValue, interpolatedValue);
-                countdownLabel.style.scale = new StyleScale(scale);
-            })
-            .setOnComplete(() =>
-            {
-                if (i <= 1)
-                {
-                    countdownLabel.HideByDisplay();
-                }
-            });
-
-        if (i < timeInSeconds)
+        if (passedTimeInSeconds < 0
+            || targetTimeInSeconds < 0)
         {
-            animation.setDelay(timeInSeconds - i);
+            return;
         }
 
-        return animation.id;
+        passedTimeInSeconds += deltaTimeInSeconds;
+        if (passedTimeInSeconds >= targetTimeInSeconds)
+        {
+            // Countdown done
+            CancelCountdown();
+            return;
+        }
+
+        countdownLabel.ShowByDisplay();
+        float passedTimeInWholeSeconds = (float)Math.Truncate(passedTimeInSeconds);
+        float passedTimeInSingleSecond = (float)(passedTimeInSeconds - passedTimeInWholeSeconds);
+        int missingSeconds = (int)Math.Ceiling(targetTimeInSeconds - passedTimeInSeconds);
+        countdownLabel.text = missingSeconds.ToString();
+
+        Vector2 scale = new(1 - passedTimeInSingleSecond, 1 - passedTimeInSingleSecond);
+        countdownLabel.style.scale = new StyleScale(scale);
     }
 
     public void CancelCountdown()
     {
-        leanTweenAnimationIds.ForEach(leanTweenAnimationId => LeanTween.cancel(leanTweenAnimationId));
-        leanTweenAnimationIds.Clear();
+        passedTimeInSeconds = -1;
+        targetTimeInSeconds = -1;
+        countdownLabel.HideByDisplay();
     }
 }
