@@ -34,4 +34,7 @@
 
     // song editor
     SongEditorScene = 13,
+
+    // Party
+    PartyModeScene = 23,
 }

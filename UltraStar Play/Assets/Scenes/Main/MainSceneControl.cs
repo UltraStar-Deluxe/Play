@@ -96,11 +96,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void Start()
     {
-        startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(() => OpenSongSelectScene());
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.AboutScene));
         creditsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CreditsScene));
+        partyButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.PartyModeScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
 
@@ -110,7 +111,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         InitButtonDescription(creditsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_credits_description));
         InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
         InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
-        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
+        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_party_description));
 
         UpdateVersionInfoText();
 
@@ -126,10 +127,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             injector);
     }
 
+    private void OpenSongSelectScene()
+    {
+        SongSelectSceneData songSelectSceneData = SceneNavigator.GetSceneData(new SongSelectSceneData());
+        songSelectSceneData.PartyModeSettings = null;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+    }
+
     private void InitInputActions()
     {
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.SongSelectScene));
+            .Subscribe(_ => OpenSongSelectScene());
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => OnBack());

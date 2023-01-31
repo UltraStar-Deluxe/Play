@@ -57,8 +57,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
 
-    [Inject(UxmlName = R.UxmlNames.deviceContainer)]
-    private VisualElement deviceContainer;
+    [Inject(UxmlName = R.UxmlNames.deviceItemPicker)]
+    private ItemPicker deviceItemPicker;
 
     [Inject(UxmlName = R.UxmlNames.amplificationContainer)]
     private VisualElement amplificationContainer;
@@ -126,7 +126,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     private void Start()
     {
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceItemPicker, CreateMicProfiles());
         devicePickerControl.GetLabelTextFunction = micProfile => micProfile.GetDisplayNameWithChannel();
         if (!TryReSelectLastMicProfile())
         {

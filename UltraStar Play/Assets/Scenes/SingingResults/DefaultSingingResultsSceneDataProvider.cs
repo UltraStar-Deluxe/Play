@@ -7,6 +7,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     [Range(1, 16)]
     public int playerCount = 1;
 
+    public int partyModeTeams = 5;
+
     public SceneData GetDefaultSceneData()
     {
         SingingResultsSceneData data = new();
@@ -45,7 +47,44 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         {
             data.AddPlayerScores(SettingsManager.Instance.Settings.PlayerProfiles[i], playerScoreData);
         }
+
+        if (partyModeTeams > 0)
+        {
+            data.partyModeSettings = CreatePartyModeSettings();
+        }
         return data;
+    }
+
+    private PartyModeSettings CreatePartyModeSettings()
+    {
+        PartyModeSettings partyModeSettings = new();
+
+        void AddTeams()
+        {
+            for (int i = 1; i <= partyModeTeams; i++)
+            {
+                PlayerProfile guestPlayerProfile = new($"Guest 0{i}", EDifficulty.Medium);
+
+                PartyModeTeamSettings teamSettings = new();
+                teamSettings.name = $"Team 0{i}";
+                teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
+                partyModeSettings.teamSettings.teams.Add(teamSettings);
+                partyModeSettings.teamToScoreMap[teamSettings] = i;
+            }
+        }
+
+        void AddRounds()
+        {
+            GameRoundSettings roundSettings = new();
+            partyModeSettings.roundsSettings.gameRoundSettings.Add(roundSettings);
+
+            // Set round index to last round
+            partyModeSettings.currentRoundIndex = partyModeSettings.roundsSettings.gameRoundSettings.Count - 1;
+        }
+
+        AddTeams();
+        AddRounds();
+        return partyModeSettings;
     }
 
     private Sentence CreateDummySentence(int startBeat, int endBeat)

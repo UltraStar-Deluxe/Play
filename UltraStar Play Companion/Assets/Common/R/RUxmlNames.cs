@@ -10,6 +10,15 @@ public static partial class R
         public const string background = "background";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string cancelButton = "cancelButton";
+        public const string chipsComboButton = "chipsComboButton";
+        public const string chipsComboButtonIcon = "chipsComboButtonIcon";
+        public const string chipsComboChipsList = "chipsComboChipsList";
+        public const string chipsComboContent = "chipsComboContent";
+        public const string chipsComboEntryButton = "chipsComboEntryButton";
+        public const string chipsComboEntryButtonIcon = "chipsComboEntryButtonIcon";
+        public const string chipsComboEntryLabel = "chipsComboEntryLabel";
+        public const string chipsComboEntryRoot = "chipsComboEntryRoot";
+        public const string chipsComboLabel = "chipsComboLabel";
         public const string clientNameTextField = "clientNameTextField";
         public const string closeMenuButton = "closeMenuButton";
         public const string commitHashText = "commitHashText";
@@ -30,6 +39,7 @@ public static partial class R
         public const string devModePicker = "devModePicker";
         public const string dialogButtonContainer = "dialogButtonContainer";
         public const string dialogContent = "dialogContent";
+        public const string dialogContentScrollView = "dialogContentScrollView";
         public const string dialogMessage = "dialogMessage";
         public const string dialogMessageContainer = "dialogMessageContainer";
         public const string dialogTitle = "dialogTitle";
@@ -45,6 +55,7 @@ public static partial class R
         public const string invalidValueLabel = "invalidValueLabel";
         public const string itemImage = "itemImage";
         public const string itemLabel = "itemLabel";
+        public const string itemPickerLabel = "itemPickerLabel";
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
@@ -56,6 +67,7 @@ public static partial class R
         public const string micViewContainer = "micViewContainer";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextItemButton = "nextItemButton";
+        public const string nextItemIcon = "nextItemIcon";
         public const string notificationLabel = "notificationLabel";
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
@@ -64,6 +76,7 @@ public static partial class R
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
         public const string previousItemButton = "previousItemButton";
+        public const string previousItemIcon = "previousItemIcon";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceContainer = "recordingDeviceContainer";
         public const string recordingDeviceInfo = "recordingDeviceInfo";

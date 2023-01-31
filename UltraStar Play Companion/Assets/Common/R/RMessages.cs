@@ -88,6 +88,7 @@ public static partial class R
         public static readonly string mainScene_button_jukebox_label = "mainScene_button_jukebox_label";
         public static readonly string mainScene_button_newSong_description = "mainScene_button_newSong_description";
         public static readonly string mainScene_button_newSong_label = "mainScene_button_newSong_label";
+        public static readonly string mainScene_button_party_description = "mainScene_button_party_description";
         public static readonly string mainScene_button_party_label = "mainScene_button_party_label";
         public static readonly string mainScene_button_quit_description = "mainScene_button_quit_description";
         public static readonly string mainScene_button_quit_label = "mainScene_button_quit_label";

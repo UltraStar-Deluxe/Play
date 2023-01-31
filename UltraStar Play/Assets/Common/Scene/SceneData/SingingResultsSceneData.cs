@@ -10,6 +10,7 @@ public class SingingResultsSceneData : SceneData
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
     private readonly Dictionary<PlayerProfile, PlayerScoreControlData> playerScoreMap = new();
+    public PartyModeSettings partyModeSettings;
 
     public void AddPlayerScores(PlayerProfile profile, PlayerScoreControlData scoreData)
     {

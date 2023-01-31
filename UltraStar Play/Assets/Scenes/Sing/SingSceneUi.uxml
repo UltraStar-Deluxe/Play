@@ -6,7 +6,7 @@
     <ui:VisualElement name="background">
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
-        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
+        <ui:VisualElement name="webcamRenderContainerContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
             <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgb(0, 0, 0); display: none;" />
         </ui:VisualElement>
         <ui:Instance template="SingingLyricsUi" name="topLyricsContainer" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; overflow: hidden;" />
@@ -23,11 +23,14 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" style="overflow: hidden; border-top-left-radius: 10px; border-top-right-radius: 10px;" />
-        <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex;">
+        <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex; align-items: flex-end;">
             <ui:Label text="Time" display-tooltip-when-elided="true" name="timeLabel" />
-            <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; margin-left: 15px; margin-right: 15px; margin-top: 3px; margin-bottom: 2px;">
-                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
-                <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
+            <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 15px; margin-right: 15px; margin-top: 3px; margin-bottom: 2px;">
+                <ui:ProgressBar value="22" name="passTheMicProgressBar" style="align-self: center; width: 100%; height: auto; margin-bottom: 2px; display: flex;" />
+                <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; min-height: 8px;">
+                    <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                    <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" />
         </ui:VisualElement>

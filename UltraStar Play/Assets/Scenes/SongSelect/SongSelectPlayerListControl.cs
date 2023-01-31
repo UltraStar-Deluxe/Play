@@ -36,6 +36,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
     private Injector injector;
 
     [Inject]
@@ -50,6 +53,19 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(HandleClientConnectedEvent)
             .AddTo(gameObject);
+
+        if (songSelectSceneControl.HasPartyModeSettings)
+        {
+            SelectMicsForPartyMode();
+        }
+    }
+
+    private void SelectMicsForPartyMode()
+    {
+        // Assign mics by re-selecting every player profile of this round.
+        // TODO: Prefer same mic of the team from last round
+        PlayerEntryControlControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(false, true));
+        PlayerEntryControlControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -77,12 +93,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void UpdateListEntries()
     {
         // Remove old entries
-        playerScrollView.Clear();
+        playerScrollView.RemoveTemplateContainers();
         playerEntryControls.Clear();
 
         // Create new entries
-        List<PlayerProfile> playerProfiles = settings.PlayerProfiles;
-        List<PlayerProfile> enabledPlayerProfiles = playerProfiles.Where(it => it.IsEnabled).ToList();
+        List<PlayerProfile> enabledPlayerProfiles = songSelectSceneControl.GetEnabledPlayerProfiles();
         foreach (PlayerProfile playerProfile in enabledPlayerProfiles)
         {
             CreateListEntry(playerProfile);
@@ -96,11 +111,12 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
+            .WithBindingForInstance(playerProfile)
+            .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSettings, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
-        listEntryControl.Init(playerProfile);
 
-        listEntryControl.EnabledToggle.RegisterValueChangedCallback(evt => OnSelectionStatusChanged(listEntryControl, evt.newValue));
-        listEntryControl.SetSelected(playerProfile.IsSelected);
+        listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
+        listEntryControl.SetSelected(playerProfile.IsSelected, false);
 
         playerEntryControls.Add(listEntryControl);
     }
@@ -218,7 +234,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             if (entry.IsSelected)
             {
-                entry.SetSelected(false);
+                entry.SetSelected(false, false);
             }
             else
             {
@@ -229,7 +245,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         // Because others have been deselected, they will be assigned free mics if any.
         foreach (SongSelectPlayerEntryControl entry in deselectedEntries)
         {
-            entry.SetSelected(true);
+            entry.SetSelected(true, false);
         }
     }
 

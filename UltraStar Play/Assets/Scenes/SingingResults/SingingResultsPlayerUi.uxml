@@ -46,5 +46,8 @@
                 <ui:VisualElement name="filledScoreBar" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]endcap.png?fileID=21300000&amp;guid=2cf4b5832641ba44eb2240332f340bdd&amp;type=3#[score]endcap&apos;); position: absolute; bottom: 0; -unity-background-scale-mode: stretch-to-fill; height: 5%; width: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="knockOutLabelOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="knockOutLabel" text="K.O." />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

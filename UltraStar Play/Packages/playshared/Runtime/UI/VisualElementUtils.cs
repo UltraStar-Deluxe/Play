@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public static class VisualElementUtils
@@ -67,5 +69,15 @@ public static class VisualElementUtils
                 visualElement.style.top = visualElement.style.bottom.value.value + shift.y;
             }
         }
+    }
+
+    public static VisualElement LoadVisualElementFromResources(string path)
+    {
+        VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
+        if (visualTreeAsset == null)
+        {
+            throw new Exception("Could not load " + path);
+        }
+        return visualTreeAsset.CloneTree().Children().FirstOrDefault();
     }
 }

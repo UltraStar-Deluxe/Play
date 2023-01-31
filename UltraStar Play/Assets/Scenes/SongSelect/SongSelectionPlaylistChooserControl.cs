@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener, ITranslator
+public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFinishedListener, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.playlistChooserButton)]
     private Button playlistChooserButton;
@@ -28,6 +28,9 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
     private List<UltraStarPlaylist> items = new();
 
     public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new();
@@ -36,14 +39,13 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-
         InitItems();
 
         // Update settings
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
 
         // Show playlist name in button
-        Selection.Subscribe(playlist => playlistChooserButton.text = GetDisplayString(playlist));
+        Selection.Subscribe(playlist => playlistChooserButton.text = playlistManager.GetPlaylistName(playlist));
 
         HidePlaylistChooserDropdownOverlay();
         playlistChooserButton.RegisterCallbackButtonTriggered(() =>
@@ -66,36 +68,33 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     private void InitItems()
     {
         items = new List<UltraStarPlaylist>();
-        items.Add(new UltraStarAllSongsPlaylist());
+        items.Add(UltraStarAllSongsPlaylist.Instance);
         items.Add(playlistManager.FavoritesPlaylist);
         items.AddRange(playlistManager.Playlists.Where(playlist => playlist != playlistManager.FavoritesPlaylist));
 
         // Initial selection
-        UltraStarPlaylist newSelection = items
-            .FirstOrDefault(playlist => GetDisplayString(playlist) == settings.SongSelectSettings.playlistName)
-            .OrIfNull(items[0]);
-        Selection.SetValueAndForceNotify(newSelection);
-    }
-
-    private string GetDisplayString(UltraStarPlaylist playlist)
-    {
-        if (playlist == null
-            || playlist is UltraStarAllSongsPlaylist)
+        UltraStarPlaylist newSelection;
+        if (songSelectSceneControl.UsePartyModePlaylist)
         {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
-        }
-        else if (playlist == playlistManager.FavoritesPlaylist)
-        {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_favorites);
+            newSelection = songSelectSceneControl.PartyModeSettings.songSelectionSettings.songPoolPlaylist;
         }
         else
         {
-            return playlist.Name;
+            // Use last selected playlist or the first
+            newSelection = items
+                .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
+                .OrIfNull(items.FirstOrDefault());
         }
+        Selection.SetValueAndForceNotify(newSelection);
     }
 
     public void ToggleFavoritePlaylist()
     {
+        if (songSelectSceneControl.UsePartyModePlaylist)
+        {
+            return;
+        }
+
         if (items.IndexOf(Selection.Value) == 0)
         {
             Selection.Value = playlistManager.FavoritesPlaylist;
@@ -113,6 +112,11 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void Reset()
     {
+        if (songSelectSceneControl.UsePartyModePlaylist)
+        {
+            return;
+        }
+
         Selection.Value = items[0];
     }
 
@@ -123,6 +127,13 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void ShowPlaylistChooserDropdownOverlay()
     {
+        if (songSelectSceneControl.UsePartyModePlaylist)
+        {
+            // Changing the playlist is not allowed
+            UiManager.CreateNotification("Using playlist from party mode settings");
+            return;
+        }
+
         playlistChooserDropdownOverlay.ShowByDisplay();
 
         // Fill dropdown with playlist buttons
@@ -138,11 +149,16 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
     private Button CreatePlaylistButton(UltraStarPlaylist item)
     {
         Button button = new();
-        button.text = GetDisplayString(item);
+        button.text = playlistManager.GetPlaylistName(item);
         button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
 
         button.RegisterCallbackButtonTriggered(() =>
         {
+            if (songSelectSceneControl.UsePartyModePlaylist)
+            {
+                return;
+            }
+
             Selection.Value = item;
             HidePlaylistChooserDropdownOverlay();
         });
@@ -151,6 +167,6 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void UpdateTranslation()
     {
-        playlistChooserButton.text = GetDisplayString(Selection.Value);
+        playlistChooserButton.text = playlistManager.GetPlaylistName(Selection.Value);
     }
 }

@@ -230,4 +230,15 @@ public static class CollectionExtensions
     {
         enumerable.ForEach(item => hashSet.Add(item));
     }
+
+    public static void Replace<T>(this List<T> list, T item, T replacement)
+    {
+        int index = list.IndexOf(item);
+        if (index < 0)
+        {
+            return;
+        }
+
+        list[index] = replacement;
+    }
 }

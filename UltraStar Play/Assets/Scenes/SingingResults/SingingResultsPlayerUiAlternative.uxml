@@ -46,5 +46,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="knockOutLabelOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0);">
+            <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="knockOutLabel" text="K.O." />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

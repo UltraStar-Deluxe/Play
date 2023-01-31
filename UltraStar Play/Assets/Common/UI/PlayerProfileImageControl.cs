@@ -13,6 +13,18 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 
     [Inject(Optional = true)]
     private PlayerProfile playerProfile;
+    public PlayerProfile PlayerProfile
+    {
+        get
+        {
+            return playerProfile;
+        }
+        set
+        {
+            playerProfile = value;
+            UpdatePlayerProfileImage();
+        }
+    }
 
     [Inject]
     private UiManager uiManager;
@@ -24,6 +36,11 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
     private VisualElement image;
 
     public void OnInjectionFinished()
+    {
+        UpdatePlayerProfileImage();
+    }
+
+    private void UpdatePlayerProfileImage()
     {
         if (playerProfile == null)
         {

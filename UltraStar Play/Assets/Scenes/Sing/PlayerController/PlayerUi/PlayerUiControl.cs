@@ -29,6 +29,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerProfile playerProfile;
 
+    [Inject(UxmlName = R.UxmlNames.noteContainer)]
+    private VisualElement noteContainer;
+
     [Inject(UxmlName = R.UxmlNames.playerScoreContainer)]
     private VisualElement playerScoreContainer;
 
@@ -47,6 +50,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
 
+    [Inject(UxmlName = R.UxmlNames.nextPlayerNameLabel)]
+    private Label nextPlayerNameLabel;
+
     [Inject]
     private Settings settings;
 
@@ -64,9 +70,16 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private AbstractSingSceneNoteDisplayer noteDisplayer;
 
+    private PlayerProfile nextPlayerProfile;
+
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
+    private int fadeOutAnimationId;
+
+    private float displayNextPlayerProfileTimeInSeconds;
+
+    private PlayerProfileImageControl playerProfileImageControl;
 
     public void OnInjectionFinished()
     {
@@ -108,6 +121,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 .AddTo(singSceneControl);
         }
 
+        nextPlayerNameLabel.HideByDisplay();
+
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         playerScoreControl.SentenceScoreEventStream.Buffer(2, 1)
@@ -134,8 +149,21 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
+        // PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singSceneControl.PartyModeSettings, playerProfile);
+        // bool showTeamName = teamSettings != null
+        //                     && singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic)
+        //                     && !singSceneControl.PartyModeSettings.teamSettings.isFreeForAll;
+        // if (showTeamName)
+        // {
+        //     playerNameLabel.text = teamSettings.name;
+        // }
+        // else
+        // {
+        //     playerNameLabel.text = playerProfile.Name;
+        // }
+
         playerNameLabel.text = playerProfile.Name;
-        injector.WithRootVisualElement(playerImage)
+        playerProfileImageControl = injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
@@ -154,6 +182,19 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void Update()
     {
         noteDisplayer.Update();
+        UpdateNextPlayerProfileLabel();
+    }
+
+    private void UpdateNextPlayerProfileLabel()
+    {
+        if (nextPlayerProfile == null)
+        {
+            nextPlayerNameLabel.HideByDisplay();
+            return;
+        }
+
+        nextPlayerNameLabel.ShowByDisplay();
+        nextPlayerNameLabel.text = $"Next: {nextPlayerProfile.Name}";
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -277,7 +318,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Enable and initialize the selected note displayer
-        injector.Inject(noteDisplayer);
+        injector
+            .WithRootVisualElement(noteContainer)
+            .Inject(noteDisplayer);
         noteDisplayer.SetLineCount(localLineCount);
     }
 
@@ -312,5 +355,57 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void HideLeadingPlayerIcon()
     {
         leadingPlayerIcon.HideByVisibility();
+    }
+
+    public void FadeOutNotes(float animTimeInSeconds)
+    {
+        noteDisplayer.FadeOut(animTimeInSeconds);
+    }
+
+    public void FadeInNotes(float animTimeInSeconds)
+    {
+        noteDisplayer.FadeIn(animTimeInSeconds);
+    }
+
+    public void FadeOut(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeOutVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
+    }
+
+    public void FadeIn(float animTimeInSeconds)
+    {
+        LeanTween.cancel(fadeOutAnimationId);
+        fadeOutAnimationId = AnimationUtils.FadeInVisualElement(singSceneControl.gameObject, playerScoreContainer, animTimeInSeconds);
+    }
+
+    public void SetPlayerProfile(PlayerProfile newCurrentPlayerProfile)
+    {
+        if (playerProfile == newCurrentPlayerProfile)
+        {
+            return;
+        }
+
+        playerProfile = newCurrentPlayerProfile;
+        playerNameLabel.text = newCurrentPlayerProfile.Name;
+        playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
+
+        // Highlight the change with an animation
+        float animTimeInSeconds = 1.5f;
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerNameLabel, animTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImage, animTimeInSeconds);
+    }
+
+    public void SetNextPlayerProfile(PlayerProfile newNextPlayerProfile)
+    {
+        if (newNextPlayerProfile == playerProfile)
+        {
+            // Will keep the current player.
+            nextPlayerProfile = null;
+        }
+        else
+        {
+            nextPlayerProfile = newNextPlayerProfile;
+        }
     }
 }

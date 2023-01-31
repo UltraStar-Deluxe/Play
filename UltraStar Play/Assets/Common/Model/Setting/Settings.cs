@@ -19,6 +19,8 @@ public class Settings : ISettings
 
     public DeveloperSettings DeveloperSettings { get; set; } = new();
 
+    public PartyModeSettings PartyModeSettings { get; set; } = new();
+
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.
     public List<string> IgnoredReleases { get; set; } = new();

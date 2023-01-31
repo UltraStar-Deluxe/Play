@@ -40,7 +40,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     {
         if (GetFocusableNavigatorRootVisualElement() == null)
         {
-            songSelectSceneControl.CheckAudioAndShowPlayerSelectOverlay();
+            songSelectSceneControl.AttemptStartSong();
         }
     }
 
@@ -72,7 +72,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
         {
             if (evt.NavigationDirection.y > 0)
             {
-                songSelectSceneControl.PlaylistChooserControl.FocusPlaylistChooser();
+                songSelectSceneControl.SongSelectionPlaylistChooserControl.FocusPlaylistChooser();
                 return;
             }
             if (evt.NavigationDirection.y < 0)

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using ICSharpCode.SharpZipLib;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -161,8 +162,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songDetailOverlayScrollView)]
     private VisualElement songDetailOverlayScrollView;
 
-    [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
-    private Button backToMainMenuButton;
+    [Inject(UxmlName = R.UxmlNames.quitSongSelectButton)]
+    private Button quitSongSelectButton;
 
     [Inject(UxmlName = R.UxmlNames.nextSongButton)]
     private Button nextSongButton;
@@ -273,7 +274,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.deleteGameRoundButton)]
     private Button deleteGameRoundButton;
 
-    public PlaylistChooserControl PlaylistChooserControl { get; private set; } = new();
+    [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
+    private Button selectRandomSongButton;
+
+    public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
@@ -310,7 +314,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
+    public PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
+    public bool HasPartyModeSettings => PartyModeSettings != null;
+    public bool IsPartyModeRandomSongSelection => PartyModeSettings != null
+                                                  && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
+    public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
+                                        && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
+    public bool CanUseSongSelectionJoker => PartyModeSettings.songSelectionSettings.jokerCount != 0;
+
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
+    private readonly SongSelectScenePartyModeControl partyModeControl = new();
 
     private void Start()
     {
@@ -332,6 +345,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
+        selectRandomSongButton.RegisterCallbackButtonTriggered(() => SelectRandomSong());
 
         closePlayerSelectOverlayButton.RegisterCallbackButtonTriggered(() => HidePlayerSelectOverlay());
 
@@ -339,13 +353,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => CheckAudioAndShowPlayerSelectOverlay());
+        playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => AttemptStartSong());
         playerSelectCreateSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
         playerSelectOpenSongEditorButton.RegisterCallbackButtonTriggered(() => StartSongEditorScene());
+        if (HasPartyModeSettings)
+        {
+            playerSelectOpenSongEditorButton.SetEnabled(false);
+        }
 
         menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
         closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
-        backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        quitSongSelectButton.RegisterCallbackButtonTriggered(() => QuitSongSelect());
 
         toggleSongDetailOverlayButton.RegisterCallbackButtonTriggered(() =>
         {
@@ -372,7 +390,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => OnSearchTextChanged());
 
-        PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
+        SongSelectionPlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
 
         SongOrderPickerControl.Selection.Subscribe(newValue =>
         {
@@ -383,7 +401,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
         {
-            if (playlistChangeEvent.Playlist == PlaylistChooserControl.Selection.Value)
+            if (playlistChangeEvent.Playlist == SongSelectionPlaylistChooserControl.Selection.Value)
             {
                 UpdateFilteredSongs();
             }
@@ -393,7 +411,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongRouletteSongMetas();
         songRouletteControl.SelectionClickedEventStream
-            .Subscribe(_ => CheckAudioAndShowPlayerSelectOverlay());
+            .Subscribe(_ => AttemptStartSong());
 
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
@@ -474,6 +492,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
     }
 
+    public void QuitSongSelect()
+    {
+        if (HasPartyModeSettings)
+        {
+            PartyModeSceneData partyModeSceneData = new();
+            partyModeSceneData.PartyModeSettings = PartyModeSettings;
+            sceneNavigator.LoadScene(EScene.PartyModeScene, partyModeSceneData);
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.MainScene);
+        }
+    }
+
     private void ShowGameRoundsOverlay()
     {
         gameRoundsOverlay.RemoveFromClassList("hidden");
@@ -488,6 +520,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AddCurrentSongAsMedley()
     {
+        if (HasPartyModeSettings)
+        {
+            // Medleys not supported in party mode
+            return;
+        }
+
         if (!gameRoundManager.HasGameRounds)
         {
             AddNewMedleyWithCurrentSettings();
@@ -499,6 +537,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AddNewMedleyWithCurrentSettings()
     {
+        if (HasPartyModeSettings)
+        {
+            // Medleys not supported in party mode
+            return;
+        }
+
         GameRoundData gameRoundData = new();
         gameRoundData.SongMetas = new List<SongMeta> { SelectedSong };
         gameRoundData.SingScenePlayerData = CreateSingScenePlayerData();
@@ -842,6 +886,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
+        singSceneData.partyModeSettings = PartyModeSettings;
+        if (HasPartyModeSettings &&
+            PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+        {
+            // Set as medley song to play shortened version
+            singSceneData.MedleySongIndex = 0;
+        }
         return singSceneData;
     }
 
@@ -863,7 +914,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene()
     {
-        if (gameRoundManager.HasGameRounds)
+        if (gameRoundManager.HasGameRounds
+            && !HasPartyModeSettings)
         {
             StartSingSceneWithNextGameRound();
         }
@@ -895,6 +947,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSongEditorScene(SongMeta songMeta)
     {
+        if (HasPartyModeSettings)
+        {
+            UiManager.CreateNotification("Song editor not available in party mode");
+            return;
+        }
+
         if (songMeta.FailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
@@ -916,11 +974,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneNavigator.LoadScene(EScene.SongEditorScene, editorSceneData);
     }
 
-    private SongSelectSceneData CreateDefaultSceneData()
-    {
-        return new SongSelectSceneData();
-    }
-
     private void SetEmptySongDetails()
     {
         genreLabel.text = "";
@@ -932,12 +985,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         UpdateFavoriteIcon();
     }
 
-    public void OnRandomSong()
+    public void SelectRandomSong()
     {
-        songRouletteControl.SelectRandomSong();
+        SongMeta randomSongMeta = RandomUtils.RandomOf(songRouletteControl.Songs);
+        songRouletteControl.SelectSong(randomSongMeta);
     }
 
-    public void CheckAudioAndShowPlayerSelectOverlay()
+    private void CheckAudioAndShowPlayerSelectOverlay()
     {
         if (SelectedSong == null)
         {
@@ -974,6 +1028,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             ShowPlayerSelectOverlay();
         }
+    }
+
+    public void AttemptStartSong()
+    {
+        if (IsPartyModeRandomSongSelection
+            && partyModeControl.RandomlySelectedSong != songRouletteControl.SelectedSongEntryControl.SongMeta)
+        {
+            // The user selected a different song than the randomly selected.
+            // Ask to use joker or quit.
+            if (CanUseSongSelectionJoker)
+            {
+                partyModeControl.OpenAskToUseJokerDialog(
+                    songRouletteControl.SelectedSongEntryControl.SongMeta,
+                    () => CheckAudioAndShowPlayerSelectOverlay());
+            }
+            else
+            {
+                // No jokers left, go back to randomly selected song
+                ShowCannotUseJokerMessage();
+                songRouletteControl.SelectSong(partyModeControl.RandomlySelectedSong);
+            }
+            return;
+        }
+
+        CheckAudioAndShowPlayerSelectOverlay();
     }
 
     private void ShowPlayerSelectOverlay()
@@ -1068,7 +1147,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
-        UltraStarPlaylist playlist = PlaylistChooserControl.Selection.Value;
+        UltraStarPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
         List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
@@ -1122,16 +1201,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
         bb.BindExistingInstance(focusableNavigator);
-        bb.BindExistingInstance(PlaylistChooserControl);
+        bb.BindExistingInstance(SongSelectionPlaylistChooserControl);
         bb.BindExistingInstance(createSingAlongSongControl);
+        bb.BindExistingInstance(partyModeControl);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
     }
 
+    private SongSelectSceneData CreateDefaultSceneData()
+    {
+        return new SongSelectSceneData();
+    }
+
     public void ToggleFavoritePlaylist()
     {
-        PlaylistChooserControl.ToggleFavoritePlaylist();
+        SongSelectionPlaylistChooserControl.ToggleFavoritePlaylist();
     }
 
     public void ToggleSelectedSongIsFavorite()
@@ -1158,17 +1243,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public bool IsPlaylistActive()
     {
-        return PlaylistChooserControl.Selection.Value != null
-               && !(PlaylistChooserControl.Selection.Value is UltraStarAllSongsPlaylist);
+        return SongSelectionPlaylistChooserControl.Selection.Value != null
+               && !(SongSelectionPlaylistChooserControl.Selection.Value is UltraStarAllSongsPlaylist);
     }
 
     public void ResetPlaylistSelection()
     {
-        PlaylistChooserControl.Reset();
+        SongSelectionPlaylistChooserControl.Reset();
     }
 
     private bool TryExecuteSpecialSearchSyntax(string searchText)
     {
+        if (IsPartyModeRandomSongSelection)
+        {
+            return false;
+        }
+
         if (searchText != null && searchText.StartsWith("#"))
         {
             // #<number> jumps to song at index <number>.
@@ -1189,7 +1279,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
         closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        backToMainMenuButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
+        quitSongSelectButton.text = TranslationManager.GetTranslation(R.Messages.quit);
         toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
         duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
         videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
@@ -1204,7 +1294,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
         onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
 
-        PlaylistChooserControl.UpdateTranslation();
+        SongSelectionPlaylistChooserControl.UpdateTranslation();
         SongSearchControl.UpdateTranslation();
         songRouletteControl.UpdateTranslation();
         UpdateInputLegend();
@@ -1224,8 +1314,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void OnInjectionFinished()
     {
-        injector.Inject(PlaylistChooserControl);
+        injector.Inject(SongSelectionPlaylistChooserControl);
         injector.Inject(createSingAlongSongControl);
+        injector.Inject(partyModeControl);
     }
 
     private void UpdateInputLegend()
@@ -1338,5 +1429,47 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             songDetailOverlayScrollView.Add(lyricsLabel);
             songDetailOverlayScrollView.Add(new Label("\n"));
         });
+    }
+
+    public void ShowCannotUseJokerMessage()
+    {
+        UiManager.CreateNotification("No jokers left to change the song");
+    }
+
+    public List<PlayerProfile> GetEnabledPlayerProfiles()
+    {
+        if (!HasPartyModeSettings)
+        {
+            return settings.PlayerProfiles
+                .Where(playerProfile => playerProfile.IsEnabled)
+                .ToList();
+        }
+        else if (PartyModeSettings.teamSettings.isFreeForAll)
+        {
+            // Select all players of all teams
+            List<PlayerProfile> allPlayerProfiles = PartyModeUtils.GetAllPlayerProfiles(PartyModeSettings);
+            return allPlayerProfiles
+                .Where(playerProfile => playerProfile != null
+                                        && !PartyModeUtils.GetTeam(PartyModeSettings, playerProfile).isKnockedOut)
+                .Distinct()
+                .ToList();
+        }
+        else
+        {
+            // Select random player of each team
+            List<PlayerProfile> result = new();
+            PartyModeSettings.teamSettings.teams
+                .Where(team => !team.isKnockedOut)
+                .ForEach(team =>
+                {
+                    List<PlayerProfile> allTeamPlayerProfiles = team.playerProfiles.Union(team.guestPlayerProfiles).ToList();
+                    PlayerProfile playerProfile = RandomUtils.RandomOf(allTeamPlayerProfiles);
+                    result.Add(playerProfile);
+                });
+            return result
+                .Where(playerProfile => playerProfile != null)
+                .Distinct()
+                .ToList();
+        }
     }
 }

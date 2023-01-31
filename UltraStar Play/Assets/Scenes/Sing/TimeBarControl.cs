@@ -43,6 +43,9 @@ public class TimeBarControl : INeedInjection
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
         string secsPadding = (secs < 10) ? "0" : "";
         timeValueLabel.text = $"{minsPadding}{mins}:{secsPadding}{secs}";
+
+        // int progressPercent = (int)(100 * positionInSongInMillis / durationOfSongInMillis);
+        // timeValueLabel.text = $"{progressPercent} %";
     }
 
     public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)

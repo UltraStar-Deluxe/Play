@@ -12,7 +12,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private SingingResultsSceneControl singingResultsSceneControl;
 
     [Inject]
-    private PlayerProfile playerProfile;
+    public PlayerProfile PlayerProfile { get; private set; }
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
@@ -47,6 +47,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject(UxmlName = R.UxmlNames.filledScoreBar)]
     private VisualElement filledScoreBar;
 
+    [Inject(UxmlName = R.UxmlNames.knockOutLabelOverlay)]
+    private VisualElement knockOutLabelOverlay;
+
     [Inject]
     private SongRating songRating;
 
@@ -64,7 +67,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     public void OnInjectionFinished()
     {
         // Player name and image
-        playerNameLabel.text = playerProfile.Name;
+        playerNameLabel.text = ShouldShowTeamName()
+            ? GetTeamName()
+            : PlayerProfile.Name;
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
 
@@ -77,10 +82,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             }
 
             ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-                // Bouncy size animation
-                LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
-                    .setEaseSpring()
-                    .setOnUpdate(s => ratingImage.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+            AnimationUtils.BounceVisualElementSize(singingResultsSceneControl.gameObject, ratingImage, animationTimeInSeconds);
         });
         ratingLabel.text = songRating.Text;
 
@@ -102,7 +104,26 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => filledScoreBar.style.height = new StyleLength(new Length(interpolatedValue, LengthUnit.Percent)))
             .setEaseOutSine();
 
+        knockOutLabelOverlay.HideByDisplay();
+
         UpdateTranslation();
+    }
+
+    private string GetTeamName()
+    {
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
+        return teamSettings.name;
+    }
+
+    private bool ShouldShowTeamName()
+    {
+        if (singingResultsSceneControl.HasPartyModeSettings
+            && singingResultsSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+        {
+            return false;
+        }
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
+        return teamSettings != null;
     }
 
     private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
@@ -156,5 +177,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private void SetScoreLabelText(VisualElement container, float interpolatedValue)
     {
         container.Q<Label>(R.UxmlNames.scoreValue).text = interpolatedValue.ToString("0", CultureInfo.InvariantCulture);
+    }
+
+    public void ShowKnockedOutLabel()
+    {
+        knockOutLabelOverlay.ShowByDisplay();
     }
 }

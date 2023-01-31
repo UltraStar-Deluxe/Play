@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" >
+    <ui:VisualElement name="background">
         <ui:VisualElement class="optionsSceneMainContainer">
             <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
                 <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -9,9 +9,7 @@
                             <ui:Label text="Recording Device" name="sceneTitle" class="titleText" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement name="deviceContainer" class="optionsLabelAndItemPicker">
-                    <ItemPicker wrap-around="false" min-value="0" max-value="100" step-value="10" name="ItemPicker" class="multiline" style="width: 100%;" />
+                    <ItemPicker wrap-around="false" min-value="0" max-value="100" step-value="10" name="deviceItemPicker" class="multiline" style="margin-left: 10px; flex-grow: 1;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="micVisualizationContainer" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; width: 100%; min-height: 10%; flex-grow: 1; margin-bottom: 5px; align-items: flex-start; justify-content: center; flex-direction: row; flex-shrink: 1; height: 10%;">
