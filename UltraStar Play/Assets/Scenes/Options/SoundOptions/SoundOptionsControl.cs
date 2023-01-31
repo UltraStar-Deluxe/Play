@@ -66,6 +66,16 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         volumePickerControl.Bind(() => settings.AudioSettings.VolumePercent,
             newValue => settings.AudioSettings.VolumePercent = (int)newValue);
 
+        // Volume can be changed via REST API
+        settings.ObserveEveryValueChanged(it => it.AudioSettings.VolumePercent)
+            .Subscribe(newValue =>
+            {
+                if (!volumePickerControl.SelectedItem.NearlyEquals(newValue, 0.1f))
+                {
+                    volumePickerControl.SelectItem(newValue);
+                }
+            });
+
         PercentNumberPickerControl animateSceneChangeVolumePickerControl = new(animateSceneChangeVolumePicker);
         animateSceneChangeVolumePickerControl.Bind(() => settings.AudioSettings.SceneChangeSoundVolumePercent,
             newValue => settings.AudioSettings.SceneChangeSoundVolumePercent = (int)newValue);
